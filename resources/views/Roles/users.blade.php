@@ -53,7 +53,9 @@
                                             <form action="{{route('users.reset.password', $user->id)}}" method="POST">
                                                 @csrf
                                                 @method('PUT')
-                                                <button class="btn btn-danger btn-xs" onclick="return confirm('Are you sure you want to reset password for {{strtoupper($user->first_name)}} {{strtoupper($user->last_name)}}?')">Reset Password</button>
+                                                <button class="btn btn-outline-danger btn-xs" onclick="return confirm('Are you sure you want to reset password for {{strtoupper($user->first_name)}} {{strtoupper($user->last_name)}}?')">
+                                                    <i class="ti-unlock"> Reset Password</i>
+                                                </button>
                                             </form>
                                         </td>
                                     </tr>

@@ -8,6 +8,7 @@ use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class RolesController extends Controller
@@ -100,8 +101,12 @@ class RolesController extends Controller
 
     //update password as password reset to default password============
     public function resetPassword (Request $request, $user)
-    {   
-        
+    {
+        $users = User::findOrFail($user);
+        $users->password = Hash::make($request->input('password', 'shule123'));
+        $users->save();
+        Alert::success('Success!', 'Password reset successfully');
+        return back();
     }
 
     /**
