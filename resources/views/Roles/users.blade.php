@@ -7,7 +7,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-12">
-                        <h4 class="header-title text-uppercase">All Users</h4>
+                        <h4 class="header-title text-uppercase text-center">All Users</h4>
                     </div>
                 </div>
                 <div class="single-table">
@@ -17,6 +17,7 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Username</th>
+                                    <th>User Type</th>
                                     <th scope="col">Phone</th>
                                     <th scope="col">Email</th>
                                     <th scope="col">status</th>
@@ -25,20 +26,37 @@
                             </thead>
                             <tbody>
                                 @foreach ($users as $user)
-                                    <td>{{$loop->iteration}}</td>
-                                    <td class="text-capitalize">{{$user->first_name}} {{$user->last_name}}</td>
-                                    <td class="text-capitalize">{{$user->phone}}</td>
-                                    <td class="">{{$user->email}}</td>
-                                    @if ($user->status == 1)
+                                    <tr>
+                                        <td>{{$loop->iteration}}</td>
+                                        <td class="text-capitalize">{{$user->first_name}} {{$user->last_name}}</td>
+                                        @if ($user->usertype == 3)
+                                            <td>
+                                                <span class="badge bg-info text-white">Teacher</span>
+                                            </td>
+                                            @else
+                                            <td>
+                                                <span class="badge bg-primary text-white">Parent</span>
+                                            </td>
+                                        @endif
+                                        <td class="text-capitalize">{{$user->phone}}</td>
+                                        <td class="">{{$user->email}}</td>
+                                        @if ($user->status == 1)
+                                            <td>
+                                                <span class="badge bg-success text-white">Active</span>
+                                            </td>
+                                            @else
+                                            <td>
+                                                <span class="badge bg-secondary text-white">Blocked</span>
+                                            </td>
+                                        @endif
                                         <td>
-                                            <span class="badge bg-success text-white">Active</span>
+                                            <form action="{{route('users.reset.password', $user->id)}}" method="POST">
+                                                @csrf
+                                                @method('PUT')
+                                                <button class="btn btn-danger btn-xs" onclick="return confirm('Are you sure you want to reset password for {{strtoupper($user->first_name)}} {{strtoupper($user->last_name)}}?')">Reset Password</button>
+                                            </form>
                                         </td>
-                                        @else
-                                        <td>
-                                            <span class="badge bg-secondary text-white">Blocked</span>
-                                        </td>
-                                        <td>Reset</td>
-                                    @endif
+                                    </tr>
                                 @endforeach
                             </tbody>
                         </table>

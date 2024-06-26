@@ -52,7 +52,7 @@
                             <a href="javascript:void(0)"><i class="fa fa-cogs"></i><span>Advanced</span></a>
                             <ul class="submenu">
                                 <li><a href=""><i class="ti-unlock"></i>Roles & Permission</a></li>
-                                <li><a href=""><i class="fas fa-user-lock"></i>User Password Reset</a></li>
+                                <li><a href="{{route('users.lists')}}"><i class="fas fa-user-lock"></i>User Password Reset</a></li>
                             </ul>
                         </li>
                         @endif

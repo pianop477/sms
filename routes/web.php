@@ -216,6 +216,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::prefix('User-management')->group(function () {
         Route::middleware('CheckUsertype:2')->group(function () {
             Route::get('Password-Reset', [RolesController::class, 'userPassword'])->name('users.lists');
+            Route::put('{user}/Reset', [RolesController::class, 'resetPassword'])->name('users.reset.password');
         });
     });
 });

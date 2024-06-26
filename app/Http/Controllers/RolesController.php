@@ -78,16 +78,30 @@ class RolesController extends Controller
     }
 
     /**
-     * Display the resource.
+     * Display users resource corresponding to school.
      */
     public function userPassword()
     {
-        //
-        $users = User::where('school_id', Auth::user()->school_id)
-                        ->where('usertype', 3)
-                        ->where('usertype', 4)
-                        ->get();
-            return view('Roles.users', ['users' => $users]);
+        // Get the school_id of the authenticated user
+        $schoolId = Auth::user()->school_id;
+
+        // Retrieve users with the specified school_id and usertype 3 or 4
+        $users = User::where('school_id', $schoolId)
+                    ->where(function ($query) {
+                        $query->where('usertype', 3)
+                            ->orWhere('usertype', 4);
+                    })
+                    ->orderBy('first_name')
+                    ->get();
+
+        // Return the view with the users data
+        return view('Roles.users', ['users' => $users]);
+    }
+
+    //update password as password reset to default password============
+    public function resetPassword (Request $request, $user)
+    {   
+        
     }
 
     /**
