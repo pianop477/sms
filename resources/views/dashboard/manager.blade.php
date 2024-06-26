@@ -25,7 +25,7 @@
                         <div class="seofct-icon"><i class="fas fa-user-tie"></i> Teachers</div>
                         <h2>{{count($teachers)}}</h2>
                     </div>
-                    <canvas id="seolinechart1" height="50"></canvas>
+                    <canvas id="" height="50"></canvas>
                 </div>
             </div>
         </div>
@@ -36,7 +36,7 @@
                         <div class="seofct-icon"><i class="fas fa-user-shield"></i> Parents</div>
                         <h2>{{count($parents)}}</h2>
                     </div>
-                    <canvas id="seolinechart2" height="50"></canvas>
+                    <canvas id="" height="50"></canvas>
                 </div>
             </div>
         </div>
@@ -51,7 +51,7 @@
                             <li><span class="text-white">Female: <strong>{{$femaleStudents}}</strong></span></li>
                         </ul>
                     </div>
-                    <canvas id="seolinechart2" height="50"></canvas>
+                    <canvas id="" height="50"></canvas>
                 </div>
             </div>
         </div>
@@ -66,7 +66,7 @@
                         <div class="seofct-icon"><i class="ti-book"></i> Open Courses</div>
                         <h2>{{count($subjects)}}</h2>
                     </div>
-                    <canvas id="seolinechart1" height="50"></canvas>
+                    <canvas id="" height="50"></canvas>
                 </div>
             </div>
         </div>
@@ -77,7 +77,7 @@
                         <div class="seofct-icon"><i class="ti-blackboard"></i> Classes</div>
                         <h2>{{count($classes)}}</h2>
                     </div>
-                    <canvas id="seolinechart2" height="50"></canvas>
+                    <canvas id="" height="50"></canvas>
                 </div>
             </div>
         </div>
@@ -85,10 +85,10 @@
             <div class="card">
                 <div class="seo-fact sbg4">
                     <div class="p-4 d-flex justify-content-between align-items-center">
-                        <div class="seofct-icon"><i class="fas fa-bus"></i> Total Buses</div>
+                        <div class="seofct-icon"><i class="fas fa-bus"></i> School Buses</div>
                         <h2>{{count($buses)}}</h2>
                     </div>
-                    <canvas id="seolinechart2" height="50"></canvas>
+                    <canvas id="" height="50"></canvas>
                 </div>
             </div>
         </div>
