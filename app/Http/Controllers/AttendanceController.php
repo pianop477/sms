@@ -502,7 +502,7 @@ class AttendanceController extends Controller
             return $dayGroup->groupBy('teacher_id');
         });
 
-        return view('Attendance.all_report', compact('datas', 'maleSummary', 'femaleSummary'));
+        return view('Attendance.all_report', compact('datas', 'maleSummary', 'femaleSummary', 'attendances'));
     }
 
 }

@@ -7,10 +7,12 @@
         <div class="card-body">
             @if(isset($datas) && $datas->isNotEmpty())
             <h3 class="text-center text-uppercase">{{Auth::user()->school->school_name}} - {{Auth::user()->school->school_reg_no}}</h3>
+            <h5 class="text-center text-uppercase">Attendance Report for {{$attendances->first()->class_name}} - {{\Carbon\Carbon::parse($attendances->first()->attendance_date)->format('F')}}</h5>
+            <hr>
                 @foreach($datas as $date => $teachers)
                     @foreach($teachers as $teacherId => $attendances)
                     <h5 class="text-center">{{ $date }}</h5>
-                        <table class="table table-hover table-responsive-md table-borderless">
+                        <table class="table table-hover table-responsive-md table-bordered">
                             <thead>
                                 <tr>
                                     <th>#</th>
@@ -34,6 +36,8 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        <hr>
+                        <h6 class="text-center">Attendance Overall Summary</h6>
                         <p>Teacher: {{ $attendances->first()->teacher_firstname }} {{ $attendances->first()->teacher_lastname }}</p>
                         <p>Total Present (Male): {{ $maleSummary[$date]['present'] }}</p>
                         <p>Total Absent (Male): {{ $maleSummary[$date]['absent'] }}</p>
