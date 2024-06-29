@@ -80,7 +80,7 @@
                             @enderror
                         </div>
                         <input type="hidden" name="usertype" value="2">
-                        <input type="hidden" name="password" value="shule@123">
+                        <input type="hidden" name="password" value="shule123">
                     </div>
                 </div>
 

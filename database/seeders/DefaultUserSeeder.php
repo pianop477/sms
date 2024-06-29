@@ -19,13 +19,14 @@ class DefaultUserSeeder extends Seeder
             'first_name' => 'frank',
             'last_name' => 'piano',
             'email' => 'pianop477@gmail.com',
-            'gender' => 'male',
             'phone' => '0678669000',
+            'gender' => 'male',
+            'email_verified_at' => null,
             'usertype' => 1,
             'status' => 1,
-            'school_id' => '',
+            'school_id' => null,
             'password' => Hash::make('shule123'),
-            'image' => ''
+            'image' => null,
         ]);
     }
 }

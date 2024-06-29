@@ -84,7 +84,7 @@ class ManagerController extends Controller
     /**
      * Show the form for editing the resource.
      */
-    public function resetPassword($user, Request $request)
+    public function resetPassword(Request $request, $user)
     {
         //
         $users = User::findOrFail($user);

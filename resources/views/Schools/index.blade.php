@@ -10,7 +10,7 @@
                 <div class="form-row">
                     <div class="col-md-4 mb-3">
                         <label for="validationCustom01">School name</label>
-                        <input type="text" name="name" class="form-control" id="validationCustom01" placeholder="First name" value="{{old('name')}}" required="">
+                        <input type="text" name="name" class="form-control text-uppercase" id="validationCustom01" placeholder="School Name" value="{{old('name')}}" required="">
                         @error('name')
                         <div class="invalid-feedback">
                             {{$message}}
@@ -19,7 +19,7 @@
                     </div>
                     <div class="col-md-4 mb-3">
                         <label for="validationCustom02">Registration No</label>
-                        <input type="text" name="reg_no" class="form-control" id="validationCustom02" placeholder="Last name" required="" value="{{old('reg_no')}}">
+                        <input type="text" name="reg_no" class="form-control text-uppercase" id="validationCustom02" placeholder="Registration Number" required="" value="{{old('reg_no')}}">
                         @error('reg_no')
                         <div class="invalid-feedback">
                            {{$message}}
@@ -52,7 +52,7 @@
                                         <th scope="col">#</th>
                                         <th scope="col">School Name</th>
                                         <th scope="col">Registration No</th>
-                                        <th>School Logo</th>
+                                        <th class="text-center">School Logo</th>
                                         <th scope="col">status</th>
                                     </tr>
                                 </thead>
@@ -65,7 +65,7 @@
                                             </td>
                                             <td class="text-uppercase">{{$school->school_reg_no}}</td>
                                             <td class="text-center">
-                                                <img src="{{asset('assets/img/logo/' .$school->logo)}}" alt="" class="profile-img rounded-circle" style="width: 40px; object-fit: cover;">
+                                                <img src="{{asset('assets/img/logo/' .$school->logo)}}" alt="" class="profile-img rounded-circle" style="width: 50px; object-fit: cover;">
                                             </td>
                                             <td>
                                                 @if ($school->status == 1)
@@ -74,19 +74,7 @@
                                                 <span class="status-p bg-secondary">Closed</span>
                                                 @endif
                                             </td>
-                                            {{-- @if ($teacher->status == 1)
-                                            <ul class="d-flex justify-content-center">
-                                                <form action="{{route('activate.status', $manager->id)}}" method="POST">
-                                                @csrf
-                                                @method('PUT')
-                                                    <li>
-                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want block this school?')">
-                                                            <i class="fas fa-ban text-success"></i>
-                                                        </button>
-                                                    </li>
-                                                </form>
-                                            </ul>
-                                            @endif --}}
+
                                         </tr>
                                     @endforeach
                                 </tbody>

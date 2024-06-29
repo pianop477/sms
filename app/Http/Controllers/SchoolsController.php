@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\school;
 use Illuminate\Http\Request;
 use App\Models\User;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class SchoolsController extends Controller
 {
@@ -51,10 +52,11 @@ class SchoolsController extends Controller
             $image->move($imagePath, $imageFile);
 
             // Set the image file name on the student record
-            $school->image = $imageFile;
+            $school->logo = $imageFile;
         }
         $school->save();
-        return back()->with('success', 'School information saved successfully');
+        Alert::success('Success!', 'School information saved successfully');
+        return back();
     }
 
     /**

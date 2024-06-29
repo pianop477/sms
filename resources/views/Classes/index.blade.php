@@ -27,7 +27,7 @@
                                             <div class="form-row">
                                                 <div class="col-md-6 mb-3">
                                                     <label for="validationCustom01">Class name</label>
-                                                    <input type="text" name="name" class="form-control" id="validationCustom01" placeholder="Class Name" value="{{old('name')}}" required="">
+                                                    <input type="text" name="name" class="form-control text-uppercase" id="validationCustom01" placeholder="Class Name" value="{{old('name')}}" required="">
                                                     @error('name')
                                                     <div class="invalid-feedback">
                                                         {{$message}}
@@ -36,7 +36,7 @@
                                                 </div>
                                                 <div class="col-md-6 mb-3">
                                                     <label for="validationCustom02">Class Code</label>
-                                                    <input type="text" name="code" class="form-control" id="validationCustom02" placeholder="Class Numeric Code" required="" value="{{old('code')}}" required>
+                                                    <input type="text" name="code" class="form-control text-uppercase" id="validationCustom02" placeholder="Class Numeric Code" required="" value="{{old('code')}}" required>
                                                     @error('code')
                                                     <div class="invalid-feedback">
                                                        {{$message}}

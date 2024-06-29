@@ -58,6 +58,8 @@ Route::group(['middleware' => ['auth']], function () {
             Route::put('{school}/Activate', [ManagerController::class, 'activateStatus'])->name('activate.status');
             //register new schools or institutions
             Route::resource('Schools', SchoolsController::class);
+            Route::get('Admin-reset-password', [ManagerController::class, 'reset'])->name('admin.reset.password');
+            Route::put('{user}/Update', [ManagerController::class, 'resetPassword'])->name('admin.update.password');
         });
     });
     Route::middleware('CheckUsertype:2')->group(function(){
@@ -102,12 +104,10 @@ Route::group(['middleware' => ['auth']], function () {
     });
 
     Route::prefix('Profile-management')->group(function () {
-        Route::middleware('CheckUsertype:1,2,3,4')->group(function() {
-            Route::get('Change-password', [HomeController::class, 'changepassword'])->name('change.password');
-            Route::post('Change-password', [HomeController::class, 'storePassword'])->name('change.new.password');
-            Route::get('Persona-details', [HomeController::class, 'showProfile'])->name('show.profile');
-            Route::put('{user}/Personal-details', [HomeController::class, 'updateProfile'])->name('update.profile');
-        });
+        Route::get('Change-password', [HomeController::class, 'changepassword'])->name('change.password');
+        Route::post('Change-password', [HomeController::class, 'storePassword'])->name('change.new.password');
+        Route::get('Persona-details', [HomeController::class, 'showProfile'])->name('show.profile');
+        Route::put('{user}/Personal-details', [HomeController::class, 'updateProfile'])->name('update.profile');
     });
     Route::prefix('Parents')->group(function () {
         Route::middleware('CheckUsertype:4')->group(function () {

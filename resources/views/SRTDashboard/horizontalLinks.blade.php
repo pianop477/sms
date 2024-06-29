@@ -15,7 +15,7 @@
                             <a href="{{route('Schools.index')}}"><i class="fas fa-building"></i> <span>Schools</span></a>
                         </li>
                         <li>
-                            <a href=""><i class="ti-lock"></i><span>User Password Reset</span></a>
+                            <a href="{{route('admin.reset.password')}}"><i class="ti-unlock"></i><span>User Password Reset</span></a>
                         </li>
                         @elseif (Auth::user()->usertype == 2 && Auth::user()->status == 1)
                         <li>
