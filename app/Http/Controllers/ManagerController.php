@@ -70,17 +70,28 @@ class ManagerController extends Controller
     /**
      * Display the resource.
      */
-    public function show()
+    public function reset()
     {
         //
+        $users = User::query()->join('schools', 'schools.id', '=', 'users.school_id')
+                        ->select('users.*', 'schools.school_name', 'schools.school_reg_no')
+                        ->where('users.usertype', 2)
+                        ->orderBy('users.first_name')
+                        ->get();
+        return view('Managers.managers_password_reset', compact('users'));
     }
 
     /**
      * Show the form for editing the resource.
      */
-    public function edit()
+    public function resetPassword($user, Request $request)
     {
         //
+        $users = User::findOrFail($user);
+        $users->password = Hash::make($request->input('password', 'shule123'));
+        $users->save();
+        Alert::success('Success!', 'User Password reset successfully');
+        return back();
     }
 
     /**
