@@ -31,11 +31,28 @@ class SchoolsController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'reg_no' => 'required|string|max:255',
+            'logo' => 'image|max:4096'
         ]);
 
         $school = new school();
         $school->school_name = $request->name;
         $school->school_reg_no = $request->reg_no;
+        if ($request->hasFile('logo')) {
+            $image = $request->file('logo');
+            $imageFile = time() . '.' . $image->getClientOriginalExtension();
+            $imagePath = public_path('assets/img/logo');
+
+            // Ensure the directory exists
+            if (!file_exists($imagePath)) {
+                mkdir($imagePath, 0775, true);
+            }
+
+            // Move the file
+            $image->move($imagePath, $imageFile);
+
+            // Set the image file name on the student record
+            $school->image = $imageFile;
+        }
         $school->save();
         return back()->with('success', 'School information saved successfully');
     }

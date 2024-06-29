@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -11,13 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('schools', function (Blueprint $table) {
-            $table->id();
-            $table->string('school_name');
-            $table->string('school_reg_no');
-            $table->integer('status')->default(1);
-            $table->string('logo');
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            //
+            DB::table('users')->trancate();
         });
     }
 
@@ -26,6 +23,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('schools');
+        Schema::table('users', function (Blueprint $table) {
+            //
+        });
     }
 };

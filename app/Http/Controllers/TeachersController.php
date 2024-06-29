@@ -51,6 +51,7 @@ class TeachersController extends Controller
             'phone' => 'required|string|max:10|min:10',
             'qualification' => 'required',
             'street' => 'required|string',
+            'joined' => 'required'
         ]);
 
         $existingRecords = Teacher::where('dob', '=', $request->dob)
@@ -81,6 +82,7 @@ class TeachersController extends Controller
         $teachers->dob = $request->dob;
         $teachers->qualification = $request->qualification;
         $teachers->address = $request->street;
+        $teachers->joined = $request->joined;
         $teachers->save();
         Alert::success('Success', 'Teacher records saved successfully');
         return back();
@@ -132,6 +134,7 @@ class TeachersController extends Controller
                 'qualification' => 'required',
                 'street' => 'required|string',
                 'gender' => 'required',
+                'joined' => 'required',
                 'image' => 'nullable|image|max:2048',
             ]);
 
@@ -171,6 +174,7 @@ class TeachersController extends Controller
                     // Log::info('User updated successfully');
                     $teacher->dob = $request->dob;
                     $teacher->address = $request->street;
+                    $teacher->joined = $request->joined;
                     $teacher->qualification = $request->qualification;
 
                     if ($teacher->save()) {

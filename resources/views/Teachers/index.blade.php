@@ -108,6 +108,20 @@
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-4 mb-3">
+                                                    <label for="validationCustom01">Year Joined</label>
+                                                    <select name="joined" id="" class="form-control" required>
+                                                        <option value="">-- Select Year --</option>
+                                                        @for ($year = date('Y'); $year >= 2017; $year--)
+                                                            <option value="{{ $year }}">{{ $year }}</option>
+                                                        @endfor
+                                                    </select>
+                                                    @error('joined')
+                                                    <div class="invalid-feedback">
+                                                        {{$message}}
+                                                    </div>
+                                                    @enderror
+                                                </div>
+                                                <div class="col-md-4 mb-3">
                                                     <label for="validationCustomUsername">Street/Village</label>
                                                     <div class="input-group">
                                                         <input type="text" name="street" class="form-control" id="validationCustom02" value="{{old('street')}}" placeholder="Street Address" required>
@@ -143,6 +157,7 @@
                                     <th scope="col">Gender</th>
                                     <th scope="col">Phone</th>
                                     <th scope="col">Email</th>
+                                    <th scope="col">Joined</th>
                                     <th scope="col">status</th>
                                     <th scope="col">Action</th>
                                 </tr>
@@ -155,6 +170,7 @@
                                         <td class="text-capitalize">{{$teacher->gender[0]}}</td>
                                         <td>{{$teacher->phone}}</td>
                                         <td>{{$teacher->email}}</td>
+                                        <td>{{$teacher->join}}</td>
                                         <td>
                                             @if ($teacher->status ==1)
                                                 <span class="badge bg-success">{{_('Active')}}</span>

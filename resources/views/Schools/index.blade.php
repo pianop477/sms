@@ -26,6 +26,15 @@
                         </div>
                         @enderror
                     </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="validationCustom02">School Logo</label>
+                        <input type="file" name="logo" class="form-control" id="validationCustom02" placeholder="Last name" required="" value="{{old('logo')}}">
+                        @error('logo')
+                        <div class="invalid-feedback">
+                           {{$message}}
+                        </div>
+                        @enderror
+                    </div>
                 </div>
                 <div class="col-md-4 mb-3">
                     <button class="btn btn-primary" type="submit">Register</button>
@@ -43,6 +52,7 @@
                                         <th scope="col">#</th>
                                         <th scope="col">School Name</th>
                                         <th scope="col">Registration No</th>
+                                        <th>School Logo</th>
                                         <th scope="col">status</th>
                                     </tr>
                                 </thead>
@@ -54,6 +64,9 @@
                                                 {{$school->school_name}}
                                             </td>
                                             <td class="text-uppercase">{{$school->school_reg_no}}</td>
+                                            <td class="text-center">
+                                                <img src="{{asset('assets/img/logo/' .$school->logo)}}" alt="" class="profile-img rounded-circle" style="width: 40px; object-fit: cover;">
+                                            </td>
                                             <td>
                                                 @if ($school->status == 1)
                                                 <span class="status-p bg-success">Open</span>

@@ -152,6 +152,7 @@
                     <hr>
                     <div class="text-center font-weight-bold">
                         <p class="text-uppercase font-weight-bold"><i>End of Report</i></p>
+                        <hr>
                     </div>
                 </div>
             </div>

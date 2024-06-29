@@ -17,7 +17,7 @@
           <h5 class="mb-1">
             <span class="text-capitalize">{{$teachers->first_name. ' '. $teachers->last_name}}</span>
             <p class="mb-2">
-                Worker ID: <span class="text-uppercase">{{$teachers->school_reg_no.'/'. Str::substr($teachers->school_name, 0,  4).'/'. str_pad($teachers->id, 3, '0', STR_PAD_LEFT)}}</span>
+                Worker ID: <span class="text-uppercase">{{$teachers->school_reg_no.'/'.$teachers->joined.'/'. str_pad($teachers->id, 3, '0', STR_PAD_LEFT)}}</span>
             </p>
           </h5>
           <p class="mb-0 font-weight-normal text-sm">
@@ -129,7 +129,21 @@
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="validationCustom01">Photo</label>
+                    <label for="validationCustom01">Member Since</label>
+                    <select name="joined" id="" class="form-control text-uppercase" required>
+                        <option value="{{$teachers->gender}}">{{$teachers->joined}}</option>
+                        @for ($year = date('Y'); $year >= 2017; $year--)
+                            <option value="{{ $year }}">{{ $year }}</option>
+                        @endfor
+                    </select>
+                    @error('joined')
+                    <div class="invalid-feedback">
+                        {{$message}}
+                    </div>
+                    @enderror
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="validationCustom01">Passport Size</label>
                     <input type="file" name="image" class="form-control text-capitalize" value="{{old('image')}}">
                     @error('image')
                     <div class="invalid-feedback">

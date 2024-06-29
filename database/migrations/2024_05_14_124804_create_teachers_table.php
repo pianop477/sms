@@ -20,6 +20,7 @@ return new class extends Migration
             $table->date('dob');
             $table->integer('qualification');
             $table->string('address');
+            $table->year('joined');
             $table->integer('status')->default(1);
             $table->timestamps();
         });
