@@ -49,7 +49,9 @@
                     @endforeach
                 @endforeach
             @else
-                <p>No data available for the selected period.</p>
+                <div class="alert alert-warning" role="alert">
+                    <p class="text-center">No data available for the selected period.</p>
+                </div>
             @endif
             <button class="btn btn-primary no-print" onclick="scrollToTopAndPrint(); return false;">Print Attendance</button>
         </div>
