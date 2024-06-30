@@ -3,12 +3,12 @@
         <div class="row align-items-center">
             <div class="col-md-8">
                 @if(Auth::user()->school && Auth::user()->school->school_name)
-                    <img src="{{asset('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" class="profile-img rounded-circle" style="width:70px; object-ft-cover;">
+                    <img src="{{asset('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" class="rounded-circle" style="width:70px; object-ft-cover;">
                     <a href="{{route('home')}}" class="navbar-brand text-white font-weight-bold text-capitalize">ShuleApp - {{ Auth::user()->school->school_name }}</a>
                         @else
-                            <img src="{{asset('assets/img/logo/sms logo2.jpg')}}" alt="" class="profile-img rounded-circle" style="width:70px; object-ft-cover;">
+                            <img src="{{asset('assets/img/logo/sms logo2.jpg')}}" alt="" class="rounded-circle" style="width:70px; object-ft-cover;">
                             <a href="{{route('home')}}" class="navbar-brand text-white font-weight-bold">ShuleApp - Admin</a>
-                        @endif
+                @endif
             </div>
             <!-- profile info & task notification -->
             <div class="col-md-4 clearfix text-right">

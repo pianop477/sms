@@ -60,6 +60,8 @@ Route::group(['middleware' => ['auth']], function () {
             Route::resource('Schools', SchoolsController::class);
             Route::get('Admin-reset-password', [ManagerController::class, 'reset'])->name('admin.reset.password');
             Route::put('{user}/Update', [ManagerController::class, 'resetPassword'])->name('admin.update.password');
+            Route::get('{school}/About-school', [SchoolsController::class, 'show'])->name('schools.show');
+            Route::get('{school}/Invoice', [SchoolsController::class, 'invoceCreate'])->name('admin.generate.invoice');
         });
     });
     Route::middleware('CheckUsertype:2')->group(function(){

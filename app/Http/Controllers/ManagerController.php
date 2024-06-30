@@ -111,8 +111,8 @@ class ManagerController extends Controller
     }
 
     public function updateStatus($school, Request $request) {
-        $user_status = User::findOrFail($school);
-        $school_id = $user_status->school_id;
+        $user_status = User::where('school_id', $school)->firstOrFail();
+        // $school_id = $user_status->school_id;
         $status = $request->input('status', 0);
 
         // Update the status of the user
@@ -120,27 +120,27 @@ class ManagerController extends Controller
         $user_status->update();
 
         // Update the status of the school associated with the user
-        $school_info = School::findOrFail($school_id);
+        $school_info = School::findOrFail($school);
         $school_info->status = $status;
         $school_info->update();
 
             // Update the status of all users associated with the school
-            User::where('school_id', $school_id)->update(['status' => $status]);
+            User::where('school_id', $school_info->id)->update(['status' => $status]);
 
             // Update the status of all teachers associated with the school
-            Teacher::where('school_id', $school_id)->update(['status' => $status]);
+            Teacher::where('school_id', $school_info->id)->update(['status' => $status]);
 
             // Update the status of all parents associated with the school
-            Parents::where('school_id', $school_id)->update(['status' => $status]);
+            Parents::where('school_id', $school_info->id)->update(['status' => $status]);
 
             //update the status of all classes associated with the school
-            Grade::where('school_id', $school_id)->update(['status' => $status]);
+            Grade::where('school_id', $school_info->id)->update(['status' => $status]);
 
             //update the status of all subjects associated with the school
-            Subject::where('school_id', $school_id)->update(['status' => $status]);
+            Subject::where('school_id', $school_info->id)->update(['status' => $status]);
 
             //update the status of all transport associated with the school
-            Transport::where('school_id', $school_id)->update(['status' => $status]);
+            Transport::where('school_id', $school_info->id)->update(['status' => $status]);
         if($school_info) {
             Alert::success('Success', 'User Blocked Successfully');
             return back();
@@ -152,8 +152,8 @@ class ManagerController extends Controller
     }
 
     public function activateStatus($school, Request $request) {
-        $user_status = User::findOrFail($school);
-        $school_id = $user_status->school_id;
+        $user_status = User::where('school_id', $school)->firstOrFail();
+        // $school_id = $user_status->school_id;
         $status = $request->input('status', 1);
 
         // Update the status of the user
@@ -161,27 +161,27 @@ class ManagerController extends Controller
         $user_status->update();
 
         // Update the status of the school associated with the user
-        $school_info = School::findOrFail($school_id);
+        $school_info = School::findOrFail($school);
         $school_info->status = $status;
         $school_info->update();
 
             // Update the status of all users associated with the school
-            User::where('school_id', $school_id)->update(['status' => $status]);
+            User::where('school_id', $school_info->id)->update(['status' => $status]);
 
             // Update the status of all teachers associated with the school
-            Teacher::where('school_id', $school_id)->update(['status' => $status]);
+            Teacher::where('school_id', $school_info->id)->update(['status' => $status]);
 
             // Update the status of all parents associated with the school
-            Parents::where('school_id', $school_id)->update(['status' => $status]);
+            Parents::where('school_id', $school_info->id)->update(['status' => $status]);
 
             //update the status of all classes associated with the school
-            Grade::where('school_id', $school_id)->update(['status' => $status]);
+            Grade::where('school_id', $school_info->id)->update(['status' => $status]);
 
             //update the status of all subjects associated with the school
-            Subject::where('school_id', $school_id)->update(['status' => $status]);
+            Subject::where('school_id', $school_info->id)->update(['status' => $status]);
 
             //update the status of all transport associated with the school
-            Transport::where('school_id', $school_id)->update(['status' => $status]);
+            Transport::where('school_id', $school_info->id)->update(['status' => $status]);
         if($school_info) {
             Alert::success('Success', 'User Unblocked successfully');
             return back();

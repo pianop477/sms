@@ -38,11 +38,12 @@ class HomeController extends Controller
                 $classes = Grade::where('status', '=', 1)->get();
                 $subjects = Subject::where('status', '=', 1)->get();
                 $buses = Transport::where('status', '=', 1)->get();
-                $school_details = User::query()->join('schools', 'schools.id', '=', 'users.school_id')
-                                                ->select('users.*', 'schools.school_name', 'schools.school_reg_no')
-                                                ->where('users.usertype', '=', 2)
-                                                ->orderBy('users.first_name')
-                                                ->get();
+                $school_details = school::orderBy('school_name')->get();
+                // $school_details = User::query()->join('schools', 'schools.id', '=', 'users.school_id')
+                //                                 ->select('users.*', 'schools.school_name', 'schools.school_reg_no')
+                //                                 ->where('users.usertype', '=', 2)
+                //                                 ->orderBy('users.first_name')
+                //                                 ->get();
                 return view('home', compact('teachers', 'students', 'parents', 'classes', 'subjects', 'buses', 'schools', 'school_details'));
             } elseif ($user->usertype == 2 && $user->status == 1) {
                 $teachers = Teacher::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();

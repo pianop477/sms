@@ -25,7 +25,7 @@
     <script src="{{asset('assets/js/vendor/modernizr-2.8.3.min.js')}}"></script>
     <style>
         @media print {
-            * body {
+            * {
                 color: black;
             }
             .attendance {
@@ -45,7 +45,6 @@
             }
             .table {
                 border: 1px solid black;
-                width: 100%;
             }
             .table-attendance {
                 border: 1px solid black;

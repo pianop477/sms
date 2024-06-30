@@ -94,24 +94,27 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($school_details as $manager )
+                                @foreach ($school_details as $school )
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
                                         <td class="text-uppercase">
-                                            <a href="">{{$manager->school_name}}</a>
+                                            <a href="{{route('schools.show', $school->id)}}">{{$school->school_name}}</a>
                                         </td>
-                                        <td class="text-uppercase">{{$manager->school_reg_no}}</td>
+                                        <td class="text-uppercase">{{$school->school_reg_no}}</td>
                                         <td>
-                                            @if ($manager->status == 1)
+                                            @if ($school->status == 1)
                                             <span class="status-p bg-success">Active</span>
                                             @else
                                             <span class="status-p bg-secondary">Closed</span>
                                             @endif
                                         </td>
                                         <td>
-                                            @if ($manager->status == 1)
+                                            @if ($school->status == 1)
                                             <ul class="d-flex justify-content-center">
-                                                <form action="{{route('deactivate.status', $manager->id)}}" method="POST">
+                                                <li class="mr-3">
+                                                    <a href="{{route('schools.show', $school->id)}}"><i class="ti-eye text-secondary"></i></a>
+                                                </li>
+                                                <form action="{{route('deactivate.status', $school->id)}}" method="POST">
                                                     @csrf
                                                     @method('PUT')
                                                     <li>
@@ -124,7 +127,10 @@
 
                                             @else
                                             <ul class="d-flex justify-content-center">
-                                                <form action="{{route('activate.status', $manager->id)}}" method="POST">
+                                                <li class="mr-3">
+                                                    <a href="{{route('schools.show', $school->id)}}"><i class="ti-eye text-secondary"></i></a>
+                                                </li>
+                                                <form action="{{route('activate.status', $school->id)}}" method="POST">
                                                 @csrf
                                                 @method('PUT')
                                                     <li>
