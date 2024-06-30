@@ -118,7 +118,7 @@
                                                     @csrf
                                                     @method('PUT')
                                                     <li>
-                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to block this school?')">
+                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to block school {{strtoupper($school->school_name)}}?')">
                                                             <i class="ti-trash text-danger"></i>
                                                         </button>
                                                     </li>
@@ -134,7 +134,7 @@
                                                 @csrf
                                                 @method('PUT')
                                                     <li>
-                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want unblock this school?')">
+                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want unblock school {{strtoupper($school->school_name)}}?')">
                                                             <i class="ti-share-alt text-success"></i>
                                                         </button>
                                                     </li>
