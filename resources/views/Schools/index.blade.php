@@ -27,6 +27,42 @@
                         @enderror
                     </div>
                     <div class="col-md-4 mb-3">
+                        <label for="validationCustom01">Postal Address</label>
+                        <input type="text" name="postal" class="form-control" id="userInput validationCustom01" onblur="addPrefix()" placeholder="P.O Box 123" value="{{old('postal')}}" required="">
+                        @error('postal')
+                        <div class="invalid-feedback">
+                            {{$message}}
+                        </div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="col-md-4 mb-3">
+                        <label for="validationCustom01">Address Name</label>
+                        <input type="text" name="postal_name" class="form-control text-capitalize" id="validationCustom01" placeholder="Dodoma" value="{{old('postal_name')}}" required="">
+                        @error('postal_name')
+                        <div class="invalid-feedback">
+                            {{$message}}
+                        </div>
+                        @enderror
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="validationCustom01">Select Country</label>
+                        <select name="country" id="validationCustom01" class="form-control text-capitalize" required>
+                            <option value="">-- Select Country --</option>
+                            @foreach ($countries as $country)
+                                <option value="{{ $country['name']['common'] }}" {{ $country['name']['common'] == 'Tanzania' ? 'selected' : '' }}>
+                                    {{ $country['name']['common'] }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('country')
+                        <div class="invalid-feedback">
+                            {{$message}}
+                        </div>
+                        @enderror
+                    </div>
+                    <div class="col-md-4 mb-3">
                         <label for="validationCustom02">School Logo</label>
                         <input type="file" name="logo" class="form-control" id="validationCustom02" placeholder="Last name" required="" value="{{old('logo')}}">
                         @error('logo')
@@ -52,6 +88,7 @@
                                         <th scope="col">#</th>
                                         <th scope="col">School Name</th>
                                         <th scope="col">Registration No</th>
+                                        <th scope="col">Address</th>
                                         <th class="text-center">School Logo</th>
                                         <th scope="col">status</th>
                                     </tr>
@@ -64,6 +101,7 @@
                                                 {{$school->school_name}}
                                             </td>
                                             <td class="text-uppercase">{{$school->school_reg_no}}</td>
+                                            <td class="text-uppercase">P.O Box {{$school->postal_address}} - {{$school->postal_name}}</td>
                                             <td class="text-center">
                                                 <img src="{{asset('assets/img/logo/' .$school->logo)}}" alt="" class="profile-img rounded-circle" style="width: 50px; object-fit: cover;">
                                             </td>

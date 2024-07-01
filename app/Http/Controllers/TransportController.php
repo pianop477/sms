@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Student;
 use App\Models\Transport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -137,5 +138,22 @@ class TransportController extends Controller
         $trans->save();
         Alert::success('Success!', 'School bus information updated successfully');
         return redirect()->route('Transportation.index');
+    }
+
+    public function showStudents(Transport $trans)
+    {
+        $students = Student::query()->join('grades', 'grades.id', '=', 'students.class_id')
+                                    ->join('parents', 'parents.id', '=', 'students.parent_id')
+                                    ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+                                    ->select(
+                                        'students.*',
+                                        'grades.id as class_id', 'grades.class_name', 'grades.class_code',
+                                        'parents.address', 'users.phone'
+
+                                    )
+                                    ->where('students.transport_id', $trans->id)
+                                    ->orderBy('students.first_name')
+                                    ->get();
+        return view('Transport.students', compact('students', 'trans'));
     }
 }

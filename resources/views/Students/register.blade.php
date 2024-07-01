@@ -61,7 +61,7 @@
                             <div class="col-4">
                                 <label class="form-label">Birth Date</label>
                                 <div class="input-group input-group-outline mb-3">
-                                    <input type="date" name="dob" class="form-control">
+                                    <input type="text" id="customDatePicker" name="dob" class="form-control">
                                 </div>
                                 @error('dob')<span class="text-danger text-sm">{{$message}}</span>@enderror
                             </div>

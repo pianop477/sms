@@ -10,7 +10,7 @@
                 <div class="form-row">
                     <div class="col-md-4 mb-3">
                         <label for="validationCustom01">First name</label>
-                        <input type="text" name="fname" class="form-control" id="validationCustom01" placeholder="First name" value="{{old('fname')}}" required="">
+                        <input type="text" name="fname" class="form-control text-capitalize" id="validationCustom01" placeholder="First name" value="{{old('fname')}}" required="">
                         @error('fname')
                         <div class="invalid-feedback">
                             {{$message}}
@@ -19,7 +19,7 @@
                     </div>
                     <div class="col-md-4 mb-3">
                         <label for="validationCustom02">Last name</label>
-                        <input type="text" name="lname" class="form-control" id="validationCustom02" placeholder="Last name" required="" value="{{old('lname')}}">
+                        <input type="text" name="lname" class="form-control text-capitalize" id="validationCustom02" placeholder="Last name" required="" value="{{old('lname')}}">
                         @error('lname')
                         <div class="invalid-feedback">
                            {{$message}}

@@ -33,10 +33,10 @@ class CoursesController extends Controller
                                         'grades.class_name', 'grades.class_code',
                                         'users.first_name', 'users.last_name'
                                     )
-                                    ->where('subjects.class_id', $class->id)
+                                    ->where('subjects.class_id', $class)
                                     ->orderBy('subjects.course_name', 'ASC')
                                     ->get();
-        return view('Courses.index', compact('courses'));
+        return view('Courses.index', compact('courses', 'class'));
      }
 
 

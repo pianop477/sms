@@ -89,6 +89,7 @@
                                     <th scope="col">#</th>
                                     <th scope="col">Institute Name</th>
                                     <th scope="col">Registration No</th>
+                                    <th scope="col">Address</th>
                                     <th scope="col">status</th>
                                     <th scope="col">action</th>
                                 </tr>
@@ -101,6 +102,7 @@
                                             <a href="{{route('schools.show', $school->id)}}">{{$school->school_name}}</a>
                                         </td>
                                         <td class="text-uppercase">{{$school->school_reg_no}}</td>
+                                        <td class="text-uppercase">P.O box {{$school->postal_address}} - {{$school->postal_name}}</td>
                                         <td>
                                             @if ($school->status == 1)
                                             <span class="status-p bg-success">Active</span>

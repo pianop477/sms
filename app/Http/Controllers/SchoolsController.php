@@ -10,14 +10,27 @@ use App\Models\Subject;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Http;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class SchoolsController extends Controller
 {
 
     public function index() {
+        $response = Http::get('https://restcountries.com/v3.1/all');
+        $countries = $response->json();
+
+         // Optionally, filter by continent
+         $africanCountries = array_filter($countries, function ($country) {
+            return isset($country['region']) && $country['region'] == 'Africa';
+        });
+         // Sort countries by name in ascending order
+         usort($africanCountries, function ($a, $b) {
+            return strcmp($a['name']['common'], $b['name']['common']);
+        });
+
         $schools = school::orderBy('school_name', 'ASC')->orderBy('school_name', 'ASC')->get();
-        return view('Schools.index', ['schools' => $schools]);
+        return view('Schools.index', ['schools' => $schools, 'countries' => $africanCountries]);
     }
     /**
      * Show the form for creating the resource.
@@ -37,12 +50,18 @@ class SchoolsController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'reg_no' => 'required|string|max:255',
-            'logo' => 'image|max:4096'
+            'logo' => 'image|max:4096',
+            'postal' => 'required|string',
+            'postal_name' => 'required|string',
+            'country' => 'required|string'
         ]);
 
         $school = new school();
         $school->school_name = $request->name;
         $school->school_reg_no = $request->reg_no;
+        $school->postal_address = $request->postal;
+        $school->postal_name = $request->postal_name;
+        $school->country = $request->country;
         if ($request->hasFile('logo')) {
             $image = $request->file('logo');
             $imageFile = time() . '.' . $image->getClientOriginalExtension();

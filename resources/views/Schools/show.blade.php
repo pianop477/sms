@@ -25,20 +25,25 @@
                             <ul>
                                 <li>Phone Number: <span class="font-weight-bold text-uppercase">{{$managers->first()->phone}}</span></li>
                                 <li>Email Address: <span class="font-weight-bold">{{$managers->first()->email}}</span></li>
+                                <li>Address: <span class="font-weight-bold text-uppercase">P.O Box {{$school->postal_address}} - {{$school->postal_name}}</span></li>
+                                <li>Country: <span class="font-weight-bold text-capitalize">{{$school->country}}</span></li>
                             </ul>
                         </div>
                         <div class="col-2">
                             @if ($managers->first()->image == NULL)
                                 @if ($managers->first()->gender == 'male')
                                     <img src="{{asset('assets/img/profile/avatar.jpg')}}" alt="" class="profile-img" style="width: 120px; object-fit:cover; border: 1px solid black; border-radius: 4xp;">
-                                    <span>Manager Photo</span>
+                                    <p class="text-capitalize"><strong>{{$managers->first()->first_name}} {{$managers->first()->last_name}}</strong></p>
+                                    <p>Manager</p>
                                 @else
                                     <img src="{{asset('assets/img/profile/avatar-female.jpg')}}" alt="" class="profile-img" style="width: 120px; object-fit:cover; border: 1px solid black; border-radius: 4xp;">
-                                    <span>Manager Photo</span>
+                                    <p class="text-capitalize"><strong>{{$managers->first()->first_name}} {{$managers->first()->last_name}}</strong></p>
+                                    <p>Manager</p>
                                 @endif
                             @else
                                 <img src="{{asset('assets/img/profile/' .$managers->first()->image)}}" alt="" class="profile-img border-radius-lg shadow-sm" style="width: 150px; object-fit:cover; border: 1px solid black; border-radius: 4px;">
-                                <span>Manager Photo</span>
+                                <p class="text-capitalize"><strong>{{$managers->first()->first_name}} {{$managers->first()->last_name}}</strong></p>
+                                <p>Manager</p>
                             @endif
                         </div>
                     </div>

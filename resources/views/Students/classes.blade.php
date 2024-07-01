@@ -5,6 +5,12 @@
     <div class="card">
         <div class="card-body">
             <h4 class="header-title">Students List</h4>
+            @if ($classes->isEmpty())
+            <div class="alert alert-warning text-center">
+                <p>No classes records found. Please register classes first!</p>
+            </div>
+
+            @else
             <ul class="list-group">
                 @foreach ($classes as $class)
                 <a href="{{route('create.selected.class', $class->id)}}">
@@ -15,6 +21,7 @@
                 </a>
                 @endforeach
             </ul>
+            @endif
         </div>
     </div>
 </div>

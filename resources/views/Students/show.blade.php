@@ -17,7 +17,7 @@
           <h5 class="mb-1">
             <span class="text-uppercase">{{$data->first_name. ' '. $data->middle_name}}</span>
             <p class="font-weight-bold mb-3 text-sm">
-                Admission No: <span class="text-uppercase"> {{$data->school_reg_no.'-'. str_pad($data->id, 4, '0', STR_PAD_LEFT)}}</span>
+                Admission No: <span class="text-uppercase"> {{$data->school_reg_no.'/'. str_pad($data->id, 4, '0', STR_PAD_LEFT)}}</span>
 
             </p>
           </h5>

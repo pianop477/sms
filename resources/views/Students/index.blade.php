@@ -70,7 +70,7 @@
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom02">Date of Birth</label>
-                                                    <input type="date" name="dob" class="form-control" id="validationCustom02" placeholder="Enter your birth date" required="" value="{{old('dob')}}">
+                                                    <input type="date" id="customDatePicker" name="dob" class="form-control" id="validationCustom02" placeholder="Enter your birth date" required="" value="{{old('dob')}}">
                                                     @error('dob')
                                                     <div class="invalid-feedback">
                                                        {{$message}}

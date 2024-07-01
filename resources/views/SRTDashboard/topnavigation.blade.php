@@ -4,14 +4,14 @@
             <div class="col-md-8">
                 @if(Auth::user()->school && Auth::user()->school->school_name)
                     <img src="{{asset('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" class="rounded-circle" style="width:70px; object-ft-cover;">
-                    <a href="{{route('home')}}" class="navbar-brand text-white font-weight-bold text-capitalize">ShuleApp - {{ Auth::user()->school->school_name }}</a>
+                    <a href="{{route('home')}}" class="navbar-brand font-weight-bold text-capitalize">{{ Auth::user()->school->school_name }}</a>
                         @else
-                            <img src="{{asset('assets/img/logo/sms logo2.jpg')}}" alt="" class="rounded-circle" style="width:70px; object-ft-cover;">
-                            <a href="{{route('home')}}" class="navbar-brand text-white font-weight-bold">ShuleApp - Admin</a>
+                            <img src="{{asset('assets/img/logo/shuleapp_transparent.png')}}" alt="" class="rounded-circle" style="width:70px; object-ft-cover;">
+                            <a href="{{route('home')}}" class="navbar-brand font-weight-bold">ShuleApp - Admin</a>
                 @endif
             </div>
             <!-- profile info & task notification -->
-            <div class="col-md-4 clearfix text-right">
+            <div class="col-md-4 clearfix text-md-right">
                 <div class="clearfix d-md-inline-block d-block">
                     <div class="user-profile m-0">
                         {{-- <img class="avatar user-thumb" src="assets/images/author/avatar.png" alt="avatar"> --}}

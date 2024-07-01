@@ -221,4 +221,7 @@ Route::group(['middleware' => ['auth']], function () {
             Route::put('{user}/Reset', [RolesController::class, 'resetPassword'])->name('users.reset.password');
         });
     });
+
+    //students using school bus=====================
+    Route::get('{trans}/Student-tranport', [TransportController::class, 'showStudents'])->name('students.transport');
 });

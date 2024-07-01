@@ -10,7 +10,7 @@
                         @if (isset($message))
                             <h4 class="header-title">{{ $message }}</h4>
                         @else
-                            <h4 class="header-title">Courses List for <span class="text-uppercase"><strong>{{$courses->first()->class_name}}</strong></span></h4>
+                            <h4 class="header-title">Courses List for <span class="text-uppercase"><strong>{{$class->class_name}}</strong></span></h4>
                         @endif
                     </div>
                     <div class="col-2">

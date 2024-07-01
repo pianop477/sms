@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('school_name');
             $table->string('school_reg_no');
+            $table->string('postal_address');
+            $table->string('postal_name');
+            $table->string('country');
             $table->integer('status')->default(1);
             $table->string('logo');
             $table->timestamps();

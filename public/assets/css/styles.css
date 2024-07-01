@@ -205,12 +205,12 @@
 }
 
 .mainheader-area {
-    background: #1b4a90;
-    border-bottom: 5px solid gold;
+    background: #ccdfee;
+    border-bottom: 3px solid orange;
     padding-left: 10px;
     position: relative;
     z-index: 99;
-    color: white;
+    color: rgb(39, 69, 104);
 }
 
 .mainheader-area .logo a span {

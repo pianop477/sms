@@ -11,33 +11,33 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <style>
     .navbar-custom {
-      background-color: #1b4a90;
-      color: white;
-      border-bottom: 6px solid #7d0352;/* Thick dark blue bottom border */
+      background-color: #ccdfee;
+      color: rgb(39, 75, 109);
+      border-bottom: 3px solid orange;/* Thick dark blue bottom border */
     }
 
     .navbar-custom .navbar-brand {
-      color: white; /* Brand name color */
+      color: rgb(35, 66, 112); /* Brand name color */
       font-weight: bold; /* Make the brand name bold */
       font-size: 1.5rem;
     }
 
     .navbar-custom .navbar-nav .nav-link {
-      color: white;
+      color: rgb(49, 75, 118);
     }
 
     .navbar-custom .navbar-dark .navbar-nav .nav-link.active,
     .navbar-custom .navbar-dark .navbar-nav .show > .nav-link {
-      color: #fff;
+      color: rgb(49, 75, 118);
     }
 
     .navbar-custom .navbar-dark .navbar-nav .nav-link {
-      color: rgba(255,255,255,.5);
+      color: rgb(49, 75, 118);
     }
 
     .navbar-custom .navbar-dark .navbar-nav .nav-link:hover,
     .navbar-custom .navbar-dark .navbar-nav .nav-link:focus {
-      color: #fff;
+      color: rgb(49, 75, 118);
     }
 
     /* Border radius for cards */
@@ -89,7 +89,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-custom navbar-dark">
         <div class="container">
-            <img src="{{asset('assets/img/logo/sms logo2.jpg')}}" alt="" class="profile-img">
+            <img src="{{asset('assets/img/logo/shuleapp_transparent.png')}}" alt="" class="profile-img">
             <a class="navbar-brand" href="#">ShuleApp</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>

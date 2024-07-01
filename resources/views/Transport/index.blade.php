@@ -25,7 +25,7 @@
                                             <div class="form-row">
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom01">Driver name</label>
-                                                    <input type="text" name="fullname" class="form-control" id="validationCustom01" placeholder="Driver Full Name" value="{{old('fname')}}" required="">
+                                                    <input type="text" name="fullname" class="form-control text-capitalize" id="validationCustom01" placeholder="Driver Full Name" value="{{old('fname')}}" required="">
                                                     @error('fname')
                                                     <div class="invalid-feedback">
                                                         {{$message}}
@@ -58,7 +58,7 @@
                                             <div class="form-row">
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom01">Bus Number</label>
-                                                    <input type="text" name="bus" class="form-control" id="validationCustom02" value="{{old('bus')}}" required>
+                                                    <input type="text" name="bus" class="form-control text-uppercase" placeholder="Bus number" id="validationCustom02" value="{{old('bus')}}" required>
                                                     @error('bus')
                                                     <div class="invalid-feedback">
                                                         {{$message}}
@@ -68,7 +68,7 @@
                                                 <div class="col-md-6 mb-3">
                                                     <label for="validationCustomUsername">Bus Routine Description</label>
                                                     <div class="input-group">
-                                                        <textarea name="routine" id="" cols="60" rows="4" class="form-control"></textarea>
+                                                        <textarea name="routine" id="" cols="60" rows="4" class="form-control text-uppercase"></textarea>
                                                         @error('routine')
                                                         <div class="invalid-feedback">
                                                             {{$message}}
@@ -100,7 +100,7 @@
                                     <th scope="col">Bus No.</th>
                                     <th scope="col">Routine</th>
                                     <th scope="col">Status</th>
-                                    <th scope="col">Action</th>
+                                    <th scope="col" class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -124,6 +124,9 @@
                                         @if ($trans->status == 1)
                                         <td>
                                             <ul class="d-flex justify-content-center">
+                                                <li class="mr-3">
+                                                    <a href="{{route('students.transport', $trans->id)}}" class="btn btn-primary btn-xs">Student List</a>
+                                                </li>
                                                 <li class="mr-3">
                                                     <a href="{{route('transport.edit', $trans->id)}}"><i class="ti-pencil text-primary"></i></a>
                                                 </li>

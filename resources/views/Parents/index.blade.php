@@ -7,7 +7,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-10">
-                        <h4 class="header-title text-uppercase">Parents list</h4>
+                        <h4 class="header-title text-uppercase text-center">Parents list</h4>
                     </div>
                     <div class="col-2">
                         <button type="button" class="btn btn-link btn-sm" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus-circle text-secondary" style="font-size: 2rem;"></i>
@@ -47,7 +47,7 @@
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text" id="inputGroupPrepend">@</span>
                                                         </div>
-                                                        <input type="text" name="email" class="form-control" id="validationCustomUsername" placeholder="Email ID" aria-describedby="inputGroupPrepend" required="" value="{{old('email')}}">
+                                                        <input type="email" name="email" class="form-control" id="validationCustomUsername" placeholder="Email ID" aria-describedby="inputGroupPrepend" required="" value="{{old('email')}}">
                                                         @error('email')
                                                         <div class="invalid-feedback">
                                                             {{$message}}
@@ -95,7 +95,7 @@
                                                 </div>
                                                     <input type="hidden" name="usertype" value="4">
                                                     <input type="hidden" name="school_id" value="{{Auth::user()->school_id}}">
-                                                    <input type="hidden" name="password" value="shule@123">
+                                                    <input type="hidden" name="password" value="shule123">
                                             </div>
                                     </div>
                                     <div class="modal-footer">
@@ -132,9 +132,9 @@
                                         <td>{{$parent->email}}</td>
                                         <td>
                                             @if ($parent->status ==1)
-                                                <span class="badge bg-success">{{_('Active')}}</span>
+                                                <span class="badge bg-success text-white">{{_('Active')}}</span>
                                                 @else
-                                                <span class="badge bg-danger">{{_('Blocked')}}</span>
+                                                <span class="badge bg-danger text-white">{{_('Blocked')}}</span>
                                             @endif
                                         </td>
                                         @if ($parent->status == 1)
