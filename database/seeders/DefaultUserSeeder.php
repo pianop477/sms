@@ -28,5 +28,12 @@ class DefaultUserSeeder extends Seeder
             'password' => Hash::make('shule123'),
             'image' => null,
         ]);
+
+        DB::table('roles')->insert([
+            ['role_name' => 'teacher'],
+            ['role_name' => 'head teacher'],
+            ['role_name' => 'academic'],
+            ['role_name' => 'class_teacher']
+        ]);
     }
 }

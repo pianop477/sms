@@ -111,7 +111,7 @@
                                                     <label for="validationCustom01">Year Joined</label>
                                                     <select name="joined" id="" class="form-control" required>
                                                         <option value="">-- Select Year --</option>
-                                                        @for ($year = date('Y'); $year >= 2017; $year--)
+                                                        @for ($year = date('Y'); $year >= 2000; $year--)
                                                             <option value="{{ $year }}">{{ $year }}</option>
                                                         @endfor
                                                     </select>
@@ -170,12 +170,12 @@
                                         <td class="text-capitalize">{{$teacher->gender[0]}}</td>
                                         <td>{{$teacher->phone}}</td>
                                         <td>{{$teacher->email}}</td>
-                                        <td>{{$teacher->join}}</td>
+                                        <td>{{$teacher->joined}}</td>
                                         <td>
                                             @if ($teacher->status ==1)
-                                                <span class="badge bg-success">{{_('Active')}}</span>
+                                                <span class="badge bg-success text-white">{{_('Active')}}</span>
                                                 @else
-                                                <span class="badge bg-danger">{{_('Blocked')}}</span>
+                                                <span class="badge bg-danger text-white">{{_('Blocked')}}</span>
                                             @endif
                                         </td>
                                         @if ($teacher->status == 1)

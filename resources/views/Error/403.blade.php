@@ -16,9 +16,10 @@
     <div class="error-area ptb--100 text-center">
         <div class="container">
             <div class="error-content">
-                <h4>403</h4>
-                <p>Access denied</p>
-                <a href="{{route('home')}}">Back to Dashboard</a>
+                <h4>404</h4>
+                <p class="text-danger p-3">Ooops! You don't have permission to access this Page!</p>
+                <p><i class="fas fa-ban text-danger text-center" style="font-size: 2.5rem;"></i></p>
+                <a href="{{url()->previous()}}"><i class="ti-angle-double-left"></i> Go Back</a>
             </div>
         </div>
     </div>

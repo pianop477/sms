@@ -9,6 +9,7 @@
                     <div class="col-10">
                         <h4 class="header-title text-uppercase">Tests & Examination Type</h4>
                     </div>
+                    @if (Route::has('exams.store'))
                     <div class="col-2">
                         <button type="button" class="btn btn-link" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-circle-plus text-secondary" style="font-size: 2rem"></i>
                         </button>
@@ -42,6 +43,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
                     </div>
                 </div>
                 <div class="single-table">
@@ -52,7 +54,9 @@
                                     <th scope="col">#</th>
                                     <th scope="col">Examination Type</th>
                                     <th scope="col">Status</th>
+                                    @if (Route::has(['exams.block', 'exams.destroy', 'exams.edit', 'exams.unblock', 'exams.update']))
                                     <th scope="col">Action</th>
+                                    @endif
                                 </tr>
                             </thead>
                             @foreach ($exams as $exam)

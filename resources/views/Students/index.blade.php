@@ -12,6 +12,7 @@
                     <div class="col-2">
                         <a href="{{route('classes.list', $classId->id)}}"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
                     </div>
+                    @if (Route::has('student.create'))
                     <div class="col-2">
                         <a type="#" class="btn p-0" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus-circle text-secondary" style="font-size:2rem;"></i>
                         </a>
@@ -143,6 +144,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
                 </div>
                 <div class="single-table">
                     <div class="table-responsive">

@@ -65,9 +65,18 @@ class User extends Authenticatable
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function parents()
+    public function parent()
     {
-        return $this->belongsTo(Parents::class);
+        return $this->hasOne(Parents::class);
     }
 
+    /**
+     * Get the user associated with the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function teacher()
+    {
+        return $this->hasOne(Teacher::class, 'user_id');
+    }
 }

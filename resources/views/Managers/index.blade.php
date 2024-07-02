@@ -70,7 +70,7 @@
                             <select name="school" id="validationCustomUsername" class="form-control text-uppercase">
                                 <option value="">-- Select Institution --</option>
                                 @foreach ($schools as $school)
-                                    <option value="{{$school->id}}">{{$school->school_name}}</option>
+                                    <option value="{{$school->id}}">{{$school->school_name}} - {{$school->school_reg_no}}</option>
                                 @endforeach
                             </select>
                             @error('school')

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Class_teacher;
 use App\Models\Grade;
+use App\Models\Role;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -73,6 +74,7 @@ class RolesController extends Controller
         $assignedTeacher->group = $request->group;
         $assignedTeacher->school_id = $request->school_id;
         $assignedTeacher->save();
+
         Alert::success('Success', 'Class Teacher assigned Successfully');
         return back();
 
@@ -167,5 +169,35 @@ class RolesController extends Controller
         $class_teacher->delete();
         Alert::success('Success!', "Class teacher removed successfully");
         return back();
+    }
+
+    public function updateRoles()
+    {
+        $users = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
+                                ->join('roles', 'roles.id', '=', 'teachers.role_id')
+                                ->select(
+                                    'teachers.*', 'users.first_name', 'users.last_name',
+                                    'roles.role_name'
+                                )
+                                ->where('teachers.school_id', Auth::user()->school_id)
+                                ->where('teachers.role_id', '!=', 1)
+                                ->get();
+        $roles = Role::all();
+        $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
+                                    ->select(
+                                        'teachers.*', 'users.first_name', 'users.last_name',
+                                    )
+                                    ->where('teachers.school_id', '=', Auth::user()->school_id)
+                                    ->get();
+        return view('Roles.index', compact('users', 'roles', 'teachers'));
+    }
+
+    public function assignRole(Teacher $teacher, Request $request)
+    {
+        if(empty($request->teacher)) {
+            return "no teacher selected";
+        } else {
+            return $teacher;
+        }
     }
 }

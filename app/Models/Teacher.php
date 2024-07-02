@@ -14,9 +14,20 @@ class Teacher extends Model
         'dob',
         'qualification',
         'address',
+        'role_id',
         'status'
     ];
 
     protected $guarded = ['id'];
+
+    /**
+     * Get the user that owns the Teacher
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
 }
