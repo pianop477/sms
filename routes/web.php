@@ -73,13 +73,6 @@ Route::group(['middleware' => ['auth']], function () {
     /* parents route management==================================================================================
     route will be managed by school head teacher or school manager==============================================*/
     Route::middleware('ManagerOrTeacher')->group(function(){
-        Route::resource('Parents', ParentsController::class);
-        Route::put('{parent}/Update-teachers-status', [ParentsController::class, 'updateStatus'])->name('Update.parents.status');
-        Route::put('{parent}/Restore-parents-status', [ParentsController::class, 'restoreStatus'])->name('restore.parents.status');
-        Route::get('{parent}/Delete-permanent', [ParentsController::class, 'destroy'])->name('Parents.remove');
-        Route::get('{parent}/Parents', [ParentsController::class, 'edit'])->name('Parents.edit');
-        Route::put('{parents}/Update', [ParentsController::class, 'update'])->name('Parents.update');
-
         //teachers panel management =======================================================================
         Route::resource('Teachers', TeachersController::class);
         Route::put('{teachers}/Update-teachers', [TeachersController::class, 'updateTeachers'])->name('Update.teachers');
@@ -100,6 +93,15 @@ Route::group(['middleware' => ['auth']], function () {
 
         //manage classses ========================================================================================
         Route::resource('Classes', ClassesController::class);
+    });
+    //manage parents informations ================================================================================
+    Route::middleware('GeneralMiddleware')->group(function () {
+        Route::resource('Parents', ParentsController::class);
+        Route::put('{parent}/Update-teachers-status', [ParentsController::class, 'updateStatus'])->name('Update.parents.status');
+        Route::put('{parent}/Restore-parents-status', [ParentsController::class, 'restoreStatus'])->name('restore.parents.status');
+        Route::get('{parent}/Delete-permanent', [ParentsController::class, 'destroy'])->name('Parents.remove');
+        Route::get('{parent}/Parents', [ParentsController::class, 'edit'])->name('Parents.edit');
+        Route::put('{parents}/Update', [ParentsController::class, 'update'])->name('Parents.update');
     });
 
     Route::middleware('CheckUsertype:1,2,3,4')->group(function () {
@@ -127,7 +129,6 @@ Route::group(['middleware' => ['auth']], function () {
     //assign class teachers======================================================================================
     Route::middleware('CheckUsertype:3')->group(function () {
         Route::middleware('CheckRoleType:3')->group(function () {
-            Route::get('{class}/Class-Teacher', [RolesController::class, 'index'])->name('Class.Teachers');
             Route::post('{classes}/Assign-Teacher', [RolesController::class, 'store'])->name('Class.teacher.assign');
             Route::get('{teacher}/Edit', [RolesController::class, 'edit'])->name('roles.edit');
             Route::put('{classTeacher}/Update', [RolesController::class, 'update'])->name('roles.update');
@@ -180,6 +181,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('{course}/Unblock', [CoursesController::class, 'unblockCourse'])->name('courses.unblock');
         Route::get('{course}/Assign-teacher', [CoursesController::class, 'assign'])->name('courses.assign');
         Route::put('{courses}/Assigned-teacher', [CoursesController::class, 'assignedTeacher'])->name('courses.assigned.teacher');
+        //view class teachers-----------------------
+        Route::get('{class}/Class-Teacher', [RolesController::class, 'index'])->name('Class.Teachers');
     });
     //end of condition =================================================================================
 
@@ -240,7 +243,7 @@ Route::group(['middleware' => ['auth']], function () {
         //assign new roles ==========================================================================================
         Route::middleware('GeneralMiddleware')->group(function () {
             Route::get('Update-roles', [RolesController::class, 'updateRoles'])->name('roles.update');
-            Route::put('{teacher}/Update', [RolesController::class, 'assignRole'])->name('roles.assign');
+            Route::put('/Update', [RolesController::class, 'assignRole'])->name('roles.assign');
         });
     });
     //end of condition =========================================================================================

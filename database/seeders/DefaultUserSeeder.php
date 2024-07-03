@@ -33,7 +33,7 @@ class DefaultUserSeeder extends Seeder
             ['role_name' => 'teacher'],
             ['role_name' => 'head teacher'],
             ['role_name' => 'academic'],
-            ['role_name' => 'class_teacher']
+            ['role_name' => 'class teacher']
         ]);
     }
 }

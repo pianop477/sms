@@ -69,7 +69,7 @@ class ParentsController extends Controller
         // return back()->with('success', 'Parent records saved successfully');
         if($new_parent) {
             Alert::success('Success', 'Parent records saved successfully');
-            return redirect()->route('Parents.index');
+            return back();
         }
     }
 

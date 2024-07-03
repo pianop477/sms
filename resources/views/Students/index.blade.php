@@ -83,9 +83,13 @@
                                                     <div class="input-group">
                                                         <select name="parent" id="validationCustomUsername" class="form-control text-uppercase" required>
                                                             <option value="">-- Select Parent --</option>
+                                                            @if ($parents->isEmpty())
+                                                                <option value="" disabled class="text-danger text-capitalize">No parents records found</option>
+                                                            @else
                                                             @foreach ($parents as $parent)
                                                                 <option value="{{$parent->id}}" class="text-uppercase">{{$parent->first_name. ' '. $parent->last_name}}</option>
                                                             @endforeach
+                                                            @endif
                                                         </select>
                                                         @error('school')
                                                         <div class="invalid-feedback">
@@ -98,7 +102,7 @@
                                             <div class="form-row">
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom01">Class Group</label>
-                                                    <input type="text" name="group" id="validationCustomUsername" class="form-control" placeholder="Enter Group A, B or C" id="validationCustom02" value="{{old('dob')}}" required>
+                                                    <input type="text" name="group" id="validationCustomUsername" class="form-control text-uppercase" placeholder="Enter Group A, B or C" id="validationCustom02" value="{{old('dob')}}" required>
                                                     @error('dob')
                                                     <div class="invalid-feedback">
                                                         {{$message}}
@@ -110,9 +114,13 @@
                                                     <div class="input-group">
                                                         <select name="driver" id="validationCustomUsername" class="form-control text-uppercase">
                                                             <option value="">-- select driver --</option>
-                                                            @foreach ($buses as $bus)
-                                                            <option value="{{$bus->id}}">{{$bus->driver_name}}</option>
-                                                            @endforeach
+                                                            @if ($buses->isEmpty())
+                                                                <option value="" class="text-danger text-capitalize" disabled>No drivers records found</option>
+                                                            @else
+                                                                @foreach ($buses as $bus)
+                                                                    <option value="{{$bus->id}}">{{$bus->driver_name}}</option>
+                                                                @endforeach
+                                                            @endif
                                                         </select>
                                                         @error('street')
                                                         <div class="invalid-feedback">
@@ -123,7 +131,7 @@
                                                     <input type="hidden" name="school_id" value="{{Auth::user()->school_id}}">
                                                 </div>
                                                 <div class="col-md-4 mb-3">
-                                                    <label for="validationCustomUsername">Student Photo :<small class="text-sm text-muted">Must not exceed 2 MB</small></label>
+                                                    <label for="validationCustomUsername">Passport Size :<small class="text-sm text-danger">(Optional)</small></label>
                                                     <div class="input-group">
                                                         <input type="file" name="image" id="validationCustomUsername" class="form-control" value="{{old('image')}}">
                                                         @error('image')

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\school;
 use App\Models\Teacher;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -124,7 +125,6 @@ class TeachersController extends Controller
 
     public function updateTeachers(Request $request, $teachers)
     {
-        // Log::info('Update method called');
 
             $validated = $request->validate([
                 'fname' => 'required|string|max:255',
@@ -134,18 +134,14 @@ class TeachersController extends Controller
                 'qualification' => 'required',
                 'street' => 'required|string',
                 'gender' => 'required',
-                'joined' => 'required',
+                'joined_at' => 'required',
                 'image' => 'nullable|image|max:2048',
             ]);
 
-            // Log::info('Validation passed', $validated);
-
             try {
                 $teacher = Teacher::findOrFail($teachers);
-                // Log::info('Teacher found', ['teacher' => $teacher]);
 
                 $user = User::findOrFail($teacher->user_id);
-                // Log::info('User found', ['user' => $user]);
 
                 $user->first_name = $request->fname;
                 $user->last_name = $request->lname;
@@ -171,28 +167,23 @@ class TeachersController extends Controller
                 }
 
                 if ($user->save()) {
-                    // Log::info('User updated successfully');
                     $teacher->dob = $request->dob;
                     $teacher->address = $request->street;
-                    $teacher->joined = $request->joined;
+                    $teacher->joined = $request->joined_at;
                     $teacher->qualification = $request->qualification;
 
                     if ($teacher->save()) {
-                        // Log::info('Teacher updated successfully');
                         Alert::success('Success', 'Teacher records updated successfully');
                         return back();
                     } else {
-                        // Log::error('Failed to update teacher information');
                         Alert::error('Error', 'Failed to updated teacher records');
                         return back();
                     }
                 } else {
-                    // Log::error('Failed to update user information');
                     Alert::error('Error', 'Failed to update teachers records');
                     return back();
                 }
             } catch (\Exception $e) {
-                // Log::error('An error occurred: ' . $e->getMessage());
                 Alert::error('Error', 'An error occured: ' . $e->getMessage());
                 return back();
             }

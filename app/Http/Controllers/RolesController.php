@@ -52,7 +52,6 @@ class RolesController extends Controller
      */
     public function store(Request $request, $classes)
     {
-        // abort(404);
         $request->validate([
             'teacher' => 'required',
             'group' => 'required'
@@ -67,7 +66,7 @@ class RolesController extends Controller
         }
 
         $class = Grade::findOrFail($classes);
-        // return $class->id;
+
         $assignedTeacher = new Class_teacher();
         $assignedTeacher->class_id = $class->id;
         $assignedTeacher->teacher_id = $request->teacher;
@@ -75,9 +74,13 @@ class RolesController extends Controller
         $assignedTeacher->school_id = $request->school_id;
         $assignedTeacher->save();
 
+        // Update the teacher's role to 4
+        $teacher = Teacher::findOrFail($request->teacher);
+        $teacher->role_id = 4;
+        $teacher->save();
+
         Alert::success('Success', 'Class Teacher assigned Successfully');
         return back();
-
     }
 
     /**
@@ -150,10 +153,28 @@ class RolesController extends Controller
             Alert::error('Error!', 'Selected Teacher already assigned in another class');
             return back();
         }
-        // return $class_teacher;
+
+        // Get the current teacher assigned to this class
+        $currentTeacherId = $class_teacher->teacher_id;
+
+        // Update the class_teacher record
         $class_teacher->teacher_id = $request->teacher;
         $class_teacher->save();
-        Alert::success('Success!', 'Class teacher  Changed successfully');
+
+        // Update the new teacher's role to 4
+        $newTeacher = Teacher::findOrFail($request->teacher);
+        $newTeacher->role_id = 4;
+        $newTeacher->save();
+
+        // Check if the old teacher is no longer assigned to any classes and reset their role_id if necessary
+        $isCurrentTeacherAssigned = Class_teacher::where('teacher_id', $currentTeacherId)->exists();
+        if (!$isCurrentTeacherAssigned) {
+            $oldTeacher = Teacher::findOrFail($currentTeacherId);
+            $oldTeacher->role_id = 1;
+            $oldTeacher->save();
+        }
+
+        Alert::success('Success!', 'Class teacher Changed successfully');
         return redirect()->route('Class.Teachers', $class_teacher->class_id);
     }
 
@@ -176,28 +197,24 @@ class RolesController extends Controller
         $users = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
                                 ->join('roles', 'roles.id', '=', 'teachers.role_id')
                                 ->select(
-                                    'teachers.*', 'users.first_name', 'users.last_name',
+                                    'teachers.*', 'users.first_name', 'users.last_name', 'users.usertype',
                                     'roles.role_name'
                                 )
                                 ->where('teachers.school_id', Auth::user()->school_id)
-                                ->where('teachers.role_id', '!=', 1)
-                                ->get();
-        $roles = Role::all();
+                                ->paginate(5);
+        $roles = Role::where('role_name', '!=', 'class teacher')->where('role_name', '!=', 'teacher')->orderBy('role_name')->get();
         $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
                                     ->select(
-                                        'teachers.*', 'users.first_name', 'users.last_name',
+                                        'teachers.*', 'users.first_name', 'users.last_name', 'users.usertype',
                                     )
                                     ->where('teachers.school_id', '=', Auth::user()->school_id)
+                                    ->where('teachers.status', 1)
                                     ->get();
         return view('Roles.index', compact('users', 'roles', 'teachers'));
     }
 
-    public function assignRole(Teacher $teacher, Request $request)
+    public function assignRole(Request $request)
     {
-        if(empty($request->teacher)) {
-            return "no teacher selected";
-        } else {
-            return $teacher;
-        }
+
     }
 }

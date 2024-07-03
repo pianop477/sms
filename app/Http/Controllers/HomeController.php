@@ -115,6 +115,12 @@ class HomeController extends Controller
                     ->where('class_teachers.teacher_id', '=', $teachers->id)
                     ->where('class_teachers.school_id', '=', $teachers->school_id)
                     ->get();
+                $teachers = Teacher::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
+                $parents = Parents::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
+                $students = Student::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
+                $classes = Grade::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
+                $subjects = Subject::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
+                $buses = Transport::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
 
                 $classes = Grade::where('status', '=', 1)
                     ->where('school_id', $teachers->school_id)
@@ -123,7 +129,13 @@ class HomeController extends Controller
                 return view('home', [
                     'courses' => $courses,
                     'myClass' => $myClass,
-                    'classes' => $classes
+                    'classes' => $classes,
+                    'teachers' => $teachers,
+                    'students' => $students,
+                    'classes' => $classes,
+                    'subjects' => $subjects,
+                    'parents' => $parents,
+                    'buses' => $buses
                 ]);
             }
 
