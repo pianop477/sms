@@ -26,9 +26,17 @@
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
                                         <td class="text-capitalize">{{$user->first_name}} {{$user->last_name}}</td>
-                                        <td class="text-capitalize">{{$user->role_name}}</td>
+                                        <td class="text-capitalize">
+                                            @if ($user->role_id == 3)
+                                                <span class="alert alert-primary">{{$user->role_name}}</span>
+                                            @elseif ($user->role_id == 2)
+                                                <span class="alert alert-success">{{$user->role_name}}</span>
+                                                @else
+                                                <span class="">{{$user->role_name}}</span>
+                                            @endif
+                                        </td>
                                         <td>
-                                            <a href="" class="btn btn-primary btn-xs">Update Role</a>
+                                            <a href="{{route('roles.assign', $user->id)}}" class="btn btn-primary btn-xs">Update Role</a>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -42,7 +50,7 @@
             </div>
         </div>
     </div>
-
+{{-- end of role assigning card --}}
     <div class="col-6 mt-5">
         <div class="card">
             <div class="card-body">
@@ -79,8 +87,6 @@
                                 @endforeach
                             </tbody>
                         </table>
-                    </div>
-                    <div class="d-flex justify-content-center">
                         {{$users->links('vendor.pagination.bootstrap-5')}}
                     </div>
                 </div>

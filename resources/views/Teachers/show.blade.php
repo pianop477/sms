@@ -20,7 +20,7 @@
                 Worker ID: <span class="text-uppercase">{{$teachers->school_reg_no.'/'.$teachers->joined.'/'. str_pad($teachers->id, 3, '0', STR_PAD_LEFT)}}</span>
             </p>
           </h5>
-          <p class="mb-0 font-weight-normal text-sm">
+          <p class="mb-0 font-weight-normal text-sm"> Qualification:
             @if ($teachers->qualification == 1)
                 <span class="badge bg-success text-white">{{_('Masters')}}</span>
                 @elseif($teachers->qualification == 2)
@@ -29,6 +29,12 @@
                 <span class="badge bg-info text-white">{{_('Diploma')}}</span>
                 @else
                 <span class="badge bg-secondary text-white">{{_('Cerificate')}}</span>
+            @endif
+          </p>
+          <p class="text-sm">
+            Job Title:
+            @if ($teachers->usertype == 3)
+                <span  class="text-capitalize text-white badge bg-secondary"> Teacher - {{$teachers->role_name}}</span>
             @endif
           </p>
         </div>

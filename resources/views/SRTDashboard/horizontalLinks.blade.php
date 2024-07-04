@@ -37,7 +37,7 @@
                                 </ul>
                             </li>
                             <li>
-                                <a href="{{route('attendance.fill.form')}}"><i class="fa fa-user-graduate"></i><span> Attendance Report</span></a>
+                                <a href="{{route('attendance.fill.form')}}"><i class="fa fa-list"></i><span> Attendance Report</span></a>
                             </li>
                             <li>
                                 <a href="javascript:void(0)"><i class="fa fa-list-check"></i><span>Exams & Results</span></a>
@@ -81,7 +81,7 @@
                             <li>
                                 <a href="javascript:void(0)"><i class="fa fa-cogs"></i><span>Advanced</span></a>
                                 <ul class="submenu">
-                                    <li><a href="{{route('roles.update')}}"><i class="ti-unlock"></i>Roles & Permission</a></li>
+                                    <li><a href="{{route('roles.updateRole')}}"><i class="ti-unlock"></i>Roles & Permission</a></li>
                                     <li><a href="{{route('users.lists')}}"><i class="fas fa-user-lock"></i>User Password Reset</a></li>
                                 </ul>
                             </li>

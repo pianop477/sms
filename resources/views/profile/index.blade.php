@@ -27,7 +27,7 @@
                 @elseif ($user->usertype == 2)
                 {{_('School Manager')}}
                 @elseif ($user->usertype == 3)
-                {{_('Teacher')}}
+                {{_('Teacher') }}
                 @else
                 {{_('Parent')}}
             @endif

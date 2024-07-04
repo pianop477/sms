@@ -65,6 +65,14 @@ class RolesController extends Controller
             return back();
         }
 
+        $ifTeacherHasRole = Teacher::where('role_id', '=', 2)
+                                    ->where('role_id', '=', 3)
+                                    ->exists();
+        if($ifTeacherHasRole) {
+            Alert::error('Error!', 'Selected teacher has been assigned another role, cannot be a class teacher!');
+            return back();
+        }
+
         $class = Grade::findOrFail($classes);
 
         $assignedTeacher = new Class_teacher();
@@ -154,6 +162,14 @@ class RolesController extends Controller
             return back();
         }
 
+        $ifTeacherHasRole = Teacher::where('role_id', '=', 2)
+                                    ->where('role_id', '=', 3)
+                                    ->exists();
+        if($ifTeacherHasRole) {
+            Alert::error('Error!', 'Selected teacher has been assigned another role, cannot be a class teacher');
+            return back();
+        }
+
         // Get the current teacher assigned to this class
         $currentTeacherId = $class_teacher->teacher_id;
 
@@ -201,7 +217,7 @@ class RolesController extends Controller
                                     'roles.role_name'
                                 )
                                 ->where('teachers.school_id', Auth::user()->school_id)
-                                ->paginate(5);
+                                ->paginate(6);
         $roles = Role::where('role_name', '!=', 'class teacher')->where('role_name', '!=', 'teacher')->orderBy('role_name')->get();
         $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
                                     ->select(
@@ -213,8 +229,26 @@ class RolesController extends Controller
         return view('Roles.index', compact('users', 'roles', 'teachers'));
     }
 
-    public function assignRole(Request $request)
+    public function assignRole(Teacher $user)
     {
-
+        $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
+                                    ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.usertype')
+                                    ->findOrFail($user->id);
+        $roles = Role::where('role_name', '!=', 'teacher')->where('role_name', '!=', 'class teacher')->orderBy('role_name')->get();
+        return view('Roles.assign_roles', compact('user', 'teachers', 'roles'));
     }
+
+    public function AssignNewRole(Teacher $user, Request $request)
+    {
+        $request->validate([
+            'role' => 'required|exists:roles,id',
+        ]);
+
+        $user->role_id = $request->role; // Assuming 'role_id' is the correct field in the 'teachers' table
+        $user->save();
+
+        Alert::success('Success!', 'Role has been assigned successfully');
+        return redirect()->route('roles.updateRole');
+    }
+
 }

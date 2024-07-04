@@ -75,23 +75,30 @@
                             <th>Grade</th>
                         </thead>
                         <tbody>
-                            @foreach ($students as $student)
-                            <tr>
-                                <td>
-                                    {{str_pad($student->id, 4, '0', STR_PAD_LEFT)}}
-                                    <input type="hidden" name="students[{{ $loop->index }}][student_id]" value="{{ $student->id }}">
-                                </td>
-                                <td class="text-capitalize">
-                                    {{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}
-                                </td>
-                                <td>
-                                    <input type="number" class="form-control score-input" name="students[{{ $loop->index }}][score]" placeholder="Score" min="0" max="50">
-                                </td>
-                                <td>
-                                    <input type="text" disabled name="students[{{ $loop->index }}][grade]" class="form-control grade-input">
-                                </td>
-                            </tr>
+                            @if ($students->isEmpty())
+                                <tr>
+                                    <td colspan="4" class="alert alert-warning text-center">No students records found!</td>
+                                </tr>
+
+                                @else
+                                @foreach ($students as $student)
+                                    <tr>
+                                        <td>
+                                            {{str_pad($student->id, 4, '0', STR_PAD_LEFT)}}
+                                            <input type="hidden" name="students[{{ $loop->index }}][student_id]" value="{{ $student->id }}">
+                                        </td>
+                                        <td class="text-capitalize">
+                                            {{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control score-input" name="students[{{ $loop->index }}][score]" placeholder="Score" min="0" max="50">
+                                        </td>
+                                        <td>
+                                            <input type="text" disabled name="students[{{ $loop->index }}][grade]" class="form-control grade-input">
+                                        </td>
+                                    </tr>
                             @endforeach
+                            @endif
                         </tbody>
                     </table>
                     <hr>

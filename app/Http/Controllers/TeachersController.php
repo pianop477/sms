@@ -102,7 +102,11 @@ class TeachersController extends Controller
             $teachers = Teacher::query()
                 ->join('users', 'users.id', '=', 'teachers.user_id')
                 ->join('schools', 'schools.id', '=', 'teachers.school_id')
-                ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.usertype', 'users.image', 'schools.school_reg_no', 'schools.school_name')
+                ->join('roles', 'roles.id', '=', 'teachers.role_id')
+                ->select(
+                    'teachers.*', 'users.first_name', 'users.last_name', 'users.gender',
+                    'users.phone', 'users.usertype', 'users.image', 'schools.school_reg_no',
+                    'schools.school_name', 'roles.role_name')
                 ->where('teachers.id', '=', $teacher->id)
                 ->where('teachers.school_id', '=', Auth::user()->school_id)
                 ->firstOrFail();

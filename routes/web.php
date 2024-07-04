@@ -166,10 +166,11 @@ Route::group(['middleware' => ['auth']], function () {
         });
     });
 
-    Route::middleware('CheckUsertype:3')->group(function () {
-            Route::middleware('CheckRoleType:1,3,4')->group(function () {
-            Route::post('Register', [CoursesController::class, 'store'])->name('courses.store');
-        });
+    Route::middleware('CheckRoleType:1,3,4')->group(function () {
+        Route::post('Register-course', [CoursesController::class, 'store'])->name('courses.store');
+        Route::get('{course}/Edit-course', [CoursesController::class, 'edit'])->name('courses.edit');
+        Route::put('{courses}/Update-course', [CoursesController::class, 'update'])->name('courses.update');
+
     });
 
     //access this routes for subjects if the usertype as manager of school head teacher only ==========
@@ -182,7 +183,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('{course}/Assign-teacher', [CoursesController::class, 'assign'])->name('courses.assign');
         Route::put('{courses}/Assigned-teacher', [CoursesController::class, 'assignedTeacher'])->name('courses.assigned.teacher');
         //view class teachers-----------------------
-        Route::get('{class}/Class-Teacher', [RolesController::class, 'index'])->name('Class.Teachers');
+        Route::get('{class}/Class-Teacher', [RolesController::class, 'update'])->name('Class.Teachers');
     });
     //end of condition =================================================================================
 
@@ -242,8 +243,9 @@ Route::group(['middleware' => ['auth']], function () {
 
         //assign new roles ==========================================================================================
         Route::middleware('GeneralMiddleware')->group(function () {
-            Route::get('Update-roles', [RolesController::class, 'updateRoles'])->name('roles.update');
-            Route::put('/Update', [RolesController::class, 'assignRole'])->name('roles.assign');
+            Route::get('Update-roles', [RolesController::class, 'updateRoles'])->name('roles.updateRole');
+            Route::get('{user}/Assign-role', [RolesController::class, 'assignRole'])->name('roles.assign');
+            Route::put('{user}/Update-role', [RolesController::class, 'AssignNewRole'])->name('roles.assign.new');
         });
     });
     //end of condition =========================================================================================

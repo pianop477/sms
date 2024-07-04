@@ -5,7 +5,7 @@
     @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 2)
         {{-- school head teacher panel start here --}}
             <div class="row">
-                @php
+                {{-- @php
                     use App\Models\Student;
                     use Illuminate\Support\Facades\Auth;
 
@@ -18,7 +18,7 @@
                                             ->where('status', 1)
                                             ->where('school_id', Auth::user()->school_id)
                                             ->count();
-                @endphp
+                @endphp --}}
 
                 <div class="col-md-4 mt-5 mb-3">
                     <div class="card">
@@ -97,14 +97,12 @@
             </div>
         </div>
         {{-- school head teacher panel end here --}}
-    @endif
-    {{-- first argument end here ============================================= --}}
-
-    {{-- second argument start here =========================================== --}}
-    @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 3)
-            {{-- academic teacher panel start here =================== --}}
+        {{-- first argument end here ============================================= --}}
+    @elseif (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 3)
+        {{-- second argument start here =========================================== --}}
+        {{-- academic teacher panel start here =================== --}}
             <div class="row">
-                @php
+                {{-- @php
                     use App\Models\Student;
                     use Illuminate\Support\Facades\Auth;
 
@@ -117,7 +115,7 @@
                                             ->where('status', 1)
                                             ->where('school_id', Auth::user()->school_id)
                                             ->count();
-                @endphp
+                @endphp --}}
 
                 <div class="col-md-4 mt-5 mb-3">
                     <div class="card">
@@ -137,8 +135,8 @@
                                 <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Students</div>
                                 <h2>{{count($students)}}</h2>
                                 <ul>
-                                    <li><span class="text-white">Male: <strong>{{$maleStudents}}</strong></span></li>
-                                    <li><span class="text-white">Female: <strong>{{$femaleStudents}}</strong></span></li>
+                                    <li><span class="text-white">Male: <strong>0</strong></span></li>
+                                    <li><span class="text-white">Female: <strong>0</strong></span></li>
                                 </ul>
                             </div>
                             <canvas id="" height="50"></canvas>
@@ -171,15 +169,27 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-4 mt-5 mb-3">
+                    <div class="card bg-secondary">
+                        <div class="">
+                            <div class="p-4 d-flex justify-content-between align-items-center">
+                                <div class="seofct-icon"><i class="ti-book"></i> My Course</div>
+                                <h2 class="text-white">{{ count($courses) }}</h2>
+                            </div>
+                            <canvas id="" height="50"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+        <hr>
         {{-- academic panel end here =========================================== --}}
         {{-- academic teacher its courses records start here ====================== --}}
-        <div class="col-lg-6 mt-0">
+        <div class="col-lg-10 mt-0">
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-10"><h4 class="header-title"> My Courses</h4></div>
+                        <div class="col-10"><h4 class="header-title text-uppercase text-center"> My Courses</h4></div>
                         <div class="col-2">
                             <button type="button" class="btn btn-xs mb-3 btn-link" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-circle-plus text-secondary" style="font-size:1.5rem;"></i>
                             </button>
@@ -247,7 +257,7 @@
                                     <th>Course name</th>
                                     <th>Code</th>
                                     <th>Class</th>
-                                    <th>Action</th>
+                                    <th class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -271,16 +281,12 @@
                                         <td>
                                             @if ($course->status == 1)
                                             <ul class="d-flex justify-content-center">
-                                                <div class="btn-group" role="group">
-                                                    <button id="btnGroupDrop" type="button" class="btn btn-success btn-xs p-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                        ACTION
-                                                    </button>
-                                                    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                                        <a class="dropdown-item" href="{{route('courses.edit', $course->id)}}"><i class="ti-pencil"></i> Edit</a>
-                                                        <a class="dropdown-item" href="{{route('score.prepare.form', $course->id)}}"><i class="ti-file"></i> Score</a>
-                                                        {{-- <a class="dropdown-item" href="{{route('courses.destroy', $course->id)}}" onclick="return confirm('Are you sure you want to delete this course permanently?')"><i class="ti-close"></i> Close</a> --}}
-                                                    </div>
-                                                </div>
+                                                <li class="mr-3">
+                                                    <a class="btn btn-primary btn-xs" href="{{route('courses.edit', $course->id)}}"><i class="ti-pencil"> Edit</i></a>
+                                                </li>
+                                                <li>
+                                                    <a class="btn btn-success btn-xs" href="{{route('score.prepare.form', $course->id)}}"><i class="ti-file"> Results</i></a>
+                                                </li>
                                             </ul>
                                             @else
                                                 <span class="badge bg-danger text-white">{{_('Blocked')}}</span>
@@ -296,14 +302,12 @@
             </div>
         </div>
         {{-- academic teacher courses records end here============================= --}}
-    @endif
-    {{-- end of second argument ==================================================== --}}
-
-    {{-- third argument ============================================================ --}}
-    @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 4)
+        {{-- end of second argument ==================================================== --}}
+    @elseif (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 4)
+        {{-- third argument ============================================================ --}}
         {{-- class teacher panel start here ======================================= --}}
         <div class="row">
-                @php
+                {{-- @php
                     $maleCount = 0;
                     $femaleCount = 0;
 
@@ -318,7 +322,7 @@
                             ->where('gender', 'female')
                             ->count();
                     }
-                @endphp
+                @endphp --}}
 
                 {{-- first card --}}
                 <div class="col-md-4 mt-md-5 mb-3">
@@ -339,10 +343,10 @@
                         <div class="seo-fact sbg3">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Student</div>
-                                <h2>{{ $maleCount + $femaleCount }}</h2>
+                                <h2>0</h2>
                                 <ul>
-                                    <li><span class="text-white">Male: <strong>{{$maleCount}}</strong></span></li>
-                                    <li><span class="text-white">Female: <strong>{{$femaleCount}}</strong></span></li>
+                                    <li><span class="text-white">Male: <strong>0</strong></span></li>
+                                    <li><span class="text-white">Female: <strong>0</strong></span></li>
                                 </ul>
                             </div>
                             <canvas id="" height="50"></canvas>
@@ -365,14 +369,14 @@
                 <div class="col-lg-6 mt-0">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="header-title"> My Attendance Class</h4>
+                            <h4 class="header-title text-center text-uppercase"> My Attendance Class</h4>
                             <div class="table-responsive-md">
                                 <table class="table">
                                     <thead>
                                         <tr class="text-capitalize">
                                             <th>Class</th>
                                             <th>Stream</th>
-                                            <th>Action</th>
+                                            <th class="">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -386,7 +390,7 @@
                                                     <ul class="d-flex">
                                                         <li class="">
                                                             <a href="{{ route('attendance.get.form', $class->id) }}" class="btn btn-info btn-xs p-1">
-                                                                <i class="ti-settings"></i> Report
+                                                                <i class="ti-settings"> Generate Report</i>
                                                             </a>
                                                         </li>
                                                     </ul>
@@ -404,7 +408,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-10"><h4 class="header-title"> My Courses</h4></div>
+                            <div class="col-10"><h4 class="header-title text-center text-uppercase"> My Courses</h4></div>
                             <div class="col-2">
                                 <button type="button" class="btn btn-xs mb-3 btn-link" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-circle-plus text-secondary" style="font-size:1.5rem;"></i>
                                 </button>
@@ -472,7 +476,7 @@
                                         <th>Course name</th>
                                         <th>Code</th>
                                         <th>Class</th>
-                                        <th>Action</th>
+                                        <th class="text-center">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -496,16 +500,12 @@
                                             <td>
                                                 @if ($course->status == 1)
                                                 <ul class="d-flex justify-content-center">
-                                                    <div class="btn-group" role="group">
-                                                        <button id="btnGroupDrop" type="button" class="btn btn-success btn-xs p-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            ACTION
-                                                        </button>
-                                                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                                            <a class="dropdown-item" href="{{route('courses.edit', $course->id)}}"><i class="ti-pencil"></i> Edit</a>
-                                                            <a class="dropdown-item" href="{{route('score.prepare.form', $course->id)}}"><i class="ti-file"></i> Score</a>
-                                                            {{-- <a class="dropdown-item" href="{{route('courses.destroy', $course->id)}}" onclick="return confirm('Are you sure you want to delete this course permanently?')"><i class="ti-close"></i> Close</a> --}}
-                                                        </div>
-                                                    </div>
+                                                    <li class="mr-3">
+                                                        <a href="{{route('courses.edit', $course->id)}}" class="btn btn-primary btn-xs"><i class="ti-pencil"> Edit</i></a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{route('score.prepare.form', $course->id)}}" class="btn btn-success btn-xs"><i class="ti-file"> Marks</i></a>
+                                                    </li>
                                                 </ul>
                                                 @else
                                                     <span class="badge bg-danger text-white">{{_('Blocked')}}</span>
@@ -522,35 +522,27 @@
             </div>
         </div>
         {{-- class teacher panel end here ========================================= --}}
-    @endif
-    {{-- end of third argument ====================================================== --}}
-
-    {{-- fourth argument start here ================================================ --}}
-    @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 1)
-    {{-- normal teacher panel start here ========================================== --}}
+        {{-- end of third argument ====================================================== --}}
+    @else
+        {{-- fourth argument start here ================================================ --}}
+        {{-- normal teacher panel start here ========================================== --}}
         <div class="row">
-            <div class="col-md-4 mt-md-5 mb-3">
+            <div class="col-md-4 mt-5 mb-3">
                 <div class="card">
-                    <div class="seo-fact sbg3">
+                    <div class="seo-fact sbg2">
                         <div class="p-4 d-flex justify-content-between align-items-center">
-                            <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Student</div>
-                            <h2>{{ $maleCount + $femaleCount }}</h2>
-                            <ul>
-                                <li><span class="text-white">Male: <strong>{{$maleCount}}</strong></span></li>
-                                <li><span class="text-white">Female: <strong>{{$femaleCount}}</strong></span></li>
-                            </ul>
+                            <div class="seofct-icon"><i class="ti-book"></i> My Course</div>
+                            <h2>{{ count($courses) }}</h2>
                         </div>
                         <canvas id="" height="50"></canvas>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-6 mt-0">
+            <div class="col-lg-8 mt-0">
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-10"><h4 class="header-title"> My Courses</h4></div>
+                            <div class="col-10"><h4 class="header-title text-center text-uppercase"> My Courses</h4></div>
                             <div class="col-2">
                                 <button type="button" class="btn btn-xs mb-3 btn-link" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-circle-plus text-secondary" style="font-size:1.5rem;"></i>
                                 </button>
@@ -618,7 +610,7 @@
                                         <th>Course name</th>
                                         <th>Code</th>
                                         <th>Class</th>
-                                        <th>Action</th>
+                                        <th class="text-center">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -642,16 +634,12 @@
                                             <td>
                                                 @if ($course->status == 1)
                                                 <ul class="d-flex justify-content-center">
-                                                    <div class="btn-group" role="group">
-                                                        <button id="btnGroupDrop" type="button" class="btn btn-success btn-xs p-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            ACTION
-                                                        </button>
-                                                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                                            <a class="dropdown-item" href="{{route('courses.edit', $course->id)}}"><i class="ti-pencil"></i> Edit</a>
-                                                            <a class="dropdown-item" href="{{route('score.prepare.form', $course->id)}}"><i class="ti-file"></i> Score</a>
-                                                            {{-- <a class="dropdown-item" href="{{route('courses.destroy', $course->id)}}" onclick="return confirm('Are you sure you want to delete this course permanently?')"><i class="ti-close"></i> Close</a> --}}
-                                                        </div>
-                                                    </div>
+                                                    <li class="mr-3">
+                                                        <a href="{{route('courses.edit', $course->id)}}" class="btn btn-primary btn-xs"><i class="ti-pencil"> Edit</i></a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{route('score.prepare.form', $course->id)}}" class="btn btn-success btn-xs"><i class="ti-file"> Results</i></a>
+                                                    </li>
                                                 </ul>
                                                 @else
                                                     <span class="badge bg-danger text-white">{{_('Blocked')}}</span>
@@ -667,6 +655,7 @@
                 </div>
             </div>
         </div>
+        <hr>
     {{-- normal teacher panel end here ============================================ --}}
     @endif
     {{-- end of argument end here ================================================== --}}

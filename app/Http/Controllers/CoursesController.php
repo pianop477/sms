@@ -33,7 +33,7 @@ class CoursesController extends Controller
                                         'grades.class_name', 'grades.class_code',
                                         'users.first_name', 'users.last_name'
                                     )
-                                    ->where('subjects.class_id', $class)
+                                    ->where('subjects.class_id', $class->id)
                                     ->orderBy('subjects.course_name', 'ASC')
                                     ->get();
         return view('Courses.index', compact('courses', 'class'));
@@ -93,18 +93,15 @@ class CoursesController extends Controller
     /**
      * Show the form for editing the resource.
      */
-    public function edit($course)
+    public function edit(Subject $course)
     {
         //
-        $coursesID = Subject::findOrFail($course);
         $courses = Subject::query()->join('grades', 'grades.id', '=', 'subjects.class_id')
-                                    ->join('teachers', 'teachers.id', '=', 'subjects.teacher_id')
-                                    ->select('subjects.*', 'grades.id as class_id', 'grades.class_name', 'grades.class_code')
-                                    ->where('subjects.class_id', '=', $coursesID->class_id)
-                                    ->where('subjects.teacher_id', '=', $coursesID->teacher_id)
-                                    ->firstOrFail();
+                                    ->select(
+                                        'subjects.*', 'grades.class_name'
+                                    )->findOrFail($course->id);
         $classes = Grade::where('school_id', '=', Auth::user()->school_id)->where('status', '=', 1)->orderBy('id', 'ASC')->get();
-        return view('Courses.edit', ['courses' => $courses, 'classes' => $classes]);
+        return view('Courses.edit', compact('course', 'courses', 'classes'));
     }
 
     /**

@@ -121,11 +121,6 @@ class HomeController extends Controller
                 $classes = Grade::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
                 $subjects = Subject::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
                 $buses = Transport::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
-
-                $classes = Grade::where('status', '=', 1)
-                    ->where('school_id', $teachers->school_id)
-                    ->get();
-
                 return view('home', [
                     'courses' => $courses,
                     'myClass' => $myClass,
