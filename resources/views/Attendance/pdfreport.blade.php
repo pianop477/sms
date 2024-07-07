@@ -32,7 +32,7 @@
                 </div>
                 <div class="row mt-3">
                     <div class="col-10">
-                        <h3 class="">Attendance Report</h3>
+                        <h3 class="">Attendance Report for: {{\Carbon\Carbon::parse($attendanceRecords->first()->attendance_date)->format('d-F-Y')}}</h3>
                     </div>
                     <div class="col-1">
                         <a href="" onclick="scrollToTopAndPrint(); return false;" class="no-print">
@@ -117,8 +117,8 @@
                                     <tr>
                                         <th>StudentID</th>
                                         <th>Student Name</th>
-                                        <th>Gender</th>
-                                        <th>Group</th>
+                                        <th class="text-center">Gender</th>
+                                        <th class="text-center">Group</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>

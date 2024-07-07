@@ -14,18 +14,16 @@
                 <table class="table">
                     <thead class="text-capitalize bg-info">
                         <tr class="text-white">
-                            <th scope="col">#</th>
                             <th scope="col">AdmNo.</th>
                             <th scope="col">Name</th>
                             <th scope="col">Sex</th>
-                            <th scope="col">Group</th>
+                            <th scope="col">Stream</th>
                             <th scope="col" colspan="3" class="text-center">Attendance Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($studentList as $student)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
                                 <td>
                                     <input type="hidden" name="student_id[]" value="{{ $student->id }}">
                                     {{ str_pad($student->id, 4, '0', STR_PAD_LEFT) }}
@@ -33,7 +31,7 @@
                                 <td class="text-uppercase">
                                     <a href="{{ route('Students.show', $student->id) }}">{{ $student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name }}</a>
                                 </td>
-                                <td class="text-uppercase">{{ $student->gender[0] }}</td>
+                                <td class="text-uppercase text-center">{{ $student->gender[0] }}</td>
                                 <td class="text-uppercase">
                                     <input type="hidden" name="group[{{$student->id}}]" value="{{$student->group}}">
                                     {{ $student->group }}

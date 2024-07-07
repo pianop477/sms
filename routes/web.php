@@ -67,6 +67,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('{user}/Update', [ManagerController::class, 'resetPassword'])->name('admin.update.password');
         Route::get('{school}/About-school', [SchoolsController::class, 'show'])->name('schools.show');
         Route::get('{school}/Invoice', [SchoolsController::class, 'invoceCreate'])->name('admin.generate.invoice');
+        //edit school information ===================================================================================
+        Route::get('{school}/Edit-school', [SchoolsController::class, 'edit'])->name('schools.edit');
+        Route::put('{school}/Update-school', [SchoolsController::class, 'updateSchool'])->name('schools.update.school');
     });
     // end of routes for administrator =============================================================
 
@@ -79,7 +82,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('{teacher}/Teachers', [TeachersController::class, 'updateStatus'])->name('update.teacher.status');
         Route::put('{teacher}/Restore', [TeachersController::class, 'restoreStatus'])->name('teachers.restore');
         Route::get('{teacher}/Teacher-show', [TeachersController::class, 'showProfile'])->name('Teachers.show.profile');
-        Route::get('{teacher}/Teacher', [TeachersController::class, 'destroy'])->name('Teachers.remove');
+        Route::put('{teacher}/Teacher', [TeachersController::class, 'destroy'])->name('Teachers.remove');
 
         //generate general attendance report =============================================================
         Route::get('Attendance-report', [AttendanceController::class, 'getField'])->name('attendance.fill.form');
@@ -99,7 +102,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::resource('Parents', ParentsController::class);
         Route::put('{parent}/Update-teachers-status', [ParentsController::class, 'updateStatus'])->name('Update.parents.status');
         Route::put('{parent}/Restore-parents-status', [ParentsController::class, 'restoreStatus'])->name('restore.parents.status');
-        Route::get('{parent}/Delete-permanent', [ParentsController::class, 'destroy'])->name('Parents.remove');
+        Route::put('{parent}/Delete-permanent', [ParentsController::class, 'destroy'])->name('Parents.remove');
         Route::get('{parent}/Parents', [ParentsController::class, 'edit'])->name('Parents.edit');
         Route::put('{parents}/Update', [ParentsController::class, 'update'])->name('Parents.update');
     });
@@ -129,12 +132,18 @@ Route::group(['middleware' => ['auth']], function () {
     //assign class teachers======================================================================================
     Route::middleware('CheckUsertype:3')->group(function () {
         Route::middleware('CheckRoleType:3')->group(function () {
-            Route::post('{classes}/Assign-Teacher', [RolesController::class, 'store'])->name('Class.teacher.assign');
             Route::get('{teacher}/Edit', [RolesController::class, 'edit'])->name('roles.edit');
-            Route::put('{classTeacher}/Update', [RolesController::class, 'update'])->name('roles.update');
+            Route::put('{classTeacher}/Update-class-teacher', [RolesController::class, 'update'])->name('roles.update.class.teacher');
             Route::get('{teacher}/Delete', [RolesController::class, 'destroy'])->name('roles.destroy');
         });
     });
+
+    //assign class teacher ===========
+   Route::middleware('CheckUsertype:3')->group(function () {
+        Route::middleware('CheckRoleType:2,3')->group(function () {
+            Route::post('{classes}/Assign-Teacher', [RolesController::class, 'store'])->name('Class.teacher.assign');
+        });
+   });
 
     //teacher manager attendance .......................======================================================
     Route::middleware('CheckUsertype:3')->group(function() {
@@ -183,7 +192,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('{course}/Assign-teacher', [CoursesController::class, 'assign'])->name('courses.assign');
         Route::put('{courses}/Assigned-teacher', [CoursesController::class, 'assignedTeacher'])->name('courses.assigned.teacher');
         //view class teachers-----------------------
-        Route::get('{class}/Class-Teacher', [RolesController::class, 'update'])->name('Class.Teachers');
+        Route::get('{class}/Class-Teacher', [RolesController::class, 'index'])->name('Class.Teachers');
+
     });
     //end of condition =================================================================================
 
@@ -224,7 +234,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     //delete students records =======================================================================================
     Route::middleware('GeneralMiddleware')->group(function () {
-        Route::get('{student}/Delete-student', [StudentsController::class, 'destroy'])->name('Students.destroy');
+        Route::put('{student}/Delete-student', [StudentsController::class, 'destroy'])->name('Students.destroy');
 
         //reset users passwords =====================================================================================
         Route::prefix('User-management')->group(function () {

@@ -148,7 +148,13 @@
                                                         <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Block {{strtoupper($parent->first_name)}} {{strtoupper($parent->last_name)}}?')"><i class="fas fa-ban text-info"></i></button>
                                                     </form>
                                                 </li>
-                                                <li><a href="{{route('Parents.remove', $parent->id)}}" onclick="return confirm('Are you sure you want to delete {{strtoupper($parent->first_name)}} {{strtoupper($parent->last_name)}} Permanently?')" class="text-danger"><i class="ti-trash"></i></a></li>
+                                                <li>
+                                                    <form action="{{route('Parents.remove', $parent->id)}}" method="POST">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <button class="btn btn-link p-0" onclick="return confirm('Are you sure you want to delete {{strtoupper($parent->first_name)}} {{strtoupper($parent->last_name)}} Permanently?')"><i class="ti-trash text-danger"></i></button>
+                                                    </form>
+                                                </li>
                                             </ul>
                                         </td>
                                         @else
@@ -158,7 +164,7 @@
                                                     <form action="{{route('restore.parents.status', $parent->id)}}" method="POST">
                                                         @csrf
                                                         @method('PUT')
-                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Unblock {{strtoupper($parent->first_name)}} {{strtoupper($parent->last_name)}}?')"><i class="ti-share-alt text-success"></i></button>
+                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Unblock {{strtoupper($parent->first_name)}} {{strtoupper($parent->last_name)}}?')"><i class="ti-reload text-success"></i></button>
                                                     </form>
                                                 </li>
                                                 <li><a href="{{route('Parents.remove', $parent->id)}}" onclick="return confirm('Are you sure you want to delete {{strtoupper($parent->first_name)}} {{strtoupper($parent->last_name)}} Permanently?')" class="text-danger"><i class="ti-trash"></i></a></li>

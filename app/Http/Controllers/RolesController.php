@@ -17,6 +17,8 @@ class RolesController extends Controller
     /**
      * Show the form for creating the resource.
      */
+
+     //shows class teachers lists ======================================
     public function index ($class)
     {
         $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
@@ -24,6 +26,9 @@ class RolesController extends Controller
                                     ->where('teachers.status', '=', 1)
                                     ->where('users.status', '=', 1)
                                     ->where('teachers.school_id', '=', Auth::user()->school_id)
+                                    ->where('role_id', '!=', 2)
+                                    ->where('role_id', '!=', 3)
+                                    ->where('role_id', '!=', 4)
                                     ->orderBy('users.first_name')
                                     ->get();
         $classes = Grade::findOrFail($class);
@@ -50,6 +55,8 @@ class RolesController extends Controller
     /**
      * Store the newly created resource in storage.
      */
+
+     //register / assign class teachers ===============================================
     public function store(Request $request, $classes)
     {
         $request->validate([
@@ -94,6 +101,8 @@ class RolesController extends Controller
     /**
      * Display users resource corresponding to school.
      */
+
+     //head teacher / manager to reset the its users password==============================
     public function userPassword()
     {
         // Get the school_id of the authenticated user
@@ -125,6 +134,9 @@ class RolesController extends Controller
     /**
      * Show the form for editing the resource.
      */
+
+
+     //edit class teachers detail if you want to change class teacher name ============================
     public function edit($teacher)
     {
         //
@@ -199,14 +211,23 @@ class RolesController extends Controller
      */
     public function destroy($teacher)
     {
-        // abort(404);
         $teachers = Teacher::findOrFail($teacher);
-        // return $teachers;
         $class_teacher = Class_teacher::where('teacher_id', '=', $teachers->id)->firstOrFail();
         $class_teacher->delete();
-        Alert::success('Success!', "Class teacher removed successfully");
+
+        $currentTeacherId = $teachers->id;
+        $isCurrentTeacherAssigned = Class_teacher::where('teacher_id', $currentTeacherId)->exists();
+
+        // Update role_id to 1 only if the teacher is not assigned to any other class
+        if (!$isCurrentTeacherAssigned) {
+            $teachers->role_id = 1;
+            $teachers->save();
+        }
+
+        Alert::success('Success!', 'Class teacher removed successfully');
         return back();
     }
+
 
     public function updateRoles()
     {
@@ -217,6 +238,8 @@ class RolesController extends Controller
                                     'roles.role_name'
                                 )
                                 ->where('teachers.school_id', Auth::user()->school_id)
+                                ->where('teachers.status', 1)
+                                ->orderBy('users.first_name')
                                 ->paginate(6);
         $roles = Role::where('role_name', '!=', 'class teacher')->where('role_name', '!=', 'teacher')->orderBy('role_name')->get();
         $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
@@ -244,6 +267,11 @@ class RolesController extends Controller
             'role' => 'required|exists:roles,id',
         ]);
 
+        $userId = Auth::user()->id;
+        if($user->user_id == $userId) {
+            Alert::error('Error!', 'You cannot change your role while you are logged in');
+            return back();
+        }
         $user->role_id = $request->role; // Assuming 'role_id' is the correct field in the 'teachers' table
         $user->save();
 

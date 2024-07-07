@@ -21,6 +21,10 @@ class ParentsController extends Controller
                             ->join('schools', 'schools.id', '=', 'parents.school_id')
                             ->select('parents.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.email')
                             ->where('parents.school_id', '=', $user->school_id)
+                            ->where(function ($query) {
+                                $query->where('parents.status', 1)
+                                        ->orWhere('parents.status', 0);
+                            })
                             ->orderBy('users.first_name', 'ASC')
                             ->get();
         return view('Parents.index', ['parents' => $parents]);
@@ -145,20 +149,14 @@ class ParentsController extends Controller
         DB::beginTransaction();
 
         try {
-            // Delete related records in students table
-            DB::table('students')->where('parent_id', $parents->id)->delete();
 
-            // Delete teacher's record
-            $parent->delete();
+            //update parents status ------------
+            $parents->status = 2;
+            $parents->save();
 
-            // Check if the image file exists and is not a default image, then delete it
-            $defaultImages = ['avatar.jpg', 'female-avatar.jpg'];
-            if (file_exists($userImgPath) && !in_array(basename($userImgPath), $defaultImages)) {
-                unlink($userImgPath);
-            }
-
-            // Delete user's record
-            $user->delete();
+            //update users status references to parents
+            $user->status = 2;
+            $user->save();
 
             // Commit the transaction
             DB::commit();

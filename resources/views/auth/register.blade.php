@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-@include('layouts.header')
+@include('SRTDashboard.header')
 <body class="">
   <div class="container position-sticky z-index-sticky top-0">
     <div class="row">
@@ -134,7 +134,7 @@
     </section>
   </main>
   <!--   Core JS Files   -->
-  @include('layouts.coreJs')
+  @include('SRTDashboard.script')
 </body>
 
 </html>

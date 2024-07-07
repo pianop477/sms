@@ -8,11 +8,11 @@
         <div class="card-body">
             <div class="col-row">
                 <div class="d-flex">
-                    <div class="col-10">
-                        <h4 class="header-title text-center text-uppercase">Classes List</h4>
+                    <div class="col-8">
+                        <h4 class="header-title text-center text-uppercase">Classes</h4>
                     </div>
-                    <div class="col-2">
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-circle-plus text-secondary" style="font-size: 2rem;"></i>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-link float-right" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-circle-plus text-secondary" style="font-size: 2rem;"></i>
                         </button>
                         <div class="modal fade bd-example-modal-lg">
                             <div class="modal-dialog modal-lg">
@@ -77,7 +77,9 @@
                             @else
                             @foreach ($classes as $class )
                                 <tr>
-                                    <td>{{$class->class_name}}</td>
+                                    <td>
+                                        <i class="ti-angle-double-right"></i> {{$class->class_name}}
+                                    </td>
                                     <td class="text-uppercase">{{$class->class_code}}</td>
                                     <td>
                                         <a href=""><i class="ti-pencil"></i></a>
@@ -99,7 +101,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-10">
-                    <h4 class="header-title text-center text-uppercase">View Class Teachers</h4>
+                    <h4 class="header-title text-center text-uppercase">Assigned Class Teachers</h4>
                 </div>
             </div>
             @if ($classes->isEmpty())
@@ -107,15 +109,28 @@
                     <p>No classes records found. Please register classes!</p>
                 </div>
             @else
-            <ul class="list-group">
-                @foreach ($classes as $class)
-                <a href="{{route('Class.Teachers', $class->id)}}">
-                    <li class="list-group-item d-flex justify-content-between align-items-center text-uppercase">
-                        {{$class->class_name}}
-                    </li>
-                </a>
-                @endforeach
-            </ul>
+            <div class="single-table">
+                <div class="table-responsive">
+                    <table class="table text-uppercase">
+                        <thead class="bg-primary">
+                            <tr class="text-white">
+                                <th scope="col">Class Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($classes as $class )
+                                <tr>
+                                    <td class="">
+                                        <a href="{{route('Class.Teachers', $class->id)}}">
+                                            <i class="ti-angle-double-right"></i> {{$class->class_name}} - {{$class->class_code}}
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             @endif
         </div>
     </div>

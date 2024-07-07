@@ -7,7 +7,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-8">
-                        <h4 class="header-title text-uppercase">{{$classId->class_name. ' Class'}}</h4>
+                        <h4 class="header-title text-uppercase text-center">{{$classId->class_name. ' Students list - ('.$classId->class_code.')'}}</h4>
                     </div>
                     <div class="col-2">
                         <a href="{{route('classes.list', $classId->id)}}"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
@@ -184,7 +184,15 @@
                                                 <li class="mr-3">
                                                     <a href="{{route('Students.show', $student->id)}}"><i class="ti-eye text-secondary"></i></a>
                                                 </li>
-                                                <li><a href="{{route('Students.destroy', $student->id)}}" onclick="return confirm('Are you sure you want to delete {{strtoupper($student->first_name)}} {{strtoupper($student->middle_name)}} {{strtoupper($student->last_name)}} Permanently?')" class="text-danger"><i class="ti-trash"></i></a></li>
+                                                <li>
+                                                    <form action="{{route('Students.destroy', $student->id)}}" method="POST">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <button class="btn btn-link p-0" onclick="return confirm('Are you sure you want to delete {{strtoupper($student->first_name)}} {{strtoupper($student->middle_name)}} {{strtoupper($student->last_name)}} Permanently?')">
+                                                            <i class="ti-trash text-danger"></i>
+                                                        </button>
+                                                    </form>
+                                                </li>
                                             </ul>
                                         </td>
                                     </tr>

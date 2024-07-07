@@ -87,6 +87,7 @@
   </style>
 </head>
 <body>
+    @include('SRTDashboard.preloader')
     <nav class="navbar navbar-expand-lg navbar-custom navbar-dark">
         <div class="container">
             <img src="{{asset('assets/img/logo/shuleapp_transparent.png')}}" alt="" class="profile-img">

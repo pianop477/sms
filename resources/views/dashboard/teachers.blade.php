@@ -5,21 +5,6 @@
     @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 2)
         {{-- school head teacher panel start here --}}
             <div class="row">
-                {{-- @php
-                    use App\Models\Student;
-                    use Illuminate\Support\Facades\Auth;
-
-                    $maleStudents = Student::where('gender', 'male')
-                                            ->where('status', 1)
-                                            ->where('school_id', Auth::user()->school_id)
-                                            ->count();
-
-                    $femaleStudents = Student::where('gender', 'female')
-                                            ->where('status', 1)
-                                            ->where('school_id', Auth::user()->school_id)
-                                            ->count();
-                @endphp --}}
-
                 <div class="col-md-4 mt-5 mb-3">
                     <div class="card">
                         <div class="seo-fact sbg1">
@@ -49,8 +34,8 @@
                                 <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Students</div>
                                 <h2>{{count($students)}}</h2>
                                 <ul>
-                                    <li><span class="text-white">Male: <strong>{{$maleStudents}}</strong></span></li>
-                                    <li><span class="text-white">Female: <strong>{{$femaleStudents}}</strong></span></li>
+                                    <li><span class="text-white">Male: <strong>{{$totalMaleStudents}}</strong></span></li>
+                                    <li><span class="text-white">Female: <strong>{{$totalFemaleStudents}}</strong></span></li>
                                 </ul>
                             </div>
                             <canvas id="" height="50"></canvas>
@@ -102,21 +87,6 @@
         {{-- second argument start here =========================================== --}}
         {{-- academic teacher panel start here =================== --}}
             <div class="row">
-                {{-- @php
-                    use App\Models\Student;
-                    use Illuminate\Support\Facades\Auth;
-
-                    $maleStudents = Student::where('gender', 'male')
-                                            ->where('status', 1)
-                                            ->where('school_id', Auth::user()->school_id)
-                                            ->count();
-
-                    $femaleStudents = Student::where('gender', 'female')
-                                            ->where('status', 1)
-                                            ->where('school_id', Auth::user()->school_id)
-                                            ->count();
-                @endphp --}}
-
                 <div class="col-md-4 mt-5 mb-3">
                     <div class="card">
                         <div class="seo-fact sbg1">
@@ -135,8 +105,8 @@
                                 <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Students</div>
                                 <h2>{{count($students)}}</h2>
                                 <ul>
-                                    <li><span class="text-white">Male: <strong>0</strong></span></li>
-                                    <li><span class="text-white">Female: <strong>0</strong></span></li>
+                                    <li><span class="text-white">Male: <strong>{{$totalMaleStudents}}</strong></span></li>
+                                    <li><span class="text-white">Female: <strong>{{$totalFemaleStudents}}</strong></span></li>
                                 </ul>
                             </div>
                             <canvas id="" height="50"></canvas>
@@ -307,24 +277,6 @@
         {{-- third argument ============================================================ --}}
         {{-- class teacher panel start here ======================================= --}}
         <div class="row">
-                {{-- @php
-                    $maleCount = 0;
-                    $femaleCount = 0;
-
-                    foreach ($myClass as $class) {
-                        $maleCount += App\Models\Student::where('class_id', $class->class_id)
-                            ->where('group', $class->group)
-                            ->where('gender', 'male')
-                            ->count();
-
-                        $femaleCount += App\Models\Student::where('class_id', $class->class_id)
-                            ->where('group', $class->group)
-                            ->where('gender', 'female')
-                            ->count();
-                    }
-                @endphp --}}
-
-                {{-- first card --}}
                 <div class="col-md-4 mt-md-5 mb-3">
                     <div class="card">
                         <div class="seo-fact sbg1">
@@ -345,8 +297,10 @@
                                 <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Student</div>
                                 <h2>0</h2>
                                 <ul>
-                                    <li><span class="text-white">Male: <strong>0</strong></span></li>
-                                    <li><span class="text-white">Female: <strong>0</strong></span></li>
+                                    @foreach ($classData as $data)
+                                        <li><span class="text-white">Male: <strong>{{$data['maleCount']}}</strong></span></li>
+                                        <li><span class="text-white">Female: <strong></strong>{{$data['femaleCount']}}</span></li>
+                                    @endforeach
                                 </ul>
                             </div>
                             <canvas id="" height="50"></canvas>

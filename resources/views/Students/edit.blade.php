@@ -69,6 +69,7 @@
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom01">Driver Name: <span class="text-danger">Select if Using school bus</span></label>
                     <select name="driver" id="validationCustom01" class="form-control text-uppercase">
+                        <option value="">--Not using School Bus--</option>
                         @if ($students->transport == NULL)
                             <option value="">-- Select Driver Name --</option>
                             @foreach ($buses as $bus )

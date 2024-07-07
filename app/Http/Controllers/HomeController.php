@@ -29,23 +29,20 @@ class HomeController extends Controller
     public function index()
         {
             $user = Auth::user();
-
+                //system adminstrator dashboard redirection --------------------------------------------
             if ($user->usertype == 1 && $user->status == 1) {
-                $schools = School::where('status', '=', 1)->get();
+                $schools = School::where('status', '=', 1)->orderBy('school_name')->get();
                 $teachers = Teacher::where('status', '=', 1)->get();
                 $students = Student::where('status', '=', 1)->get();
                 $parents = Parents::where('status', '=', 1)->get();
                 $classes = Grade::where('status', '=', 1)->get();
                 $subjects = Subject::where('status', '=', 1)->get();
                 $buses = Transport::where('status', '=', 1)->get();
-                $school_details = school::orderBy('school_name')->get();
-                // $school_details = User::query()->join('schools', 'schools.id', '=', 'users.school_id')
-                //                                 ->select('users.*', 'schools.school_name', 'schools.school_reg_no')
-                //                                 ->where('users.usertype', '=', 2)
-                //                                 ->orderBy('users.first_name')
-                //                                 ->get();
-                return view('home', compact('teachers', 'students', 'parents', 'classes', 'subjects', 'buses', 'schools', 'school_details'));
-            } elseif ($user->usertype == 2 && $user->status == 1) {
+                // $school_details = school::orderBy('school_name')->get();
+                return view('home', compact('teachers', 'students', 'parents', 'classes', 'subjects', 'buses', 'schools'));
+            }
+                 //manager dashboard redirection --------------------------------------
+            elseif ($user->usertype == 2 && $user->status == 1) {
                 $teachers = Teacher::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
                 $parents = Parents::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
                 $students = Student::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
@@ -54,6 +51,7 @@ class HomeController extends Controller
                 $buses = Transport::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
                 return view('home', compact('teachers', 'parents', 'students', 'classes', 'subjects', 'buses'));
             }
+            //parents dashboard redirection ----------------------
             elseif ($user->usertype == 4 && $user->status == 1) {
                 $students = Student::query()->join('parents', 'parents.id', '=', 'students.parent_id')
                                         ->join('users', 'users.id', '=', 'parents.user_id')
@@ -69,6 +67,7 @@ class HomeController extends Controller
                                         'transports.routine as bus_routine' // Select transport fields, if needed
                                         )
                                         ->where('parents.user_id', '=', $user->id)
+                                        ->where('students.status', 1)
                                         ->orderBy('students.first_name', 'ASC')
                                         ->get();
                 $classes = Grade::where('status', '=', 1)->get();
@@ -76,9 +75,11 @@ class HomeController extends Controller
                 return view('home', ['students' => $students, 'classes' => $classes, 'buses' => $buses]);
             }
 
-            if ($user->usertype == 3 && $user->status == 1) {
+            //teachers dashboard redirection ---------------------------------------------------------
+            elseif ($user->usertype == 3 && $user->status == 1) {
                 $teachers = Teacher::where('user_id', $user->id)->first();
 
+                //return class teachers course assigned-------------------
                 $courses = Subject::query()
                     ->join('grades', 'grades.id', 'subjects.class_id')
                     ->join('teachers', 'teachers.id', 'subjects.teacher_id')
@@ -98,6 +99,7 @@ class HomeController extends Controller
                     ->where('subjects.status', '=', 1)
                     ->get();
 
+                //return myclass assigned as class teachers ------------------------
                 $myClass = Class_teacher::query()
                     ->join('grades', 'grades.id', 'class_teachers.class_id')
                     ->join('teachers', 'teachers.id', 'class_teachers.teacher_id')
@@ -115,23 +117,38 @@ class HomeController extends Controller
                     ->where('class_teachers.teacher_id', '=', $teachers->id)
                     ->where('class_teachers.school_id', '=', $teachers->school_id)
                     ->get();
+
+                    $classData = [];
+                    foreach ($myClass as $class) {
+                        $maleCount = Student::where('class_id', $class->class_id)
+                                            ->where('group', $class->group)
+                                            ->where('gender', 'male')
+                                            ->count();
+                        $femaleCount = Student::where('class_id', $class->class_id)
+                                              ->where('group', $class->group)
+                                              ->where('gender', 'female')
+                                              ->count();
+
+                        $classData[] = [
+                            'class' => $class,
+                            'maleCount' => $maleCount,
+                            'femaleCount' => $femaleCount
+                        ];
+                    }
+
                 $teachers = Teacher::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
                 $parents = Parents::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
                 $students = Student::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
                 $classes = Grade::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
                 $subjects = Subject::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
                 $buses = Transport::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
-                return view('home', [
-                    'courses' => $courses,
-                    'myClass' => $myClass,
-                    'classes' => $classes,
-                    'teachers' => $teachers,
-                    'students' => $students,
-                    'classes' => $classes,
-                    'subjects' => $subjects,
-                    'parents' => $parents,
-                    'buses' => $buses
-                ]);
+
+                //summary counts ------------------
+                $totalMaleStudents = Student::where('gender', '=', 'male')->where('school_id', '=', $user->school_id)->count();
+                $totalFemaleStudents = Student::where('gender', '=', 'female')->where('school_id', '=', $user->school_id)->count();
+                //end of summary -----------------
+                return view('home', compact('courses', 'myClass', 'classes', 'teachers', 'students', 'classes', 'subjects',
+                            'parents', 'buses', 'totalMaleStudents', 'totalFemaleStudents', 'classData',));
             }
 
             else {

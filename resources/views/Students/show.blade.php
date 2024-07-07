@@ -32,7 +32,7 @@
         </div>
       </div>
       <div class="col-lg-2 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
-        <a href="{{ route('home') ?? '' }}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+        <a href="{{ url()->previous() }}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
       </div>
     </div>
     <hr class="dark horizontal my-0">
@@ -65,7 +65,7 @@
                         </button>
                         @else
                         <button type="button" class="list-group-item list-group-item-action" disabled="">
-                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="ti-eye"> View School bus details</i>
+                            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="ti-eye"> SCHOOL BUS DETAILS</i>
                             </button>
                             <div class="modal fade bd-example-modal-lg">
                                 <div class="modal-dialog modal-lg">

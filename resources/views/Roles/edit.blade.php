@@ -10,7 +10,7 @@
                     <a href="{{route('Class.Teachers', $classTeacher->class_id)}}"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
                 </div>
             </div>
-            <form class="needs-validation" novalidate="" action="{{route('roles.update', $classTeacher->id)}}" method="POST" enctype="multipart/form-data">
+            <form class="needs-validation" novalidate="" action="{{route('roles.update.class.teacher', $classTeacher->id)}}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="form-row">

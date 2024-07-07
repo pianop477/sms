@@ -178,23 +178,9 @@ class StudentsController extends Controller
          // Find the student record
          $student = Student::findOrFail($student);
 
-         // Check if the student record has an image
-         if ($student->image) {
-             // Get the photo path from the student record
-             $photoPath = public_path('assets/img/students/' . $student->image);
-
-             // Delete the student record
-             $student->delete();
-
-             // Delete the photo file if it exists
-             if (file_exists($photoPath)) {
-                 unlink($photoPath);
-             }
-         } else {
-             // Delete the student record even if there is no image
-             $student->delete();
-         }
-
+         //update status ------------
+         $student->status = 2;
+         $student->save();
          // Show success message
          Alert::success('Success', 'Student records deleted successfully');
          return back();
@@ -223,6 +209,7 @@ class StudentsController extends Controller
                                 'transports.routine')
                             ->where('students.class_id', '=', $classId->id)
                             ->where('students.school_id', '=', Auth::user()->school_id)
+                            ->where('students.status', 1)
                             ->orderBy('students.first_name', 'ASC')
                             ->get();
         return view('Students.index', ['students' => $students, 'classId' => $classId, 'parents' => $parents, 'buses' => $buses]);

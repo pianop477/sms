@@ -95,7 +95,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($school_details as $school )
+                                @foreach ($schools as $school )
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
                                         <td class="text-uppercase">
@@ -113,6 +113,9 @@
                                         <td>
                                             @if ($school->status == 1)
                                             <ul class="d-flex justify-content-center">
+                                                <li class="mr-3">
+                                                    <a href="{{route('schools.edit', $school->id)}}"><i class="ti-pencil text-primary"></i></a>
+                                                </li>
                                                 <li class="mr-3">
                                                     <a href="{{route('schools.show', $school->id)}}"><i class="ti-eye text-secondary"></i></a>
                                                 </li>

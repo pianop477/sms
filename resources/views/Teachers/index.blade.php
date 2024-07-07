@@ -7,7 +7,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-10">
-                        <h4 class="header-title text-uppercase">Teachers list</h4>
+                        <h4 class="header-title text-uppercase text-center">Teachers list</h4>
                     </div>
                     <div class="col-2">
                         <button type="button" class="btn btn-link" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-circle-plus text-secondary" style="font-size: 2rem;"></i>
@@ -189,7 +189,13 @@
                                                         <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Block {{strtoupper($teacher->first_name)}} {{strtoupper($teacher->last_name)}}?')"><i class="fas fa-ban text-info"></i></button>
                                                     </form>
                                                 </li>
-                                                <li><a href="{{route('Teachers.remove', $teacher->id)}}" onclick="return confirm('Are you sure you want to Delete {{ strtoupper($teacher->first_name) }} {{ strtoupper($teacher->last_name) }} Permanently?')" class="text-danger"><i class="ti-trash"></i></a></li>
+                                                <li>
+                                                    <form action="{{route('Teachers.remove', $teacher->id)}}" method="POST">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <button class="btn btn-link p-0" type="submit" onclick="return confirm('Are you sure you want to Delete {{ strtoupper($teacher->first_name) }} {{ strtoupper($teacher->last_name) }} Permanently?')"><i class="ti-trash text-danger"></i></button>
+                                                    </form>
+                                                </li>
                                             </ul>
                                         </td>
                                         @else
@@ -199,10 +205,16 @@
                                                     <form action="{{route('teachers.restore', $teacher->id)}}" method="POST">
                                                         @csrf
                                                         @method('PUT')
-                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Unblock {{strtoupper($teacher->first_name)}} {{strtoupper($teacher->last_name)}}?')"><i class="ti-share-alt text-success"></i></button>
+                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Unblock {{strtoupper($teacher->first_name)}} {{strtoupper($teacher->last_name)}}?')"><i class="ti-reload text-success"></i></button>
                                                     </form>
                                                 </li>
-                                                <li><a href="{{route('Teachers.remove', $teacher->id)}}" onclick="return confirm('Are you sure you want to Delete {{ strtoupper($teacher->first_name) }} {{ strtoupper($teacher->last_name) }} Permanently?')" class="text-danger"><i class="ti-trash"></i></a></li>
+                                                <li>
+                                                    <form action="{{route('Teachers.remove', $teacher->id)}}" method="POST">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <button class="btn btn-link p-0" type="submit" onclick="return confirm('Are you sure you want to Delete {{ strtoupper($teacher->first_name) }} {{ strtoupper($teacher->last_name) }} Permanently?')"><i class="ti-trash text-danger"></i></button>
+                                                    </form>
+                                                </li>
                                             </ul>
                                         </td>
                                         @endif

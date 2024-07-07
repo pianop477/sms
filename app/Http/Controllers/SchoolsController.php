@@ -131,11 +131,66 @@ class SchoolsController extends Controller
     }
 
     /**
-     * Update the resource in storage.
+     * Edit the resource in storage
+    */
+
+    public function edit (school $school)
+    {
+        $response = Http::get('https://restcountries.com/v3.1/all');
+        $countries = $response->json();
+
+         // Optionally, filter by continent
+         $africanCountries = array_filter($countries, function ($country) {
+            return isset($country['region']) && $country['region'] == 'Africa';
+        });
+         // Sort countries by name in ascending order
+         usort($africanCountries, function ($a, $b) {
+            return strcmp($a['name']['common'], $b['name']['common']);
+        });
+
+        return view('Schools.edit', ['countries' => $africanCountries, 'school' => $school]);
+    }
+
+     /** Update the resource in storage.
      */
-    public function update(Request $request)
+
+    public function updateSchool($school, Request $request)
     {
         //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'reg_no' => 'required|string|max:255',
+            'logo' => 'image|max:4096',
+            'postal' => 'required|string',
+            'postal_name' => 'required|string',
+            'country' => 'required|string'
+        ]);
+
+        $schools = school::findOrFail($school);
+        $schools->school_name = $request->name;
+        $schools->school_reg_no = $request->reg_no;
+        $schools->postal_address = $request->postal;
+        $schools->postal_name = $request->postal_name;
+        $schools->country = $request->country;
+        if ($request->hasFile('logo')) {
+            $image = $request->file('logo');
+            $imageFile = time() . '.' . $image->getClientOriginalExtension();
+            $imagePath = public_path('assets/img/logo');
+
+            // Ensure the directory exists
+            if (!file_exists($imagePath)) {
+                mkdir($imagePath, 0775, true);
+            }
+
+            // Move the file
+            $image->move($imagePath, $imageFile);
+
+            // Set the image file name on the student record
+            $school->logo = $imageFile;
+        }
+        $schools->save();
+        Alert::success('Success!', 'School information updated successfully');
+        return redirect()->route('home');
     }
 
     /**

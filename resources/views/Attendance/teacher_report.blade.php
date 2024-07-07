@@ -98,7 +98,6 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>Attendance Date</th>
                             <th>Student ID</th>
                             <th>Student Name</th>
                             <th>Gender</th>
@@ -109,7 +108,6 @@
                     <tbody>
                         @foreach($records as $attendance)
                             <tr>
-                                <td>{{ \Carbon\Carbon::parse($attendance->attendance_date)->format('d-m-Y') }}</td>
                                 <td>{{ str_pad($attendance->studentID, 4, '0', STR_PAD_LEFT) }}</td>
                                 <td class="text-capitalize">{{ $attendance->first_name }} {{$attendance->middle_name}} {{ $attendance->last_name }}</td>
                                 <td class="text-capitalize">{{ ucfirst($attendance->gender[0]) }}</td>

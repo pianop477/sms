@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Class_teacher;
 use App\Models\school;
 use App\Models\Teacher;
 use App\Models\User;
@@ -23,6 +24,10 @@ class TeachersController extends Controller
                             ->join('schools', 'schools.id', '=', 'teachers.school_id')
                             ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.email')
                             ->where('teachers.school_id', '=', $userLogged->school_id)
+                            ->where(function ($query) {
+                                $query->where('teachers.status', 1)
+                                    ->orWhere('teachers.status', 0);
+                            })
                             ->orderBy('users.first_name', 'ASC')
                             ->get();
         return view('Teachers.index', ['teachers' => $teachers]);
@@ -244,40 +249,58 @@ class TeachersController extends Controller
         // Find the associated user or fail
         $user = User::findOrFail($teacher->user_id);
 
-        // Check the image path
-        $userImgPath = public_path('assets/img/profile/' . $user->image);
+        //user id logged in
+        $userId = Auth::user()->id;
+
+        // Check if the selected teacher is logged in and trying to update their status themselves
+        if ($teacher->user_id == $userId) {
+            Alert::error('Error!', 'You cannot delete your own account while you are logged in');
+            return back();
+        }
+
+         //check role of logged user compare with role of deleted user=======
+         // Check the role of the logged-in user and compare with the role of the user being deleted
+        $loggedInTeacher = Teacher::where('user_id', $userId)->firstOrFail();
+        if ($loggedInTeacher->role_id == 3 && $teacher->role_id == 2) {
+            Alert::error('Error!', 'You do not have permission to delete this teacher.');
+            return back();
+        }
+
+        // Check if the user is assigned as a class teacher to any class
+        $assignedClassTeacher = Class_teacher::where('teacher_id', $teacher->id)->first();
+        if ($assignedClassTeacher) {
+            // Delete the class teacher record
+            $assignedClassTeacher->delete();
+        }
 
         // Begin a database transaction
         DB::beginTransaction();
 
         try {
-            // Delete related records in class_teachers table
-            DB::table('class_teachers')->where('teacher_id', $teacher->id)->delete();
+            // Update the status column and role_id in the teachers table
+            $teacher->status = 2;
+            $teacher->role_id = 1; // Set to NULL
+            $teacher->save();
 
-            // Delete teacher's record
-            $teacher->delete();
-
-            // Check if the image file exists and is not a default image, then delete it
-            $defaultImages = ['avatar.jpg', 'female-avatar.jpg'];
-            if (file_exists($userImgPath) && !in_array(basename($userImgPath), $defaultImages)) {
-                unlink($userImgPath);
-            }
-
-            // Delete user's record
-            $user->delete();
+            // Update the status column in the users table
+            $user->status = 2;
+            $user->save();
 
             // Commit the transaction
             DB::commit();
 
-            Alert::success('Success', 'Teacher records deleted successfully');
+            Alert::success('Success', 'Teacher status deleted successfully');
         } catch (\Exception $e) {
             // Rollback the transaction if there's an error
             DB::rollBack();
 
-            Alert::error('Error', 'Failed to delete teacher records');
+            \Log::error('Failed to delete teacher records: ' . $e->getMessage());
+
+            Alert::error('Error', 'Failed to delete teacher status');
         }
 
         return back();
     }
+
 
 }
