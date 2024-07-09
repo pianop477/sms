@@ -27,6 +27,7 @@ return new class extends Migration
             $table->foreign('school_id')->references('id')->on('schools')->onDelete('cascade');
             $table->float('score');
             $table->string('Exam_term');
+            $table->integer('marking_style');
             $table->string('status')->default(1);
             $table->date('exam_date');
             $table->timestamps();

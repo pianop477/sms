@@ -7,6 +7,7 @@ use App\Http\Controllers\ExamController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\ParentsController;
+use App\Http\Controllers\PdfGeneratorController;
 use App\Http\Controllers\ResultsController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SchoolsController;

@@ -17,7 +17,8 @@ class Examination_result extends Model
         'school_id',
         'exam_date',
         'Exam_term',
-        'score'
+        'score',
+        'marking_style'
     ];
 
     protected $guarded = ['id'];

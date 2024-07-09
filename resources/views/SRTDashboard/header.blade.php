@@ -25,29 +25,54 @@
     <script src="{{asset('assets/js/vendor/modernizr-2.8.3.min.js')}}"></script>
     <style>
         @media print {
-            * {
-                color: black;
-            }
-            .attendance {
-                border: 2px solid black;
-            }
-            .attendance-date{
-                background-color: gray;
-            }
-            .teacher-details {
-                border: 2px solid black;
-            }
             .no-print {
                 display: none;
             }
             .print-only {
                 display: block;
             }
+            .footer {
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+                border-top: 1px solid #ddd;
+                padding-top: 10px;
+            }
+            @page {
+                margin: 15mm;
+                @top-left {
+                        content: none;
+                    }
+                    @top-right {
+                        content: none;
+                    }
+                    @bottom-left {
+                        content: none;
+                    }
+                    @bottom-right {
+                        content: none;
+                    }
+            }
+            thead {
+                display: table-header-group;
+                background-color: gray; /* Adds a gray background to thead */
+            }
+            tbody {
+                display: table-row-group;
+            }
+            body {
+                color: black; /* Sets text color to black */
+            }
             .table {
                 border: 1px solid black;
+                border-collapse: collapse;
             }
-            .table-attendance {
+            .table th,
+            .table td {
                 border: 1px solid black;
+            }
+            .logo {
+                color: inherit; /* Ensure logo color is not changed */
             }
         }
         .print-only {

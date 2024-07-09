@@ -37,52 +37,54 @@ class ExamController extends Controller
 
     //capture values and send it to the next step===========================
     public function captureValues(Request $request)
-{
-    $dataValidation = $request->validate([
-        'exam_type' => 'required|exists:examinations,id',
-        'exam_date' => 'required|date_format:Y-m-d',
-        'term' => 'required',
-    ]);
+    {
+        $dataValidation = $request->validate([
+            'exam_type' => 'required|exists:examinations,id',
+            'exam_date' => 'required|date_format:Y-m-d',
+            'term' => 'required',
+            'marking_style' => 'required|integer'
+        ]);
 
-    // Capture values
-    $courseId = $request->course_id;
-    $classId = $request->class_id;
-    $teacherId = $request->teacher_id;
-    $schoolId = $request->school_id;
-    $examTypeId = $request->exam_type;
-    $examDate = $request->exam_date;
-    $term = $request->term;
+        // Capture values
+        $courseId = $request->course_id;
+        $classId = $request->class_id;
+        $teacherId = $request->teacher_id;
+        $schoolId = $request->school_id;
+        $examTypeId = $request->exam_type;
+        $examDate = $request->exam_date;
+        $term = $request->term;
+        $markingStyle = $request->marking_style;
 
-    $students = Student::where('class_id', $classId)->where('status', 1)->orderBy('first_name', 'ASC')->get();
-    $className = Grade::find($classId)->class_code;
-    $courseName = Subject::find($courseId)->course_code;
-    $examName = Examination::find($examTypeId)->exam_type;
+        $students = Student::where('class_id', $classId)->where('status', 1)->orderBy('first_name', 'ASC')->get();
+        $className = Grade::find($classId)->class_code;
+        $courseName = Subject::find($courseId)->course_code;
+        $examName = Examination::find($examTypeId)->exam_type;
 
-    // Store the captured values into session
-    $request->session()->put('course_id', $courseId);
-    $request->session()->put('class_id', $classId);
-    $request->session()->put('teacher_id', $teacherId);
-    $request->session()->put('school_id', $schoolId);
-    $request->session()->put('exam_type_id', $examTypeId);
-    $request->session()->put('exam_date', $examDate);
-    $request->session()->put('term', $term);
+        // Store the captured values into session
+        $request->session()->put('course_id', $courseId);
+        $request->session()->put('class_id', $classId);
+        $request->session()->put('teacher_id', $teacherId);
+        $request->session()->put('school_id', $schoolId);
+        $request->session()->put('exam_type_id', $examTypeId);
+        $request->session()->put('exam_date', $examDate);
+        $request->session()->put('term', $term);
+        $request->session()->put('marking_style', $markingStyle);
 
-    return view('Examinations.register_score', [
-        'courseId' => $courseId,
-        'classId' => $classId,
-        'teacherId' => $teacherId,
-        'schoolId' => $schoolId,
-        'examTypeId' => $examTypeId,
-        'examDate' => $examDate,
-        'term' => $term,
-        'students' => $students,
-        'className' => $className,
-        'courseName' => $courseName,
-        'examName' => $examName,
-    ]);
-}
-
-
+        return view('Examinations.register_score', [
+            'courseId' => $courseId,
+            'classId' => $classId,
+            'teacherId' => $teacherId,
+            'schoolId' => $schoolId,
+            'examTypeId' => $examTypeId,
+            'examDate' => $examDate,
+            'term' => $term,
+            'students' => $students,
+            'className' => $className,
+            'courseName' => $courseName,
+            'examName' => $examName,
+            'marking_style' => $markingStyle,
+        ]);
+    }
 
     //store examination scores ==================================
     public function storeScore(Request $request)
@@ -90,7 +92,7 @@ class ExamController extends Controller
         // Define validation rules
         $rules = [
             'students.*.student_id' => 'required|exists:students,id',
-            'students.*.score' => 'required|numeric|min:0|max:50',  // Validation for score
+            'students.*.score' => 'required|numeric|min:0|max:100',  // Validation for score
         ];
         $validator = Validator::make($request->all(), $rules);
 
@@ -105,15 +107,8 @@ class ExamController extends Controller
         $classId = $request->session()->get('class_id');
         $schoolId = $request->session()->get('school_id');
         $term = $request->session()->get('term');
+        $markingStyle = $request->session()->get('marking_style');
         $students = $request->input('students');
-
-        // Debugging output
-        // \Log::info('Exam Type ID: ' . $examTypeId);
-        // \Log::info('Exam Date: ' . $examDate);
-        // \Log::info('Course ID: ' . $courseId);
-        // \Log::info('Teacher ID: ' . $teacherId);
-        // \Log::info('Class ID: ' . $classId);
-        // \Log::info('School ID: ' . $schoolId);
 
         foreach ($students as $studentData) {
             $studentId = $studentData['student_id'];
@@ -130,19 +125,6 @@ class ExamController extends Controller
                 Alert::error('Error!', 'Examination Results already submitted for this Course');
                 return redirect()->route('score.prepare.form', $courseId);
             } else {
-                // Log the data before creating the record
-                // \Log::info('Creating record with data: ', [
-                //     'student_id' => $studentId,
-                //     'course_id' => $courseId,
-                //     'class_id' => $classId,
-                //     'teacher_id' => $teacherId,
-                //     'exam_type_id' => $examTypeId,
-                //     'school_id' => $schoolId,
-                //     'exam_date' => $examDate,
-                //     'score' => $score,
-                //     'Exam_term' => $term
-                // ]);
-
                 // Create a new examination result entry
                 Examination_result::create([
                     'student_id' => $studentId,
@@ -153,7 +135,8 @@ class ExamController extends Controller
                     'school_id' => $schoolId,
                     'exam_date' => $examDate,
                     'score' => $score,
-                    'Exam_term' => $term
+                    'Exam_term' => $term,
+                    'marking_style' => $markingStyle
                 ]);
             }
         }
@@ -161,9 +144,6 @@ class ExamController extends Controller
         Alert::success('Success!', 'Examination results have been submitted successfully');
         return redirect()->route('score.prepare.form', $courseId);
     }
-
-
-
 
     /**
      * Store the newly created resource in storage.
@@ -293,7 +273,7 @@ class ExamController extends Controller
             ->distinct()
             ->select('examinations.exam_type', DB::raw('MONTH(examination_results.exam_date) as exam_month'))
             ->orderBy(DB::raw('MONTH(examination_results.exam_date)'))
-            ->paginate(5);
+            ->paginate(7);
 
         return view('Examinations.results_by_year', compact('examTypes', 'year'));
     }
@@ -301,63 +281,66 @@ class ExamController extends Controller
 
 
     public function viewResultsByType($year, $type)
-    {
-        $user = Auth::user()->id;
-        $teacher = Teacher::where('user_id', $user)->firstOrFail();
-        // return $teacher;
-        $course = Subject::where('teacher_id', $teacher->id)->firstOrFail();
-        // return $course;
-        $results = Examination_result::query()
-            ->join('students', 'students.id', '=', 'examination_results.student_id')
-            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-            ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
-            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-            ->select(
-                'examination_results.*',
-                'subjects.course_name', 'subjects.course_code',
-                'grades.class_name', 'grades.class_code',
-                'students.first_name', 'students.id as studentId', 'students.middle_name', 'students.last_name', 'students.class_id', 'students.group', 'students.gender',
-                'examinations.exam_type',
-                'users.first_name as teacher_firstname', 'users.last_name as teacherlastname', 'users.phone as teacher_phone',
-                DB::raw('MONTH(examination_results.exam_date) as exam_month')
-            )
-            ->whereYear('examination_results.exam_date', $year)
-            ->where('examinations.exam_type', $type)
-            ->where('examination_results.course_id', $course->id)
-            ->where('examination_results.teacher_id', $course->teacher_id)
-            ->where('examination_results.class_id', $course->class_id)
-            ->orderBy('students.first_name', 'ASC')
-            ->get();
+{
+    $user = Auth::user()->id;
+    $teacher = Teacher::where('user_id', $user)->firstOrFail();
+    $course = Subject::where('teacher_id', $teacher->id)->firstOrFail();
 
-        // Calculate summary statistics
-        $total_male = $results->where('gender', 'male')->count();
-        $total_female = $results->where('gender', 'female')->count();
+    $results = Examination_result::query()
+        ->join('students', 'students.id', '=', 'examination_results.student_id')
+        ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+        ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+        ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+        ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
+        ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+        ->select(
+            'examination_results.*',
+            'subjects.course_name', 'subjects.course_code',
+            'grades.class_name', 'grades.class_code',
+            'students.first_name', 'students.id as studentId', 'students.middle_name', 'students.last_name', 'students.class_id', 'students.group', 'students.gender',
+            'examinations.exam_type',
+            'users.first_name as teacher_firstname', 'users.last_name as teacherlastname', 'users.phone as teacher_phone',
+            DB::raw('MONTH(examination_results.exam_date) as exam_month')
+        )
+        ->whereYear('examination_results.exam_date', $year)
+        ->where('examinations.exam_type', $type)
+        ->where('examination_results.course_id', $course->id)
+        ->where('examination_results.teacher_id', $course->teacher_id)
+        ->where('examination_results.class_id', $course->class_id)
+        ->orderBy('students.first_name', 'ASC')
+        ->get();
 
-        $summary = [
-            'total_students' => $results->count(),
-            'total_male' => $total_male,
-            'total_female' => $total_female,
-            'grades' => [
-                'male_E' => $results->where('score', '<=', 10)->where('gender', 'male')->count(),
-                'female_E' => $results->where('score', '<=', 10)->where('gender', 'female')->count(),
-                'male_D' => $results->whereBetween('score', [11, 20])->where('gender', 'male')->count(),
-                'female_D' => $results->whereBetween('score', [11, 20])->where('gender', 'female')->count(),
-                'male_C' => $results->whereBetween('score', [21, 30])->where('gender', 'male')->count(),
-                'female_C' => $results->whereBetween('score', [21, 30])->where('gender', 'female')->count(),
-                'male_B' => $results->whereBetween('score', [31, 40])->where('gender', 'male')->count(),
-                'female_B' => $results->whereBetween('score', [31, 40])->where('gender', 'female')->count(),
-                'male_A' => $results->whereBetween('score', [41, 50])->where('gender', 'male')->count(),
-                'female_A' => $results->whereBetween('score', [41, 50])->where('gender', 'female')->count(),
-            ],
-            'average_score' => $results->avg('score'),
-            'course_name' => $results->first()->course_name ?? '',
-            'class_name' => $results->first()->class_name ?? ''
-        ];
-
-        return view('Examinations.results_by_type', compact('results', 'summary', 'year', 'type'));
+    if ($results->isEmpty()) {
+        return back()->with('error', 'No results found for the given criteria.');
     }
+
+    $total_male = $results->where('gender', 'male')->count();
+    $total_female = $results->where('gender', 'female')->count();
+
+    $summary = [
+        'total_students' => $results->count(),
+        'total_male' => $total_male,
+        'total_female' => $total_female,
+        'grades' => [
+            'male_E' => $results->where('score', '<=', 10)->where('gender', 'male')->count(),
+            'female_E' => $results->where('score', '<=', 10)->where('gender', 'female')->count(),
+            'male_D' => $results->whereBetween('score', [11, 20])->where('gender', 'male')->count(),
+            'female_D' => $results->whereBetween('score', [11, 20])->where('gender', 'female')->count(),
+            'male_C' => $results->whereBetween('score', [21, 30])->where('gender', 'male')->count(),
+            'female_C' => $results->whereBetween('score', [21, 30])->where('gender', 'female')->count(),
+            'male_B' => $results->whereBetween('score', [31, 40])->where('gender', 'male')->count(),
+            'female_B' => $results->whereBetween('score', [31, 40])->where('gender', 'female')->count(),
+            'male_A' => $results->whereBetween('score', [41, 50])->where('gender', 'male')->count(),
+            'female_A' => $results->whereBetween('score', [41, 50])->where('gender', 'female')->count(),
+        ],
+        'average_score' => $results->avg('score'),
+        'course_name' => $results->first()->course_name ?? '',
+        'class_name' => $results->first()->class_name ?? ''
+    ];
+
+    return view('Examinations.results_by_type', compact('results', 'summary', 'year', 'type'));
+}
+
 
 
 

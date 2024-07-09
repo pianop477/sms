@@ -60,10 +60,7 @@
 
     /* Profile image style */
     .profile-img {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      margin-right: 10px;
+      margin-right: 5px;
     }
 
     /* Customization for card header */
@@ -90,7 +87,7 @@
     @include('SRTDashboard.preloader')
     <nav class="navbar navbar-expand-lg navbar-custom navbar-dark">
         <div class="container">
-            <img src="{{asset('assets/img/logo/shuleapp_transparent.png')}}" alt="" class="profile-img">
+            <img src="{{asset('assets/img/logo/shuleapp_transparent.png')}}" alt="" class="rounded-circle" style="width:70px; object-ft-cover;">
             <a class="navbar-brand" href="#">ShuleApp</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>

@@ -1,155 +1,130 @@
 @extends('SRTDashboard.frame')
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .table, .table th, .table td {
-            border: 1px solid black;
-        }
-        .table th, .table td {
-            padding: 8px;
-            text-align: left;
-        }
-        .bg-info {
-            background-color: #17a2b8;
-        }
-        .text-white {
-            color: white;
-        }
-    </style>
-    @section('content')
-    <div class="attendance col-md-12">
-        <div class="card">
+@section('content')
+    <div class="col-md-12">
+        <div class="card mt-2">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-12">
-                        <h3 class="text-uppercase text-center">{{ Auth::user()->school->school_name }}</h3>
+                    <div class="col-2 logo">
+                        <img src="{{asset('assets/img/logo/' .Auth::user()->school->logo)}}" alt="" style="max-width: 120px;">
+                    </div>
+                    <div class="col-8 text-center">
+                        <h4 class="text-uppercase">{{Auth::user()->school->school_name}}</h4>
+                        <h5 class="text-uppercase">class daily attendance report</h5>
                     </div>
                 </div>
-                <div class="row mt-3">
-                    <div class="col-10">
-                        <h3 class="">Attendance Report for: {{\Carbon\Carbon::parse($attendanceRecords->first()->attendance_date)->format('d-F-Y')}}</h3>
-                    </div>
-                    <div class="col-1">
-                        <a href="" onclick="scrollToTopAndPrint(); return false;" class="no-print">
-                            <i class="fas fa-print text-secondary" style="font-size: 1rem"></i>
-                        </a>
-                    </div>
-                    <div class="col-1">
-                        <a href="{{url()->previous()}}" class="no-print">
-                            <i class="fas fa-arrow-circle-left text-secondary" style="font-size: 1rem"></i>
-                        </a>
-                    </div>
-                </div>
-                @if($attendanceRecords->isEmpty())
-                    <div class="alert alert-warning mt-3 text-center" role="alert">
-                        <h6>You have not submitted attendance report, kindly submit it before a day to end!</h6>
-                    </div>
-                @else
-                    <!-- Display Teacher's Details -->
-                    <div class="mt-3 teacher-details">
-                        <h4 class="text-capitalize bg-info">Class Teacher Details</h4>
-                        <div class="row">
-                            <div class="col-6">
-                                <p class="text-capitalize"><strong>Name:</strong> {{ $attendanceRecords->first()->teacher_firstname }} {{ $attendanceRecords->first()->teacher_lastname }}</p>
-                                <p><strong>Gender:</strong> {{ ucfirst($attendanceRecords->first()->teacher_gender) }}</p>
-                            </div>
-                            <div class="col-4">
-                                <p><strong>Phone:</strong> {{ $attendanceRecords->first()->teacher_phone }}</p>
-                                <p class="text-uppercase"><strong>Class:</strong> {{ $attendanceRecords->first()->class_name }} ({{ $attendanceRecords->first()->class_code }})</p>
-                                {{-- <p class="text-capitalize"><strong>Class Group:</strong> {{ $attendanceRecords->first()->group }}</p> --}}
+                <hr>
+                @if ($attendanceRecords->isEmpty())
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="alert alert-warning text-center mt-3" role="alert">
+                                <p>Today report not submitted, please submit the attendance before a day to end!</p>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Summary Table -->
-                    <table class="table table-sm table-responsive-sm table-bordered mt-3">
-                        <tr>
-                            <th>Gender</th>
-                            <th>Present</th>
-                            <th>Absent</th>
-                            <th>Permission</th>
-                            <th>Sum</th>
-                        </tr>
-                        <tr>
-                            <td>Male</td>
-                            <td>{{ $malePresent }}</td>
-                            <td>{{ $maleAbsent }}</td>
-                            <td>{{ $malePermission }}</td>
-                            <th><strong>{{$sumMale = $malePresent + $maleAbsent + $malePermission}}</strong></th>
-                        </tr>
-                        <tr>
-                            <td>Female</td>
-                            <td>{{ $femalePresent }}</td>
-                            <td>{{ $femaleAbsent }}</td>
-                            <td>{{ $femalePermission }}</td>
-                            <td><strong>{{$sumFemale = $femalePresent  + $femaleAbsent + $femalePermission  }}</strong></td>
-                        </tr>
-                        <tr>
-                            <td>Grand Total</td>
-                            <td><strong>{{$malePresent +  $femalePresent}}</strong></td>
-                            <td><strong>{{$maleAbsent +  $femaleAbsent}}</strong></td>
-                            <td><strong>{{$malePermission +  $femalePermission}}</strong></td>
-                            <td><strong>{{$sumMale +  $sumFemale}}</strong></td>
-                        </tr>
-                    </table>
-
-                    <!-- Detailed Attendance Records -->
-                    @php
-                        $currentDate = '';
-                    @endphp
-
-                    @foreach ($attendanceRecords as $record)
-                        @if ($currentDate !== $record->attendance_date)
-                            @php
-                                $currentDate = $record->attendance_date;
-                            @endphp
-                            <!-- Attendance Date Header -->
-                            <h5 class="bg-info text-center mt-3 attendance-date">Date: {{ \Carbon\Carbon::parse($currentDate)->format('F d, Y') }}</h5>
-
-                            <!-- Table Headers -->
-                            <table class="table mb-4 table-bordered table-attendance">
-                                <thead>
-                                    <tr>
-                                        <th>StudentID</th>
-                                        <th>Student Name</th>
-                                        <th class="text-center">Gender</th>
-                                        <th class="text-center">Group</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
+                @else
+                <div class="row">
+                    <div class="col-12 mt-2 border-bottom">
+                        <h6 class="text-center">Attendance Summary</h6>
+                    </div>
+                </div>
+                <div class="row border-bottom">
+                    <div class="col-5">
+                        <p class="text-center font-weight-bold text-capitalize p-2">class details</p>
+                        <p class="text-capitalize border-bottom">Attendance Date: <span class="float-right"><strong>{{\Carbon\Carbon::parse($attendanceRecords->first()->attendance_date)->format('d-F-Y')}}</strong></span></p>
+                        <p class="text-capitalize border-bottom">class teacher name: <span class="float-right"><strong>{{ $attendanceRecords->first()->teacher_firstname }} {{ $attendanceRecords->first()->teacher_lastname }}</strong></span></p>
+                        <p class="text-capitalize border-bottom">Class name: <span class="text-uppercase float-right"><strong>{{ $attendanceRecords->first()->class_name }} ({{ $attendanceRecords->first()->class_code }})</strong></span></p>
+                        <p class="text-capitalize border-bottom">class teacher phone: <span class="float-right"><strong>{{ $attendanceRecords->first()->teacher_phone }}</strong></span></p>
+                        <p class="text-capitalize border-bottom">Class Stream: <span class="float-right"><strong>Stream: {{$attendanceRecords->first()->class_group}}</strong></span> </p>
+                    </div>
+                    <div class="col-7" style="border-left: 1px solid black;">
+                        <p class="text-center font-weight-bold text-capitalize p-2">attendance details</p>
+                        <table class="table table-hover table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Gender</th>
+                                    <th>Present</th>
+                                    <th>Absent</th>
+                                    <th>Permission</th>
+                                    <th>Sum</th>
+                                </tr>
                                 <tbody>
-                        @endif
-
-                        <tr>
-                            <td>{{ str_pad($record->studentId, 4, '0', STR_PAD_LEFT) }}</td>
-                            <td class="text-capitalize">{{ $record->first_name }} {{ $record->middle_name }} {{ $record->last_name }}</td>
-                            <td class="text-capitalize text-center">{{ $record->gender[0] }}</td>
-                            <td class="text-capitalize text-center">{{ $record->class_group }}</td>
-                            <td>{{ ucfirst($record->attendance_status) }}</td>
-                        </tr>
-
-                        @if ($loop->last || $attendanceRecords[$loop->index + 1]->attendance_date !== $currentDate)
+                                    <tr>
+                                        <td>Male</td>
+                                        <td>{{ $malePresent }}</td>
+                                        <td>{{ $maleAbsent }}</td>
+                                        <td>{{ $malePermission }}</td>
+                                        <th><strong>{{$sumMale = $malePresent + $maleAbsent + $malePermission}}</strong></th>
+                                    </tr>
+                                    <tr>
+                                        <td>Female</td>
+                                        <td>{{ $femalePresent }}</td>
+                                        <td>{{ $femaleAbsent }}</td>
+                                        <td>{{ $femalePermission }}</td>
+                                        <td><strong>{{$sumFemale = $femalePresent  + $femaleAbsent + $femalePermission  }}</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Grand Total</td>
+                                        <td><strong>{{$malePresent +  $femalePresent}}</strong></td>
+                                        <td><strong>{{$maleAbsent +  $femaleAbsent}}</strong></td>
+                                        <td><strong>{{$malePermission +  $femalePermission}}</strong></td>
+                                        <td><strong>{{$sumMale +  $sumFemale}}</strong></td>
+                                    </tr>
                                 </tbody>
-                            </table>
-                        @endif
-                    @endforeach
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+                <!-- Detailed Attendance Records -->
+                <div class="row border-bottom">
+                    <div class="col-12">
+                        <h6 class="text-center text-capitalize p-2">Students Attendance Records</h6>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <th style="width: 5px">S/N</th>
+                                <th class="text-center">Admission No</th>
+                                <th>Student Name</th>
+                                <th style="width: 10px" class="text-center">Gender</th>
+                                <th style="width: 10px" class="text-center">Stream</th>
+                                <th>Attendance Status</th>
+                            </thead>
+                            <tbody>
+                                @foreach ($attendanceRecords as $record )
+                                    <tr>
+                                        <td>{{$loop->iteration}}</td>
+                                        <td class="text-center">{{ str_pad($record->studentId, 4, '0', STR_PAD_LEFT) }}</td>
+                                        <td class="text-capitalize">{{ $record->first_name }} {{ $record->middle_name }} {{ $record->last_name }}</td>
+                                        <td class="text-capitalize text-center">{{ $record->gender[0] }}</td>
+                                        <td class="text-capitalize text-center">{{ $record->class_group }}</td>
+                                        <td>{{ ucfirst($record->attendance_status) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 mt-3">
+                        <ul class="d-flex justify-content-center">
+                            <li class="mr-3">
+                                <a href="" class="btn btn-primary no-print" onclick="scrollToTopAndPrint(); return false;">Print Attendance</a>
+                            </li>
+                            <li>
+                                <a href="{{url()->previous()}}" class="btn btn-danger no-print">Cancel</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
                 @endif
             </div>
         </div>
     </div>
-    <!-- Footer -->
     <div class="footer mt-5" style="position: fixed; bottom: 0; width: 100%; border-top: 1px solid #ddd; padding-top: 10px;">
         <div class="row">
             <div class="col-8">
                 <p class="">Printed by: {{ Auth::user()->email}}</p>
             </div>
             <div class="col-4">
-                <p class="">{{ \Carbon\Carbon::now()->format('d/m/Y H:i:s') }}</p>
+                <p class="">{{ \Carbon\Carbon::now()->format('d/m/Y H:i A') }}</p>
             </div>
         </div>
         <script type="text/php">
@@ -158,28 +133,5 @@
             }
         </script>
     </div>
-    @endsection
-    @section('styles')
-<style>
-    @media print {
-        .footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            text-align: center;
-            border-top: 1px solid #ddd;
-            padding-top: 10px;
-        }
-        @page {
-            margin: 20mm;
-        }
-        thead {
-            display: table-header-group;
-        }
-        tbody {
-            display: table-row-group;
-        }
-    }
-</style>
 @endsection
-
+@section('styles')

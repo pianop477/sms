@@ -14,6 +14,8 @@ use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Validator;
 use Barryvdh\DomPDF\PDF;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 
 class AttendanceController extends Controller
 {
@@ -130,33 +132,49 @@ class AttendanceController extends Controller
     /**
      * Display the resource.
      */
-    public function show(Student $student, $year)
-    {
-        // $students = Student::findOrFail($student);
-        $attendance = Attendance::query()
-            ->join('students', 'students.id', '=', 'attendances.student_id')
-            ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
-            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-            ->join('grades', 'grades.id', '=', 'attendances.class_id')
-            ->select(
-                'attendances.*',
-                'users.first_name as teacher_firstname',
-                'users.last_name as teacher_lastname',
-                'users.phone as teacher_phone',
-                'students.first_name as student_firstname',
-                'students.middle_name as student_middlename',
-                'students.last_name as student_lastname'
-            )
-            ->whereYear('attendances.attendance_date', $year)
-            ->where('attendances.student_id', '=', $student->id)
-            ->orderBy('attendances.attendance_date', 'ASC')
-            ->get()
-            ->groupBy(function($date) {
-                return \Carbon\Carbon::parse($date->attendance_date)->format('W'); // grouping by week number
-            });
 
-        return view('Attendance.show', compact('attendance', 'student'));
-    }
+public function show(Student $student, $year)
+{
+    $attendanceQuery = Attendance::query()
+        ->join('students', 'students.id', '=', 'attendances.student_id')
+        ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
+        ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+        ->join('grades', 'grades.id', '=', 'attendances.class_id')
+        ->select(
+            'attendances.*',
+            'users.first_name as teacher_firstname',
+            'users.last_name as teacher_lastname',
+            'users.phone as teacher_phone',
+            'students.first_name as student_firstname',
+            'students.middle_name as student_middlename',
+            'students.last_name as student_lastname'
+        )
+        ->whereYear('attendances.attendance_date', $year)
+        ->where('attendances.student_id', '=', $student->id)
+        ->orderBy('attendances.attendance_date', 'ASC');
+
+    // Paginate the raw data
+    $perPage =5;
+    $page = request()->get('page', 1);
+    $rawData = $attendanceQuery->paginate($perPage, ['*'], 'page', $page);
+
+    // Group the paginated data by week
+    $grouped = $rawData->getCollection()->groupBy(function($date) {
+        return \Carbon\Carbon::parse($date->attendance_date)->format('W'); // grouping by week number
+    });
+
+    // Create a LengthAwarePaginator instance
+    $groupedData = new LengthAwarePaginator(
+        $grouped,
+        $rawData->total(),
+        $rawData->perPage(),
+        $rawData->currentPage(),
+        ['path' => request()->url(), 'query' => request()->query()]
+    );
+
+    return view('Attendance.show', compact('groupedData', 'student'));
+}
+
 
     //group attendance by year ===========================
     public function attendanceYear (Student $student)
@@ -433,7 +451,6 @@ class AttendanceController extends Controller
         $classes = Grade::where('school_id', Auth::user()->school_id)->get();
         return view('Attendance.general_attendance', ['classes' => $classes]);
     }
-
     public function genaralAttendance(Request $request)
     {
         $request->validate([
@@ -495,11 +512,9 @@ class AttendanceController extends Controller
             }
         }
 
-        // Group by attendance date and then by teacher ID
+        // Group by attendance date
         $datas = $attendances->groupBy(function($item) {
             return Carbon::parse($item->attendance_date)->format('Y-m-d');
-        })->map(function($dayGroup) {
-            return $dayGroup->groupBy('teacher_id');
         });
 
         return view('Attendance.all_report', compact('datas', 'maleSummary', 'femaleSummary', 'attendances'));

@@ -22,8 +22,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if ($attendance->isNotEmpty())
-                                @foreach ($attendance as $week => $records)
+                            @if ($groupedData->isNotEmpty())
+                                @foreach ($groupedData as $week => $records)
                                     <tr>
                                         <td colspan="3" class="bg-light text-center">Week {{ $week }}</td>
                                     </tr>
@@ -55,6 +55,10 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+            <!-- Pagination Links -->
+            <div class="d-flex justify-content-center">
+                {{ $groupedData->links('vendor.pagination.bootstrap-5') }}
             </div>
         </div>
     </div>

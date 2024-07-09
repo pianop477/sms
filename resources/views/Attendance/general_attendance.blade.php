@@ -4,7 +4,7 @@
 <div class="card mt-5">
     <div class="card-body">
         <h4 class="header-title">Generate Attendance Report</h4>
-        <form class="needs-validation" novalidate="" action="{{route('manage.attendance')}}" method="POST" enctype="multipart/form-data">
+        <form class="needs-validation" novalidate="" action="{{route('manage.attendance')}}" method="POST" enctype="multipart/form-data" onsubmit="showPreloader()">
             @csrf
             <div class="form-row">
                 <div class="col-md-4 mb-3">
@@ -23,7 +23,7 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom02">From Month</label>
-                    <input type="month" name="start" class="form-control" id="validationCustom02" placeholder="Last name" required="" value="{{old('start_date')}}">
+                    <input type="month" name="start" class="form-control" id="validationCustom02" placeholder="Last name" required value="{{old('start_date')}}">
                     @error('start_date')
                     <div class="invalid-feedback">
                        {{$message}}
@@ -32,7 +32,7 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom02">To Month</label>
-                    <input type="month" name="end" class="form-control" id="validationCustom02" placeholder="Last name" required="" value="{{old('end_date')}}">
+                    <input type="month" name="end" class="form-control" id="validationCustom02" placeholder="Last name" required value="{{old('end_date')}}">
                     @error('end_date')
                     <div class="invalid-feedback">
                        {{$message}}
@@ -40,8 +40,10 @@
                     @enderror
                 </div>
             </div>
-            <div class="col-md-4 mb-3">
-                <button class="btn btn-primary" type="submit" class="p-0"><i class="ti-settings"></i> Generate</button>
+            <div class="form-row">
+                <div class="col-12 justify-content-center">
+                    <button class="btn btn-primary float-right" type="submit"><i class="ti-settings"></i> Generate</button>
+                </div>
             </div>
 
             <div id="preloader" style="display:none;">
@@ -54,11 +56,13 @@
                     </div>
                 </div>
             </div>
+        </form>
+    </div>
+</div>
 
-
-            <script>
-                function showPreloader() {
-                    document.getElementById('preloader').style.display = 'block';
-                }
-            </script>
+<script>
+    function showPreloader() {
+        document.getElementById('preloader').style.display = 'block';
+    }
+</script>
 @endsection

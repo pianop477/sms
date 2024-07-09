@@ -14,6 +14,7 @@
                 <table class="table">
                     <thead class="text-capitalize bg-info">
                         <tr class="text-white">
+                            <th>#</th>
                             <th scope="col">AdmNo.</th>
                             <th scope="col">Name</th>
                             <th scope="col">Sex</th>
@@ -24,6 +25,7 @@
                     <tbody>
                         @foreach ($studentList as $student)
                             <tr>
+                                <td>{{$loop->iteration}}</td>
                                 <td>
                                     <input type="hidden" name="student_id[]" value="{{ $student->id }}">
                                     {{ str_pad($student->id, 4, '0', STR_PAD_LEFT) }}
@@ -39,7 +41,7 @@
                                 <td>
                                     <ul class="d-flex justify-content-center">
                                         <li class="mr-3">
-                                            <input type="radio" name="attendance_status[{{ $student->id }}]" value="present" {{ old('attendance_status.' . $student->id) == 'present' ? 'checked' : '' }}> Pres
+                                            <input type="radio" name="attendance_status[{{ $student->id }}]" required value="present" {{ old('attendance_status.' . $student->id) == 'present' ? 'checked' : '' }}> Pres
                                         </li>
                                         <li class="mr-3">
                                             <input type="radio" name="attendance_status[{{ $student->id }}]" value="absent" {{ old('attendance_status.' . $student->id) == 'absent' ? 'checked' : '' }}> Abs
