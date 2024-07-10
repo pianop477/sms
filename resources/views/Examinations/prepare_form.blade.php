@@ -8,7 +8,7 @@
                     <h4 class="header-title">Fill the Result Form</h4>
                 </div>
                 <div class="col-4">
-                    <a href="{{route('course.results', $courses->id)}}" class="float-right btn-xs btn btn-success"><i class="ti-eye"></i> Results</a>
+                    <a href="{{route('results_byCourse', $courses->id)}}" class="float-right btn-xs btn btn-success"><i class="ti-eye"></i> Results</a>
                 </div>
             </div>
             <form class="needs-validation" novalidate="" action="{{route('score.captured.values')}}" method="POST" enctype="multipart/form-data">

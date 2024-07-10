@@ -232,116 +232,78 @@ class ExamController extends Controller
         return back();
     }
 
-    public function viewResultCourse(Subject $courses)
+    //get results by its course=========================
+    public function courseResults(Subject $courses)
     {
-        $results = Examination_result::query()
-            ->join('students', 'students.id', '=', 'examination_results.student_id')
-            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-            ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
-            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-            ->select(
-                'examination_results.*',
-                'grades.class_name', 'grades.class_code',
-                'students.first_name', 'students.middle_name', 'students.id as studentId',  'students.last_name', 'students.class_id', 'students.group', 'students.gender',
-                'examinations.exam_type', 'examinations.id as examId',
-                'users.first_name as teacher_firstname', 'users.last_name as teacherlastname', 'users.phone as teacher_phone'
-            )
-            ->where('examination_results.course_id', $courses->id)
-            ->where('examination_results.teacher_id', $courses->teacher_id)
-            ->where('examination_results.class_id', '=', $courses->class_id)
+        $results = Examination_result::where('course_id', $courses->id)
+            ->where('class_id', $courses->class_id) // Assuming class_id matches class_alias
+            ->where('teacher_id', $courses->teacher_id)
             ->get();
 
-        // Group results by year and examination type
-        $groupedResults = $results->groupBy(function ($item) {
+        $groupedData = $results->groupBy(function ($item) {
             return Carbon::parse($item->exam_date)->format('Y');
-        })->map(function ($yearGroup) {
-            return $yearGroup->groupBy('exam_type');
         });
 
-        return view('Examinations.teacher_results', compact('groupedResults', 'courses'));
+        return view('Examinations.teacher_results_by_year', compact('groupedData', 'courses'));
     }
 
-//
-    public function viewResultsByYear($year)
+    public function resultByYear(Subject $courses, $year)
     {
-        // Retrieve distinct exam types and their corresponding months for the specified year
-        $examTypes = Examination_result::query()
-            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-            ->whereYear('examination_results.exam_date', $year)
-            ->distinct()
-            ->select('examinations.exam_type', DB::raw('MONTH(examination_results.exam_date) as exam_month'))
-            ->orderBy(DB::raw('MONTH(examination_results.exam_date)'))
-            ->paginate(7);
+        $results = Examination_result::query()->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+            ->select('examination_results.*', 'examinations.exam_type')
+            ->where('course_id', $courses->id)
+            ->where('class_id', $courses->class_id) // Assuming class_id matches class_alias
+            ->where('teacher_id', $courses->teacher_id)
+            ->whereYear('exam_date', $year)
+            ->get();
 
-        return view('Examinations.results_by_year', compact('examTypes', 'year'));
+        $examTypes = $results->groupBy('exam_type_id');
+
+        return view('Examinations.teacher_results_by_exam_type', compact('examTypes', 'year', 'courses'));
     }
 
+    public function resultByExamType(Subject $courses, $year, $examType)
+    {
+        $results = Examination_result::where('course_id', $courses->id)
+            ->where('class_id', $courses->class_id) // Assuming class_id matches class_alias
+            ->where('teacher_id', $courses->teacher_id)
+            ->whereYear('exam_date', $year)
+            ->where('exam_type_id', $examType)
+            ->get();
 
+        $months = $results->groupBy(function ($item) {
+            return Carbon::parse($item->exam_date)->format('F');
+        });
 
-    public function viewResultsByType($year, $type)
-{
-    $user = Auth::user()->id;
-    $teacher = Teacher::where('user_id', $user)->firstOrFail();
-    $course = Subject::where('teacher_id', $teacher->id)->firstOrFail();
-
-    $results = Examination_result::query()
-        ->join('students', 'students.id', '=', 'examination_results.student_id')
-        ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-        ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-        ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-        ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
-        ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-        ->select(
-            'examination_results.*',
-            'subjects.course_name', 'subjects.course_code',
-            'grades.class_name', 'grades.class_code',
-            'students.first_name', 'students.id as studentId', 'students.middle_name', 'students.last_name', 'students.class_id', 'students.group', 'students.gender',
-            'examinations.exam_type',
-            'users.first_name as teacher_firstname', 'users.last_name as teacherlastname', 'users.phone as teacher_phone',
-            DB::raw('MONTH(examination_results.exam_date) as exam_month')
-        )
-        ->whereYear('examination_results.exam_date', $year)
-        ->where('examinations.exam_type', $type)
-        ->where('examination_results.course_id', $course->id)
-        ->where('examination_results.teacher_id', $course->teacher_id)
-        ->where('examination_results.class_id', $course->class_id)
-        ->orderBy('students.first_name', 'ASC')
-        ->get();
-
-    if ($results->isEmpty()) {
-        return back()->with('error', 'No results found for the given criteria.');
+        return view('Examinations.teacher_results_by_month', compact('months', 'year', 'examType', 'courses'));
     }
 
-    $total_male = $results->where('gender', 'male')->count();
-    $total_female = $results->where('gender', 'female')->count();
+    public function resultByMonth(Subject $courses, $year, $examType, $month)
+    {
+        $results = Examination_result::query()
+                        ->join('students', 'students.id', '=', 'examination_results.student_id')
+                        ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+                        ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+                        ->join('schools', 'schools.id', '=', 'examination_results.school_id')
+                        ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+                        ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
+                        ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+                        ->select(
+                            'examination_results.*', 'grades.class_name', 'grades.class_code', 'examinations.exam_type',
+                            'students.first_name', 'students.id as studentId', 'students.middle_name', 'students.last_name', 'students.gender', 'students.group', 'students.class_id',
+                            'subjects.course_name', 'subjects.course_code', 'users.first_name as teacher_firstname',
+                            'users.last_name as teacher_lastname', 'users.gender as teacher_gender', 'users.phone as teacher_phone'
+                        )
+                        ->where('examination_results.course_id', $courses->id)
+                        ->where('examination_results.class_id', $courses->class_id) // Assuming class_id matches class_alias
+                        ->where('examination_results.teacher_id', $courses->teacher_id)
+                        ->whereYear('examination_results.exam_date', $year)
+                        ->where('examination_results.exam_type_id', $examType)
+                        ->whereMonth('examination_results.exam_date', Carbon::parse($month)->month)
+                        ->get();
 
-    $summary = [
-        'total_students' => $results->count(),
-        'total_male' => $total_male,
-        'total_female' => $total_female,
-        'grades' => [
-            'male_E' => $results->where('score', '<=', 10)->where('gender', 'male')->count(),
-            'female_E' => $results->where('score', '<=', 10)->where('gender', 'female')->count(),
-            'male_D' => $results->whereBetween('score', [11, 20])->where('gender', 'male')->count(),
-            'female_D' => $results->whereBetween('score', [11, 20])->where('gender', 'female')->count(),
-            'male_C' => $results->whereBetween('score', [21, 30])->where('gender', 'male')->count(),
-            'female_C' => $results->whereBetween('score', [21, 30])->where('gender', 'female')->count(),
-            'male_B' => $results->whereBetween('score', [31, 40])->where('gender', 'male')->count(),
-            'female_B' => $results->whereBetween('score', [31, 40])->where('gender', 'female')->count(),
-            'male_A' => $results->whereBetween('score', [41, 50])->where('gender', 'male')->count(),
-            'female_A' => $results->whereBetween('score', [41, 50])->where('gender', 'female')->count(),
-        ],
-        'average_score' => $results->avg('score'),
-        'course_name' => $results->first()->course_name ?? '',
-        'class_name' => $results->first()->class_name ?? ''
-    ];
-
-    return view('Examinations.results_by_type', compact('results', 'summary', 'year', 'type'));
-}
-
-
+        return view('Examinations.teacher_results_by_type', compact('results', 'year', 'examType', 'month', 'courses'));
+    }
 
 
 }

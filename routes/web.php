@@ -170,9 +170,11 @@ Route::group(['middleware' => ['auth']], function () {
             Route::get('{course}/Prepare', [ExamController::class, 'prepare'])->name('score.prepare.form');
             Route::post('Examination-result-create', [ExamController::class, 'captureValues'])->name('score.captured.values');
             Route::post('Upload/results', [ExamController::class, 'storeScore'])->name('exams.store.score');
-            Route::get('{courses}/view-results', [ExamController::class, 'viewResultCourse'])->name('course.results');
-            Route::get('/exams/{year}', [ExamController::class, 'viewResultsByYear'])->name('exams.byYear');
-            Route::get('/exams/{year}/{type}', [ExamController::class, 'viewResultsByType'])->name('exams.byType');
+            //teachers  examination results =============================
+            Route::get('{courses}/Results', [ExamController::class, 'courseResults'])->name('results_byCourse');
+            Route::get('/Results/{courses}/{year}', [ExamController::class, 'resultByYear'])->name('results.byYear');
+            Route::get('/Results/{courses}/{year}/{examType}', [ExamController::class, 'resultByExamType'])->name('results.byExamType');
+            Route::get('/Results/{courses}/{year}/{examType}/{month}', [ExamController::class, 'resultByMonth'])->name('results.byMonth');
         });
     });
 
@@ -214,11 +216,11 @@ Route::group(['middleware' => ['auth']], function () {
         // view examination lists =========================================================================
         Route::get('Examination-test', [ExamController::class, 'index'])->name('exams.index');
         //end or examination lists =======================================================================
-        Route::get('Results-management/{school}', [ResultsController::class, 'general'])->name('results.general');
-        Route::get('Results-management/{school}/year/{year}', [ResultsController::class, 'classesByYear'])->name('results.classesByYear');
-        Route::get('Results-management/{school}/year/{year}/class/{class}', [ResultsController::class, 'examTypesByClass'])->name('results.examTypesByClass');
-        Route::get('Results-management/{school}/year/{year}/class/{class}/exam-type/{examType}/months', [ResultsController::class, 'monthsByExamType'])->name('results.monthsByExamType');
-        Route::get('Results-management/{school}/year/{year}/class/{class}/exam-type/{examType}/month/{month}', [ResultsController::class, 'resultsByMonth'])->name('results.resultsByMonth');
+        Route::get('Results/{school}', [ResultsController::class, 'general'])->name('results.general');
+        Route::get('Results/{school}/year/{year}', [ResultsController::class, 'classesByYear'])->name('results.classesByYear');
+        Route::get('Results/{school}/year/{year}/class/{class}', [ResultsController::class, 'examTypesByClass'])->name('results.examTypesByClass');
+        Route::get('Results/{school}/year/{year}/class/{class}/exam-type/{examType}/months', [ResultsController::class, 'monthsByExamType'])->name('results.monthsByExamType');
+        Route::get('Resultst/{school}/year/{year}/class/{class}/exam-type/{examType}/month/{month}', [ResultsController::class, 'resultsByMonth'])->name('results.resultsByMonth');
     });
     //end of condition ===========================================================================================
 
