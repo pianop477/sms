@@ -455,13 +455,22 @@
                                                 @if ($course->status == 1)
                                                 <ul class="d-flex justify-content-center">
                                                     <li class="mr-3">
-                                                        <a href="{{route('courses.edit', $course->id)}}" class="btn btn-primary btn-xs"><i class="ti-pencil"> Edit</i></a>
+                                                        <a href="{{route('courses.edit', $course->id)}}" class="text-primary text-sm"><i class="ti-pencil"></i>Edit</a>
+                                                    </li>
+                                                    <li class="mr-3">
+                                                        <a href="{{route('score.prepare.form', $course->id)}}" class="text-success text-sm"><i class="ti-pencil-alt"></i>Score</a>
                                                     </li>
                                                     <li>
-                                                        <a href="{{route('score.prepare.form', $course->id)}}" class="btn btn-success btn-xs"><i class="ti-file"> Marks</i></a>
+                                                        <form action="{{route('courses.remove', $course->id)}}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to remove {{strtoupper($course->course_name)}} course?')">
+                                                                <i class="ti-trash text-danger">Close</i>
+                                                            </button>
+                                                        </form>
                                                     </li>
                                                 </ul>
-                                                @else
+                                                @elseif ($course->status == 0)
                                                     <span class="badge bg-danger text-white">{{_('Blocked')}}</span>
                                                 @endif
                                             </td>

@@ -182,6 +182,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('Register-course', [CoursesController::class, 'store'])->name('courses.store');
         Route::get('{course}/Edit-course', [CoursesController::class, 'edit'])->name('courses.edit');
         Route::put('{courses}/Update-course', [CoursesController::class, 'update'])->name('courses.update');
+        Route::put('{course}/Remove-course', [CoursesController::class, 'removeCourse'])->name('courses.remove');
 
     });
 
@@ -189,7 +190,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::middleware('ManagerOrTeacher')->group(function () {
         Route::get('View-all', [CoursesController::class, 'index'])->name('courses.index');
         Route::get('{class}/Class-courses', [CoursesController::class, 'classCourses'])->name('courses.view.class');
-        Route::get('{course}/Delete-course', [CoursesController::class, 'deleteCourse'])->name('courses.delete');
+        // Route::get('{course}/Delete-course', [CoursesController::class, 'deleteCourse'])->name('courses.delete');
         Route::put('{course}/Block', [CoursesController::class, 'blockCourse'])->name('courses.block');
         Route::put('{course}/Unblock', [CoursesController::class, 'unblockCourse'])->name('courses.unblock');
         Route::get('{course}/Assign-teacher', [CoursesController::class, 'assign'])->name('courses.assign');

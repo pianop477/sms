@@ -80,12 +80,4 @@
         }
     </style>
 
-    <script>
-        function addPrefix() {
-            var prefix = "P.O BOX "; // Example prefix
-            var userInput = document.getElementById('userInput').value;
-            var prefixedInput = prefix + userInput;
-            document.getElementById('userInput').value = prefixedInput;
-        }
-    </script>
 </head>

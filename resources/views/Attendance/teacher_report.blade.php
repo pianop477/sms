@@ -152,20 +152,4 @@
             </div>
         </div>
     </div>
-    <div class="footer mt-5" style="position: fixed; bottom: 0; width: 100%; border-top: 1px solid #ddd; padding-top: 10px;">
-        <div class="row">
-            <div class="col-8">
-                <p class="">Printed by: {{ Auth::user()->email}}</p>
-            </div>
-            <div class="col-4">
-                <p class="">{{ \Carbon\Carbon::now()->format('d/m/Y H:i A') }}</p>
-            </div>
-        </div>
-        <script type="text/php">
-            if ( isset($pdf) ) {
-                $pdf->page_text(270, 770, "Page {PAGE_NUM} of {PAGE_COUNT}", null, 10, array(0,0,0));
-            }
-        </script>
-    </div>
 @endsection
-@section('styles')

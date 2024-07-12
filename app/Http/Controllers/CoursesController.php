@@ -181,9 +181,20 @@ class CoursesController extends Controller
 
         $course = Subject::findOrFail($courses);
         $course->teacher_id = $request->teacher;
+        $course->status = $request->input('status', 1);
         $course->save();
         Alert::success('Success!', 'Subject Teacher updated successfully');
         return redirect()->route('courses.view.class', $course->class_id);
 
+    }
+
+    //teacher remove courses from its lists
+    public function removeCourse(Subject $course, Request $request)
+    {
+        $courses = Subject::findOrFail($course->id);
+        $courses->status = $request->input('status', 2);
+        $courses->save();
+        Alert::success('Success!', 'Your course has been moved to trash!');
+        return back();
     }
 }

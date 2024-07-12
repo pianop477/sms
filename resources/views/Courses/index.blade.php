@@ -49,8 +49,10 @@
                                             <td>
                                                 @if ($course->status == 1)
                                                     <span class="badge bg-success text-white">{{ __('Open') }}</span>
-                                                @else
-                                                    <span class="badge bg-danger text-white">{{ __('Closed') }}</span>
+                                                @elseif ($course->status == 2)
+                                                    <span class="badge bg-secondary text-white">{{ __('Unassigned') }}</span>
+                                                    @else
+                                                    <span class="badge bg-danger text-white">{{ __('Blocked') }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -69,13 +71,17 @@
                                                         <li>
                                                             {{-- <a href="{{route('courses.delete', $course->id)}}" onclick="return confirm('Are you sure you want to Delete {{strtoupper($course->course_name)}} Course permanently?')"><i class="ti-trash text-danger"></i></a> --}}
                                                         </li>
-                                                    @else
+                                                    @elseif ($course->status == 0)
                                                         <li>
                                                             <form action="{{route('courses.unblock', $course->id)}}" method="POST">
                                                                 @csrf
                                                                 @method('PUT')
                                                                 <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Unblock {{strtoupper($course->course_name)}} Course?')"><i class="ti-share-alt text-success"></i></button>
                                                             </form>
+                                                        </li>
+                                                        @else
+                                                        <li>
+                                                            <a href="{{route('courses.assign', $course->id)}}"><i class="ti-pencil text-primary"></i></a>
                                                         </li>
                                                     @endif
                                                 </ul>

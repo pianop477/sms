@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\DB;
+// use Barryvdh\DomPDF\PDF;
+use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class ExamController extends Controller
 {
@@ -278,32 +281,133 @@ class ExamController extends Controller
         return view('Examinations.teacher_results_by_month', compact('months', 'year', 'examType', 'courses'));
     }
 
+
     public function resultByMonth(Subject $courses, $year, $examType, $month)
     {
         $results = Examination_result::query()
-                        ->join('students', 'students.id', '=', 'examination_results.student_id')
-                        ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                        ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                        ->join('schools', 'schools.id', '=', 'examination_results.school_id')
-                        ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                        ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
-                        ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-                        ->select(
-                            'examination_results.*', 'grades.class_name', 'grades.class_code', 'examinations.exam_type',
-                            'students.first_name', 'students.id as studentId', 'students.middle_name', 'students.last_name', 'students.gender', 'students.group', 'students.class_id',
-                            'subjects.course_name', 'subjects.course_code', 'users.first_name as teacher_firstname',
-                            'users.last_name as teacher_lastname', 'users.gender as teacher_gender', 'users.phone as teacher_phone'
-                        )
-                        ->where('examination_results.course_id', $courses->id)
-                        ->where('examination_results.class_id', $courses->class_id) // Assuming class_id matches class_alias
-                        ->where('examination_results.teacher_id', $courses->teacher_id)
-                        ->whereYear('examination_results.exam_date', $year)
-                        ->where('examination_results.exam_type_id', $examType)
-                        ->whereMonth('examination_results.exam_date', Carbon::parse($month)->month)
-                        ->get();
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
+            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+            ->join('schools', 'schools.id', '=', 'examination_results.school_id')
+            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+            ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
+            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+            ->select(
+                'examination_results.*', 'grades.class_name', 'grades.class_code', 'examinations.exam_type',
+                'students.first_name', 'students.id as studentId', 'students.middle_name', 'students.last_name', 'students.gender', 'students.group', 'students.class_id',
+                'subjects.course_name', 'subjects.course_code', 'users.first_name as teacher_firstname',
+                'users.last_name as teacher_lastname', 'users.gender as teacher_gender', 'users.phone as teacher_phone'
+            )
+            ->where('examination_results.course_id', $courses->id)
+            ->where('examination_results.class_id', $courses->class_id) // Assuming class_id matches class_alias
+            ->where('examination_results.teacher_id', $courses->teacher_id)
+            ->whereYear('examination_results.exam_date', $year)
+            ->where('examination_results.exam_type_id', $examType)
+            ->whereMonth('examination_results.exam_date', Carbon::parse($month)->month)
+            ->orderBy('examination_results.score', 'desc') // Sort by score descending
+            ->get();
 
-        return view('Examinations.teacher_results_by_type', compact('results', 'year', 'examType', 'month', 'courses'));
+        // Initialize grade counts
+        $gradeCounts = [
+            'A' => 0,
+            'B' => 0,
+            'C' => 0,
+            'D' => 0,
+            'E' => 0
+        ];
+
+        // Calculate grades, positions, and average score
+        $totalScore = 0;
+        $totalRecords = $results->count();
+        $position = 1;
+
+        foreach ($results as $result) {
+            if ($result->marking_style == 1) {
+                if ($result->score >= 41) {
+                    $result->grade = 'A';
+                    $gradeCounts['A']++;
+                } elseif ($result->score >= 31) {
+                    $result->grade = 'B';
+                    $gradeCounts['B']++;
+                } elseif ($result->score >= 21) {
+                    $result->grade = 'C';
+                    $gradeCounts['C']++;
+                } elseif ($result->score >= 11) {
+                    $result->grade = 'D';
+                    $gradeCounts['D']++;
+                } else {
+                    $result->grade = 'E';
+                    $gradeCounts['E']++;
+                }
+            } else {
+                if ($result->score >= 81) {
+                    $result->grade = 'A';
+                    $gradeCounts['A']++;
+                } elseif ($result->score >= 61) {
+                    $result->grade = 'B';
+                    $gradeCounts['B']++;
+                } elseif ($result->score >= 41) {
+                    $result->grade = 'C';
+                    $gradeCounts['C']++;
+                } elseif ($result->score >= 21) {
+                    $result->grade = 'D';
+                    $gradeCounts['D']++;
+                } else {
+                    $result->grade = 'E';
+                    $gradeCounts['E']++;
+                }
+            }
+            $totalScore += $result->score;
+            $result->position = $position++;
+        }
+
+        $averageScore = $totalRecords > 0 ? $totalScore / $totalRecords : 0;
+        $averageGrade = $this->determineGrade($averageScore, $results->first()->marking_style);
+
+        // Count number of students by gender
+        $maleStudents = $results->where('gender', 'male')->count();
+        $femaleStudents = $results->where('gender', 'female')->count();
+
+        $pdf = \PDF::loadView('Examinations.teacher_results_by_type', compact(
+            'results', 'year', 'examType', 'month', 'courses', 'maleStudents', 'femaleStudents', 'averageScore', 'averageGrade', 'gradeCounts'
+        ));
+
+        $pdfPath = public_path('results.pdf');
+        $pdf->save($pdfPath);
+
+        if (!file_exists($pdfPath)) {
+            return response()->json(['error' => 'PDF file not found after generation'], 404);
+        }
+
+        return view('Examinations.teacher_results_pdf', compact('pdfPath'));
     }
 
-
+    protected function determineGrade($score, $marking_style)
+    {
+        if ($marking_style == 1) {
+            if ($score >= 41) {
+                return 'A';
+            } elseif ($score >= 31) {
+                return 'B';
+            } elseif ($score >= 21) {
+                return 'C';
+            } elseif ($score >= 11) {
+                return 'D';
+            } else {
+                return 'E';
+            }
+        } else {
+            if ($score >= 81) {
+                return 'A';
+            } elseif ($score >= 61) {
+                return 'B';
+            } elseif ($score >= 41) {
+                return 'C';
+            } elseif ($score >= 21) {
+                return 'D';
+            } else {
+                return 'E';
+            }
+        }
+    }
 }

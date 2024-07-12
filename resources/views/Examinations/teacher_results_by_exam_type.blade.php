@@ -4,7 +4,14 @@
 <div class="col-md-12 mt-5">
     <div class="card">
         <div class="card-body">
-            <h4 class="header-title text-center">Select Examination Type for {{ $year }}</h4>
+            <div class="row">
+                <div class="col-10">
+                    <h4 class="header-title text-center">Select Examination Type for {{ $year }}</h4>
+                </div>
+                <div class="col-2">
+                    <a href="{{route('results_byCourse', ['courses'=>$courses->id])}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                </div>
+            </div>
             <div class="list-group">
                 @foreach ($examTypes as $examType)
                     <a href="{{ route('results.byExamType', ['courses' => $courses->id, 'year' => $year, 'examType' => $examType->first()->exam_type_id]) }}">
