@@ -60,7 +60,7 @@
         .logo {
             position: absolute;
             width: 50px;
-            left: 4px;
+            left: 7px;
             top: 5px;
             color: inherit;
         }
@@ -122,7 +122,7 @@
 <body>
     <div class="container">
         <div class="logo">
-            <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="">
+            <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 100px;">
         </div>
         <div class="header">
             <h3>{{_('the united republic of tanzania')}}</h3>
@@ -171,7 +171,7 @@
         </div>
     </div>
     <hr>
-    <h5 style="text-transform:capitalize; text-align:center; font-size:20px;">student examination results records</h5>
+    <h5 style="text-transform:capitalize; text-align:center; font-size:20px;">students examination results records</h5>
     <table class="table table-bordered table-hover">
         <thead>
             <tr>
@@ -189,7 +189,7 @@
             @foreach ($results as $result)
                 <tr>
                     <td>{{$loop->iteration}}</td>
-                    <td style="text-align:center">{{Str_pad($result->studentId, 4, '0', STR_PAD_LEFT)}}</td>
+                    <td style="text-align:center"><span style="text-transform: uppercase">{{$result->school_reg_no}}</span>-{{Str_pad($result->studentId, 4, '0', STR_PAD_LEFT)}}</td>
                     <td>{{$result->first_name}} {{$result->middle_name}} {{$result->last_name}}</td>
                     <td style="text-align:center">{{$result->gender[0]}}</td>
                     <td style="text-align:center">{{$result->group}}</td>

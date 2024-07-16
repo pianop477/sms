@@ -1,155 +1,242 @@
-@extends('SRTDashboard.frame')
-@section('content')
-    <div class="col-md-12">
-        <div class="card mt-2">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-2 logo">
-                        <img src="{{asset('assets/img/logo/' .Auth::user()->school->logo)}}" alt="" style="max-width: 120px;">
-                    </div>
-                    <div class="col-8 text-center">
-                        <h4 class="text-uppercase">{{Auth::user()->school->school_name}}</h4>
-                        <h5 class="text-uppercase">class attendance report</h5>
-                        @forelse ($datas as $month => $attendances )
-                            <h6 class="text-capitalize">time duration: <strong>{{ \Carbon\Carbon::parse($month)->format('F Y') }}</strong></h6>
-                    </div>
-                </div>
-                <hr>
-                    @if ($attendances->isEmpty())
-                        <div class="alert alert-warning text-center mt-3" role="alert">
-                            <p>There is no attendance records for {{ \Carbon\Carbon::parse($month)->format('F Y') }}</p>
-                            <a href="{{url()->previous()}}" class="btn btn-danger no-print">Cancel</a>
-                        </div>
-                    @else
-                        @php
-                            // Group attendances by date
-                            $groupedByDate = $attendances->groupBy('attendance_date');
-                        @endphp
-                            @foreach ($groupedByDate as $date => $records )
-                                    @php
-                                        // Initialize counters
-                                        $malePresent = $maleAbsent = $malePermission = 0;
-                                        $femalePresent = $femaleAbsent = $femalePermission = 0;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Shule | App</title>
+    <style>
+        /* Inline your Bootstrap CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+        }
+        @media print {
+            .no-print {
+                display: none;
+            }
+            h1, h2, h4, h5, h6 {
+                text-transform: uppercase;
+                text-align: center
+            }
+            .print-only {
+                display: block;
+            }
+            .footer {
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+                border-top: 1px solid #ddd;
+                padding-top: 10px;
+            }
+            thead {
+                display: table-header-group;
+                background-color: gray; /* Adds a gray background to thead */
+            }
+            tbody {
+                display: table-row-group;
+            }
+            .table {
+                border: 1px solid black;
+                border-collapse: collapse;
+                width: 100%;
+            }
+            .table th,
+            .table td {
+                border: 1px solid black;
+            }
+            @page {
+                margin: 20mm;
+                @bottom-center {
+                    content: "Page " counter(page) " of " counter(pages);
+                }
+            }
+        }
 
-                                        // Get teacher details from the first record of the day
-                                        $teacher = $records->first();
+        .container {
+            display: flex;
+            padding: 10px;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+        .logo {
+            margin-left: 45%;
+            top: 30%;
+            color: inherit;
+        }
+        .header {
+            text-align: center;
+            position: relative;
+            top: 5%;
+            text-transform: uppercase;
+            font-size: 20px;
+        }
+        .summary-header {
+            text-align: center;
+            text-transform: capitalize;
+            font-size: 20px;
+            line-height: 2px;
+            margin-bottom: 0%;
+            padding: 0%;
+        }
+        .summary-content {
+            display: flex;
+            flex-direction: row;
+            text-transform: capitalize
+        }
+        .course-details {
+            position: relative;
+            left: 5px;
+            width: auto;
+            line-height: 5px;
+        }
 
-                                        // Count attendance status by gender
-                                        foreach ($records as $record) {
-                                            if ($record->gender == 'male') {
-                                                if ($record->attendance_status == 'present') $malePresent++;
-                                                elseif ($record->attendance_status == 'absent') $maleAbsent++;
-                                                elseif ($record->attendance_status == 'permission') $malePermission++;
-                                            } elseif ($record->gender == 'female') {
-                                                if ($record->attendance_status == 'present') $femalePresent++;
-                                                elseif ($record->attendance_status == 'absent') $femaleAbsent++;
-                                                elseif ($record->attendance_status == 'permission') $femalePermission++;
-                                            }
-                                        }
-                                    @endphp
-
-                                    {{-- attendance summary --}}
-                                    <div class="row border-bottom">
-                                        <div class="col-12 text-center text-capitalize p-2">
-                                            <h6>attendance report summary</h6>
-                                        </div>
-                                    </div>
-                                    <div class="row border-bottom">
-                                        <div class="col-5">
-                                            <p class="text-center text-capitalize font-weight-bold p-2">class details</p>
-                                            <p class="border-bottom">Attendance Date: <span class="float-right"><strong>{{ \Carbon\Carbon::parse($date)->format('F d, Y') }}</strong></span> </p>
-                                            <p class="border-bottom text-capitalize">Class Teacher name: <span class="float-right"><strong>{{ $teacher->teacher_firstname }} {{ $teacher->teacher_lastname }}</strong></span></p>
-                                            <p class="border-bottom text-capitalize">Class teacher phone: <span class="float-right"><strong>{{$teacher->teacher_phone }}</strong></span></p>
-                                            <p class="border-bottom text-capitalize">attendance class: <span class="float-right text-uppercase"><strong>{{ $teacher->class_name }} ({{ $teacher->class_code }})</strong></span></p>
-                                            <p class="border-bottom text-capitalize">Class Stream: <span class="float-right"><strong>Stream "{{ $teacher->group }}"</strong></span></p>
-                                        </div>
-                                        <div class="col-7 text-right" style="border-left: 1px solid black;">
-                                            <p class="text-capitalize text-center p-2 font-weight-bold">Attendance details</p>
-                                            <table class="table table-bordered table-hover text-center">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Gender</th>
-                                                        <th>Present</th>
-                                                        <th>Absent</th>
-                                                        <th>Permission</th>
-                                                        <th>Sum</th>
-                                                    </tr>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>Male</td>
-                                                            <td>{{ $malePresent }}</td>
-                                                            <td>{{ $maleAbsent }}</td>
-                                                            <td>{{ $malePermission }}</td>
-                                                            <td><strong>{{$sumMale = $malePresent + $maleAbsent + $malePermission}}</strong></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Female</td>
-                                                            <td>{{ $femalePresent }}</td>
-                                                            <td>{{ $femaleAbsent }}</td>
-                                                            <td>{{ $femalePermission }}</td>
-                                                            <td><strong>{{$sumFemale = $femalePresent + $femaleAbsent + $femalePermission  }}</strong></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Total</td>
-                                                            <td>{{$malePresent + $femalePresent}}</td>
-                                                            <td>{{$maleAbsent + $femaleAbsent}}</td>
-                                                            <td>{{$malePermission + $femalePermission }}</td>
-                                                            <td><strong>{{$sumMale + $sumFemale}}</strong></td>
-                                                        </tr>
-                                                    </tbody>
-                                                </thead>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-12 border-bottom mt-3">
-                                            <h6 class="text-capitalize text-center font-weight-bold">Students attendance records</h6>
-                                            <table class="table table-hover table-bordered">
-                                                <thead>
-                                                    <th style="width: 5px">S/N</th>
-                                                    <th class="text-center">Admission No</th>
-                                                    <th>Student's Name</th>
-                                                    <th class="text-center" style="width: 10px">Gender</th>
-                                                    <th class="text-center" style="width: 10px">Stream</th>
-                                                    <th>Attendance Status</th>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach ($records as $attendance )
-                                                    <tr>
-                                                        <td>{{$loop->iteration}}</td>
-                                                        <td class="text-center">{{ str_pad($attendance->studentID, 4, '0', STR_PAD_LEFT) }}</td>
-                                                        <td class="text-capitalize">{{ $attendance->first_name }} {{$attendance->middle_name}} {{ $attendance->last_name }}</td>
-                                                        <td class="text-capitalize text-center">{{ ucfirst($attendance->gender[0]) }}</td>
-                                                        <td class="text-capitalize text-center">{{ucfirst($attendance->class_group)}}</td>
-                                                        <td class="text-capitalize">{{ ucfirst($attendance->attendance_status) }}</td>
-                                                    </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                            @endforeach
-                            <div class="row">
-                                <div class="col-12 mt-3">
-                                    <ul class="d-flex justify-content-center">
-                                        <li class="mr-3">
-                                            <a href="" onclick="scrollToTopAndPrint(); return false;" class="btn btn-primary no-print">Print Attendance</a>
-                                        </li>
-                                        <li>
-                                            <a href="{{url()->previous()}}" class="btn btn-danger no-print">Cancel</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                    @endif
-                @empty
-                    <div class="alert alert-warning mt-3 text-center" role="alert">
-                        <p>There is no attendance records for the selected time duration!</p>
-                        <a href="{{url()->previous()}}" class="btn btn-danger">Cancel</a>
-                    </div>
-                @endforelse
-            </div>
+        th, td {
+            border: 1px solid black;
+        }
+        .table {
+            width: 100%;
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        .date-section {
+            page-break-before: always;
+        }
+        .title {
+            text-transform: uppercase;
+            text-align: center;
+            font-size: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">
+            <h3>{{_('the united republic of tanzania')}}</h3>
+            <h4>{{_("the president's office - ralg")}}</h4>
         </div>
+        <div class="logo">
+            <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 100px;">
+        </div>
+        <div class="header">
+            <h4>{{ Auth::user()->school->school_name }} - P.O Box {{ Auth::user()->school->postal_address }}, {{ Auth::user()->school->postal_name }}</h4>
+            <h5>class attendance report</h5>
+            @forelse ( $datas as $month => $attendances )
+            <h6 class="text-capitalize">time duration: <strong>{{ \Carbon\Carbon::parse($month)->format('F Y') }}</strong></h6>
+        </div>
+        @if ($attendances->isEmpty())
+            <div class="alert alert-warning text-center mt-3" role="alert">
+                <p>There is no attendance records for {{ \Carbon\Carbon::parse($month)->format('F Y') }}</p>
+            </div>
+        @else
+            @php
+                // Group attendances by date
+                $groupedByDate = $attendances->groupBy('attendance_date');
+            @endphp
+            @foreach ($groupedByDate as $date => $records)
+                @php
+                    // Initialize counters
+                    $malePresent = $maleAbsent = $malePermission = 0;
+                    $femalePresent = $femaleAbsent = $femalePermission = 0;
+
+                    // Get teacher details from the first record of the day
+                    $teacher = $records->first();
+
+                    // Count attendance status by gender
+                    foreach ($records as $record) {
+                        if ($record->gender == 'male') {
+                            if ($record->attendance_status == 'present') $malePresent++;
+                            elseif ($record->attendance_status == 'absent') $maleAbsent++;
+                            elseif ($record->attendance_status == 'permission') $malePermission++;
+                        } elseif ($record->gender == 'female') {
+                            if ($record->attendance_status == 'present') $femalePresent++;
+                            elseif ($record->attendance_status == 'absent') $femaleAbsent++;
+                            elseif ($record->attendance_status == 'permission') $femalePermission++;
+                        }
+                    }
+                @endphp
+                <div class="date-section">
+                    <div class="summary-header">
+                        <p style="line-height: 5px">attendance report summary</p>
+                    </div>
+                    <div class="summary-content">
+                        <div class="course-details">
+                            <div>
+                                <p>Attendance Date: <strong><span style="text-decoration:underline">{{ \Carbon\Carbon::parse($date)->format('d/F/Y') }}</span></strong></p>
+                                <p>Class Teacher Name: <strong>{{ $teacher->teacher_firstname }} {{ $teacher->teacher_lastname }}</strong></p>
+                                <p>Class Name: <strong>{{ $teacher->class_name }} <span style="text-transform: uppercase">({{ $teacher->class_code }})</span></strong></p>
+                                <p>Stream: <strong>{{ $teacher->group }}</strong></p>
+                            </div>
+                        </div>
+                        <div class="grade-summary">
+                            <p style="text-align:center; font-weight:bold">Students attendance summary</p>
+                            <table class="table" style="text-align:center">
+                                <tr>
+                                    <th>Gender</th>
+                                    <th>Present</th>
+                                    <th>Absent</th>
+                                    <th>Permission</th>
+                                    <th>Sum</th>
+                                </tr>
+                                <tr>
+                                    <td>Male</td>
+                                    <td>{{ $malePresent }}</td>
+                                    <td>{{ $maleAbsent }}</td>
+                                    <td>{{ $malePermission }}</td>
+                                    <td><strong>{{$sumMale = $malePresent + $maleAbsent + $malePermission}}</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>Female</td>
+                                    <td>{{ $femalePresent }}</td>
+                                    <td>{{ $femaleAbsent }}</td>
+                                    <td>{{ $femalePermission }}</td>
+                                    <td><strong>{{$sumFemale = $femalePresent + $femaleAbsent + $femalePermission  }}</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>Total</td>
+                                    <td>{{$malePresent + $femalePresent}}</td>
+                                    <td>{{$maleAbsent + $femaleAbsent}}</td>
+                                    <td>{{$malePermission + $femalePermission }}</td>
+                                    <td><strong>{{$sumMale + $sumFemale}}</strong></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <hr>
+                    <h5 style="text-transform:capitalize; text-align:center; font-size:20px;">students attendance records</h5>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th class="text-center" style="text-align: center">Admission No</th>
+                                <th>Student's Name</th>
+                                <th class="text-center" style="text-align:center">Gender</th>
+                                <th class="text-center" style="text-align:center">Stream</th>
+                                <th style="text-align:center">Attendance Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ( $records as $attendance )
+                            <tr>
+                                <td>{{$loop->iteration}}</td>
+                                <td class="text-center" style="text-align: center; text-transform:uppercase">{{$attendance->school_reg_no}}-{{ str_pad($attendance->studentID, 4, '0', STR_PAD_LEFT) }}</td>
+                                <td class="text-capitalize">{{ $attendance->first_name }} {{$attendance->middle_name}} {{ $attendance->last_name }}</td>
+                                <td class="text-capitalize text-center" style="text-align: center">{{ ucfirst($attendance->gender[0]) }}</td>
+                                <td class="text-capitalize text-center" style="text-align: center">{{ucfirst($attendance->class_group)}}</td>
+                                <td class="text-capitalize" style="text-align: center">{{ ucfirst($attendance->attendance_status) }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endforeach
+        @endif
+        @empty
+            <div class="alert alert-warning mt-3 text-center" role="alert">
+                <p>There is no attendance records for the selected time duration!</p>
+            </div>
+        @endforelse
     </div>
-@endsection
+</body>
+</html>

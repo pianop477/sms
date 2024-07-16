@@ -12,7 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Validator;
-use Barryvdh\DomPDF\PDF;
+use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -241,6 +242,7 @@ public function show(Student $student, $year)
             ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
             ->join('users', 'users.id', '=', 'teachers.user_id')
             ->join('grades', 'grades.id', '=', 'attendances.class_id')
+            ->leftJoin('schools', 'schools.id', '=', 'students.school_id')
             ->select(
                 'attendances.*', // Select all columns from the attendances table
                 'students.id as studentID',
@@ -253,7 +255,8 @@ public function show(Student $student, $year)
                 'users.first_name as teacher_firstname',
                 'users.last_name as teacher_lastname',
                 'users.phone as teacher_phone',
-                'users.gender as teacher_gender'
+                'users.gender as teacher_gender',
+                'schools.school_reg_no',
             )
             ->where('attendances.class_id', $classId)
             ->where('students.group', $group) // Compare 'group' directly
@@ -301,9 +304,16 @@ public function show(Student $student, $year)
         $datas = $attendances->groupBy(function($item) {
             return Carbon::parse($item->attendance_date)->format('Y-m');
         });
+        $pdf = \PDF::loadView('Attendance.teacher_report', compact('datas', 'maleSummary', 'femaleSummary'));
+        $pdfPath = public_path('assets/attendances/class_attendance_report.pdf');
+        $pdf->save($pdfPath);
 
-        // Return the view with the report data
-        return view('attendance.teacher_report', compact('datas', 'maleSummary', 'femaleSummary'));
+        if(!file_exists($pdfPath)) {
+            return response()->json(['Error', 'Pdf report not found!'], 404);
+        }
+
+        return view('Attendance.class_teacher_pdf');
+
     }
 
 
@@ -312,107 +322,44 @@ public function show(Student $student, $year)
      * Show the form for editing the resource.
      */
 
-
-    public function teacherAttendance($class)
-    {
-        $attendanceData = Attendance::findOrFail($class);
-        // return $id;
-        $class = Grade::findOrFail($attendanceData->class_id); //this is an object;
-        // return $class->id;
-        $teacher = Teacher::findOrFail($attendanceData->teacher_id);//this is an object
-        $today = date('Y-m-d');
-        // return $teacher;
-        $attendanceRecords = Attendance::query()->join('students', 'students.id', '=', 'attendances.student_id')
-                                                ->join('grades', 'grades.id', '=', 'attendances.class_id')
-                                                ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
-                                                ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-                                                ->select(
-                                                    'attendances.*', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.gender', 'students.group', 'students.id as studentId',
-                                                    'users.first_name as teacher_firstname', 'users.last_name as teacher_lastname', 'users.gender as teacher_gender',
-                                                    'users.phone as teacher_phone', 'grades.class_name', 'grades.class_code'
-                                                )
-                                                ->where('attendances.class_id', '=', $class->id)
-                                                ->where('attendances.teacher_id', '=', $teacher->id)
-                                                ->where('attendances.attendance_date', '=', $today)
-                                                ->get();
-        // return $attendanceRecords;
-        return view('Attendance.pdfreport', ['attendanceRecords' => $attendanceRecords]);
-    }
-
-
     //download attendance records----------------
-    public function downloadAttendancePDF($class)
-    {
-        $attendanceData = Attendance::findOrFail($class);
-        $class = Grade::findOrFail($attendanceData->class_id);
-        $teacher = Teacher::findOrFail($attendanceData->teacher_id);
-
-        $attendanceRecords = Attendance::query()
-            ->join('students', 'students.id', '=', 'attendances.student_id')
-            ->join('grades', 'grades.id', '=', 'attendances.class_id')
-            ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
-            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-            ->select(
-                'attendances.*',
-                'students.first_name',
-                'students.middle_name',
-                'students.last_name',
-                'students.gender',
-                'users.first_name as teacher_firstname',
-                'users.last_name as teacher_lastname',
-                'users.gender as teacher_gender',
-                'users.phone as teacher_phone',
-                'grades.class_name',
-                'grades.class_code'
-            )
-            ->where('attendances.class_id', '=', $class->id)
-            ->where('attendances.teacher_id', '=', $teacher->id)
-            ->orderBy('attendances.attendance_date', 'asc')
-            ->get();
-
-        $pdf = PDF::loadView('Attendance.pdfreport', compact('attendanceRecords'));
-        return $pdf->download('attendance_records.pdf');
-    }
-
     public function todayAttendance($student_class)
     {
         $user = Auth::user()->id;
         $teacher = Teacher::where('user_id', '=', $user)->firstOrFail();
-        // return $teacher;
-        $class = Grade::findOrFail($student_class); //this is a CLASS object;
+        $class = Grade::findOrFail($student_class);
         $classTeacher = Class_teacher::where('class_id', '=', $class->id)->firstOrFail();
-        // return $classTeacher;
         $teacher_id = $classTeacher->teacher_id;
         $teacherGroup = $classTeacher->group;
-        // return $teacher_id . $teacherGroup;
-
         $today = date('Y-m-d');
 
         $attendanceRecords = Attendance::query()->join('students', 'students.id', '=', 'attendances.student_id')
-                                        ->join('grades', 'grades.id', '=', 'attendances.class_id')
-                                        ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
-                                        ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-                                        ->select(
-                                            'attendances.*',
-                                            'students.id as studentId', 'students.first_name', 'students.middle_name',
-                                            'students.last_name', 'students.group', 'students.class_id', 'students.gender',
-                                            'grades.class_name', 'grades.class_code', 'grades.id as class_id',
-                                            'users.first_name as teacher_firstname', 'users.last_name as teacher_lastname',
-                                            'users.phone as teacher_phone', 'users.gender as teacher_gender'
-                                        )
-                                        ->where('attendances.attendance_date', '=', $today)
-                                        ->where('attendances.teacher_id', '=', $teacher->id)
-                                        ->where('attendances.school_id', '=', Auth::user()->school_id)
-                                        ->orderBy('students.gender', 'DESC')
-                                        ->orderBy('students.first_name', 'ASC')
-                                        ->get();
-                        // Initialize counters
-                        $malePresent = 0;
-                        $maleAbsent = 0;
-                        $malePermission = 0;
-                        $femalePresent = 0;
-                        $femaleAbsent = 0;
-                        $femalePermission = 0;
+            ->join('grades', 'grades.id', '=', 'attendances.class_id')
+            ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
+            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+            ->leftJoin('schools', 'schools.id', '=', 'students.school_id')
+            ->select(
+                'attendances.*',
+                'students.id as studentId', 'students.first_name', 'students.middle_name',
+                'students.last_name', 'students.group', 'students.class_id', 'students.gender', 'schools.school_reg_no',
+                'grades.class_name', 'grades.class_code', 'grades.id as class_id',
+                'users.first_name as teacher_firstname', 'users.last_name as teacher_lastname',
+                'users.phone as teacher_phone', 'users.gender as teacher_gender'
+            )
+            ->where('attendances.attendance_date', '=', $today)
+            ->where('attendances.teacher_id', '=', $teacher->id)
+            ->where('attendances.school_id', '=', Auth::user()->school_id)
+            ->orderBy('students.gender', 'DESC')
+            ->orderBy('students.first_name', 'ASC')
+            ->get();
+
+        // Initialize counters
+        $malePresent = 0;
+        $maleAbsent = 0;
+        $malePermission = 0;
+        $femalePresent = 0;
+        $femaleAbsent = 0;
+        $femalePermission = 0;
 
         // Count the attendance based on gender and status
         foreach ($attendanceRecords as $record) {
@@ -435,17 +382,18 @@ public function show(Student $student, $year)
             }
         }
 
-        // Pass the counters to the view
-        return view('Attendance.pdfreport', [
-            'attendanceRecords' => $attendanceRecords,
-            'malePresent' => $malePresent,
-            'maleAbsent' => $maleAbsent,
-            'malePermission' => $malePermission,
-            'femalePresent' => $femalePresent,
-            'femaleAbsent' => $femaleAbsent,
-            'femalePermission' => $femalePermission,
-        ]);
+        $pdf = \PDF::loadView('Attendance.pdfreport', compact('attendanceRecords', 'malePresent', 'maleAbsent',
+            'malePermission', 'femalePresent', 'femaleAbsent', 'femalePermission'));
+
+        $pdfPath = public_path('assets/attendances/today_attendance_'.$today.'.pdf');
+        $pdf->save($pdfPath);
+
+        if(!file_exists($pdfPath)) {
+            return response()->json(['Error', 'PDF file not found!'], 404);
+        }
+        return view('Attendance.today_attendance_pdf', compact('today'));
     }
+
 
     public function getField() {
         $classes = Grade::where('school_id', Auth::user()->school_id)->get();

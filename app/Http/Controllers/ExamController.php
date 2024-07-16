@@ -285,27 +285,27 @@ class ExamController extends Controller
     public function resultByMonth(Subject $courses, $year, $examType, $month)
     {
         $results = Examination_result::query()
-            ->join('students', 'students.id', '=', 'examination_results.student_id')
-            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-            ->join('schools', 'schools.id', '=', 'examination_results.school_id')
-            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-            ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
-            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-            ->select(
-                'examination_results.*', 'grades.class_name', 'grades.class_code', 'examinations.exam_type',
-                'students.first_name', 'students.id as studentId', 'students.middle_name', 'students.last_name', 'students.gender', 'students.group', 'students.class_id',
-                'subjects.course_name', 'subjects.course_code', 'users.first_name as teacher_firstname',
-                'users.last_name as teacher_lastname', 'users.gender as teacher_gender', 'users.phone as teacher_phone'
-            )
-            ->where('examination_results.course_id', $courses->id)
-            ->where('examination_results.class_id', $courses->class_id) // Assuming class_id matches class_alias
-            ->where('examination_results.teacher_id', $courses->teacher_id)
-            ->whereYear('examination_results.exam_date', $year)
-            ->where('examination_results.exam_type_id', $examType)
-            ->whereMonth('examination_results.exam_date', Carbon::parse($month)->month)
-            ->orderBy('examination_results.score', 'desc') // Sort by score descending
-            ->get();
+                        ->join('students', 'students.id', '=', 'examination_results.student_id')
+                        ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+                        ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+                        ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+                        ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
+                        ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+                        ->leftJoin('schools', 'schools.id', '=', 'students.school_id')
+                        ->select(
+                            'examination_results.*', 'grades.class_name', 'grades.class_code', 'examinations.exam_type',
+                            'students.first_name', 'students.id as studentId', 'students.middle_name', 'students.last_name', 'students.gender', 'students.group', 'students.class_id',
+                            'subjects.course_name', 'subjects.course_code', 'users.first_name as teacher_firstname',
+                            'users.last_name as teacher_lastname', 'users.gender as teacher_gender', 'users.phone as teacher_phone', 'schools.school_reg_no'
+                        )
+                        ->where('examination_results.course_id', $courses->id)
+                        ->where('examination_results.class_id', $courses->class_id) // Assuming class_id matches class_alias
+                        ->where('examination_results.teacher_id', $courses->teacher_id)
+                        ->whereYear('examination_results.exam_date', $year)
+                        ->where('examination_results.exam_type_id', $examType)
+                        ->whereMonth('examination_results.exam_date', Carbon::parse($month)->month)
+                        ->orderBy('examination_results.score', 'desc') // Sort by score descending
+                        ->get();
 
         // Initialize grade counts
         $gradeCounts = [
@@ -372,14 +372,14 @@ class ExamController extends Controller
             'results', 'year', 'examType', 'month', 'courses', 'maleStudents', 'femaleStudents', 'averageScore', 'averageGrade', 'gradeCounts'
         ));
 
-        $pdfPath = public_path('results.pdf');
+        $pdfPath = public_path('assets/results/results_'. $month.'.pdf');
         $pdf->save($pdfPath);
 
         if (!file_exists($pdfPath)) {
-            return response()->json(['error' => 'PDF file not found after generation'], 404);
+            return response()->json(['error' => 'PDF file not found'], 404);
         }
 
-        return view('Examinations.teacher_results_pdf', compact('pdfPath'));
+        return view('Examinations.teacher_results_pdf', compact('month', 'pdfPath'));
     }
 
     protected function determineGrade($score, $marking_style)
