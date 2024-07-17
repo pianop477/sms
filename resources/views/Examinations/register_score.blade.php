@@ -78,7 +78,6 @@
                                     <th style="width: 5px">S/N</th>
                                     <th class="text-center">Admission No.</th>
                                     <th>Students Name</th>
-                                    <th style="width: " class="text-center">Stream</th>
                                     <th style="width: ">Score</th>
                                     <th style="width: ">Grade</th>
                                 </thead>
@@ -99,9 +98,8 @@
                                                 <td class="text-capitalize">
                                                     {{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}
                                                 </td>
-                                                <td class="text-center text-uppercase">{{$student->group}}</td>
                                                 <td>
-                                                    <input type="number" class="form-control score-input" name="students[{{ $loop->index }}][score]" placeholder="Score" min="0" max="100">
+                                                    <input type="number" class="form-control score-input" name="students[{{ $loop->index }}][score]" placeholder="Score" required>
                                                 </td>
                                                 <td>
                                                     <input type="text" disabled name="students[{{ $loop->index }}][grade]" class="form-control grade-input">
@@ -113,7 +111,7 @@
                             </table>
                             <hr>
                             <div class="d-flex justify-content-center my-3">
-                                <button type="submit" class="btn btn-primary">Send Results</button>
+                                <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to send this results? You will not able to make any changes after submitting')">Send Results</button>
                             </div>
                         </form>
                     </div>

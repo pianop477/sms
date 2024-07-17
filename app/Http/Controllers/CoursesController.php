@@ -59,7 +59,6 @@ class CoursesController extends Controller
         $courseExisting = Subject::where('course_name', '=', $request->name)
                                     ->where('course_code', '=', $request->code)
                                     ->where('class_id', '=', $request->class)
-                                    ->where('teacher_id', '=', $teacher->id)
                                     ->where('school_id', '=', Auth::user()->school_id)
                                     ->exists();
         if($courseExisting) {

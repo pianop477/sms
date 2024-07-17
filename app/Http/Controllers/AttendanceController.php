@@ -309,7 +309,7 @@ public function show(Student $student, $year)
         $pdf->save($pdfPath);
 
         if(!file_exists($pdfPath)) {
-            return response()->json(['Error', 'Pdf report not found!'], 404);
+            return response()->json(['Error' => 'Pdf report not found!'], 404);
         }
 
         return view('Attendance.class_teacher_pdf');
@@ -389,7 +389,7 @@ public function show(Student $student, $year)
         $pdf->save($pdfPath);
 
         if(!file_exists($pdfPath)) {
-            return response()->json(['Error', 'PDF file not found!'], 404);
+            return response()->json(['Error' => 'PDF file not found!'], 404);
         }
         return view('Attendance.today_attendance_pdf', compact('today'));
     }
@@ -411,25 +411,26 @@ public function show(Student $student, $year)
         $endOfMonth = Carbon::parse($request->input('end'))->endOfMonth();
 
         $attendances = Attendance::query()
-            ->join('students', 'students.id', '=', 'attendances.student_id')
-            ->join('grades', 'grades.id', '=', 'attendances.class_id')
-            ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
-            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-            ->select(
-                'attendances.*',
-                'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.gender',
-                'students.group', 'students.class_id as student_class',
-                'grades.id as class_id', 'grades.class_name', 'grades.class_code',
-                'users.first_name as teacher_firstname', 'users.last_name as teacher_lastname',
-                'users.gender as teacher_gender', 'users.phone as teacher_phone'
-            )
-            ->where('attendances.class_id', $request->class)
-            ->whereBetween('attendances.attendance_date', [$startOfMonth, $endOfMonth])
-            ->where('attendances.school_id', Auth::user()->school_id)
-            ->orderBy('attendances.attendance_date', 'ASC')
-            ->orderBy('students.gender', 'DESC')
-            ->orderBy('students.first_name', 'ASC')
-            ->get();
+                    ->join('students', 'students.id', '=', 'attendances.student_id')
+                    ->join('grades', 'grades.id', '=', 'attendances.class_id')
+                    ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
+                    ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+                    ->leftJoin('schools', 'schools.id', '=', 'students.school_id')
+                    ->select(
+                        'attendances.*',
+                        'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.gender',
+                        'students.group', 'students.class_id as student_class',
+                        'grades.id as class_id', 'grades.class_name', 'grades.class_code',
+                        'users.first_name as teacher_firstname', 'users.last_name as teacher_lastname',
+                        'users.gender as teacher_gender', 'users.phone as teacher_phone', 'schools.school_reg_no',
+                    )
+                    ->where('attendances.class_id', $request->class)
+                    ->whereBetween('attendances.attendance_date', [$startOfMonth, $endOfMonth])
+                    ->where('attendances.school_id', Auth::user()->school_id)
+                    ->orderBy('attendances.attendance_date', 'ASC')
+                    ->orderBy('students.gender', 'DESC')
+                    ->orderBy('students.first_name', 'ASC')
+                    ->get();
 
         $maleSummary = [];
         $femaleSummary = [];
@@ -464,8 +465,16 @@ public function show(Student $student, $year)
         $datas = $attendances->groupBy(function($item) {
             return Carbon::parse($item->attendance_date)->format('Y-m-d');
         });
+        $pdf = \PDF::loadView('Attendance.all_report', compact('datas', 'maleSummary', 'femaleSummary', 'attendances', 'startOfMonth', 'endOfMonth'));
+        $pdfPath = public_path('assets/attendances/attendance_report_'.Carbon::parse($startOfMonth)->format('F').'_to_'.Carbon::parse($endOfMonth)->format('F').'.pdf');
+        $pdf->save($pdfPath);
 
-        return view('Attendance.all_report', compact('datas', 'maleSummary', 'femaleSummary', 'attendances'));
+        if(!file_exists($pdfPath)) {
+            return response()->json(['Error' => 'PDF report file does not exists'], 404);
+        }
+
+        return view('Attendance.general_pdf_report', compact('startOfMonth', 'endOfMonth'));
+
     }
 
 }

@@ -3,7 +3,7 @@
 @section('content')
 <div class="card mt-5">
     <div class="card-body">
-        <h4 class="header-title">Generate Attendance Report</h4>
+        <h4 class="header-title text-uppercase text-center">Generate Attendance Report</h4>
         <form class="needs-validation" novalidate="" action="{{route('manage.attendance')}}" method="POST" enctype="multipart/form-data" onsubmit="showPreloader()">
             @csrf
             <div class="form-row">

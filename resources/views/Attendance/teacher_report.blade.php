@@ -221,10 +221,10 @@
                             <tr>
                                 <td>{{$loop->iteration}}</td>
                                 <td class="text-center" style="text-align: center; text-transform:uppercase">{{$attendance->school_reg_no}}-{{ str_pad($attendance->studentID, 4, '0', STR_PAD_LEFT) }}</td>
-                                <td class="text-capitalize">{{ $attendance->first_name }} {{$attendance->middle_name}} {{ $attendance->last_name }}</td>
-                                <td class="text-capitalize text-center" style="text-align: center">{{ ucfirst($attendance->gender[0]) }}</td>
-                                <td class="text-capitalize text-center" style="text-align: center">{{ucfirst($attendance->class_group)}}</td>
-                                <td class="text-capitalize" style="text-align: center">{{ ucfirst($attendance->attendance_status) }}</td>
+                                <td style="text-transform: capitalize">{{ $attendance->first_name }} {{$attendance->middle_name}} {{ $attendance->last_name }}</td>
+                                <td style="text-align: center; text-transform:capitalize">{{ ucfirst($attendance->gender[0]) }}</td>
+                                <td style="text-align: center; text-transform:capitalize">{{ucfirst($attendance->class_group)}}</td>
+                                <td style="text-align: center; text-transform:capitalize">{{ ucfirst($attendance->attendance_status) }}</td>
                             </tr>
                             @endforeach
                         </tbody>

@@ -135,14 +135,14 @@ class ResultsController extends Controller
     public function classesByYear(school $school, $year)
     {
         $results = Examination_result::query()
-            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-            ->select(
-                'examination_results.*',
-                'grades.id as class_id', 'grades.class_name', 'grades.class_code'
-            )
-            ->where('examination_results.school_id', $school->id)
-            ->whereYear('examination_results.exam_date', $year)
-            ->get();
+                    ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+                    ->select(
+                        'examination_results.*',
+                        'grades.id as class_id', 'grades.class_name', 'grades.class_code'
+                    )
+                    ->where('examination_results.school_id', $school->id)
+                    ->whereYear('examination_results.exam_date', $year)
+                    ->get();
 
         $groupedByClass = $results->groupBy('class_id');
 
@@ -167,7 +167,7 @@ class ResultsController extends Controller
         return view('Results.general_result_type', compact('school', 'year', 'class', 'groupedByExamType'));
     }
 
-    public function monthsByExamType(school $school, $year, $class, $examType)
+    public function monthsByExamType(School $school, $year, Grade $class, $examType)
     {
         $results = Examination_result::query()
             ->join('students', 'students.id', '=', 'examination_results.student_id')
@@ -181,9 +181,12 @@ class ResultsController extends Controller
             )
             ->where('examination_results.school_id', $school->id)
             ->whereYear('examination_results.exam_date', $year)
-            ->where('examination_results.class_id', $class)
+            ->where('examination_results.class_id', $class->id)
             ->where('examination_results.exam_type_id', $examType)
             ->get();
+
+        // Debugging line
+        // dd($results);
 
         $groupedByMonth = $results->groupBy(function ($item) {
             return Carbon::parse($item->exam_date)->format('F'); // Group by month name
@@ -192,26 +195,27 @@ class ResultsController extends Controller
         return view('Results.months_by_exam_type', compact('school', 'year', 'class', 'examType', 'groupedByMonth'));
     }
 
+
     public function resultsByMonth(School $school, $year, $class, $examType, $month)
     {
         $results = Examination_result::query()
-            ->join('students', 'students.id', '=', 'examination_results.student_id')
-            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-            ->select(
-                'examination_results.*',
-                'students.first_name', 'students.middle_name', 'students.last_name', 'students.gender', 'students.id as student_id', 'students.group',
-                'grades.class_name',
-                'examinations.exam_type',
-                'subjects.course_name', 'subjects.course_code'
-            )
-            ->where('examination_results.school_id', $school->id)
-            ->whereYear('examination_results.exam_date', $year)
-            ->where('examination_results.class_id', $class)
-            ->where('examination_results.exam_type_id', $examType)
-            ->whereMonth('examination_results.exam_date', Carbon::parse($month)->month)
-            ->get();
+                            ->join('students', 'students.id', '=', 'examination_results.student_id')
+                            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+                            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+                            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+                            ->select(
+                                'examination_results.*',
+                                'students.first_name', 'students.middle_name', 'students.last_name', 'students.gender', 'students.id as student_id', 'students.group',
+                                'grades.class_name',
+                                'examinations.exam_type',
+                                'subjects.course_name', 'subjects.course_code'
+                            )
+                            ->where('examination_results.school_id', $school->id)
+                            ->whereYear('examination_results.exam_date', $year)
+                            ->where('examination_results.class_id', $class)
+                            ->where('examination_results.exam_type_id', $examType)
+                            ->whereMonth('examination_results.exam_date', Carbon::parse($month)->month)
+                            ->get();
 
         // Total number of students by gender
         $totalMaleStudents = $results->where('gender', 'male')->groupBy('student_id')->count();
@@ -219,12 +223,12 @@ class ResultsController extends Controller
 
         // Average score per course with grade and course name
         $averageScoresByCourse = $results->groupBy('course_id')->map(function ($courseResults) {
-            $averageScore = $courseResults->avg('score');
-            return [
-                'course_name' => $courseResults->first()->course_name,
-                'average_score' => $averageScore,
-                'grade' => $this->calculateGrade($averageScore)
-            ];
+                            $averageScore = $courseResults->avg('score');
+                            return [
+                                'course_name' => $courseResults->first()->course_name,
+                                'average_score' => $averageScore,
+                                'grade' => $this->calculateGrade($averageScore, $courseResults->first()->marking_style)
+                            ];
         });
 
         // Sum of all course averages
@@ -232,19 +236,25 @@ class ResultsController extends Controller
 
         // Sort courses by average score to determine position
         $sortedCourses = $averageScoresByCourse->sortByDesc('average_score')->values()->all();
-        foreach ($sortedCourses as $index => &$course) {
-            $course['position'] = $index + 1;
-        }
+                foreach ($sortedCourses as $index => &$course) {
+                    $course['position'] = $index + 1;
+                }
 
         // Evaluation score table
         $evaluationScores = $results->groupBy('course_id')->map(function ($courseResults) {
             $grades = [
-                'A' => $courseResults->whereBetween('score', [41, 50])->count(),
-                'B' => $courseResults->whereBetween('score', [31, 40])->count(),
-                'C' => $courseResults->whereBetween('score', [21, 30])->count(),
-                'D' => $courseResults->whereBetween('score', [11, 20])->count(),
-                'E' => $courseResults->whereBetween('score', [0, 10])->count(),
+                'A' => 0,
+                'B' => 0,
+                'C' => 0,
+                'D' => 0,
+                'E' => 0,
             ];
+
+            foreach ($courseResults as $result) {
+                $grade = $this->calculateGrade($result->score, $result->marking_style);
+                $grades[$grade]++;
+            }
+
             return $grades;
         });
 
@@ -255,7 +265,7 @@ class ResultsController extends Controller
         $studentsResults = $results->groupBy('student_id')->map(function ($studentResults) {
             $totalMarks = $studentResults->sum('score');
             $average = $studentResults->avg('score');
-            $grade = $this->calculateGrade($average);
+            $grade = $this->calculateGrade($average, $studentResults->first()->marking_style);
 
             return [
                 'student_id' => $studentResults->first()->student_id,
@@ -266,6 +276,7 @@ class ResultsController extends Controller
                     return [
                         'course_name' => $result->course_name,
                         'score' => $result->score,
+                        'grade' => $this->calculateGrade($result->score, $result->marking_style)
                     ];
                 }),
                 'total_marks' => $totalMarks,
@@ -282,25 +293,48 @@ class ResultsController extends Controller
             $studentResult['position'] = $index + 1;
         }
 
-        return view('Results.results_by_month', compact(
+        $pdf = \PDF::loadView('Results.results_by_month', compact(
             'school', 'year', 'class', 'examType', 'month', 'results', 'totalMaleStudents', 'totalFemaleStudents',
             'averageScoresByCourse', 'evaluationScores', 'totalAverageScore', 'sortedStudentsResults', 'sumOfCourseAverages', 'sortedCourses'
         ));
+        $pdfPath = public_path('assets/results/general_results_'.$class.'_'.$month.'_'.$year.'.pdf');
+        $pdf->save($pdfPath);
+
+        if(!file_exists($pdfPath)) {
+            return response()->json(['Error' => 'File does not exists'], 404);
+        }
+
+        return view('Results.result_pdf_report', compact('year', 'month', 'class'));
     }
 
-    private function calculateGrade($average)
+    private function calculateGrade($score, $marking_style)
     {
-        if ($average >= 41) {
-            return 'A';
-        } elseif ($average >= 31) {
-            return 'B';
-        } elseif ($average >= 21) {
-            return 'C';
-        } elseif ($average >= 11) {
-            return 'D';
+        if ($marking_style == 1) {
+            if ($score >= 41) {
+                return 'A';
+            } elseif ($score >= 31) {
+                return 'B';
+            } elseif ($score >= 21) {
+                return 'C';
+            } elseif ($score >= 11) {
+                return 'D';
+            } else {
+                return 'E';
+            }
         } else {
-            return 'E';
+            if ($score >= 81) {
+                return 'A';
+            } elseif ($score >= 61) {
+                return 'B';
+            } elseif ($score >= 41) {
+                return 'C';
+            } elseif ($score >= 21) {
+                return 'D';
+            } else {
+                return 'E';
+            }
         }
     }
+
     //end of results in general ==============================================
 }

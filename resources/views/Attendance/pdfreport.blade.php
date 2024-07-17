@@ -149,11 +149,11 @@
                 <div class="summary-content">
                     <div class="course-details">
                         <p class="text-center font-weight-bold text-capitalize p-2" style="text-transform: uppercase; border-bottom: 1px solid black;">class details</p>
-                        <p class="text-capitalize border-bottom">Attendance Date: <span class="float-right"><strong>{{\Carbon\Carbon::parse($attendanceRecords->first()->attendance_date)->format('d-F-Y')}}</strong></span></p>
-                        <p class="text-capitalize border-bottom">class teacher name: <span class="float-right"><strong>{{ $attendanceRecords->first()->teacher_firstname }} {{ $attendanceRecords->first()->teacher_lastname }}</strong></span></p>
-                        <p class="text-capitalize border-bottom">Class name: <span class="text-uppercase float-right"><strong>{{ $attendanceRecords->first()->class_name }} ({{ $attendanceRecords->first()->class_code }})</strong></span></p>
-                        <p class="text-capitalize border-bottom">class teacher phone: <span class="float-right"><strong>{{ $attendanceRecords->first()->teacher_phone }}</strong></span></p>
-                        <p class="text-capitalize border-bottom">Class Stream: <span class="float-right"><strong>Stream: {{$attendanceRecords->first()->class_group}}</strong></span> </p>
+                        <p>Attendance Date: <span class="float-right"><strong>{{\Carbon\Carbon::parse($attendanceRecords->first()->attendance_date)->format('d-F-Y')}}</strong></span></p>
+                        <p>class teacher name: <span class="float-right"><strong>{{ $attendanceRecords->first()->teacher_firstname }} {{ $attendanceRecords->first()->teacher_lastname }}</strong></span></p>
+                        <p>Class name: <span class="text-uppercase float-right"><strong>{{ $attendanceRecords->first()->class_name }} ({{ $attendanceRecords->first()->class_code }})</strong></span></p>
+                        <p>class teacher phone: <span class="float-right"><strong>{{ $attendanceRecords->first()->teacher_phone }}</strong></span></p>
+                        <p>Class Stream: <span style="text-transform: capitalize"><strong>Stream: {{$attendanceRecords->first()->class_group}}</strong></span> </p>
                     </div>
                     <div class="grade-summary">
                         <p class="text-center font-weight-bold text-capitalize p-2" style="text-transform: uppercase; border-bottom:1px solid black;">attendance details</p>

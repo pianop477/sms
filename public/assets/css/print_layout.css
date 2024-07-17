@@ -1,0 +1,103 @@
+        /* Inline your Bootstrap CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+        }
+        @media print {
+            .no-print {
+                display: none;
+            }
+            h1, h2, h4, h5, h6 {
+                text-transform: uppercase;
+                text-align: center
+            }
+            .print-only {
+                display: block;
+            }
+            .footer {
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+                border-top: 1px solid #ddd;
+                padding-top: 10px;
+            }
+            thead {
+                display: table-header-group;
+                background-color: gray; /* Adds a gray background to thead */
+            }
+            tbody {
+                display: table-row-group;
+            }
+            .table {
+                border: 1px solid black;
+                border-collapse: collapse;
+                width: 100%;
+            }
+            .table th,
+            .table td {
+                border: 1px solid black;
+            }
+            @page {
+                margin: 20mm;
+                @bottom-center {
+                    content: "Page " counter(page) " of " counter(pages);
+                }
+            }
+        }
+
+        .container {
+            display: flex;
+            padding: 10px;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+        .logo {
+            margin-left: 45%;
+            top: 30%;
+            color: inherit;
+        }
+        .header {
+            text-align: center;
+            position: relative;
+            top: 5%;
+            text-transform: uppercase;
+            font-size: 20px;
+        }
+        .summary-header {
+            text-align: center;
+            text-transform: capitalize;
+            font-size: 20px;
+            line-height: 2px;
+            margin-bottom: 0%;
+            padding: 0%;
+        }
+        .summary-content {
+            display: flex;
+            flex-direction: row;
+            text-transform: capitalize
+        }
+        .course-details {
+            position: relative;
+            left: 5px;
+            width: auto;
+            line-height: 5px;
+        }
+
+        th, td {
+            border: 1px solid black;
+        }
+        .table {
+            width: 100%;
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        .date-section {
+            page-break-before: always;
+        }
+        .title {
+            text-transform: uppercase;
+            text-align: center;
+            font-size: 30px;
+        }
+

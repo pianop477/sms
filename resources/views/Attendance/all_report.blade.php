@@ -1,108 +1,92 @@
-@extends('SRTDashboard.frame')
-@section('content')
-    <div class="col-md-12">
-        <div class="card mt-2">
-            <div class="card-body">
-                @if (isset($datas) && $datas->isNotEmpty())
-                    <div class="row">
-                        <div class="col-2 logo">
-                            <img src="{{asset('assets/img/logo/' .Auth::user()->school->logo)}}" alt="" style="max-width: 120px;">
-                        </div>
-                        <div class="col-8 text-center">
-                            <h4 class="text-uppercase">{{Auth::user()->school->school_name}}</h4>
-                            <h5 class="text-uppercase">class attendance report for {{$attendances->first()->class_name}}</h5>
-                            <h5 class="text-uppercase">Academic year {{\Carbon\Carbon::parse($attendances->first()->attendance_date)->format('Y')}}</h5>
-                        </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Shule | App</title>
+    <link rel="stylesheet" href="{{public_path('assets/css/print_layout.css')}}">
+</head>
+<body>
+    <div class="container">
+        @if (isset($datas) && $datas->isNotEmpty())
+            <div class="title">
+                <h3>{{_('the united republic of tanzania')}}</h3>
+                <h4>{{_("the president's office - ralg")}}</h4>
+            </div>
+            <div class="logo">
+                <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 100px;">
+            </div>
+            <div class="header">
+                <h3>{{ Auth::user()->school->school_name }} - P.O Box {{ Auth::user()->school->postal_address }}, {{ Auth::user()->school->postal_name }}</h3>
+                <h4>class attendance report for </h4>
+                <h4 class="text-uppercase">Academic year {{\Carbon\Carbon::parse($attendances->first()->attendance_date)->format('F, Y')}}</h4>
+                <h4>Class Name: {{$attendances->first()->class_name}}</h4>
+            </div>
+
+            {{-- looping attendances records --}}
+            @foreach ($datas as $date => $attendances)
+                <div class="date-section">
+                    <div class="summary-header">
+                        <p>attendance report summary</p>
+                    </div>
+                    <div class="summary-content">
+                        <p style="border: 1px solid gray; padding:5px; background:rgb(190, 190, 190);">Date: <strong>{{\Carbon\Carbon::parse($date)->format('d/F/Y')}}</strong></p>
+                        <table class="table" style="text-align: center">
+                            <tr>
+                                <th>Gender</th>
+                                <th>Present</th>
+                                <th>Absent</th>
+                                <th>Permision</th>
+                                <th>Total</th>
+                            </tr>
+                            <tr>
+                                <td>Male</td>
+                                <td>{{ $maleSummary[$date]['present'] }}</td>
+                                <td>{{ $maleSummary[$date]['absent'] }}</td>
+                                <td>{{ $maleSummary[$date]['permission'] }}</td>
+                                <td>{{ $maleSummary[$date]['present'] + $maleSummary[$date]['absent'] + $maleSummary[$date]['permission'] }}</td>
+                            </tr>
+                            <tr>
+                                <td>Female</td>
+                                <td>{{ $femaleSummary[$date]['present'] }}</td>
+                                <td>{{ $femaleSummary[$date]['absent'] }}</td>
+                                <td>{{ $femaleSummary[$date]['permission'] }}</td>
+                                <td>{{ $femaleSummary[$date]['present'] + $femaleSummary[$date]['absent'] + $femaleSummary[$date]['permission'] }}</td>
+                            </tr>
+                        </table>
                     </div>
                     <hr>
-                    @foreach ($datas as $date => $attendances)
-                        <div class="row">
-                            <div class="col-12 border-bottom">
-                                <h6 class="text-center text-capitalize p-2">Attendance Summary</h6>
-                                <p class="border-bottom font-weight-bold text-primary">Date: {{\Carbon\Carbon::parse($date)->format('d-F-Y')}}</p>
-                                <table class="table table-hover table-bordered text-center">
-                                    <thead>
-                                        <tr>
-                                            <th>Gender</th>
-                                            <th>Present</th>
-                                            <th>Absent</th>
-                                            <th>Permision</th>
-                                            <th>Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Male</td>
-                                            <td>{{ $maleSummary[$date]['present'] }}</td>
-                                            <td>{{ $maleSummary[$date]['absent'] }}</td>
-                                            <td>{{ $maleSummary[$date]['permission'] }}</td>
-                                            <td>{{ $maleSummary[$date]['present'] + $maleSummary[$date]['absent'] + $maleSummary[$date]['permission'] }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Female</td>
-                                            <td>{{ $femaleSummary[$date]['present'] }}</td>
-                                            <td>{{ $femaleSummary[$date]['absent'] }}</td>
-                                            <td>{{ $femaleSummary[$date]['permission'] }}</td>
-                                            <td>{{ $femaleSummary[$date]['present'] + $femaleSummary[$date]['absent'] + $femaleSummary[$date]['permission'] }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12 mt-2">
-                                <h6 class="text-center font-weight-bold text-capitalize p-2">students attendance records</h6>
-                                <table class="table table-hover table-bordered text-capitalize">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 5px">S/N</th>
-                                            <th class="text-center">Admission No.</th>
-                                            <th>Student Name</th>
-                                            <th style="width: 10px" class="text-center">Gender</th>
-                                            <th style="width: 10px" class="text-center">Stream</th>
-                                            <th>attendance Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($attendances as $index => $attendance )
-                                            <tr>
-                                                <td>{{ $index + 1 }}</td>
-                                                <td class="text-center">{{ str_pad($attendance->studentId, 4, '0', STR_PAD_LEFT) }}</td>
-                                                <td class="text-capitalize">{{ $attendance->first_name }} {{ $attendance->middle_name }} {{ $attendance->last_name }}</td>
-                                                <td class="text-capitalize text-center">{{ $attendance->gender[0] }}</td>
-                                                <td class="text-capitalize text-center">{{ $attendance->group }}</td>
-                                                <td>{{ ucfirst($attendance->attendance_status) }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <hr>
-                    @endforeach
-                    <div class="row">
-                        <div class="col-12 mt-4">
-                            <ul class="d-flex justify-content-center">
-                                <li class="mr-3">
-                                    <a href="" class="btn btn-primary no-print" onclick="scrollToTopAndPrint(); return false;">Print Attendance</a>
-                                </li>
-                                <li>
-                                    <a href="{{route('attendance.fill.form')}}" class="btn btn-danger no-print">Cancel</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    @else
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="alert alert-warning text-center p-2">
-                                <p>No attendance records for the selected Time duration</p>
-                                <a href="{{route('attendance.fill.form')}}" class="btn btn-danger">Cancel</a>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-            </div>
-        </div>
+                    <h5 style="text-transform:capitalize; text-align:center; font-size:20px;">students attendance records</h5>
+                    <table class="table" style="text-transform: capitalize">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th style="text-align: center">Admission No.</th>
+                                <th>Student Name</th>
+                                <th style="text-align:center" class="text-center">Gender</th>
+                                <th style="text-align:center" class="text-center">Stream</th>
+                                <th style="text-align: center;">attendance Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($attendances as $index => $attendance )
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td style="text-transform: uppercase;">{{$attendance->school_reg_no}}-{{ str_pad($attendance->studentId, 4, '0', STR_PAD_LEFT) }}</td>
+                                    <td style="text-transform:capitalize">{{ $attendance->first_name }} {{ $attendance->middle_name }} {{ $attendance->last_name }}</td>
+                                    <td style="text-align:center; text-transform:capitalize">{{ $attendance->gender[0] }}</td>
+                                    <td style="text-align:center; text-transform:capitalize">{{ $attendance->group }}</td>
+                                    <td style="text-transform: capitalize; text-align:center">{{ ucfirst($attendance->attendance_status) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endforeach
+        @else
+
+        @endif
     </div>
-@endsection
+</body>
+</html>
