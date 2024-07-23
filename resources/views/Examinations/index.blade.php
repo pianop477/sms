@@ -74,7 +74,7 @@
                                         <ul class="d-flex justify-content-center">
                                             @if ($exam->status == 1)
                                                 <li class="mr-3">
-                                                    <a href="{{route('exams.edit', $exam->id)}}"><i class="ti-pencil text-primary"></i></a>
+                                                    <a href="{{route('exams.type.edit', $exam->id)}}"><i class="ti-pencil text-primary"></i></a>
                                                 </li>
                                                 <li class="mr-3">
                                                     <form action="{{route('exams.block', $exam->id)}}" method="POST">
@@ -91,7 +91,7 @@
                                                     <form action="{{route('exams.unblock', $exam->id)}}" method="POST">
                                                         @csrf
                                                         @method('PUT')
-                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Unblock {{strtoupper($exam->exam_type)}} Examination test?')"><i class="ti-share-alt text-success"></i></button>
+                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Unblock {{strtoupper($exam->exam_type)}} Examination test?')"><i class="ti-reload text-success"></i></button>
                                                     </form>
                                                 </li>
                                             @endif

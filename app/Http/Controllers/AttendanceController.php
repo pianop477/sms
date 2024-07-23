@@ -305,15 +305,7 @@ public function show(Student $student, $year)
             return Carbon::parse($item->attendance_date)->format('Y-m');
         });
         $pdf = \PDF::loadView('Attendance.teacher_report', compact('datas', 'maleSummary', 'femaleSummary'));
-        $pdfPath = public_path('assets/attendances/class_attendance_report.pdf');
-        $pdf->save($pdfPath);
-
-        if(!file_exists($pdfPath)) {
-            return response()->json(['Error' => 'Pdf report not found!'], 404);
-        }
-
-        return view('Attendance.class_teacher_pdf');
-
+       return $pdf->stream('class_teacher_attendance.pdf');
     }
 
 
@@ -385,13 +377,7 @@ public function show(Student $student, $year)
         $pdf = \PDF::loadView('Attendance.pdfreport', compact('attendanceRecords', 'malePresent', 'maleAbsent',
             'malePermission', 'femalePresent', 'femaleAbsent', 'femalePermission'));
 
-        $pdfPath = public_path('assets/attendances/today_attendance_'.$today.'.pdf');
-        $pdf->save($pdfPath);
-
-        if(!file_exists($pdfPath)) {
-            return response()->json(['Error' => 'PDF file not found!'], 404);
-        }
-        return view('Attendance.today_attendance_pdf', compact('today'));
+            return $pdf->stream('today_attendance.pdf');
     }
 
 
@@ -466,14 +452,7 @@ public function show(Student $student, $year)
             return Carbon::parse($item->attendance_date)->format('Y-m-d');
         });
         $pdf = \PDF::loadView('Attendance.all_report', compact('datas', 'maleSummary', 'femaleSummary', 'attendances', 'startOfMonth', 'endOfMonth'));
-        $pdfPath = public_path('assets/attendances/attendance_report_'.Carbon::parse($startOfMonth)->format('F').'_to_'.Carbon::parse($endOfMonth)->format('F').'.pdf');
-        $pdf->save($pdfPath);
-
-        if(!file_exists($pdfPath)) {
-            return response()->json(['Error' => 'PDF report file does not exists'], 404);
-        }
-
-        return view('Attendance.general_pdf_report', compact('startOfMonth', 'endOfMonth'));
+        return $pdf->stream('general_attendance.pdf');
 
     }
 

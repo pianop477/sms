@@ -20,10 +20,14 @@
                             @foreach ($examType as $exam )
                                 <a href="{{ route('results.student.get', ['year' => $year, 'type' => $exam->exam_type, $student->id]) }}">
                                     <button type="button" class="list-group-item list-group-item-action">
-                                        <h6 class="text-primary text-capitalize"><i class="fas fa-chevron-right"></i> {{$exam->exam_type}} - {{ DateTime::createFromFormat('!m', $exam->exam_month)->format('F') }}</h6>
+                                        <h6 class="text-primary text-capitalize"><i class="fas fa-chevron-right"></i> {{$exam->exam_type}} - {{ \Carbon\Carbon::parse($exam->exam_date)->format('F') }}</h6>
                                     </button>
                                 </a>
                             @endforeach
+
+                            <div class="d-flex justify-content-center">
+                                {{$examType->links('vendor.pagination.bootstrap-5')}}
+                            </div>
                         @endif
                     </div>
                 </div>

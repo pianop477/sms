@@ -295,13 +295,13 @@
                         <div class="seo-fact sbg3">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Student</div>
-                                <h2>0</h2>
+                                @foreach ($classData as $data )
+                                <h2>{{$data['maleCount'] + $data['femaleCount']}}</h2>
                                 <ul>
-                                    @foreach ($classData as $data)
-                                        <li><span class="text-white">Male: <strong>{{$data['maleCount']}}</strong></span></li>
-                                        <li><span class="text-white">Female: <strong></strong>{{$data['femaleCount']}}</span></li>
-                                    @endforeach
+                                    <li><span class="text-white">Male: <strong>{{$data['maleCount']}}</strong></span></li>
+                                    <li><span class="text-white">Female: <strong></strong>{{$data['femaleCount']}}</span></li>
                                 </ul>
+                                @endforeach
                             </div>
                             <canvas id="" height="50"></canvas>
                         </div>

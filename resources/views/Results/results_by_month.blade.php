@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Shule | App</title>
+    <title>General Results</title>
     <style>
         /* Inline your Bootstrap CSS styles here */
         body {
@@ -138,8 +138,7 @@
                         <h4>{{Auth::user()->school->school_name}}</h4>
                         <h4>{{$results->first()->exam_type}} Results - {{$month}}, {{$year}}</h4>
                         <h5>Class: {{$results->first()->class_name}}</h5>
-                        <h6>Examination Date: {{\Carbon\Carbon::parse($results->first()->exam_date)->format('d/m/Y')}}</h6>
-                        <h6>Term: {{$results->first()->Exam_term}}</h6>
+                        <h6 style="text-align:end">Term: {{$results->first()->Exam_term}}</h6>
                     </div>
                 </div>
                 <hr>
@@ -200,13 +199,13 @@
                         <tr>
                             <td class="text-center">
                                 <span>{{ number_format($totalAverageScore, 2) }}</span>
-                                @if ($totalAverageScore >= 41 && $totalAverageScore <=  50)
+                                @if ($totalAverageScore >= 41 && $totalAverageScore <=  50 || $totalAverageScore >= 81 && $totalAverageScore <= 100)
                                     <span>A</span>
-                                @elseif ($totalAverageScore >= 31 && $totalAverageScore >=  40)
+                                @elseif ($totalAverageScore >= 31 && $totalAverageScore >=  40 || $totalAverageScore >= 61 && $totalAverageScore <= 80)
                                     <span>B</span>
-                                @elseif ($totalAverageScore >= 21 && $totalAverageScore >=  30)
+                                @elseif ($totalAverageScore >= 21 && $totalAverageScore >=  30 || $totalAverageScore >= 41 && $totalAverageScore <= 60)
                                     <span>C</span>
-                                @elseif ($totalAverageScore >= 11 && $totalAverageScore >=  20)
+                                @elseif ($totalAverageScore >= 11 && $totalAverageScore >=  20 || $totalAverageScore >= 21 && $totalAverageScore <= 40)
                                     <span>D</span>
                                 @else
                                     <span>E</span>

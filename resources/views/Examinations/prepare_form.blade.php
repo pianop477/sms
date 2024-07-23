@@ -8,17 +8,17 @@
                     <h4 class="header-title">Fill the Result Form</h4>
                 </div>
                 <div class="col-4">
-                    <a href="{{route('results_byCourse', $courses->id)}}" class="float-right btn-xs btn btn-success"><i class="ti-eye"></i> Results</a>
+                    <a href="{{ route('results_byCourse', $courses->id) }}" class="float-right btn-xs btn btn-success"><i class="ti-eye"></i> Results</a>
                 </div>
             </div>
-            <form class="needs-validation" novalidate="" action="{{route('score.captured.values')}}" method="POST" enctype="multipart/form-data">
+            <form class="needs-validation" novalidate="" action="{{ route('score.captured.values') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="form-row">
                     <!-- Hidden fields -->
-                    <input type="hidden" name="course_id" value="{{$courses->id}}">
-                    <input type="hidden" name="class_id" value="{{$courses->class_id}}">
-                    <input type="hidden" name="teacher_id" value="{{$courses->teacher_id}}">
-                    <input type="hidden" name="school_id" value="{{$courses->school_id}}">
+                    <input type="hidden" name="course_id" value="{{ $courses->id }}">
+                    <input type="hidden" name="class_id" value="{{ $courses->class_id }}">
+                    <input type="hidden" name="teacher_id" value="{{ $courses->teacher_id }}">
+                    <input type="hidden" name="school_id" value="{{ $courses->school_id }}">
 
                     <!-- Exam Type -->
                     <div class="col-md-3 mb-3">
@@ -26,12 +26,12 @@
                         <select name="exam_type" id="validationCustom01" class="form-control text-uppercase" required>
                             <option value="">--Select Exam--</option>
                             @foreach ($exams as $exam)
-                                <option value="{{$exam->id}}">{{$exam->exam_type}}</option>
+                                <option value="{{ $exam->id }}">{{ $exam->exam_type }}</option>
                             @endforeach
                         </select>
                         @error('exam_type')
                         <div class="invalid-feedback">
-                            {{$message}}
+                            {{ $message }}
                         </div>
                         @enderror
                     </div>
@@ -39,10 +39,10 @@
                     <!-- Exam Date -->
                     <div class="col-md-3 mb-3">
                         <label for="validationCustom02">Examination Date</label>
-                        <input type="date" name="exam_date" class="form-control" id="validationCustom02" placeholder="" required="" value="{{old('exam_date')}}">
+                        <input type="date" name="exam_date" class="form-control" id="validationCustom02" placeholder="" required value="{{ old('exam_date') }}">
                         @error('exam_date')
                         <div class="invalid-feedback">
-                            {{$message}}
+                            {{ $message }}
                         </div>
                         @enderror
                     </div>
@@ -51,13 +51,13 @@
                     <div class="col-md-3 mb-3">
                         <label for="validationCustom02">Examination Term</label>
                         <select name="term" id="validationCustom02" class="form-control text-uppercase" required>
-                            <option value="">-- select term --</option>
-                            <option value="i">term i</option>
-                            <option value="ii">term ii</option>
+                            <option value="">-- Select Term --</option>
+                            <option value="i">Term I</option>
+                            <option value="ii">Term II</option>
                         </select>
                         @error('term')
                         <div class="invalid-feedback">
-                            {{$message}}
+                            {{ $message }}
                         </div>
                         @enderror
                     </div>
@@ -70,14 +70,43 @@
                         </select>
                         @error('marking_style')
                         <div class="invalid-feedback">
-                            {{$message}}
+                            {{ $message }}
                         </div>
                         @enderror
                     </div>
                 </div>
                 <button class="btn btn-primary float-right" type="submit">Next <i class="ti-arrow-right"></i></button>
             </form>
+            <button id="continueWithSavedData" class="btn btn-warning mt-3" style="display:none;">Continue with Saved Data</button>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const continueWithSavedDataButton = document.getElementById('continueWithSavedData');
+        const formKey = 'studentsFormData';
+
+        // Check if there is saved data in local storage
+        function checkSavedData() {
+            const savedData = localStorage.getItem(formKey);
+            if (savedData) {
+                continueWithSavedDataButton.style.display = 'block';
+            } else {
+                continueWithSavedDataButton.style.display = 'none';
+            }
+        }
+
+        // Call checkSavedData function on page load
+        checkSavedData();
+
+        // Event listener for the button to redirect to the form with saved data
+        continueWithSavedDataButton.addEventListener('click', () => {
+            if (confirm('You have unsubmitted Results. Do you want to continue with the saved data?')) {
+                // Redirect to the page with saved data
+                window.location.href = "{{ route('form.saved.values') }}";
+            }
+        });
+    });
+</script>
 @endsection

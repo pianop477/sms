@@ -38,6 +38,42 @@ class ExamController extends Controller
         return view('Examinations.prepare_form', ['exams' => $exams, 'courses' => $courses]);
     }
 
+    //navigate to the next page if there are saved data in the browser
+    public function savedDataForm()
+    {
+        // Retrieve all necessary data from the session
+        $courseId = session()->get('course_id');
+        $classId = session()->get('class_id');
+        $teacherId = session()->get('teacher_id');
+        $schoolId = session()->get('school_id');
+        $examTypeId = session()->get('exam_type_id');
+        $examDate = session()->get('exam_date');
+        $term = session()->get('term');
+        $markingStyle = session()->get('marking_style');
+
+        $students = Student::where('class_id', $classId)->where('status', 1)->orderBy('first_name', 'ASC')->get();
+        $className = Grade::find($classId)->class_code;
+        $courseName = Subject::find($courseId)->course_code;
+        $examName = Examination::find($examTypeId)->exam_type;
+
+        return view('Examinations.register_score', [
+            'courseId' => $courseId,
+            'classId' => $classId,
+            'teacherId' => $teacherId,
+            'schoolId' => $schoolId,
+            'examTypeId' => $examTypeId,
+            'examDate' => $examDate,
+            'term' => $term,
+            'students' => $students,
+            'className' => $className,
+            'courseName' => $courseName,
+            'examName' => $examName,
+            'marking_style' => $markingStyle,
+            'savedData' => session()->get('saved_data') // Add this to pass saved data
+        ]);
+    }
+
+
     //capture values and send it to the next step===========================
     public function captureValues(Request $request)
     {
@@ -91,65 +127,74 @@ class ExamController extends Controller
 
     //store examination scores ==================================
     public function storeScore(Request $request)
-    {
-        // Define validation rules
-        $rules = [
-            'students.*.student_id' => 'required|exists:students,id',
-            'students.*.score' => 'required|numeric|min:0|max:100',  // Validation for score
-        ];
-        $validator = Validator::make($request->all(), $rules);
+{
+    $requestData = $request->all();
+    $examTypeId = $request->session()->get('exam_type_id');
+    $examDate = $request->session()->get('exam_date');
+    $courseId = $request->session()->get('course_id');
+    $teacherId = $request->session()->get('teacher_id');
+    $classId = $request->session()->get('class_id');
+    $schoolId = $request->session()->get('school_id');
+    $term = $request->session()->get('term');
+    $markingStyle = $request->session()->get('marking_style');
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
+    // Define validation rules conditionally based on marking style
+    $scoreValidation = $markingStyle == 1 ? 'required|numeric|min:0|max:50' : 'required|numeric|min:0|max:100';
 
-        $examTypeId = $request->session()->get('exam_type_id');
-        $examDate = $request->session()->get('exam_date');
-        $courseId = $request->session()->get('course_id');
-        $teacherId = $request->session()->get('teacher_id');
-        $classId = $request->session()->get('class_id');
-        $schoolId = $request->session()->get('school_id');
-        $term = $request->session()->get('term');
-        $markingStyle = $request->session()->get('marking_style');
-        $students = $request->input('students');
+    $rules = [
+        'students.*.student_id' => 'required|exists:students,id',
+        'students.*.score' => $scoreValidation,  // Dynamic validation for score
+    ];
 
-        foreach ($students as $studentData) {
-            $studentId = $studentData['student_id'];
-            $score = $studentData['score'];
+    $validator = Validator::make($requestData, $rules);
 
-            // Check for duplicate records
-            $existingRecord = Examination_result::where('student_id', $studentId)
-                                                ->where('Exam_term', $term)
-                                                ->where('course_id', $courseId)
-                                               ->where('exam_date', $examDate)
-                                               ->exists();
-
-            if ($existingRecord) {
-                Alert::error('Error!', 'Examination Results already submitted for this Course');
-                return redirect()->route('score.prepare.form', $courseId);
-            } else {
-                // Create a new examination result entry
-                Examination_result::create([
-                    'student_id' => $studentId,
-                    'course_id' => $courseId,
-                    'class_id' => $classId,
-                    'teacher_id' => $teacherId,
-                    'exam_type_id' => $examTypeId,
-                    'school_id' => $schoolId,
-                    'exam_date' => $examDate,
-                    'score' => $score,
-                    'Exam_term' => $term,
-                    'marking_style' => $markingStyle
-                ]);
-            }
-        }
-
-        Alert::success('Success!', 'Examination results have been submitted successfully');
-        return redirect()->route('score.prepare.form', $courseId);
+    if ($validator->fails()) {
+        $errorMessages = $validator->errors()->all();
+        $errorMessage = implode(' ', $errorMessages);
+        Alert::error('Validation Error!', $errorMessage);
+        return redirect()->back()->withInput();
     }
 
+    $students = $request->input('students');
+
+    foreach ($students as $studentData) {
+        $studentId = $studentData['student_id'];
+        $score = $studentData['score'];
+
+        // Check for duplicate records
+        $existingRecord = Examination_result::where('student_id', $studentId)
+                                        ->where('course_id', $courseId)
+                                        ->where('exam_type_id', $examTypeId)
+                                        ->whereMonth('exam_date', Carbon::parse($examDate)->month)
+                                        ->exists();
+
+        if ($existingRecord) {
+            Alert::error('Error!', 'Examination Results already submitted for this Course');
+            return redirect()->route('score.prepare.form', $courseId);
+        } else {
+            // Create a new examination result entry
+            Examination_result::create([
+                'student_id' => $studentId,
+                'course_id' => $courseId,
+                'class_id' => $classId,
+                'teacher_id' => $teacherId,
+                'exam_type_id' => $examTypeId,
+                'school_id' => $schoolId,
+                'exam_date' => $examDate,
+                'score' => $score,
+                'Exam_term' => $term,
+                'marking_style' => $markingStyle
+            ]);
+        }
+    }
+
+    Alert::success('Success!', 'Examination results have been submitted successfully');
+    return redirect()->route('score.prepare.form', $courseId);
+}
+
+
     /**
-     * Store the newly created resource in storage.
+     * Store the newly created resource in storage examination type.
      */
     public function store(Request $request)
     {
@@ -188,11 +233,9 @@ class ExamController extends Controller
     /**
      * Show the form for editing the resource.
      */
-    public function edit($exam)
+    public function edit(Examination $exam)
     {
-        //
-        $exams = Examination::findOrFail($exam);
-        return view('Examinations.Edit', ['exams' => $exams]);
+        return view('Examinations.Edit', compact('exam'));
     }
 
     /**
@@ -239,10 +282,11 @@ class ExamController extends Controller
     public function courseResults(Subject $courses)
     {
         $results = Examination_result::where('course_id', $courses->id)
-            ->where('class_id', $courses->class_id) // Assuming class_id matches class_alias
+            ->where('class_id', $courses->class_id)
             ->where('teacher_id', $courses->teacher_id)
             ->get();
 
+        // Use distinct to ensure unique years
         $groupedData = $results->groupBy(function ($item) {
             return Carbon::parse($item->exam_date)->format('Y');
         });
@@ -250,40 +294,55 @@ class ExamController extends Controller
         return view('Examinations.teacher_results_by_year', compact('groupedData', 'courses'));
     }
 
+
     public function resultByYear(Subject $courses, $year)
     {
-        $results = Examination_result::query()->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+        $results = Examination_result::query()
+            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
             ->select('examination_results.*', 'examinations.exam_type')
             ->where('course_id', $courses->id)
-            ->where('class_id', $courses->class_id) // Assuming class_id matches class_alias
+            ->where('class_id', $courses->class_id)
             ->where('teacher_id', $courses->teacher_id)
             ->whereYear('exam_date', $year)
+            ->distinct()  // Ensure distinct exam types
             ->get();
 
+        // Group by exam type ID
         $examTypes = $results->groupBy('exam_type_id');
 
         return view('Examinations.teacher_results_by_exam_type', compact('examTypes', 'year', 'courses'));
     }
 
+
     public function resultByExamType(Subject $courses, $year, $examType)
     {
         $results = Examination_result::where('course_id', $courses->id)
-            ->where('class_id', $courses->class_id) // Assuming class_id matches class_alias
+            ->where('class_id', $courses->class_id)
             ->where('teacher_id', $courses->teacher_id)
             ->whereYear('exam_date', $year)
             ->where('exam_type_id', $examType)
+            ->distinct()  // Ensure distinct months
             ->get();
 
+        // Group by month name
         $months = $results->groupBy(function ($item) {
-            return Carbon::parse($item->exam_date)->format('F');
+            return Carbon::parse($item->exam_date)->format('F'); // Full month name
         });
 
         return view('Examinations.teacher_results_by_month', compact('months', 'year', 'examType', 'courses'));
     }
 
-
     public function resultByMonth(Subject $courses, $year, $examType, $month)
     {
+        $monthMap = [
+            'January' => 1, 'February' => 2, 'March' => 3,
+            'April' => 4, 'May' => 5, 'June' => 6,
+            'July' => 7, 'August' => 8, 'September' => 9,
+            'October' => 10, 'November' => 11, 'December' => 12
+        ];
+
+        $monthNumber = $monthMap[$month] ?? null;
+
         $results = Examination_result::query()
                         ->join('students', 'students.id', '=', 'examination_results.student_id')
                         ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
@@ -299,12 +358,13 @@ class ExamController extends Controller
                             'users.last_name as teacher_lastname', 'users.gender as teacher_gender', 'users.phone as teacher_phone', 'schools.school_reg_no'
                         )
                         ->where('examination_results.course_id', $courses->id)
-                        ->where('examination_results.class_id', $courses->class_id) // Assuming class_id matches class_alias
+                        ->where('examination_results.class_id', $courses->class_id)
                         ->where('examination_results.teacher_id', $courses->teacher_id)
                         ->whereYear('examination_results.exam_date', $year)
                         ->where('examination_results.exam_type_id', $examType)
-                        ->whereMonth('examination_results.exam_date', Carbon::parse($month)->month)
-                        ->orderBy('examination_results.score', 'desc') // Sort by score descending
+                        ->whereMonth('examination_results.exam_date', $monthNumber)
+                        ->distinct()  // Ensure distinct results
+                        ->orderBy('examination_results.score', 'desc')
                         ->get();
 
         // Initialize grade counts
@@ -372,14 +432,7 @@ class ExamController extends Controller
             'results', 'year', 'examType', 'month', 'courses', 'maleStudents', 'femaleStudents', 'averageScore', 'averageGrade', 'gradeCounts'
         ));
 
-        $pdfPath = public_path('assets/results/results_'. $month.'.pdf');
-        $pdf->save($pdfPath);
-
-        if (!file_exists($pdfPath)) {
-            return response()->json(['error' => 'PDF file not found'], 404);
-        }
-
-        return view('Examinations.teacher_results_pdf', compact('month', 'pdfPath'));
+        return $pdf->stream('my_course_results.pdf');
     }
 
     protected function determineGrade($score, $marking_style)

@@ -14,22 +14,7 @@ class ResultsController extends Controller
 {
     public function index (Student $student)
     {
-        $results = Examination_result::query()->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                                                ->join('students', 'students.id', '=', 'examination_results.student_id')
-                                                ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
-                                                ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-                                                ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                                                ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                                                ->select(
-                                                    'examination_results.*',
-                                                    'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.gender',
-                                                    'grades.class_name', 'grades.class_code',
-                                                    'users.first_name as teacher_firstname', 'users.last_name as teacher_lastname', 'users.phone as teacher_phone',
-                                                    'subjects.course_name', 'subjects.course_code',
-                                                    'examinations.exam_type'
-                                                )
-                                                ->where('examination_results.student_id', $student->id)
-                                                ->get();
+        $results = Examination_result::where('student_id', $student->id)->get();
         // return $results;
         $groupedData = $results->groupBy(function($item) {
             return Carbon::parse($item->exam_date)->format('Y');
@@ -46,16 +31,12 @@ class ResultsController extends Controller
     {
         // abort(404);
         $examType = Examination_result::query()->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                                                ->join('students', 'students.id', '=', 'examination_results.student_id')
-                                                ->whereYear('examination_results.exam_date', $year)
-                                                ->where('examination_results.student_id', $student->id)
-                                                ->distinct()
-                                                ->select(
-                                                    'examinations.exam_type', DB::raw('MONTH(examination_results.exam_date) as exam_month')
-                                                )
-                                                ->orderBy(DB::raw('MONTH(examination_results.exam_date)'))
-                                                ->get();
-        return view('Results.result_type', compact('examType', 'student', 'year'));
+                                        ->distinct()
+                                        ->select('examination_results.*', 'examinations.id as exam_id', 'examinations.exam_type')
+                                        ->whereYear('exam_date', $year)
+                                        ->where('student_id', $student->id)
+                                        ->paginate(10);
+        return view('Results.result_type', compact('student', 'year', 'examType'));
     }
 
     /**
@@ -65,23 +46,23 @@ class ResultsController extends Controller
     {
         // Fetch individual student results
         $results = Examination_result::query()->join('students', 'students.id', '=', 'examination_results.student_id')
-                                                ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                                                ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                                                ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                                                ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
-                                                ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-                                                ->select(
-                                                    'examination_results.*', 'grades.class_name', 'grades.class_code',
-                                                    'subjects.course_name', 'subjects.course_code',
-                                                    'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.gender', 'students.group',
-                                                    'examinations.exam_type', 'users.first_name as teacher_firstname', 'users.last_name as teacher_lastname',
-                                                    'users.gender as teacher_gender', 'users.phone as teacher_phone',
-                                                    DB::raw('MONTH(examination_results.exam_date) as exam_month')
-                                                )
-                                                ->whereYear('examination_results.exam_date', $year)
-                                                ->where('examinations.exam_type', $type)
-                                                ->where('examination_results.student_id', $student->id)
-                                                ->get();
+                                            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+                                            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+                                            ->leftJoin('schools', 'schools.id', 'students.school_id')
+                                            ->join('examinations', 'examinations.id', 'examination_results.exam_type_id')
+                                            ->distinct()
+                                            ->select(
+                                                'examination_results.*',
+                                                'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.image',
+                                                'subjects.course_name', 'subjects.course_code',
+                                                'grades.class_name', 'grades.class_code',
+                                                'schools.school_name', 'schools.school_reg_no', 'schools.postal_address', 'schools.postal_name', 'schools.country', 'schools.logo',
+                                                'examinations.exam_type'
+                                            )
+                                            ->whereYear('examination_results.exam_date', $year)
+                                            ->where('examination_results.exam_type_id', $type)
+                                            ->where('examination_results.student_id', $student->id)
+                                            ->get();
 
         // Calculate summary for the individual student
         $summary = [
@@ -91,12 +72,12 @@ class ResultsController extends Controller
 
         // Fetch total marks for each student and rank them
         $studentsTotalMarks = Examination_result::query()->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                                    ->select('student_id', DB::raw('SUM(score) as total_marks'))
-                                    ->whereYear('exam_date', $year)
-                                    ->where('examinations.exam_type', $type)
-                                    ->groupBy('student_id')
-                                    ->orderBy('total_marks', 'desc')
-                                    ->get();
+                                        ->select('student_id', DB::raw('SUM(score) as total_marks'))
+                                        ->whereYear('exam_date', $year)
+                                        ->where('examinations.exam_type', $type)
+                                        ->groupBy('student_id')
+                                        ->orderBy('total_marks', 'desc')
+                                        ->get();
 
         // Assign positions
         $positions = [];
@@ -107,7 +88,20 @@ class ResultsController extends Controller
         // Get the current student's position
         $currentStudentPosition = $positions[$student->id] ?? null;
 
-        return view('Results.parent_results', compact('student', 'results', 'summary', 'year', 'type', 'currentStudentPosition', 'positions'));
+        // Pass data to the view
+        $data = [
+            'results' => $results,
+            'summary' => $summary,
+            'position' => $currentStudentPosition,
+            'student' => $student,
+            'year' => $year,
+            'type' => $type
+        ];
+
+        // Load view and generate PDF
+        $pdf = \PDF::loadView('Results.parent_results', compact('data', 'student', 'results', 'summary', 'year', 'type', 'currentStudentPosition', 'positions'));
+        // Return the PDF as a download
+        return $pdf->stream('student_report.pdf');
     }
 
     //general results are intialized here ====================================
@@ -297,14 +291,7 @@ class ResultsController extends Controller
             'school', 'year', 'class', 'examType', 'month', 'results', 'totalMaleStudents', 'totalFemaleStudents',
             'averageScoresByCourse', 'evaluationScores', 'totalAverageScore', 'sortedStudentsResults', 'sumOfCourseAverages', 'sortedCourses'
         ));
-        $pdfPath = public_path('assets/results/general_results_'.$class.'_'.$month.'_'.$year.'.pdf');
-        $pdf->save($pdfPath);
-
-        if(!file_exists($pdfPath)) {
-            return response()->json(['Error' => 'File does not exists'], 404);
-        }
-
-        return view('Results.result_pdf_report', compact('year', 'month', 'class'));
+        return $pdf->stream('General_results.pdf');
     }
 
     private function calculateGrade($score, $marking_style)

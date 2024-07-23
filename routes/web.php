@@ -170,6 +170,7 @@ Route::group(['middleware' => ['auth']], function () {
             Route::get('{course}/Prepare', [ExamController::class, 'prepare'])->name('score.prepare.form');
             Route::post('Examination-result-create', [ExamController::class, 'captureValues'])->name('score.captured.values');
             Route::post('Upload/results', [ExamController::class, 'storeScore'])->name('exams.store.score');
+            Route::get('/Results-saved', [ExamController::class, 'savedDataForm'])->name('form.saved.values');
             //teachers  examination results =============================
             Route::get('{courses}/Results', [ExamController::class, 'courseResults'])->name('results_byCourse');
             Route::get('/Results/{courses}/{year}', [ExamController::class, 'resultByYear'])->name('results.byYear');
@@ -204,11 +205,11 @@ Route::group(['middleware' => ['auth']], function () {
     //anothe routes for registering examination and this is performed by academic only ============================
     Route::middleware('CheckUsertype:3')->group(function () {
         Route::middleware('CheckRoleType:3')->group(function () {
-            Route::post('Register', [ExamController::class, 'store'])->name('exams.store');
-            Route::get('{exam}/Delete', [ExamController::class, 'destroy'])->name('exams.destroy');
-            Route::put('{exam}/Block', [ExamController::class, 'blockExams'])->name('exams.block');
-            Route::put('{exam}/Unblock', [ExamController::class, 'unblockExams'])->name('exams.unblock');
-            Route::get('{exam}/Edit', [ExamController::class, 'edit'])->name('exams.edit');
+            Route::post('/Examination-type/Register', [ExamController::class, 'store'])->name('exams.store');
+            Route::get('{exam}/Examination-type/Delete', [ExamController::class, 'destroy'])->name('exams.destroy');
+            Route::put('{exam}/Examination-type/Block', [ExamController::class, 'blockExams'])->name('exams.block');
+            Route::put('{exam}/Examination-type/Unblock', [ExamController::class, 'unblockExams'])->name('exams.unblock');
+            Route::get('{exam}/Examination-type/Edit', [ExamController::class, 'edit'])->name('exams.type.edit');
             Route::put('{exams}/Update', [ExamController::class, 'update'])->name('exams.update');
         });
     });
@@ -230,9 +231,9 @@ Route::group(['middleware' => ['auth']], function () {
 
     //results viewing by parents routes redirection ==================================================================
     Route::middleware('CheckUsertype:4')->group(function () {
-        Route::get('Exam-results/{student}', [ResultsController::class, 'index'])->name('results.index');
-        Route::get('Result-type/{student}/{year}', [ResultsController::class, 'resultByType'])->name('result.byType');
-        Route::get('Results/{student}/{year}/{type}', [ResultsController::class, 'viewStudentResult'])->name('results.student.get');
+        Route::get('Exam-results/Student/{student}', [ResultsController::class, 'index'])->name('results.index');
+        Route::get('Result-type/Student/{student}/Year/{year}', [ResultsController::class, 'resultByType'])->name('result.byType');
+        Route::get('Results/Student/{student}/Year/{year}/Exam-type/{type}', [ResultsController::class, 'viewStudentResult'])->name('results.student.get');
     });
     //End of condition ==============================================================================================
 

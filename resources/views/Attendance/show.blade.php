@@ -14,7 +14,7 @@
             <div class="single-table">
                 <div class="table-responsive-lg">
                     <table class="table" id="myTable">
-                        <thead class="text-capitalize bg-info">
+                        <thead class="text-capitalize bg-primary">
                             <tr class="text-white">
                                 <th>Day</th>
                                 <th scope="col">Date</th>

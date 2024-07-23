@@ -10,13 +10,13 @@
                     <a href="{{route('exams.index')}}"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
                 </div>
             </div>
-            <form class="needs-validation" novalidate="" action="{{route('exams.update', $exams->id)}}" method="POST" enctype="multipart/form-data">
+            <form class="needs-validation" novalidate="" action="{{route('exams.update', $exam->id)}}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="form-row">
                     <div class="col-md-6 mb-3">
                         <label for="validationCustom01">Examination Name</label>
-                        <input type="text" name="name" class="form-control text-uppercase" id="validationCustom01" placeholder="Enter Examination Eest" value="{{$exams->exam_type}}" required="">
+                        <input type="text" name="name" class="form-control text-uppercase" id="validationCustom01" placeholder="Enter Examination Eest" value="{{$exam->exam_type}}" required="">
                         @error('name')
                         <div class="invalid-feedback">
                             {{$message}}

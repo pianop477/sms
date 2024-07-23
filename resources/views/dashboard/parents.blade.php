@@ -19,7 +19,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-9">
-                            <h4 class="header-title text-uppercase">My Children List</h4>
+                            <h4 class="header-title text-uppercase text-center">My Children List</h4>
                         </div>
                         <div class="col-3">
                             <button type="button" class="btn btn-link" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fa-solid fa-user-plus text-secondary" style="font-size: 2rem"></i>
@@ -157,8 +157,8 @@
                     <div class="single-table">
                         <div class="table-responsive">
                             <table class="table" id="myTable">
-                                <thead class="text-uppercase bg-dark">
-                                    <tr class="text-white">
+                                <thead class="text-capitalize">
+                                    <tr class="">
                                         <th scope="col">#</th>
                                         <th scope="col">Name</th>
                                         <th scope="col">Gender</th>
