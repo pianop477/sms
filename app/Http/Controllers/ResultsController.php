@@ -42,27 +42,68 @@ class ResultsController extends Controller
     /**
      * Store the newly created resource in storage.
      */
-    public function viewStudentResult(Student $student, $year, $type)
+    public function viewStudentResult(Student $student, $year, $type, $month)
     {
-        // Fetch individual student results
-        $results = Examination_result::query()->join('students', 'students.id', '=', 'examination_results.student_id')
-                                            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                                            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                                            ->leftJoin('schools', 'schools.id', 'students.school_id')
-                                            ->join('examinations', 'examinations.id', 'examination_results.exam_type_id')
-                                            ->distinct()
-                                            ->select(
-                                                'examination_results.*',
-                                                'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.image',
-                                                'subjects.course_name', 'subjects.course_code',
-                                                'grades.class_name', 'grades.class_code',
-                                                'schools.school_name', 'schools.school_reg_no', 'schools.postal_address', 'schools.postal_name', 'schools.country', 'schools.logo',
-                                                'examinations.exam_type'
-                                            )
-                                            ->whereYear('examination_results.exam_date', $year)
-                                            ->where('examination_results.exam_type_id', $type)
-                                            ->where('examination_results.student_id', $student->id)
-                                            ->get();
+
+        // Fetch individual student results with year, exam type, and month filter
+        $results = Examination_result::query()
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
+            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+            ->leftJoin('schools', 'schools.id', '=', 'students.school_id')
+            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+            ->select(
+                'examination_results.*',
+                'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.image',
+                'subjects.course_name', 'subjects.course_code',
+                'grades.class_name', 'grades.class_code',
+                'schools.school_name', 'schools.school_reg_no', 'schools.postal_address', 'schools.postal_name', 'schools.country', 'schools.logo',
+                'examinations.exam_type'
+            )
+            ->whereYear('examination_results.exam_date', $year)
+            ->where('examination_results.exam_type_id', $type)
+            ->where('examination_results.student_id', $student->id)
+            ->whereMonth('examination_results.exam_date', $month) // Filter by month
+            ->get();
+
+        // Determine grades and remarks based on marking style
+        $results->each(function ($result) {
+            if ($result->marking_style == 1) {
+                if ($result->score >= 41) {
+                    $result->grade = 'A';
+                    $result->remark = 'Excellent';
+                } elseif ($result->score >= 31) {
+                    $result->grade = 'B';
+                    $result->remark = 'Good';
+                } elseif ($result->score >= 21) {
+                    $result->grade = 'C';
+                    $result->remark = 'Pass';
+                } elseif ($result->score >= 11) {
+                    $result->grade = 'D';
+                    $result->remark = 'Unsatisfactory';
+                } else {
+                    $result->grade = 'E';
+                    $result->remark = 'Fail';
+                }
+            } else {
+                if ($result->score >= 81) {
+                    $result->grade = 'A';
+                    $result->remark = 'Excellent';
+                } elseif ($result->score >= 61) {
+                    $result->grade = 'B';
+                    $result->remark = 'Good';
+                } elseif ($result->score >= 41) {
+                    $result->grade = 'C';
+                    $result->remark = 'Pass';
+                } elseif ($result->score >= 21) {
+                    $result->grade = 'D';
+                    $result->remark = 'Unsatisfactory';
+                } else {
+                    $result->grade = 'E';
+                    $result->remark = 'Fail';
+                }
+            }
+        });
 
         // Calculate summary for the individual student
         $summary = [
@@ -71,13 +112,19 @@ class ResultsController extends Controller
         ];
 
         // Fetch total marks for each student and rank them
-        $studentsTotalMarks = Examination_result::query()->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                                        ->select('student_id', DB::raw('SUM(score) as total_marks'))
-                                        ->whereYear('exam_date', $year)
-                                        ->where('examinations.exam_type', $type)
-                                        ->groupBy('student_id')
-                                        ->orderBy('total_marks', 'desc')
-                                        ->get();
+       // Fetch total marks for each student and rank them
+        $studentsTotalMarks = Examination_result::query()
+                            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+                            ->select('student_id', DB::raw('SUM(score) as total_marks'))
+                            ->whereYear('exam_date', $year)
+                            ->where('examinations.exam_type', $type)
+                            ->whereMonth('exam_date', $month)
+                            ->groupBy('student_id')
+                            ->orderBy('total_marks', 'desc')
+                            ->get();
+
+        // Debug the total marks
+        // dd($studentsTotalMarks);
 
         // Assign positions
         $positions = [];
@@ -86,20 +133,21 @@ class ResultsController extends Controller
         }
 
         // Get the current student's position
-        $currentStudentPosition = $positions[$student->id] ?? null;
+        $currentStudentPosition = $positions[$student->id] ?? 'Position not available';
 
         // Pass data to the view
         $data = [
             'results' => $results,
             'summary' => $summary,
-            'position' => $currentStudentPosition,
+            'currentStudentPosition' => $currentStudentPosition,
             'student' => $student,
             'year' => $year,
-            'type' => $type
+            'type' => $type,
+            'month' => $month
         ];
 
         // Load view and generate PDF
-        $pdf = \PDF::loadView('Results.parent_results', compact('data', 'student', 'results', 'summary', 'year', 'type', 'currentStudentPosition', 'positions'));
+        $pdf = \PDF::loadView('Results.parent_results', $data);
         // Return the PDF as a download
         return $pdf->stream('student_report.pdf');
     }

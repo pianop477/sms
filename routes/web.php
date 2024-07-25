@@ -11,6 +11,7 @@ use App\Http\Controllers\PdfGeneratorController;
 use App\Http\Controllers\ResultsController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SchoolsController;
+use App\Http\Controllers\SendMessageController;
 use App\Http\Controllers\StudentsController;
 use App\Http\Controllers\SubjectsController;
 use App\Http\Controllers\TeachersController;
@@ -48,14 +49,15 @@ Auth::routes();
         Route::post('Users', [UsersController::class, 'create'])->name('users.create');
     });
 //end of condition ===========================================================================================
+//any user to send message as feedback ==============================
+    Route::post('/Feedback', [SendMessageController::class, 'store'])->name('send.feedback.message');
+//end of condition =================================================
 
 Route::group(['middleware' => ['auth']], function () {
-
     Route::middleware('CheckUsertype:1,2,3,4')->group(function () {
         // Home controller redirection ==============================================================================
         Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     });
-
     //this routes is special for admin - system administrator only =================================================
     Route::middleware('CheckUsertype:1')->group(function() {
         Route::get('Registration', [UsersController::class, 'managerForm'])->name('register.manager');
@@ -210,7 +212,7 @@ Route::group(['middleware' => ['auth']], function () {
             Route::put('{exam}/Examination-type/Block', [ExamController::class, 'blockExams'])->name('exams.block');
             Route::put('{exam}/Examination-type/Unblock', [ExamController::class, 'unblockExams'])->name('exams.unblock');
             Route::get('{exam}/Examination-type/Edit', [ExamController::class, 'edit'])->name('exams.type.edit');
-            Route::put('{exams}/Update', [ExamController::class, 'update'])->name('exams.update');
+            Route::put('{exams}/Examination-type/Update', [ExamController::class, 'update'])->name('exams.update');
         });
     });
     //manage examination results in general schools ========================================================
@@ -233,7 +235,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::middleware('CheckUsertype:4')->group(function () {
         Route::get('Exam-results/Student/{student}', [ResultsController::class, 'index'])->name('results.index');
         Route::get('Result-type/Student/{student}/Year/{year}', [ResultsController::class, 'resultByType'])->name('result.byType');
-        Route::get('Results/Student/{student}/Year/{year}/Exam-type/{type}', [ResultsController::class, 'viewStudentResult'])->name('results.student.get');
+        Route::get('Results/Student/{student}/Year/{year}/Exam-type/{type}/month/{month}', [ResultsController::class, 'viewStudentResult'])->name('results.student.get');
     });
     //End of condition ==============================================================================================
 

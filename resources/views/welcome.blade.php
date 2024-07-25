@@ -4,21 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shule | App</title>
-  <link rel="icon" type="image/png" href="{{asset('assets/img/favicon/favicon.png')}}">
+  <link rel="icon" type="image/png" href="{{ asset('assets/img/favicon/favicon.png') }}">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <style>
+    /* Navbar customization */
     .navbar-custom {
       background-color: #ccdfee;
       color: rgb(39, 75, 109);
-      border-bottom: 3px solid orange;/* Thick dark blue bottom border */
+      border-bottom: 3px solid orange;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
 
     .navbar-custom .navbar-brand {
-      color: rgb(35, 66, 112); /* Brand name color */
-      font-weight: bold; /* Make the brand name bold */
+      color: rgb(35, 66, 112);
+      font-weight: bold;
       font-size: 1.5rem;
     }
 
@@ -26,113 +30,264 @@
       color: rgb(49, 75, 118);
     }
 
-    .navbar-custom .navbar-dark .navbar-nav .nav-link.active,
-    .navbar-custom .navbar-dark .navbar-nav .show > .nav-link {
-      color: rgb(49, 75, 118);
+    /* Hero section styling */
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
     }
 
-    .navbar-custom .navbar-dark .navbar-nav .nav-link {
-      color: rgb(49, 75, 118);
+    .carousel-item {
+      height: 100vh;
+      background-size: cover;
+      background-position: center;
+      transition: opacity 1s ease-in-out;
     }
 
-    .navbar-custom .navbar-dark .navbar-nav .nav-link:hover,
-    .navbar-custom .navbar-dark .navbar-nav .nav-link:focus {
-      color: rgb(49, 75, 118);
+    .carousel-item-next, .carousel-item-prev, .carousel-item.active {
+      transition: opacity 1s ease-in-out;
     }
 
-    /* Border radius for cards */
-    .card {
-      border-radius: 15px; /* Adjust the value as needed */
-      box-shadow: 0px 4px 8px rgba(16, 15, 15, 0.1); /* Add a bottom shadow */
+    .carousel-caption {
+      position: absolute;
+      top: 60%;
+      transform: translateY(-50%);
+      text-align: center;
+      color: white;
     }
 
-    /* Customization for images */
-    .card-img-top {
-      height: 100%;
-      object-fit: cover;
-      border-radius: 15px; /* Ensure rounded border for images */
+    .carousel-caption h1 {
+      font-size: 3rem;
+      font-weight: bold;
     }
 
-    /* Adjust spacing between paragraphs */
-    .card-body p {
-      margin-bottom: 1px; /* Adjust spacing between paragraphs */
+    .carousel-caption p {
+      font-size: 1.3rem;
+      color: #07db78;
+      font-weight: bold;
     }
 
-    /* Profile image style */
-    .profile-img {
-      margin-right: 5px;
+    /* Blur effect */
+    .carousel-item-next, .carousel-item-prev {
+      filter: blur(8px);
+      opacity: 0;
     }
 
-    /* Customization for card header */
-    .card-header {
-      border-top-left-radius: 15px;
-      border-top-right-radius: 15px;
-      background-color: transparent;
-      color: black; /* Card header font color */
-      font-weight: bold; /* Make the card header font bold */
-      box-shadow: 0px 4px 8px rgba(56, 52, 52, 0.1); /* Add a bottom shadow */
-      font-size: 1.5rem; /* Increase font size of card header */
+    .carousel-item.active {
+      filter: none;
+      opacity: 1;
     }
 
-    /* Customization for card titles */
-    .card-title {
-      background-color: #28a745; /* Success color */
-      color: white; /* Text color */
-      padding: 1px 3px; /* Padding for better appearance */
-      border-radius: 8px; /* Add border radius */
+    .section {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .bg-light {
+      background-color: #f8f9fa;
+    }
+
+    /* Media queries for responsiveness */
+    @media (max-width: 768px) {
+      .hero {
+        height: 60vh;
+      }
+
+      .carousel-caption {
+        top: 50%;
+        font-size: 1rem;
+      }
+
+      .carousel-caption h1 {
+        font-size: 1.5rem;
+      }
+
+      .carousel-caption p {
+        font-size: 1rem;
+      }
+
+      .section {
+        height: auto;
+        padding: 20px 0;
+      }
+
+      .card {
+        width: 100%;
+        margin-bottom: 20px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .carousel-caption h1 {
+        font-size: 1.2rem;
+      }
+
+      .carousel-caption p {
+        font-size: 0.8rem;
+      }
+
+      .card img {
+        height: auto;
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-    @include('SRTDashboard.preloader')
-    <nav class="navbar navbar-expand-lg navbar-custom navbar-dark">
-        <div class="container">
-            <img src="{{asset('assets/img/logo/shuleapp_transparent.png')}}" alt="" class="rounded-circle" style="width:70px; object-ft-cover;">
-            <a class="navbar-brand" href="#">ShuleApp</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+  @include('SRTDashboard.preloader')
 
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav ml-auto">
-                    @if (Route::has('users.form'))
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{route('users.form')}}">Register</a>
-                    </li>
-                    @endif
-                    @if (Route::has('login'))
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{route('login')}}">Login</a>
-                    </li>
-                    @endif
-                </ul>
-            </div>
-        </div>
-    </nav>
+  <nav class="navbar navbar-expand-lg navbar-custom navbar-dark">
+    <div class="container">
+      <img src="{{ asset('assets/img/logo/shuleapp_transparent.png') }}" alt="" class="rounded-circle" style="width:70px; object-fit:cover;">
+      <a class="navbar-brand" href="#">ShuleApp</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+          @if (Route::has('users.form'))
+          <li class="nav-item">
+            <a class="nav-link" href="{{ route('users.form') }}">Register</a>
+          </li>
+          @endif
+          @if (Route::has('login'))
+          <li class="nav-item">
+            <a class="nav-link" href="{{ route('login') }}">Login</a>
+          </li>
+          @endif
+        </ul>
+      </div>
+    </div>
+  </nav>
 
-  <div class="container mt-3">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="card mb-3">
-          <div class="card-header">
-            {{-- <img src="{{asset('assets/img/logo/sms logo3.jpg')}}" alt="" class="profile-img"> --}}
-            Contact Us
+  <section class="hero">
+    <div id="heroCarousel" class="carousel slide carousel-fade" data-ride="carousel">
+      <ol class="carousel-indicators">
+        <li data-target="#heroCarousel" data-slide-to="0" class="active"></li>
+        <li data-target="#heroCarousel" data-slide-to="1"></li>
+        <li data-target="#heroCarousel" data-slide-to="2"></li>
+        <li data-target="#heroCarousel" data-slide-to="3"></li>
+      </ol>
+      <div class="carousel-inner">
+        <div class="carousel-item active" style="background-image: url('{{ asset('assets/img/cards/paper 1.jpeg') }}');">
+          <div class="carousel-caption">
+            <h1>Welcome to ShuleApp</h1>
+            <p>Your Ultimate Education Management Solution</p>
+            <a href="{{route('login')}}" class="btn btn-primary btn-lg">Get Started</a>
           </div>
-          <div class="card-body">
-            <span class="card-title">Service Provide:</span>
-            <p class="card-text">Graphics Designer & Multimedia Technology</p>
-            <span class="card-title">Contact Us</span>
-            <p class="card-text">+255 753 671 658 or +255 622 704 021</p>
-            <p class="card-text">matekelefreyson@gmail.com</p>
+        </div>
+        <div class="carousel-item" style="background-image: url('{{ asset('assets/img/cards/paper 2.jpg') }}');">
+          <div class="carousel-caption">
+            <h1>Efficient Records Management</h1>
+            <p>Streamline your educational processes</p>
+            <a href="{{route('login')}}" class="btn btn-primary btn-lg">Get Started</a>
+          </div>
+        </div>
+        <div class="carousel-item" style="background-image: url('{{ asset('assets/img/cards/paper 3.jpg') }}');">
+          <div class="carousel-caption">
+            <h1>Innovative Solutions</h1>
+            <p>Enhance learning with technology</p>
+            <a href="{{route('login')}}" class="btn btn-primary btn-lg">Get Started</a>
+          </div>
+        </div>
+        <div class="carousel-item" style="background-image: url('{{ asset('assets/img/cards/paper 4.jpg') }}');">
+          <div class="carousel-caption">
+            <h1>Join to Our Community</h1>
+            <p>Be part of the future of education</p>
+            <a href="{{route('login')}}" class="btn btn-primary btn-lg">Get Started</a>
           </div>
         </div>
       </div>
-      <div class="col-md-6">
-        <div class="card mb-3">
-          <img src="{{asset('assets/img/cards/studying.jpg')}}" class="card-img-top" alt="Wiring Image">
+      <a class="carousel-control-prev" href="#heroCarousel" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#heroCarousel" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section" id="features" style="background: lightseagreen">
+    <div class="container">
+      <h2 class="text-center mb-4">OUR FEATURES</h2>
+      <div class="row features">
+        <div class="col-md-4">
+            <div class="card">
+                <img src="{{asset('assets/img/features/feature 1.png')}}" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title">Reports Management</h5>
+                  <p class="card-text">The reporting capabilities of ShuleApp systems are flexible enough to get reports from attendance, grades/scores, and student Reports</p>
+                </div>
+              </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <img src="{{asset('assets/img/features/feature 2.png')}}" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title">Parents Portal</h5>
+                  <p class="card-text">The parent app gives parents a level of control over their child's performance at school than ever seen before.</p>
+                </div>
+              </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <img src="{{asset('assets/img/features/feature 3.jpeg')}}" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title">Students Portal</h5>
+                  <p class="card-text">Students are able to interact with the system through their portal and access necessary learning materials provided by their teachers</p>
+                </div>
+              </div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
+
+  <section class="section" id="contact" style="background:lightskyblue">
+    <div class="container">
+      <h2 class="text-center mb-4">CONTACT US</h2>
+      <div class="row">
+        <div class="col-md-6">
+          <h4>ShuleApp - Admin</h4>
+          <p>Address: Dodoma, Tanzania</p>
+          <p>Email: pianop477@gmail.com</p>
+          <p>Phone: +255 678 669 000</p>
+        </div>
+        <div class="col-md-6">
+          <form method="POST" action="{{route('send.feedback.message') . ('#contact')}}" class="needs-validation" novalidate>
+            @csrf
+            <div class="form-group">
+              <label for="name">Name:</label>
+              <input type="text" class="form-control" id="name" name="name" value="{{old('name')}}">
+              @error('name')
+                  <div class="text-danger">{{$message}}</div>
+              @enderror
+            </div>
+            <div class="form-group">
+              <label for="email">Email:</label>
+              <input type="email" class="form-control" id="email" name="email" value="{{old('email')}}">
+              @error('email')
+                  <div class="text-danger">{{$message}}</div>
+              @enderror
+            </div>
+            <div class="form-group">
+              <label for="message">Message:</label>
+              <textarea class="form-control" id="message" rows="3" name="message">{{old('message')}}</textarea>
+              @error('message')
+                  <div class="text-danger">{{$message}}</div>
+              @enderror
+            </div>
+            <button type="submit" class="btn btn-primary">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+  @include('sweetalert::alert')
 </body>
 </html>

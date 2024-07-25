@@ -160,18 +160,20 @@
                             <thead class="text-uppercase">
                                 <tr>
                                     <th scope="col">#</th>
+                                    <th scope="col" class="text-center">Admission No.</th>
                                     <th scope="col">First Name</th>
                                     <th scope="col">Middle Name</th>
                                     <th scope="col">Last Name</th>
-                                    <th scope="col">Gender</th>
+                                    <th scope="col" class="text-center">Gender</th>
                                     <th scope="col">Date of Birth</th>
-                                    <th scope="col">Action</th>
+                                    <th scope="col" class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($students as $student )
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
+                                        <td class="text-uppercase text-center">{{$student->school_reg_no}} - {{Str_pad($student->id, 4, '0', STR_PAD_LEFT)}}</td>
                                         <td class="text-uppercase">{{$student->first_name}}</td>
                                         <td class="text-uppercase">{{$student->middle_name}}</td>
                                         <td class="text-uppercase">{{$student->last_name}}</td>

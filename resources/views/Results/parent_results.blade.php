@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Result</title>
     <style>
-        /* Include your styles here, e.g., Bootstrap, inline styles */
         body {
             font-family: 'Arial, sans-serif';
         }
@@ -35,6 +34,7 @@
                 <th>Course Code</th>
                 <th>Score</th>
                 <th>Grade</th>
+                <th>Remark</th>
             </tr>
         </thead>
         <tbody>
@@ -44,6 +44,7 @@
                     <td>{{ $result->course_code }}</td>
                     <td>{{ $result->score }}</td>
                     <td>{{ $result->grade }}</td>
+                    <td>{{ $result->remark }}</td>
                 </tr>
             @endforeach
         </tbody>
@@ -52,6 +53,6 @@
     <h2>Summary</h2>
     <p>Average Score: {{ $summary['average'] }}</p>
     <p>Total Marks: {{ $summary['total_marks'] }}</p>
-    <p>Position: {{ $position }}</p>
+    <p>Position: {{ $currentStudentPosition }}</p>
 </body>
 </html>

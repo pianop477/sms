@@ -206,7 +206,7 @@ class StudentsController extends Controller
                             ->leftJoin('transports', 'transports.id', '=', 'students.transport_id')
                             ->select('students.id', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.gender', 'students.dob',
                                 'transports.driver_name', 'transports.gender as driver_gender', 'transports.phone as driver_phone', 'transports.bus_no',
-                                'transports.routine')
+                                'transports.routine', 'schools.school_reg_no')
                             ->where('students.class_id', '=', $classId->id)
                             ->where('students.school_id', '=', Auth::user()->school_id)
                             ->where('students.status', 1)
