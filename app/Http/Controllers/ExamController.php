@@ -432,7 +432,7 @@ class ExamController extends Controller
             'results', 'year', 'examType', 'month', 'courses', 'maleStudents', 'femaleStudents', 'averageScore', 'averageGrade', 'gradeCounts'
         ));
 
-        return $pdf->stream('my_course_results.pdf');
+        return $pdf->stream('results_'.$courses->course_code.'_'.$month.'_'.$year.'.pdf');
     }
 
     protected function determineGrade($score, $marking_style)

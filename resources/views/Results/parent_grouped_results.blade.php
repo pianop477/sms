@@ -5,7 +5,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-10">
-                            <h4 class="header-title">Examination Results for <span class="text-uppercase text-primary"><strong>({{$student->first_name. ' '. $student->middle_name. ' '. $student->last_name}})</strong></span></h4>
+                            <h4 class="header-title text-center">Results for <span class="text-uppercase text-primary"><strong>({{$student->first_name. ' '. $student->middle_name. ' '. $student->last_name}})</strong></span></h4>
                         </div>
                         <div class="col-2">
                             <a href="{{route('home')}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>

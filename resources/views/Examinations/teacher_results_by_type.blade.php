@@ -86,12 +86,12 @@
         .course-details {
             position: relative;
             left: 5px;
-            width: 40%;
+            width: 50%;
             line-height: 5px;
         }
         .grade-summary {
             position: absolute;
-            width: 40.3%;
+            width: 50%;
             left: 45%;
             top: 23%
         }
@@ -139,7 +139,7 @@
     <div class="summary-content">
         <div class="course-details">
             <div>
-                <p>Course Name: <strong>{{$courses->course_name}} - {{$courses->course_code}}</strong></p>
+                <p>Course Name: <span style="text-transform: uppercase"><strong>{{$courses->course_name}} - {{$courses->course_code}}</strong></span></p>
                 <p>Course Instructor: <strong>{{$results->first()->teacher_firstname}}, {{$results->first()->teacher_lastname[0]}}</strong></p>
                 <p>Examination: <strong>{{$results->first()->exam_type}}</strong></p>
                 <p>Examination Date: <strong>{{\Carbon\Carbon::parse($results->first()->exam_date)->format('d-F-Y')}}</strong></p>

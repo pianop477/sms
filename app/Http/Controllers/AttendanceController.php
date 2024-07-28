@@ -377,7 +377,7 @@ public function show(Student $student, $year)
         $pdf = \PDF::loadView('Attendance.pdfreport', compact('attendanceRecords', 'malePresent', 'maleAbsent',
             'malePermission', 'femalePresent', 'femaleAbsent', 'femalePermission'));
 
-            return $pdf->stream('today_attendance.pdf');
+            return $pdf->stream($today.' Attendance.pdf');
     }
 
 
@@ -385,6 +385,8 @@ public function show(Student $student, $year)
         $classes = Grade::where('school_id', Auth::user()->school_id)->get();
         return view('Attendance.general_attendance', ['classes' => $classes]);
     }
+
+
     public function genaralAttendance(Request $request)
     {
         $request->validate([
@@ -452,7 +454,7 @@ public function show(Student $student, $year)
             return Carbon::parse($item->attendance_date)->format('Y-m-d');
         });
         $pdf = \PDF::loadView('Attendance.all_report', compact('datas', 'maleSummary', 'femaleSummary', 'attendances', 'startOfMonth', 'endOfMonth'));
-        return $pdf->stream('general_attendance.pdf');
+        return $pdf->stream($attendances->first()->class_name. ' '.Carbon::parse($attendances->first()->attendance_date)->format('F').' Attendance Report.pdf');
 
     }
 

@@ -19,6 +19,9 @@
                             <li>
                                 <a href="{{route('admin.reset.password')}}"><i class="ti-unlock"></i><span>User Password Reset</span></a>
                             </li>
+                            <li>
+                                <a href="{{route('feedback')}}"><i class="ti-email"></i><span>Users Feedback</span></a>
+                            </li>
                         @endif
 
                         {{-- school academic teacher navigation links --}}

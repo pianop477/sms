@@ -225,7 +225,6 @@
                                 <tr class="text-capitalize">
                                     <th>#</th>
                                     <th>Course name</th>
-                                    <th>Code</th>
                                     <th>Class</th>
                                     <th class="text-center">Action</th>
                                 </tr>
@@ -246,16 +245,24 @@
                                         <td class="text-uppercase">
                                             {{$course->course_name}}
                                         </td>
-                                        <td class="text-uppercase">{{$course->course_code}}</td>
                                         <td class="text-uppercase">{{$course->class_code}}</td>
                                         <td>
                                             @if ($course->status == 1)
                                             <ul class="d-flex justify-content-center">
                                                 <li class="mr-3">
-                                                    <a class="btn btn-primary btn-xs" href="{{route('courses.edit', $course->id)}}"><i class="ti-pencil"> Edit</i></a>
+                                                    <a href="{{route('courses.edit', $course->id)}}" class="text-primary" onclick="return confirm('Are you sure you want to Edit this Course?')"><i class="ti-pencil"></i></a>
+                                                </li>
+                                                <li class="mr-3">
+                                                    <a href="{{route('score.prepare.form', $course->id)}}" class="text-success" onclick="return confirm('Are you sure you want to VIEW or ENTER results?')"><i class="ti-pencil-alt"></i></a>
                                                 </li>
                                                 <li>
-                                                    <a class="btn btn-success btn-xs" href="{{route('score.prepare.form', $course->id)}}"><i class="ti-file"> Results</i></a>
+                                                    <form action="{{route('courses.remove', $course->id)}}" method="POST">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to remove {{strtoupper($course->course_name)}} course?')">
+                                                            <i class="ti-trash text-danger"></i>
+                                                        </button>
+                                                    </form>
                                                 </li>
                                             </ul>
                                             @else
@@ -428,7 +435,6 @@
                                     <tr class="text-capitalize">
                                         <th>#</th>
                                         <th>Course name</th>
-                                        <th>Code</th>
                                         <th>Class</th>
                                         <th class="text-center">Action</th>
                                     </tr>
@@ -449,23 +455,22 @@
                                             <td class="text-uppercase">
                                                 {{$course->course_name}}
                                             </td>
-                                            <td class="text-uppercase">{{$course->course_code}}</td>
                                             <td class="text-uppercase">{{$course->class_code}}</td>
                                             <td>
                                                 @if ($course->status == 1)
                                                 <ul class="d-flex justify-content-center">
                                                     <li class="mr-3">
-                                                        <a href="{{route('courses.edit', $course->id)}}" class="text-primary text-sm"><i class="ti-pencil"></i>Edit</a>
+                                                        <a href="{{route('courses.edit', $course->id)}}" class="text-primary" onclick="return confirm('Are you sure you want to Edit this Course?')"><i class="ti-pencil"></i></a>
                                                     </li>
                                                     <li class="mr-3">
-                                                        <a href="{{route('score.prepare.form', $course->id)}}" class="text-success text-sm"><i class="ti-pencil-alt"></i>Score</a>
+                                                        <a href="{{route('score.prepare.form', $course->id)}}" class="text-success" onclick="return confirm('Are you sure you want to VIEW or ENTER results?')"><i class="ti-pencil-alt"></i></a>
                                                     </li>
                                                     <li>
                                                         <form action="{{route('courses.remove', $course->id)}}" method="POST">
                                                             @csrf
                                                             @method('PUT')
                                                             <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to remove {{strtoupper($course->course_name)}} course?')">
-                                                                <i class="ti-trash text-danger">Close</i>
+                                                                <i class="ti-trash text-danger"></i>
                                                             </button>
                                                         </form>
                                                     </li>
@@ -571,7 +576,6 @@
                                     <tr class="text-capitalize">
                                         <th>#</th>
                                         <th>Course name</th>
-                                        <th>Code</th>
                                         <th>Class</th>
                                         <th class="text-center">Action</th>
                                     </tr>
@@ -592,16 +596,24 @@
                                             <td class="text-uppercase">
                                                 {{$course->course_name}}
                                             </td>
-                                            <td class="text-uppercase">{{$course->course_code}}</td>
                                             <td class="text-uppercase">{{$course->class_code}}</td>
                                             <td>
                                                 @if ($course->status == 1)
                                                 <ul class="d-flex justify-content-center">
                                                     <li class="mr-3">
-                                                        <a href="{{route('courses.edit', $course->id)}}" class="btn btn-primary btn-xs"><i class="ti-pencil"> Edit</i></a>
+                                                        <a href="{{route('courses.edit', $course->id)}}" class="text-primary" onclick="return confirm('Are you sure you want to Edit this Course?')"><i class="ti-pencil"></i></a>
+                                                    </li>
+                                                    <li class="mr-3">
+                                                        <a href="{{route('score.prepare.form', $course->id)}}" class="text-success" onclick="return confirm('Are you sure you want to VIEW or ENTER results?')"><i class="ti-pencil-alt"></i></a>
                                                     </li>
                                                     <li>
-                                                        <a href="{{route('score.prepare.form', $course->id)}}" class="btn btn-success btn-xs"><i class="ti-file"> Results</i></a>
+                                                        <form action="{{route('courses.remove', $course->id)}}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to remove {{strtoupper($course->course_name)}} course?')">
+                                                                <i class="ti-trash text-danger"></i>
+                                                            </button>
+                                                        </form>
                                                     </li>
                                                 </ul>
                                                 @else

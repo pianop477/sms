@@ -17,13 +17,39 @@
                             <h6>No Result Records found</h6>
                         </div>
                     @else
-                        @foreach ($groupedByMonth as $month => $results)
-                            <a href="{{ route('results.resultsByMonth', ['school' => $school->id, 'year' => $year, 'class' => $class->id, 'examType' => $examType, 'month' => $month]) }}">
-                                <button type="button" class="list-group-item list-group-item-action">
-                                    <h6 class="text-primary text-capitalize"><i class="fas fa-chevron-right"></i> {{ $month }} Results Link</h6>
-                                </button>
-                            </a>
-                        @endforeach
+                    <table class="table table-responsive-md table-hover">
+                        <tbody>
+                            @foreach ($groupedByMonth as $month => $results)
+                                @php
+                                    $firstResult = $results->first();
+                                @endphp
+                                <tr>
+                                    <td>
+                                        <a href="{{ route('results.resultsByMonth', ['school' => $school->id, 'year' => $year, 'class' => $class->id, 'examType' => $examType, 'month' => $month]) }}">
+                                            <h6 class="text-primary text-capitalize"><i class="fas fa-chevron-right"></i> {{ $month }} Results Link</h6>
+                                        </a>
+                                    </td>
+                                    @if ($firstResult->status == 1)
+                                        <td>
+                                            <form action="{{ route('publish.results', ['school' => $school->id, 'year' => $year, 'class' => $class->id, 'examType' => $examType, 'month' => $month]) }}" method="POST">
+                                                @csrf
+                                                @method('PUT')
+                                                <button class="btn btn-primary btn-xs" onclick="return confirm('Are you sure you want to publish the results? Once you publish, the results will be visible to all parents.')">Publish</button>
+                                            </form>
+                                        </td>
+                                    @else
+                                        <td>
+                                            <form action="{{ route('unpublish.results', ['school' => $school->id, 'year' => $year, 'class' => $class->id, 'examType' => $examType, 'month' => $month]) }}" method="POST">
+                                                @csrf
+                                                @method('PUT')
+                                                <button class="btn btn-danger btn-xs" onclick="return confirm('Are you sure you want to block the results? Parents will no longer be able to access the results.')">Unpublish</button>
+                                            </form>
+                                        </td>
+                                    @endif
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                     @endif
                 </div>
             </div>

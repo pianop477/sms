@@ -112,7 +112,7 @@
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="validationCustom01">Student Photo</label>
+                    <label for="validationCustom01">Student Passport Size</label>
                     <input type="file" name="image" class="form-control text-capitalize" id="validationCustom01" value="{{old('image')}}">
                     @error('image')
                     <div class="invalid-feedback">

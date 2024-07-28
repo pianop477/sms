@@ -114,7 +114,7 @@
                                                         @enderror
                                                     </div>
                                                     <div class="col-md-4 mb-3">
-                                                        <label for="validationCustomUsername">Driver Name :<small class="text-sm text-muted">Select if using School bus</small></label>
+                                                        <label for="validationCustomUsername">Driver Name :<small class="text-sm text-danger">Select if using School bus</small></label>
                                                         <div class="input-group">
                                                             <select name="driver" id="" class="form-control text-uppercase">
                                                                 <option value="">--Select bus driver--</option>
@@ -159,10 +159,10 @@
                             <table class="table" id="myTable">
                                 <thead class="text-capitalize">
                                     <tr class="">
-                                        <th scope="col">#</th>
+                                        <th scope="col" style="width: 3px">#</th>
                                         <th scope="col">Name</th>
-                                        <th scope="col">Gender</th>
-                                        <th scope="col">Class</th>
+                                        <th scope="col" style="width: 10px;">Gender</th>
+                                        <th scope="col" style="width: 10px;">Class</th>
                                         <th scope="col">action</th>
                                     </tr>
                                 </thead>

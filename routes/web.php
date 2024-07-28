@@ -73,6 +73,8 @@ Route::group(['middleware' => ['auth']], function () {
         //edit school information ===================================================================================
         Route::get('{school}/Edit-school', [SchoolsController::class, 'edit'])->name('schools.edit');
         Route::put('{school}/Update-school', [SchoolsController::class, 'updateSchool'])->name('schools.update.school');
+        Route::get('Feedback', [SchoolsController::class, 'showFeedback'])->name('feedback');
+        Route::get('{sms}/Delete-feedback', [SchoolsController::class, 'deletePost'])->name('delete.post');
     });
     // end of routes for administrator =============================================================
 
@@ -235,7 +237,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::middleware('CheckUsertype:4')->group(function () {
         Route::get('Exam-results/Student/{student}', [ResultsController::class, 'index'])->name('results.index');
         Route::get('Result-type/Student/{student}/Year/{year}', [ResultsController::class, 'resultByType'])->name('result.byType');
-        Route::get('Results/Student/{student}/Year/{year}/Exam-type/{type}/month/{month}', [ResultsController::class, 'viewStudentResult'])->name('results.student.get');
+        // For displaying months
+        Route::get('Result-months/Student/{student}/Year/{year}/Type/{exam_type}', [ResultsController::class, 'resultByMonth'])->name('result.byMonth');
+        Route::get('Results/Student/{student}/Year/{year}/Exam-type/{type}/Month/{month}', [ResultsController::class, 'viewStudentResult'])->name('results.student.get');
+
     });
     //End of condition ==============================================================================================
 
@@ -264,6 +269,11 @@ Route::group(['middleware' => ['auth']], function () {
             Route::get('{user}/Assign-role', [RolesController::class, 'assignRole'])->name('roles.assign');
             Route::put('{user}/Update-role', [RolesController::class, 'AssignNewRole'])->name('roles.assign.new');
         });
+    });
+
+    Route::middleware('ManagerOrTeacher')->group(function() {
+        Route::put('Publish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'publishResult'])->name('publish.results');
+        Route::put('Unpublish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'unpublishResult'])->name('unpublish.results');
     });
     //end of condition =========================================================================================
 });

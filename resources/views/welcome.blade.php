@@ -154,11 +154,6 @@
             <a class="nav-link" href="{{ route('users.form') }}">Register</a>
           </li>
           @endif
-          @if (Route::has('login'))
-          <li class="nav-item">
-            <a class="nav-link" href="{{ route('login') }}">Login</a>
-          </li>
-          @endif
         </ul>
       </div>
     </div>
@@ -182,7 +177,7 @@
         </div>
         <div class="carousel-item" style="background-image: url('{{ asset('assets/img/cards/paper 2.jpg') }}');">
           <div class="carousel-caption">
-            <h1>Efficient Records Management</h1>
+            <h1>Efficient Data Management</h1>
             <p>Streamline your educational processes</p>
             <a href="{{route('login')}}" class="btn btn-primary btn-lg">Get Started</a>
           </div>
@@ -239,8 +234,8 @@
             <div class="card">
                 <img src="{{asset('assets/img/features/feature 3.jpeg')}}" class="card-img-top" alt="...">
                 <div class="card-body">
-                  <h5 class="card-title">Students Portal</h5>
-                  <p class="card-text">Students are able to interact with the system through their portal and access necessary learning materials provided by their teachers</p>
+                  <h5 class="card-title">Centralized Data Management</h5>
+                  <p class="card-text">Our system provides a centralized platform for managing all staff data, ensuring that information is organized, accessible, and secure.</p>
                 </div>
               </div>
         </div>

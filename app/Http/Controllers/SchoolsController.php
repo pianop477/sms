@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Grade;
+use App\Models\message;
 use App\Models\Parents;
 use App\Models\school;
 use App\Models\Student;
@@ -199,5 +200,19 @@ class SchoolsController extends Controller
     public function destroy(): never
     {
         abort(404);
+    }
+
+    public function showFeedback ()
+    {
+        $message = message::latest()->paginate(15);
+        return view('Schools.feedback', compact('message'));
+    }
+
+    public function deletePost (message $sms)
+    {
+        $message = message::findOrFail($sms->id);
+        $message->delete();
+        Alert::success('Success!', 'Post has been moved to trash');
+        return back();
     }
 }

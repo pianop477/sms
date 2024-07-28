@@ -14,18 +14,15 @@
                 <table class="table">
                     <thead class="text-capitalize bg-info">
                         <tr class="text-white">
-                            <th>#</th>
-                            <th scope="col">AdmNo.</th>
+                            <th scope="col" style="width: 5px;">AdmNo.</th>
                             <th scope="col">Name</th>
                             <th scope="col">Sex</th>
-                            <th scope="col">Stream</th>
                             <th scope="col" colspan="3" class="text-center">Attendance Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($studentList as $student)
                             <tr>
-                                <td>{{$loop->iteration}}</td>
                                 <td>
                                     <input type="hidden" name="student_id[]" value="{{ $student->id }}">
                                     {{ str_pad($student->id, 4, '0', STR_PAD_LEFT) }}
@@ -34,10 +31,7 @@
                                     <a href="{{ route('Students.show', $student->id) }}">{{ $student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name }}</a>
                                 </td>
                                 <td class="text-uppercase text-center">{{ $student->gender[0] }}</td>
-                                <td class="text-uppercase">
                                     <input type="hidden" name="group[{{$student->id}}]" value="{{$student->group}}">
-                                    {{ $student->group }}
-                                </td>
                                 <td>
                                     <ul class="d-flex justify-content-center">
                                         <li class="mr-3">
@@ -63,7 +57,7 @@
 
         <div class="card-footer text-center">
             <ul class="d-flex justify-content-center">
-                <li class="mr-3"><button type="submit" class="btn btn-primary">Submit Attendance</button></li>
+                <li class="mr-3"><button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to submit attendance? No any changes will be allowed after submission')">Submit Attendance</button></li>
                 <li><a href="{{route('today.attendance', $student_class->id)}}" class="btn btn-success">Check Today Report</a></li>
             </ul>
         </div>
