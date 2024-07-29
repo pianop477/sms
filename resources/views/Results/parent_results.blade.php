@@ -129,7 +129,8 @@
         .thanks {
             position: fixed;
             bottom: 0;
-            align-content: center;
+            margin-left: 35%;
+            font-size: 10px;
         }
     </style>
 </head>
@@ -198,12 +199,16 @@
                         @endforeach
                     </tbody>
                 </table>
-                <p>Total Marks: <strong>{{ $totalScore }}</strong></p>
-                <p>Average: <strong>{{ number_format($averageScore, 2) }}</strong></p>
-                <p>Position: <strong>{{ $studentRank }} out of {{ $rankings->count() }}</strong></p>
-                <hr>
-                <div class="thanks">
-                    <i>End of Report. Thank you</i>
+                <div class="cut" style="border-bottom: 2px dashed gray;">
+                    <p>Total Marks: <strong>{{ $totalScore }}</strong></p>
+                    <p>Average: <strong>{{ number_format($averageScore, 2) }}</strong></p>
+                    <p>Position: <strong>{{ $studentRank }} out of {{ $rankings->count() }}</strong></p>
+                </div>
+                <div class="thanks" style="">
+                    <p style="line-height: 1px;">
+                        <i>End of Report. Thank you</i>
+                    </p>
+                    <p>Printed on: {{\Carbon\Carbon::parse(now())->format('d-F-Y')}}</p>
                 </div>
         </div>
     </div>
