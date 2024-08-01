@@ -347,10 +347,29 @@ class ResultsController extends Controller
             $studentResult['position'] = $index + 1;
         }
 
+        // Count grades by gender
+        $gradesByGender = $results->groupBy('gender')->map(function ($group) {
+            $grades = ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0];
+            foreach ($group as $result) {
+                $grade = $this->calculateGrade($result->score, $result->marking_style);
+                $grades[$grade]++;
+            }
+            return $grades;
+        });
+
+        $totalMaleGrades = $gradesByGender->get('male', ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0]);
+        $totalFemaleGrades = $gradesByGender->get('female', ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0]);
+
+        // Count unique students
+        $totalUniqueStudents = $results->pluck('student_id')->unique()->count();
+
         $pdf = \PDF::loadView('Results.results_by_month', compact(
-            'school', 'year', 'class', 'examType', 'month', 'results', 'totalMaleStudents', 'totalFemaleStudents',
-            'averageScoresByCourse', 'evaluationScores', 'totalAverageScore', 'sortedStudentsResults', 'sumOfCourseAverages', 'sortedCourses'
+            'school', 'year', 'class', 'examType', 'month', 'results', 'totalMaleStudents', 'totalFemaleStudents', 'totalMaleGrades', 'totalFemaleGrades',
+            'averageScoresByCourse', 'evaluationScores', 'totalAverageScore', 'sortedStudentsResults', 'sumOfCourseAverages', 'sortedCourses',
+            'totalUniqueStudents',
         ));
+        $pdf->setOption('isHtml5ParserEnabled', true);
+        $pdf->setOption('isPhpEnabled', true);
         return $pdf->stream($results->first()->class_name. ' '. $results->first()->exam_type. ' '. $month. ' Results.pdf');
     }
 

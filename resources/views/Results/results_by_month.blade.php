@@ -51,10 +51,13 @@
 
         .container {
             display: flex;
-            padding: 10px;
             flex-direction: row;
             flex-wrap: wrap;
-            /* border-bottom: 2px solid gray; */
+            border-bottom: 2px solid gray;
+            margin-top: 5px;
+        }
+        @page {
+            margin: 8mm;
         }
         .logo {
             position: absolute;
@@ -115,13 +118,45 @@
                 /* border: 1px solid black; */
                 text-transform: capitalize;
             }
-            th.vertical {
-            writing-mode: vertical-rl; /* or vertical-lr */
-            text-orientation: upright;
-            transform: rotate(180deg);
-            white-space: nowrap;
-        }
 
+            .details {
+                text-transform: uppercase;
+                line-height: 0.5mm;
+                padding: 0;
+                border-bottom: 2px dashed gray;
+            }
+            .total-summary {
+                padding: 2px;
+                border-bottom: 2px dashed gray;
+            }
+            .results {
+                font-size: 12px;
+                margin-top: 10px;
+            }
+            .final-summary {
+                text-transform: uppercase;
+            }
+            footer {
+            position: fixed;
+            bottom: -30px;
+            left: 0px;
+            right: 0px;
+            height: 50px;
+            text-align: center;
+            line-height: 35px;
+            font-size: 12px;
+
+        }
+        .footer {
+            position: fixed;
+            bottom: -30px;
+            align-content: space-around;
+            font-size: 12px;
+            border-top: 1px solid black;
+        }
+        .page-number:before {
+            content: "Page " counter(page);
+        }
     </style>
 </head>
 <body>
@@ -130,100 +165,74 @@
             <div class="card-body">
                 <div class="container">
                     <div class="logo">
-                        <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 100px;">
+                        <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 80px;">
                     </div>
                     <div class="header">
                         <h3>the united republic of tanzania</h3>
                         <h4>the president's office - ralg</h4>
                         <h4>{{Auth::user()->school->school_name}}</h4>
-                        <h4>{{$results->first()->exam_type}} Results - {{$month}}, {{$year}}</h4>
-                        <h5>Class: {{$results->first()->class_name}}</h5>
-                        <h6 style="text-align:end">Term: {{$results->first()->Exam_term}}</h6>
                     </div>
                 </div>
-                <hr>
-                <div class="summary-header">
-                    <h5 style="text-transform: uppercase">results evaluation summary</h5>
-                </div>
-                <div class="summary-content">
-                    <p style="text-transform:capitalize">Subjectwise average Ranking</p>
-                    <table class="table" style="width: 70%; text-align:center">
-                        <tr class="text-center">
-                            <th>Course Name</th>
-                            <th>Average</th>
-                            <th>Grade</th>
-                            <th>Rank</th>
-                        </tr>
-                        @foreach ($sortedCourses as $course)
-                            <tr class="text-center">
-                                <td style="text-transform: capitalize">{{ $course['course_name'] }}</td>
-                                <td>{{ number_format($course['average_score'], 2) }}</td>
-                                @if ($course['grade'] == 'A')
-                                    <td>{{ $course['grade'] }}</td>
-                                @elseif ($course['grade'] == 'B')
-                                    <td>{{ $course['grade'] }}</td>
-                                @elseif ($course['grade'] == 'C')
-                                    <td>{{ $course['grade'] }}</td>
-                                @elseif ($course['grade'] == 'D')
-                                    <td>{{ $course['grade'] }}</td>
-                                @else
-                                    <td>{{ $course['grade'] }}</td>
-                                @endif
-                                <td>{{ $course['position'] }}</td>
-                            </tr>
-                        @endforeach
-                    </table>
-                    <p style="text-transform: capitalize"><strong>Subjectwise grade Evaluation Summary</strong></p>
-                    <table class="table" style="width: 70%; text-align:center">
-                        <tr>
-                            <th>Course</th>
-                            <th>A</th>
-                            <th>B</th>
-                            <th>C</th>
-                            <th>D</th>
-                            <th>E</th>
-                        </tr>
-                        @foreach ( $evaluationScores as $courseId => $grades )
-                            <tr>
-                                <td class="text-uppercase">{{ $results->firstWhere('course_id', $courseId)->course_name }}</td>
-                                <td>{{ $grades['A'] }}</td>
-                                <td>{{ $grades['B'] }}</td>
-                                <td>{{ $grades['C'] }}</td>
-                                <td>{{ $grades['D'] }}</td>
-                                <td>{{ $grades['E'] }}</td>
-                            </tr>
-                            @endforeach
-                    </table>
-                    <p style="text-transform: capitalize"><strong>class average performance</strong></p>
-                    <table class="table" style="width: 40%; text-align:center">
-                        <tr>
-                            <td class="text-center">
-                                <span>{{ number_format($totalAverageScore, 2) }}</span>
-                                @if ($totalAverageScore >= 41 && $totalAverageScore <=  50 || $totalAverageScore >= 81 && $totalAverageScore <= 100)
-                                    <span>A</span>
+                <div class="details">
+                    <h4>{{$results->first()->class_name}} {{$results->first()->exam_type}} Results - {{$month}}, {{$year}}</h4>
+                    <h5 style="font-weight:normal">TERM: {{$results->first()->Exam_term}}</h5>
+                    <h5 style="font-weight:normal">NUMBER OF CANDIDATES: {{$totalUniqueStudents}}</h5>
+                    <h5 style="font-weight:normal">CLASS AVERAGE: <strong>{{number_format($sumOfCourseAverages, 4)}}</strong>
+                            @if ($totalAverageScore >= 41 && $totalAverageScore <=  50 || $totalAverageScore >= 81 && $totalAverageScore <= 100)
+                                    <span style="background:rgb(117, 244, 48); padding:2px 10px ">GRADE A (VERY GOOD)</span>
                                 @elseif ($totalAverageScore >= 31 && $totalAverageScore >=  40 || $totalAverageScore >= 61 && $totalAverageScore <= 80)
-                                    <span>B</span>
+                                    <span style="background:rgb(12, 211, 184); padding:2px 10px ">GRADE B (GOOD)</span>
                                 @elseif ($totalAverageScore >= 21 && $totalAverageScore >=  30 || $totalAverageScore >= 41 && $totalAverageScore <= 60)
-                                    <span>C</span>
+                                    <span style="background:rgb(237, 220, 113); padding:2px 10px ">GRADE C (PASS)</span>
                                 @elseif ($totalAverageScore >= 11 && $totalAverageScore >=  20 || $totalAverageScore >= 21 && $totalAverageScore <= 40)
-                                    <span>D</span>
+                                    <span style="background:rgb(235, 75, 75); padding:2px 10px "> GRADE D (UNSATISFACTORY)</span>
                                 @else
-                                    <span>E</span>
+                                    <span style="background:rgb(182, 176, 176); padding:2px 10px ">GRADE E (FAIL)</span>
                                 @endif
-                            </td>
-                            <td>
-                                <h4 class="text-center">{{number_format($sumOfCourseAverages, 4)}}</h4>
-                            </td>
+                    </h5>
+                </div>
+                <div class="total-summary results">
+                    <table class="table" style="text-align:center; width:60%">
+                        <tr>
+                            <td>Gender</td>
+                            <td>A</td>
+                            <td>B</td>
+                            <td>C</td>
+                            <td>D</td>
+                            <td>E</td>
+                        </tr>
+                        <tr>
+                            <td>GIRLS</td>
+                            <td>{{$totalFemaleGrades['A']}}</td>
+                            <td>{{$totalFemaleGrades['B']}}</td>
+                            <td>{{$totalFemaleGrades['C']}}</td>
+                            <td>{{$totalFemaleGrades['D']}}</td>
+                            <td>{{$totalFemaleGrades['E']}}</td>
+                        </tr>
+                        <tr>
+                            <td>BOYS</td>
+                            <td>{{$totalMaleGrades['A']}}</td>
+                            <td>{{$totalMaleGrades['B']}}</td>
+                            <td>{{$totalMaleGrades['C']}}</td>
+                            <td>{{$totalMaleGrades['D']}}</td>
+                            <td>{{$totalMaleGrades['E']}}</td>
+                        </tr>
+                        <tr>
+                            <td>TOTAL</td>
+                            <td>{{$totalFemaleGrades['A'] + $totalMaleGrades['A']}}</td>
+                            <td>{{$totalFemaleGrades['B'] +$totalMaleGrades['B']}}</td>
+                            <td>{{$totalFemaleGrades['C'] +$totalMaleGrades['C']}}</td>
+                            <td>{{$totalFemaleGrades['D'] +$totalMaleGrades['D']}}</td>
+                            <td>{{$totalFemaleGrades['E'] +$totalMaleGrades['E']}}</td>
                         </tr>
                     </table>
                 </div>
-                <h5 style="text-align: center; text-transform:uppercase">students results records</h5>
-                <table class="table">
+                <table class="table results">
                     <thead>
                         <tr>
-                            <th style="">#</th>
-                            <th style="">Student Name</th>
+                            <th>Admission No.</th>
                             <th style="" class="">sex</th>
+                            <th style="">Student Name</th>
                             @foreach ($results->groupBy('course_id')->keys() as $courseId)
                                 <th style="text-transform: uppercase">{{ $results->firstWhere('course_id', $courseId)->course_code }}</th>
                             @endforeach
@@ -236,9 +245,9 @@
                     <tbody>
                         @foreach ($sortedStudentsResults as $index => $studentResult)
                             <tr>
-                                <td>{{ $index + 1 }}</td>
-                                <td style="text-transform:capitalize">{{ $studentResult['student_name'] }}</td>
+                                <td style="text-align: center; text-transform:uppercase">{{Auth::user()->school->school_reg_no}}-{{Str_pad($studentResult['student_id'], 4, '0', STR_PAD_LEFT)}}</td>
                                 <td style="text-align: center">{{ $studentResult['gender'][0] }}</td>
+                                <td style="text-transform:capitalize">{{ $studentResult['student_name'] }}</td>
                                 @foreach ($studentResult['courses'] as $course)
                                     <td style="text-align:center;">{{ $course['score'] }}</td>
                                 @endforeach
@@ -250,8 +259,42 @@
                         @endforeach
                     </tbody>
                 </table>
+                <div class="final-summary">
+                    <table class="table results" style="width:80%">
+                        <tr>
+                            <th colspan="4">SUBJECTWISE PERFORMANCE</th>
+                        </tr>
+                        <tr style="">
+                            <th style="text-transform: uppercase">course name</th>
+                            <th style="text-align:center">average</th>
+                            <th style="text-align:center">rank</th>
+                            <th style="text-align:center">grade</th>
+                        </tr>
+                        @foreach ($sortedCourses as $course)
+                            <tr>
+                                <td style="text-transform: uppercase">{{ $course['course_name'] }}</td>
+                                <td style="text-align:center">{{ number_format($course['average_score'], 2) }}</td>
+                                <td style="text-align:center">{{ $course['position'] }}</td>
+                                    @if ($course['grade']=='A')
+                                        <td style="background:rgb(117, 244, 48); padding:2px 10px ">grade {{ $course['grade']}} (EXCELLENT)</td>
+                                    @elseif ($course['grade']=='B')
+                                        <td style="background:rgb(12, 211, 184); padding:2px 10px ">grade {{ $course['grade']}} (GOOD)</td>
+                                    @elseif ($course['grade']=='C')
+                                        <td style="background:rgb(237, 220, 113); padding:2px 10px ">grade {{ $course['grade']}} (PASS)</td>
+                                    @elseif ($course['grade']=='D')
+                                        <td style="background:rgb(235, 75, 75); padding:2px 10px ">grade {{ $course['grade']}} (UNSATISFACTORY)</td>
+                                    @else
+                                        <td style="background:rgb(182, 176, 176); padding:2px 10px ">grade {{ $course['grade']}} (FAIL)</td>
+                                    @endif
+                            </tr>
+                        @endforeach
+                    </table>
+                </div>
             </div>
         </div>
     </div>
+    <footer class="footer">
+        <div class="page-number"></div>
+    </footer>
 </body>
 </html>

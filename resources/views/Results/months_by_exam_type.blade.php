@@ -25,7 +25,7 @@
                                 @endphp
                                 <tr>
                                     <td>
-                                        <a href="{{ route('results.resultsByMonth', ['school' => $school->id, 'year' => $year, 'class' => $class->id, 'examType' => $examType, 'month' => $month]) }}">
+                                        <a href="{{ route('results.resultsByMonth', ['school' => $school->id, 'year' => $year, 'class' => $class->id, 'examType' => $examType, 'month' => $month]) }}" target="_blank">
                                             <h6 class="text-primary text-capitalize"><i class="fas fa-chevron-right"></i> {{ $month }} Results Link</h6>
                                         </a>
                                     </td>
