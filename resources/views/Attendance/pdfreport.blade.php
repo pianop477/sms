@@ -54,7 +54,7 @@
             padding: 10px;
             flex-direction: row;
             flex-wrap: wrap;
-            /* border-bottom: 2px solid gray; */
+            border-bottom: 2px solid gray;
         }
         .logo {
             position: absolute;
@@ -115,6 +115,16 @@
                 /* border: 1px solid black; */
                 text-transform: capitalize;
             }
+            .footer {
+            position: fixed;
+            bottom: -30px;
+            align-content: space-around;
+            font-size: 12px;
+            /* border-top: 1px solid black; */
+        }
+        .page-number:before {
+            content: "Page " counter(page);
+        }
 
     </style>
 </head>
@@ -124,14 +134,13 @@
             <div class="card-body">
                 <div class="container">
                     <div class="logo">
-                        <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 100px;">
+                        <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 80px;">
                     </div>
                     <div class="header">
                         <h4 class="text-uppercase">{{Auth::user()->school->school_name}}</h4>
                         <h5 class="text-uppercase">class daily attendance report</h5>
                     </div>
                 </div>
-                <hr>
                 @if ($attendanceRecords->isEmpty())
                     <div class="row">
                         <div class="col-12">
@@ -222,6 +231,11 @@
             @endif
             </div>
         </div>
+    </div>
+    <div class="footer">
+        <footer>
+            <div class="page-number"></div>
+        </footer>
     </div>
 </body>
 </html>

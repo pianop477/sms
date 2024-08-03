@@ -6,6 +6,18 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>General Class Attendance Report</title>
     <link rel="stylesheet" href="{{public_path('assets/css/print_layout.css')}}">
+    <style>
+        .footer {
+            position: fixed;
+            bottom: -30px;
+            align-content: space-around;
+            font-size: 12px;
+            /* border-top: 1px solid black; */
+        }
+        .page-number:before {
+            content: "Page " counter(page);
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -15,7 +27,7 @@
                 <h4>{{_("the president's office - ralg")}}</h4>
             </div>
             <div class="logo">
-                <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 100px;">
+                <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 80px;">
             </div>
             <div class="header">
                 <h3>{{ Auth::user()->school->school_name }} - P.O Box {{ Auth::user()->school->postal_address }}, {{ Auth::user()->school->postal_name }}</h3>
@@ -85,8 +97,13 @@
                 </div>
             @endforeach
         @else
-
+            <p>No data found!</p>
         @endif
+    </div>
+    <div class="footer">
+        <footer>
+            <div class="page-number"></div>
+        </footer>
     </div>
 </body>
 </html>

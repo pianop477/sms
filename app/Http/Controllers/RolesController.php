@@ -60,8 +60,8 @@ class RolesController extends Controller
     public function store(Request $request, $classes)
     {
         $request->validate([
-            'teacher' => 'required',
-            'group' => 'required'
+            'teacher' => 'required|exists:teachers,id',
+            'group' => 'required|string|max:1'
         ]);
 
         $ifExisting = Class_teacher::where('teacher_id', '=', $request->teacher)
@@ -234,7 +234,7 @@ class RolesController extends Controller
         $users = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
                                 ->join('roles', 'roles.id', '=', 'teachers.role_id')
                                 ->select(
-                                    'teachers.*', 'users.first_name', 'users.last_name', 'users.usertype',
+                                    'teachers.*', 'users.first_name', 'users.last_name', 'users.usertype', 'users.gender', 'users.phone', 'users.email',
                                     'roles.role_name'
                                 )
                                 ->where('teachers.school_id', Auth::user()->school_id)
@@ -257,7 +257,7 @@ class RolesController extends Controller
         $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
                                     ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.usertype')
                                     ->findOrFail($user->id);
-        $roles = Role::where('role_name', '!=', 'teacher')->where('role_name', '!=', 'class teacher')->orderBy('role_name')->get();
+        $roles = Role::where('role_name', '!=', 'class teacher')->orderBy('role_name')->get();
         return view('Roles.assign_roles', compact('user', 'teachers', 'roles'));
     }
 

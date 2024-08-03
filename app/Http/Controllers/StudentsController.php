@@ -53,14 +53,14 @@ class StudentsController extends Controller
         {
             // Validate the incoming request data
             $request->validate([
-                'fname' => 'required|string',
-                'middle' => 'required|string',
-                'lname' => 'required|string',
-                'gender' => 'required|string',
+                'fname' => 'required|string|max:25',
+                'middle' => 'required|string|max:25',
+                'lname' => 'required|string|max:25',
+                'gender' => 'required|string|max:6',
                 'parent' => 'required|exists:parents,id',
-                'dob' => 'required|date',
-                'driver' => 'nullable',
-                'group' => 'required|string',
+                'dob' => 'required|date|date_format:Y-m-d',
+                'driver' => 'nullable|exists:transports,id',
+                'group' => 'required|string|max:1',
                 'image' => 'nullable|image|max:2048',
             ]);
 
@@ -139,6 +139,17 @@ class StudentsController extends Controller
      */
     public function updateRecords(Request $request, $students)
     {
+        $request->validate([
+            'fname' => 'required|string|max:25',
+            'middle' => 'required|string|max:25',
+            'lname' => 'required|string|max:25',
+            'class' => 'required|integer|exists:grades,id',
+            'group' => 'required|max:1',
+            'gender' => 'required|max:6',
+            'dob' => 'required|date|date_format:Y-m-d',
+            'driver' => 'integer|nullable|exists:transports,id',
+            'image' => 'nullable|max:2048|image',
+        ]);
         $student = Student::findOrFail($students);
         // return $student->first_name . ' '. $student->school_id. ' '. $student->parent_id;
         $student->first_name = $request->fname;
@@ -225,14 +236,14 @@ class StudentsController extends Controller
     public function registerStudent (Request $request)
     {
         $request->validate([
-            'fname' => 'required|string',
-            'middle' => 'required|string',
-            'lname' => 'required|string',
-            'gender' => 'required|string',
-            'grade' => 'required',
-            'dob' => 'required|date',
-            'driver' => 'nullable',
-            'group' => 'required|string',
+            'fname' => 'required|string|max:25',
+            'middle' => 'required|string|max:25',
+            'lname' => 'required|string|max:25',
+            'gender' => 'required|string|max:6',
+            'grade' => 'required|integer|exists:grades,id',
+            'dob' => 'required|date|date_format:Y-m-d',
+            'driver' => 'nullable|integer|exists:transports,id',
+            'group' => 'required|string|max:1',
             'image' => 'nullable|image|max:2048',
         ]);
 

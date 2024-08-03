@@ -47,9 +47,9 @@ class CoursesController extends Controller
     {
         // abort(404);
         $request->validate([
-            'name' => 'required|string',
-            'code' => 'string|required',
-            'class' => 'required|integer',
+            'name' => 'required|string|max:15',
+            'code' => 'string|required|max:5',
+            'class' => 'required|integer|exists:grades,id',
             // 'teacher_id' => 'required|integer',
         ]);
 
@@ -110,8 +110,8 @@ class CoursesController extends Controller
     {
         //
         $request->validate([
-            'name' => 'required|string|max:255',
-            'code' => 'required|string|max:4',
+            'name' => 'required|string|max:15',
+            'code' => 'required|string|max:5',
             // 'class'  => 'required|integer|exists:grades,id',
         ]);
         $user = Auth::user()->id;

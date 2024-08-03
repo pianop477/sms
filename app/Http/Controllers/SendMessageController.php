@@ -24,7 +24,7 @@ class SendMessageController extends Controller
         // abort(404);
         $request->validate([
             'name' => 'required|string|max:50',
-            'email' => 'required|email',
+            'email' => 'required|email|max:50',
             'message' => 'required|string|max:500'
         ]);
         $sendFeeback = new message();

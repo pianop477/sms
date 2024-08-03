@@ -127,13 +127,6 @@ class AttendanceController extends Controller
     return back();
 }
 
-
-
-
-    /**
-     * Display the resource.
-     */
-
 public function show(Student $student, $year)
 {
     $attendanceQuery = Attendance::query()
@@ -308,13 +301,6 @@ public function show(Student $student, $year)
        return $pdf->stream('class_teacher_attendance.pdf');
     }
 
-
-
-    /**
-     * Show the form for editing the resource.
-     */
-
-    //download attendance records----------------
     public function todayAttendance($student_class)
     {
         $user = Auth::user()->id;

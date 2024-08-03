@@ -49,15 +49,15 @@ class TeachersController extends Controller
     {
         // abort(404);
         $request->validate([
-            'fname' => 'required|string|max:255',
-            'lname' => 'required|string|max:255',
+            'fname' => 'required|string|max:25',
+            'lname' => 'required|string|max:25',
             'email' => 'required|string|unique:users,email',
-            'gender' => 'required|string',
-            'dob' => 'required',
+            'gender' => 'required|string|max:6',
+            'dob' => 'required|date|date_format:Y-m-d',
             'phone' => 'required|string|max:10|min:10',
-            'qualification' => 'required',
-            'street' => 'required|string',
-            'joined' => 'required'
+            'qualification' => 'required|integer|max:6',
+            'street' => 'required|string|max:15',
+            'joined' => 'required|date_format:Y'
         ]);
 
         $existingRecords = Teacher::where('dob', '=', $request->dob)
@@ -136,14 +136,14 @@ class TeachersController extends Controller
     {
 
             $validated = $request->validate([
-                'fname' => 'required|string|max:255',
-                'lname' => 'required|string|max:255',
-                'dob' => 'required',
+                'fname' => 'required|string|max:25',
+                'lname' => 'required|string|max:25',
+                'dob' => 'required|date|date_format:Y-m-d',
                 'phone' => 'required|string|max:10|min:10',
-                'qualification' => 'required',
-                'street' => 'required|string',
-                'gender' => 'required',
-                'joined_at' => 'required',
+                'qualification' => 'required|integer|max:6',
+                'street' => 'required|string|max:15',
+                'gender' => 'required|max:6',
+                'joined_at' => 'required|date_format:Y',
                 'image' => 'nullable|image|max:2048',
             ]);
 

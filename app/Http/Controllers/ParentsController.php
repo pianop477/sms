@@ -45,12 +45,12 @@ class ParentsController extends Controller
     {
         // abort(404);
         $request->validate([
-            'fname' => 'required|string|max:255',
-            'lname' => 'required|string|max:255',
+            'fname' => 'required|string|max:25',
+            'lname' => 'required|string|max:25',
             'email' => 'required|string|unique:users,email',
-            'gender' => 'required|string',
+            'gender' => 'required|string|max:6',
             'phone' => 'required|string|max:10|min:10',
-            'street' => 'required|string',
+            'street' => 'required|string|max:15',
         ]);
 
         $users = new User();
@@ -176,11 +176,11 @@ class ParentsController extends Controller
     public function update (Request $request, $parents)
     {
         $request->validate([
-            'fname' => 'required',
-            'lname' => 'required',
-            'gender' => 'required',
-            'phone' => 'required',
-            'street' => 'required',
+            'fname' => 'required|max:25|string',
+            'lname' => 'required|max:25|string',
+            'gender' => 'required|string|max:6',
+            'phone' => 'required|min:10|max:10',
+            'street' => 'required|string|max:15',
             'image' => 'nullable|image|max:20148',
         ]);
 

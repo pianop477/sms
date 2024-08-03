@@ -33,11 +33,11 @@ class TransportController extends Controller
     {
         // abort(404);
         $request->validate([
-            'fullname' => 'required|string|max:255',
-            'gender' => 'string|required',
+            'fullname' => 'required|string|max:50',
+            'gender' => 'string|required|max:6',
             'phone' => 'required|string|max:10|min:10',
-            'bus' => 'required|string',
-            'routine' => 'required|string',
+            'bus' => 'required|string|max:15',
+            'routine' => 'required|string|max:255',
         ]);
 
         $existingRecord = Transport::where('driver_name', $request->fullname)
@@ -123,11 +123,11 @@ class TransportController extends Controller
     public function UpdateRecords(Request $request, $transport)
     {
         $request->validate([
-            'fullname' => 'required|string',
-            'gender' => 'required|string',
-            'phone' => 'required|string',
-            'bus_no' => 'required|string',
-            'routine' => 'required|string'
+            'fullname' => 'required|string|max:50',
+            'gender' => 'required|string|max:6',
+            'phone' => 'required|string|min:0|max:10',
+            'bus_no' => 'required|string|max|15',
+            'routine' => 'required|string|max:255'
         ]);
         $trans = Transport::findOrFail($transport);
         $trans->driver_name = $request->fullname;

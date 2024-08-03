@@ -144,8 +144,8 @@ class HomeController extends Controller
                 $buses = Transport::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
 
                 //summary counts ------------------
-                $totalMaleStudents = Student::where('gender', '=', 'male')->where('school_id', '=', $user->school_id)->count();
-                $totalFemaleStudents = Student::where('gender', '=', 'female')->where('school_id', '=', $user->school_id)->count();
+                $totalMaleStudents = Student::where('gender', '=', 'male')->where('status', 1)->where('school_id', '=', $user->school_id)->count();
+                $totalFemaleStudents = Student::where('gender', '=', 'female')->where('status', 1)->where('school_id', '=', $user->school_id)->count();
                 //end of summary -----------------
                 return view('home', compact('courses', 'myClass', 'classes', 'teachers', 'students', 'classes', 'subjects',
                             'parents', 'buses', 'totalMaleStudents', 'totalFemaleStudents', 'classData',));

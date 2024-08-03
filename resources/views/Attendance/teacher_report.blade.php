@@ -108,6 +108,17 @@
             text-align: center;
             font-size: 30px;
         }
+        .footer {
+            position: fixed;
+            bottom: -30px;
+            align-content: space-around;
+            font-size: 12px;
+            /* border-top: 1px solid black; */
+        }
+        .page-number:before {
+            content: "Page " counter(page);
+        }
+
     </style>
 </head>
 <body>
@@ -117,7 +128,7 @@
             <h4>{{_("the president's office - ralg")}}</h4>
         </div>
         <div class="logo">
-            <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 100px;">
+            <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 80px;">
         </div>
         <div class="header">
             <h4>{{ Auth::user()->school->school_name }} - P.O Box {{ Auth::user()->school->postal_address }}, {{ Auth::user()->school->postal_name }}</h4>
@@ -237,6 +248,11 @@
                 <p>There is no attendance records for the selected time duration!</p>
             </div>
         @endforelse
+    </div>
+    <div class="footer">
+        <footer>
+            <div class="page-number"></div>
+        </footer>
     </div>
 </body>
 </html>

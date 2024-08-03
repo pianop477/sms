@@ -75,6 +75,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('{school}/Update-school', [SchoolsController::class, 'updateSchool'])->name('schools.update.school');
         Route::get('Feedback', [SchoolsController::class, 'showFeedback'])->name('feedback');
         Route::get('{sms}/Delete-feedback', [SchoolsController::class, 'deletePost'])->name('delete.post');
+
+        //manager assigne other teacher to become manager too.
+        Route::put('{user}/Change-usertype', [RolesController::class, 'changeUsertype'])->name('change.usertype');
     });
     // end of routes for administrator =============================================================
 

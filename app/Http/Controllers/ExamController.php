@@ -200,7 +200,7 @@ class ExamController extends Controller
     {
         // abort(404);
         $request->validate([
-            'name' => 'required|string|max:100'
+            'name' => 'required|string|max:25'
         ]);
 
         $existingRecords = Examination::where('exam_type', '=', $request->name)->where('school_id', '='. Auth::user()->school_id)->exists();
@@ -244,7 +244,7 @@ class ExamController extends Controller
     public function update(Request $request, $exams)
     {
         $request->validate([
-            'name' => 'required|string|max:100'
+            'name' => 'required|string|max:25'
         ]);
 
         $exam = Examination::findOrFail($exams);

@@ -49,11 +49,11 @@ class SchoolsController extends Controller
     {
         // abort(404);
         $request->validate([
-            'name' => 'required|string|max:255',
-            'reg_no' => 'required|string|max:255',
+            'name' => 'required|string|max:50',
+            'reg_no' => 'required|string|max:20',
             'logo' => 'image|max:4096',
-            'postal' => 'required|string',
-            'postal_name' => 'required|string',
+            'postal' => 'required|string|max:30',
+            'postal_name' => 'required|string|max:30',
             'country' => 'required|string'
         ]);
 
@@ -159,11 +159,11 @@ class SchoolsController extends Controller
     {
         //
         $request->validate([
-            'name' => 'required|string|max:255',
-            'reg_no' => 'required|string|max:255',
+            'name' => 'required|string|max:50',
+            'reg_no' => 'required|string|max:30',
             'logo' => 'image|max:4096',
-            'postal' => 'required|string',
-            'postal_name' => 'required|string',
+            'postal' => 'required|string|max:30',
+            'postal_name' => 'required|string|max:30',
             'country' => 'required|string'
         ]);
 

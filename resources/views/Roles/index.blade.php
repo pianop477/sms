@@ -2,12 +2,12 @@
 
 @section('content')
 <div class="row">
-    <div class="col-6 mt-5">
-        <div class="card">
+    <div class="col-10 mt-5">
+        <div class="card" style="background: rgb(175, 236, 175);">
             <div class="card-body">
                 <div class="row">
                     <div class="col-10">
-                        <h4 class="header-title text-uppercase text-center">Teacher's Roles</h4>
+                        <h4 class="header-title text-uppercase text-center">Roles & Permission</h4>
                     </div>
                 </div>
                 <div class="single-table">
@@ -17,6 +17,9 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Teacher's Name</th>
+                                    <th scope="col" class="text-center">Gender</th>
+                                    <th scope="col">Phone</th>
+                                    <th scope="col">Email</th>
                                     <th scope="col">Role Name</th>
                                     <th scope="col" class="text-center">Action</th>
                                 </tr>
@@ -26,6 +29,9 @@
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
                                         <td class="text-capitalize">{{$user->first_name}} {{$user->last_name}}</td>
+                                        <td class="text-capitalize text-center">{{$user->gender[0]}}</td>
+                                        <td class="text-capitalize">{{$user->phone}}</td>
+                                        <td class="">{{$user->email}}</td>
                                         <td class="text-capitalize">
                                             @if ($user->role_id == 3)
                                                 <span class="alert alert-primary">{{$user->role_name}}</span>
@@ -51,47 +57,5 @@
         </div>
     </div>
 {{-- end of role assigning card --}}
-    <div class="col-6 mt-5">
-        <div class="card">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-10">
-                        <h4 class="header-title text-uppercase text-center">usertype & permissions</h4>
-                    </div>
-                </div>
-                <div class="single-table">
-                    <div class="table-responsive">
-                        <table class="table table-hover progress-table" id="">
-                            <thead class="text-uppercase">
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Teacher's Name</th>
-                                    <th scope="col">Usertype</th>
-                                    <th scope="col" class="text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($users as $user )
-                                    <tr>
-                                        <td>{{$loop->iteration}}</td>
-                                        <td class="text-capitalize">{{$user->first_name}} {{$user->last_name}}</td>
-                                        <td>
-                                            @if ($user->usertype == 3)
-                                                Teacher
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <a href="" class="btn btn-success btn-xs">Assign</a>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                        {{$users->links('vendor.pagination.bootstrap-5')}}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 @endsection

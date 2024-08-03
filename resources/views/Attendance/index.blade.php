@@ -58,7 +58,7 @@
         <div class="card-footer text-center">
             <ul class="d-flex justify-content-center">
                 <li class="mr-3"><button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to submit attendance? No any changes will be allowed after submission')">Submit Attendance</button></li>
-                <li><a href="{{route('today.attendance', $student_class->id)}}" class="btn btn-success">Check Today Report</a></li>
+                <li><a href="{{route('today.attendance', $student_class->id)}}" target="_blank" class="btn btn-success">Check Today Report</a></li>
             </ul>
         </div>
     </form>
