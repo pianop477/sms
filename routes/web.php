@@ -1,5 +1,6 @@
 <?php
 
+use App\Exports\TeachersExport;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ClassesController;
 use App\Http\Controllers\CoursesController;
@@ -24,6 +25,7 @@ use App\Models\Student;
 use App\Models\Transport;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 use PHPUnit\Runner\ResultCache\ResultCache;
 
 /*
@@ -279,4 +281,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('Unpublish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'unpublishResult'])->name('unpublish.results');
     });
     //end of condition =========================================================================================
+
+     //generate /export teachers excel template====================
+        Route::get('/teachers/export', function () {
+            return Excel::download(new TeachersExport, 'teachers.xlsx');
+        })->name('teachers.excel.export');
 });

@@ -6,11 +6,14 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-10">
+                    <div class="col-8">
                         <h4 class="header-title text-uppercase text-center">Teachers list</h4>
                     </div>
                     <div class="col-2">
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-circle-plus text-secondary" style="font-size: 2rem;"></i>
+                        <a href="{{route('teachers.excel.export')}}" class="btn btn-success btn-xs float-right">Export</a>
+                    </div>
+                    <div class="col-2">
+                        <button type="button" class="btn btn-link float-right" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-circle-plus text-secondary" style="font-size: 2rem;"></i>
                         </button>
                         <div class="modal fade bd-example-modal-lg">
                             <div class="modal-dialog modal-lg">
