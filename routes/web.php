@@ -286,4 +286,5 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/teachers/export', function () {
             return Excel::download(new TeachersExport, 'teachers.xlsx');
         })->name('teachers.excel.export');
+        Route::get('/teachers/pdf', [TeachersController::class, 'export'])->name('teachers.pdf.export');
 });

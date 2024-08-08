@@ -26,8 +26,6 @@
 <body>
     <div class="header">
         <h1>Teachers Export Report</h1>
-        <p>School: {{ Auth::user()->school->name }}</p>
-        <p>Date: {{ \Carbon\Carbon::now()->format('d-M-Y') }}</p>
     </div>
     <table>
         <thead>

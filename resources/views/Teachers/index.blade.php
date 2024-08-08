@@ -9,8 +9,16 @@
                     <div class="col-8">
                         <h4 class="header-title text-uppercase text-center">Teachers list</h4>
                     </div>
-                    <div class="col-2">
-                        <a href="{{route('teachers.excel.export')}}" class="btn btn-success btn-xs float-right">Export</a>
+                    <div class="col-2 mt-2">
+                        <div class="btn-group" role="group">
+                            <button id="btnGroupDrop" type="button" class="btn btn-primary btn-xs dropdown-toggle float-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Download
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                <a class="dropdown-item" href="{{route('teachers.excel.export')}}">Excel</a>
+                                <a class="dropdown-item" href="{{route('teachers.pdf.export')}}">pdf</a>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-2">
                         <button type="button" class="btn btn-link float-right" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-circle-plus text-secondary" style="font-size: 2rem;"></i>

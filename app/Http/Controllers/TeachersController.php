@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\PDF as PDF;
 
 class TeachersController extends Controller
 {
@@ -31,6 +32,25 @@ class TeachersController extends Controller
                             ->orderBy('users.first_name', 'ASC')
                             ->get();
         return view('Teachers.index', ['teachers' => $teachers]);
+    }
+
+    public function export ()
+    {
+        $userLogged = Auth::user();
+        $teachers = Teacher::query()
+                            ->join('users', 'users.id', '=', 'teachers.user_id')
+                            ->join('schools', 'schools.id', '=', 'teachers.school_id')
+                            ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.email',
+                            'schools.school_name', 'schools.school_reg_no')
+                            ->where('teachers.school_id', '=', $userLogged->school_id)
+                            ->where(function ($query) {
+                                $query->where('teachers.status', 1)
+                                    ->orWhere('teachers.status', 0);
+                            })
+                            ->orderBy('users.first_name', 'ASC')
+                            ->get();
+        $pdf = \PDF::loadView('Teachers.teachers_pdf', compact('teachers'));
+         return $pdf->download('teachers.pdf');
     }
     /**
      * Show the form for creating the resource.
