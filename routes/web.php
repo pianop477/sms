@@ -267,18 +267,19 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('{trans}/Delete-permanent', [TransportController::class, 'destroy'])->name('transport.remove');
         Route::get('{trans}/Transport-Edit', [TransportController::class, 'Edit'])->name('transport.edit');
         Route::put('{transport}/Update', [TransportController::class, 'UpdateRecords'])->name('transport.update.records');
+        Route::get('{trans}/Export-transport', [TransportController::class, 'export'])->name('transport.export');
 
         //assign new roles ==========================================================================================
-        Route::middleware('GeneralMiddleware')->group(function () {
-            Route::get('Update-roles', [RolesController::class, 'updateRoles'])->name('roles.updateRole');
-            Route::get('{user}/Assign-role', [RolesController::class, 'assignRole'])->name('roles.assign');
-            Route::put('{user}/Update-role', [RolesController::class, 'AssignNewRole'])->name('roles.assign.new');
-        });
+        Route::get('Update-roles', [RolesController::class, 'updateRoles'])->name('roles.updateRole');
+        Route::get('{user}/Assign-role', [RolesController::class, 'assignRole'])->name('roles.assign');
+        Route::put('{user}/Update-role', [RolesController::class, 'AssignNewRole'])->name('roles.assign.new');
     });
 
     Route::middleware('ManagerOrTeacher')->group(function() {
         Route::put('Publish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'publishResult'])->name('publish.results');
         Route::put('Unpublish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'unpublishResult'])->name('unpublish.results');
+        //export students records to PDF
+        Route::get('{classId}/Export-students', [StudentsController::class, 'exportPdf'])->name('export.student.pdf');
     });
     //end of condition =========================================================================================
 

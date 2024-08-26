@@ -49,7 +49,7 @@
                             </div>
                             @if (Route::has('password.reset'))
                             <div class="col-6 text-right">
-                                <a href="#">Forgot Password?</a>
+                                <a href="{{route('password.request')}}">Forgot Password?</a>
                             </div>
                             @endif
                         </div>

@@ -440,8 +440,16 @@ public function show(Student $student, $year)
             return Carbon::parse($item->attendance_date)->format('Y-m-d');
         });
         $pdf = \PDF::loadView('Attendance.all_report', compact('datas', 'maleSummary', 'femaleSummary', 'attendances', 'startOfMonth', 'endOfMonth'));
-        return $pdf->stream($attendances->first()->class_name. ' '.Carbon::parse($attendances->first()->attendance_date)->format('F').' Attendance Report.pdf');
 
+        if ($attendances->isNotEmpty()) {
+            $className = $attendances->first()->class_name;
+            $attendanceDate = Carbon::parse($attendances->first()->attendance_date)->format('F');
+            $fileName = "{$className} {$attendanceDate} Attendance Report.pdf";
+        } else {
+            $fileName = "Attendance Report.pdf";
+        }
+
+        return $pdf->stream($fileName);
     }
 
 }

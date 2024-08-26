@@ -226,6 +226,36 @@ class StudentsController extends Controller
         return view('Students.index', ['students' => $students, 'classId' => $classId, 'parents' => $parents, 'buses' => $buses]);
     }
 
+    //export to pdf ======================
+    public function exportPdf($classId)
+    {
+        // return $classId;
+        $students = Student::query()->join('grades', 'grades.id', '=', 'students.class_id')
+                                    ->join('schools', 'schools.id', '=', 'students.school_id')
+                                    ->join('parents', 'parents.id', 'students.parent_id')
+                                    ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+                                    ->select(
+                                        'students.*',
+                                        'grades.class_name', 'grades.class_code',
+                                        'schools.school_name', 'schools.school_reg_no', 'schools.logo', 'schools.postal_address',
+                                        'schools.postal_name', 'schools.country',
+                                        'parents.address', 'users.phone'
+                                    )
+                                    ->where('students.class_id', $classId)
+                                    ->orderBy('students.first_name')
+                                    ->get();
+        $pdf = \PDF::loadView('Students.student_export', compact('students'));
+        // return $pdf->download($students->first()->class_name.' students.pdf');
+
+        if ($students->isNotEmpty()) {
+            $className = $students->first()->class_name;
+            $fileName = "{$className} Attendance Report.pdf";
+        } else {
+            $fileName = "Students List.pdf";
+        }
+        return $pdf->stream($fileName);
+    }
+
     public function parentByStudent()
     {
         $buses = Transport::where('school_id', '=', Auth::user()->school_id)->where('status', '=', 1)->orderBy('driver_name', 'ASC')->get();

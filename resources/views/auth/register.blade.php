@@ -93,14 +93,7 @@
                                 <div class="text-danger">{{$message}}</div>
                             @enderror
                         </div>
-                        <div class="form-gp">
-                            <label for="exampleInputEmail1">Photo</label>
-                            <input type="file" id="exampleInputEmail1" name="image" value="{{old('image')}}">
-                            <i class="ti-clip"></i>
-                            @error('image')
-                                <div class="text-danger">{{$message}}</div>
-                            @enderror
-                        </div>
+
                         <div class="submit-btn-area">
                             <button id="form_submit" type="submit">Submit <i class="ti-arrow-right"></i></button>
                         </div>

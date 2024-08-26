@@ -10,7 +10,11 @@
                         <h4 class="header-title text-uppercase text-center">Student Lists - {{$trans->driver_name}}</h4>
                     </div>
                     <div class="col-2">
-                        <h6 class="text-left text-danger">Total Students: {{count($students)}}</h6>
+                        @if ($students->isNotEmpty())
+                            <h6 class="text-left">
+                                <a href="{{route('transport.export', $trans->id)}}" class="btn btn-primary btn-xs float-right">Export PDF</a>
+                            </h6>
+                        @endif
                     </div>
                     <div class="col-2">
                        <a href="{{route('Transportation.index')}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>

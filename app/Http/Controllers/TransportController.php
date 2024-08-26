@@ -114,7 +114,7 @@ class TransportController extends Controller
        }
     }
 
-    public function Edit($trans)
+    public function Edit(Transport $trans)
     {
         $transport = Transport::findOrFail($trans);
         return view('Transport.Edit', ['transport' => $transport]);
@@ -155,5 +155,24 @@ class TransportController extends Controller
                                     ->orderBy('students.first_name')
                                     ->get();
         return view('Transport.students', compact('students', 'trans'));
+    }
+
+    public function export (Transport $trans)
+    {
+        // return response()->json($trans);
+        $students = Student::query()
+                            ->join('grades', 'grades.id', '=', 'students.class_id')
+                            ->join('parents', 'parents.id', '=', 'students.parent_id')
+                            ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+                            ->select(
+                                'students.*',
+                                'parents.address', 'users.phone',
+                                'grades.class_name', 'grades.class_code'
+                            )
+                            ->where('students.transport_id', $trans->id)
+                            ->orderBy('first_name')
+                            ->get();
+        $pdf = \PDF::loadView('Transport.export', compact('students', 'trans'));
+        return $pdf->stream($trans->driver_name. ' students.pdf');
     }
 }

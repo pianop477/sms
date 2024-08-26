@@ -2,11 +2,11 @@
 
 @section('content')
 <div class="row">
-    <div class="col-10 mt-5">
+    <div class="col-12 mt-5">
         <div class="card" style="background: rgb(175, 236, 175);">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-10">
+                    <div class="col-12">
                         <h4 class="header-title text-uppercase text-center">Roles & Permission</h4>
                     </div>
                 </div>

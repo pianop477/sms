@@ -9,18 +9,23 @@
                     <div class="col-8">
                         <h4 class="header-title text-uppercase text-center">{{$classId->class_name. ' Students list - ('.$classId->class_code.')'}}</h4>
                     </div>
-                    <div class="col-2">
-                        <a href="{{route('classes.list', $classId->id)}}"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                    @if ($students->isNotEmpty())
+                        <div class="col-2">
+                            <a href="{{route('export.student.pdf', $classId->id)}}" class="float-left btn btn-primary btn-xs"><i class="fas fa-download"></i> Export PDF</a>
+                        </div>
+                        @endif
+                    <div class="col-1">
+                        <a href="{{route('classes.list', $classId->id)}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
                     </div>
                     @if (Route::has('student.create'))
-                    <div class="col-2">
-                        <a type="#" class="btn p-0" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus-circle text-secondary" style="font-size:2rem;"></i>
+                    <div class="col-1">
+                        <a type="#" class="btn p-0 float-right" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus-circle text-secondary" style="font-size:2rem;"></i>
                         </a>
                         <div class="modal fade bd-example-modal-lg">
                             <div class="modal-dialog modal-lg">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title text-uppercase">{{$classId->class_name}} class Registration Form</h5>
+                                        <h5 class="modal-title text-uppercase">{{$classId->class_name}} Students Registration Form</h5>
                                         <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                     </div>
                                     <div class="modal-body">
