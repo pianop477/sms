@@ -197,16 +197,16 @@
                                                     <form action="{{route('update.teacher.status', $teacher->id)}}" method="POST">
                                                         @csrf
                                                         @method('PUT')
-                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Block {{strtoupper($teacher->first_name)}} {{strtoupper($teacher->last_name)}}?')"><i class="fas fa-ban text-info"></i></button>
+                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Block {{strtoupper($teacher->first_name)}} {{strtoupper($teacher->last_name)}}?')"><i class="fas fa-ban text-danger"></i></button>
                                                     </form>
                                                 </li>
-                                                <li>
+                                                {{-- <li>
                                                     <form action="{{route('Teachers.remove', $teacher->id)}}" method="POST">
                                                         @csrf
                                                         @method('PUT')
                                                         <button class="btn btn-link p-0" type="submit" onclick="return confirm('Are you sure you want to Delete {{ strtoupper($teacher->first_name) }} {{ strtoupper($teacher->last_name) }} Permanently?')"><i class="ti-trash text-danger"></i></button>
                                                     </form>
-                                                </li>
+                                                </li> --}}
                                             </ul>
                                         </td>
                                         @else
@@ -219,13 +219,13 @@
                                                         <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Unblock {{strtoupper($teacher->first_name)}} {{strtoupper($teacher->last_name)}}?')"><i class="ti-reload text-success"></i></button>
                                                     </form>
                                                 </li>
-                                                <li>
+                                                {{-- <li>
                                                     <form action="{{route('Teachers.remove', $teacher->id)}}" method="POST">
                                                         @csrf
                                                         @method('PUT')
                                                         <button class="btn btn-link p-0" type="submit" onclick="return confirm('Are you sure you want to Delete {{ strtoupper($teacher->first_name) }} {{ strtoupper($teacher->last_name) }} Permanently?')"><i class="ti-trash text-danger"></i></button>
                                                     </form>
-                                                </li>
+                                                </li> --}}
                                             </ul>
                                         </td>
                                         @endif

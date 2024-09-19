@@ -108,7 +108,7 @@ class SchoolsController extends Controller
                                     ->where('users.usertype', 3)
                                     ->where('teachers.school_id', $school->id)
                                     ->get();
-        $students = Student::where('school_id', $school->id)->get();
+        $students = Student::where('school_id', $school->id)->where('status', 1)->get();
         $courses = Subject::where('school_id', $school->id)->get();
         $classes = Grade::where('school_id', $school->id)->get();
         return view('Schools.show', compact('managers', 'parents', 'teachers', 'students', 'courses', 'classes', 'school'));
@@ -127,7 +127,7 @@ class SchoolsController extends Controller
                             ->where('users.usertype', 2)
                             ->where('users.school_id', $school->id)
                             ->get();
-        $students = Student::where('school_id', $school->id)->get();
+        $students = Student::where('school_id', $school->id)->where('status', 1)->get();
         return view('invoice.invoice', compact('school', 'managers', 'students'));
     }
 

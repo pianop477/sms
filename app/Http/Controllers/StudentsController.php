@@ -19,7 +19,9 @@ class StudentsController extends Controller
     {
         // Get all classes with their respective student counts
         $classes = Grade::where('status', 1)
-                        ->withCount('students')
+                        ->withCount(['students' => function($query) {
+                            $query->where('status', 1);
+                        }])
                         ->where('school_id', '=', Auth::user()->school_id)
                         ->orderBy('id', 'ASC')
                         ->get();
@@ -253,7 +255,7 @@ class StudentsController extends Controller
         } else {
             $fileName = "Students List.pdf";
         }
-        return $pdf->stream($fileName);
+        return $pdf->download($fileName);
     }
 
     public function parentByStudent()

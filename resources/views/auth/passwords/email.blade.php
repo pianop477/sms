@@ -1,59 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    @include('SRTDashboard.header')
-    <title>Password Reset Link</title>
-</head>
+<!doctype html>
+<html class="no-js" lang="en">
+@include('SRTDashboard.header')
 <body>
-@include('SRTDashboard.preloader')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Reset Password') }}</div>
-
-                <div class="card-body">
+    @include('SRTDashboard.preloader')
+    <!-- preloader area end -->
+    <!-- login area start -->
+    <div class="login-area login-bg">
+        <div class="container">
+            <div class="login-box ptb--100">
+                <form method="POST" action="{{ route('password.email') }}">
+                    @csrf
+                    <div class="login-form-head">
+                        <h4>Reset Password</h4>
+                    </div>
                     @if (session('status'))
                         <div class="alert alert-success" role="alert">
                             {{ session('status') }}
                         </div>
                     @endif
-
-                    <form method="POST" action="{{ route('password.email') }}">
-                        @csrf
-
-                        <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
-
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
+                    @error('email')
+                        <div class="alert alert-danger text-center" role="alert">{{$message}}</div>
+                    @enderror
+                    <div class="login-form-body">
+                        <div class="form-gp">
+                            <label for="exampleInputEmail1">Email address</label>
+                            <input type="email" id="exampleInputEmail1" name="email" value="{{old('email')}}">
+                            <i class="ti-email"></i>
+                            @error('email')
+                            <div class="text-danger">{{$message}}</div>
+                            @enderror
                         </div>
 
-                        <div class="row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Send Password Reset Link') }}
-                                </button>
-                            </div>
+                        <div class="submit-btn-area">
+                            <button id="form_submit" type="submit">Send Password Reset Link <i class="ti-arrow-right"></i></button>
                         </div>
-                    </form>
-                </div>
+                        @if (Route::has('users.form'))
+                        <div class="form-footer text-center mt-1">
+                            <p class="text-muted">Already have an account? <a href="{{route('login')}}">Sign In</a></p>
+                        </div>
+                        @endif
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</div>
+    <!-- login area end -->
 
-@include('SRTDashboard.script')
-@include('sweetalert::alert')
+    @include('SRTDashboard.script')
+    @include('sweetalert::alert')
 </body>
+
 </html>

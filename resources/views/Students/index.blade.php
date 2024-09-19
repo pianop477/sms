@@ -84,7 +84,7 @@
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-4 mb-3">
-                                                    <label for="validationCustomUsername">Parent Name/Guardian</label>
+                                                    <label for="validationCustomUsername">Parent/Guardian Name</label>
                                                     <div class="input-group">
                                                         <select name="parent" id="validationCustomUsername" class="form-control text-uppercase" required>
                                                             <option value="">-- Select Parent --</option>

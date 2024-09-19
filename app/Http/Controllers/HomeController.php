@@ -31,7 +31,7 @@ class HomeController extends Controller
             $user = Auth::user();
                 //system adminstrator dashboard redirection --------------------------------------------
             if ($user->usertype == 1 && $user->status == 1) {
-                $schools = School::where('status', '=', 1)->orderBy('school_name')->get();
+                $schools = School::orderBy('school_name')->get();
                 $teachers = Teacher::where('status', '=', 1)->get();
                 $students = Student::where('status', '=', 1)->get();
                 $parents = Parents::where('status', '=', 1)->get();
@@ -153,7 +153,9 @@ class HomeController extends Controller
 
             else {
                 Auth::logout(); // You can use the Auth facade to logout
-                return redirect()->route('login')->with('error', 'Account suspended, contact system administrator');
+                // return redirect()->route('login')->with('error', 'Account suspended, contact system administrator');
+                Alert::warning('Warning!', 'Account suspended, contact system administrator');
+                return redirect()->route('login');
             }
 
         }

@@ -274,14 +274,14 @@ class TeachersController extends Controller
 
         // Check if the selected teacher is logged in and trying to update their status themselves
         if ($teacher->user_id == $userId) {
-            Alert::error('Error!', 'You cannot delete your own account while you are logged in');
+            Alert::error('Error!', 'You cannot delete your own account');
             return back();
         }
 
          //check role of logged user compare with role of deleted user=======
          // Check the role of the logged-in user and compare with the role of the user being deleted
         $loggedInTeacher = Teacher::where('user_id', $userId)->firstOrFail();
-        if ($loggedInTeacher->role_id == 3 && $teacher->role_id == 2) {
+        if ($loggedInTeacher->role_id == 3 && $teacher->role_id == 2 && $loggedInTeacher->role_id == 4) {
             Alert::error('Error!', 'You do not have permission to delete this teacher.');
             return back();
         }

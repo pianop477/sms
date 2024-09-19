@@ -1,65 +1,63 @@
-@extends('layouts.app')
-
-@section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Reset Password') }}</div>
-
-                <div class="card-body">
-                    <form method="POST" action="{{ route('password.update') }}">
-                        @csrf
-
+<!doctype html>
+<html class="no-js" lang="en">
+@include('SRTDashboard.header')
+<body>
+    @include('SRTDashboard.preloader')
+    <!-- preloader area end -->
+    <!-- login area start -->
+    <div class="login-area login-bg">
+        <div class="container">
+            <div class="login-box ptb--100">
+                <form method="POST" action="{{ route('password.update') }}">
+                    @csrf
+                    <div class="login-form-head">
+                        <h4>Reset Password</h4>
+                    </div>
+                    @if (Session::has('error'))
+                    <div class="alert alert-danger text-center" role="alert">{{Session::get('error')}}</div>
+                    @endif
+                    @if (Session::has('success'))
+                        <div class="alert alert-success text-center" role="alert">{{Session::get('success')}}</div>
+                    @endif
+                    <div class="login-form-body">
                         <input type="hidden" name="token" value="{{ $token }}">
-
-                        <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ $email ?? old('email') }}" required autocomplete="email" autofocus>
-
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
+                        <div class="form-gp">
+                            <label for="exampleInputEmail1">Email address</label>
+                            <input type="email" id="exampleInputEmail1" name="email" value="{{ $email ?? old('email') }}">
+                            <i class="ti-email"></i>
+                            @error('email')
+                            <div class="text-danger">{{$message}}</div>
+                            @enderror
+                        </div>
+                        <div class="form-gp">
+                            <label for="exampleInputPassword1">Password</label>
+                            <input type="password" id="exampleInputPassword1" name="password" value="{{old('password')}}">
+                            <i class="ti-lock"></i>
+                            @error('password')
+                                <div class="text-danger">{{$message}}</div>
+                            @enderror
+                        </div>
+                        <div class="form-gp">
+                            <label for="exampleInputPassword1">Confirm Password</label>
+                            <input type="password" id="exampleInputPassword1" name="password_confirmation" value="{{old('password')}}">
+                            <i class="ti-lock"></i>
+                            @error('password_confirmation')
+                                <div class="text-danger">{{$message}}</div>
+                            @enderror
                         </div>
 
-                        <div class="row mb-3">
-                            <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
-
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
+                        <div class="submit-btn-area">
+                            <button id="form_submit" type="submit">Reset Password <i class="ti-arrow-right"></i></button>
                         </div>
-
-                        <div class="row mb-3">
-                            <label for="password-confirm" class="col-md-4 col-form-label text-md-end">{{ __('Confirm Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
-                            </div>
-                        </div>
-
-                        <div class="row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Reset Password') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</div>
-@endsection
+    <!-- login area end -->
+
+    @include('SRTDashboard.script')
+    @include('sweetalert::alert')
+</body>
+
+</html>
