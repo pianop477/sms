@@ -92,6 +92,7 @@ class StudentsController extends Controller
             $new_student->parent_id = $request->parent;
             $new_student->class_id = $class->id;
             $new_student->transport_id = $request->driver;
+            $new_student->admission_number = $this->getAdmissionNumber();
             $new_student->school_id = Auth::user()->school_id;
 
             // Handle file upload if present
@@ -118,7 +119,19 @@ class StudentsController extends Controller
             Alert::success('Success', 'Student records saved successfully');
             return redirect()->route('create.selected.class', $class->id);
            }
-        }
+    }
+        //generate uniqe student admission number randomly
+    protected function getAdmissionNumber ()
+    {
+        do {
+            // Generate a random 4-digit number between 1000 and 9999
+            $admissionNumber = mt_rand(100000, 999999);
+
+            // Check if this admission number already exists
+        } while (Student::where('admission_number', $admissionNumber)->exists());
+
+        return $admissionNumber; // Return the unique admission number
+    }
 
     /**
      * Display the resource.
@@ -217,7 +230,7 @@ class StudentsController extends Controller
                             ->join('grades', 'grades.id', '=', 'students.class_id')
                             ->join('schools', 'schools.id', '=', 'students.school_id')
                             ->leftJoin('transports', 'transports.id', '=', 'students.transport_id')
-                            ->select('students.id', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.gender', 'students.dob',
+                            ->select('students.id', 'students.first_name', 'students.middle_name', 'students.admission_number', 'students.last_name', 'students.gender', 'students.dob',
                                 'transports.driver_name', 'transports.gender as driver_gender', 'transports.phone as driver_phone', 'transports.bus_no',
                                 'transports.routine', 'schools.school_reg_no')
                             ->where('students.class_id', '=', $classId->id)

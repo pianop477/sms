@@ -151,7 +151,7 @@
                     </div>
                     <div class="student-image">
                         <img src="{{public_path('assets/img/students/'.$student->image)}}" alt="" style="max-width: 100px; border:1px solid black; border-radius:4px;">
-                        <p style="text-transform: uppercase; text-align:center; padding-top;0">{{$results->first()->school_reg_no}}-{{Str_pad($results->first()->studentId, 4, '0', STR_PAD_LEFT)}}</p>
+                        <p style="text-transform: uppercase; text-align:center; padding-top;0">{{$results->first()->school_reg_no}}/{{ $results->first()->admission_number}}</p>
                     </div>
                 </div>
                 <hr>

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('students', function (Blueprint $table) {
             $table->id();
+            $table->string('admission_number')->unique();
             $table->unsignedBigInteger('parent_id');
             $table->foreign('parent_id')->references('id')->on('parents')->onDelete('cascade');
             $table->unsignedBigInteger('class_id');

@@ -145,7 +145,7 @@ public function show(Student $student, $year)
         )
         ->whereYear('attendances.attendance_date', $year)
         ->where('attendances.student_id', '=', $student->id)
-        ->orderBy('attendances.attendance_date', 'ASC');
+        ->orderBy('attendances.attendance_date', 'DESC');
 
     // Paginate the raw data
     $perPage =5;
@@ -182,7 +182,7 @@ public function show(Student $student, $year)
                                                 'users.first_name as teacher_firstname',
                                                 'users.last_name as teacher_lastname',
                                                 'users.phone as teacher_phone',
-                                                'students.first_name as student_firstname',
+                                                'students.first_name as student_firstname', 'students.admission_number',
                                                 'students.middle_name as student_middlename',
                                                 'students.last_name as student_lastname'
                                             )
@@ -245,6 +245,7 @@ public function show(Student $student, $year)
                 'students.last_name',
                 'students.gender',
                 'students.group',
+                'students.admission_number',
                 'users.first_name as teacher_firstname',
                 'users.last_name as teacher_lastname',
                 'users.phone as teacher_phone',
@@ -319,7 +320,7 @@ public function show(Student $student, $year)
             ->select(
                 'attendances.*',
                 'students.id as studentId', 'students.first_name', 'students.middle_name',
-                'students.last_name', 'students.group', 'students.class_id', 'students.gender', 'schools.school_reg_no',
+                'students.last_name', 'students.admission_number', 'students.group', 'students.class_id', 'students.gender', 'schools.school_reg_no',
                 'grades.class_name', 'grades.class_code', 'grades.id as class_id',
                 'users.first_name as teacher_firstname', 'users.last_name as teacher_lastname',
                 'users.phone as teacher_phone', 'users.gender as teacher_gender'
@@ -393,7 +394,7 @@ public function show(Student $student, $year)
                     ->select(
                         'attendances.*',
                         'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.gender',
-                        'students.group', 'students.class_id as student_class',
+                        'students.group', 'students.class_id as student_class', 'students.admission_number',
                         'grades.id as class_id', 'grades.class_name', 'grades.class_code',
                         'users.first_name as teacher_firstname', 'users.last_name as teacher_lastname',
                         'users.gender as teacher_gender', 'users.phone as teacher_phone', 'schools.school_reg_no',

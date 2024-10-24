@@ -25,7 +25,7 @@
                             <tr>
                                 <td>
                                     <input type="hidden" name="student_id[]" value="{{ $student->id }}">
-                                    {{ str_pad($student->id, 4, '0', STR_PAD_LEFT) }}
+                                    {{ $student->admission_number }}
                                 </td>
                                 <td class="text-uppercase">
                                     <a href="{{ route('Students.show', $student->id) }}">{{ $student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name }}</a>

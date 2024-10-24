@@ -178,7 +178,7 @@
                                 @foreach ($students as $student )
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
-                                        <td class="text-uppercase text-center">{{$student->school_reg_no}} - {{Str_pad($student->id, 4, '0', STR_PAD_LEFT)}}</td>
+                                        <td class="text-uppercase text-center">{{$student->school_reg_no}}/{{$student->admission_number}}</td>
                                         <td class="text-uppercase">{{$student->first_name}}</td>
                                         <td class="text-uppercase">{{$student->middle_name}}</td>
                                         <td class="text-uppercase">{{$student->last_name}}</td>

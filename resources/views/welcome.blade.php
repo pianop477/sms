@@ -252,6 +252,7 @@
           <p>Address: Dodoma, Tanzania</p>
           <p>Email: pianop477@gmail.com</p>
           <p>Phone: +255 678 669 000</p>
+          <p>&copy; Copyright <a href="#">ShuleApp</a> {{date('Y')}}</p>
         </div>
         <div class="col-md-6">
           <form method="POST" action="{{route('send.feedback.message') . ('#contact')}}" class="needs-validation" novalidate>

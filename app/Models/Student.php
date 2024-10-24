@@ -20,6 +20,7 @@ class Student extends Model
         'group',
         'transport_id',
         'school_id',
+        'admission_number',
         'status'
     ];
 

@@ -81,7 +81,7 @@ class ResultsController extends Controller
             ->select(
                 'examination_results.*',
                 'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name',
-                'students.group', 'students.image', 'students.gender',
+                'students.group', 'students.image', 'students.gender', 'students.admission_number',
                 'subjects.course_name', 'subjects.course_code',
                 'grades.class_name', 'grades.class_code',
                 'examinations.exam_type',
@@ -229,7 +229,7 @@ class ResultsController extends Controller
             ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
             ->select(
                 'examination_results.*',
-                'students.first_name', 'students.middle_name', 'students.last_name', 'students.id as student_id',
+                'students.first_name', 'students.middle_name', 'students.last_name', 'students.id as student_id', 'students.admission_number',
                 'grades.class_name',
                 'examinations.exam_type'
             )
@@ -259,7 +259,7 @@ class ResultsController extends Controller
                             ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
                             ->select(
                                 'examination_results.*',
-                                'students.first_name', 'students.middle_name', 'students.last_name', 'students.gender', 'students.id as student_id', 'students.group',
+                                'students.first_name', 'students.middle_name', 'students.last_name', 'students.gender', 'students.id as student_id', 'students.group', 'students.admission_number',
                                 'grades.class_name',
                                 'examinations.exam_type',
                                 'subjects.course_name', 'subjects.course_code'
@@ -447,13 +447,6 @@ class ResultsController extends Controller
             // Convert month name to month number
             $monthNumber = date('m', strtotime($month));
 
-            \Log::info('Publish Result called', [
-                'school_id' => $school->id,
-                'year' => $year,
-                'class_id' => $class,
-                'exam_type_id' => $examType,
-                'month' => $monthNumber
-            ]);
 
             // Update the query to correctly match the month
             $updatedRows = Examination_result::where('school_id', $school->id)
