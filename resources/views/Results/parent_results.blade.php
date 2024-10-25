@@ -151,7 +151,7 @@
                     </div>
                     <div class="student-image">
                         <img src="{{public_path('assets/img/students/'.$student->image)}}" alt="" style="max-width: 100px; border:1px solid black; border-radius:4px;">
-                        <p style="text-transform: uppercase; text-align:center; padding-top;0">{{$results->first()->school_reg_no}}/{{ $results->first()->admission_number}}</p>
+                        <p style="text-transform: uppercase; text-align:center; padding-top;0">Adm No: {{$results->first()->school_reg_no}}/{{ $results->first()->admission_number}}</p>
                     </div>
                 </div>
                 <hr>
@@ -159,7 +159,7 @@
                     <h5 style="text-align: center;">Student Information</h5>
                     <div class="info-container student-info">
                         <p><strong>Student Name:</strong> <span style="text-transform: uppercase">{{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}</span></p>
-                        <p><strong>Class:</strong> <span style="text-transform: uppercase">{{ $student->gender}}</span></p>
+                        <p><strong>Gender:</strong> <span style="text-transform: uppercase">{{ $student->gender}}</span></p>
                         <p><strong>Class:</strong> <span style="text-transform: uppercase">{{ $results->first()->class_name }}({{$results->first()->class_code}})</span></p>
                         <p><strong>Stream:</strong> <span style="text-transform: uppercase">{{ $student->group }}</span></p>
                     </div>
@@ -189,8 +189,8 @@
                         @foreach ($results as $index => $result)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
-                                <td>{{ $result->course_name }}</td>
-                                <td>{{ $result->course_code }}</td>
+                                <td style="text-align: left;">{{ $result->course_name }}</td>
+                                <td style="text-transform: uppercase">{{ $result->course_code }}</td>
                                 <td>{{ $result->score }}</td>
                                 <td>{{ $result->grade }}</td>
                                 <td>{{ $result->remarks }}</td>
