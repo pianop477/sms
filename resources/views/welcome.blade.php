@@ -143,7 +143,7 @@
   <nav class="navbar navbar-expand-lg navbar-custom navbar-dark">
     <div class="container">
       <img src="{{ asset('assets/img/logo/shuleapp_transparent.png') }}" alt="" class="rounded-circle" style="width:70px; object-fit:cover;">
-      <a class="navbar-brand" href="#">ShuleApp</a>
+      <a class="navbar-brand" href="{{route('welcome')}}">ShuleApp</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -151,14 +151,9 @@
         <ul class="navbar-nav ml-auto">
           @if (Route::has('users.form'))
           <li class="nav-item">
-            <a class="nav-link" href="{{ route('users.form') }}">Sign Up</a>
+            <a class="nav-link btn btn-outline-primary btn-sm" href="{{ route('users.form') }}">Sign Up</a>
           </li>
           @endif
-          @if(Route::has('login'))
-            <li class="nav-item">
-                <a href="{{route('login')}}" class="nav-link">Sign In</a>
-            </li>
-        @endif
         </ul>
       </div>
     </div>
@@ -213,9 +208,9 @@
     </div>
   </section>
 
-  <section class="section" id="features" style="background: lightseagreen">
+  <section class="section" id="features" style="background: rgb(232, 167, 221)">
     <div class="container">
-      <h2 class="text-center mb-4">OUR FEATURES</h2>
+      <h2 class="text-center mb-4">MAIN FEATURES</h2>
       <div class="row features">
         <div class="col-md-4">
             <div class="card">
@@ -231,7 +226,7 @@
                 <img src="{{asset('assets/img/features/feature 2.png')}}" class="card-img-top" alt="...">
                 <div class="card-body">
                   <h5 class="card-title">Parents Portal</h5>
-                  <p class="card-text">The parent app gives parents a level of control over their child's performance at school than ever seen before.</p>
+                  <p class="card-text">The ShuleApp gives parents a level of control over their child's performance at school than ever seen before. Don't plan to miss using this Amazing Application</p>
                 </div>
               </div>
         </div>
@@ -248,7 +243,7 @@
     </div>
   </section>
 
-  <section class="section" id="contact" style="background:lightskyblue">
+  <section class="section" id="contact" style="background:rgb(159, 240, 214)">
     <div class="container">
       <h2 class="text-center mb-4">CONTACT US</h2>
       <div class="row">
@@ -264,21 +259,21 @@
             @csrf
             <div class="form-group">
               <label for="name">Name:</label>
-              <input type="text" class="form-control" id="name" name="name" value="{{old('name')}}">
+              <input type="text" class="form-control" id="name" name="name" placeholder="Enter your Name" value="{{old('name')}}">
               @error('name')
                   <div class="text-danger">{{$message}}</div>
               @enderror
             </div>
             <div class="form-group">
               <label for="email">Email:</label>
-              <input type="email" class="form-control" id="email" name="email" value="{{old('email')}}">
+              <input type="email" class="form-control" id="email" placeholder="Enter your Email Address" name="email" value="{{old('email')}}">
               @error('email')
                   <div class="text-danger">{{$message}}</div>
               @enderror
             </div>
             <div class="form-group">
               <label for="message">Message:</label>
-              <textarea class="form-control" id="message" rows="3" name="message">{{old('message')}}</textarea>
+              <textarea class="form-control" id="message" rows="3" placeholder="Enter your Message here" name="message">{{old('message')}}</textarea>
               @error('message')
                   <div class="text-danger">{{$message}}</div>
               @enderror
