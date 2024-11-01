@@ -59,6 +59,7 @@
                         @if (Route::has('users.form'))
                         <div class="form-footer text-center mt-1">
                             <p class="text-muted">Don't have an account? <a href="{{route('users.form')}}">Sign up</a></p>
+                            <p class="text-muted">Nothing else? <a href="{{route('welcome')}}"> Home</a></p>
                         </div>
                         @endif
                     </div>

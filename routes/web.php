@@ -41,8 +41,7 @@ use PHPUnit\Runner\ResultCache\ResultCache;
 
 Route::get('/', function () {
     return view('welcome');
-});
-
+})->name('welcome');
 
 Route::middleware('throttle:30,1')->group(function () {
     Auth::routes();

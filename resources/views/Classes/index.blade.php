@@ -12,7 +12,7 @@
                         <h4 class="header-title text-center text-uppercase">Classes</h4>
                     </div>
                     <div class="col-4">
-                        <button type="button" class="btn btn-link float-right" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-circle-plus text-secondary" style="font-size: 2rem;"></i>
+                        <button type="button" class="btn btn-link float-right" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus"></i> New Class
                         </button>
                         <div class="modal fade bd-example-modal-lg">
                             <div class="modal-dialog modal-lg">
@@ -82,7 +82,7 @@
                                     </td>
                                     <td class="text-uppercase">{{$class->class_code}}</td>
                                     <td>
-                                        <a href=""><i class="ti-pencil"></i></a>
+                                        <a href="{{route('Classes.edit', $class->id)}}"><i class="ti-pencil"></i></a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -114,7 +114,7 @@
                     <table class="table text-uppercase">
                         <thead class="bg-primary">
                             <tr class="text-white">
-                                <th scope="col">Class Name</th>
+                                <th scope="col">Classes</th>
                             </tr>
                         </thead>
                         <tbody>

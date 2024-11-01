@@ -411,14 +411,6 @@ class ResultsController extends Controller
             // Convert month name to month number
             $monthNumber = date('m', strtotime($month));
 
-            \Log::info('Publish Result called', [
-                'school_id' => $school->id,
-                'year' => $year,
-                'class_id' => $class,
-                'exam_type_id' => $examType,
-                'month' => $monthNumber
-            ]);
-
             // Update the query to correctly match the month
             $updatedRows = Examination_result::where('school_id', $school->id)
                                             ->whereYear('exam_date', $year)

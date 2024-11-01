@@ -67,17 +67,35 @@ class ClassesController extends Controller
     /**
      * Show the form for editing the resource.
      */
-    public function edit()
+    public function edit(string $id)
     {
         //
+        $class = Grade::findOrFail($id);
+        return view('Classes.edit', compact('class'));
     }
 
     /**
      * Update the resource in storage.
      */
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
         //
+        $class = Grade::findOrFail($id);
+        if(! $class) {
+            Alert::error('Error', 'No class found');
+            return back();
+        }
+        $request->validate([
+            'cname' => 'required|string|max:255',
+            'ccode' => 'required|string|max:255',
+        ]);
+
+        $class->update([
+            'class_name' => $request->cname,
+            'class_code' => $request->ccode,
+        ]);
+        Alert::success('success', 'Class details updated successfully');
+        return redirect()->route('Classes.index');
     }
 
     /**
