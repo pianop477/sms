@@ -47,8 +47,8 @@
                         <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Students</div>
                         <h2>{{count($students)}}</h2>
                         <ul>
-                            <li><span class="text-white">Male: <strong>{{$maleStudents}}</strong></span></li>
-                            <li><span class="text-white">Female: <strong>{{$femaleStudents}}</strong></span></li>
+                            <li><span class="text-white">M: <strong>{{$maleStudents}}</strong></span></li>
+                            <li><span class="text-white">F: <strong>{{$femaleStudents}}</strong></span></li>
                         </ul>
                     </div>
                     <canvas id="" height="50"></canvas>

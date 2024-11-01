@@ -122,7 +122,7 @@
                                                     <label for="validationCustom01">Year Joined</label>
                                                     <select name="joined" id="" class="form-control" required>
                                                         <option value="">-- Select Year --</option>
-                                                        @for ($year = date('Y'); $year >= 2000; $year--)
+                                                        @for ($year = date('Y'); $year >= 1990; $year--)
                                                             <option value="{{ $year }}">{{ $year }}</option>
                                                         @endfor
                                                     </select>
@@ -144,7 +144,7 @@
                                                     </div>
                                                     <input type="hidden" name="usertype" value="3">
                                                     <input type="hidden" name="school_id" value="{{Auth::user()->school_id}}">
-                                                    <input type="hidden" name="password" value="shule123">
+                                                    <input type="hidden" name="password" value="shule@2024">
                                                 </div>
                                             </div>
                                     </div>
@@ -186,7 +186,7 @@
                                             @if ($teacher->status ==1)
                                                 <span class="badge bg-success text-white">{{_('Active')}}</span>
                                                 @else
-                                                <span class="badge bg-danger text-white">{{_('Blocked')}}</span>
+                                                <span class="badge bg-secondary text-white">{{_('Blocked')}}</span>
                                             @endif
                                         </td>
                                         @if ($teacher->status == 1)
@@ -200,13 +200,13 @@
                                                         <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Block {{strtoupper($teacher->first_name)}} {{strtoupper($teacher->last_name)}}?')"><i class="fas fa-ban text-danger"></i></button>
                                                     </form>
                                                 </li>
-                                                {{-- <li>
+                                                <li>
                                                     <form action="{{route('Teachers.remove', $teacher->id)}}" method="POST">
                                                         @csrf
                                                         @method('PUT')
                                                         <button class="btn btn-link p-0" type="submit" onclick="return confirm('Are you sure you want to Delete {{ strtoupper($teacher->first_name) }} {{ strtoupper($teacher->last_name) }} Permanently?')"><i class="ti-trash text-danger"></i></button>
                                                     </form>
-                                                </li> --}}
+                                                </li>
                                             </ul>
                                         </td>
                                         @else
@@ -219,13 +219,13 @@
                                                         <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Unblock {{strtoupper($teacher->first_name)}} {{strtoupper($teacher->last_name)}}?')"><i class="ti-reload text-success"></i></button>
                                                     </form>
                                                 </li>
-                                                {{-- <li>
+                                                <li>
                                                     <form action="{{route('Teachers.remove', $teacher->id)}}" method="POST">
                                                         @csrf
                                                         @method('PUT')
                                                         <button class="btn btn-link p-0" type="submit" onclick="return confirm('Are you sure you want to Delete {{ strtoupper($teacher->first_name) }} {{ strtoupper($teacher->last_name) }} Permanently?')"><i class="ti-trash text-danger"></i></button>
                                                     </form>
-                                                </li> --}}
+                                                </li>
                                             </ul>
                                         </td>
                                         @endif

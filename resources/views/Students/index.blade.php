@@ -136,7 +136,7 @@
                                                     <input type="hidden" name="school_id" value="{{Auth::user()->school_id}}">
                                                 </div>
                                                 <div class="col-md-4 mb-3">
-                                                    <label for="validationCustomUsername">Passport Size :<small class="text-sm text-danger">(Optional)</small></label>
+                                                    <label for="validationCustomUsername">Passport Photo :<small class="text-sm text-danger">(Optional)</small></label>
                                                     <div class="input-group">
                                                         <input type="file" name="image" id="validationCustomUsername" class="form-control" value="{{old('image')}}">
                                                         @error('image')

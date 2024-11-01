@@ -17,7 +17,7 @@
           <h5 class="mb-1">
             <span class="text-capitalize">{{$teachers->first_name. ' '. $teachers->last_name}}</span>
             <p class="mb-2">
-                Worker ID: <span class="text-uppercase">{{$teachers->school_reg_no.'/'.$teachers->joined.'/'. str_pad($teachers->id, 3, '0', STR_PAD_LEFT)}}</span>
+                Member ID: <span class="text-uppercase">{{$teachers->school_reg_no.'/'.$teachers->joined.'/'. $teachers->member_id}}</span>
             </p>
           </h5>
           <p class="mb-0 font-weight-normal text-sm"> Qualification:

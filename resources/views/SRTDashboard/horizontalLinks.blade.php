@@ -86,6 +86,7 @@
                                 <ul class="submenu">
                                     <li><a href="{{route('roles.updateRole')}}"><i class="ti-unlock"></i>Roles & Permission</a></li>
                                     <li><a href="{{route('users.lists')}}"><i class="fas fa-user-lock"></i>User Password Reset</a></li>
+                                    <li><a href="{{route('Teachers.trashed')}}"><i class="fas fa-trash"></i>Recycle Bin</a></li>
                                 </ul>
                             </li>
                         @endif

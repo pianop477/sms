@@ -19,17 +19,17 @@ class UsersController extends Controller
 
     public function create(Request $req) {
         $req->validate([
-            'fname' => 'required|string|max:25',
-            'lname' => 'required|string|max:25',
+            'fname' => 'required|string|max:255',
+            'lname' => 'required|string|max:255',
             'email' => 'required|string|unique:users,email',
-            'phone' => 'required|string|min:10|max:10',
-            'gender' => 'required|string|max:6',
-            'usertype' => 'required|max:6|integer',
+            'phone' => 'required|string|min:10|max:255',
+            'gender' => 'required|string|max:255',
+            'usertype' => 'required|integer',
             'school' => 'required|integer|exists:schools,id',
             'password' => 'required|min:8',
             'password_confirmation' => 'same:password',
             'image' => 'nullable|image|max:2048',
-            'street' => 'required|string|max:15',
+            'street' => 'required|string|max:255',
         ]);
 
 

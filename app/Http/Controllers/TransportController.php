@@ -33,10 +33,10 @@ class TransportController extends Controller
     {
         // abort(404);
         $request->validate([
-            'fullname' => 'required|string|max:50',
-            'gender' => 'string|required|max:6',
-            'phone' => 'required|string|max:10|min:10',
-            'bus' => 'required|string|max:15',
+            'fullname' => 'required|string|max:255',
+            'gender' => 'string|required|max:255',
+            'phone' => 'required|string|max:10|min:255',
+            'bus' => 'required|string|max:255',
             'routine' => 'required|string|max:255',
         ]);
 
@@ -123,10 +123,10 @@ class TransportController extends Controller
     public function UpdateRecords(Request $request, $transport)
     {
         $request->validate([
-            'fullname' => 'required|string|max:50',
-            'gender' => 'required|string|max:6',
-            'phone' => 'required|string|min:0|max:10',
-            'bus_no' => 'required|string|max|15',
+            'fullname' => 'required|string|max:255',
+            'gender' => 'required|string|max:255',
+            'phone' => 'required|string|min:0|max:255',
+            'bus_no' => 'required|string|max|255',
             'routine' => 'required|string|max:255'
         ]);
         $trans = Transport::findOrFail($transport);

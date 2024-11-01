@@ -48,9 +48,9 @@ class ParentsController extends Controller
             'fname' => 'required|string|max:25',
             'lname' => 'required|string|max:25',
             'email' => 'required|string|unique:users,email',
-            'gender' => 'required|string|max:6',
-            'phone' => 'required|string|max:10|min:10',
-            'street' => 'required|string|max:15',
+            'gender' => 'required|string|max:255',
+            'phone' => 'required|string|max:10|min:255',
+            'street' => 'required|string|max:255',
         ]);
 
         $users = new User();
@@ -178,10 +178,10 @@ class ParentsController extends Controller
         $request->validate([
             'fname' => 'required|max:25|string',
             'lname' => 'required|max:25|string',
-            'gender' => 'required|string|max:6',
-            'phone' => 'required|min:10|max:10',
-            'street' => 'required|string|max:15',
-            'image' => 'nullable|image|max:20148',
+            'gender' => 'required|string|max:255',
+            'phone' => 'required|min:10|max:255',
+            'street' => 'required|string|max:255',
+            'image' => 'nullable|image|max:2048',
         ]);
 
         try {

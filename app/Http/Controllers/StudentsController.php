@@ -55,14 +55,14 @@ class StudentsController extends Controller
         {
             // Validate the incoming request data
             $request->validate([
-                'fname' => 'required|string|max:25',
-                'middle' => 'required|string|max:25',
-                'lname' => 'required|string|max:25',
-                'gender' => 'required|string|max:6',
+                'fname' => 'required|string|max:255',
+                'middle' => 'required|string|max:255',
+                'lname' => 'required|string|max:255',
+                'gender' => 'required|string|max:255',
                 'parent' => 'required|exists:parents,id',
                 'dob' => 'required|date|date_format:Y-m-d',
                 'driver' => 'nullable|exists:transports,id',
-                'group' => 'required|string|max:1',
+                'group' => 'required|string|max:255',
                 'image' => 'nullable|image|max:2048',
             ]);
 
@@ -155,12 +155,12 @@ class StudentsController extends Controller
     public function updateRecords(Request $request, $students)
     {
         $request->validate([
-            'fname' => 'required|string|max:25',
-            'middle' => 'required|string|max:25',
-            'lname' => 'required|string|max:25',
+            'fname' => 'required|string|max:255',
+            'middle' => 'required|string|max:255',
+            'lname' => 'required|string|max:255',
             'class' => 'required|integer|exists:grades,id',
-            'group' => 'required|max:1',
-            'gender' => 'required|max:6',
+            'group' => 'required|max:255',
+            'gender' => 'required|max:255',
             'dob' => 'required|date|date_format:Y-m-d',
             'driver' => 'integer|nullable|exists:transports,id',
             'image' => 'nullable|max:2048|image',
@@ -281,14 +281,14 @@ class StudentsController extends Controller
     public function registerStudent (Request $request)
     {
         $request->validate([
-            'fname' => 'required|string|max:25',
-            'middle' => 'required|string|max:25',
-            'lname' => 'required|string|max:25',
-            'gender' => 'required|string|max:6',
+            'fname' => 'required|string|max:255',
+            'middle' => 'required|string|max:255',
+            'lname' => 'required|string|max:255',
+            'gender' => 'required|string|max:255',
             'grade' => 'required|integer|exists:grades,id',
             'dob' => 'required|date|date_format:Y-m-d',
             'driver' => 'nullable|integer|exists:transports,id',
-            'group' => 'required|string|max:1',
+            'group' => 'required|string|max:255',
             'image' => 'nullable|image|max:2048',
         ]);
 
@@ -305,6 +305,7 @@ class StudentsController extends Controller
         }
 
         $students = new Student();
+        $students->admission_number = $this->getAdmissionNumber();
         $students->first_name = $request->fname;
         $students->middle_name = $request->middle;
         $students->last_name = $request->lname;

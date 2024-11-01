@@ -34,8 +34,8 @@
                                 <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Students</div>
                                 <h2>{{count($students)}}</h2>
                                 <ul>
-                                    <li><span class="text-white">Male: <strong>{{$totalMaleStudents}}</strong></span></li>
-                                    <li><span class="text-white">Female: <strong>{{$totalFemaleStudents}}</strong></span></li>
+                                    <li><span class="text-white">M: <strong>{{$totalMaleStudents}}</strong></span></li>
+                                    <li><span class="text-white">F: <strong>{{$totalFemaleStudents}}</strong></span></li>
                                 </ul>
                             </div>
                             <canvas id="" height="50"></canvas>
@@ -105,8 +105,8 @@
                                 <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Students</div>
                                 <h2>{{count($students)}}</h2>
                                 <ul>
-                                    <li><span class="text-white">Male: <strong>{{$totalMaleStudents}}</strong></span></li>
-                                    <li><span class="text-white">Female: <strong>{{$totalFemaleStudents}}</strong></span></li>
+                                    <li><span class="text-white">M: <strong>{{$totalMaleStudents}}</strong></span></li>
+                                    <li><span class="text-white">F: <strong>{{$totalFemaleStudents}}</strong></span></li>
                                 </ul>
                             </div>
                             <canvas id="" height="50"></canvas>

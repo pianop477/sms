@@ -15,6 +15,7 @@ class Teacher extends Model
         'qualification',
         'address',
         'role_id',
+        'member_id',
         'status'
     ];
 

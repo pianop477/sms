@@ -151,9 +151,14 @@
         <ul class="navbar-nav ml-auto">
           @if (Route::has('users.form'))
           <li class="nav-item">
-            <a class="nav-link" href="{{ route('users.form') }}">Register</a>
+            <a class="nav-link" href="{{ route('users.form') }}">Sign Up</a>
           </li>
           @endif
+          @if(Route::has('login'))
+            <li class="nav-item">
+                <a href="{{route('login')}}" class="nav-link">Sign In</a>
+            </li>
+        @endif
         </ul>
       </div>
     </div>
@@ -172,28 +177,28 @@
           <div class="carousel-caption">
             <h1>Welcome to ShuleApp</h1>
             <p>Your Ultimate Education Management Solution</p>
-            <a href="{{route('login')}}" class="btn btn-primary btn-lg">Get Started</a>
+            <a href="{{route('login')}}" class="btn btn-primary btn-lg">Get Started Now</a>
           </div>
         </div>
         <div class="carousel-item" style="background-image: url('{{ asset('assets/img/cards/paper 2.jpg') }}');">
           <div class="carousel-caption">
             <h1>Efficient Data Management</h1>
             <p>Streamline your educational processes</p>
-            <a href="{{route('login')}}" class="btn btn-primary btn-lg">Get Started</a>
+            <a href="{{route('login')}}" class="btn btn-primary btn-lg">Get Started Now</a>
           </div>
         </div>
         <div class="carousel-item" style="background-image: url('{{ asset('assets/img/cards/paper 3.jpg') }}');">
           <div class="carousel-caption">
             <h1>Innovative Solutions</h1>
             <p>Enhance learning with technology</p>
-            <a href="{{route('login')}}" class="btn btn-primary btn-lg">Get Started</a>
+            <a href="{{route('login')}}" class="btn btn-primary btn-lg">Get Started Now</a>
           </div>
         </div>
         <div class="carousel-item" style="background-image: url('{{ asset('assets/img/cards/paper 4.jpg') }}');">
           <div class="carousel-caption">
             <h1>Join to Our Community</h1>
             <p>Be part of the future of education</p>
-            <a href="{{route('login')}}" class="btn btn-primary btn-lg">Get Started</a>
+            <a href="{{route('login')}}" class="btn btn-primary btn-lg">Get Started Now</a>
           </div>
         </div>
       </div>

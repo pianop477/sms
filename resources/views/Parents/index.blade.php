@@ -89,13 +89,10 @@
                                                         </div>
                                                         @enderror
                                                     </div>
-                                                    <input type="hidden" name="usertype" value="4">
-                                                    <input type="hidden" name="school_id" value="{{Auth::user()->school_id}}">
-                                                    <input type="hidden" name="password" value="shule123">
                                                 </div>
                                                     <input type="hidden" name="usertype" value="4">
                                                     <input type="hidden" name="school_id" value="{{Auth::user()->school_id}}">
-                                                    <input type="hidden" name="password" value="shule123">
+                                                    <input type="hidden" name="password" value="shule@2024">
                                             </div>
                                     </div>
                                     <div class="modal-footer">

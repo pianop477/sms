@@ -4,7 +4,7 @@
 <div class="col-12">
     <div class="card mt-5">
         <div class="card-body">
-            <h4 class="header-title">User Registration Form</h4>
+            <h4 class="header-title">Manager Registration Form</h4>
             <form class="needs-validation" novalidate="" action="{{route('manager.store')}}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="form-row">
@@ -80,7 +80,7 @@
                             @enderror
                         </div>
                         <input type="hidden" name="usertype" value="2">
-                        <input type="hidden" name="password" value="shule123">
+                        <input type="hidden" name="password" value="shule@2024">
                     </div>
                 </div>
 

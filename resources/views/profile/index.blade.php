@@ -93,7 +93,7 @@
                     @error('phone')<span class="text-danger text-sm">{{$message}}</span>@enderror
                 </div>
                 <div class="">
-                    <label class="form-label">Profile Picture: <span class="text-danger">must not exceed 2MB's</span></label>
+                    <label class="form-label">Photo: <span class="text-danger">Max 2MB</span></label>
                     <div class="input-group input-group-outline mb-3">
                         <input type="file" name="image" class="form-control" value="">
                     </div>

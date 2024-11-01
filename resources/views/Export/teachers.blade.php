@@ -31,7 +31,7 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>ID</th>
+                <th>MEMBER ID</th>
                 <th>GENDER</th>
                 <th>FIRST NAME</th>
                 <th>LAST NAME</th>
@@ -48,7 +48,7 @@
             @foreach($teachers as $teacher)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td class="text-uppercase" style="text-transform: uppercase">{{ $teacher->school_reg_no . '/' . $teacher->joined . '/' . str_pad($teacher->id, 3, '0', STR_PAD_LEFT) }}</td>
+                    <td class="text-uppercase" style="text-transform: uppercase">{{ $teacher->school_reg_no . '/' . $teacher->joined . '/' . $teacher->member_id }}</td>
                     <td class="text-capitalize" style="text-transform: uppercase">{{ $teacher->gender[0] }}</td>
                     <td class="text-capitalize" style="text-transform: capitalize">{{ $teacher->first_name }}</td>
                     <td class="text-capitalize" style="text-transform: capitalize">{{ $teacher->last_name }}</td>

@@ -130,7 +130,7 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th style="text-align: center">WorkerID</th>
+                            <th style="text-align: center">Member ID</th>
                             <th>Gender</th>
                             <th>First Name</th>
                             <th>Last Name</th>
@@ -140,12 +140,13 @@
                             <th>Qualification</th>
                             <th style="text-align: center">Joined</th>
                             <th>Street</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($teachers as $teacher)
                             <tr>
-                                <td style="text-transform: uppercase; text-align:center">{{ $teacher->school_reg_no . '/' . $teacher->joined . '/' . str_pad($teacher->id, 3, '0', STR_PAD_LEFT) }}</td>
+                                <td style="text-transform: uppercase; text-align:center">{{ $teacher->school_reg_no . '/' . $teacher->joined . '/' .$teacher->member_id }}</td>
                                 <td style="text-transform: uppercase; text-align:center; width:5px;">{{ $teacher->gender[0] }}</td>
                                 <td style="text-transform: capitalize">{{ $teacher->first_name }}</td>
                                 <td style="text-transform: capitalize">{{ $teacher->last_name }}</td>
@@ -165,6 +166,13 @@
                                 </td>
                                 <td style="text-align: center">{{ $teacher->joined }}</td>
                                 <td class="" style="text-transform: capitalize">{{ $teacher->address }}</td>
+                                <td style="text-transform: capitalize">
+                                    @if ($teacher->status == 1)
+                                        {{_('Active')}}
+                                    @else
+                                        {{_('Inactive')}}
+                                    @endif
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

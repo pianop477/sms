@@ -69,14 +69,14 @@ class TeachersController extends Controller
     {
         // abort(404);
         $request->validate([
-            'fname' => 'required|string|max:25',
-            'lname' => 'required|string|max:25',
+            'fname' => 'required|string|max:255',
+            'lname' => 'required|string|max:255',
             'email' => 'required|string|unique:users,email',
-            'gender' => 'required|string|max:6',
+            'gender' => 'required|string|max:255',
             'dob' => 'required|date|date_format:Y-m-d',
-            'phone' => 'required|string|max:10|min:10',
-            'qualification' => 'required|integer|max:6',
-            'street' => 'required|string|max:15',
+            'phone' => 'required|string|max:10|min:255',
+            'qualification' => 'required|integer|max:255',
+            'street' => 'required|string|max:255',
             'joined' => 'required|date_format:Y'
         ]);
 
@@ -109,10 +109,22 @@ class TeachersController extends Controller
         $teachers->qualification = $request->qualification;
         $teachers->address = $request->street;
         $teachers->joined = $request->joined;
+        $teachers->member_id = $this->getMemberId();
         $teachers->save();
         Alert::success('Success', 'Teacher records saved successfully');
         return back();
 
+    }
+    protected function getMemberId ()
+    {
+        do {
+            // Generate a random 4-digit number between 1000 and 9999
+            $memberIdNumber = mt_rand(1000, 9999);
+
+            // Check if this admission number already exists
+        } while (Teacher::where('member_id', $memberIdNumber)->exists());
+
+        return $memberIdNumber; // Return the unique admission number
     }
 
     /**
@@ -156,13 +168,13 @@ class TeachersController extends Controller
     {
 
             $validated = $request->validate([
-                'fname' => 'required|string|max:25',
-                'lname' => 'required|string|max:25',
+                'fname' => 'required|string|max:255',
+                'lname' => 'required|string|max:255',
                 'dob' => 'required|date|date_format:Y-m-d',
-                'phone' => 'required|string|max:10|min:10',
-                'qualification' => 'required|integer|max:6',
-                'street' => 'required|string|max:15',
-                'gender' => 'required|max:6',
+                'phone' => 'required|string|max:10|min:255',
+                'qualification' => 'required|integer|max:255',
+                'street' => 'required|string|max:255',
+                'gender' => 'required|max:255',
                 'joined_at' => 'required|date_format:Y',
                 'image' => 'nullable|image|max:2048',
             ]);
@@ -261,13 +273,14 @@ class TeachersController extends Controller
         }
     }
 
-    public function destroy($teacher)
+    public function deleteTeacher($teacher)
     {
         // Find the teacher record or fail
         $teacher = Teacher::findOrFail($teacher);
 
         // Find the associated user or fail
-        $user = User::findOrFail($teacher->user_id);
+        $user = User::where('id', $teacher->user_id)->first();
+        // return $user;
 
         //user id logged in
         $userId = Auth::user()->id;
@@ -279,12 +292,10 @@ class TeachersController extends Controller
         }
 
          //check role of logged user compare with role of deleted user=======
-         // Check the role of the logged-in user and compare with the role of the user being deleted
-        $loggedInTeacher = Teacher::where('user_id', $userId)->firstOrFail();
-        if ($loggedInTeacher->role_id == 3 && $teacher->role_id == 2 && $loggedInTeacher->role_id == 4) {
+         if($teacher->role_id != 1) {
             Alert::error('Error!', 'You do not have permission to delete this teacher.');
             return back();
-        }
+         }
 
         // Check if the user is assigned as a class teacher to any class
         $assignedClassTeacher = Class_teacher::where('teacher_id', $teacher->id)->first();
@@ -314,12 +325,24 @@ class TeachersController extends Controller
             // Rollback the transaction if there's an error
             DB::rollBack();
 
-            \Log::error('Failed to delete teacher records: ' . $e->getMessage());
-
             Alert::error('Error', 'Failed to delete teacher status');
         }
 
         return back();
+    }
+
+    public function trashedTeachers ()
+    {
+        $userLogged = Auth::user();
+        $teachers = Teacher::query()
+                            ->join('users', 'users.id', '=', 'teachers.user_id')
+                            ->join('schools', 'schools.id', '=', 'teachers.school_id')
+                            ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.email')
+                            ->where('teachers.school_id', '=', $userLogged->school_id)
+                            ->where('teachers.status', 2)
+                            ->orderBy('users.first_name', 'ASC')
+                            ->get();
+        return view('Teachers.trash', ['teachers' => $teachers]);
     }
 
 

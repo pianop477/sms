@@ -16,8 +16,8 @@
     <div class="error-area ptb--100 text-center">
         <div class="container">
             <div class="error-content p-1">
-                <h4 class="text-danger">Error 404</h4>
-                <p class="text-danger p-3">Ooops! You don't have permission to access this Page!</p>
+                <h4 class="text-danger">404</h4>
+                <p class="text-danger p-3">Error! Permission Access Denied</p>
                 <p><i class="fas fa-ban text-danger text-center" style="font-size: 2.5rem;"></i></p>
                 <a href="{{url()->previous()}}" class="btn btn-sm"><i class="ti-angle-double-left"></i> Go Back</a>
             </div>
