@@ -125,7 +125,7 @@ class RolesController extends Controller
     public function resetPassword (Request $request, $user)
     {
         $users = User::findOrFail($user);
-        $users->password = Hash::make($request->input('password', 'shule123'));
+        $users->password = Hash::make($request->input('password', 'shule@2024'));
         $users->save();
         Alert::success('Success!', 'Password reset successfully');
         return back();

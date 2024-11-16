@@ -21,7 +21,13 @@
                     <div class="seo-fact sbg2">
                         <div class="p-4 d-flex justify-content-between align-items-center">
                             <div class="seofct-icon"><i class="fas fa-user-tie"></i> Teacher (s)</div>
-                            <h2>{{count($teachers)}}</h2>
+                            <h2>
+                                @if (count($teachers) > 99)
+                                    100+
+                                @else
+                                    {{count($teachers)}}
+                                @endif
+                            </h2>
                         </div>
                         <canvas id="seolinechart2" height="50"></canvas>
                     </div>
@@ -32,7 +38,13 @@
                     <div class="seo-fact sbg3">
                         <div class="p-4 d-flex justify-content-between align-items-center">
                             <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Student (s)</div>
-                            <h2>{{count($students)}}</h2>
+                            <h2>
+                                @if (count($students) > 999)
+                                    1000+
+                                @else
+                                    {{count($students)}}
+                                @endif
+                            </h2>
                         </div>
                         <canvas id="seolinechart2" height="50"></canvas>
                     </div>
@@ -47,7 +59,13 @@
                     <div class="seo-fact sbg4">
                         <div class="p-4 d-flex justify-content-between align-items-center">
                             <div class="seofct-icon"><i class="fas fa-user-shield"></i> Parent (s)</div>
-                            <h2>{{count($parents)}}</h2>
+                            <h2>
+                                @if (count($parents) > 999)
+                                    1000+
+                                @else
+                                    {{count($parents)}}
+                                @endif
+                            </h2>
                         </div>
                         <canvas id="seolinechart1" height="50"></canvas>
                     </div>
@@ -58,7 +76,13 @@
                     <div class="seo-fact sbg2">
                         <div class="p-4 d-flex justify-content-between align-items-center">
                             <div class="seofct-icon"><i class="ti-book"></i> Courses (s)</div>
-                            <h2>{{count($subjects)}}</h2>
+                            <h2>
+                                @if (count($subjects) > 99)
+                                    100+
+                                @else
+                                    {{count($subjects)}}
+                                @endif
+                            </h2>
                         </div>
                         <canvas id="seolinechart2" height="50"></canvas>
                     </div>
@@ -69,7 +93,13 @@
                     <div class="seo-fact sbg1">
                         <div class="p-4 d-flex justify-content-between align-items-center">
                             <div class="seofct-icon"><i class="ti-blackboard"></i> Classes/Faculty (s)</div>
-                            <h2>{{count($classes)}}</h2>
+                            <h2>
+                                @if (count($classes) > 49)
+                                    50+
+                                @else
+                                    {{count($classes)}}
+                                @endif
+                            </h2>
                         </div>
                         <canvas id="seolinechart2" height="50"></canvas>
                     </div>

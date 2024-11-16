@@ -187,7 +187,7 @@ class SchoolsController extends Controller
             $image->move($imagePath, $imageFile);
 
             // Set the image file name on the student record
-            $school->logo = $imageFile;
+            $schools->logo = $imageFile;
         }
         $schools->save();
         Alert::success('Success!', 'School information updated successfully');

@@ -25,7 +25,7 @@ class DefaultUserSeeder extends Seeder
             'usertype' => 1,
             'status' => 1,
             'school_id' => null,
-            'password' => Hash::make('shule123'),
+            'password' => Hash::make('shule@2024'),
             'image' => null,
         ]);
 

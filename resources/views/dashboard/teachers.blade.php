@@ -10,7 +10,13 @@
                         <div class="seo-fact sbg1">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="fas fa-user-tie"></i> Teachers</div>
-                                <h2>{{count($teachers)}}</h2>
+                                <h2>
+                                    @if (count($teachers) > 29)
+                                        30+
+                                    @else
+                                        {{count($teachers)}}
+                                    @endif
+                                </h2>
                             </div>
                             <canvas id="" height="50"></canvas>
                         </div>
@@ -21,7 +27,13 @@
                         <div class="seo-fact sbg2">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="fas fa-user-shield"></i> Parents</div>
-                                <h2>{{count($parents)}}</h2>
+                                <h2>
+                                    @if (count($parents) > 999)
+                                        1000+
+                                    @else
+                                        {{count($parents)}}
+                                    @endif
+                                </h2>
                             </div>
                             <canvas id="" height="50"></canvas>
                         </div>
@@ -32,10 +44,28 @@
                         <div class="seo-fact sbg3">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Students</div>
-                                <h2>{{count($students)}}</h2>
+                                <h2>
+                                    @if (count($students) > 999)
+                                        1000+
+                                    @else
+                                        {{count($students)}}
+                                    @endif
+                                </h2>
                                 <ul>
-                                    <li><span class="text-white">M: <strong>{{$totalMaleStudents}}</strong></span></li>
-                                    <li><span class="text-white">F: <strong>{{$totalFemaleStudents}}</strong></span></li>
+                                    <li><span class="text-white">M: <strong>
+                                        @if ($totalMaleStudents > 99)
+                                            100+
+                                        @else
+                                            {{$totalMaleStudents}}
+                                        @endif
+                                    </strong></span></li>
+                                    <li><span class="text-white">F: <strong>
+                                        @if ($totalFemaleStudents > 99)
+                                            100+
+                                        @else
+                                            {{$totalFemaleStudents}}
+                                        @endif
+                                    </strong></span></li>
                                 </ul>
                             </div>
                             <canvas id="" height="50"></canvas>
@@ -51,7 +81,13 @@
                         <div class="seo-fact sbg2">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="ti-book"></i> Open Courses</div>
-                                <h2>{{count($subjects)}}</h2>
+                                <h2>
+                                    @if (count($subjects) > 19)
+                                        20+
+                                    @else
+                                        {{count($subjects)}}
+                                    @endif
+                                </h2>
                             </div>
                             <canvas id="" height="50"></canvas>
                         </div>
@@ -62,7 +98,13 @@
                         <div class="seo-fact sbg1">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="ti-blackboard"></i> Classes</div>
-                                <h2>{{count($classes)}}</h2>
+                                <h2>
+                                    @if (count($classes) > 9)
+                                        10+
+                                    @else
+                                        {{count($classes)}}
+                                    @endif
+                                </h2>
                             </div>
                             <canvas id="" height="50"></canvas>
                         </div>
@@ -73,7 +115,13 @@
                         <div class="seo-fact sbg4">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="fas fa-bus"></i> School Buses</div>
-                                <h2>{{count($buses)}}</h2>
+                                <h2>
+                                    @if (count($buses) > 19)
+                                        20+
+                                    @else
+                                        {{count($buses)}}
+                                    @endif
+                                </h2>
                             </div>
                             <canvas id="" height="50"></canvas>
                         </div>
@@ -92,7 +140,13 @@
                         <div class="seo-fact sbg1">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="fas fa-user-tie"></i> Teachers</div>
-                                <h2>{{count($teachers)}}</h2>
+                                <h2>
+                                    @if (count($teachers) > 29)
+                                        30+
+                                    @else
+                                        {{count($teachers)}}
+                                    @endif
+                                </h2>
                             </div>
                             <canvas id="" height="50"></canvas>
                         </div>
@@ -103,10 +157,28 @@
                         <div class="seo-fact sbg3">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Students</div>
-                                <h2>{{count($students)}}</h2>
+                                <h2>
+                                    @if count($students) > 999)
+                                        1000+
+                                    @else
+                                        {{count($students)}}
+                                    @endif
+                                </h2>
                                 <ul>
-                                    <li><span class="text-white">M: <strong>{{$totalMaleStudents}}</strong></span></li>
-                                    <li><span class="text-white">F: <strong>{{$totalFemaleStudents}}</strong></span></li>
+                                    <li><span class="text-white">M: <strong>
+                                        @if ($totalMaleStudents > 99)
+                                            100+
+                                        @else
+                                            {{$totalMaleStudents}}
+                                        @endif
+                                    </strong></span></li>
+                                    <li><span class="text-white">F: <strong>
+                                        @if ($totalFemaleStudents > 99)
+                                            100+
+                                        @else
+                                            {{$totalFemaleStudents}}
+                                        @endif
+                                    </strong></span></li>
                                 </ul>
                             </div>
                             <canvas id="" height="50"></canvas>
@@ -118,7 +190,13 @@
                         <div class="seo-fact sbg2">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="ti-book"></i> Open Courses</div>
-                                <h2>{{count($subjects)}}</h2>
+                                <h2>
+                                    @if (count($subjects) > 19)
+                                        20+
+                                    @else
+                                        {{count($subjects)}}
+                                    @endif
+                                </h2>
                             </div>
                             <canvas id="" height="50"></canvas>
                         </div>
@@ -133,7 +211,13 @@
                         <div class="seo-fact sbg1">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="ti-blackboard"></i> Classes</div>
-                                <h2>{{count($classes)}}</h2>
+                                <h2>
+                                    @if (count($classes) > 9)
+                                        10+
+                                    @else
+                                        {{count($classes)}}
+                                    @endif
+                                </h2>
                             </div>
                             <canvas id="" height="50"></canvas>
                         </div>
@@ -144,7 +228,13 @@
                         <div class="">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="ti-book"></i> My Course</div>
-                                <h2 class="text-white">{{ count($courses) }}</h2>
+                                <h2 class="text-white">
+                                    @if ( count($courses) > 2)
+                                        3+
+                                    @else
+                                        {{ count($courses) }}
+                                    @endif
+                                </h2>
                             </div>
                             <canvas id="" height="50"></canvas>
                         </div>
