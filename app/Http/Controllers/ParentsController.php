@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Parents;
+use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -10,11 +11,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class ParentsController extends Controller
 {
 
-    public function index() {
+    public function showAllParents() {
         $user = Auth::user();
         $parents = Parents::query()
                             ->join('users', 'users.id', '=', 'parents.user_id')
@@ -27,7 +30,7 @@ class ParentsController extends Controller
                             })
                             ->orderBy('users.first_name', 'ASC')
                             ->get();
-        return view('Parents.index', ['parents' => $parents]);
+        return view('Parents.index', compact('parents'));
     }
     /**
      * Show the form for creating the resource.
@@ -41,38 +44,50 @@ class ParentsController extends Controller
     /**
      * Store the newly created resource in storage.
      */
-    public function store(Request $request)
+    public function registerParents(Request $request)
     {
-        // abort(404);
-        $request->validate([
-            'fname' => 'required|string|max:25',
-            'lname' => 'required|string|max:25',
-            'email' => 'required|string|unique:users,email',
-            'gender' => 'required|string|max:255',
-            'phone' => 'required|string|max:10|min:255',
-            'street' => 'required|string|max:255',
-        ]);
+        $user = Auth::user();
 
-        $users = new User();
-        $users->first_name = $request->fname;
-        $users->last_name = $request->lname;
-        $users->email = $request->email;
-        $users->phone = $request->phone;
-        $users->gender = $request->gender;
-        $users->usertype = $request->usertype;
-        $users->password = Hash::make($request->password);
-        $users->school_id = $request->school_id;
-        $users->save();
+        try {
+            $dataValidation = $request->validate([
+                'fname' => 'required|string|max:255',
+                'lname' => 'required|string|max:255',
+                'email' => 'required|string|unique:users,email',
+                'gender' => 'required|string|max:255',
+                'phone' => 'required|string|min:10|max:15',
+                'street' => 'required|string|max:255',
+            ]);
 
-        $parents = new Parents();
-        $parents->user_id = $users->id;
-        $parents->school_id = $users->school_id;
-        $parents->address = $request->street;
-        $new_parent = $parents->save();
+            $userExists = User::where('phone', $request->phone)
+                                ->where('school_id', $user->school_id)
+                                ->exists();
+            if($userExists) {
+                Alert::info('Info', 'Parents information already exists in our records');
+                return back();
+            }
 
-        // return back()->with('success', 'Parent records saved successfully');
-        if($new_parent) {
-            Alert::success('Success', 'Parent records saved successfully');
+            $users = User::create([
+                'first_name' => $request->fname,
+                'last_name' => $request->lname,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'gender' => $request->gender,
+                'usertype' => $request->usertype,
+                'password' => Hash::make($request->password),
+                'school_id' => $user->school_id
+            ]);
+
+            $parents = Parents::create([
+                'user_id' => $users->id,
+                'school_id' => $user->school_id,
+                'address' => $request->street,
+            ]);
+
+            Alert::success('Success', 'Parent has registered successfully');
+            return redirect()->route('Parents.index');
+
+        } catch (\Exception $e) {
+            Alert::error('Error', $e->getMessage());
             return back();
         }
     }
@@ -88,7 +103,7 @@ class ParentsController extends Controller
     /**
      * Show the form for editing the resource.
      */
-    public function edit($parent)
+    public function editParent($parent)
     {
         //
         $parents = Parents::query()->join('users', 'users.id', '=', 'parents.user_id')
@@ -134,46 +149,57 @@ class ParentsController extends Controller
     /**
      * Remove the resource from storage.
      */
-    public function destroy($parent)
+    public function deleteParent($parentId)
     {
-        // Find the teacher record or fail
-        $parents = Parents::findOrFail($parent);
-
-        // Find the associated user or fail
-        $user = User::findOrFail($parents->user_id);
-
-        // Check the image path
-        $userImgPath = public_path('assets/img/profile/' . $user->image);
-
-        // Begin a database transaction
-        DB::beginTransaction();
-
         try {
+            // Find the parent record
+            $parent = Parents::find($parentId);
 
-            //update parents status ------------
-            $parents->status = 2;
-            $parents->save();
+            if (!$parent) {
+                Alert::error('Error', 'No such parent was found');
+                return back();
+            }
 
-            //update users status references to parents
-            $user->status = 2;
-            $user->save();
+            // Find the associated user
+            $user = User::find($parent->user_id);
+            if (!$user) {
+                Alert::error('Error', 'No associated user was found');
+                return back();
+            }
 
-            // Commit the transaction
-            DB::commit();
+            // Check if the parent has active students
+            $activeStudents = Student::where('parent_id', $parent->id)->where('status', 1)->count();
 
-            Alert::success('Success', 'Parent records deleted successfully');
+            if ($activeStudents > 0) {
+                Alert::info('Info', 'Cannot delete this parent because they have active children.');
+                return back();
+            }
+
+            // Delete any related inactive students (if needed)
+            Student::where('parent_id', $parent->id)->where('status', '!=', 1)->delete();
+
+            // Check and delete the user's profile image if it exists
+            if (!empty($user->image)) {
+                $userImagePath = public_path('assets/img/profile/' . $user->image);
+                if (file_exists($userImagePath)) {
+                    unlink($userImagePath);
+                }
+            }
+
+            // Delete the user and parent records
+            $user->delete();
+            $parent->delete();
+
+            Alert::success('Success', 'Parent data has been deleted successfully');
+            return back();
         } catch (\Exception $e) {
-            // Rollback the transaction if there's an error
-            DB::rollBack();
-
-            Alert::error('Error', 'Failed to delete parent records');
+            Alert::error('Error', 'An error occurred: ' . $e->getMessage());
+            return back();
         }
-
-        return back();
     }
 
 
-    public function update (Request $request, $parents)
+    public function updateParent (Request $request, $parents)
     {
         $request->validate([
             'fname' => 'required|max:25|string',

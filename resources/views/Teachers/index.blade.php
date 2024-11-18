@@ -21,7 +21,8 @@
                         </div>
                     </div>
                     <div class="col-2">
-                        <button type="button" class="btn btn-link float-right" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-circle-plus text-secondary" style="font-size: 2rem;"></i>
+                        <button type="button" class="btn btn-xs btn-info float-right" data-toggle="modal" data-target=".bd-example-modal-lg">
+                            <i class="fas fa-user-plus"></i> New Teacher
                         </button>
                         <div class="modal fade bd-example-modal-lg">
                             <div class="modal-dialog modal-lg">
@@ -197,7 +198,7 @@
                                                     <form action="{{route('update.teacher.status', $teacher->id)}}" method="POST">
                                                         @csrf
                                                         @method('PUT')
-                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Block {{strtoupper($teacher->first_name)}} {{strtoupper($teacher->last_name)}}?')"><i class="fas fa-ban text-danger"></i></button>
+                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Block {{strtoupper($teacher->first_name)}} {{strtoupper($teacher->last_name)}}?')"><i class="fas fa-ban text-info"></i></button>
                                                     </form>
                                                 </li>
                                                 <li>

@@ -7,11 +7,12 @@ use App\Models\Transport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
+use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
 
 class TransportController extends Controller
 {
 
-    public function index() {
+    public function getSchoolBuses() {
         $transport = Transport::get();
         return view('Transport.index', ['transport' => $transport]);
     }
@@ -29,24 +30,24 @@ class TransportController extends Controller
     /**
      * Store the newly created resource in storage.
      */
-    public function store(Request $request)
+    public function registerDrivers(Request $request)
     {
         // abort(404);
-        $request->validate([
-            'fullname' => 'required|string|max:255',
-            'gender' => 'string|required|max:255',
-            'phone' => 'required|string|max:10|min:255',
-            'bus' => 'required|string|max:255',
-            'routine' => 'required|string|max:255',
-        ]);
+        $user = Auth::user();
 
-        $existingRecord = Transport::where('driver_name', $request->fullname)
-                            ->where('gender', $request->gender)
-                            ->where('phone', $request->phone)
-                            ->where('bus_no', $request->bus)
-                            ->where('routine', $request->routine)
-                            ->where('school_id', Auth::user()->school_id)
-                            ->exists();
+        try {
+
+            $request->validate([
+                'fullname' => 'required|string|max:255',
+                'gender' => 'string|required|max:255',
+                'phone' => 'required|string|min:10|max:15',
+                'bus' => 'required|string|max:255',
+                'routine' => 'required|string|max:255',
+            ]);
+
+            $existingRecord = Transport::where('bus_no', $request->bus)
+                                        ->where('school_id', Auth::user()->school_id)
+                                        ->exists();
 
             // If a record with the same combination exists, return validation error
             if ($existingRecord) {
@@ -55,17 +56,22 @@ class TransportController extends Controller
 
             }
 
-        $new_routine = new Transport();
-        $new_routine->driver_name = $request->fullname;
-        $new_routine->gender = $request->gender;
-        $new_routine->phone = $request->phone;
-        $new_routine->bus_no = $request->bus;
-        $new_routine->routine = $request->routine;
-        $new_routine->school_id = Auth::user()->school_id;
-        $new_routine->save();
+            $schoolBus = Transport::create([
+                'driver_name' => $request->fullname,
+                'gender' => $request->gender,
+                'phone' => $request->phone,
+                'bus_no' => $request->bus,
+                'routine' => $request->routine,
+                'school_id' => $user->school_id
+            ]);
 
-        Alert::success('Success', 'School bus routine saved successfully');
-        return back();
+            Alert::success('Success', 'School bus routine saved successfully');
+            return back();
+
+        } catch (\Exception $e) {
+            Alert::error('Error', $e->getMessage());
+            return back();
+        }
     }
 
     /**
@@ -107,6 +113,14 @@ class TransportController extends Controller
     {
         // abort(404);
         $transport = Transport::findOrFail($trans);
+
+        $hasStudentTake = Student::where('transport_id', $transport->id)->where('status', 1)->count();
+
+        if($hasStudentTake > 0) {
+            Alert::info('Info', 'Cannot delete this route because they have active students');
+            return back();
+        }
+
         $transport->delete();
        if($transport) {
             Alert::success('Success', 'School bus routine deleted successfully');
@@ -122,22 +136,27 @@ class TransportController extends Controller
 
     public function UpdateRecords(Request $request, $transport)
     {
-        $request->validate([
-            'fullname' => 'required|string|max:255',
-            'gender' => 'required|string|max:255',
-            'phone' => 'required|string|min:0|max:255',
-            'bus_no' => 'required|string|max|255',
-            'routine' => 'required|string|max:255'
-        ]);
-        $trans = Transport::findOrFail($transport);
-        $trans->driver_name = $request->fullname;
-        $trans->gender = $request->gender;
-        $trans->phone = $request->phone;
-        $trans->bus_no = $request->bus_no;
-        $trans->routine = $request->routine;
-        $trans->save();
-        Alert::success('Success!', 'School bus information updated successfully');
-        return redirect()->route('Transportation.index');
+        try {
+            $request->validate([
+                'fullname' => 'required|string|max:255',
+                'gender' => 'required|string|max:255',
+                'phone' => 'required|string|min:10|max:15',
+                'bus_no' => 'required|string|max|255',
+                'routine' => 'required|string|max:255'
+            ]);
+            $trans = Transport::findOrFail($transport);
+            $trans->driver_name = $request->fullname;
+            $trans->gender = $request->gender;
+            $trans->phone = $request->phone;
+            $trans->bus_no = $request->bus_no;
+            $trans->routine = $request->routine;
+            $trans->save();
+            Alert::success('Success!', 'School bus information updated successfully');
+            return redirect()->route('Transportation.index');
+        } catch (\Exception $e) {
+            Alert::error('Errors', $e->getMessage());
+            return back();
+        }
     }
 
     public function showStudents(Transport $trans)

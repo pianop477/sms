@@ -18,7 +18,7 @@ use Barryvdh\DomPDF\PDF as PDF;
 class TeachersController extends Controller
 {
 
-    public function index() {
+    public function showTeachersList() {
         $userLogged = Auth::user();
         $teachers = Teacher::query()
                             ->join('users', 'users.id', '=', 'teachers.user_id')
@@ -65,56 +65,77 @@ class TeachersController extends Controller
     /**
      * Store the newly created resource in storage.
      */
-    public function store(Request $request)
+    public function registerTeachers(Request $request)
     {
-        // abort(404);
-        $request->validate([
+        $validatedData = $request->validate([
             'fname' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
-            'email' => 'required|string|unique:users,email',
+            'email' => 'required|string|email|unique:users,email',
             'gender' => 'required|string|max:255',
             'dob' => 'required|date|date_format:Y-m-d',
-            'phone' => 'required|string|max:10|min:255',
-            'qualification' => 'required|integer|max:255',
+            'phone' => 'required|string|max:15|min:10',
+            'qualification' => 'required|integer|min:1|max:20',
             'street' => 'required|string|max:255',
             'joined' => 'required|date_format:Y'
         ]);
 
-        $existingRecords = Teacher::where('dob', '=', $request->dob)
-                                    ->where('qualification', '=', $request->qualification)
-                                    ->where('address', '=', $request->street)
-                                    ->where('school_id', '=', Auth::user()->school_id)
-                                    ->exists();
-                if($existingRecords){
-                    // return back()->with('error', 'Teacher with the same records already exist in our records');
-                    Alert::error('Error', 'Teacher with the same records already exist in our records');
-                    return back();
-                }
+        Log::info('Validation passed', $validatedData);
 
-        $users = new User();
-        $users->first_name = $request->fname;
-        $users->last_name = $request->lname;
-        $users->email = $request->email;
-        $users->phone = $request->phone;
-        $users->gender = $request->gender;
-        $users->usertype = $request->usertype;
-        $users->password = Hash::make($request->password);
-        $users->school_id = $request->school_id;
-        $users->save();
+        $existingRecords = Teacher::where('dob', $request->dob)
+            ->where('qualification', $request->qualification)
+            ->where('address', $request->street)
+            ->where('school_id', Auth::user()->school_id)
+            ->exists();
 
-        $teachers = new Teacher();
-        $teachers->user_id = $users->id;
-        $teachers->school_id = $users->school_id;
-        $teachers->dob = $request->dob;
-        $teachers->qualification = $request->qualification;
-        $teachers->address = $request->street;
-        $teachers->joined = $request->joined;
-        $teachers->member_id = $this->getMemberId();
-        $teachers->save();
-        Alert::success('Success', 'Teacher records saved successfully');
-        return back();
+        if ($existingRecords) {
+            Log::info('Duplicate record detected for DOB: ' . $request->dob);
 
+            Alert::error('Error', 'Teacher with the same records already exists in our records');
+            return back();
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Create User
+            $users = new User();
+            $users->first_name = $request->fname;
+            $users->last_name = $request->lname;
+            $users->email = $request->email;
+            $users->phone = $request->phone;
+            $users->gender = $request->gender;
+            $users->usertype = $request->usertype;
+            $users->password = Hash::make($request->password);
+            $users->school_id = $request->school_id;
+            $users->save();
+
+            Log::info('User created successfully', ['user_id' => $users->id]);
+
+            // Create Teacher
+            $teachers = new Teacher();
+            $teachers->user_id = $users->id;
+            $teachers->school_id = $users->school_id;
+            $teachers->dob = $request->dob;
+            $teachers->qualification = $request->qualification;
+            $teachers->address = $request->street;
+            $teachers->joined = $request->joined;
+            $teachers->member_id = $this->getMemberId();
+            $teachers->save();
+
+            Log::info('Teacher record saved successfully', ['teacher_id' => $teachers->id]);
+
+            DB::commit();
+            Alert::success('Success', 'Teacher records saved successfully');
+            return back();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error saving teacher records: ' . $e->getMessage());
+
+            Alert::error('Error', 'Something went wrong. Please try again.');
+            return back();
+        }
     }
+
     protected function getMemberId ()
     {
         do {
@@ -164,71 +185,79 @@ class TeachersController extends Controller
      * Update the resource in storage.
      */
 
-    public function updateTeachers(Request $request, $teachers)
-    {
+     public function updateTeachers(Request $request, $teachers)
+     {
+        try {
+            // Log the start of the method
+            Log::info('Update Teachers method started', ['teacher_id' => $teachers]);
 
+            // Validation
             $validated = $request->validate([
                 'fname' => 'required|string|max:255',
                 'lname' => 'required|string|max:255',
                 'dob' => 'required|date|date_format:Y-m-d',
-                'phone' => 'required|string|max:10|min:255',
-                'qualification' => 'required|integer|max:255',
+                'phone' => 'required|string|min:10|max:15',
+                'qualification' => 'required|integer|max:20',
                 'street' => 'required|string|max:255',
-                'gender' => 'required|max:255',
+                'gender' => 'required|max:20',
                 'joined_at' => 'required|date_format:Y',
                 'image' => 'nullable|image|max:2048',
             ]);
 
-            try {
-                $teacher = Teacher::findOrFail($teachers);
+            Log::info('Validation passed', $validated);
 
-                $user = User::findOrFail($teacher->user_id);
+            // Find teacher and user
+            $teacher = Teacher::findOrFail($teachers);
+            $user = User::findOrFail($teacher->user_id);
 
-                $user->first_name = $request->fname;
-                $user->last_name = $request->lname;
-                $user->phone = $request->phone;
-                $user->gender = $request->gender;
+            Log::info('Teacher and user found', ['teacher' => $teacher, 'user' => $user]);
 
-                if($request->hasFile('image')) {
-                    // Log::info('Image upload detected');
-                    $image = $request->file('image');
-                    $imageName = time() . '.' . $image->getClientOriginalExtension();
-                    $imageDestinationPath = public_path('assets/img/profile');
+            // Update user
+            $user->first_name = $request->fname;
+            $user->last_name = $request->lname;
+            $user->phone = $request->phone;
+            $user->gender = $request->gender;
 
-                    // Ensure the directory exists
-                    if (!file_exists($imageDestinationPath)) {
-                        mkdir($imageDestinationPath, 0775, true);
-                    }
+            // Handle image upload
+            if ($request->hasFile('image')) {
+                Log::info('Image upload detected');
+                $image = $request->file('image');
+                $imageName = time() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('assets/img/profile'), $imageName);
+                $user->image = $imageName;
+            }
 
-                    // Move the file
-                    $image->move($imageDestinationPath, $imageName);
+            // Save user
+            if ($user->save()) {
+                Log::info('User updated successfully');
 
-                    // Save the file name to the database
-                    $user->image = $imageName;
-                }
+                // Update teacher
+                $teacher->dob = $request->dob;
+                $teacher->address = $request->street;
+                $teacher->joined = $request->joined_at;
+                $teacher->qualification = $request->qualification;
 
-                if ($user->save()) {
-                    $teacher->dob = $request->dob;
-                    $teacher->address = $request->street;
-                    $teacher->joined = $request->joined_at;
-                    $teacher->qualification = $request->qualification;
-
-                    if ($teacher->save()) {
-                        Alert::success('Success', 'Teacher records updated successfully');
-                        return back();
-                    } else {
-                        Alert::error('Error', 'Failed to updated teacher records');
-                        return back();
-                    }
+                if ($teacher->save()) {
+                    Log::info('Teacher updated successfully');
+                    Alert::success('Success', 'Teacher records updated successfully');
+                    return back();
                 } else {
-                    Alert::error('Error', 'Failed to update teachers records');
+                    Log::error('Failed to update teacher');
+                    Alert::error('Error', 'Failed to update teacher records');
                     return back();
                 }
-            } catch (\Exception $e) {
-                Alert::error('Error', 'An error occured: ' . $e->getMessage());
+            } else {
+                Log::error('Failed to update user');
+                Alert::error('Error', 'Failed to update user records');
                 return back();
             }
+        } catch (\Exception $e) {
+            Log::error('An error occurred', ['message' => $e->getMessage()]);
+            Alert::error('Error', 'An error occurred: ' . $e->getMessage());
+            return back();
         }
+     }
+
 
     public function updateStatus(Request $request, $teacher)
     {
@@ -253,24 +282,38 @@ class TeachersController extends Controller
         });
 
         // Show success message
-        Alert::success('Success', 'Teacher status updated successfully');
+        Alert::success('Success', 'Teacher has been blocked successfully');
 
         // Redirect back
         return back();
     }
 
     public function restoreStatus(Request $request, $teacher) {
-        $teachers = Teacher::findOrFail($teacher);
-        $user = User::findOrFail($teachers->user_id);
-        $user->status = $request->input('status', 1);
-        if($user->save()) {
-            $teachers->status = $request->input('status', 1);
+        // Find the teacher record
+        $teacher = Teacher::findOrFail($teacher);
 
-            if($teachers->save()) {
-                Alert::success('Success', 'Teacher unblocked successfully');
-                return back();
-            }
-        }
+        // Find the associated user record
+        $user = User::findOrFail($teacher->user_id);
+
+        // Retrieve the status from the request, default to 0 if not provided
+        $status = $request->input('status', 1);
+
+        // Wrap the updates in a transaction
+        DB::transaction(function () use ($user, $teacher, $status) {
+            // Update the user status
+            $user->status = $status;
+            $user->save();
+
+            // Update the teacher status
+            $teacher->status = $status;
+            $teacher->save();
+        });
+
+        // Show success message
+        Alert::success('Success', 'Teacher has been unblocked successfully');
+
+        // Redirect back
+        return back();
     }
 
     public function deleteTeacher($teacher)
@@ -320,12 +363,12 @@ class TeachersController extends Controller
             // Commit the transaction
             DB::commit();
 
-            Alert::success('Success', 'Teacher status deleted successfully');
+            Alert::success('Success', 'Teacher deleted successfully');
         } catch (\Exception $e) {
             // Rollback the transaction if there's an error
             DB::rollBack();
 
-            Alert::error('Error', 'Failed to delete teacher status');
+            Alert::error('Error', 'Failed to delete teacher');
         }
 
         return back();

@@ -147,7 +147,7 @@
                                                     <form action="{{route('transport.restore', $trans->id)}}" method="POST">
                                                         @csrf
                                                         @method('PUT')
-                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Unblock this Bus Routine?')"><i class="ti-share-alt text-success"></i></button>
+                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Unblock this Bus Routine?')"><i class="ti-reload text-success"></i></button>
                                                     </form>
                                                 </li>
                                                 <li><a href="{{route('transport.remove', $trans->id)}}" onclick="return confirm('Are you sure you want to delete this Bus Routine Permanently?')" class="text-danger"><i class="ti-trash"></i></a></li>
