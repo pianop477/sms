@@ -154,6 +154,7 @@ class RolesController extends Controller
     $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
                                 ->select('teachers.*', 'users.first_name', 'users.last_name')
                                 ->where('teachers.status', '=', 1)
+                                ->whereNotIn('teachers.role_id', [2, 3])
                                 ->where('teachers.school_id', '=', Auth::user()->school_id)->get();
         // return $classTeacher;
         return view('Roles.edit', ['classTeacher' => $classTeacher, 'teachers' => $teachers]);

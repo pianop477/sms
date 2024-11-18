@@ -158,7 +158,7 @@
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Students</div>
                                 <h2>
-                                    @if count($students) > 999)
+                                    @if(count($students) > 999)
                                         1000+
                                     @else
                                         {{count($students)}}

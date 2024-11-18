@@ -82,7 +82,20 @@
                                     </td>
                                     <td class="text-uppercase">{{$class->class_code}}</td>
                                     <td>
-                                        <a href="{{route('Classes.edit', $class->id)}}"><i class="ti-pencil"></i></a>
+                                        <ul class="d-flex justify-content-center">
+                                            <li class="mr-3">
+                                                <a href="{{route('Classes.edit', $class->id)}}"><i class="ti-pencil text-secondary"></i></a>
+                                            </li>
+                                            <li>
+                                                <form action="{{route('Classes.destroy', $class->id)}}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button class="btn btn-link p-0" onclick="return confirm('Are you sure you want to delete this class Permanently?')">
+                                                        <i class="ti-trash text-danger"></i>
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
                                     </td>
                                 </tr>
                             @endforeach

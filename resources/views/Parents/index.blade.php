@@ -10,7 +10,8 @@
                         <h4 class="header-title text-uppercase text-center">Parents list</h4>
                     </div>
                     <div class="col-2">
-                        <button type="button" class="btn btn-link btn-sm" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus-circle text-secondary" style="font-size: 2rem;"></i>
+                        <button type="button" class="btn btn-xs btn-info" data-toggle="modal" data-target=".bd-example-modal-lg">
+                            <i class="fas fa-user-plus"></i> New Parent
                         </button>
                         <div class="modal fade bd-example-modal-lg">
                             <div class="modal-dialog modal-lg">

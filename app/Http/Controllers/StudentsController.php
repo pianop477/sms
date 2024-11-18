@@ -280,6 +280,8 @@ class StudentsController extends Controller
 
     public function registerStudent (Request $request)
     {
+        $user = Auth::user();
+        $parent = Parents::where('user_id', $user->id)->first();
         $request->validate([
             'fname' => 'required|string|max:255',
             'middle' => 'required|string|max:255',
@@ -316,7 +318,7 @@ class StudentsController extends Controller
         $students->transport_id = $request->driver;
         $parents = Parents::where('user_id', '=', Auth::user()->id)->first();
         $students->parent_id = $parents->id;
-        $students->school_id = Auth::user()->school_id;
+        $students->school_id = $parent->school_id;
 
         // Handle file upload if present
         if ($request->hasFile('image')) {
