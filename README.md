@@ -35,12 +35,9 @@ this is the welcome page where the program starts.
 
 ## USER CONTROL MANAGEMENT
 
-Since the program is designed using Php - Laravel framework, during installation it allow you to make database migration. use this code to make migration as php artisan migrate --seed, this command migrate all tables and seed the default records which will be used by the super user admin account with the following credentials
-<<<<<<< HEAD
+Since the program is designed using Php - Laravel framework during installation it allow user to make database migration. use this command to make migration as php artisan migrate --seed, this command migrate all tables and seed the default records which will be used by the super user admin account with the following credentials
+
 email: <pianop477@gmail.com>
-=======
-email: pianop477@gmail.com
->>>>>>> d977b076efde862c6dcddcbb060d523665b7e155
 password: shule@2024
 
 ## ROLES AND PERMISSION
@@ -126,7 +123,7 @@ This account handle the following request/roles;
 - change password
 - upload profile picture
 
-## DEFAULT PASSWORD 
+## DEFAULT PASSWORD
 
 - At the level where user password account has been forgoten, password can be resetted to the previous version as "shule@2024" >> this is our default password once account password reset or your account has been registered by either manager or head teacher.
 - the above password is used as a default account to all account types from admin, manager, teacher even parents. and once the user password has reset the default password will be used.
@@ -156,10 +153,9 @@ For any suggestion you can contact me through the following alternatives;
 
 The program designed and developed by Piano.
 <<<<<<< HEAD
-Thank you.
+Thank you
 =======
-### Thank you.
 
-
+### Thank you
 
 >>>>>>> d977b076efde862c6dcddcbb060d523665b7e155
