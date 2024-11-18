@@ -36,7 +36,11 @@ this is the welcome page where the program starts.
 ## USER CONTROL MANAGEMENT
 
 Since the program is designed using Php - Laravel framework, during installation it allow you to make database migration. use this code to make migration as php artisan migrate --seed, this command migrate all tables and seed the default records which will be used by the super user admin account with the following credentials
+<<<<<<< HEAD
 email: <pianop477@gmail.com>
+=======
+email: pianop477@gmail.com
+>>>>>>> d977b076efde862c6dcddcbb060d523665b7e155
 password: shule@2024
 
 ## ROLES AND PERMISSION
@@ -151,4 +155,11 @@ For any suggestion you can contact me through the following alternatives;
 2. Email: <pianop477@gmail.com>
 
 The program designed and developed by Piano.
+<<<<<<< HEAD
 Thank you.
+=======
+### Thank you.
+
+
+
+>>>>>>> d977b076efde862c6dcddcbb060d523665b7e155
