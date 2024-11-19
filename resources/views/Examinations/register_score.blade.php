@@ -91,14 +91,14 @@
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td class="text-center">
-                                                    {{ str_pad($student->id, 4, '0', STR_PAD_LEFT) }}
+                                                    {{ $student->admission_number }}
                                                     <input type="hidden" name="students[{{ $loop->index }}][student_id]" value="{{ $student->id }}">
                                                 </td>
                                                 <td class="text-capitalize">
                                                     {{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}
                                                 </td>
                                                 <td>
-                                                    <input type="number" class="form-control score-input" name="students[{{ $loop->index }}][score]" placeholder="Score", value="{{old('score')}}">
+                                                    <input type="number" required class="form-control score-input" name="students[{{ $loop->index }}][score]" placeholder="Score", value="{{old('score')}}">
                                                 </td>
                                                 <td>
                                                     <input type="text" disabled name="students[{{ $loop->index }}][grade]" class="form-control grade-input">

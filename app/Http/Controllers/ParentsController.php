@@ -56,6 +56,7 @@ class ParentsController extends Controller
                 'gender' => 'required|string|max:255',
                 'phone' => 'required|string|min:10|max:15',
                 'street' => 'required|string|max:255',
+                'school_id' => 'required|exists:schools,id'
             ]);
 
             $userExists = User::where('phone', $request->phone)
@@ -74,7 +75,7 @@ class ParentsController extends Controller
                 'gender' => $request->gender,
                 'usertype' => $request->usertype,
                 'password' => Hash::make($request->password),
-                'school_id' => $user->school_id
+                'school_id' => $request->school_id
             ]);
 
             $parents = Parents::create([
@@ -171,7 +172,7 @@ class ParentsController extends Controller
             $activeStudents = Student::where('parent_id', $parent->id)->where('status', 1)->count();
 
             if ($activeStudents > 0) {
-                Alert::info('Info', 'Cannot delete this parent because they have active children.');
+                Alert::info('Info', 'Cannot delete this parent because has active children.');
                 return back();
             }
 
@@ -202,10 +203,10 @@ class ParentsController extends Controller
     public function updateParent (Request $request, $parents)
     {
         $request->validate([
-            'fname' => 'required|max:25|string',
-            'lname' => 'required|max:25|string',
+            'fname' => 'required|max:255|string',
+            'lname' => 'required|max:255|string',
             'gender' => 'required|string|max:255',
-            'phone' => 'required|min:10|max:255',
+            'phone' => 'required|min:10|max:15',
             'street' => 'required|string|max:255',
             'image' => 'nullable|image|max:2048',
         ]);

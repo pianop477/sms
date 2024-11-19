@@ -157,7 +157,7 @@
                 </div>
                 <div class="summary-content">
                     <div class="course-details">
-                        <p class="text-center font-weight-bold text-capitalize p-2" style="text-transform: uppercase; border-bottom: 1px solid black;">class details</p>
+                        <p class="text-center font-weight-bold text-capitalize p-2" style="text-transform: uppercase;">class details</p>
                         <p>Attendance Date: <span class="float-right"><strong>{{\Carbon\Carbon::parse($attendanceRecords->first()->attendance_date)->format('d-F-Y')}}</strong></span></p>
                         <p>class teacher name: <span class="float-right"><strong>{{ $attendanceRecords->first()->teacher_firstname }} {{ $attendanceRecords->first()->teacher_lastname }}</strong></span></p>
                         <p>Class name: <span class="" style="text-transform: uppercase"><strong>{{ $attendanceRecords->first()->class_name }} ({{ $attendanceRecords->first()->class_code }})</strong></span></p>
@@ -165,7 +165,7 @@
                         <p>Class Stream: <span style="text-transform: capitalize"><strong>{{$attendanceRecords->first()->class_group}}</strong></span> </p>
                     </div>
                     <div class="grade-summary">
-                        <p class="text-center font-weight-bold text-capitalize p-2" style="text-transform: uppercase; border-bottom:1px solid black;">attendance details</p>
+                        <p class="text-center font-weight-bold text-capitalize p-2" style="text-transform: uppercase;">attendance details</p>
                         <table class="table table-hover table-bordered" style="text-align:center">
                             <thead>
                                 <tr>

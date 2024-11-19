@@ -38,7 +38,7 @@ class ManagerController extends Controller
             'fname' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
             'email' => 'required|string|unique:users,email',
-            'phone' => 'required|string|min:10|max:255',
+            'phone' => 'required|string|min:10|max:15',
             'gender' => 'required|string|max:255',
             'usertype' => 'required',
             'school' => 'required|exists:schools,id',

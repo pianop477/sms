@@ -200,7 +200,7 @@ class ExamController extends Controller
     {
         // abort(404);
         $request->validate([
-            'name' => 'required|string|max:25'
+            'name' => 'required|string|max:255'
         ]);
 
         $existingRecords = Examination::where('exam_type', '=', $request->name)->where('school_id', '='. Auth::user()->school_id)->exists();
@@ -244,7 +244,7 @@ class ExamController extends Controller
     public function update(Request $request, $exams)
     {
         $request->validate([
-            'name' => 'required|string|max:25'
+            'name' => 'required|string|max:255'
         ]);
 
         $exam = Examination::findOrFail($exams);
@@ -353,7 +353,7 @@ class ExamController extends Controller
                         ->leftJoin('schools', 'schools.id', '=', 'students.school_id')
                         ->select(
                             'examination_results.*', 'grades.class_name', 'grades.class_code', 'examinations.exam_type',
-                            'students.first_name', 'students.id as studentId', 'students.middle_name', 'students.last_name', 'students.gender', 'students.group', 'students.class_id',
+                            'students.first_name', 'students.id as studentId', 'students.middle_name', 'students.last_name', 'students.gender', 'students.group', 'students.class_id', 'students.admission_number',
                             'subjects.course_name', 'subjects.course_code', 'users.first_name as teacher_firstname',
                             'users.last_name as teacher_lastname', 'users.gender as teacher_gender', 'users.phone as teacher_phone', 'schools.school_reg_no'
                         )

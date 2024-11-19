@@ -66,7 +66,7 @@
                         <select name="marking_style" id="validationCustom02" class="form-control" required>
                             <option value="">-- Select Marking System --</option>
                             <option value="2">Percentage</option>
-                            <option value="1">From 0 to 50</option>
+                            <option value="1" selected>From 0 to 50</option>
                         </select>
                         @error('marking_style')
                         <div class="invalid-feedback">

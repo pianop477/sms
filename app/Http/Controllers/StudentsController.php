@@ -125,7 +125,7 @@ class StudentsController extends Controller
     {
         do {
             // Generate a random 4-digit number between 1000 and 9999
-            $admissionNumber = mt_rand(100000, 999999);
+            $admissionNumber = mt_rand(1000, 9999);
 
             // Check if this admission number already exists
         } while (Student::where('admission_number', $admissionNumber)->exists());

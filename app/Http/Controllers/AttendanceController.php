@@ -124,7 +124,7 @@ class AttendanceController extends Controller
     Attendance::insert($attendanceData);
 
     Alert::success('Success', 'Attendance Submitted and Saved successfully');
-    return back();
+    return redirect()->route('get.student.list');
 }
 
 public function show(Student $student, $year)

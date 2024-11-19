@@ -44,9 +44,8 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
-Route::middleware('throttle:30,1')->group(function () {
-    Auth::routes();
-});
+
+Auth::routes();
 
 // User registration controller redirection ===================================================================
     Route::prefix('Register')->group(function () {
@@ -143,9 +142,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::middleware(['CheckUsertype:4'])->group(function () {
         Route::get('Register-student', [StudentsController::class, 'parentByStudent'])->name('parent.student.registration');
         Route::post('Register-students', [StudentsController::class, 'registerStudent'])->name('register.student');
-        Route::get('{student}/Edit-student', [StudentsController::class, 'modify'])->name('students.modify');
-        Route::put('{students}/Update-student', [StudentsController::class, 'updateRecords'])->name('students.update.records');
     });
+
+    //free role routes for edit students
+    Route::get('{student}/Edit-student', [StudentsController::class, 'modify'])->name('students.modify');
+    Route::put('{students}/Update-student', [StudentsController::class, 'updateRecords'])->name('students.update.records');
 
     //access students information ===========================================================================
     Route::middleware(['CheckUsertype:2,3,4'])->group(function () {

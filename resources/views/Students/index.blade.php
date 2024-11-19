@@ -191,6 +191,9 @@
                                                 <li class="mr-3">
                                                     <a href="{{route('Students.show', $student->id)}}"><i class="ti-eye text-secondary"></i></a>
                                                 </li>
+                                                <li class="mr-3">
+                                                    <a href="{{route('students.modify', $student->id)}}"><i class="ti-pencil text-primary"></i></a>
+                                                </li>
                                                 <li>
                                                     <form action="{{route('Students.destroy', $student->id)}}" method="POST">
                                                         @csrf

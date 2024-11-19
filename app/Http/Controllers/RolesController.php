@@ -61,7 +61,7 @@ class RolesController extends Controller
     {
         $request->validate([
             'teacher' => 'required|exists:teachers,id',
-            'group' => 'required|string|max:1'
+            'group' => 'required|string|max:10'
         ]);
 
         $ifExisting = Class_teacher::where('teacher_id', '=', $request->teacher)

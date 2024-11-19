@@ -5,7 +5,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-10">
-                        <h4 class="header-title text-center text-uppercase">select month</h4>
+                        <h4 class="header-title text-center text-uppercase">chagua mwezi - kupakua matokeo</h4>
                     </div>
                     <div class="col-2">
                         <a href="{{ route('result.byType', ['student' => $student->id, 'year' => $year]) }}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
