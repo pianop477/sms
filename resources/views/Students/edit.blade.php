@@ -4,7 +4,7 @@
     <div class="card-body">
         <div class="row">
             <div class="col-10">
-                <h4 class="header-title">Edit Student Information</h4>
+                <h4 class="header-title">Hariri Taarifa za Mwanafunzi</h4>
             </div>
             <div class="col-2">
                 <a href="{{url()->previous()}}" class=""><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
@@ -26,21 +26,21 @@
             </div>
             <div class="form-row">
                 <div class="col-md-4 mb-3">
-                    <label for="validationCustom01">First Name</label>
+                    <label for="validationCustom01">Jina la Kwanza</label>
                     <input type="text" name="fname" class="form-control text-capitalize" id="validationCustom01" value="{{$students->first_name}}" required>
                     @error('fname')
                         <div class="invalid-feedback">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="validationCustom01">Middle Name</label>
+                    <label for="validationCustom01">Jina la Kati</label>
                     <input type="text" name="middle" class="form-control text-capitalize" id="validationCustom01" value="{{$students->middle_name}}" required>
                     @error('middle')
                         <div class="invalid-feedback">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="validationCustom01">Last Name</label>
+                    <label for="validationCustom01">Jina la Mwisho/Ukoo</label>
                     <input type="text" name="lname" class="form-control text-capitalize" id="validationCustom01" value="{{$students->last_name}}" required>
                     @error('lname')
                         <div class="invalid-feedback">{{$message}}</div>
@@ -49,31 +49,31 @@
             </div>
             <div class="form-row">
                 <div class="col-md-4 mb-3">
-                    <label for="validationCustom01">Gender</label>
+                    <label for="validationCustom01">Jinsia</label>
                     <select name="gender" id="" class='form-control text-capitalize'>
                         <option value="{{$students->gender}}">{{$students->gender}}</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
+                        <option value="male">Mvulana</option>
+                        <option value="female">Msichana</option>
                     </select>
                     @error('gender')
                         <div class="invalid-feedback">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="validationCustom01">Birth Date</label>
+                    <label for="validationCustom01">Tarehe ya Kuzaliwa</label>
                     <input type="date" name="dob" class="form-control" id="validationCustom01" value="{{$students->dob}}" required>
                     @error('dob')
                         <div class="invalid-feedback">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="validationCustom01">Driver Name: <span class="text-danger">Select if Using school bus</span></label>
+                    <label for="validationCustom01">Chagua Ruti za Mabasi: <span class="text-danger">Chagua kama anatumia usafiri/Kubadilisha ruti</span></label>
                     <select name="driver" id="validationCustom01" class="form-control text-uppercase">
-                        <option value="">--Not using School Bus--</option>
+                        <option value="">--Hatumii Usafiri--</option>
                         @if ($students->transport == NULL)
-                            <option value="">-- Select Driver Name --</option>
+                            <option value="">-- Chagua Ruti --</option>
                             @foreach ($buses as $bus )
-                                <option value="{{$bus->id}}">{{$bus->driver_name}}</option>
+                                <option value="{{$bus->id}}">{{$bus->routine}}</option>
                             @endforeach
                             @else
                             <option value="{{$students->transport_id}}" selected>{{$students->driver_name}}</option>
@@ -89,7 +89,7 @@
             </div>
             <div class="form-row">
                 <div class="col-md-4 mb-3">
-                    <label for="validationCustom01">Class</label>
+                    <label for="validationCustom01">Darasa</label>
                     <select name="class" id="validationCustom01" class="form-control text-uppercase" required>
                         <option value="{{$students->class_id}}">{{$students->class_name}}</option>
                         @foreach ($classes as $class)
@@ -103,7 +103,7 @@
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="validationCustom01">Class Group</label>
+                    <label for="validationCustom01">Mkondo</label>
                     <input type="text" name="group" class="form-control text-capitalize" id="validationCustom01" value="{{$students->group}}">
                     @error('group')
                     <div class="invalid-feedback">
@@ -112,7 +112,7 @@
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="validationCustom01">Student Passport Size</label>
+                    <label for="validationCustom01">Picha ya Passport</label>
                     <input type="file" name="image" class="form-control text-capitalize" id="validationCustom01" value="{{old('image')}}">
                     @error('image')
                     <div class="invalid-feedback">
@@ -123,7 +123,7 @@
 
             </div>
             <div class="col-md-4 mb-3">
-                <button class="btn btn-primary" type="submit">Update</button>
+                <button class="btn btn-primary" type="submit">Hifadhi</button>
             </div>
 
 @endsection

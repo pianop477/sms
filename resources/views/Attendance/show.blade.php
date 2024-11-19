@@ -5,7 +5,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-10">
-                    <h4 class="header-title">Attendance For: <span class="text-uppercase text-primary">{{$student->first_name. ' '. $student->middle_name. ' '.$student->last_name}}</span></h4>
+                    <h4 class="header-title">Taarifa ya Mahudhurio ya: <span class="text-uppercase text-primary">{{$student->first_name. ' '. $student->middle_name. ' '.$student->last_name}}</span></h4>
                 </div>
                 <div class="col-2">
                     <a href="{{route('attendance.byYear', $student->id)}}"><i class="fa-solid fa-circle-arrow-left text-secondary" style="font-size: 2rem"></i></a>

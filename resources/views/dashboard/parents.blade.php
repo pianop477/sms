@@ -7,7 +7,7 @@
             <div class="card">
                 <div class="seo-fact sbg2">
                     <div class="p-4 d-flex justify-content-between align-items-center">
-                        <div class="seofct-icon"><i class="fas fa-user-graduate"></i> My Children</div>
+                        <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Watoto Wangu</div>
                         <h2>{{count($students)}}</h2>
                     </div>
                     <canvas id="seolinechart2" height="50"></canvas>
@@ -18,26 +18,28 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-9">
-                            <h4 class="header-title text-uppercase text-center">My Children List</h4>
+                        <div class="col-8">
+                            <h4 class="header-title text-uppercase">Watoto wangu</h4>
                         </div>
-                        <div class="col-3">
-                            <button type="button" class="btn btn-link" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fa-solid fa-user-plus text-secondary" style="font-size: 2rem"></i>
+                        <div class="col-4">
+                            <button type="button" class="btn btn-xs btn-info float-right" data-toggle="modal" data-target=".bd-example-modal-lg">
+                                <i class="fas fa-plus"></i> Sajili Mpya
                             </button>
                             <div class="modal fade bd-example-modal-lg">
                                 <div class="modal-dialog modal-lg">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title text-uppercase">Students Registration Form</h5>
+                                            <h5 class="modal-title text-uppercase">fomu ya Usajili wa Mwanafunzi</h5>
                                             <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                         </div>
                                         <div class="modal-body">
+                                            <p class="text-danger text-center text-capitalize">Tafadhali Jaza taarifa hizi kwa usahihi</p>
                                             <form class="needs-validation" novalidate="" action="{{route('register.student')}}" method="POST" enctype="multipart/form-data">
                                                 @csrf
                                                 <div class="form-row">
                                                     <div class="col-md-4 mb-3">
-                                                        <label for="validationCustom01">First name</label>
-                                                        <input type="text" name="fname" class="form-control" id="validationCustom01" placeholder="First name" value="{{old('fname')}}" required="">
+                                                        <label for="validationCustom01">Jina la Kwanza</label>
+                                                        <input type="text" name="fname" class="form-control" id="validationCustom01" placeholder="Jina la Kwanza" value="{{old('fname')}}" required="">
                                                         @error('fname')
                                                         <div class="invalid-feedback">
                                                             {{$message}}
@@ -45,8 +47,8 @@
                                                         @enderror
                                                     </div>
                                                     <div class="col-md-4 mb-3">
-                                                        <label for="validationCustom02">Middle name</label>
-                                                        <input type="text" name="middle" class="form-control" id="validationCustom02" placeholder="Middle name" required="" value="{{old('middle')}}">
+                                                        <label for="validationCustom02">Jina la Kati</label>
+                                                        <input type="text" name="middle" class="form-control" id="validationCustom02" placeholder="Jina la kati" required="" value="{{old('middle')}}">
                                                         @error('middle')
                                                         <div class="invalid-feedback">
                                                            {{$message}}
@@ -54,8 +56,8 @@
                                                         @enderror
                                                     </div>
                                                     <div class="col-md-4 mb-3">
-                                                        <label for="validationCustom02">Last name</label>
-                                                        <input type="text" name="lname" class="form-control" id="validationCustom02" placeholder="Last name" required="" value="{{old('lname')}}">
+                                                        <label for="validationCustom02">Jina la Mwisho/Ukoo</label>
+                                                        <input type="text" name="lname" class="form-control" id="validationCustom02" placeholder="Jina la mwisho" required="" value="{{old('lname')}}">
                                                         @error('lname')
                                                         <div class="invalid-feedback">
                                                            {{$message}}
@@ -65,11 +67,11 @@
                                                 </div>
                                                 <div class="form-row">
                                                     <div class="col-md-4 mb-3">
-                                                        <label for="validationCustom01">Gender</label>
+                                                        <label for="validationCustom01">Jinsia</label>
                                                         <select name="gender" id="validationCustom01" class="form-control text-capitalize" required>
-                                                            <option value="">-- select gender --</option>
-                                                            <option value="male">male</option>
-                                                            <option value="female">female</option>
+                                                            <option value="">-- Chagua Jinsia --</option>
+                                                            <option value="male">Mvulana</option>
+                                                            <option value="female">Msichana</option>
                                                         </select>
                                                         @error('gender')
                                                         <div class="invalid-feedback">
@@ -78,8 +80,8 @@
                                                         @enderror
                                                     </div>
                                                     <div class="col-md-4 mb-3">
-                                                        <label for="validationCustom02">Date of Birth</label>
-                                                        <input type="date" name="dob" class="form-control" id="validationCustom02" placeholder="Enter Birth Date" required="" value="{{old('dob')}}">
+                                                        <label for="validationCustom02">Tarehe ya Kuzaliwa</label>
+                                                        <input type="date" name="dob" class="form-control" id="validationCustom02" placeholder="Tarehe ya kuzaliwa" required="" value="{{old('dob')}}">
                                                         @error('dob')
                                                         <div class="invalid-feedback">
                                                            {{$message}}
@@ -87,10 +89,10 @@
                                                         @enderror
                                                     </div>
                                                     <div class="col-md-4 mb-3">
-                                                        <label for="validationCustomUsername">Class</label>
+                                                        <label for="validationCustomUsername">Darasa</label>
                                                         <div class="input-group">
                                                             <select name="grade" id="" class="form-control text-uppercase" required>
-                                                                <option value="">--select grade--</option>
+                                                                <option value="">--Chagua Darasa--</option>
                                                                 @foreach ($classes as $class )
                                                                 <option value="{{$class->id}}">{{$class->class_name}}</option>
                                                                 @endforeach
@@ -105,8 +107,8 @@
                                                 </div>
                                                 <div class="form-row">
                                                     <div class="col-md-4 mb-3">
-                                                        <label for="validationCustom01">Class Group</label>
-                                                        <input type="text" name="group" id="validationCustomUsername" class="form-control" placeholder="Enter Group A, B or C" id="validationCustom02" value="{{old('group')}}" required>
+                                                        <label for="validationCustom01">Mkondo</label>
+                                                        <input type="text" name="group" id="validationCustomUsername" class="form-control" placeholder="Andika A, B au C" id="validationCustom02" value="{{old('group')}}" required>
                                                         @error('group')
                                                         <div class="invalid-feedback">
                                                             {{$message}}
@@ -114,12 +116,12 @@
                                                         @enderror
                                                     </div>
                                                     <div class="col-md-4 mb-3">
-                                                        <label for="validationCustomUsername">Driver Name :<small class="text-sm text-danger">Select if using School bus</small></label>
+                                                        <label for="validationCustomUsername">Ruti za Mabasi  :<small class="text-sm text-danger">Chagua kama anatumia usafiri</small></label>
                                                         <div class="input-group">
-                                                            <select name="driver" id="" class="form-control text-uppercase">
-                                                                <option value="">--Select bus driver--</option>
+                                                            <select name="driver" id="" class="form-control text-capitalize">
+                                                                <option value="">--Chagua ruti ya basi--</option>
                                                                 @foreach ($buses as $bus )
-                                                                <option value="{{$bus->id}}">{{$bus->driver_name}}</option>
+                                                                <option value="{{$bus->id}}">{{$bus->routine}}</option>
                                                                 @endforeach
                                                             </select>
                                                             @error('driver')
@@ -131,7 +133,7 @@
                                                         <input type="hidden" name="school_id" value="{{Auth::user()->school_id}}">
                                                     </div>
                                                     <div class="col-md-4 mb-3">
-                                                        <label for="validationCustomUsername">Passport Size Photo :<small class="text-sm text-danger"> (Optional)</small></label>
+                                                        <label for="validationCustomUsername">Picha ya Passport :<small class="text-sm text-danger"> (Sio lazima)</small></label>
                                                         <div class="input-group">
                                                             <input type="file" name="image" id="validationCustomUsername" class="form-control" value="{{old('image')}}">
                                                             @error('image')
@@ -144,8 +146,8 @@
                                                 </div>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                            <button type="submit" class="btn btn-primary">Register</button>
+                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Ghairi</button>
+                                            <button type="submit" class="btn btn-success">Hifadhi Taarifa</button>
                                         </div>
                                     </div>
                                 </form>
@@ -159,17 +161,15 @@
                             <table class="table" id="myTable">
                                 <thead class="text-capitalize">
                                     <tr class="">
-                                        <th scope="col" style="width: 3px">#</th>
-                                        <th scope="col">Name</th>
-                                        <th scope="col" style="width: 10px;">Gender</th>
-                                        <th scope="col" style="width: 10px;">Class</th>
+                                        <th scope="col">Jina</th>
+                                        <th scope="col" style="width: 10px;">Jinsi</th>
+                                        <th scope="col" style="width: 10px;">Darasa</th>
                                         <th scope="col">action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($students as $student )
                                         <tr>
-                                            <td>{{$loop->iteration}}</td>
                                             <td class="text-uppercase">
                                                 <a href="{{route('Students.show', $student->id)}}">{{$student->first_name. ' '.$student->middle_name.' ' .$student->last_name}}</a>
                                             </td>
@@ -182,9 +182,9 @@
                                                             ACTION
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                                            <a class="dropdown-item" href="{{route('students.modify', $student->id)}}"><i class="ti-pencil"></i> Edit</a>
-                                                            <a class="dropdown-item" href="{{route('attendance.byYear', $student->id)}}"><i class="fa fa-list-check"></i> Attendance</a>
-                                                            <a class="dropdown-item" href="{{route('results.index', $student->id)}}"><i class="ti-file"></i> Results</a>
+                                                            <a class="dropdown-item" href="{{route('students.modify', $student->id)}}"><i class="ti-pencil"></i> Hariri</a>
+                                                            <a class="dropdown-item" href="{{route('attendance.byYear', $student->id)}}"><i class="fa fa-list-check"></i> Mahudhurio</a>
+                                                            <a class="dropdown-item" href="{{route('results.index', $student->id)}}"><i class="ti-file"></i> Matokeo</a>
                                                         </div>
                                                     </div>
                                                 </ul>

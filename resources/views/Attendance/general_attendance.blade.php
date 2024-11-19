@@ -61,6 +61,32 @@
 </div>
 
 <script>
+    // Prevent caching of the preloader state
+    if (performance.navigation.type === 2) {
+        // If back/forward navigation is detected
+        window.location.reload(); // Force a page reload
+    }
+
+    // Alternative for browsers that support `pageshow`
+    window.addEventListener("pageshow", function (event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+
+    // Ensure the preloader is not shown unnecessarily
+    document.addEventListener("DOMContentLoaded", function () {
+        const preloader = document.getElementById('preloader');
+        if (preloader) {
+            preloader.style.display = 'none';
+        }
+    });
+    // Hide preloader on page load
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById('preloader').style.display = 'none';
+    });
+
+    // Show preloader when the form is submitted
     function showPreloader() {
         document.getElementById('preloader').style.display = 'block';
     }

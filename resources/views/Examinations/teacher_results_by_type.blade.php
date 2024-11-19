@@ -86,7 +86,7 @@
         .course-details {
             position: relative;
             left: 5px;
-            width: 50%;
+            width: 100%;
             line-height: 5px;
         }
         .grade-summary {
@@ -139,36 +139,35 @@
     <div class="summary-content">
         <div class="course-details">
             <div>
-                <p>Course Name: <span style="text-transform: uppercase"><strong>{{$courses->course_name}} - {{$courses->course_code}}</strong></span></p>
-                <p>Course Instructor: <strong>{{$results->first()->teacher_firstname}}, {{$results->first()->teacher_lastname[0]}}</strong></p>
-                <p>Examination: <strong>{{$results->first()->exam_type}}</strong></p>
-                <p>Examination Date: <strong>{{\Carbon\Carbon::parse($results->first()->exam_date)->format('d-F-Y')}}</strong></p>
-                <p>Examination Term: <strong><span style="text-transform: uppercase">{{$results->first()->Exam_term}}</span></strong></p>
+                <p>Subject: <span style="text-transform: uppercase"><strong>{{$courses->course_name}} - {{$courses->course_code}}</strong></span></p>
+                <p>Teacher: <strong>{{$results->first()->teacher_firstname}}, {{$results->first()->teacher_lastname[0]}}</strong></p>
+                <p>Exam Type: <strong>{{$results->first()->exam_type}}</strong></p>
+                <p>Date: <strong>{{\Carbon\Carbon::parse($results->first()->exam_date)->format('d-F-Y')}}</strong></p>
+                <p>Term: <strong><span style="text-transform: uppercase">{{$results->first()->Exam_term}}</span></strong></p>
             </div>
         </div>
-        <div>
-            <div class="grade-summary">
-                <p style="">students overall performance</p>
-                    <table class="table" style="border: 1px solid black; border-collapse:collapse; text-align:center">
-                        <tr>
-                            <th>Grade</th>
-                            <th>A</th>
-                            <th>B</th>
-                            <th>C</th>
-                            <th>D</th>
-                            <th>E</th>
-                        </tr>
-                        <tr>
-                            <td>Number</td>
-                            <td>{{$gradeCounts['A']}}</td>
-                            <td>{{$gradeCounts['B']}}</td>
-                            <td>{{$gradeCounts['C']}}</td>
-                            <td>{{$gradeCounts['D']}}</td>
-                            <td>{{$gradeCounts['E']}}</td>
-                        </tr>
-                    </table>
-            </div>
-        </div>
+    </div>
+    <hr>
+    <div class="">
+        <p style="">students overall performance</p>
+            <table class="table" style="border: 1px solid black; border-collapse:collapse; text-align:center">
+                <tr>
+                    <th>Grade</th>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>C</th>
+                    <th>D</th>
+                    <th>E</th>
+                </tr>
+                <tr>
+                    <td>Number</td>
+                    <td>{{$gradeCounts['A']}}</td>
+                    <td>{{$gradeCounts['B']}}</td>
+                    <td>{{$gradeCounts['C']}}</td>
+                    <td>{{$gradeCounts['D']}}</td>
+                    <td>{{$gradeCounts['E']}}</td>
+                </tr>
+            </table>
     </div>
     <hr>
     <h5 style="text-transform:capitalize; text-align:center; font-size:20px;">students examination results records</h5>
@@ -189,7 +188,7 @@
             @foreach ($results as $result)
                 <tr>
                     <td>{{$loop->iteration}}</td>
-                    <td style="text-align:center"><span style="text-transform: uppercase">{{$result->school_reg_no}}</span>-{{Str_pad($result->studentId, 4, '0', STR_PAD_LEFT)}}</td>
+                    <td style="text-align:center"><span style="text-transform: uppercase">{{$result->school_reg_no}}</span>/{{$result->admission_number}}</td>
                     <td>{{$result->first_name}} {{$result->middle_name}} {{$result->last_name}}</td>
                     <td style="text-align:center">{{$result->gender[0]}}</td>
                     <td style="text-align:center">{{$result->group}}</td>

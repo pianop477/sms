@@ -73,8 +73,8 @@ class TeachersController extends Controller
             'email' => 'required|string|email|unique:users,email',
             'gender' => 'required|string|max:255',
             'dob' => 'required|date|date_format:Y-m-d',
-            'phone' => 'required|string|max:15|min:10',
-            'qualification' => 'required|integer|min:1|max:20',
+            'phone' => 'required|string|min:10|max:15',
+            'qualification' => 'required|integer|max:20',
             'street' => 'required|string|max:255',
             'joined' => 'required|date_format:Y'
         ]);

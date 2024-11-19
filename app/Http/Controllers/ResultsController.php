@@ -80,7 +80,7 @@ class ResultsController extends Controller
             ->join('schools', 'schools.id', '=', 'examination_results.school_id')
             ->select(
                 'examination_results.*',
-                'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name',
+                'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.admission_number',
                 'students.group', 'students.image', 'students.gender', 'students.admission_number',
                 'subjects.course_name', 'subjects.course_code',
                 'grades.class_name', 'grades.class_code',
@@ -323,6 +323,7 @@ class ResultsController extends Controller
 
             return [
                 'student_id' => $studentResults->first()->student_id,
+                'admission_number' => $studentResults->first()->admission_number,
                 'student_name' => $studentResults->first()->first_name . ' ' . $studentResults->first()->middle_name . ' ' . $studentResults->first()->last_name,
                 'gender' => $studentResults->first()->gender,
                 'group' => $studentResults->first()->group,
