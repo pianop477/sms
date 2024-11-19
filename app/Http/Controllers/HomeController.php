@@ -167,7 +167,7 @@ class HomeController extends Controller
     public function storePassword(Request $request) {
         $request->validate([
             'current_password' => 'required|string',
-            'new_password' => 'required|string|min:6',
+            'new_password' => 'required|string|min:8',
             'confirm_password' => 'required|same:new_password'
         ]);
 
@@ -204,9 +204,9 @@ class HomeController extends Controller
         public function updateProfile(Request $request, $user)
         {
             $request->validate([
-                'fname' => 'required|string',
-                'lname' => 'required|string',
-                'phone' => 'required|string',
+                'fname' => 'required|string|max:255',
+                'lname' => 'required|string|max:255',
+                'phone' => 'required|string|min:10|max:15',
                 'image' => 'nullable|image|max:2048'
             ]);
 
