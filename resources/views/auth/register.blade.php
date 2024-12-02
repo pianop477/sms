@@ -12,11 +12,11 @@
                     @csrf
                     <div class="login-form-head">
                         <h4>ShuleApp</h4>
-                        <p>Parents Registration Form</p>
+                        <p>Fomu ya Kujisajili Wazazi</p>
                     </div>
                     <div class="login-form-body">
                         <div class="form-gp">
-                            <label for="exampleInputName1">First Name</label>
+                            <label for="exampleInputName1">Jina la Kwanza</label>
                             <input type="text" id="exampleInputName1" name="fname" value="{{old('fname')}}">
                             <i class="ti-user"></i>
                             @error('fname')
@@ -24,7 +24,7 @@
                             @enderror
                         </div>
                         <div class="form-gp">
-                            <label for="exampleInputName1">Last Name</label>
+                            <label for="exampleInputName1">Jina la Mwisho</label>
                             <input type="text" id="exampleInputName1" name="lname" value="{{old('lname')}}">
                             <i class="ti-user"></i>
                             @error('lname')
@@ -32,7 +32,7 @@
                             @enderror
                         </div>
                         <div class="form-gp">
-                            <label for="exampleInputEmail1">Email address</label>
+                            <label for="exampleInputEmail1">Barua pepe</label>
                             <input type="email" id="exampleInputEmail1" name="email" value="{{old('email')}}">
                             <i class="ti-email"></i>
                             @error('email')
@@ -41,16 +41,16 @@
                         </div>
                         <div class="form-gp">
                             <select name="gender" id="exampleInputEmail1" class="form-control">
-                                <option value="">--Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
+                                <option value="">--Chagua Jinsia--</option>
+                                <option value="male">Mwanaume</option>
+                                <option value="female">Mwanamke</option>
                             </select>
                             @error('email')
                                 <div class="text-danger">{{$message}}</div>
                             @enderror
                         </div>
                         <div class="form-gp">
-                            <label for="exampleInputEmail1">Mobile Phone</label>
+                            <label for="exampleInputEmail1">Namba ya simu</label>
                             <input type="tel" id="exampleInputEmail1" name="phone" value="{{old('phone')}}">
                             <i class="ti-mobile"></i>
                             @error('phone')
@@ -58,7 +58,7 @@
                             @enderror
                         </div>
                         <div class="form-gp">
-                            <label for="exampleInputEmail1">Street/Village</label>
+                            <label for="exampleInputEmail1">Mtaa/Kijiji unachoishi</label>
                             <input type="text" id="exampleInputEmail1" name="street" value="{{old('street')}}">
                             <i class="ti-location-pin"></i>
                             @error('street')
@@ -67,7 +67,7 @@
                         </div>
                         <input type="hidden" name="usertype" value="4">
                         <div class="form-gp">
-                            <label for="exampleInputPassword1">Password</label>
+                            <label for="exampleInputPassword1">Neno la siri</label>
                             <input type="password" id="exampleInputPassword1" name="password">
                             <i class="ti-lock"></i>
                             @error('password')
@@ -75,7 +75,7 @@
                             @enderror
                         </div>
                         <div class="form-gp">
-                            <label for="exampleInputPassword2">Confirm Password</label>
+                            <label for="exampleInputPassword2">Rudia Neno la siri</label>
                             <input type="password" id="exampleInputPassword2" name="password_confirmation">
                             <i class="ti-lock"></i>
                             @error('password_confirmation')
@@ -84,7 +84,7 @@
                         </div>
                         <div class="form-gp">
                             <select name="school" id="exampleInputEmail1" class="form-control text-uppercase">
-                                <option value="">--Select School</option>
+                                <option value="">--Chagua Jina la Shule ya Mwanao--</option>
                                 @foreach ($schools as $school )
                                     <option value="{{$school->id}}">{{$school->school_name}}</option>
                                 @endforeach
@@ -95,10 +95,10 @@
                         </div>
 
                         <div class="submit-btn-area">
-                            <button id="form_submit" type="submit">Submit <i class="ti-arrow-right"></i></button>
+                            <button id="form_submit" type="submit">Hifadhi Taarifa <i class="ti-arrow-right"></i></button>
                         </div>
                         <div class="form-footer text-center mt-4">
-                            <p class="text-muted">Already have an account? <a href="{{route('login')}}">Sign in</a></p>
+                            <p class="text-muted">Tayari una akaunti? <a href="{{route('login')}}">Ingia hapa</a></p>
                         </div>
                     </div>
                 </form>

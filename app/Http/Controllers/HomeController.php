@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\class_learning_courses;
 use App\Models\Class_teacher;
 use App\Models\Grade;
 use App\Models\Parents;
@@ -30,19 +31,19 @@ class HomeController extends Controller
         {
             $user = Auth::user();
                 //system adminstrator dashboard redirection --------------------------------------------
-            if ($user->usertype == 1 && $user->status == 1) {
+            if ($user->usertype == 1 ) {
                 $schools = School::orderBy('school_name')->get();
-                $teachers = Teacher::where('status', '=', 1)->get();
-                $students = Student::where('status', '=', 1)->get();
-                $parents = Parents::where('status', '=', 1)->get();
-                $classes = Grade::where('status', '=', 1)->get();
-                $subjects = Subject::where('status', '=', 1)->get();
-                $buses = Transport::where('status', '=', 1)->get();
+                $teachers = Teacher::where('status', '=', 1)->where('status', 1)->get();
+                $students = Student::where('status', '=', 1)->where('status', 1)->get();
+                $parents = Parents::where('status', '=', 1)->where('status', 1)->get();
+                $classes = Grade::where('status', '=', 1)->where('status', 1)->get();
+                $subjects = Subject::where('status', '=', 1)->where('status', 1)->get();
+                $buses = Transport::where('status', '=', 1)->where('status', 1)->get();
                 // $school_details = school::orderBy('school_name')->get();
                 return view('home', compact('teachers', 'students', 'parents', 'classes', 'subjects', 'buses', 'schools'));
             }
                  //manager dashboard redirection --------------------------------------
-            elseif ($user->usertype == 2 && $user->status == 1) {
+            elseif ($user->usertype == 2 ) {
                 $teachers = Teacher::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
                 $parents = Parents::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
                 $students = Student::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
@@ -52,7 +53,7 @@ class HomeController extends Controller
                 return view('home', compact('teachers', 'parents', 'students', 'classes', 'subjects', 'buses'));
             }
             //parents dashboard redirection ----------------------
-            elseif ($user->usertype == 4 && $user->status == 1) {
+            elseif ($user->usertype == 4 ) {
                 $students = Student::query()->join('parents', 'parents.id', '=', 'students.parent_id')
                                         ->join('users', 'users.id', '=', 'parents.user_id')
                                         ->join('grades', 'grades.id', '=', 'students.class_id')
@@ -76,29 +77,20 @@ class HomeController extends Controller
             }
 
             //teachers dashboard redirection ---------------------------------------------------------
-            elseif ($user->usertype == 3 && $user->status == 1) {
+            elseif ($user->usertype == 3) {
                 $teachers = Teacher::where('user_id', $user->id)->first();
 
                 //return class teachers course assigned-------------------
-                $courses = Subject::query()
-                    ->join('grades', 'grades.id', 'subjects.class_id')
-                    ->join('teachers', 'teachers.id', 'subjects.teacher_id')
-                    ->leftJoin('users', 'users.id', 'teachers.user_id')
-                    ->select(
-                        'subjects.*',
-                        'grades.id as class_id',
-                        'grades.class_name',
-                        'grades.class_code',
-                        'users.first_name',
-                        'users.last_name',
-                        'users.gender',
-                        'users.phone'
-                    )
-                    ->where('subjects.teacher_id', $teachers->id)
-                    ->where('subjects.school_id', $teachers->school_id)
-                    ->where('subjects.status', '=', 1)
-                    ->get();
-
+                $courses = class_learning_courses::query()
+                                                ->join('grades', 'grades.id', '=', 'class_learning_courses.class_id')
+                                                ->join('subjects', 'subjects.id', '=', 'class_learning_courses.course_id')
+                                                ->join('teachers', 'teachers.id', '=', 'class_learning_courses.teacher_id')
+                                                ->select(
+                                                    'class_learning_courses.*', 'subjects.course_name', 'grades.class_code',
+                                                )
+                                                ->where('class_learning_courses.teacher_id', $teachers->id)
+                                                ->where('class_learning_courses.school_id', $user->school_id)
+                                                ->get();
                 //return myclass assigned as class teachers ------------------------
                 $myClass = Class_teacher::query()
                     ->join('grades', 'grades.id', 'class_teachers.class_id')
@@ -151,13 +143,6 @@ class HomeController extends Controller
                             'parents', 'buses', 'totalMaleStudents', 'totalFemaleStudents', 'classData',));
             }
 
-            else {
-                Auth::logout(); // You can use the Auth facade to logout
-                // return redirect()->route('login')->with('error', 'Account suspended, contact system administrator');
-                Alert::warning('Warning!', 'Account suspended, contact system administrator');
-                return redirect()->route('login');
-            }
-
         }
 
         public function changepassword() {
@@ -165,34 +150,39 @@ class HomeController extends Controller
         }
 
     public function storePassword(Request $request) {
-        $request->validate([
-            'current_password' => 'required|string',
-            'new_password' => 'required|string|min:8',
-            'confirm_password' => 'required|same:new_password'
-        ]);
+        try {
+            $request->validate([
+                'current_password' => 'required|string',
+                'new_password' => 'required|string|min:8',
+                'confirm_password' => 'required|same:new_password'
+            ]);
 
-            if(!(Hash::check($request->get('current_password'), Auth::user()->password))) {
-                // return back()->with('error', 'Current password does not match');
-                Alert::error('Error', 'Current password does not match');
-                return back();
-            }
+                if(!(Hash::check($request->get('current_password'), Auth::user()->password))) {
+                    // return back()->with('error', 'Current password does not match');
+                    Alert::error('Error', 'Current password does not match');
+                    return back();
+                }
 
-            if(strcmp($request->get('current_password'), $request->get('new_password')) == 0) {
-                // return back()->with('error', 'This password you have already used, choose new one');
-                Alert::error('Error', 'This password you have already used, choose new one');
-                return back();
-            }
-            $user = Auth::user();
-            $user->password = Hash::make($request->new_password);
-            $new_password = $user->save();
+                if(strcmp($request->get('current_password'), $request->get('new_password')) == 0) {
+                    // return back()->with('error', 'This password you have already used, choose new one');
+                    Alert::error('Error', 'This password you have already used, choose new one');
+                    return back();
+                }
+                $user = Auth::user();
+                $user->password = Hash::make($request->new_password);
+                $new_password = $user->save();
 
-            if($new_password) {
-                Alert::success('Password Updated successfully');
-                Auth::logout();
-                return redirect()->route('login');
-            }
-
+                if($new_password) {
+                    Alert::success('Password Updated successfully');
+                    Auth::logout();
+                    return redirect()->route('login');
+                }
+        } catch (\Exception $e) {
+            Alert::error('Errors', $e->getMessage());
+            return back();
         }
+
+    }
 
         public function showProfile()
         {

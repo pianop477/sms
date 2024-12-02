@@ -17,7 +17,7 @@
                             <h6>No Result Records found</h6>
                         </div>
                     @else
-                    <table class="table table-responsive-md table-hover">
+                    <table class="table table-responsive-md table-hover table-borderless">
                         <tbody>
                             @foreach ($groupedByMonth as $month => $results)
                                 @php
@@ -34,7 +34,7 @@
                                             <form action="{{ route('publish.results', ['school' => $school->id, 'year' => $year, 'class' => $class->id, 'examType' => $examType, 'month' => $month]) }}" method="POST">
                                                 @csrf
                                                 @method('PUT')
-                                                <button class="btn btn-primary btn-xs" onclick="return confirm('Are you sure you want to publish the results? Once you publish, the results will be visible to all parents.')">Publish</button>
+                                                <button class="btn btn-primary btn-xs float-right" onclick="return confirm('Are you sure you want to publish the results? Once you publish, the results will be visible to all parents.')">Publish</button>
                                             </form>
                                         </td>
                                     @else
@@ -42,7 +42,7 @@
                                             <form action="{{ route('unpublish.results', ['school' => $school->id, 'year' => $year, 'class' => $class->id, 'examType' => $examType, 'month' => $month]) }}" method="POST">
                                                 @csrf
                                                 @method('PUT')
-                                                <button class="btn btn-danger btn-xs" onclick="return confirm('Are you sure you want to block the results? Parents will no longer be able to access the results.')">Unpublish</button>
+                                                <button class="btn btn-danger btn-xs float-right" onclick="return confirm('Are you sure you want to block the results? Parents will no longer be able to access the results.')">Unpublish</button>
                                             </form>
                                         </td>
                                     @endif

@@ -132,14 +132,12 @@
         </div>
     </div>
     <hr>
-    <div class="summary-header">
-        <h5>Overall Summary</h5>
-        <hr>
-    </div>
     <div class="summary-content">
         <div class="course-details">
+            <p style="font-weight: bold">Course information Summary</p>
+            <hr>
             <div>
-                <p>Subject: <span style="text-transform: uppercase"><strong>{{$courses->course_name}} - {{$courses->course_code}}</strong></span></p>
+                <p>Subject: <span style="text-transform: uppercase"><strong>{{$subjectCourse->course_name}} - {{$subjectCourse->course_code}}</strong></span></p>
                 <p>Teacher: <strong>{{$results->first()->teacher_firstname}}, {{$results->first()->teacher_lastname[0]}}</strong></p>
                 <p>Exam Type: <strong>{{$results->first()->exam_type}}</strong></p>
                 <p>Date: <strong>{{\Carbon\Carbon::parse($results->first()->exam_date)->format('d-F-Y')}}</strong></p>
@@ -149,7 +147,7 @@
     </div>
     <hr>
     <div class="">
-        <p style="">students overall performance</p>
+        <p style="">Performance Summary</p>
             <table class="table" style="border: 1px solid black; border-collapse:collapse; text-align:center">
                 <tr>
                     <th>Grade</th>
@@ -169,8 +167,34 @@
                 </tr>
             </table>
     </div>
+    <div style="align-items: center">
+        @php
+            if($averageGrade == 'A') {
+                $bgColor = 'rgb(117, 244, 48)';
+                $comment = 'Excellent';
+            }
+            if($averageGrade == 'B') {
+                $bgColor = 'rgb(12, 211, 184)';
+                $comment = 'Good';
+            }
+            if($averageGrade == 'C') {
+                $bgColor = 'rgb(237, 220, 113)';
+                $comment = 'Average';
+            }
+            if($averageGrade == 'D') {
+                $bgColor = 'rgb(235, 75, 75)';
+                $comment = 'Unsatisfactory';
+            }
+            if($averageGrade == 'E') {
+                $bgColor = 'rgb(182, 176, 176)';
+                $comment = 'Fail';
+            }
+        @endphp
+        <p><strong>Average: {{number_format($averageScore, 2)}}</strong></p>
+        <p><strong>Grade: <span style="padding: 4px; background:{{$bgColor}}">{{$averageGrade}} - {{$comment}}</span></strong></p>
+    </div>
     <hr>
-    <h5 style="text-transform:capitalize; text-align:center; font-size:20px;">students examination results records</h5>
+    <p style="text-transform:capitalize; text-align:center;">students examination results records</p>
     <table class="table table-bordered table-hover">
         <thead>
             <tr>
@@ -199,11 +223,5 @@
             @endforeach
         </tbody>
     </table>
-    <hr>
-    <div style="align-items: center">
-        <span><strong>Course Average: {{number_format($averageScore, 2)}}</strong></span>,
-        <span><strong>Grade: {{$averageGrade}}</strong></span>
-    </div>
-    <hr>
 </body>
 </html>

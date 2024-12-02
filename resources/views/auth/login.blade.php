@@ -25,7 +25,7 @@
                     @enderror
                     <div class="login-form-body">
                         <div class="form-gp">
-                            <label for="exampleInputEmail1">Email address</label>
+                            <label for="exampleInputEmail1">Email</label>
                             <input type="email" id="exampleInputEmail1" name="email" value="{{old('email')}}">
                             <i class="ti-email"></i>
                             @error('email')

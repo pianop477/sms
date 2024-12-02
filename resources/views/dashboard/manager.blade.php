@@ -19,11 +19,11 @@
         @endphp
 
         <div class="col-md-4 mt-5 mb-3">
-            <div class="card">
-                <div class="seo-fact sbg1">
+            <div class="card" style="background: #e176a6">
+                <div class="">
                     <div class="p-4 d-flex justify-content-between align-items-center">
                         <div class="seofct-icon"><i class="fas fa-user-tie"></i> Teachers</div>
-                        <h2>
+                        <h2 class="text-white">
                             @if (count($teachers) > 29)
                                 30+
                             @else
@@ -36,11 +36,11 @@
             </div>
         </div>
         <div class="col-md-4 mt-md-5 mb-3">
-            <div class="card">
-                <div class="seo-fact sbg2">
+            <div class="card" style="background: #c84fe0">
+                <div class="">
                     <div class="p-4 d-flex justify-content-between align-items-center">
                         <div class="seofct-icon"><i class="fas fa-user-shield"></i> Parents</div>
-                        <h2>
+                        <h2 class="text-white">
                             @if (count($parents) > 999)
                                 1000+
                             @else
@@ -53,11 +53,11 @@
             </div>
         </div>
         <div class="col-md-4 mt-md-5 mb-3">
-            <div class="card">
-                <div class="seo-fact sbg3">
+            <div class="card" style="background: #098ddf">
+                <div class="">
                     <div class="p-4 d-flex justify-content-between align-items-center">
                         <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Students</div>
-                        <h2>
+                        <h2 class="text-white">
                             @if (count($students) > 999)
                                 1000+
                             @else
@@ -92,11 +92,11 @@
 <div class="col-lg-12">
     <div class="row">
         <div class="col-md-4 mt-5 mb-3">
-            <div class="card">
-                <div class="seo-fact sbg2">
+            <div class="card" style="background: #9fbc71">
+                <div class="">
                     <div class="p-4 d-flex justify-content-between align-items-center">
                         <div class="seofct-icon"><i class="ti-book"></i> Open Courses</div>
-                        <h2>
+                        <h2 class="text-white">
                             @if (count($subjects) > 19)
                                 20+
                             @else
@@ -109,11 +109,11 @@
             </div>
         </div>
         <div class="col-md-4 mt-md-5 mb-3">
-            <div class="card">
-                <div class="seo-fact sbg1">
+            <div class="card" style="background: #bf950a">
+                <div class="">
                     <div class="p-4 d-flex justify-content-between align-items-center">
                         <div class="seofct-icon"><i class="ti-blackboard"></i> Classes</div>
-                        <h2>
+                        <h2 class="text-white">
                             @if (count($classes) > 9)
                                 10+
                             @else
@@ -126,11 +126,11 @@
             </div>
         </div>
         <div class="col-md-4 mt-md-5 mb-3">
-            <div class="card">
-                <div class="seo-fact sbg4">
+            <div class="card" style="background: #329688">
+                <div class="">
                     <div class="p-4 d-flex justify-content-between align-items-center">
                         <div class="seofct-icon"><i class="fas fa-bus"></i> School Buses</div>
-                        <h2>
+                        <h2 class="text-white">
                             @if (count($buses) > 19)
                                 20+
                             @else

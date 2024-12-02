@@ -9,9 +9,9 @@
                         </li>
 
                         {{-- school administrator links --}}
-                        @if (Auth::user()->usertype == 1 && Auth::user()->status ==1)
+                        @if (Auth::user()->usertype == 1 )
                             <li>
-                                <a href="{{route('register.manager')}}"><i class="fa fa-users"></i><span> Users</span></a>
+                                <a href="{{route('register.manager')}}"><i class="fa fa-users"></i><span> Managers</span></a>
                             </li>
                             <li class="mega-menu">
                                 <a href="{{route('Schools.index')}}"><i class="fas fa-building"></i> <span>Schools</span></a>
@@ -25,9 +25,12 @@
                         @endif
 
                         {{-- school academic teacher navigation links --}}
-                        @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 3 && Auth::user()->status == 1)
+                        @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 3 )
                             <li>
                                 <a href="{{route('Teachers.index')}}"><i class="fa fa-user-tie"></i><span> Teachers</span></a>
+                            </li>
+                            <li>
+                                <a href="{{route('Parents.index')}}"><i class="fa fa-user-shield"></i><span> Parents</span></a>
                             </li>
                             <li>
                                 <a href="{{route('classes.list')}}"><i class="fa fa-user-graduate"></i><span> Students</span></a>
@@ -50,7 +53,7 @@
                                 </ul>
                             </li>
                         @endif
-                        @if (Auth::user()->usertype == 2 && Auth::user()->status == 1 || Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 2 && Auth::user()->status == 1)
+                        @if (Auth::user()->usertype == 2 || Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 2)
                             <li>
                                 <a href="{{route('Teachers.index')}}"><i class="fa fa-user-tie"></i><span> Teachers</span></a>
                             </li>

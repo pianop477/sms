@@ -22,7 +22,7 @@ class ManagerOrTeacher
         // Check if the user is authenticated
         if ($user) {
             // Check if the user has usertype = 2
-            if ($user->usertype == 2 || $user->usertype == 3) {
+            if ($user->usertype == 2) {
                 return $next($request);
             }
 

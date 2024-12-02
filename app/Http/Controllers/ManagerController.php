@@ -8,6 +8,7 @@ use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Grade;
+use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Transport;
 use Illuminate\Support\Facades\Hash;
@@ -182,6 +183,7 @@ class ManagerController extends Controller
 
             //update the status of all transport associated with the school
             Transport::where('school_id', $school_info->id)->update(['status' => $status]);
+
         if($school_info) {
             Alert::success('Success', 'User Unblocked successfully');
             return back();

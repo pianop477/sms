@@ -57,7 +57,7 @@ Auth::routes();
     Route::post('/Feedback', [SendMessageController::class, 'store'])->name('send.feedback.message');
 //end of condition =================================================
 
-Route::group(['middleware' => ['auth']], function () {
+Route::middleware('auth', 'activeUser')->group(function () {
     Route::middleware('CheckUsertype:1,2,3,4')->group(function () {
         // Home controller redirection ==============================================================================
         Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
@@ -118,7 +118,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::delete('{id}/Delete-class', [ClassesController::class, 'deleteClass'])->name('Classes.destroy');
     });
     //manage parents informations ================================================================================
-    Route::middleware(['GeneralMiddleware'])->group(function () {
+    Route::middleware(['ManagerOrTeacher'])->group(function () {
         // Route::resource('Parents', ParentsController::class);
         Route::get('Parents', [ParentsController::class, 'showAllParents'])->name('Parents.index');
         Route::post('Register-parents', [ParentsController::class, 'registerParents'])->name('Parents.store');
@@ -190,37 +190,31 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::middleware(['CheckUsertype:3'])->group(function() {
         Route::middleware('CheckRoleType:1,3,4')->group(function () {
-            Route::get('{course}/Prepare', [ExamController::class, 'prepare'])->name('score.prepare.form');
+            Route::get('{id}/Prepare', [ExamController::class, 'prepare'])->name('score.prepare.form');
             Route::post('Examination-result-create', [ExamController::class, 'captureValues'])->name('score.captured.values');
             Route::post('Upload/results', [ExamController::class, 'storeScore'])->name('exams.store.score');
             Route::get('/Results-saved', [ExamController::class, 'savedDataForm'])->name('form.saved.values');
             //teachers  examination results =============================
-            Route::get('{courses}/Results', [ExamController::class, 'courseResults'])->name('results_byCourse');
-            Route::get('/Results/{courses}/{year}', [ExamController::class, 'resultByYear'])->name('results.byYear');
-            Route::get('/Results/{courses}/{year}/{examType}', [ExamController::class, 'resultByExamType'])->name('results.byExamType');
-            Route::get('/Results/{courses}/{year}/{examType}/{month}', [ExamController::class, 'resultByMonth'])->name('results.byMonth');
+            Route::get('course{id}/Results', [ExamController::class, 'courseResults'])->name('results_byCourse');
+            Route::get('/Results/course{course}/&year{year}', [ExamController::class, 'resultByYear'])->name('results.byYear');
+            Route::get('/Results/course{course}/&year{year}/&examination{examType}', [ExamController::class, 'resultByExamType'])->name('results.byExamType');
+            Route::get('/Results/course{course}/&year{year}/&examination{examType}/{month}', [ExamController::class, 'resultByMonth'])->name('results.byMonth');
         });
-    });
-
-    Route::middleware(['CheckRoleType:1,3,4'])->group(function () {
-        Route::post('Register-course', [CoursesController::class, 'store'])->name('courses.store');
-        Route::get('{course}/Edit-course', [CoursesController::class, 'edit'])->name('courses.edit');
-        Route::put('{courses}/Update-course', [CoursesController::class, 'update'])->name('courses.update');
-        Route::put('{course}/Remove-course', [CoursesController::class, 'removeCourse'])->name('courses.remove');
-
     });
 
     //access this routes for subjects if the usertype as manager of school head teacher only ==========
     Route::middleware(['ManagerOrTeacher'])->group(function () {
         Route::get('View-all', [CoursesController::class, 'index'])->name('courses.index');
-        Route::get('{class}/Class-courses', [CoursesController::class, 'classCourses'])->name('courses.view.class');
-        // Route::get('{course}/Delete-course', [CoursesController::class, 'deleteCourse'])->name('courses.delete');
-        Route::put('{course}/Block', [CoursesController::class, 'blockCourse'])->name('courses.block');
-        Route::put('{course}/Unblock', [CoursesController::class, 'unblockCourse'])->name('courses.unblock');
-        Route::get('{course}/Assign-teacher', [CoursesController::class, 'assign'])->name('courses.assign');
-        Route::put('{courses}/Assigned-teacher', [CoursesController::class, 'assignedTeacher'])->name('courses.assigned.teacher');
+        Route::get('{id}/Class-courses', [CoursesController::class, 'classCourses'])->name('courses.view.class');
+        Route::get('{id}/Delete-course', [CoursesController::class, 'deleteCourse'])->name('courses.delete');
+        Route::put('{id}/Block', [CoursesController::class, 'blockCourse'])->name('courses.block');
+        Route::put('{id}/Unblock', [CoursesController::class, 'unblockCourse'])->name('courses.unblock');
+        Route::get('{id}/Assign-teacher', [CoursesController::class, 'assign'])->name('courses.assign');
+        Route::put('{id}/Assigned-teacher', [CoursesController::class, 'assignedTeacher'])->name('courses.assigned.teacher');
         //view class teachers-----------------------
         Route::get('{class}/Class-Teacher', [RolesController::class, 'index'])->name('Class.Teachers');
+        Route::put('{id}/Block-assigned-class-course', [CoursesController::class, 'blockAssignedCourse'])->name('block.assigned.course');
+        Route::put('{id}/Unblock-assigned-class-course', [CoursesController::class, 'unblockAssignedCourse'])->name('unblock.assigned.course');
 
     });
     //end of condition =================================================================================
@@ -259,6 +253,7 @@ Route::group(['middleware' => ['auth']], function () {
         // For displaying months
         Route::get('Result-months/Student/{student}/Year/{year}/Type/{exam_type}', [ResultsController::class, 'resultByMonth'])->name('result.byMonth');
         Route::get('Results/Student/{student}/Year/{year}/Exam-type/{type}/Month/{month}', [ResultsController::class, 'viewStudentResult'])->name('results.student.get');
+        Route::get('student/{id}/Courses-list', [CoursesController::class, 'viewStudentCourses'])->name('student.courses.list');
 
     });
     //End of condition ==============================================================================================
@@ -296,6 +291,13 @@ Route::group(['middleware' => ['auth']], function () {
         Route::put('Unpublish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'unpublishResult'])->name('unpublish.results');
         //export students records to PDF
         Route::get('{classId}/Export-students', [StudentsController::class, 'exportPdf'])->name('export.student.pdf');
+
+        //register school courses/manage all
+        Route::post('Register-courses', [CoursesController::class, 'addCourse'])->name('course.registration');
+        Route::get('{id}/Edit-courses', [CoursesController::class, 'editCourse'])->name('course.edit');
+        Route::put('{id}/Update-courses', [CoursesController::class, 'updateCourse'])->name('course.update');
+        Route::post('Assign-class-course', [CoursesController::class, 'assignClassCourse'])->name('course.assign');
+
     });
     //end of condition =========================================================================================
 

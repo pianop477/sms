@@ -263,9 +263,16 @@ class TeachersController extends Controller
     {
         // Find the teacher record
         $teacher = Teacher::findOrFail($teacher);
+        // return $teacher; user user_id
 
         // Find the associated user record
         $user = User::findOrFail($teacher->user_id);
+        // return $user;
+
+        if(Auth::user()->id == $user->id) {
+            Alert::error('Error!', 'You cannot block your own account');
+            return back();
+        }
 
         // Retrieve the status from the request, default to 0 if not provided
         $status = $request->input('status', 0);
@@ -294,6 +301,7 @@ class TeachersController extends Controller
 
         // Find the associated user record
         $user = User::findOrFail($teacher->user_id);
+
 
         // Retrieve the status from the request, default to 0 if not provided
         $status = $request->input('status', 1);

@@ -30,20 +30,21 @@
                 <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 80px;">
             </div>
             <div class="header">
-                <h3>{{ Auth::user()->school->school_name }} - P.O Box {{ Auth::user()->school->postal_address }}, {{ Auth::user()->school->postal_name }}</h3>
-                <h4>class attendance report for </h4>
-                <h4 class="text-uppercase">Academic year {{\Carbon\Carbon::parse($attendances->first()->attendance_date)->format('F, Y')}}</h4>
-                <h4>Class Name: {{$attendances->first()->class_name}}</h4>
+                <h3>{{ Auth::user()->school->school_name }}</h3>
+                <h4>P.O Box {{ Auth::user()->school->postal_address }}</h4>
+                <h4>{{ Auth::user()->school->postal_name }} - {{Auth::user()->school->country}}</h4>
+                <h4>attendance report Month: {{\Carbon\Carbon::parse($attendances->first()->attendance_date)->format('F, Y')}} </h4>
+                <h4>Class: {{$attendances->first()->class_name}}</h4>
             </div>
 
             {{-- looping attendances records --}}
             @foreach ($datas as $date => $attendances)
                 <div class="date-section">
                     <div class="summary-header">
-                        <p>attendance report summary</p>
+                        <p>attendance summary</p>
                     </div>
                     <div class="summary-content">
-                        <p style="border: 1px solid gray; padding:5px; background:rgb(190, 190, 190);">Date: <strong>{{\Carbon\Carbon::parse($date)->format('d/F/Y')}}</strong></p>
+                        <p style="border: 1px solid gray; padding:5px; background:rgb(190, 190, 190);">Date: <strong>{{\Carbon\Carbon::parse($date)->format('F d, Y')}}</strong></p>
                         <table class="table" style="text-align: center">
                             <tr>
                                 <th>Gender</th>
@@ -68,7 +69,6 @@
                             </tr>
                         </table>
                     </div>
-                    <hr>
                     <h5 style="text-transform:capitalize; text-align:center; font-size:20px;">students attendance records</h5>
                     <table class="table" style="text-transform: capitalize">
                         <thead>

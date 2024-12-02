@@ -48,14 +48,9 @@
                         @enderror
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label for="validationCustom01">Select Country</label>
+                        <label for="validationCustom01">Country</label>
                         <select name="country" id="validationCustom01" class="form-control text-capitalize" required>
-                            <option value="">-- Select Country --</option>
-                            @foreach ($countries as $country)
-                                <option value="{{ $country['name']['common'] }}" {{ $country['name']['common'] == 'Tanzania' ? 'selected' : '' }}>
-                                    {{ $country['name']['common'] }}
-                                </option>
-                            @endforeach
+                            <option value="{{$school->country}}" selected>{{$school->country}}</option>
                         </select>
                         @error('country')
                         <div class="invalid-feedback">

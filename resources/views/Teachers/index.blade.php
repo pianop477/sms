@@ -37,7 +37,7 @@
                                             <div class="form-row">
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom01">First name</label>
-                                                    <input type="text" name="fname" class="form-control" id="validationCustom01" placeholder="First name" value="{{old('fname')}}" required="">
+                                                    <input type="text" required name="fname" class="form-control" id="validationCustom01" placeholder="First name" value="{{old('fname')}}" required="">
                                                     @error('fname')
                                                     <div class="invalid-feedback">
                                                         {{$message}}
@@ -46,7 +46,7 @@
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom02">Last name</label>
-                                                    <input type="text" name="lname" class="form-control" id="validationCustom02" placeholder="Last name" required="" value="{{old('lname')}}">
+                                                    <input type="text" required name="lname" class="form-control" id="validationCustom02" placeholder="Last name" required="" value="{{old('lname')}}">
                                                     @error('lname')
                                                     <div class="invalid-feedback">
                                                        {{$message}}
@@ -59,7 +59,7 @@
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text" id="inputGroupPrepend">@</span>
                                                         </div>
-                                                        <input type="email" name="email" class="form-control" id="validationCustomUsername" placeholder="Email ID" aria-describedby="inputGroupPrepend" required="" value="{{old('email')}}">
+                                                        <input type="email" required name="email" class="form-control" id="validationCustomUsername" placeholder="Email ID" aria-describedby="inputGroupPrepend" required="" value="{{old('email')}}">
                                                         @error('email')
                                                         <div class="invalid-feedback">
                                                             {{$message}}
@@ -84,7 +84,7 @@
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom02">Mobile Phone</label>
-                                                    <input type="text" name="phone" class="form-control" id="validationCustom02" placeholder="Phone Number" required="" value="{{old('phone')}}">
+                                                    <input type="text" required name="phone" class="form-control" id="validationCustom02" placeholder="Phone Number" required="" value="{{old('phone')}}">
                                                     @error('phone')
                                                     <div class="invalid-feedback">
                                                        {{$message}}
@@ -112,7 +112,7 @@
                                             <div class="form-row">
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom01">Date of Birth</label>
-                                                    <input type="date" name="dob" class="form-control" id="validationCustom02" value="{{old('dob')}}" required>
+                                                    <input type="date" required name="dob" class="form-control" id="validationCustom02" value="{{old('dob')}}" required>
                                                     @error('dob')
                                                     <div class="invalid-feedback">
                                                         {{$message}}
@@ -136,7 +136,7 @@
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustomUsername">Street/Village</label>
                                                     <div class="input-group">
-                                                        <input type="text" name="street" class="form-control" id="validationCustom02" value="{{old('street')}}" placeholder="Street Address" required>
+                                                        <input type="text" required name="street" class="form-control" id="validationCustom02" value="{{old('street')}}" placeholder="Street Address" required>
                                                         @error('street')
                                                         <div class="invalid-feedback">
                                                             {{$message}}

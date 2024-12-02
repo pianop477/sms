@@ -9,12 +9,12 @@
                     <h4 class="header-title text-center">Select Month for {{ $year }}</h4>
                 </div>
                 <div class="col-2">
-                    <a href="{{route('results.byYear', ['year'=>$year, 'courses' => $courses->id])}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                    <a href="{{route('results.byYear', ['year'=>$year, 'course' => $class_course->course_id])}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
                 </div>
             </div>
             <div class="list-group">
                 @foreach ($months as $month => $results)
-                    <a href="{{ route('results.byMonth', ['courses' => $courses->id, 'year' => $year, 'examType' => $examType, 'month' => $month]) }}">
+                    <a href="{{ route('results.byMonth', ['course' => $class_course->course_id, 'year' => $year, 'examType' => $examType, 'month' => $month]) }}">
                         <button type="button" class="list-group-item list-group-item-action">
                             <h6 class="text-primary"><i class="fas fa-chevron-right"></i> {{ $month }} - {{$year}}</h6>
                         </button>
