@@ -76,7 +76,7 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="text-center">
-                                    <h4>Payment Mode</h4>
+                                    <h4>Mode of Payments</h4>
                                 </div>
                             </div>
                         </div>
@@ -96,11 +96,11 @@
                             <div class="col-4">
                                 <h5>Lipa Namba | Lipa kwa Simu</h5>
                                 <p><strong>Tigo Lipa Number</strong></p>
-                                <p>Merchant Acc. Number: <strong>6272246</strong></p>
+                                <p>Merchant Acc. Number: <strong>15966786</strong></p>
                                 <p>Merchant Acc. Name: <strong>Piano Shop</strong></p>
                                 <hr>
                                 <p><strong>M - Pesa Lipa Number</strong></p>
-                                <p>Merchant Acc. Number: <strong>5956810</strong></p>
+                                <p>Merchant Acc. Number: <strong>3391086</strong></p>
                                 <p>Merchant Acc. Name: <strong>Lipa Masaka Shop Vieyura</strong></p>
                             </div>
                         </div>

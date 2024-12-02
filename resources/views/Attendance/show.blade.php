@@ -13,12 +13,12 @@
             </div>
             <div class="single-table">
                 <div class="table-responsive-lg">
-                    <table class="table" id="myTable">
+                    <table class="table table-bordered text-center" id="myTable">
                         <thead class="text-capitalize bg-primary">
                             <tr class="text-white">
-                                <th>Day</th>
-                                <th scope="col">Date</th>
-                                <th scope="col">Status</th>
+                                <th>Siku</th>
+                                <th scope="col">Tarehe</th>
+                                <th scope="col">Mahudhurio</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -33,11 +33,11 @@
                                             <td>{{ \Carbon\Carbon::parse($item->attendance_date)->format('M d, Y') }}</td>
                                             <td>
                                                 @if ($item->attendance_status == 'present')
-                                                    <span class="badge bg-success text-capitalize text-white">{{$item->attendance_status}}</span>
+                                                    <span class="badge bg-success text-capitalize text-white">Amefika</span>
                                                 @elseif ($item->attendance_status == 'absent')
-                                                    <span class="badge bg-danger text-capitalize text-white">{{$item->attendance_status}}</span>
+                                                    <span class="badge bg-danger text-capitalize text-white">Hajafika</span>
                                                 @else
-                                                    <span class="badge bg-warning text-capitalize text-white">{{$item->attendance_status}}</span>
+                                                    <span class="badge bg-warning text-capitalize text-white">Ruhusa</span>
                                                 @endif
                                             </td>
                                         </tr>

@@ -32,6 +32,11 @@ class UsersController extends Controller
             'street' => 'required|string|max:255',
         ]);
 
+        $parentExists = User::where('phone', $req->phone)->exists();
+        if($parentExists) {
+            Alert::error('Error', 'This accounts already exists');
+            return back();
+        }
 
         $users = new User();
         $users->first_name = $req->fname;
@@ -70,8 +75,8 @@ class UsersController extends Controller
         $parents->save();
         // return redirect()->back()->with('success', 'User registered successfully, Login now');
 
-        Alert::success('Success', 'User registered successfully');
-        return back();
+        Alert::success('Imefanikiwa', 'Taarifa zimehifadhiwa kikamilifu, unaweza kuingia sasa!');
+        return redirect()->route('login');
 
     }
 

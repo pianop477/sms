@@ -6,22 +6,22 @@
     <div class="col-lg-12">
         <div class="row">
             <div class="col-md-4 mt-5 mb-3">
-                <div class="card">
-                    <div class="seo-fact sbg1">
+                <div class="card" style="background: #93dad6;">
+                    <div class="">
                         <div class="p-4 d-flex justify-content-between align-items-center">
                             <div class="seofct-icon"><i class="fas fa-building"></i> School (s)</div>
-                            <h2>{{count($schools)}}</h2>
+                            <h2 class="text-white">{{count($schools)}}</h2>
                         </div>
                         <canvas id="seolinechart1" height="50"></canvas>
                     </div>
                 </div>
             </div>
             <div class="col-md-4 mt-md-5 mb-3">
-                <div class="card">
-                    <div class="seo-fact sbg2">
+                <div class="card" style="background: #e176a6">
+                    <div class="">
                         <div class="p-4 d-flex justify-content-between align-items-center">
                             <div class="seofct-icon"><i class="fas fa-user-tie"></i> Teacher (s)</div>
-                            <h2>
+                            <h2 class="text-white">
                                 @if (count($teachers) > 99)
                                     100+
                                 @else
@@ -34,11 +34,11 @@
                 </div>
             </div>
             <div class="col-md-4 mt-md-5 mb-3">
-                <div class="card">
-                    <div class="seo-fact sbg3">
+                <div class="card" style="background: #098ddf">
+                    <div class="">
                         <div class="p-4 d-flex justify-content-between align-items-center">
                             <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Student (s)</div>
-                            <h2>
+                            <h2 class="text-white">
                                 @if (count($students) > 999)
                                     1000+
                                 @else
@@ -55,11 +55,11 @@
     <div class="col-lg-12">
         <div class="row">
             <div class="col-md-4 mt-5 mb-3">
-                <div class="card">
-                    <div class="seo-fact sbg4">
+                <div class="card" style="background: #c84fe0">
+                    <div class="">
                         <div class="p-4 d-flex justify-content-between align-items-center">
                             <div class="seofct-icon"><i class="fas fa-user-shield"></i> Parent (s)</div>
-                            <h2>
+                            <h2 class="text-white">
                                 @if (count($parents) > 999)
                                     1000+
                                 @else
@@ -72,11 +72,11 @@
                 </div>
             </div>
             <div class="col-md-4 mt-md-5 mb-3">
-                <div class="card">
-                    <div class="seo-fact sbg2">
+                <div class="card" style="background: #9fbc71">
+                    <div class="">
                         <div class="p-4 d-flex justify-content-between align-items-center">
                             <div class="seofct-icon"><i class="ti-book"></i> Courses (s)</div>
-                            <h2>
+                            <h2 class="text-white">
                                 @if (count($subjects) > 99)
                                     100+
                                 @else
@@ -89,11 +89,11 @@
                 </div>
             </div>
             <div class="col-md-4 mt-md-5 mb-3">
-                <div class="card">
-                    <div class="seo-fact sbg1">
+                <div class="card" style="background: #bf950a">
+                    <div class="">
                         <div class="p-4 d-flex justify-content-between align-items-center">
                             <div class="seofct-icon"><i class="ti-blackboard"></i> Classes/Faculty (s)</div>
-                            <h2>
+                            <h2 class="text-white">
                                 @if (count($classes) > 49)
                                     50+
                                 @else
@@ -137,7 +137,7 @@
                                             @if ($school->status == 1)
                                             <span class="status-p bg-success">Active</span>
                                             @else
-                                            <span class="status-p bg-secondary">Closed</span>
+                                            <span class="status-p bg-danger">Closed</span>
                                             @endif
                                         </td>
                                         <td>
@@ -146,34 +146,36 @@
                                                 <li class="mr-3">
                                                     <a href="{{route('schools.edit', $school->id)}}"><i class="ti-pencil text-primary"></i></a>
                                                 </li>
-                                                <li class="mr-3">
-                                                    <a href="{{route('schools.show', $school->id)}}"><i class="ti-eye text-secondary"></i></a>
-                                                </li>
                                                 <form action="{{route('deactivate.status', $school->id)}}" method="POST">
                                                     @csrf
                                                     @method('PUT')
-                                                    <li>
+                                                    <li class="mr-3">
                                                         <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to block school {{strtoupper($school->school_name)}}?')">
-                                                            <i class="ti-trash text-danger"></i>
+                                                            <i class="ti-na text-warning"></i>
                                                         </button>
                                                     </li>
                                                 </form>
+                                                <li>
+                                                    <li class="mr-3">
+                                                        <a href=""><i class="ti-trash text-danger" onclick="return confirm('Are you sure you want to delete school {{strtoupper($school->school_name)}}?')"></i></a>
+                                                    </li>
+                                                </li>
                                             </ul>
 
                                             @else
                                             <ul class="d-flex justify-content-center">
-                                                <li class="mr-3">
-                                                    <a href="{{route('schools.show', $school->id)}}"><i class="ti-eye text-secondary"></i></a>
-                                                </li>
                                                 <form action="{{route('activate.status', $school->id)}}" method="POST">
                                                 @csrf
                                                 @method('PUT')
-                                                    <li>
+                                                    <li class="mr-3">
                                                         <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want unblock school {{strtoupper($school->school_name)}}?')">
-                                                            <i class="ti-share-alt text-success"></i>
+                                                            <i class="ti-reload text-success"></i>
                                                         </button>
                                                     </li>
                                                 </form>
+                                                <li class="mr-3">
+                                                    <a href=""><i class="ti-trash text-danger" onclick="return confirm('Are you sure you want to delete school {{strtoupper($school->school_name)}}?')"></i></a>
+                                                </li>
                                             </ul>
                                             @endif
                                         </td>

@@ -6,11 +6,11 @@
         {{-- school head teacher panel start here --}}
             <div class="row">
                 <div class="col-md-4 mt-5 mb-3">
-                    <div class="card">
-                        <div class="seo-fact sbg1">
+                    <div class="card" style="background: #e176a6;">
+                        <div class="">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="fas fa-user-tie"></i> Teachers</div>
-                                <h2>
+                                <h2 class="text-white">
                                     @if (count($teachers) > 29)
                                         30+
                                     @else
@@ -23,11 +23,11 @@
                     </div>
                 </div>
                 <div class="col-md-4 mt-md-5 mb-3">
-                    <div class="card">
-                        <div class="seo-fact sbg2">
+                    <div class="card" style="background: #c84fe0;">
+                        <div class="">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="fas fa-user-shield"></i> Parents</div>
-                                <h2>
+                                <h2 class="text-white">
                                     @if (count($parents) > 999)
                                         1000+
                                     @else
@@ -40,11 +40,11 @@
                     </div>
                 </div>
                 <div class="col-md-4 mt-md-5 mb-3">
-                    <div class="card">
-                        <div class="seo-fact sbg3">
+                    <div class="card" style="background: #098ddf;">
+                        <div class="">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Students</div>
-                                <h2>
+                                <h2 class="text-white">
                                     @if (count($students) > 999)
                                         1000+
                                     @else
@@ -77,11 +77,11 @@
         <div class="col-lg-12">
             <div class="row">
                 <div class="col-md-4 mt-5 mb-3">
-                    <div class="card">
-                        <div class="seo-fact sbg2">
+                    <div class="card" style="background: #9fbc71;">
+                        <div class="">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="ti-book"></i> Open Courses</div>
-                                <h2>
+                                <h2 class="text-white">
                                     @if (count($subjects) > 19)
                                         20+
                                     @else
@@ -94,11 +94,11 @@
                     </div>
                 </div>
                 <div class="col-md-4 mt-md-5 mb-3">
-                    <div class="card">
-                        <div class="seo-fact sbg1">
+                    <div class="card" style="background: #bf950a;">
+                        <div class="">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="ti-blackboard"></i> Classes</div>
-                                <h2>
+                                <h2 class="text-white">
                                     @if (count($classes) > 9)
                                         10+
                                     @else
@@ -111,11 +111,11 @@
                     </div>
                 </div>
                 <div class="col-md-4 mt-md-5 mb-3">
-                    <div class="card">
-                        <div class="seo-fact sbg4">
+                    <div class="card" style="background: #329688;">
+                        <div class="">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="fas fa-bus"></i> School Buses</div>
-                                <h2>
+                                <h2 class="text-white">
                                     @if (count($buses) > 19)
                                         20+
                                     @else
@@ -136,11 +136,11 @@
         {{-- academic teacher panel start here =================== --}}
             <div class="row">
                 <div class="col-md-4 mt-5 mb-3">
-                    <div class="card">
-                        <div class="seo-fact sbg1">
+                    <div class="card" style="background: #e176a6">
+                        <div class="">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="fas fa-user-tie"></i> Teachers</div>
-                                <h2>
+                                <h2 class="text-white">
                                     @if (count($teachers) > 29)
                                         30+
                                     @else
@@ -153,11 +153,11 @@
                     </div>
                 </div>
                 <div class="col-md-4 mt-md-5 mb-3">
-                    <div class="card">
-                        <div class="seo-fact sbg3">
+                    <div class="card" style="background: #098ddf">
+                        <div class="">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Students</div>
-                                <h2>
+                                <h2 class="text-white">
                                     @if(count($students) > 999)
                                         1000+
                                     @else
@@ -186,11 +186,11 @@
                     </div>
                 </div>
                 <div class="col-md-4 mt-5 mb-3">
-                    <div class="card">
-                        <div class="seo-fact sbg2">
+                    <div class="card" style="background: #9fbc71">
+                        <div class="">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="ti-book"></i> Open Courses</div>
-                                <h2>
+                                <h2 class="text-white">
                                     @if (count($subjects) > 19)
                                         20+
                                     @else
@@ -207,11 +207,11 @@
         <div class="col-lg-12">
             <div class="row">
                 <div class="col-md-4 mt-md-5 mb-3">
-                    <div class="card">
-                        <div class="seo-fact sbg1">
+                    <div class="card" style="background:#bf950a">
+                        <div class="">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="ti-blackboard"></i> Classes</div>
-                                <h2>
+                                <h2 class="text-white">
                                     @if (count($classes) > 9)
                                         10+
                                     @else
@@ -224,15 +224,15 @@
                     </div>
                 </div>
                 <div class="col-md-4 mt-5 mb-3">
-                    <div class="card bg-secondary">
+                    <div class="card" style="background: #b14fbe">
                         <div class="">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="ti-book"></i> My Course</div>
                                 <h2 class="text-white">
-                                    @if ( count($courses) > 2)
+                                    @if ( $courses->where('status', 1)->count() > 2)
                                         3+
                                     @else
-                                        {{ count($courses) }}
+                                        {{ $courses->where('status', 1)->count() }}
                                     @endif
                                 </h2>
                             </div>
@@ -250,67 +250,9 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-10"><h4 class="header-title text-uppercase text-center"> My Courses</h4></div>
-                        <div class="col-2">
-                            <button type="button" class="btn btn-xs mb-3 btn-link" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-circle-plus text-secondary" style="font-size:1.5rem;"></i>
-                            </button>
-                            <div class="modal fade bd-example-modal-lg">
-                                <div class="modal-dialog modal-lg">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Register New Courses</h5>
-                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form class="needs-validation" novalidate="" action="{{route('courses.store')}}" method="POST" enctype="multipart/form-data">
-                                                @csrf
-                                                <div class="form-row">
-                                                    <div class="col-md-4 mb-3">
-                                                        <label for="validationCustom01">Course Name</label>
-                                                        <input type="text" name="name" class="form-control text-uppercase" id="validationCustom01" placeholder="Course Name" value="{{old('name')}}" required="">
-                                                        @error('name')
-                                                        <div class="invalid-feedback">
-                                                            {{$message}}
-                                                        </div>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="col-md-4 mb-3">
-                                                        <label for="validationCustom02">Course Code</label>
-                                                        <input type="text" name="code" class="form-control text-uppercase" id="validationCustom02" placeholder="Course Code" required="" value="{{old('code')}}">
-                                                        @error('code')
-                                                        <div class="invalid-feedback">
-                                                           {{$message}}
-                                                        </div>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="col-md-4 mb-3">
-                                                        <label for="validationCustom01">Class</label>
-                                                        <select name="class" id="validationCustom01" class="form-control text-uppercase" required>
-                                                            <option value="">-- select class --</option>
-                                                            @foreach ($classes as $class)
-                                                            <option value="{{$class->id}}">{{$class->class_name}}</option>
-                                                            @endforeach
-                                                        </select>
-                                                        @error('class')
-                                                        <div class="invalid-feedback">
-                                                            {{$message}}
-                                                        </div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-                                                {{-- <input type="hidden" name="teacher_id" value="{{$teacher->id}}"> --}}
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                            <button type="submit" class="btn btn-primary">Save</button>
-                                        </div>
-                                    </div>
-                                </form>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                     <div class="table-responsive-md">
-                        <table class="table" id="">
+                        <table class="table table-hover text-center" id="">
                             <thead>
                                 <tr class="text-capitalize">
                                     <th>#</th>
@@ -324,7 +266,7 @@
                                     <tr>
                                         <td colspan="5">
                                             <div class="alert alert-warning text-center">
-                                                You dont have any subject/course
+                                                No any subject assigned for you
                                             </div>
                                         </td>
                                     </tr>
@@ -340,19 +282,12 @@
                                             @if ($course->status == 1)
                                             <ul class="d-flex justify-content-center">
                                                 <li class="mr-3">
-                                                    <a href="{{route('courses.edit', $course->id)}}" class="text-primary" onclick="return confirm('Are you sure you want to Edit this Course?')"><i class="ti-pencil"></i></a>
+                                                    <a href="{{route('score.prepare.form', $course->id)}}" class="text-success" onclick="return confirm('Do you want to enter Examination score in {{strtoupper($course->course_name)}} subject?')"><i class="ti-pencil-alt"></i></a>
                                                 </li>
                                                 <li class="mr-3">
-                                                    <a href="{{route('score.prepare.form', $course->id)}}" class="text-success" onclick="return confirm('Are you sure you want to VIEW or ENTER results?')"><i class="ti-pencil-alt"></i></a>
-                                                </li>
-                                                <li>
-                                                    <form action="{{route('courses.remove', $course->id)}}" method="POST">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to remove {{strtoupper($course->course_name)}} course?')">
-                                                            <i class="ti-trash text-danger"></i>
-                                                        </button>
-                                                    </form>
+                                                    <a href="{{ route('results_byCourse', $course->id) }}" onclick="return confirm('Do you want to view results in {{strtoupper($course->course_name)}} subject?')">
+                                                        <i class="ti-eye text-primary"></i>
+                                                    </a>
                                                 </li>
                                             </ul>
                                             @else
@@ -375,11 +310,11 @@
         {{-- class teacher panel start here ======================================= --}}
         <div class="row">
                 <div class="col-md-4 mt-md-5 mb-3">
-                    <div class="card">
-                        <div class="seo-fact sbg1">
+                    <div class="card" style="background:#098ddf">
+                        <div class="">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="ti-blackboard"></i> My Class</div>
-                                <h2>{{ $myClass->count() }}</h2>
+                                <h2 class="text-white">{{ $myClass->count() }}</h2>
                             </div>
                             <canvas id="" height="50"></canvas>
                         </div>
@@ -388,12 +323,12 @@
 
                 {{-- second card --}}
                 <div class="col-md-4 mt-md-5 mb-3">
-                    <div class="card">
-                        <div class="seo-fact sbg3">
+                    <div class="card" style="background:#c84fe0">
+                        <div class="">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Student</div>
                                 @foreach ($classData as $data )
-                                <h2>{{$data['maleCount'] + $data['femaleCount']}}</h2>
+                                <h2 class="text-white">{{$data['maleCount'] + $data['femaleCount']}}</h2>
                                 <ul>
                                     <li><span class="text-white">Male: <strong>{{$data['maleCount']}}</strong></span></li>
                                     <li><span class="text-white">Female: <strong></strong>{{$data['femaleCount']}}</span></li>
@@ -405,11 +340,17 @@
                     </div>
                 </div>
                 <div class="col-md-4 mt-5 mb-3">
-                    <div class="card">
-                        <div class="seo-fact sbg2">
+                    <div class="card" style="background: #bf950a">
+                        <div class="">
                             <div class="p-4 d-flex justify-content-between align-items-center">
                                 <div class="seofct-icon"><i class="ti-book"></i> My Course</div>
-                                <h2>{{ count($courses) }}</h2>
+                                <h2 class="text-white">
+                                    @if ($courses->where('status', 1)->count() > 2)
+                                        3+
+                                    @else
+                                        {{$courses->where('status', 1)->count()}}
+                                    @endif
+                                </h2>
                             </div>
                             <canvas id="" height="50"></canvas>
                         </div>
@@ -422,7 +363,7 @@
                         <div class="card-body">
                             <h4 class="header-title text-center text-uppercase"> My Attendance Class</h4>
                             <div class="table-responsive-md">
-                                <table class="table">
+                                <table class="table table-hover text-center">
                                     <thead>
                                         <tr class="text-capitalize">
                                             <th>Class</th>
@@ -460,67 +401,9 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-10"><h4 class="header-title text-center text-uppercase"> My Courses</h4></div>
-                            <div class="col-2">
-                                <button type="button" class="btn btn-xs mb-3 btn-link" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-circle-plus text-secondary" style="font-size:1.5rem;"></i>
-                                </button>
-                                <div class="modal fade bd-example-modal-lg">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Register New Courses</h5>
-                                                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <form class="needs-validation" novalidate="" action="{{route('courses.store')}}" method="POST" enctype="multipart/form-data">
-                                                    @csrf
-                                                    <div class="form-row">
-                                                        <div class="col-md-4 mb-3">
-                                                            <label for="validationCustom01">Course Name</label>
-                                                            <input type="text" name="name" class="form-control text-uppercase" id="validationCustom01" placeholder="Course Name" value="{{old('name')}}" required="">
-                                                            @error('name')
-                                                            <div class="invalid-feedback">
-                                                                {{$message}}
-                                                            </div>
-                                                            @enderror
-                                                        </div>
-                                                        <div class="col-md-4 mb-3">
-                                                            <label for="validationCustom02">Course Code</label>
-                                                            <input type="text" name="code" class="form-control text-uppercase" id="validationCustom02" placeholder="Course Code" required="" value="{{old('code')}}">
-                                                            @error('code')
-                                                            <div class="invalid-feedback">
-                                                               {{$message}}
-                                                            </div>
-                                                            @enderror
-                                                        </div>
-                                                        <div class="col-md-4 mb-3">
-                                                            <label for="validationCustom01">Class</label>
-                                                            <select name="class" id="validationCustom01" class="form-control text-uppercase" required>
-                                                                <option value="">-- select class --</option>
-                                                                @foreach ($classes as $class)
-                                                                <option value="{{$class->id}}">{{$class->class_name}}</option>
-                                                                @endforeach
-                                                            </select>
-                                                            @error('class')
-                                                            <div class="invalid-feedback">
-                                                                {{$message}}
-                                                            </div>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
-                                                    {{-- <input type="hidden" name="teacher_id" value="{{$teacher->id}}"> --}}
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                <button type="submit" class="btn btn-primary">Save</button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                         <div class="table-responsive-md">
-                            <table class="table" id="">
+                            <table class="table table-hover text-center" id="">
                                 <thead>
                                     <tr class="text-capitalize">
                                         <th>#</th>
@@ -534,7 +417,7 @@
                                         <tr>
                                             <td colspan="5">
                                                 <div class="alert alert-warning text-center">
-                                                    You dont have any subject/course
+                                                    No any subject assigned for you
                                                 </div>
                                             </td>
                                         </tr>
@@ -550,19 +433,12 @@
                                                 @if ($course->status == 1)
                                                 <ul class="d-flex justify-content-center">
                                                     <li class="mr-3">
-                                                        <a href="{{route('courses.edit', $course->id)}}" class="text-primary" onclick="return confirm('Are you sure you want to Edit this Course?')"><i class="ti-pencil"></i></a>
+                                                        <a href="{{route('score.prepare.form', $course->id)}}" class="text-success" onclick="return confirm('Do you want to enter examination score in {{strtoupper($course->course_name)}} subject?')"><i class="ti-pencil-alt"></i></a>
                                                     </li>
                                                     <li class="mr-3">
-                                                        <a href="{{route('score.prepare.form', $course->id)}}" class="text-success" onclick="return confirm('Are you sure you want to VIEW or ENTER results?')"><i class="ti-pencil-alt"></i></a>
-                                                    </li>
-                                                    <li>
-                                                        <form action="{{route('courses.remove', $course->id)}}" method="POST">
-                                                            @csrf
-                                                            @method('PUT')
-                                                            <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to remove {{strtoupper($course->course_name)}} course?')">
-                                                                <i class="ti-trash text-danger"></i>
-                                                            </button>
-                                                        </form>
+                                                        <a href="{{ route('results_byCourse', $course->id) }}" onclick="return confirm('Do you want to view results in {{strtoupper($course->course_name)}} subject?')">
+                                                            <i class="ti-eye text-primary"></i>
+                                                        </a>
                                                     </li>
                                                 </ul>
                                                 @elseif ($course->status == 0)
@@ -586,11 +462,17 @@
         {{-- normal teacher panel start here ========================================== --}}
         <div class="row">
             <div class="col-md-4 mt-5 mb-3">
-                <div class="card">
-                    <div class="seo-fact sbg2">
+                <div class="card" style="background: #bf950a">
+                    <div class="">
                         <div class="p-4 d-flex justify-content-between align-items-center">
                             <div class="seofct-icon"><i class="ti-book"></i> My Course</div>
-                            <h2>{{ count($courses) }}</h2>
+                            <h2 class="text-white">
+                                @if ($courses->where('status', 1)->count() > 2)
+                                    3+
+                                @else
+                                    {{$courses->where('status', 1)->count()}}
+                                @endif
+                            </h2>
                         </div>
                         <canvas id="" height="50"></canvas>
                     </div>
@@ -601,67 +483,9 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-10"><h4 class="header-title text-center text-uppercase"> My Courses</h4></div>
-                            <div class="col-2">
-                                <button type="button" class="btn btn-xs mb-3 btn-link" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-circle-plus text-secondary" style="font-size:1.5rem;"></i>
-                                </button>
-                                <div class="modal fade bd-example-modal-lg">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Register New Courses</h5>
-                                                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <form class="needs-validation" novalidate="" action="{{route('courses.store')}}" method="POST" enctype="multipart/form-data">
-                                                    @csrf
-                                                    <div class="form-row">
-                                                        <div class="col-md-4 mb-3">
-                                                            <label for="validationCustom01">Course Name</label>
-                                                            <input type="text" name="name" class="form-control text-uppercase" id="validationCustom01" placeholder="Course Name" value="{{old('name')}}" required="">
-                                                            @error('name')
-                                                            <div class="invalid-feedback">
-                                                                {{$message}}
-                                                            </div>
-                                                            @enderror
-                                                        </div>
-                                                        <div class="col-md-4 mb-3">
-                                                            <label for="validationCustom02">Course Code</label>
-                                                            <input type="text" name="code" class="form-control text-uppercase" id="validationCustom02" placeholder="Course Code" required="" value="{{old('code')}}">
-                                                            @error('code')
-                                                            <div class="invalid-feedback">
-                                                               {{$message}}
-                                                            </div>
-                                                            @enderror
-                                                        </div>
-                                                        <div class="col-md-4 mb-3">
-                                                            <label for="validationCustom01">Class</label>
-                                                            <select name="class" id="validationCustom01" class="form-control text-uppercase" required>
-                                                                <option value="">-- select class --</option>
-                                                                @foreach ($classes as $class)
-                                                                <option value="{{$class->id}}">{{$class->class_name}}</option>
-                                                                @endforeach
-                                                            </select>
-                                                            @error('class')
-                                                            <div class="invalid-feedback">
-                                                                {{$message}}
-                                                            </div>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
-                                                    {{-- <input type="hidden" name="teacher_id" value="{{$teacher->id}}"> --}}
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                <button type="submit" class="btn btn-primary">Save</button>
-                                            </div>
-                                        </div>
-                                    </form>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                         <div class="table-responsive-md">
-                            <table class="table" id="">
+                            <table class="table table-hover text-center" id="">
                                 <thead>
                                     <tr class="text-capitalize">
                                         <th>#</th>
@@ -675,7 +499,7 @@
                                         <tr>
                                             <td colspan="5">
                                                 <div class="alert alert-warning text-center">
-                                                    You dont have any subject/course
+                                                    No any subject assigned for you
                                                 </div>
                                             </td>
                                         </tr>
@@ -691,19 +515,12 @@
                                                 @if ($course->status == 1)
                                                 <ul class="d-flex justify-content-center">
                                                     <li class="mr-3">
-                                                        <a href="{{route('courses.edit', $course->id)}}" class="text-primary" onclick="return confirm('Are you sure you want to Edit this Course?')"><i class="ti-pencil"></i></a>
+                                                        <a href="{{route('score.prepare.form', $course->id)}}" class="text-success" onclick="return confirm('Do you want to enter examination score in {{strtoupper($course->course_name)}} subject?')"><i class="ti-pencil-alt"></i></a>
                                                     </li>
                                                     <li class="mr-3">
-                                                        <a href="{{route('score.prepare.form', $course->id)}}" class="text-success" onclick="return confirm('Are you sure you want to VIEW or ENTER results?')"><i class="ti-pencil-alt"></i></a>
-                                                    </li>
-                                                    <li>
-                                                        <form action="{{route('courses.remove', $course->id)}}" method="POST">
-                                                            @csrf
-                                                            @method('PUT')
-                                                            <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to remove {{strtoupper($course->course_name)}} course?')">
-                                                                <i class="ti-trash text-danger"></i>
-                                                            </button>
-                                                        </form>
+                                                        <a href="{{ route('results_byCourse', $course->id) }}" onclick="return confirm('Do you want to view results in {{strtoupper($course->course_name)}} subject?')">
+                                                            <i class="ti-eye text-primary"></i>
+                                                        </a>
                                                     </li>
                                                 </ul>
                                                 @else

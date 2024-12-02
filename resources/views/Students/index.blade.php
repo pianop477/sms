@@ -34,7 +34,7 @@
                                             <div class="form-row">
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom01">First name</label>
-                                                    <input type="text" name="fname" class="form-control" id="validationCustom01" placeholder="First name" value="{{old('fname')}}" required="">
+                                                    <input type="text" required name="fname" class="form-control" id="validationCustom01" placeholder="First name" value="{{old('fname')}}" required="">
                                                     @error('fname')
                                                     <div class="invalid-feedback">
                                                         {{$message}}
@@ -43,7 +43,7 @@
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom02">Middle name</label>
-                                                    <input type="text" name="middle" class="form-control" id="validationCustom02" placeholder="Middle name" required="" value="{{old('middle')}}">
+                                                    <input type="text" required name="middle" class="form-control" id="validationCustom02" placeholder="Middle name" required="" value="{{old('middle')}}">
                                                     @error('middle')
                                                     <div class="invalid-feedback">
                                                        {{$message}}
@@ -52,7 +52,7 @@
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom02">Last name</label>
-                                                    <input type="text" name="lname" class="form-control" id="validationCustom02" placeholder="Last name" required="" value="{{old('lname')}}">
+                                                    <input type="text" required name="lname" class="form-control" id="validationCustom02" placeholder="Last name" required="" value="{{old('lname')}}">
                                                     @error('lname')
                                                     <div class="invalid-feedback">
                                                        {{$message}}
@@ -63,7 +63,7 @@
                                             <div class="form-row">
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom01">Gender</label>
-                                                    <select name="gender" id="validationCustom01" class="form-control text-capitalize" required>
+                                                    <select name="gender" required id="validationCustom01" class="form-control text-capitalize" required>
                                                         <option value="">-- select gender --</option>
                                                         <option value="male">male</option>
                                                         <option value="female">female</option>
@@ -76,7 +76,7 @@
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom02">Date of Birth</label>
-                                                    <input type="date" id="customDatePicker" name="dob" class="form-control" id="validationCustom02" placeholder="Enter your birth date" required="" value="{{old('dob')}}">
+                                                    <input type="date" required id="customDatePicker" name="dob" class="form-control" id="validationCustom02" placeholder="Enter your birth date" required="" value="{{old('dob')}}">
                                                     @error('dob')
                                                     <div class="invalid-feedback">
                                                        {{$message}}
@@ -107,7 +107,7 @@
                                             <div class="form-row">
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom01">Class Group</label>
-                                                    <input type="text" name="group" id="validationCustomUsername" class="form-control text-uppercase" placeholder="Enter Group A, B or C" id="validationCustom02" value="{{old('dob')}}" required>
+                                                    <input type="text" name="group" required id="validationCustomUsername" class="form-control text-uppercase" placeholder="Enter Group A, B or C" id="validationCustom02" value="{{old('dob')}}" required>
                                                     @error('dob')
                                                     <div class="invalid-feedback">
                                                         {{$message}}

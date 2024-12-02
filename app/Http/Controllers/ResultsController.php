@@ -114,36 +114,36 @@ class ResultsController extends Controller
             if ($result->marking_style == 1) {
                 if ($result->score >= 41) {
                     $result->grade = 'A';
-                    $result->remarks = 'Excellent';
+                    $result->remarks = 'Vizuri sana';
                 } elseif ($result->score >= 31) {
                     $result->grade = 'B';
-                    $result->remarks = 'Good';
+                    $result->remarks = 'Vizuri';
                 } elseif ($result->score >= 21) {
                     $result->grade = 'C';
-                    $result->remarks = 'Pass';
+                    $result->remarks = 'Wastani';
                 } elseif ($result->score >= 11) {
                     $result->grade = 'D';
-                    $result->remarks = 'Unsatisfactory';
+                    $result->remarks = 'Hairidhishi';
                 } else {
                     $result->grade = 'E';
-                    $result->remarks = 'Fail';
+                    $result->remarks = 'Ameshindwa';
                 }
             } else {
                 if ($result->score >= 81) {
                     $result->grade = 'A';
-                    $result->remarks = 'Excellent';
+                    $result->remarks = 'Vizuri sana';
                 } elseif ($result->score >= 61) {
                     $result->grade = 'B';
-                    $result->remarks = 'Good';
+                    $result->remarks = 'Vizuri';
                 } elseif ($result->score >= 41) {
                     $result->grade = 'C';
-                    $result->remarks = 'Pass';
+                    $result->remarks = 'Wastani';
                 } elseif ($result->score >= 21) {
                     $result->grade = 'D';
-                    $result->remarks = 'Unsatisfactory';
+                    $result->remarks = 'Hairidhishi';
                 } else {
                     $result->grade = 'E';
-                    $result->remarks = 'Fail';
+                    $result->remarks = 'Ameshindwa';
                 }
             }
 
@@ -348,18 +348,19 @@ class ResultsController extends Controller
             $studentResult['position'] = $index + 1;
         }
 
-        // Count grades by gender
-        $gradesByGender = $results->groupBy('gender')->map(function ($group) {
+        // Count grades by gender based on overall student performance
+        $gradesByGender = $studentsResults->groupBy('gender')->map(function ($group) {
             $grades = ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0];
-            foreach ($group as $result) {
-                $grade = $this->calculateGrade($result->score, $result->marking_style);
-                $grades[$grade]++;
+            foreach ($group as $student) {
+                $grades[$student['grade']]++; // Count the grade calculated for the student
             }
             return $grades;
         });
 
+        // Separate counts for male and female grades
         $totalMaleGrades = $gradesByGender->get('male', ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0]);
         $totalFemaleGrades = $gradesByGender->get('female', ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0]);
+
 
         // Count unique students
         $totalUniqueStudents = $results->pluck('student_id')->unique()->count();

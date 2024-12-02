@@ -54,9 +54,9 @@
                                     <th scope="col">#</th>
                                     <th scope="col">Examination Type</th>
                                     <th scope="col">Status</th>
-                                    @if (Route::has(['exams.block', 'exams.destroy', 'exams.edit', 'exams.unblock', 'exams.update']))
+                                    {{-- @if (Route::has(['exams.block', 'exams.destroy', 'exams.edit', 'exams.unblock', 'exams.update'])) --}}
                                     <th scope="col">Action</th>
-                                    @endif
+                                    {{-- @endif --}}
                                 </tr>
                             </thead>
                             @foreach ($exams as $exam)
@@ -84,7 +84,7 @@
                                                     </form>
                                                 </li>
                                                 <li>
-                                                    {{-- <a href="{{route('exams.destroy', $exam->id)}}" onclick="return confirm('Are you sure you want to Delete this Examination test permanently?')"><i class="ti-trash text-danger"></i></a> --}}
+                                                    <a href="{{route('exams.destroy', $exam->id)}}" onclick="return confirm('Are you sure you want to Delete this Examination test permanently?')"><i class="ti-trash text-danger"></i></a>
                                                 </li>
                                             @else
                                                 <li>

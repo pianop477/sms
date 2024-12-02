@@ -4,11 +4,11 @@
 <div class="col-lg-12">
     <div class="row">
         <div class="col-md-4 mt-md-5 mb-3">
-            <div class="card">
-                <div class="seo-fact sbg2">
+            <div class="card" style="background: #c84fe0">
+                <div class="">
                     <div class="p-4 d-flex justify-content-between align-items-center">
                         <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Watoto Wangu</div>
-                        <h2>{{count($students)}}</h2>
+                        <h2 class="text-white">{{count($students)}}</h2>
                     </div>
                     <canvas id="seolinechart2" height="50"></canvas>
                 </div>
@@ -164,7 +164,7 @@
                                         <th scope="col">Jina</th>
                                         <th scope="col" style="width: 10px;">Jinsi</th>
                                         <th scope="col" style="width: 10px;">Darasa</th>
-                                        <th scope="col">action</th>
+                                        <th scope="col" class="text-center">Vitendo</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -179,12 +179,13 @@
                                                 <ul class="d-flex justify-content-center">
                                                     <div class="btn-group" role="group">
                                                         <button id="btnGroupDrop" type="button" class="btn btn-success btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            ACTION
+                                                            Angali
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                                            <a class="dropdown-item" href="{{route('students.modify', $student->id)}}"><i class="ti-pencil"></i> Hariri</a>
-                                                            <a class="dropdown-item" href="{{route('attendance.byYear', $student->id)}}"><i class="fa fa-list-check"></i> Mahudhurio</a>
-                                                            <a class="dropdown-item" href="{{route('results.index', $student->id)}}"><i class="ti-file"></i> Matokeo</a>
+                                                            <a class="dropdown-item" href="{{route('students.modify', $student->id)}}"><i class="ti-pencil text-primary"></i> Hariri</a>
+                                                            <a class="dropdown-item" href="{{route('attendance.byYear', $student->id)}}"><i class="fa fa-list-check text-success"></i> Mahudhurio</a>
+                                                            <a class="dropdown-item" href="{{route('results.index', $student->id)}}"><i class="ti-file text-info"></i> Matokeo</a>
+                                                            <a class="dropdown-item" href="{{route('student.courses.list', $student->id)}}"><i class="ti-book text-warning"></i> Masomo</a>
                                                         </div>
                                                     </div>
                                                 </ul>

@@ -179,7 +179,7 @@
                     <h5 style="font-weight:normal">NUMBER OF CANDIDATES: {{$totalUniqueStudents}}</h5>
                     <h5 style="font-weight:normal">CLASS AVERAGE: <strong>{{number_format($sumOfCourseAverages, 4)}}</strong>
                             @if ($totalAverageScore >= 41 && $totalAverageScore <=  50 || $totalAverageScore >= 81 && $totalAverageScore <= 100)
-                                    <span style="background:rgb(117, 244, 48); padding:2px 10px ">GRADE A (VERY GOOD)</span>
+                                    <span style="background:rgb(117, 244, 48); padding:2px 10px ">GRADE A (EXCELLENT)</span>
                                 @elseif ($totalAverageScore >= 31 && $totalAverageScore >=  40 || $totalAverageScore >= 61 && $totalAverageScore <= 80)
                                     <span style="background:rgb(12, 211, 184); padding:2px 10px ">GRADE B (GOOD)</span>
                                 @elseif ($totalAverageScore >= 21 && $totalAverageScore >=  30 || $totalAverageScore >= 41 && $totalAverageScore <= 60)
@@ -239,7 +239,7 @@
                             <th style="text-align:center;">Total</th>
                             <th style="text-align:center;">Average</th>
                             <th style="text-align:center;">Grade</th>
-                            <th style="text-align:center;">rank</th>
+                            <th style="text-align:center;">Position</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -265,14 +265,14 @@
                             <th colspan="4">SUBJECTWISE PERFORMANCE</th>
                         </tr>
                         <tr style="">
-                            <th style="text-transform: uppercase">course name</th>
-                            <th style="text-align:center">average</th>
-                            <th style="text-align:center">rank</th>
-                            <th style="text-align:center">grade</th>
+                            <th style="text-transform: uppercase">Subject Name</th>
+                            <th style="text-align:center">Subject average</th>
+                            <th style="text-align:center">subjects ranking</th>
+                            <th style="text-align:center">subject grade</th>
                         </tr>
                         @foreach ($sortedCourses as $course)
                             <tr>
-                                <td style="text-transform: uppercase">{{ $course['course_name'] }}</td>
+                                <td style="text-transform: uppercase">{{ $course['course_name'] }} </td>
                                 <td style="text-align:center">{{ number_format($course['average_score'], 2) }}</td>
                                 <td style="text-align:center">{{ $course['position'] }}</td>
                                     @if ($course['grade']=='A')

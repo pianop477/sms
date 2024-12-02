@@ -57,46 +57,57 @@ class RolesController extends Controller
      */
 
      //register / assign class teachers ===============================================
-    public function store(Request $request, $classes)
-    {
-        $request->validate([
-            'teacher' => 'required|exists:teachers,id',
-            'group' => 'required|string|max:10'
-        ]);
+     public function store(Request $request, $classes)
+     {
+         $this->validate($request, [
+             'teacher' => 'integer|exists:teachers,id',
+             'group' => 'required|string|max:1',
+         ]);
 
-        $ifExisting = Class_teacher::where('teacher_id', '=', $request->teacher)
-                                    ->where('school_id', '=', Auth::user()->school_id)
+         // Check if the selected teacher is already assigned to another class in the same school
+         $ifExisting = Class_teacher::where('teacher_id', $request->teacher)
+                                     ->where('school_id', Auth::user()->school_id)
+                                     ->exists();
+         if ($ifExisting) {
+             Alert::error('Error', 'Selected Teacher already assigned in another class');
+             return back();
+         }
+
+         // Check if the selected teacher has a conflicting role
+         $ifTeacherHasRole = Teacher::where('id', $request->teacher)
+                                    ->whereIn('role_id', [2, 3])
                                     ->exists();
-        if($ifExisting) {
-            Alert::error('Error', 'Selected Teacher already assigned in another class');
-            return back();
-        }
+         if ($ifTeacherHasRole) {
+             Alert::error('Error!', 'Selected teacher has been assigned another role, cannot be a class teacher!');
+             return back();
+         }
 
-        $ifTeacherHasRole = Teacher::where('role_id', '=', 2)
-                                    ->where('role_id', '=', 3)
-                                    ->exists();
-        if($ifTeacherHasRole) {
-            Alert::error('Error!', 'Selected teacher has been assigned another role, cannot be a class teacher!');
-            return back();
-        }
+         // Check if the maximum number of teachers is reached for the same class_id and group
+         $teacherCount = Class_teacher::where('class_id', $classes)
+                                       ->where('group', $request->group)
+                                       ->count();
+         if ($teacherCount >= 2) {
+             Alert::error('Error', 'Maximum number of class teachers has reached to 2');
+             return back();
+         }
 
-        $class = Grade::findOrFail($classes);
+         // Assign the class teacher
+         $class = Grade::findOrFail($classes);
+         $assignedTeacher = new Class_teacher();
+         $assignedTeacher->class_id = $class->id;
+         $assignedTeacher->teacher_id = $request->teacher;
+         $assignedTeacher->group = $request->group;
+         $assignedTeacher->school_id = Auth::user()->school_id;
+         $assignedTeacher->save();
 
-        $assignedTeacher = new Class_teacher();
-        $assignedTeacher->class_id = $class->id;
-        $assignedTeacher->teacher_id = $request->teacher;
-        $assignedTeacher->group = $request->group;
-        $assignedTeacher->school_id = $request->school_id;
-        $assignedTeacher->save();
+         // Update the teacher's role to 4
+         $teacher = Teacher::findOrFail($request->teacher);
+         $teacher->role_id = 4;
+         $teacher->save();
 
-        // Update the teacher's role to 4
-        $teacher = Teacher::findOrFail($request->teacher);
-        $teacher->role_id = 4;
-        $teacher->save();
-
-        Alert::success('Success', 'Class Teacher assigned Successfully');
-        return back();
-    }
+         Alert::success('Success', 'Class Teacher assigned Successfully');
+         return back();
+     }
 
     /**
      * Display users resource corresponding to school.

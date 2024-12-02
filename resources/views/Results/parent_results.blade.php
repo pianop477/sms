@@ -148,7 +148,7 @@
                         <h3>jamhuri ya muungano wa tanzania</h3>
                         <h4>ofisi ya rais - TAMISEMI</h4>
                         <h4>{{$results->first()->school_name}}</h4>
-                        <h6>{{$results->first()->postal_address}} - {{$results->first()->postal_name}}, {{$results->first()->country}}</h6>
+                        <h6>S.L.P. {{$results->first()->postal_address}} - {{$results->first()->postal_name}}, {{$results->first()->country}}</h6>
                         <h6>Ripoti ya maendeleo ya mwanafunzi</h6>
                     </div>
                     <div class="student-image">
@@ -192,7 +192,7 @@
                             <th>Alama</th>
                             <th>Daraja</th>
                             <th>Maoni ya Mwl.</th>
-                            <th>Nafasi</th>
+                            <th>Nafasi @ somo</th>
                         </tr>
                     </thead>
                     <tbody>

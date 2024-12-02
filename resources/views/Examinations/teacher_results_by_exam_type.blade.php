@@ -9,12 +9,12 @@
                     <h4 class="header-title text-center">Select Examination Type for {{ $year }}</h4>
                 </div>
                 <div class="col-2">
-                    <a href="{{route('results_byCourse', ['courses'=>$courses->id])}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                    <a href="{{route('results_byCourse', ['id'=>$class_course->id])}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
                 </div>
             </div>
             <div class="list-group">
                 @foreach ($examTypes as $examType)
-                    <a href="{{ route('results.byExamType', ['courses' => $courses->id, 'year' => $year, 'examType' => $examType->first()->exam_type_id]) }}">
+                    <a href="{{ route('results.byExamType', ['course' => $class_course->course_id, 'year' => $year, 'examType' => $examType->first()->exam_type_id]) }}">
                         <button type="button" class="list-group-item list-group-item-action">
                             <h6 class="text-primary text-capitalize"><i class="fas fa-chevron-right"></i> {{ $examType->first()->exam_type }}</h6>
                         </button>

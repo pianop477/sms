@@ -8,17 +8,17 @@
                     <h4 class="header-title">Fill the Result Form</h4>
                 </div>
                 <div class="col-4">
-                    <a href="{{ route('results_byCourse', $courses->id) }}" class="float-right btn-xs btn btn-success"><i class="ti-eye"></i> Results</a>
+                    <a href="{{ route('home') }}" class="float-right"><i class="fas fa-arrow-circle-left"></i> Back</a>
                 </div>
             </div>
             <form class="needs-validation" novalidate="" action="{{ route('score.captured.values') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="form-row">
                     <!-- Hidden fields -->
-                    <input type="hidden" name="course_id" value="{{ $courses->id }}">
-                    <input type="hidden" name="class_id" value="{{ $courses->class_id }}">
-                    <input type="hidden" name="teacher_id" value="{{ $courses->teacher_id }}">
-                    <input type="hidden" name="school_id" value="{{ $courses->school_id }}">
+                    <input type="hidden" name="course_id" value="{{ $class_course->course_id ?? '' }}">
+                    <input type="hidden" name="class_id" value="{{ $class_course->class_id ?? '' }}">
+                    <input type="hidden" name="teacher_id" value="{{ $class_course->teacher_id ?? '' }}">
+                    <input type="hidden" name="school_id" value="{{ $class_course->school_id ?? '' }}">
 
                     <!-- Exam Type -->
                     <div class="col-md-3 mb-3">

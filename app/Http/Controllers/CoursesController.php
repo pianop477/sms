@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\class_learning_courses;
 use App\Models\Grade;
+use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class CoursesController extends Controller
@@ -15,7 +18,9 @@ class CoursesController extends Controller
     public function index() {
         $user = Auth::user();
         $classes = Grade::where('school_id', '=', Auth::user()->school_id)->orderBy('id', 'ASC')->get();
-        $subjects = Subject::where('school_id', '=', $user->school_id)->get();
+
+        //fetch all registered subjects in the institution
+        $subjects = Subject::where('school_id', $user->school_id)->orderBy('course_name')->get();
         return view('Subjects.index', ['subjects' => $subjects, 'classes' => $classes]);
     }
     /**
@@ -23,168 +28,118 @@ class CoursesController extends Controller
      */
 
      //view courses by each class============================
-     public function classCourses(Grade $class)
+     public function classCourses($id)
      {
-        $courses = Subject::query()->join('grades', 'grades.id', '=', 'subjects.class_id')
-                                    ->join('teachers', 'teachers.id', 'subjects.teacher_id')
-                                    ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-                                    ->select(
-                                        'subjects.*',
-                                        'grades.class_name', 'grades.class_code',
-                                        'users.first_name', 'users.last_name'
-                                    )
-                                    ->where('subjects.class_id', $class->id)
-                                    ->orderBy('subjects.course_name', 'ASC')
+        $class = Grade::find($id);
+        if(! $class) {
+            Alert::error('Error!', 'No such class was found');
+            return back();
+        }
+
+        $classCourse = class_learning_courses::query()
+                                                ->join('teachers', 'teachers.id', '=', 'class_learning_courses.teacher_id')
+                                                ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+                                                ->join('subjects', 'subjects.id', '=', 'class_learning_courses.course_id')
+                                                ->join('grades', 'grades.id', '=', 'class_learning_courses.class_id')
+                                                ->join('schools', 'schools.id', '=', 'class_learning_courses.school_id')
+                                                ->select(
+                                                    'users.first_name', 'users.last_name', 'users.phone',
+                                                    'grades.class_name', 'subjects.course_name', 'subjects.course_code',
+                                                    'class_learning_courses.*'
+                                                )
+                                                ->where('class_learning_courses.class_id', $class->id)
+                                                ->where('class_learning_courses.school_id', $class->school_id)
+                                                ->orderBy('subjects.course_name')
+                                                ->get();
+        $courses = Subject::where('school_id', $class->school_id)->where('status', 1)->orderBy('course_name')->get();
+        $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
+                                    ->select('users.first_name', 'users.last_name', 'teachers.*')
+                                    ->orderBy('users.first_name')
+                                    ->where('teachers.school_id', $class->school_id)
                                     ->get();
-        return view('Courses.index', compact('courses', 'class'));
+        return view('Courses.index', compact('classCourse', 'class', 'courses', 'teachers'));
      }
 
 
     /**
      * Store the newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        // abort(404);
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'code' => 'string|required|max:255',
-            'class' => 'required|integer|exists:grades,id',
-            // 'teacher_id' => 'required|integer',
-        ]);
 
-        $user = Auth::user()->id;
-        $teacher = Teacher::where('user_id', '=', $user)->firstOrFail();
-
-        $courseExisting = Subject::where('course_name', '=', $request->name)
-                                    ->where('course_code', '=', $request->code)
-                                    ->where('class_id', '=', $request->class)
-                                    ->where('school_id', '=', Auth::user()->school_id)
-                                    ->exists();
-        if($courseExisting) {
-            Alert::error('Error', 'Same Course Details already Exists');
-            return back();
-        }
-        $courses = new Subject();
-        $courses->course_name = $request->name;
-        $courses->course_code = $request->code;
-        $courses->class_id = $request->class;
-        $courses->teacher_id = $teacher->id;
-        $courses->school_id = Auth::user()->school_id;
-        $courses->save();
-        Alert::success('Success!', 'Course saved successfully');
-        return back();
-    }
 
     /**
      * Display the resource.
      */
-    public function deleteCourse($course)
-    {
-        //
-        $courses = Subject::findOrFail($course);
-        // return $courses;
-        $courses->delete();
-        Alert::success('Success!', 'Course deleted successfully');
-        return back();
-    }
 
-    /**
-     * Show the form for editing the resource.
-     */
-    public function edit(Subject $course)
+    public function blockCourse($id, Request $request)
     {
-        //
-        $courses = Subject::query()->join('grades', 'grades.id', '=', 'subjects.class_id')
-                                    ->select(
-                                        'subjects.*', 'grades.class_name'
-                                    )->findOrFail($course->id);
-        $classes = Grade::where('school_id', '=', Auth::user()->school_id)->where('status', '=', 1)->orderBy('id', 'ASC')->get();
-        return view('Courses.edit', compact('course', 'courses', 'classes'));
-    }
-
-    /**
-     * Update the resource in storage.
-     */
-    public function update(Request $request, $courses)
-    {
-        //
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'code' => 'required|string|max:255',
-            // 'class'  => 'required|integer|exists:grades,id',
+        $course = Subject::find($id);
+        if(! $course) {
+            Alert::error('Error', 'No such course was found');
+            return back();
+        }
+        $course->update([
+            'status' => $request->input('status', 0)
         ]);
-        $user = Auth::user()->id;
-        $teacher = Teacher::where('user_id', '=', $user)->firstOrFail();
-        $course = Subject::findOrFail($courses);
-        $course->course_name = $request->name;
-        $course->course_code = $request->code;
-        // $course->class_id = $request->class;
-        $course->teacher_id = $teacher->id;
-        $course->save();
-        Alert::success('Success!', 'Course details Updated successfully');
-        return redirect()->route('home');
-    }
 
-    /**
-     * Remove the resource from storage.
-     */
-    public function destroy($course)
-    {
-        // abort(404);
-        $courses = Subject::findOrFail($course);
-        $courses->delete();
-        Alert::success('Success!', 'Courses deleted permanent successfully');
-        return back();
-    }
-
-    public function blockCourse($course, Request $request)
-    {
-        $courses = Subject::findOrFail($course);
-        $courses->status = $request->input('status', 0);
-        $courses->save();
         Alert::success('Success!', 'Course has been blocked successfully');
         return back();
     }
 
-    public function unblockCourse(Request $request, $course)
+    public function unblockCourse(Request $request, $id)
     {
-        $courses = Subject::findOrFail($course);
-        $courses->status = $request->input('status', 1);
-        $courses->save();
+        $course = Subject::find($id);
+        if(! $course) {
+            Alert::error('Error', 'No such course was found');
+            return back();
+        }
+        $course->update([
+            'status' => $request->input('status', 1)
+        ]);
+
         Alert::success('Success!', 'Course has been unblocked successfully');
         return back();
     }
 
-    public function assign($course)
+    public function assign($id)
     {
-        $courses = Subject::query()->join('grades', 'grades.id', '=', 'subjects.class_id')
-                                    ->join('teachers', 'teachers.id', '=', 'subjects.teacher_id')
-                                    ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-                                    ->select('subjects.*', 'grades.class_name', 'teachers.id as teacher_id', 'users.first_name', 'users.last_name')
-                                    ->findOrFail($course);
+        $classCourse = class_learning_courses::query()
+                                            ->join('subjects', 'subjects.id', '=', 'class_learning_courses.course_id')
+                                            ->join('grades', 'grades.id', '=', 'class_learning_courses.class_id')
+                                            ->join('teachers', 'teachers.id', '=', 'class_learning_courses.teacher_id')
+                                            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+                                            ->select(
+                                                'class_learning_courses.*',
+                                                'grades.class_name', 'subjects.course_name', 'users.first_name', 'users.last_name',
+                                                'teachers.id as teacherId'
+                                            )
+                                            ->find($id);
+        if(! $classCourse) {
+            Alert::error('Error', 'No such course was found');
+            return back();
+        }
         $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
-                                    ->select('teachers.id', 'users.first_name', 'users.last_name')
-                                    ->where('teachers.status', '=', 1)
-                                    ->where('teachers.school_id', '=', Auth::user()->school_id)
-                                    ->orderBy('users.first_name', 'ASC')
+                                    ->select('teachers.*', 'users.first_name', 'users.last_name')
+                                    ->where('teachers.id', '!=', $classCourse->teacherId)
+                                    ->where('teachers.role_id', '!=', 2)
                                     ->get();
-        return view('Courses.admin-edit', ['courses' => $courses, 'teachers' => $teachers]);
+
+        return view('Courses.admin-edit', compact('classCourse', 'teachers'));
+
     }
 
-    public function assignedTeacher(Request $request, $courses)
+    public function assignedTeacher(Request $request, $id)
     {
-        $request->validate([
-            'teacher' => 'required|integer|exists:teachers,id'
+        $class_course = class_learning_courses::find($id);
+        if(! $class_course) {
+            Alert::error('Error!', 'No such course was found');
+            return back();
+        }
+
+        $class_course->update([
+            'teacher_id' => $request->teacher_id
         ]);
-
-        $course = Subject::findOrFail($courses);
-        $course->teacher_id = $request->teacher;
-        $course->status = $request->input('status', 1);
-        $course->save();
-        Alert::success('Success!', 'Subject Teacher updated successfully');
-        return redirect()->route('courses.view.class', $course->class_id);
-
+        Alert::success('Success!', 'Subject teacher has been saved successfully');
+        return redirect()->route('courses.view.class', $class_course->class_id);
     }
 
     //teacher remove courses from its lists
@@ -194,6 +149,174 @@ class CoursesController extends Controller
         $courses->status = $request->input('status', 2);
         $courses->save();
         Alert::success('Success!', 'Your course has been moved to trash!');
+        return back();
+    }
+
+    //add course by either head teacher or academic teacher usertype
+    public function addCourse(Request $request)
+    {
+        $this->validate($request, [
+            'sname' => 'required|string|max:255',
+            'scode' => 'required|string|max:10',
+            'school_id' => 'integer|exists:schools,id'
+        ]);
+
+        $ifExists = Subject::where('course_name', $request->sname)
+                            ->where('school_id', $request->school_id)
+                            ->exists();
+
+        if($ifExists) {
+            Alert::error('Error!', 'Course details already exists');
+            return back();
+        }
+        $course = Subject::create([
+            'course_name' => $request->sname,
+            'course_code' => $request->scode,
+            'school_id' => $request->school_id
+        ]);
+
+        Alert::success('Success!', 'Course has been saved successfully');
+        return back();
+    }
+
+    public function editCourse($id)
+    {
+        $course = Subject::find($id);
+        return view('Subjects.edit', compact('course'));
+    }
+
+    public function updateCourse (Request $request, $id)
+    {
+        $course = Subject::find($id);
+
+        if(! $course) {
+            Alert::error('Error', 'No such course was found');
+            return back();
+        }
+
+        $this->validate($request, [
+            'sname' => 'required|string|max:255',
+            'scode' => 'required|string|max:10'
+        ]);
+
+        $course->update([
+            'course_name' => $request->sname,
+            'course_code' => $request->scode,
+        ]);
+
+        Alert::success('Success!', 'Course information has been updated successfully');
+        return redirect()->route('courses.index');
+    }
+
+    public function assignClassCourse (Request $request)
+    {
+        $this->validate($request, [
+            'course_id' => 'integer|exists:subjects,id',
+            'class_id' => 'integer|exists:grades,id',
+            'teacher_id' => 'integer|exists:teachers,id',
+            'school_id' => 'integer|exists:schools,id'
+        ]);
+
+        //check if course already exists to that class
+        $hasAlreadyAssigned = class_learning_courses::where('course_id', $request->course_id)
+                                                        ->where('class_id', $request->class_id)
+                                                        ->where('school_id', $request->school_id)
+                                                        ->exists();
+        if($hasAlreadyAssigned) {
+            Alert::error('Error!', 'Course already assigned to this class');
+            return back();
+        }
+        $class_course = class_learning_courses::create([
+            'course_id' => $request->course_id,
+            'class_id' => $request->class_id,
+            'teacher_id' => $request->teacher_id,
+            'school_id' => $request->school_id
+        ]);
+
+        Alert::success('Success!', 'Data saved successfully');
+        return back();
+    }
+
+    public function deleteCourse($id)
+    {
+        $class_course = class_learning_courses::find($id);
+
+        if(! $class_course) {
+            Alert::error('Error', 'No such course was found in the records');
+            return back();
+        }
+
+        $class_course->delete();
+
+        Alert::success('Success!', 'Subject deleted successfully to this class');
+        return back();
+    }
+
+    //show lists of courses enrolled by students in a class
+    public function viewStudentCourses ($id)
+    {
+        $student = Student::find($id);
+        if(! $student) {
+            Alert::error('Haijafanikiwa', 'Hakuna taarifa za mwanafunzi huyu');
+            return back();
+        }
+
+        $class = Grade::find($student->class_id);
+
+        if(! $class) {
+            Alert::error('Haijafanikiwa', 'Hakuna taarifa za darasa hili');
+            return back();
+        }
+        $class_course = class_learning_courses::query()
+                                            ->join('subjects', 'subjects.id', '=', 'class_learning_courses.course_id')
+                                            ->join('grades', 'grades.id', '=', 'class_learning_courses.class_id')
+                                            ->join('teachers', 'teachers.id', '=', 'class_learning_courses.teacher_id')
+                                            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+                                            ->select(
+                                                'class_learning_courses.*', 'grades.class_name', 'subjects.course_name', 'subjects.course_code',
+                                                'users.first_name', 'users.last_name', 'users.phone'
+                                            )
+                                            ->where('class_learning_courses.class_id', $class->id)
+                                            ->get();
+
+        return view('Subjects.student_subject', compact('class', 'class_course'));
+    }
+
+    public function blockAssignedCourse($id, Request $request)
+    {
+        $class_course = class_learning_courses::find($id);
+
+        if(! $class_course) {
+            Alert::error('Error!', 'No such class course was found');
+            return back();
+        }
+
+        $status = 0;
+
+        $class_course->update([
+            'status' => $status,
+        ]);
+
+        Alert::success('Success!', 'Class course has been blocked successfully');
+        return back();
+    }
+
+    public function unblockAssignedCourse($id, Request $request)
+    {
+        $class_course = class_learning_courses::find($id);
+
+        if(! $class_course) {
+            Alert::error('Error!', 'No such class course was found');
+            return back();
+        }
+
+        $status = 1;
+
+        $class_course->update([
+            'status' => $status,
+        ]);
+
+        Alert::success('Success!', 'Class course has been blocked successfully');
         return back();
     }
 }

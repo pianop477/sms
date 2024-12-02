@@ -37,7 +37,7 @@ class AttendanceController extends Controller
                                 ->orderBy('gender', 'ASC')
                                 ->orderBy('first_name', 'ASC')
                                 ->get();
-        return view('Attendance.index', ['myClass' => $myClass, 'teacher' => $teacher, 'student_class' => $student_class, 'studentList' => $studentList]);
+        return view('Attendance.index', ['myClass' => $myClass, 'teacher' => $teacher, 'student_class' => $student_class, 'studentList' => $studentList, 'class' => $class]);
     }
     /**
      * Show the form for creating the resource.
@@ -96,7 +96,6 @@ class AttendanceController extends Controller
     // Check if attendance already exists for each student
     $existingAttendance = Attendance::whereIn('student_id', $student_ids)
                                     ->where('attendance_date', '=', $attendanceDate)
-                                    ->where('teacher_id', '=', $teacher->id)
                                     ->pluck('student_id')
                                     ->toArray();
 
@@ -124,7 +123,7 @@ class AttendanceController extends Controller
     Attendance::insert($attendanceData);
 
     Alert::success('Success', 'Attendance Submitted and Saved successfully');
-    return redirect()->route('get.student.list');
+    return redirect()->back();
 }
 
 public function show(Student $student, $year)
@@ -307,6 +306,7 @@ public function show(Student $student, $year)
         $user = Auth::user()->id;
         $teacher = Teacher::where('user_id', '=', $user)->firstOrFail();
         $class = Grade::findOrFail($student_class);
+        // return $class;
         $classTeacher = Class_teacher::where('class_id', '=', $class->id)->firstOrFail();
         $teacher_id = $classTeacher->teacher_id;
         $teacherGroup = $classTeacher->group;
@@ -360,11 +360,17 @@ public function show(Student $student, $year)
                 }
             }
         }
+        $message = 'You have not submitted daily attendance report, please do it right now!';
 
-        $pdf = \PDF::loadView('Attendance.pdfreport', compact('attendanceRecords', 'malePresent', 'maleAbsent',
+        if($attendanceRecords->isEmpty()) {
+            return view('Attendance.todayAttendance', compact('message', 'class'));
+        }
+        else {
+            $pdf = \PDF::loadView('Attendance.pdfreport', compact('attendanceRecords', 'malePresent', 'maleAbsent',
             'malePermission', 'femalePresent', 'femaleAbsent', 'femalePermission'));
 
             return $pdf->stream($today.' Attendance.pdf');
+        }
     }
 
 
