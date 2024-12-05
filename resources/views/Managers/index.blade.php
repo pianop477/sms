@@ -18,6 +18,7 @@
                                         <th scope="col">Gender</th>
                                         <th scope="col">Phone</th>
                                         <th scope="col">Email</th>
+                                        <th scope="col">School</th>
                                         <th scope="col">status</th>
                                     </tr>
                                 </thead>
@@ -31,6 +32,7 @@
                                             <td class="text-capitalize">{{$manager->gender[0]}}</td>
                                             <td> {{$manager->phone}}</td>
                                             <td>{{$manager->email}}</td>
+                                            <td class="text-capitalize">{{$manager->school_name}}</td>
                                             <td>
                                                 @if ($manager->status == 1)
                                                 <span class="status-p bg-success">Active</span>
