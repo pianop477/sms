@@ -57,7 +57,7 @@ Auth::routes();
     Route::post('/Feedback', [SendMessageController::class, 'store'])->name('send.feedback.message');
 //end of condition =================================================
 
-Route::middleware('auth', 'activeUser')->group(function () {
+Route::middleware('auth', 'activeUser', 'throttle:60,1')->group(function () {
     Route::middleware('CheckUsertype:1,2,3,4')->group(function () {
         // Home controller redirection ==============================================================================
         Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
