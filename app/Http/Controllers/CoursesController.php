@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\class_learning_courses;
+use App\Models\Class_teacher;
 use App\Models\Grade;
 use App\Models\Student;
 use App\Models\Subject;
@@ -278,8 +279,19 @@ class CoursesController extends Controller
                                             )
                                             ->where('class_learning_courses.class_id', $class->id)
                                             ->get();
+        //fetch class teacher details
+        $student = Student::where('class_id', $class->id)->first();
+        $myClassTeacher = Class_teacher::query()
+                                        ->join('teachers', 'teachers.id', '=', 'class_teachers.teacher_id')
+                                        ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+                                        ->join('grades', 'grades.id', '=', 'class_teachers.class_id')
+                                        ->select('users.first_name', 'users.last_name', 'users.phone', 'users.gender', 'users.image', 'class_teachers.*', 'grades.class_name')
+                                        ->where('class_teachers.class_id', $class->id)
+                                        ->where('class_teachers.group', $student->group)
+                                        ->get();
+        // return ['data' => $myClassTeacher];
 
-        return view('Subjects.student_subject', compact('class', 'class_course'));
+        return view('Subjects.student_subject', compact('class', 'class_course', 'myClassTeacher'));
     }
 
     public function blockAssignedCourse($id, Request $request)
