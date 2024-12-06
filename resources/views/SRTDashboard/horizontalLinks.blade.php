@@ -52,6 +52,9 @@
                                     <li><a href="{{route('results.general', Auth::user()->school_id)}}"><i class="ti-layers-alt"></i>Results</a></li>
                                 </ul>
                             </li>
+                            <li>
+                                <a href="{{route('Teachers.trashed')}}"><i class="fa fa-trash"></i><span> Dustbin</span></a>
+                            </li>
                         @endif
                         @if (Auth::user()->usertype == 2 || Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 2)
                             <li>

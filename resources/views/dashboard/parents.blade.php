@@ -23,7 +23,7 @@
                         </div>
                         <div class="col-4">
                             <button type="button" class="btn btn-xs btn-info float-right" data-toggle="modal" data-target=".bd-example-modal-lg">
-                                <i class="fas fa-plus"></i> Sajili Mpya
+                                <i class="fas fa-plus"></i> Andikisha Mwanafunzi
                             </button>
                             <div class="modal fade bd-example-modal-lg">
                                 <div class="modal-dialog modal-lg">
@@ -174,7 +174,7 @@
                                                 <a href="{{route('Students.show', $student->id)}}">{{$student->first_name. ' '.$student->middle_name.' ' .$student->last_name}}</a>
                                             </td>
                                             <td class="text-uppercase">{{$student->gender[0]}}</td>
-                                            <td class="text-uppercase">{{$student->class_code}}</td>
+                                            <td class="text-uppercase">{{$student->class_code}} {{$student->group}}</td>
                                             <td>
                                                 <ul class="d-flex justify-content-center">
                                                     <div class="btn-group" role="group">

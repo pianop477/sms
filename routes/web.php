@@ -108,6 +108,11 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1')->group(function () {
         Route::get('{class}/Create-selected-class', [StudentsController::class, 'showStudent'])->name('create.selected.class');
         Route::get('{classId}/Student-registration', [StudentsController::class, 'create'])->name('student.create');
         Route::post('{class}/Student-registration', [StudentsController::class, 'createNew'])->name('student.store');
+        Route::put('{id}/Promote-students', [StudentsController::class, 'promoteClass'])->name('promote.student.class');
+        Route::put('{student}/Delete-student', [StudentsController::class, 'destroy'])->name('Students.destroy');
+        Route::get('Student-trash', [StudentsController::class, 'studentTrashList'])->name('students.trash');
+        Route::put('{id}/Restore-trashed-students', [StudentsController::class, 'restoreTrashList'])->name('student.restored.trash');
+        Route::get('{id}/Delete-student-permanent', [StudentsController::class, 'deletePerStudent'])->name('student.delete.permanent');
 
         //manage classses ========================================================================================
         // Route::resource('Classes', ClassesController::class);
@@ -260,8 +265,6 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1')->group(function () {
 
     //delete students records =======================================================================================
     Route::middleware(['GeneralMiddleware'])->group(function () {
-        Route::put('{student}/Delete-student', [StudentsController::class, 'destroy'])->name('Students.destroy');
-
         //reset users passwords =====================================================================================
         Route::prefix('User-management')->group(function () {
             Route::get('Password-Reset', [RolesController::class, 'userPassword'])->name('users.lists');

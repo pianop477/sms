@@ -9,6 +9,20 @@
                     <div class="col-8">
                         <h4 class="header-title text-uppercase text-center">Deleted Teachers Accounts</h4>
                     </div>
+                    <div class="col-4">
+                        <div class="btn-group float-right btn-xs" role="group" aria-label="Button group with nested dropdown">
+                            <div class="btn-group" role="group">
+                              <button id="btnGroupDrop1" type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Deleted Account
+                              </button>
+                              <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                <a href="{{route('Teachers.trashed')}}" class="dropdown-item">Teachers</a>
+                                <a class="dropdown-item" href="{{route('students.trash')}}">Students</a>
+                                <a class="dropdown-item" href="#">Parents</a>
+                              </div>
+                            </div>
+                          </div>
+                    </div>
                 </div>
                 <div class="single-table">
                     <div class="table-responsive">
