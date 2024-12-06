@@ -123,7 +123,7 @@
 
             </div>
             <div class="col-md-4 mb-3">
-                <button class="btn btn-primary" type="submit">Hifadhi</button>
+                <button class="btn btn-success" type="submit">Hifadhi Taarifa</button>
             </div>
 
 @endsection

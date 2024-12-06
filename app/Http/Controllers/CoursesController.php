@@ -257,6 +257,7 @@ class CoursesController extends Controller
     public function viewStudentCourses ($id)
     {
         $student = Student::find($id);
+        // return $student;
         if(! $student) {
             Alert::error('Haijafanikiwa', 'Hakuna taarifa za mwanafunzi huyu');
             return back();
@@ -280,7 +281,7 @@ class CoursesController extends Controller
                                             ->where('class_learning_courses.class_id', $class->id)
                                             ->get();
         //fetch class teacher details
-        $student = Student::where('class_id', $class->id)->first();
+
         $myClassTeacher = Class_teacher::query()
                                         ->join('teachers', 'teachers.id', '=', 'class_teachers.teacher_id')
                                         ->leftJoin('users', 'users.id', '=', 'teachers.user_id')

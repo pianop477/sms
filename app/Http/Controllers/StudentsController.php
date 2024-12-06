@@ -238,7 +238,29 @@ class StudentsController extends Controller
                             ->where('students.status', 1)
                             ->orderBy('students.first_name', 'ASC')
                             ->get();
-        return view('Students.index', ['students' => $students, 'classId' => $classId, 'parents' => $parents, 'buses' => $buses]);
+        $classes = Grade::where('id', '!=', $classId->id)->get();
+        return view('Students.index', ['students' => $students, 'classId' => $classId, 'parents' => $parents, 'buses' => $buses, 'classes' => $classes]);
+    }
+
+    //promote students to the next class
+    public function promoteClass($id, Request $request)
+    {
+        $class = Grade::find($id);
+        if(! $class) {
+            Alert::error('Error!', 'No such class was found');
+            return back();
+        }
+
+        $this->validate($request, [
+            'class_id' => 'required|exists:grades,id',
+        ]);
+
+        // $student = Student::where('class_id', $class->id)->get();
+        Student::where('class_id', $class->id)->update(['class_id' => $request->class_id]);
+        Alert::success('Success!', 'Students have been upgraded to the next class');
+        return back();
+        // return $student;
+
     }
 
     //export to pdf ======================
@@ -401,6 +423,50 @@ class StudentsController extends Controller
         $buses = Transport::where('status', '=', 1)->orderBy('driver_name', 'ASC')->get();
         $classes = Grade::where('status', '=', 1)->get();
         return view('Students.edit', ['buses' => $buses, 'students' => $students, 'classes' => $classes ]);
+    }
+
+    public function studentTrashList()
+    {
+        $user = Auth::user();
+
+        $students = Student::query()
+                            ->join('grades', 'grades.id', '=', 'students.class_id')
+                            ->select(
+                                'students.*', 'grades.class_name'
+                            )
+                            ->where('students.status', 2)
+                            ->where('students.school_id', $user->school_id)
+                            ->get();
+        return view('Students.trash', compact('students'));
+    }
+
+    public function restoreTrashList ($id, Request $request)
+    {
+        $student = Student::find($id);
+
+        if(! $student ) {
+            Alert::error('Error!', 'No such student was found');
+            return back();
+        }
+
+        $status = 1;
+        $student->update(['status' => $request->input('status', $status)]);
+        Alert::success('Success!', 'Student has been restored successfully');
+        return back();
+    }
+
+    public function deletePerStudent($id)
+    {
+        $student = Student::find($id);
+
+        if(! $student) {
+            Alert::error('Error!', 'No such student was found');
+            return back();
+        }
+
+        $student->delete();
+        Alert::success('Done!', 'Student has been deleted permanently');
+        return back();
     }
 
 }

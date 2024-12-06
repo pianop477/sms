@@ -413,50 +413,53 @@ public function show(Student $student, $year)
                     ->orderBy('students.first_name', 'ASC')
                     ->get();
 
-        $maleSummary = [];
-        $femaleSummary = [];
-
-        foreach($attendances as $attendance) {
-            $date = Carbon::parse($attendance->attendance_date)->format('Y-m-d');
-
-            if(!isset($maleSummary[$date])) {
-                $maleSummary[$date] = [
-                    'present' => 0,
-                    'absent' => 0,
-                    'permission' => 0
-                ];
-            }
-            if (!isset($femaleSummary[$date])) {
-                $femaleSummary[$date] = [
-                    'present' => 0,
-                    'absent' => 0,
-                    'permission' => 0,
-                ];
-            }
-            $gender = $attendance->gender;
-            $status = $attendance->attendance_status;
-            if($gender === 'male') {
-                $maleSummary[$date][$status]++;
-            } else {
-                $femaleSummary[$date][$status]++;
-            }
+        if($attendances->isEmpty()) {
+            $message = 'No attendance records found';
+            return view('Attendance.attendance_records', compact('message'));
         }
+        else {
+            $maleSummary = [];
+            $femaleSummary = [];
 
-        // Group by attendance date
-        $datas = $attendances->groupBy(function($item) {
-            return Carbon::parse($item->attendance_date)->format('Y-m-d');
-        });
-        $pdf = \PDF::loadView('Attendance.all_report', compact('datas', 'maleSummary', 'femaleSummary', 'attendances', 'startOfMonth', 'endOfMonth'));
+            foreach($attendances as $attendance) {
+                $date = Carbon::parse($attendance->attendance_date)->format('Y-m-d');
 
-        if ($attendances->isNotEmpty()) {
-            $className = $attendances->first()->class_name;
-            $attendanceDate = Carbon::parse($attendances->first()->attendance_date)->format('F');
-            $fileName = "{$className} {$attendanceDate} Attendance Report.pdf";
-        } else {
-            $fileName = "Attendance Report.pdf";
+                if(!isset($maleSummary[$date])) {
+                    $maleSummary[$date] = [
+                        'present' => 0,
+                        'absent' => 0,
+                        'permission' => 0
+                    ];
+                }
+                if (!isset($femaleSummary[$date])) {
+                    $femaleSummary[$date] = [
+                        'present' => 0,
+                        'absent' => 0,
+                        'permission' => 0,
+                    ];
+                }
+                $gender = $attendance->gender;
+                $status = $attendance->attendance_status;
+                if($gender === 'male') {
+                    $maleSummary[$date][$status]++;
+                } else {
+                    $femaleSummary[$date][$status]++;
+                }
+            }
+
+                // Group by attendance date
+                $datas = $attendances->groupBy(function($item) {
+                    return Carbon::parse($item->attendance_date)->format('Y-m-d');
+                });
+
+                $pdf = \PDF::loadView('Attendance.all_report', compact('datas', 'maleSummary', 'femaleSummary', 'attendances', 'startOfMonth', 'endOfMonth'));
+
+                $className = $attendances->first()->class_name;
+                $attendanceDate = Carbon::parse($attendances->first()->attendance_date)->format('F');
+                $fileName = "{$className} {$attendanceDate} Attendance Report.pdf";
+
+                return $pdf->stream($fileName);
         }
-
-        return $pdf->stream($fileName);
     }
 
 }
