@@ -93,32 +93,34 @@ class HomeController extends Controller
                                                 ->get();
                 //return myclass assigned as class teachers ------------------------
                 $myClass = Class_teacher::query()
-                    ->join('grades', 'grades.id', 'class_teachers.class_id')
-                    ->join('teachers', 'teachers.id', 'class_teachers.teacher_id')
-                    ->leftJoin('users', 'users.id', 'teachers.user_id')
-                    ->select(
-                        'class_teachers.*',
-                        'grades.id as class_id',
-                        'grades.class_name',
-                        'grades.class_code',
-                        'users.first_name',
-                        'users.last_name',
-                        'users.gender',
-                        'users.phone'
-                    )
-                    ->where('class_teachers.teacher_id', '=', $teachers->id)
-                    ->where('class_teachers.school_id', '=', $teachers->school_id)
-                    ->get();
+                            ->join('grades', 'grades.id', 'class_teachers.class_id')
+                            ->join('teachers', 'teachers.id', 'class_teachers.teacher_id')
+                            ->leftJoin('users', 'users.id', 'teachers.user_id')
+                            ->select(
+                                'class_teachers.*',
+                                'grades.id as class_id',
+                                'grades.class_name',
+                                'grades.class_code',
+                                'users.first_name',
+                                'users.last_name',
+                                'users.gender',
+                                'users.phone'
+                            )
+                            ->where('class_teachers.teacher_id', '=', $teachers->id)
+                            ->where('class_teachers.school_id', '=', $teachers->school_id)
+                            ->get();
 
                     $classData = [];
                     foreach ($myClass as $class) {
                         $maleCount = Student::where('class_id', $class->class_id)
                                             ->where('group', $class->group)
                                             ->where('gender', 'male')
+                                            ->where('status', 1)
                                             ->count();
                         $femaleCount = Student::where('class_id', $class->class_id)
                                               ->where('group', $class->group)
                                               ->where('gender', 'female')
+                                              ->where('status', 1)
                                               ->count();
 
                         $classData[] = [
@@ -213,6 +215,14 @@ class HomeController extends Controller
                 // Ensure the directory exists
                 if (!file_exists($imageDestinationPath)) {
                     mkdir($imageDestinationPath, 0775, true);
+                }
+
+                //check for existing image file
+                if(! empty($userData->image)) {
+                    $existingFile = $imageDestinationPath . '/' . $userData->image;
+                    if(file_exists($existingFile)) {
+                        unlink($existingFile);
+                    }
                 }
 
                 // Move the file

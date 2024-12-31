@@ -71,7 +71,7 @@
                         @if ($myClassTeacher->first()->image == NULL)
                         <i class="fas fa-user-tie" style="font-size: 5rem;"></i>
                         @else
-                            <img src="{{asset('assets/img/profile/'.$myClassTeacher->first()->image)}}" alt="" class="" style="max-width: 100px; border:1px solid gray; border-radius:4px;">
+                            <img src="{{asset('assets/img/profile/'.$myClassTeacher->first()->image)}}" alt="" class="" style="max-width: 100px; border-radius:50px;">
                         @endif
                     </div>
                     <ul class="list-group">

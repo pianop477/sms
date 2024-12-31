@@ -9,8 +9,9 @@
         /* Inline your Bootstrap CSS styles here */
         body {
             font-family: Arial, sans-serif;
-            margin: 0; /* Remove default margin */
-            padding: 0; /* Remove default padding */
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
         }
         @media print {
             .no-print {
@@ -46,68 +47,62 @@
             .table td {
                 border: 1px solid black;
             }
-            @page {
-                margin: 20mm;
-                @bottom-center {
-                    content: "Page " counter(page) " of " counter(pages);
-                }
-            }
         }
 
         .container {
             display: flex;
-            padding: 10px;
+            padding: 5px;
             flex-direction: row;
             flex-wrap: wrap;
         }
         .logo {
-            margin-left: 45%;
-            top: 30%;
+            position: absolute;
+            width: 50px;
+            left: 7px;
+            top: 20px;
             color: inherit;
         }
         .header {
             text-align: center;
             position: relative;
-            top: 5%;
+            top: 0;
+            left: 40px;
+            margin-bottom: 10px;
             text-transform: uppercase;
-            font-size: 20px;
-        }
-        .summary-header {
-            text-align: center;
-            text-transform: capitalize;
-            font-size: 20px;
-            line-height: 2px;
-            margin-bottom: 0%;
-            padding: 0%;
-        }
-        .summary-content {
-            display: flex;
-            flex-direction: row;
-            text-transform: capitalize
-        }
-        .course-details {
-            position: relative;
-            left: 5px;
-            width: auto;
-            line-height: 5px;
-        }
-
-        th, td {
-            border: 1px solid black;
+            font-size: 24px;
+            color: #343a40;
         }
         .table {
             width: 100%;
             border: 1px solid black;
             border-collapse: collapse;
         }
-        .date-section {
-            page-break-before: always;
+
+        .table th, .table td {
+            border: 1px solid #dee2e6;
+            padding: 2px;
+            text-align: left;
+            text-transform: capitalize
         }
-        .title {
-            text-transform: uppercase;
+
+        .table th {
+            background-color: #343a40;
+            color: #fff;
             text-align: center;
-            font-size: 30px;
         }
+
+        .table td {
+            background-color: #fff;
+        }
+
+        .table img {
+            display: block;
+            margin: 0 auto;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
         .footer {
             position: fixed;
             bottom: -30px;

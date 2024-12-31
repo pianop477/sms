@@ -394,12 +394,13 @@ class ExamController extends Controller
                         ->select(
                             'examination_results.*', 'grades.class_name', 'grades.class_code', 'examinations.exam_type',
                             'students.first_name', 'students.id as studentId', 'students.middle_name', 'students.last_name', 'students.gender', 'students.group', 'students.class_id', 'students.admission_number',
-                            'subjects.course_name', 'subjects.course_code', 'users.first_name as teacher_firstname',
+                            'subjects.course_name', 'subjects.course_code', 'users.first_name as teacher_firstname', 'students.status',
                             'users.last_name as teacher_lastname', 'users.gender as teacher_gender', 'users.phone as teacher_phone', 'schools.school_reg_no'
                         )
                         ->where('examination_results.course_id', $class_course->course_id)
                         ->where('examination_results.class_id', $class_course->class_id)
                         ->where('examination_results.teacher_id', $class_course->teacher_id)
+                        ->where('students.status', 1)
                         ->whereYear('examination_results.exam_date', $year)
                         ->where('examination_results.exam_type_id', $examType)
                         ->whereMonth('examination_results.exam_date', $monthNumber)

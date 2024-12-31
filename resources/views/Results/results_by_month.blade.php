@@ -9,9 +9,9 @@
         /* Inline your Bootstrap CSS styles here */
         body {
             font-family: Arial, sans-serif;
-            /* line-height: 2px; */
-            margin: 0; /* Remove default margin */
-            padding: 0; /* Remove default padding */
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
         }
         @media print {
             .no-print {
@@ -73,6 +73,9 @@
             left: 40px;
             text-transform: uppercase;
             line-height: 1px;
+            margin-bottom: 10px;
+            font-size: 24px;
+            color: #343a40;
         }
         .summary-header {
             margin-top: 5px;
@@ -113,10 +116,20 @@
             tbody {
                 display: table-row-group;
             }
+
+            .table th {
+                background-color: #343a40;
+                color: #fff;
+                text-align: center;
+            }
             .table th,
             .table td {
                 /* border: 1px solid black; */
                 text-transform: capitalize;
+            }
+
+            .table td {
+                background-color: #fff;
             }
 
             .details {
@@ -262,10 +275,11 @@
                 <div class="final-summary">
                     <table class="table results" style="width:80%">
                         <tr>
-                            <th colspan="4">SUBJECTWISE PERFORMANCE</th>
+                            <th colspan="5">SUBJECTWISE PERFORMANCE</th>
                         </tr>
                         <tr style="">
                             <th style="text-transform: uppercase">Subject Name</th>
+                            <th style="text-transform: uppercase">Subject code</th>
                             <th style="text-align:center">Subject average</th>
                             <th style="text-align:center">subjects ranking</th>
                             <th style="text-align:center">subject grade</th>
@@ -273,6 +287,7 @@
                         @foreach ($sortedCourses as $course)
                             <tr>
                                 <td style="text-transform: uppercase">{{ $course['course_name'] }} </td>
+                                <td style="text-transform: uppercase; text-align:center">{{ $course['course_code'] }} </td>
                                 <td style="text-align:center">{{ number_format($course['average_score'], 2) }}</td>
                                 <td style="text-align:center">{{ $course['position'] }}</td>
                                     @if ($course['grade']=='A')

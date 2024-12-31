@@ -9,9 +9,9 @@
         /* Inline your Bootstrap CSS styles here */
         body {
             font-family: Arial, sans-serif;
-            /* line-height: 2px; */
-            margin: 0; /* Remove default margin */
-            padding: 0; /* Remove default padding */
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
         }
         @media print {
             .no-print {
@@ -51,16 +51,15 @@
 
         .container {
             display: flex;
-            padding: 10px;
+            padding: 5px;
             flex-direction: row;
             flex-wrap: wrap;
-            border-bottom: 2px solid gray;
         }
         .logo {
             position: absolute;
             width: 50px;
             left: 7px;
-            top: 5px;
+            top: 20px;
             color: inherit;
         }
         .header {
@@ -68,31 +67,43 @@
             position: relative;
             top: 0;
             left: 40px;
+            margin-bottom: 10px;
             text-transform: uppercase;
-            line-height: 1px;
-        }
-        th, td {
-            border: 1px solid black;
+            font-size: 24px;
+            color: #343a40;
         }
         .table {
             width: 100%;
             border: 1px solid black;
             border-collapse: collapse;
-            font-size: 11px
         }
-        thead {
-                display: table-header-group;
-                background-color: gray; /* Adds a gray background to thead */
-            }
-            tbody {
-                display: table-row-group;
-            }
-            .table th,
-            .table td {
-                /* border: 1px solid black; */
-                text-transform: capitalize;
-            }
-            .footer {
+
+        .table th, .table td {
+            border: 1px solid #dee2e6;
+            padding: 2px;
+            text-align: left;
+            text-transform: capitalize
+        }
+
+        .table th {
+            background-color: #343a40;
+            color: #fff;
+            text-align: center;
+        }
+
+        .table td {
+            background-color: #fff;
+        }
+
+        .table img {
+            display: block;
+            margin: 0 auto;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .footer {
             position: fixed;
             bottom: -30px;
             align-content: space-around;

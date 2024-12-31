@@ -12,7 +12,7 @@
                     <div class="col-2">
                         @if ($students->isNotEmpty())
                             <h6 class="text-left">
-                                <a href="{{route('transport.export', $trans->id)}}" class="btn btn-primary btn-xs float-right">Export PDF</a>
+                                <a href="{{route('transport.export', $trans->id)}}" target="_blank" class="btn btn-primary btn-xs float-right"><i class="fas fa-cloud-arrow-down"></i> Export</a>
                             </h6>
                         @endif
                     </div>

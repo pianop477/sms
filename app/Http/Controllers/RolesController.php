@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PasswordResetEvent;
 use App\Models\Class_teacher;
 use App\Models\Grade;
 use App\Models\Role;
@@ -136,8 +137,11 @@ class RolesController extends Controller
     public function resetPassword (Request $request, $user)
     {
         $users = User::findOrFail($user);
+
         $users->password = Hash::make($request->input('password', 'shule@2024'));
         $users->save();
+        //dispatch event to logout user after password reset
+        event(new PasswordResetEvent($user));
         Alert::success('Success!', 'Password reset successfully');
         return back();
     }

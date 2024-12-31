@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PasswordResetEvent;
 use App\Models\Class_teacher;
 use App\Models\school;
 use App\Models\Teacher;
@@ -50,7 +51,7 @@ class TeachersController extends Controller
                             ->orderBy('users.first_name', 'ASC')
                             ->get();
         $pdf = \PDF::loadView('Teachers.teachers_pdf', compact('teachers'));
-         return $pdf->download('teachers.pdf');
+         return $pdf->stream('teachers.pdf');
     }
     /**
      * Show the form for creating the resource.
@@ -76,21 +77,22 @@ class TeachersController extends Controller
             'phone' => 'required|string|min:10|max:15',
             'qualification' => 'required|integer|max:20',
             'street' => 'required|string|max:255',
-            'joined' => 'required|date_format:Y'
+            'joined' => 'required|date_format:Y',
+            'school_id' => 'exists:schools, id'
         ]);
 
         Log::info('Validation passed', $validatedData);
 
         $existingRecords = Teacher::where('dob', $request->dob)
-            ->where('qualification', $request->qualification)
-            ->where('address', $request->street)
-            ->where('school_id', Auth::user()->school_id)
-            ->exists();
+                ->where('phone', $request->phone)
+                ->where('first_name', $request->fname)
+                ->where('school_id', Auth::user()->school_id)
+                ->exists();
 
         if ($existingRecords) {
-            Log::info('Duplicate record detected for DOB: ' . $request->dob);
+            // Log::info('Duplicate record detected for DOB: ' . $request->dob);
 
-            Alert::error('Error', 'Teacher with the same records already exists in our records');
+            Alert::error('Error', 'Teacher with the same records already exists');
             return back();
         }
 
@@ -104,12 +106,12 @@ class TeachersController extends Controller
             $users->email = $request->email;
             $users->phone = $request->phone;
             $users->gender = $request->gender;
-            $users->usertype = $request->usertype;
-            $users->password = Hash::make($request->password);
+            $users->usertype = $request->input('usertype', 3);
+            $users->password = Hash::make($request->input('password', 'shule@2024'));
             $users->school_id = $request->school_id;
             $users->save();
 
-            Log::info('User created successfully', ['user_id' => $users->id]);
+            // Log::info('User created successfully', ['user_id' => $users->id]);
 
             // Create Teacher
             $teachers = new Teacher();
@@ -220,10 +222,20 @@ class TeachersController extends Controller
 
             // Handle image upload
             if ($request->hasFile('image')) {
-                Log::info('Image upload detected');
+                // Log::info('Image upload detected');
                 $image = $request->file('image');
                 $imageName = time() . '.' . $image->getClientOriginalExtension();
-                $image->move(public_path('assets/img/profile'), $imageName);
+                $imagePath = public_path('assets/img/profile');
+
+                //check for existing file before update new
+                if(!empty($user->image)) {
+                    $existingImagePath = public_path('assets/img/profile/' . $user->image);
+                    if (file_exists($existingImagePath)) {
+                        unlink($existingImagePath);
+                    }
+                }
+
+                $image->move($imagePath, $imageName);
                 $user->image = $imageName;
             }
 
@@ -287,6 +299,7 @@ class TeachersController extends Controller
             $teacher->status = $status;
             $teacher->save();
         });
+        event(new PasswordResetEvent($user->id));
 
         // Show success message
         Alert::success('Success', 'Teacher has been blocked successfully');

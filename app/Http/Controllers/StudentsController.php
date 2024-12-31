@@ -6,8 +6,10 @@ use App\Models\Grade;
 use App\Models\Parents;
 use App\Models\Student;
 use App\Models\Transport;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Psy\Command\WhereamiCommand;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Storage;
@@ -64,6 +66,7 @@ class StudentsController extends Controller
                 'driver' => 'nullable|exists:transports,id',
                 'group' => 'required|string|max:255',
                 'image' => 'nullable|image|max:2048',
+                'school_id' => 'exists:schools,id'
             ]);
 
             // Check for existing student records
@@ -175,7 +178,8 @@ class StudentsController extends Controller
         $student->gender = $request->gender;
         $student->dob = $request->dob;
         $student->transport_id = $request->driver;
-        if($request->hasFile('image')){
+
+        if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageFile = time() . '.' . $image->getClientOriginalExtension();
             $imagePath = public_path('assets/img/students');
@@ -185,13 +189,24 @@ class StudentsController extends Controller
                 mkdir($imagePath, 0775, true);
             }
 
-            // Move the file
+            // Check if the existing file exists and delete it
+            if (!empty($student->image)) {
+                $existingFile = $imagePath . '/' . $student->image;
+                if (file_exists($existingFile) && is_file($existingFile)) {
+                    unlink($existingFile);
+                }
+            }
+
+            // Move the new file
             $image->move($imagePath, $imageFile);
+
+            // Save the file name to the database
             $student->image = $imageFile;
         }
+
         $student->save();
         Alert::success('Success', 'Student records updated successfully');
-        return back();
+        return redirect()->route('Students.show', $students);
 
     }
 
@@ -246,21 +261,77 @@ class StudentsController extends Controller
     public function promoteClass($id, Request $request)
     {
         $class = Grade::find($id);
-        if(! $class) {
+        if (! $class) {
             Alert::error('Error!', 'No such class was found');
             return back();
         }
 
         $this->validate($request, [
-            'class_id' => 'required|exists:grades,id',
+            'class_id' => 'required',
         ]);
 
-        // $student = Student::where('class_id', $class->id)->get();
-        Student::where('class_id', $class->id)->update(['class_id' => $request->class_id]);
-        Alert::success('Success!', 'Students have been upgraded to the next class');
-        return back();
-        // return $student;
+        if ($request->class_id == 0) {
+            // Mark students as graduated
+            Student::where('class_id', $class->id)->update(['graduated' => true, 'status' => 0]);
+            Alert::info('Conglaturations🎉', 'Students has graduated and awarded primary education certificate');
+            return back();
+        } else {
+            // Promote students to the next class
+            Student::where('class_id', $class->id)->update(['class_id' => $request->class_id]);
 
+            Alert::success('Success!', 'Students have been upgraded to the next class');
+            return back();
+        }
+
+    }
+
+    //call graduate class list by year updated_at
+    public function callGraduateStudents()
+    {
+        $user = Auth::user();
+        $studentsByYear = Student::where('school_id', $user->school_id)
+                        ->where('graduated', true)
+                        ->where('status', 0)
+                        ->select(DB::raw('YEAR(updated_at) as year'), 'id', 'first_name', 'updated_at')
+                        ->get()
+                        ->groupBy('year');
+        return view('Students.graduate', compact('studentsByYear'));
+
+    }
+
+    //show graduated students in a specific year
+    public function graduatedStudentByYear($year)
+    {
+        $user = Auth::user();
+
+        $GraduatedStudents = Student::query()
+                                    ->join('schools', 'schools.id', '=', 'students.school_id')
+                                    ->select('students.*', 'schools.school_reg_no')
+                                    ->where('school_id', $user->school_id)
+                                    ->where('students.graduated', true)
+                                    ->where('students.status', 0)
+                                    ->whereYear('students.updated_at', $year)
+                                    ->orderBy('students.first_name')
+                                    ->get();
+        return view('Students.graduate_students_list', compact('GraduatedStudents', 'year'));
+    }
+
+    //export graduated students in a specific year
+    public function exportGraduateStudents($year)
+    {
+        $user = Auth::user();
+
+        $studentExport = Student::query()
+                                    ->join('schools', 'schools.id', '=', 'students.school_id')
+                                    ->select('students.*', 'schools.school_reg_no')
+                                    ->where('school_id', $user->school_id)
+                                    ->where('students.graduated', true)
+                                    ->where('students.status', 0)
+                                    ->whereYear('students.updated_at', $year)
+                                    ->orderBy('students.first_name')
+                                    ->get();
+        $pdf = \PDF::loadView('Students.ExportedGraduates', compact('studentExport', 'year'));
+        return $pdf->stream('Graduate_students_'.$year.'.pdf');
     }
 
     //export to pdf ======================
@@ -279,6 +350,7 @@ class StudentsController extends Controller
                                         'parents.address', 'users.phone'
                                     )
                                     ->where('students.class_id', $classId)
+                                    ->where('students.status', 1)
                                     ->orderBy('students.first_name')
                                     ->get();
         $pdf = \PDF::loadView('Students.student_export', compact('students'));
@@ -290,7 +362,7 @@ class StudentsController extends Controller
         } else {
             $fileName = "Students List.pdf";
         }
-        return $pdf->download($fileName);
+        return $pdf->stream($fileName);
     }
 
     public function parentByStudent()
@@ -314,6 +386,7 @@ class StudentsController extends Controller
             'driver' => 'nullable|integer|exists:transports,id',
             'group' => 'required|string|max:255',
             'image' => 'nullable|image|max:2048',
+            'school_id' => 'exists:schools,id',
         ]);
 
          // Check for existing student records
@@ -324,8 +397,8 @@ class StudentsController extends Controller
                                     ->exists();
 
         if ($existingRecords) {
-        Alert::error('Error', 'Student with the same records already exists in our records');
-        return back();
+            Alert::error('Error', 'Student with the same records already exists in our records');
+            return back();
         }
 
         $students = new Student();
@@ -394,6 +467,7 @@ class StudentsController extends Controller
                             'schools.school_reg_no',
                         )
                         ->where('students.id', '=', $student)
+                        ->where('students.status', 1)
                         ->first();
 
         // Check if the data is found

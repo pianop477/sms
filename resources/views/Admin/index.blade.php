@@ -7,21 +7,21 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-10">
-                        <h4 class="header-title text-uppercase text-center">Parents list</h4>
+                        <h4 class="header-title text-uppercase text-center">Super users Admin Accounts</h4>
                     </div>
                     <div class="col-2">
                         <button type="button" class="btn btn-xs btn-info" data-toggle="modal" data-target=".bd-example-modal-lg">
-                            <i class="fas fa-user-plus"></i> New Parent
+                            <i class="fas fa-user-plus"></i> New User
                         </button>
                         <div class="modal fade bd-example-modal-lg">
                             <div class="modal-dialog modal-lg">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title">Parents Registration Form</h5>
+                                        <h5 class="modal-title">users Registration Form</h5>
                                         <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                     </div>
                                     <div class="modal-body">
-                                        <form class="needs-validation" novalidate="" action="{{route('Parents.store')}}" method="POST" enctype="multipart/form-data">
+                                        <form class="needs-validation" novalidate="" action="{{route('admin.accounts.registration')}}" method="POST" enctype="multipart/form-data">
                                             @csrf
                                             <div class="form-row">
                                                 <div class="col-md-4 mb-3">
@@ -80,22 +80,11 @@
                                                     </div>
                                                     @enderror
                                                 </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <label for="validationCustomUsername">Street/Village</label>
-                                                    <div class="input-group">
-                                                        <input type="text" name="street" class="form-control" id="validationCustom02" value="{{old('street')}}" placeholder="Street Address">
-                                                        @error('street')
-                                                        <div class="invalid-feedback">
-                                                            {{$message}}
-                                                        </div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
                                             </div>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-success">Register</button>
+                                        <button type="submit" class="btn btn-success">Save</button>
                                     </div>
                                 </div>
                             </form>
@@ -109,62 +98,61 @@
                             <thead class="text-uppercase">
                                 <tr>
                                     <th scope="col">#</th>
-                                    <th scope="col">Parent's Name</th>
+                                    <th scope="col">Full name</th>
                                     <th scope="col">Gender</th>
                                     <th scope="col">Phone</th>
                                     <th scope="col">Email</th>
                                     <th scope="col">status</th>
-                                    <th scope="col">Action</th>
+                                    <th scope="col" class="text-center">action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($parents as $parent )
+                                @foreach ($users as $user )
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
-                                        <td class="text-capitalize">{{$parent->first_name. ' '. $parent->last_name}}</td>
-                                        <td class="text-capitalize">{{$parent->gender[0]}}</td>
-                                        <td>{{$parent->phone}}</td>
-                                        <td>{{$parent->email}}</td>
+                                        <td class="text-capitalize">{{$user->first_name. ' '. $user->last_name}}</td>
+                                        <td class="text-capitalize">{{$user->gender[0]}}</td>
+                                        <td>{{$user->phone}}</td>
+                                        <td>{{$user->email}}</td>
                                         <td>
-                                            @if ($parent->status ==1)
+                                            @if ($user->status ==1)
                                                 <span class="badge bg-success text-white">{{_('Active')}}</span>
                                                 @else
                                                 <span class="badge bg-danger text-white">{{_('Blocked')}}</span>
                                             @endif
                                         </td>
-                                        @if ($parent->status == 1)
-                                        <td>
-                                            <ul class="d-flex justify-content-center">
-                                                <li class="mr-3"><a href="{{route('Parents.edit', $parent->id)}}" class="text-primary"><i class="fa fa-eye"></i></a></li>
-                                                <li class="mr-3">
-                                                    <form action="{{route('Update.parents.status', $parent->id)}}" method="POST">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Block {{strtoupper($parent->first_name)}} {{strtoupper($parent->last_name)}}?')"><i class="fas fa-ban text-info"></i></button>
-                                                    </form>
-                                                </li>
-                                                <li>
-                                                    <form action="{{route('Parents.remove', $parent->id)}}" method="POST">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <button class="btn btn-link p-0" onclick="return confirm('Are you sure you want to delete {{strtoupper($parent->first_name)}} {{strtoupper($parent->last_name)}} Permanently?')"><i class="ti-trash text-danger"></i></button>
-                                                    </form>
-                                                </li>
-                                            </ul>
-                                        </td>
+                                        @if ($user->id == 1)
+                                            <td class="text-center">
+                                                <span class="badge bg-success text-white">Super User</span>
+                                            </td>
                                         @else
-                                        <td>
-                                            <ul class="d-flex justify-content-center">
-                                                <li class="mr-3">
-                                                    <form action="{{route('restore.parents.status', $parent->id)}}" method="POST">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Unblock {{strtoupper($parent->first_name)}} {{strtoupper($parent->last_name)}}?')"><i class="ti-reload text-success"></i></button>
-                                                    </form>
-                                                </li>
-                                                <li><a href="{{route('Parents.remove', $parent->id)}}" onclick="return confirm('Are you sure you want to delete {{strtoupper($parent->first_name)}} {{strtoupper($parent->last_name)}} Permanently?')" class="text-danger"><i class="ti-trash"></i></a></li>
-                                            </ul>
-                                        </td>
+                                            @if ($user->status == 1)
+                                            <td>
+                                                <ul class="d-flex justify-content-center">
+                                                    <li class="mr-3">
+                                                        <form action="{{route('admin.account.block', $user->id)}}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Block {{strtoupper($user->first_name)}} {{strtoupper($user->last_name)}}?')"><i class="fas fa-ban text-info"></i></button>
+                                                        </form>
+                                                    </li>
+                                                    <li><a href="{{route('admin.account.destroy', $user->id)}}" onclick="return confirm('Are you sure you want to delete {{strtoupper($user->first_name)}} {{strtoupper($user->last_name)}} Permanently?')" class="text-danger"><i class="ti-trash"></i></a></li>
+                                                </ul>
+                                            </td>
+                                            @else
+                                            <td>
+                                                <ul class="d-flex justify-content-center">
+                                                    <li class="mr-3">
+                                                        <form action="{{route('admin.account.unblock', $user->id)}}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Unblock {{strtoupper($user->first_name)}} {{strtoupper($user->last_name)}}?')"><i class="ti-reload text-success"></i></button>
+                                                        </form>
+                                                    </li>
+                                                    <li><a href="{{route('admin.account.destroy', $user->id)}}" onclick="return confirm('Are you sure you want to delete {{strtoupper($user->first_name)}} {{strtoupper($user->last_name)}} Permanently?')" class="text-danger"><i class="ti-trash"></i></a></li>
+                                                </ul>
+                                            </td>
+                                            @endif
                                         @endif
                                     </tr>
                                 @endforeach

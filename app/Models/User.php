@@ -25,7 +25,8 @@ class User extends Authenticatable
         'gender',
         'usertype',
         'password',
-        'school_id'
+        'school_id',
+        'status'
     ];
 
     protected $guarded = ['id'];

@@ -11,6 +11,7 @@
                         <a href="{{route('results.general', $school->id)}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
                     </div>
                 </div>
+                <p class="text-danger">Select Class you want to view results</p>
                 <div class="list-group">
                     @if ($groupedByClass->isEmpty())
                     <div class="alert alert-warning text-center" role="alert">
@@ -20,7 +21,7 @@
                         @foreach ($groupedByClass as $class_id => $results)
                                 <a href="{{ route('results.examTypesByClass', ['school' => $school->id, 'year' => $year, 'class' => $class_id]) }}">
                                     <button type="button" class="list-group-item list-group-item-action">
-                                        <h6 class="text-primary text-capitalize"><i class="fas fa-chevron-right"></i> {{ $results->first()->class_name }} Results Link</h6>
+                                        <h6 class="text-primary text-capitalize">>> {{ $results->first()->class_name }} - Link</h6>
                                     </button>
                                 </a>
                         @endforeach

@@ -30,6 +30,7 @@ return new class extends Migration
             $table->date('dob');
             $table->string('image')->nullable();
             $table->integer('status')->default(1);
+            $table->boolean('graduated')->default(false);
             $table->timestamps();
         });
     }

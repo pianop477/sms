@@ -65,7 +65,6 @@
                                 <div class="text-danger">{{$message}}</div>
                             @enderror
                         </div>
-                        <input type="hidden" name="usertype" value="4">
                         <div class="form-gp">
                             <label for="exampleInputPassword1">Neno la siri</label>
                             <input type="password" id="exampleInputPassword1" name="password">

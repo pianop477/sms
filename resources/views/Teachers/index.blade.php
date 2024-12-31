@@ -12,11 +12,11 @@
                     <div class="col-2 mt-2">
                         <div class="btn-group" role="group">
                             <button id="btnGroupDrop" type="button" class="btn btn-primary btn-xs dropdown-toggle float-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Download
+                                <i class="fas fa-cloud-arrow-down"></i> Export
                             </button>
                             <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                <a class="dropdown-item" href="{{route('teachers.excel.export')}}">Excel</a>
-                                <a class="dropdown-item" href="{{route('teachers.pdf.export')}}">pdf</a>
+                                <a class="dropdown-item" href="{{route('teachers.excel.export')}}" target="_blank"><i class="fas fa-file-excel"></i> Excel</a>
+                                <a class="dropdown-item" href="{{route('teachers.pdf.export')}}" target="_blank"><i class="fas fa-file-pdf"></i> pdf</a>
                             </div>
                         </div>
                     </div>
@@ -143,9 +143,6 @@
                                                         </div>
                                                         @enderror
                                                     </div>
-                                                    <input type="hidden" name="usertype" value="3">
-                                                    <input type="hidden" name="school_id" value="{{Auth::user()->school_id}}">
-                                                    <input type="hidden" name="password" value="shule@2024">
                                                 </div>
                                             </div>
                                     </div>

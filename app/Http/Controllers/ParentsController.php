@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PasswordResetEvent;
 use App\Models\Parents;
 use App\Models\Student;
 use App\Models\Teacher;
@@ -56,10 +57,11 @@ class ParentsController extends Controller
                 'gender' => 'required|string|max:255',
                 'phone' => 'required|string|min:10|max:15',
                 'street' => 'required|string|max:255',
-                'school_id' => 'required|exists:schools,id'
+                'school_id' => 'exists:schools,id'
             ]);
 
             $userExists = User::where('phone', $request->phone)
+                                ->where('first_name', $request->fname)
                                 ->where('school_id', $user->school_id)
                                 ->exists();
             if($userExists) {
@@ -73,9 +75,9 @@ class ParentsController extends Controller
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'gender' => $request->gender,
-                'usertype' => $request->usertype,
-                'password' => Hash::make($request->password),
-                'school_id' => $request->school_id
+                'usertype' => $request->input('usertype', 4),
+                'password' => Hash::make($request->input('password', 'shule@2024')),
+                'school_id' => $user->school_id,
             ]);
 
             $parents = Parents::create([
@@ -127,6 +129,7 @@ class ParentsController extends Controller
             $parents->status = $request->input('status', 0);
 
             if($parents->save()) {
+                event(new PasswordResetEvent($user->id));
                 Alert::success('Success', 'Parent blocked successfully');
                 return back();
             }
@@ -232,6 +235,14 @@ class ParentsController extends Controller
                 // Ensure the directory exists
                 if (!file_exists($imageDestinationPath)) {
                     mkdir($imageDestinationPath, 0775, true);
+                }
+
+                //check for existing image file
+                if(!empty($user->image)) {
+                    $existingImagePath = public_path('assets/img/profile/' . $user->image);
+                    if (file_exists($existingImagePath)) {
+                        unlink($existingImagePath);
+                    }
                 }
 
                 // Move the file
