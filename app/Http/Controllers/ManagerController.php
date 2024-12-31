@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PasswordResetEvent;
 use App\Models\Parents;
 use App\Models\school;
 use App\Models\Teacher;
@@ -11,6 +12,7 @@ use App\Models\Grade;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Transport;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use RealRashid\SweetAlert\Facades\Alert;
 
@@ -89,8 +91,9 @@ class ManagerController extends Controller
     {
         //
         $users = User::findOrFail($user);
-        $users->password = Hash::make($request->input('password', 'shule123'));
+        $users->password = Hash::make($request->input('password', 'shule@2024'));
         $users->save();
+        event(new PasswordResetEvent($user));
         Alert::success('Success!', 'User Password reset successfully');
         return back();
     }

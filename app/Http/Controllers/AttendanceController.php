@@ -51,123 +51,123 @@ class AttendanceController extends Controller
      * Store the newly created resource in storage.
      */
     public function store(Request $request, $student_class)
-{
-    // Check if the class exists
-    $class = Grade::findOrFail($student_class);
-    $class_id = $class->id;
-    $attendanceDate = date('Y-m-d');
-    $logged_user = Auth::user();
-    $teacher = Teacher::where('user_id', '=', $logged_user->id)->firstOrFail();
+    {
+        // Check if the class exists
+        $class = Grade::findOrFail($student_class);
+        $class_id = $class->id;
+        $attendanceDate = date('Y-m-d');
+        $logged_user = Auth::user();
+        $teacher = Teacher::where('user_id', '=', $logged_user->id)->firstOrFail();
 
-    // Get the students in the class
-    $students = Student::where('class_id', '=', $student_class)->get();
-    if ($students->isEmpty()) {
-        Alert::error('Error', 'No students found in this class.');
-        return back();
-    }
-
-    // Validate the request data
-    $validator = Validator::make($request->all(), [
-        'student_id' => 'required|array',
-        'student_id.*' => 'required|integer|exists:students,id',
-        'attendance_status' => 'required|array',
-        'attendance_status.*' => 'required|in:present,absent,permission',
-    ], [
-        'attendance_status.*.required' => 'Each student must have an attendance status selected.',
-    ]);
-
-    $student_ids = $request->input('student_id');
-    $attendance_status = $request->input('attendance_status');
-    $class_group = $request->input('group');
-
-    // Ensure each student has a status
-    foreach ($student_ids as $student_id) {
-        if (!isset($attendance_status[$student_id])) {
-            $validator->errors()->add('attendance_status.' . $student_id, 'The attendance status for student ' . $student_id . ' is required.');
+        // Get the students in the class
+        $students = Student::where('class_id', '=', $student_class)->get();
+        if ($students->isEmpty()) {
+            Alert::error('Error', 'No students found in this class.');
+            return back();
         }
+
+        // Validate the request data
+        $validator = Validator::make($request->all(), [
+            'student_id' => 'required|array',
+            'student_id.*' => 'required|integer|exists:students,id',
+            'attendance_status' => 'required|array',
+            'attendance_status.*' => 'required|in:present,absent,permission',
+        ], [
+            'attendance_status.*.required' => 'Each student must have an attendance status selected.',
+        ]);
+
+        $student_ids = $request->input('student_id');
+        $attendance_status = $request->input('attendance_status');
+        $class_group = $request->input('group');
+
+        // Ensure each student has a status
+        foreach ($student_ids as $student_id) {
+            if (!isset($attendance_status[$student_id])) {
+                $validator->errors()->add('attendance_status.' . $student_id, 'The attendance status for student ' . $student_id . ' is required.');
+            }
+        }
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                            ->withErrors($validator)
+                            ->withInput();
+        }
+
+        // Check if attendance already exists for each student
+        $existingAttendance = Attendance::whereIn('student_id', $student_ids)
+                                        ->where('attendance_date', '=', $attendanceDate)
+                                        ->pluck('student_id')
+                                        ->toArray();
+
+        if (!empty($existingAttendance)) {
+            Alert::error('Error', 'Attendance already taken and Submitted.');
+            return redirect()->route('get.student.list', $student_class);
+        }
+
+        // Save the attendance data
+        $attendanceData = [];
+        foreach ($student_ids as $studentId) {
+            $attendanceData[] = [
+                'student_id' => $studentId,
+                'class_id' => $class_id,
+                'teacher_id' => $teacher->id,
+                'school_id' => $logged_user->school_id,
+                'class_group' => $class_group[$studentId] ?? null,
+                'attendance_status' => $attendance_status[$studentId],
+                'attendance_date' => $attendanceDate,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        Attendance::insert($attendanceData);
+
+        Alert::success('Success', 'Attendance Submitted and Saved successfully');
+        return redirect()->back();
     }
 
-    if ($validator->fails()) {
-        return redirect()->back()
-                         ->withErrors($validator)
-                         ->withInput();
+    public function show(Student $student, $year)
+    {
+        $attendanceQuery = Attendance::query()
+            ->join('students', 'students.id', '=', 'attendances.student_id')
+            ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
+            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+            ->join('grades', 'grades.id', '=', 'attendances.class_id')
+            ->select(
+                'attendances.*',
+                'users.first_name as teacher_firstname',
+                'users.last_name as teacher_lastname',
+                'users.phone as teacher_phone',
+                'students.first_name as student_firstname',
+                'students.middle_name as student_middlename',
+                'students.last_name as student_lastname', 'students.status',
+            )
+            ->whereYear('attendances.attendance_date', $year)
+            ->where('attendances.student_id', '=', $student->id)
+            ->where('students.status', 1)
+            ->orderBy('attendances.attendance_date', 'DESC');
+
+        // Paginate the raw data
+        $perPage =5;
+        $page = request()->get('page', 1);
+        $rawData = $attendanceQuery->paginate($perPage, ['*'], 'page', $page);
+
+        // Group the paginated data by week
+        $grouped = $rawData->getCollection()->groupBy(function($date) {
+            return \Carbon\Carbon::parse($date->attendance_date)->format('W'); // grouping by week number
+        });
+
+        // Create a LengthAwarePaginator instance
+        $groupedData = new LengthAwarePaginator(
+            $grouped,
+            $rawData->total(),
+            $rawData->perPage(),
+            $rawData->currentPage(),
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        return view('Attendance.show', compact('groupedData', 'student'));
     }
-
-    // Check if attendance already exists for each student
-    $existingAttendance = Attendance::whereIn('student_id', $student_ids)
-                                    ->where('attendance_date', '=', $attendanceDate)
-                                    ->pluck('student_id')
-                                    ->toArray();
-
-    if (!empty($existingAttendance)) {
-        Alert::error('Error', 'Attendance already taken and Submitted.');
-        return back();
-    }
-
-    // Save the attendance data
-    $attendanceData = [];
-    foreach ($student_ids as $studentId) {
-        $attendanceData[] = [
-            'student_id' => $studentId,
-            'class_id' => $class_id,
-            'teacher_id' => $teacher->id,
-            'school_id' => $logged_user->school_id,
-            'class_group' => $class_group[$studentId] ?? null,
-            'attendance_status' => $attendance_status[$studentId],
-            'attendance_date' => $attendanceDate,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ];
-    }
-
-    Attendance::insert($attendanceData);
-
-    Alert::success('Success', 'Attendance Submitted and Saved successfully');
-    return redirect()->back();
-}
-
-public function show(Student $student, $year)
-{
-    $attendanceQuery = Attendance::query()
-        ->join('students', 'students.id', '=', 'attendances.student_id')
-        ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
-        ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-        ->join('grades', 'grades.id', '=', 'attendances.class_id')
-        ->select(
-            'attendances.*',
-            'users.first_name as teacher_firstname',
-            'users.last_name as teacher_lastname',
-            'users.phone as teacher_phone',
-            'students.first_name as student_firstname',
-            'students.middle_name as student_middlename',
-            'students.last_name as student_lastname'
-        )
-        ->whereYear('attendances.attendance_date', $year)
-        ->where('attendances.student_id', '=', $student->id)
-        ->orderBy('attendances.attendance_date', 'DESC');
-
-    // Paginate the raw data
-    $perPage =5;
-    $page = request()->get('page', 1);
-    $rawData = $attendanceQuery->paginate($perPage, ['*'], 'page', $page);
-
-    // Group the paginated data by week
-    $grouped = $rawData->getCollection()->groupBy(function($date) {
-        return \Carbon\Carbon::parse($date->attendance_date)->format('W'); // grouping by week number
-    });
-
-    // Create a LengthAwarePaginator instance
-    $groupedData = new LengthAwarePaginator(
-        $grouped,
-        $rawData->total(),
-        $rawData->perPage(),
-        $rawData->currentPage(),
-        ['path' => request()->url(), 'query' => request()->query()]
-    );
-
-    return view('Attendance.show', compact('groupedData', 'student'));
-}
-
 
     //group attendance by year ===========================
     public function attendanceYear (Student $student)
@@ -182,10 +182,11 @@ public function show(Student $student, $year)
                                                 'users.last_name as teacher_lastname',
                                                 'users.phone as teacher_phone',
                                                 'students.first_name as student_firstname', 'students.admission_number',
-                                                'students.middle_name as student_middlename',
+                                                'students.middle_name as student_middlename', 'students.status',
                                                 'students.last_name as student_lastname'
                                             )
                                             ->where('attendances.student_id', '=', $student->id)
+                                            ->where('students.status', 1)
                                             ->orderBy('attendances.attendance_date', 'ASC')
                                             ->get();
         $groupedAttendance = $attendances->groupBy(function ($item) {
@@ -246,7 +247,7 @@ public function show(Student $student, $year)
                 'students.group',
                 'students.admission_number',
                 'users.first_name as teacher_firstname',
-                'users.last_name as teacher_lastname',
+                'users.last_name as teacher_lastname', 'students.status',
                 'users.phone as teacher_phone',
                 'users.gender as teacher_gender',
                 'schools.school_reg_no',
@@ -255,6 +256,7 @@ public function show(Student $student, $year)
             ->where('students.group', $group) // Compare 'group' directly
             ->whereBetween('attendances.attendance_date', [$startOfMonth, $endOfMonth])
             ->orderBy('attendances.attendance_date', 'ASC')
+            ->where('students.status', 1)
             ->orderBy('students.gender', 'DESC')
             ->orderBy('students.first_name', 'ASC')
             ->get();
@@ -321,13 +323,14 @@ public function show(Student $student, $year)
                 'attendances.*',
                 'students.id as studentId', 'students.first_name', 'students.middle_name',
                 'students.last_name', 'students.admission_number', 'students.group', 'students.class_id', 'students.gender', 'schools.school_reg_no',
-                'grades.class_name', 'grades.class_code', 'grades.id as class_id',
+                'grades.class_name', 'grades.class_code', 'grades.id as class_id', 'students.status',
                 'users.first_name as teacher_firstname', 'users.last_name as teacher_lastname',
                 'users.phone as teacher_phone', 'users.gender as teacher_gender'
             )
             ->where('attendances.attendance_date', '=', $today)
             ->where('attendances.teacher_id', '=', $teacher->id)
             ->where('attendances.school_id', '=', Auth::user()->school_id)
+            ->where('students.status', 1)
             ->orderBy('students.gender', 'DESC')
             ->orderBy('students.first_name', 'ASC')
             ->get();
@@ -400,7 +403,7 @@ public function show(Student $student, $year)
                     ->select(
                         'attendances.*',
                         'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.gender',
-                        'students.group', 'students.class_id as student_class', 'students.admission_number',
+                        'students.group', 'students.class_id as student_class', 'students.admission_number', 'students.status',
                         'grades.id as class_id', 'grades.class_name', 'grades.class_code',
                         'users.first_name as teacher_firstname', 'users.last_name as teacher_lastname',
                         'users.gender as teacher_gender', 'users.phone as teacher_phone', 'schools.school_reg_no',
@@ -408,6 +411,7 @@ public function show(Student $student, $year)
                     ->where('attendances.class_id', $request->class)
                     ->whereBetween('attendances.attendance_date', [$startOfMonth, $endOfMonth])
                     ->where('attendances.school_id', Auth::user()->school_id)
+                    ->where('students.status', 1)
                     ->orderBy('attendances.attendance_date', 'ASC')
                     ->orderBy('students.gender', 'DESC')
                     ->orderBy('students.first_name', 'ASC')

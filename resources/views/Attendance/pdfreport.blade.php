@@ -9,9 +9,9 @@
         /* Inline your Bootstrap CSS styles here */
         body {
             font-family: Arial, sans-serif;
-            /* line-height: 2px; */
-            margin: 0; /* Remove default margin */
-            padding: 0; /* Remove default padding */
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
         }
         @media print {
             .no-print {
@@ -51,16 +51,15 @@
 
         .container {
             display: flex;
-            padding: 10px;
+            padding: 5px;
             flex-direction: row;
             flex-wrap: wrap;
-            border-bottom: 2px solid gray;
         }
         .logo {
             position: absolute;
             width: 50px;
             left: 7px;
-            top: 5px;
+            top: 20px;
             color: inherit;
         }
         .header {
@@ -68,54 +67,42 @@
             position: relative;
             top: 0;
             left: 40px;
+            margin-bottom: 10px;
             text-transform: uppercase;
-            line-height: 1px;
-        }
-        .summary-header {
-            margin-top: 5px;
-            text-align: center;
-            text-transform: capitalize;
-            font-size: 20px;
-        }
-        .summary-content {
-            display: flex;
-            flex-direction: row;
-            text-transform: capitalize
-        }
-        .course-details {
-            position: relative;
-            left: 5px;
-            width: 50%;
-            line-height: 5px;
-        }
-        .grade-summary {
-            position: absolute;
-            width: 50%;
-            left: 50%;
-            top: 17%
-        }
-        th, td {
-            border: 1px solid black;
+            font-size: 24px;
+            color: #343a40;
         }
         .table {
             width: 100%;
             border: 1px solid black;
             border-collapse: collapse;
-            padding: 4px;
         }
-        thead {
-                display: table-header-group;
-                background-color: gray; /* Adds a gray background to thead */
-            }
-            tbody {
-                display: table-row-group;
-            }
-            .table th,
-            .table td {
-                /* border: 1px solid black; */
-                text-transform: capitalize;
-            }
-            .footer {
+
+        .table th, .table td {
+            border: 1px solid #dee2e6;
+            padding: 2px;
+            text-transform: capitalize
+        }
+
+        .table th {
+            background-color: #343a40;
+            color: #fff;
+            text-align: center;
+        }
+
+        .table td {
+            background-color: #fff;
+        }
+
+        .table img {
+            display: block;
+            margin: 0 auto;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .footer {
             position: fixed;
             bottom: -30px;
             align-content: space-around;
@@ -166,7 +153,7 @@
                     </div>
                     <div class="grade-summary">
                         <p class="text-center font-weight-bold text-capitalize p-2" style="text-transform: uppercase;">attendance details</p>
-                        <table class="table table-hover table-bordered" style="text-align:center">
+                        <table class="table table-hover table-bordered">
                             <thead>
                                 <tr>
                                     <th>Gender</th>
@@ -178,25 +165,25 @@
                             </thead>
                                 <tbody>
                                     <tr>
-                                        <td>Male</td>
-                                        <td>{{ $malePresent }}</td>
-                                        <td>{{ $maleAbsent }}</td>
-                                        <td>{{ $malePermission }}</td>
-                                        <th><strong>{{$sumMale = $malePresent + $maleAbsent + $malePermission}}</strong></th>
+                                        <td style="text-align: center">Male</td>
+                                        <td style="text-align: center">{{ $malePresent }}</td>
+                                        <td style="text-align: center">{{ $maleAbsent }}</td>
+                                        <td style="text-align: center">{{ $malePermission }}</td>
+                                        <td style="text-align: center"><strong>{{$sumMale = $malePresent + $maleAbsent + $malePermission}}</strong></td>
                                     </tr>
                                     <tr>
-                                        <td>Female</td>
-                                        <td>{{ $femalePresent }}</td>
-                                        <td>{{ $femaleAbsent }}</td>
-                                        <td>{{ $femalePermission }}</td>
-                                        <td><strong>{{$sumFemale = $femalePresent  + $femaleAbsent + $femalePermission  }}</strong></td>
+                                        <td style="text-align: center">Female</td>
+                                        <td style="text-align: center">{{ $femalePresent }}</td>
+                                        <td style="text-align: center">{{ $femaleAbsent }}</td>
+                                        <td style="text-align: center">{{ $femalePermission }}</td>
+                                        <td style="text-align: center"><strong>{{$sumFemale = $femalePresent  + $femaleAbsent + $femalePermission  }}</strong></td>
                                     </tr>
                                     <tr>
-                                        <td>Total</td>
-                                        <td><strong>{{$malePresent +  $femalePresent}}</strong></td>
-                                        <td><strong>{{$maleAbsent +  $femaleAbsent}}</strong></td>
-                                        <td><strong>{{$malePermission +  $femalePermission}}</strong></td>
-                                        <td><strong>{{$sumMale +  $sumFemale}}</strong></td>
+                                        <td style="text-align: center">Total</td>
+                                        <td style="text-align: center"><strong>{{$malePresent +  $femalePresent}}</strong></td>
+                                        <td style="text-align: center"><strong>{{$maleAbsent +  $femaleAbsent}}</strong></td>
+                                        <td style="text-align: center"><strong>{{$malePermission +  $femalePermission}}</strong></td>
+                                        <td style="text-align: center"><strong>{{$sumMale +  $sumFemale}}</strong></td>
                                     </tr>
                                 </tbody>
                         </table>

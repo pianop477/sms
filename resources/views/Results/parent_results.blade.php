@@ -19,6 +19,7 @@
             /* line-height: 2px; */
             margin: 0; /* Remove default margin */
             padding: 0; /* Remove default padding */
+            background-color: #f8f9fa;
         }
         @media print {
             .no-print {
@@ -73,9 +74,6 @@
             text-transform: uppercase;
             line-height: 1px;
         }
-        hr {
-            margin-top: 0px;
-        }
         .summary-header {
             margin-top: 5px;
             text-align: center;
@@ -87,6 +85,7 @@
             flex-direction: row;
             text-transform: capitalize
         }
+
         .course-details {
             position: relative;
             left: 5px;
@@ -127,6 +126,16 @@
             text-align: center;
             margin-bottom: 30px;
         }
+
+    .table th {
+            background-color: #343a40;
+            color: #fff;
+            text-align: center;
+            }
+
+    .table td {
+            background-color: #fff;
+        }
         .thanks {
             position: fixed;
             margin-bottom: 0px;
@@ -158,9 +167,9 @@
                         @endphp
 
                         @if(file_exists($imagePath) && !is_dir($imagePath))
-                            <img src="{{ $imagePath }}" alt="Student Image" style="max-width: 100px; height:100px; border:1px solid black; border-radius:4px;">
+                            <img src="{{ $imagePath }}" alt="Student Image" style="max-width: 100px; height:100px; border-radius:50px;">
                         @else
-                            <img src="{{ $defaultImagePath }}" alt="" style="max-width: 100px; border:1px solid black; border-radius:4px;">
+                            <img src="{{ $defaultImagePath }}" alt="" style="max-width: 100px; border-radius:50px;">
                         @endif
                         <p style="text-transform: capitalize; font-size:10px;">Na. Usajili: <span style="text-decoration: underline;">{{$results->first()->school_reg_no}}/{{ $results->first()->admission_number}}</span></p>
                     </div>

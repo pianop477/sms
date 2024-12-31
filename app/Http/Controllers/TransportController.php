@@ -171,6 +171,7 @@ class TransportController extends Controller
 
                                     )
                                     ->where('students.transport_id', $trans->id)
+                                    ->where('students.status', 1)
                                     ->orderBy('students.first_name')
                                     ->get();
         return view('Transport.students', compact('students', 'trans'));
@@ -189,6 +190,7 @@ class TransportController extends Controller
                                 'grades.class_name', 'grades.class_code'
                             )
                             ->where('students.transport_id', $trans->id)
+                            ->where('students.status', 1)
                             ->orderBy('first_name')
                             ->get();
         $pdf = \PDF::loadView('Transport.export', compact('students', 'trans'));

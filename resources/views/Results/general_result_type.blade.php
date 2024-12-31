@@ -11,6 +11,7 @@
                             <a href="{{route('results.classesByYear', [$school->id, 'year'=>$year])}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
                         </div>
                     </div>
+                    <p class="text-danger">Select Examination type to view results</p>
                     <div class="list-group">
                         @if ($groupedByExamType->isEmpty())
                         <div class="alert alert-warning text-center" role="alert">
@@ -20,7 +21,7 @@
                             @foreach ($groupedByExamType as $exam_type_id => $results )
                                 <a href="{{ route('results.monthsByExamType', ['school' => $school->id, 'year' => $year, 'class' => $class, 'examType' => $exam_type_id]) }}">
                                     <button type="button" class="list-group-item list-group-item-action">
-                                        <h6 class="text-primary text-capitalize"><i class="fas fa-chevron-right"></i> {{ $results->first()->exam_type }}</h6>
+                                        <h6 class="text-primary text-capitalize">>> {{ $results->first()->exam_type }}</h6>
                                     </button>
                                 </a>
                             @endforeach

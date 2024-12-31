@@ -11,6 +11,7 @@
                             <a href="{{route('home')}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
                         </div>
                     </div>
+                    <p class="text-danger">Select year of study</p>
                     <div class="list-group">
                         @if ($groupedData->isEmpty())
                         <div class="alert alert-warning text-center" role="alert">
@@ -20,7 +21,7 @@
                             @foreach ($groupedData as $year => $classes)
                                 <a href="{{ route('results.classesByYear', ['school' => $school->id, 'year' => $year]) }}">
                                     <button type="button" class="list-group-item list-group-item-action">
-                                        <h6 class="text-primary"><i class="fas fa-chevron-right"></i> {{$year}} Results Link</h6>
+                                        <h6 class="text-primary">>> {{$year}} Results Link</h6>
                                     </button>
                                 </a>
                             @endforeach

@@ -20,7 +20,10 @@
                                 <a href="{{route('admin.reset.password')}}"><i class="ti-unlock"></i><span>User Password Reset</span></a>
                             </li>
                             <li>
-                                <a href="{{route('feedback')}}"><i class="ti-email"></i><span>Users Feedback</span></a>
+                                <a href="{{route('admin.accounts')}}"><i class="fas fa-user-lock"></i><span>Admin Accounts</span></a>
+                            </li>
+                            <li>
+                                <a href="{{route('feedback')}}"><i class="ti-email"></i><span>Messages</span></a>
                             </li>
                         @endif
 
@@ -53,7 +56,11 @@
                                 </ul>
                             </li>
                             <li>
-                                <a href="{{route('Teachers.trashed')}}"><i class="fa fa-trash"></i><span> Dustbin</span></a>
+                                <a href="javascript:void(0)"><i class="fa fa-cogs"></i><span>Advanced</span></a>
+                                <ul class="submenu">
+                                    <li><a href="{{route('graduate.students')}}"><i class="fas fa-user-graduate"></i>Graduate Students</a></li>
+                                    <li><a href="{{route('Teachers.trashed')}}"><i class="fas fa-trash"></i>Recycle bin</a></li>
+                                </ul>
                             </li>
                         @endif
                         @if (Auth::user()->usertype == 2 || Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 2)
@@ -74,17 +81,17 @@
                                 </ul>
                             </li>
                             <li>
-                                <a href="javascript:void(0)"><i class="fa fa-file"></i><span>Report</span></a>
+                                <a href="javascript:void(0)"><i class="ti-stats-up"></i><span>Report</span></a>
                                 <ul class="submenu">
-                                    <li><a href="{{route('attendance.fill.form')}}"><i class="ti-list"></i>Attendance</a></li>
-                                    <a href="{{route('Transportation.index')}}"><i class="ti-car"></i><span> School Bus</span></a>
+                                    <li><a href="{{route('attendance.fill.form')}}"><i class="ti-notepad"></i>Attendance</a></li>
+                                    <a href="{{route('Transportation.index')}}"><i class="fas fa-bus"></i><span> School Bus</span></a>
                                 </ul>
                             </li>
                             <li>
                                 <a href="javascript:void(0)"><i class="fa fa-list-check"></i><span>Exams & Results</span></a>
                                 <ul class="submenu">
                                     <li><a href="{{route('exams.index')}}"><i class="ti-pencil-alt"></i>Examinations</a></li>
-                                    <li><a href="{{route('results.general', Auth::user()->school_id)}}"><i class="ti-layers-alt"></i>Results</a></li>
+                                    <li><a href="{{route('results.general', Auth::user()->school_id)}}"><i class="ti-bar-chart-alt"></i>Results</a></li>
                                 </ul>
                             </li>
                             <li>
@@ -92,7 +99,8 @@
                                 <ul class="submenu">
                                     <li><a href="{{route('roles.updateRole')}}"><i class="ti-unlock"></i>Roles & Permission</a></li>
                                     <li><a href="{{route('users.lists')}}"><i class="fas fa-user-lock"></i>User Password Reset</a></li>
-                                    <li><a href="{{route('Teachers.trashed')}}"><i class="fas fa-trash"></i>Trash</a></li>
+                                    <li><a href="{{route('graduate.students')}}"><i class="fas fa-user-graduate"></i>Graduate Students</a></li>
+                                    <li><a href="{{route('Teachers.trashed')}}"><i class="fas fa-trash"></i>Recycle bin</a></li>
                                 </ul>
                             </li>
                         @endif

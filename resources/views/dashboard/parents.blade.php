@@ -34,6 +34,7 @@
                                         </div>
                                         <div class="modal-body">
                                             <p class="text-danger text-center text-capitalize">Tafadhali Jaza taarifa hizi kwa usahihi</p>
+                                            <hr>
                                             <form class="needs-validation" novalidate="" action="{{route('register.student')}}" method="POST" enctype="multipart/form-data">
                                                 @csrf
                                                 <div class="form-row">
@@ -130,7 +131,6 @@
                                                             </div>
                                                             @enderror
                                                         </div>
-                                                        <input type="hidden" name="school_id" value="{{Auth::user()->school_id}}">
                                                     </div>
                                                     <div class="col-md-4 mb-3">
                                                         <label for="validationCustomUsername">Picha ya Passport :<small class="text-sm text-danger"> (Sio lazima)</small></label>

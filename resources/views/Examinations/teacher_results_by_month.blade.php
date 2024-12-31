@@ -14,7 +14,7 @@
             </div>
             <div class="list-group">
                 @foreach ($months as $month => $results)
-                    <a href="{{ route('results.byMonth', ['course' => $class_course->course_id, 'year' => $year, 'examType' => $examType, 'month' => $month]) }}">
+                    <a href="{{ route('results.byMonth', ['course' => $class_course->course_id, 'year' => $year, 'examType' => $examType, 'month' => $month]) }}" target="_blank">
                         <button type="button" class="list-group-item list-group-item-action">
                             <h6 class="text-primary"><i class="fas fa-chevron-right"></i> {{ $month }} - {{$year}}</h6>
                         </button>

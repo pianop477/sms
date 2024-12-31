@@ -17,7 +17,7 @@
                 <div class="col-md-4">
                     <div class="avatar position-relative">
                         @if (!empty($students->image))
-                            <img src="{{ asset('assets/img/students/' . $students->image) }}" alt="profile_image" class="profile-img border-radius-lg shadow-sm" style="width: 150px; object-fit:cover; border-radius:4px; border: 1px solid black;">
+                            <img src="{{ asset('assets/img/students/' . $students->image) }}" alt="profile_image" class="shadow-sm" style="max-width: 150px; object-fit:cover; border-radius:50px;">
                         @else
                             <i class="fas fa-user-graduate text-secondary" style="font-size: 8rem;"></i>
                         @endif

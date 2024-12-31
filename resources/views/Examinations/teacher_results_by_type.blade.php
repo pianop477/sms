@@ -10,9 +10,9 @@
         /* Inline your Bootstrap CSS styles here */
         body {
             font-family: Arial, sans-serif;
-            /* line-height: 2px; */
-            margin: 0; /* Remove default margin */
-            padding: 0; /* Remove default padding */
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
         }
         @media print {
             .no-print {
@@ -52,10 +52,9 @@
 
         .container {
             display: flex;
-            padding: 10px;
+            padding: 5px;
             flex-direction: row;
             flex-wrap: wrap;
-            /* border-bottom: 2px solid gray; */
         }
         .logo {
             position: absolute;
@@ -95,27 +94,28 @@
             left: 45%;
             top: 23%
         }
-        th, td {
-            border: 1px solid black;
-        }
         .table {
             width: 100%;
             border: 1px solid black;
             border-collapse: collapse;
-            padding: 4px;
         }
-        thead {
-                display: table-header-group;
-                background-color: gray; /* Adds a gray background to thead */
-            }
-            tbody {
-                display: table-row-group;
-            }
-            .table th,
-            .table td {
-                /* border: 1px solid black; */
-                text-transform: capitalize;
-            }
+
+        .table th, .table td {
+            border: 1px solid #dee2e6;
+            padding: 2px;
+            text-align: left;
+            text-transform: capitalize
+        }
+
+        .table th {
+            background-color: #343a40;
+            color: #fff;
+            text-align: center;
+        }
+
+        .table td {
+            background-color: #fff;
+        }
 
     </style>
 </head>
@@ -158,12 +158,12 @@
                     <th>E</th>
                 </tr>
                 <tr>
-                    <td>Number</td>
-                    <td>{{$gradeCounts['A']}}</td>
-                    <td>{{$gradeCounts['B']}}</td>
-                    <td>{{$gradeCounts['C']}}</td>
-                    <td>{{$gradeCounts['D']}}</td>
-                    <td>{{$gradeCounts['E']}}</td>
+                    <td style="text-align: center">Number</td>
+                    <td style="text-align: center">{{$gradeCounts['A']}}</td>
+                    <td style="text-align: center">{{$gradeCounts['B']}}</td>
+                    <td style="text-align: center">{{$gradeCounts['C']}}</td>
+                    <td style="text-align: center">{{$gradeCounts['D']}}</td>
+                    <td style="text-align: center">{{$gradeCounts['E']}}</td>
                 </tr>
             </table>
     </div>

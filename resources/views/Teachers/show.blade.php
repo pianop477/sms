@@ -5,7 +5,7 @@
       <div class="col-auto">
         <div class="avatar position-relative">
             @if (!empty($teachers->image))
-                <img src="{{ asset('assets/img/profile/' . $teachers->image) }}" alt="profile_image" class="profile-img border-radius-lg shadow-sm" style="width: 150px; object-fit:cover; border: 1px solid black; border-radius: 4px;">
+                <img src="{{ asset('assets/img/profile/' . $teachers->image) }}" alt="profile_image" class="profile-img border-radius-lg shadow-sm" style="width: 150px; object-fit:cover; border-radius: 50px;">
             @else
                 <i class="fas fa-user-tie text-secondary" style="font-size: 8rem;"></i>
             @endif

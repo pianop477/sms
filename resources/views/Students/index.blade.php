@@ -42,6 +42,7 @@
                                                             @foreach ($classes as $class)
                                                                 <option value="{{$class->id}}" class="text-capitalize">{{$class->class_name}}</option>
                                                             @endforeach
+                                                            <option value="0" class="text-danger">Graduate Class</option>
                                                         @endif
                                                     </select>
                                                     @error('name')
@@ -54,7 +55,7 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                            <button type="submit" class="btn btn-success">Save changes</button>
+                                            <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to promote this class?')">Save changes</button>
                                         </div>
                                     </form>
                                 </div>
@@ -62,15 +63,15 @@
                             </div>
                         </div>
                         <div class="col-2">
-                            <a href="{{route('export.student.pdf', $classId->id)}}" class="float-right btn btn-primary btn-xs"><i class="fas fa-download"></i> Export PDF</a>
+                            <a href="{{route('export.student.pdf', $classId->id)}}" target="_blank" class="float-right btn btn-primary btn-xs"><i class="fas fa-cloud-arrow-down"></i> Export</a>
                         </div>
                         @endif
                     <div class="col-1">
-                        <a href="{{route('classes.list', $classId->id)}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                        <a href="{{route('classes.list', $classId->id)}}" class="float-right"><i class="fas fa-arrow-circle-left"></i> Back</a>
                     </div>
                     @if (Route::has('student.create'))
                     <div class="col-1">
-                        <a type="#" class="btn p-0 float-right" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus-circle text-secondary" style="font-size:2rem;"></i>
+                        <a type="#" class="btn p-0 float-right btn-link" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus-circle"></i> New
                         </a>
                         <div class="modal fade bd-example-modal-lg">
                             <div class="modal-dialog modal-lg">
@@ -184,7 +185,6 @@
                                                         </div>
                                                         @enderror
                                                     </div>
-                                                    <input type="hidden" name="school_id" value="{{Auth::user()->school_id}}">
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustomUsername">Photo :<small class="text-sm text-danger">(Optional)</small></label>
@@ -240,11 +240,12 @@
                                         <td>
                                             <ul class="d-flex justify-content-center">
                                                 <li class="mr-3">
-                                                    <a href="{{route('Students.show', $student->id)}}"><i class="ti-eye text-secondary"></i></a>
-                                                </li>
-                                                <li class="mr-3">
                                                     <a href="{{route('students.modify', $student->id)}}"><i class="ti-pencil text-primary"></i></a>
                                                 </li>
+                                                <li class="mr-3">
+                                                    <a href="{{route('Students.show', $student->id)}}"><i class="ti-eye text-secondary"></i></a>
+                                                </li>
+
                                                 <li>
                                                     <form action="{{route('Students.destroy', $student->id)}}" method="POST">
                                                         @csrf

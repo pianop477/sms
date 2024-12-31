@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Students</title>
+    <title>Graduated students</title>
     <style>
         /* Inline your Bootstrap CSS styles here */
         body {
@@ -126,10 +126,10 @@
                     </div>
                     <div class="header">
                         <h4 class="text-uppercase">{{Auth::user()->school->school_name}}</h4>
-                        <h5 class="text-uppercase">{{$students->first()->class_name}} Students</h5>
+                        <h5 class="text-uppercase">Standard Seven Graduates Students in {{$year}}</h5>
                     </div>
                 </div>
-                @if ($students->isEmpty())
+                @if ($studentExport->isEmpty())
                     <div class="row">
                         <div class="col-12">
                             <div class="alert alert-warning text-center mt-3" role="alert">
@@ -141,23 +141,29 @@
                 <table class="table">
                     <thead>
                         <tr>
+                            <th>Photo</th>
                             <th style="text-align: center">Admission No</th>
                             <th>Gender</th>
                             <th>Full Name</th>
-                            <th>Dob</th>
-                            <th>Street</th>
-                            <th>Parent Phone</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($students as $student)
+                        @foreach($studentExport as $student)
                             <tr>
+                                @if ($student->image == NULL)
+                                    <td>
+                                        <img src="{{public_path('assets/img/students/student.jpg')}}" style="width: 40px;" alt="">
+                                    </td>
+                                @else
+                                    <td>
+                                        <img src="{{public_path('assets/img/students/'. $student->image)}}" alt="" style="width: 40px;">
+                                    </td>
+                                @endif
                                 <td style="text-transform: uppercase; text-align:center">{{ $student->school_reg_no . '/' . $student->admission_number }}</td>
                                 <td style="text-transform: uppercase; text-align:center; width:5px;">{{ $student->gender[0] }}</td>
                                 <td style="text-transform: capitalize">{{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}</td>
-                                <td>{{ \Carbon\Carbon::parse($student->dob)->format('d/m/Y') }}</td>
-                                <td class="" style="text-transform: capitalize">{{ $student->address }}</td>
-                                <td>{{$student->phone}}</td>
+                                <td class="" style="text-transform: capitalize; font-style:italic">{{ ('Graduated') }}</td>
                             </tr>
                         @endforeach
                     </tbody>

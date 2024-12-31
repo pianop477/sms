@@ -82,6 +82,13 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1')->group(function () {
 
         //manager assign other teacher to become manager too.
         Route::put('{user}/Change-usertype', [RolesController::class, 'changeUsertype'])->name('change.usertype');
+
+        //manage admin accounts
+        Route::get('Admin-accounts', [UsersController::class, 'manageAdminAccounts'])->name('admin.accounts');
+        Route::post('Register-admin-accounts', [UsersController::class, 'addAdminAccount'])->name('admin.accounts.registration');
+        Route::put('{id}/Block-admin-accounts', [UsersController::class, 'blockAdminAccount'])->name('admin.account.block');
+        Route::put('{id}/Unblock-admin-accounts', [UsersController::class, 'unblockAdminAccount'])->name('admin.account.unblock');
+        Route::get('{id}/Delete-admin-accounts', [UsersController::class, 'deleteAdminAccount'])->name('admin.account.destroy');
     });
     // end of routes for administrator =============================================================
 
@@ -109,6 +116,9 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1')->group(function () {
         Route::get('{classId}/Student-registration', [StudentsController::class, 'create'])->name('student.create');
         Route::post('{class}/Student-registration', [StudentsController::class, 'createNew'])->name('student.store');
         Route::put('{id}/Promote-students', [StudentsController::class, 'promoteClass'])->name('promote.student.class');
+        Route::get('Graduate-student', [StudentsController::class, 'callGraduateStudents'])->name('graduate.students');
+        Route::get('Graduate-students/year/{year}', [StudentsController::class, 'graduatedStudentByYear'])->name('graduate.student.by.year');
+        Route::get('Export-graduate-students/year/{year}', [StudentsController::class, 'exportGraduateStudents'])->name('graduate.students.export');
         Route::put('{student}/Delete-student', [StudentsController::class, 'destroy'])->name('Students.destroy');
         Route::get('Student-trash', [StudentsController::class, 'studentTrashList'])->name('students.trash');
         Route::put('{id}/Restore-trashed-students', [StudentsController::class, 'restoreTrashList'])->name('student.restored.trash');

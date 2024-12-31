@@ -49,8 +49,7 @@ class SchoolsController extends Controller
             'email' => 'required|string|unique:users,email',
             'phone' => 'required|string|min:10|max:15',
             'gender' => 'required|string|max:255',
-            'usertype' => 'required',
-            'school' => 'exists:schools,id',
+            'school_id' => 'exists:schools,id',
             'password' => 'required|min:8',
         ]);
 
@@ -86,9 +85,9 @@ class SchoolsController extends Controller
         $users->email = $request->email;
         $users->phone = $request->phone;
         $users->gender = $request->gender;
-        $users->usertype = $request->usertype;
+        $users->usertype = $request->input('usertype', 2);
         $users->school_id = $request->school;
-        $users->password = Hash::make($request->password);
+        $users->password = Hash::make($request->input('password', 'shule@2024'));
         $users->school_id = $school->id;
         $saveData = $users->save();
 
@@ -183,10 +182,16 @@ class SchoolsController extends Controller
                 mkdir($imagePath, 0775, true);
             }
 
-            // Move the file
+            // Check if the existing file exists and delete it
+            $existingFile = $imagePath . '/' . $schools->logo;
+            if (file_exists($existingFile)) {
+                unlink($existingFile);
+            }
+
+            // Move the new file
             $image->move($imagePath, $imageFile);
 
-            // Set the image file name on the student record
+            // Set the image file name on the school record
             $schools->logo = $imageFile;
         }
         $schools->save();

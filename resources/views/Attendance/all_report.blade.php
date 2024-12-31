@@ -17,6 +17,92 @@
         .page-number:before {
             content: "Page " counter(page);
         }
+
+        /* Inline your Bootstrap CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        @media print {
+            .no-print {
+                display: none;
+            }
+            h1, h2, h4, h5, h6 {
+                text-transform: uppercase;
+                text-align: center
+            }
+            .print-only {
+                display: block;
+            }
+            .footer {
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+                border-top: 1px solid #ddd;
+                padding-top: 10px;
+            }
+            thead {
+                display: table-header-group;
+                background-color: gray; /* Adds a gray background to thead */
+            }
+            tbody {
+                display: table-row-group;
+            }
+            .table {
+                border: 1px solid black;
+                border-collapse: collapse;
+                width: 100%;
+            }
+            .table th,
+            .table td {
+                border: 1px solid black;
+            }
+        }
+
+        .table {
+            width: 100%;
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        .table th, .table td {
+            border: 1px solid #dee2e6;
+            padding: 2px;
+            text-align: left;
+            text-transform: capitalize
+        }
+
+        .table th {
+            background-color: #343a40;
+            color: #fff;
+            text-align: center;
+        }
+
+        .table td {
+            background-color: #fff;
+        }
+
+        .table img {
+            display: block;
+            margin: 0 auto;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: -30px;
+            align-content: space-around;
+            font-size: 12px;
+            /* border-top: 1px solid black; */
+        }
+        .page-number:before {
+            content: "Page " counter(page);
+        }
+
     </style>
 </head>
 <body>

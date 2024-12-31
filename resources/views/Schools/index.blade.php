@@ -70,6 +70,7 @@
                                 @enderror
                             </div>
                         </div>
+                        <hr>
                         <h6 class="header-title">Manager's information</h6>
                         <div class="form-row">
                             <div class="col-md-4 mb-3">
@@ -129,8 +130,6 @@
                                 @enderror
                             </div>
                             <div class="col-md-4 mb-3">
-                                <input type="hidden" name="usertype" value="2">
-                                <input type="hidden" name="password" value="shule@2024">
                             </div>
                         </div>
                         <div class="form-row">

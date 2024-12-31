@@ -43,27 +43,27 @@ class ResultsController extends Controller
              ->whereYear('exam_date', $year)
              ->where('student_id', $student->id)
              ->orderBy('examinations.exam_type', 'asc')
-             ->paginate(6);
+             ->paginate(10);
 
          return view('Results.result_type', compact('student', 'year', 'examTypes'));
      }
 
      public function resultByMonth(Student $student, $year, $exam_type)
-{
-    $months = Examination_result::query()
-        ->selectRaw('MONTH(exam_date) as month')
-        ->distinct()
-        ->whereYear('exam_date', $year)
-        ->where('exam_type_id', $exam_type)
-        ->where('student_id', $student->id)
-        ->where('status', 2)
-        ->orderBy('month')
-        ->get();
+    {
+        $months = Examination_result::query()
+            ->selectRaw('MONTH(exam_date) as month')
+            ->distinct()
+            ->whereYear('exam_date', $year)
+            ->where('exam_type_id', $exam_type)
+            ->where('student_id', $student->id)
+            ->where('status', 2)
+            ->orderBy('month')
+            ->get();
 
-        $examType = Examination::find($exam_type);
+            $examType = Examination::find($exam_type);
 
-    return view('Results.result_months', compact('student', 'year', 'examType', 'months'));
-}
+        return view('Results.result_months', compact('student', 'year', 'examType', 'months'));
+    }
 
 
     /**
@@ -252,6 +252,15 @@ class ResultsController extends Controller
 
     public function resultsByMonth(School $school, $year, $class, $examType, $month)
     {
+        // return $month;
+        $monthsArray = [
+            'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
+            'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8, 'September' => 9,
+            'October' => 10, 'November' => 11, 'December' => 12,
+        ];
+
+        $monthNumber = $monthsArray[$month];
+        // return $monthNumber;
         $results = Examination_result::query()
                             ->join('students', 'students.id', '=', 'examination_results.student_id')
                             ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
@@ -268,7 +277,7 @@ class ResultsController extends Controller
                             ->whereYear('examination_results.exam_date', $year)
                             ->where('examination_results.class_id', $class)
                             ->where('examination_results.exam_type_id', $examType)
-                            ->whereMonth('examination_results.exam_date', Carbon::parse($month)->month)
+                            ->whereMonth('examination_results.exam_date', $monthNumber)
                             ->get();
 
         // Total number of students by gender
@@ -280,6 +289,7 @@ class ResultsController extends Controller
                             $averageScore = $courseResults->avg('score');
                             return [
                                 'course_name' => $courseResults->first()->course_name,
+                                'course_code' =>$courseResults->first()->course_code,
                                 'average_score' => $averageScore,
                                 'grade' => $this->calculateGrade($averageScore, $courseResults->first()->marking_style)
                             ];
@@ -410,26 +420,38 @@ class ResultsController extends Controller
     public function publishResult(School $school, $year, $class, $examType, $month)
     {
         try {
-            // Convert month name to month number
-            $monthNumber = date('m', strtotime($month));
 
-            // Update the query to correctly match the month
-            $updatedRows = Examination_result::where('school_id', $school->id)
-                                            ->whereYear('exam_date', $year)
-                                            ->where('class_id', $class)
-                                            ->where('exam_type_id', $examType)
-                                            ->whereMonth('exam_date', $monthNumber)
-                                            ->update(['status' => 2]);
+            $monthsArray = [
+                'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
+                'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8, 'September' => 9,
+                'October' => 10, 'November' => 11, 'December' => 12,
+            ];
 
-            if ($updatedRows > 0) {
-                // return redirect()->back()->with('success', 'Results published successfully.');
-                Alert::success('Sucess!', 'Results published successfully');
-                return back();
+            // return $monthsArray;
+            if(array_key_exists($month, $monthsArray)){
+                $monthNumber = $monthsArray[$month];
+                // return $monthNumber;
+
+                $updatedRows = Examination_result::where('school_id', $school->id)
+                                                ->whereYear('exam_date', $year)
+                                                ->where('class_id', $class)
+                                                ->where('exam_type_id', $examType)
+                                                ->whereMonth('exam_date', $monthNumber)
+                                                ->update(['status' => 2]);
+                if($updatedRows){
+                    Alert::success('Success!', 'Results published successfully');
+                    return back();
+                } else {
+                    Alert::error('Error!', 'No results found to npublish.' );
+                    return redirect()->back();
+                }
             } else {
-                Alert::error('Error!', 'No results found to publish.' );
+                Alert::error('Error!', 'Invalid month name provided.' );
                 return redirect()->back();
             }
-        } catch (\Exception $e) {
+
+        }
+        catch (\Exception $e) {
             Alert::error('Error publishing results', ['error' => $e->getMessage()]);
             return back();
         }
@@ -438,31 +460,39 @@ class ResultsController extends Controller
     public function unpublishResult (School $school, $year, $class, $examType, $month)
     {
         try {
-            // Convert month name to month number
-            $monthNumber = date('m', strtotime($month));
+            $monthsArray = [
+                'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
+                'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8, 'September' => 9,
+                'October' => 10, 'November' => 11, 'December' => 12,
+            ];
 
+            // return $monthsArray;
+            if(array_key_exists($month, $monthsArray)){
+                $monthNumber = $monthsArray[$month];
+                // return $monthNumber;
 
-            // Update the query to correctly match the month
-            $updatedRows = Examination_result::where('school_id', $school->id)
-                                            ->whereYear('exam_date', $year)
-                                            ->where('class_id', $class)
-                                            ->where('exam_type_id', $examType)
-                                            ->whereMonth('exam_date', $monthNumber)
-                                            ->update(['status' => 1]);
-
-            if ($updatedRows > 0) {
-                // return redirect()->back()->with('success', 'Results published successfully.');
-                Alert::success('Sucess!', 'Results Blocked successfully');
-                return back();
+                $updatedRows = Examination_result::where('school_id', $school->id)
+                                                ->whereYear('exam_date', $year)
+                                                ->where('class_id', $class)
+                                                ->where('exam_type_id', $examType)
+                                                ->whereMonth('exam_date', $monthNumber)
+                                                ->update(['status' => 1]);
+                if($updatedRows){
+                    Alert::success('Success!', 'Results unpublished successfully');
+                    return back();
+                } else {
+                    Alert::error('Error!', 'No results found to unpublish.' );
+                    return redirect()->back();
+                }
             } else {
-                Alert::error('Error!', 'No results found to block.' );
+                Alert::error('Error!', 'Invalid month name provided.' );
                 return redirect()->back();
             }
-        } catch (\Exception $e) {
-            Alert::error('Error blocking results', ['error' => $e->getMessage()]);
+
+        }
+        catch (\Exception $e) {
+            Alert::error('Error publishing results', ['error' => $e->getMessage()]);
             return back();
         }
     }
-
-
 }
