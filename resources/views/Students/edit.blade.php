@@ -72,13 +72,13 @@
                         <option value="">--Hatumii Usafiri--</option>
                         @if ($students->transport == NULL)
                             <option value="">-- Chagua Ruti --</option>
-                            @foreach ($buses as $bus )
-                                <option value="{{$bus->id}}">{{$bus->routine}}</option>
-                            @endforeach
-                            @else
-                            <option value="{{$students->transport_id}}" selected>{{$students->driver_name}}</option>
+                                @foreach ($buses as $bus )
+                                    <option value="{{$bus->id}}">{{$bus->routine}}</option>
+                                @endforeach
+                        @else
+                            <option value="{{$students->transport_id}}" selected>{{$students->routine}}</option>
                             @foreach ($buses as $bus)
-                                <option value="{{$bus->id}}">{{$bus->driver_name}}</option>
+                                <option value="{{$bus->id}}">{{$bus->routine}}</option>
                             @endforeach
                         @endif
                     </select>
@@ -92,9 +92,13 @@
                     <label for="validationCustom01">Darasa</label>
                     <select name="class" id="validationCustom01" class="form-control text-uppercase" required>
                         <option value="{{$students->class_id}}">{{$students->class_name}}</option>
-                        @foreach ($classes as $class)
-                            <option value="{{$class->id}}">{{$class->class_name}}</option>
-                        @endforeach
+                        @if ($classes->isEmpty())
+                            <option value="" class="text-danger">No classes found</option>
+                        @else
+                            @foreach ($classes as $class)
+                                <option value="{{$class->id}}">{{$class->class_name}}</option>
+                            @endforeach
+                        @endif
                     </select>
                     @error('class')
                     <div class="invalid-feedback">

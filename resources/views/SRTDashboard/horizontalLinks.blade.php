@@ -46,13 +46,13 @@
                                 </ul>
                             </li>
                             <li>
-                                <a href="{{route('attendance.fill.form')}}"><i class="fa fa-list"></i><span> Attendance Report</span></a>
+                                <a href="{{route('attendance.fill.form')}}"><i class="ti-notepad"></i><span> Attendance Report</span></a>
                             </li>
                             <li>
-                                <a href="javascript:void(0)"><i class="fa fa-list-check"></i><span>Exams & Results</span></a>
+                                <a href="javascript:void(0)"><i class="ti-stats-up"></i><span>Exams & Results</span></a>
                                 <ul class="submenu">
                                     <li><a href="{{route('exams.index')}}"><i class="ti-pencil-alt"></i>Examinations</a></li>
-                                    <li><a href="{{route('results.general', Auth::user()->school_id)}}"><i class="ti-layers-alt"></i>Results</a></li>
+                                    <li><a href="{{route('results.general', Auth::user()->school_id)}}"><i class="ti-bar-chart-alt"></i>Results</a></li>
                                 </ul>
                             </li>
                             <li>

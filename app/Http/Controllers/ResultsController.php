@@ -9,6 +9,7 @@ use App\Models\school;
 use App\Models\Student;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert as FacadesAlert;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -18,7 +19,8 @@ class ResultsController extends Controller
 
     public function index(Student $student)
     {
-        $results = Examination_result::where('student_id', $student->id)->get();
+        $user = Auth::user();
+        $results = Examination_result::where('student_id', $student->id)->where('school_id', $user->school_id)->orderBy('exam_date', 'DESC')->get();
 
         $groupedData = $results->groupBy(function ($item) {
             return Carbon::parse($item->exam_date)->format('Y');
@@ -36,12 +38,14 @@ class ResultsController extends Controller
 
      public function resultByType(Student $student, $year)
      {
+        $user = Auth::user();
          $examTypes = Examination_result::query()
              ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
              ->select('examinations.exam_type', 'examinations.id as exam_id')
              ->distinct()
              ->whereYear('exam_date', $year)
              ->where('student_id', $student->id)
+             ->where('school_id', $user->school_id)
              ->orderBy('examinations.exam_type', 'asc')
              ->paginate(10);
 
@@ -50,6 +54,7 @@ class ResultsController extends Controller
 
      public function resultByMonth(Student $student, $year, $exam_type)
     {
+        $user = Auth::user();
         $months = Examination_result::query()
             ->selectRaw('MONTH(exam_date) as month')
             ->distinct()
@@ -57,6 +62,7 @@ class ResultsController extends Controller
             ->where('exam_type_id', $exam_type)
             ->where('student_id', $student->id)
             ->where('status', 2)
+            ->where('school_id', $user->school_id)
             ->orderBy('month')
             ->get();
 
@@ -72,6 +78,7 @@ class ResultsController extends Controller
     public function viewStudentResult(Student $student, $year, $type, $month)
     {
         // Retrieve examination results for the specific student
+        $user = Auth::user();
         $results = Examination_result::query()
             ->join('students', 'students.id', '=', 'examination_results.student_id')
             ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
@@ -91,6 +98,7 @@ class ResultsController extends Controller
             ->where('examination_results.exam_type_id', $type)
             ->whereYear('examination_results.exam_date', $year)
             ->whereMonth('examination_results.exam_date', $month)
+            ->where('examination_results.school_id', $user->school_id)
             ->get();
 
         // Calculate the sum of all scores
@@ -175,6 +183,7 @@ class ResultsController extends Controller
                 'grades.id as class_id', 'grades.class_name', 'grades.class_code'
             )
             ->where('examination_results.school_id', $school->id)
+            ->orderBy('examination_results.exam_date', 'DESC')
             ->get();
 
         $groupedData = $results->groupBy(function ($item) {
@@ -196,6 +205,7 @@ class ResultsController extends Controller
                     )
                     ->where('examination_results.school_id', $school->id)
                     ->whereYear('examination_results.exam_date', $year)
+                    ->orderBy('grades.class_code', 'ASC')
                     ->get();
 
         $groupedByClass = $results->groupBy('class_id');

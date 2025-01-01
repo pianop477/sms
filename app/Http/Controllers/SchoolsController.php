@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class SchoolsController extends Controller
@@ -37,62 +38,66 @@ class SchoolsController extends Controller
     public function store(Request $request)
     {
         // abort(404);
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'reg_no' => 'required|string|max:255',
-            'logo' => 'image|max:4096',
-            'postal' => 'required|string|max:255',
-            'postal_name' => 'required|string|max:255',
-            'country' => 'required|string',
-            'fname' => 'required|string|max:255',
-            'lname' => 'required|string|max:255',
-            'email' => 'required|string|unique:users,email',
-            'phone' => 'required|string|min:10|max:15',
-            'gender' => 'required|string|max:255',
-            'school_id' => 'exists:schools,id',
-            'password' => 'required|min:8',
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'reg_no' => 'required|string|max:255',
+                'logo' => 'image|max:4096',
+                'postal' => 'required|string|max:255',
+                'postal_name' => 'required|string|max:255',
+                'country' => 'required|string',
+                'fname' => 'required|string|max:255',
+                'lname' => 'required|string|max:255',
+                'email' => 'required|string|unique:users,email',
+                'phone' => 'required|string|min:10|max:15',
+                'gender' => 'required|string|max:255',
+            ]);
 
-        //store schools information
-        $school = new school();
-        $school->school_name = $request->name;
-        $school->school_reg_no = $request->reg_no;
-        $school->postal_address = $request->postal;
-        $school->postal_name = $request->postal_name;
-        $school->country = $request->country;
-        if ($request->hasFile('logo')) {
-            $image = $request->file('logo');
-            $imageFile = time() . '.' . $image->getClientOriginalExtension();
-            $imagePath = public_path('assets/img/logo');
+            //store schools information
+            $school = new school();
+            $school->school_name = $request->name;
+            $school->school_reg_no = $request->reg_no;
+            $school->postal_address = $request->postal;
+            $school->postal_name = $request->postal_name;
+            $school->country = $request->country;
+            if ($request->hasFile('logo')) {
+                $image = $request->file('logo');
+                $imageFile = time() . '.' . $image->getClientOriginalExtension();
+                $imagePath = public_path('assets/img/logo');
 
-            // Ensure the directory exists
-            if (!file_exists($imagePath)) {
-                mkdir($imagePath, 0775, true);
+                // Ensure the directory exists
+                if (!file_exists($imagePath)) {
+                    mkdir($imagePath, 0775, true);
+                }
+
+                // Move the file
+                $image->move($imagePath, $imageFile);
+
+                // Set the image file name on the student record
+                $school->logo = $imageFile;
             }
+            $school->save();
 
-            // Move the file
-            $image->move($imagePath, $imageFile);
+            //store managers information
+            $users = new User();
+            $users->first_name = $request->fname;
+            $users->last_name = $request->lname;
+            $users->email = $request->email;
+            $users->phone = $request->phone;
+            $users->gender = $request->gender;
+            $users->usertype = $request->input('usertype', 2);
+            $users->school_id = $request->school;
+            $users->password = Hash::make($request->input('password', 'shule@2024'));
+            $users->school_id = $school->id;
+            $saveData = $users->save();
 
-            // Set the image file name on the student record
-            $school->logo = $imageFile;
+            Alert::success('Success!', 'School information saved successfully');
+            return redirect()->back();
         }
-        $school->save();
-
-        //store managers information
-        $users = new User();
-        $users->first_name = $request->fname;
-        $users->last_name = $request->lname;
-        $users->email = $request->email;
-        $users->phone = $request->phone;
-        $users->gender = $request->gender;
-        $users->usertype = $request->input('usertype', 2);
-        $users->school_id = $request->school;
-        $users->password = Hash::make($request->input('password', 'shule@2024'));
-        $users->school_id = $school->id;
-        $saveData = $users->save();
-
-        Alert::success('Success!', 'School information saved successfully');
-        return back();
+        catch(\Exception $e){
+            Alert::error('Error', $e->getMessage());
+            return back();
+        }
     }
 
     /**
@@ -202,9 +207,25 @@ class SchoolsController extends Controller
     /**
      * Remove the resource from storage.
      */
-    public function destroy(): never
+    public function destroy($id)
     {
-        abort(404);
+        // abort(404);
+        $school = school::find($id);
+
+        if(! $school) {
+            Alert::error('Error', 'This school is not found');
+            return back();
+        }
+        $logoPath = public_path('assets/img/logo');
+        $existingFile = $logoPath . '/' . $school->logo;
+        if(file_exists($existingFile)) {
+            unlink($existingFile);
+        }
+        //delete school
+        $school->delete();
+        Alert::success('School has been deleted successfully');
+        return redirect()->back();
+
     }
 
     public function showFeedback ()

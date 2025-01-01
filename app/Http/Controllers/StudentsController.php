@@ -20,12 +20,13 @@ class StudentsController extends Controller
     public function index()
     {
         // Get all classes with their respective student counts
+        $user = Auth::user();
         $classes = Grade::where('status', 1)
-                        ->withCount(['students' => function($query) {
-                            $query->where('status', 1);
+                        ->withCount(['students' => function($query) use ($user) {
+                            $query->where('status', 1)->where('school_id', $user->school_id);
                         }])
-                        ->where('school_id', '=', Auth::user()->school_id)
-                        ->orderBy('id', 'ASC')
+                        ->where('school_id', '=', $user->school_id)
+                        ->orderBy('class_code')
                         ->get();
 
         return view('Students.classes', ['classes' => $classes]);
@@ -37,13 +38,14 @@ class StudentsController extends Controller
     public function create($classId)
     {
         // abort(404);
+        $user = Auth::user();
         $class = Grade::findOrFail($classId);
-        $buses = Transport::where('school_id', '=', Auth::user()->school_id, 'AND', 'status', '=', 1)->orderBy('driver_name', 'ASC')->get();
+        $buses = Transport::where('school_id', '=', $user->school_id, 'AND', 'status', '=', 1)->orderBy('driver_name', 'ASC')->get();
         $parents = Parents::query()
                             ->join('users', 'users.id', '=', 'parents.user_id')
                             ->join('schools', 'schools.id', '=', 'parents.school_id')
                             ->select('parents.id', 'users.first_name', 'users.last_name')
-                            ->where('parents.school_id', '=', Auth::user()->school_id)
+                            ->where('parents.school_id', '=', $user->school_id)
                             ->where('parents.status', '=', 1)
                             ->get();
         return view('Students.create', compact('class', 'buses', 'parents'));
@@ -56,6 +58,7 @@ class StudentsController extends Controller
     public function createNew(Request $request, $class)
         {
             // Validate the incoming request data
+            $user = Auth::user();
             $request->validate([
                 'fname' => 'required|string|max:255',
                 'middle' => 'required|string|max:255',
@@ -73,7 +76,7 @@ class StudentsController extends Controller
             $existingRecords = Student::where('first_name', '=', $request->fname)
                                     ->where('middle_name', '=', $request->middle)
                                     ->where('last_name', '=', $request->lname)
-                                    ->where('school_id', '=', Auth::user()->school_id)
+                                    ->where('school_id', '=', $user->school_id)
                                     ->exists();
 
             if ($existingRecords) {
@@ -229,16 +232,17 @@ class StudentsController extends Controller
 
     public function showStudent($class)
     {
+        $user = Auth::user();
         $classId = Grade::findOrFail($class);
         $parents = Parents::query()
                             ->join('users', 'users.id', '=', 'parents.user_id')
                             ->join('schools', 'schools.id', '=', 'parents.school_id')
                             ->select('parents.id', 'users.first_name', 'users.last_name')
-                            ->where('parents.school_id', '=', Auth::user()->school_id)
+                            ->where('parents.school_id', '=', $user->school_id)
                             ->where('parents.status', '=', 1)
                             ->orderBy('users.first_name', 'ASC')
                             ->get();
-        $buses = Transport::where('school_id', '=', Auth::user()->school_id)->where('status', '=', 1)->orderBy('driver_name', 'ASC')->get();
+        $buses = Transport::where('school_id', '=', $user->school_id)->where('status', '=', 1)->orderBy('driver_name', 'ASC')->get();
         $students = Student::query()
                             ->join('parents', 'parents.id', '=', 'students.parent_id')
                             ->join('users', 'users.id', '=', 'parents.user_id')
@@ -249,17 +253,19 @@ class StudentsController extends Controller
                                 'transports.driver_name', 'transports.gender as driver_gender', 'transports.phone as driver_phone', 'transports.bus_no',
                                 'transports.routine', 'schools.school_reg_no')
                             ->where('students.class_id', '=', $classId->id)
-                            ->where('students.school_id', '=', Auth::user()->school_id)
+                            ->where('students.school_id', '=', $user->school_id)
                             ->where('students.status', 1)
                             ->orderBy('students.first_name', 'ASC')
                             ->get();
-        $classes = Grade::where('id', '!=', $classId->id)->get();
+        $classes = Grade::where('id', '!=', $classId->id)->where('school_id', $user->school_id)->orderBy('class_code')->get();
+
         return view('Students.index', ['students' => $students, 'classId' => $classId, 'parents' => $parents, 'buses' => $buses, 'classes' => $classes]);
     }
 
     //promote students to the next class
     public function promoteClass($id, Request $request)
     {
+        $user = Auth::user();
         $class = Grade::find($id);
         if (! $class) {
             Alert::error('Error!', 'No such class was found');
@@ -272,12 +278,12 @@ class StudentsController extends Controller
 
         if ($request->class_id == 0) {
             // Mark students as graduated
-            Student::where('class_id', $class->id)->update(['graduated' => true, 'status' => 0]);
+            Student::where('class_id', $class->id)->where('school_id', $user->schoo_id)->update(['graduated' => true, 'status' => 0]);
             Alert::info('Conglaturations🎉', 'Students has graduated and awarded primary education certificate');
             return back();
         } else {
             // Promote students to the next class
-            Student::where('class_id', $class->id)->update(['class_id' => $request->class_id]);
+            Student::where('class_id', $class->id)->where('school_id', $user->school_id)->update(['class_id' => $request->class_id]);
 
             Alert::success('Success!', 'Students have been upgraded to the next class');
             return back();
@@ -293,6 +299,7 @@ class StudentsController extends Controller
                         ->where('graduated', true)
                         ->where('status', 0)
                         ->select(DB::raw('YEAR(updated_at) as year'), 'id', 'first_name', 'updated_at')
+                        ->orderBy('updated_at', )
                         ->get()
                         ->groupBy('year');
         return view('Students.graduate', compact('studentsByYear'));
@@ -338,6 +345,7 @@ class StudentsController extends Controller
     public function exportPdf($classId)
     {
         // return $classId;
+        $user = Auth::user();
         $students = Student::query()->join('grades', 'grades.id', '=', 'students.class_id')
                                     ->join('schools', 'schools.id', '=', 'students.school_id')
                                     ->join('parents', 'parents.id', 'students.parent_id')
@@ -351,6 +359,7 @@ class StudentsController extends Controller
                                     )
                                     ->where('students.class_id', $classId)
                                     ->where('students.status', 1)
+                                    ->where('students.school_id', $user->school_id)
                                     ->orderBy('students.first_name')
                                     ->get();
         $pdf = \PDF::loadView('Students.student_export', compact('students'));
@@ -367,8 +376,9 @@ class StudentsController extends Controller
 
     public function parentByStudent()
     {
-        $buses = Transport::where('school_id', '=', Auth::user()->school_id)->where('status', '=', 1)->orderBy('driver_name', 'ASC')->get();
-        $classes = Grade::where('school_id', '=', Auth::user()->school_id)->where('status', '=', 1)->orderBy('class_name', 'ASC')->get();
+        $user = Auth::user();
+        $buses = Transport::where('school_id', '=', $user->school_id)->where('status', '=', 1)->orderBy('driver_name', 'ASC')->get();
+        $classes = Grade::where('school_id', '=', $user->school_id)->where('status', '=', 1)->orderBy('class_code')->get();
         return view('Students.register', ['buses' => $buses, 'classes' => $classes ]);
     }
 
@@ -393,11 +403,11 @@ class StudentsController extends Controller
          $existingRecords = Student::where('first_name', '=', $request->fname)
                                     ->where('middle_name', '=', $request->middle)
                                     ->where('last_name', '=', $request->lname)
-                                    ->where('school_id', '=', Auth::user()->school_id)
+                                    ->where('school_id', '=', $user->school_id)
                                     ->exists();
 
         if ($existingRecords) {
-            Alert::error('Error', 'Student with the same records already exists in our records');
+            Alert::error('Error', 'Student with the same records already exists');
             return back();
         }
 
@@ -443,6 +453,7 @@ class StudentsController extends Controller
 
     public function showRecords($student)
     {
+        $user = Auth::user();
         $data = Student::query()
                         ->join('parents', 'parents.id', '=', 'students.parent_id')
                         ->join('grades', 'grades.id', '=', 'students.class_id')
@@ -467,13 +478,15 @@ class StudentsController extends Controller
                             'schools.school_reg_no',
                         )
                         ->where('students.id', '=', $student)
+                        ->where('students.school_id', $user->school_id)
                         ->where('students.status', 1)
                         ->first();
 
         // Check if the data is found
         if (!$data) {
             // Handle the case where no data is found, e.g., return a 404 response
-            return abort(404, 'Student not found.');
+            Alert::error('404', 'No student found');
+            return back();
         }
 
         // The student gender can be accessed directly from $data
@@ -487,6 +500,7 @@ class StudentsController extends Controller
 
     public function modify($student)
     {
+        $user = Auth::user();
         $students = Student::query()->join('parents', 'parents.id', '=', 'students.parent_id')
                                     ->join('users', 'users.id', '=', 'parents.user_id')
                                     ->join('grades', 'grades.id', '=', 'students.class_id')
@@ -494,8 +508,8 @@ class StudentsController extends Controller
                                     ->select('students.*', 'grades.class_name', 'grades.class_code', 'transports.driver_name')
                                     ->findOrFail($student);
 
-        $buses = Transport::where('status', '=', 1)->orderBy('driver_name', 'ASC')->get();
-        $classes = Grade::where('status', '=', 1)->get();
+        $buses = Transport::where('status', '=', 1)->where('school_id', $user->school_id)->orderBy('driver_name', 'ASC')->get();
+        $classes = Grade::where('status', '=', 1)->where('school_id', $user->school_id)->orderBy('class_code')->get();
         return view('Students.edit', ['buses' => $buses, 'students' => $students, 'classes' => $classes ]);
     }
 

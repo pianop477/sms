@@ -9,7 +9,7 @@
                             <div class="row">
                                 <div class="iv-left col-2">
                                     <h2>INVOICE</h2>
-                                    <img src="{{asset('assets/img/logo/shuleapp_transparent.png')}}" alt="" class="profile-img border-radius-lg shadow-sm" style="width: 150px; object-fit:cover;">
+                                    <img src="{{asset('assets/img/logo/shuleApp.png')}}" alt="" class="profile-img border-radius-lg shadow-sm" style="width: 150px; object-fit:cover;">
                                     {{-- <p class="text-center font-weight-bold">ShuleApp</p> --}}
                                 </div>
                                 <div class="iv-right col-10 text-right">

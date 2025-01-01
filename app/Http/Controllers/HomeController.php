@@ -68,11 +68,12 @@ class HomeController extends Controller
                                         'transports.routine as bus_routine' // Select transport fields, if needed
                                         )
                                         ->where('parents.user_id', '=', $user->id)
+                                        ->where('students.school_id', $user->school_id)
                                         ->where('students.status', 1)
                                         ->orderBy('students.first_name', 'ASC')
                                         ->get();
-                $classes = Grade::where('status', '=', 1)->get();
-                $buses = Transport::where('status', '=', 1)->orderBy('driver_name', 'ASC')->get();
+                $classes = Grade::where('status', '=', 1)->where('school_id', $user->school_id)->get();
+                $buses = Transport::where('status', '=', 1)->where('school_id', $user->school_id)->orderBy('driver_name', 'ASC')->get();
                 return view('home', ['students' => $students, 'classes' => $classes, 'buses' => $buses]);
             }
 
@@ -115,11 +116,13 @@ class HomeController extends Controller
                         $maleCount = Student::where('class_id', $class->class_id)
                                             ->where('group', $class->group)
                                             ->where('gender', 'male')
+                                            ->where('school_id', $teachers->school_id)
                                             ->where('status', 1)
                                             ->count();
                         $femaleCount = Student::where('class_id', $class->class_id)
                                               ->where('group', $class->group)
                                               ->where('gender', 'female')
+                                              ->where('school_id', $teachers->school_id)
                                               ->where('status', 1)
                                               ->count();
 

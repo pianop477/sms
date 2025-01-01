@@ -81,13 +81,12 @@ class TeachersController extends Controller
             'school_id' => 'exists:schools, id'
         ]);
 
-        Log::info('Validation passed', $validatedData);
+        $user = Auth::user();
 
-        $existingRecords = Teacher::where('dob', $request->dob)
-                ->where('phone', $request->phone)
-                ->where('first_name', $request->fname)
-                ->where('school_id', Auth::user()->school_id)
-                ->exists();
+        $existingRecords = User::where('phone', $request->phone)
+                    ->where('first_name', $request->fname)
+                    ->where('school_id', Auth::user()->school_id)
+                    ->exists();
 
         if ($existingRecords) {
             // Log::info('Duplicate record detected for DOB: ' . $request->dob);
@@ -108,7 +107,7 @@ class TeachersController extends Controller
             $users->gender = $request->gender;
             $users->usertype = $request->input('usertype', 3);
             $users->password = Hash::make($request->input('password', 'shule@2024'));
-            $users->school_id = $request->school_id;
+            $users->school_id = $user->school_id;
             $users->save();
 
             // Log::info('User created successfully', ['user_id' => $users->id]);
@@ -116,7 +115,7 @@ class TeachersController extends Controller
             // Create Teacher
             $teachers = new Teacher();
             $teachers->user_id = $users->id;
-            $teachers->school_id = $users->school_id;
+            $teachers->school_id = $user->school_id;
             $teachers->dob = $request->dob;
             $teachers->qualification = $request->qualification;
             $teachers->address = $request->street;
@@ -124,16 +123,12 @@ class TeachersController extends Controller
             $teachers->member_id = $this->getMemberId();
             $teachers->save();
 
-            Log::info('Teacher record saved successfully', ['teacher_id' => $teachers->id]);
-
             DB::commit();
             Alert::success('Success', 'Teacher records saved successfully');
-            return back();
+            return redirect()->back();
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error saving teacher records: ' . $e->getMessage());
-
-            Alert::error('Error', 'Something went wrong. Please try again.');
+            Alert::error('Error', $e->getMessage());
             return back();
         }
     }
@@ -191,7 +186,6 @@ class TeachersController extends Controller
      {
         try {
             // Log the start of the method
-            Log::info('Update Teachers method started', ['teacher_id' => $teachers]);
 
             // Validation
             $validated = $request->validate([
@@ -206,13 +200,10 @@ class TeachersController extends Controller
                 'image' => 'nullable|image|max:2048',
             ]);
 
-            Log::info('Validation passed', $validated);
 
             // Find teacher and user
             $teacher = Teacher::findOrFail($teachers);
             $user = User::findOrFail($teacher->user_id);
-
-            Log::info('Teacher and user found', ['teacher' => $teacher, 'user' => $user]);
 
             // Update user
             $user->first_name = $request->fname;

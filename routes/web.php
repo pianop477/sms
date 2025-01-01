@@ -77,6 +77,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1')->group(function () {
         //edit school information ===================================================================================
         Route::get('{school}/Edit-school', [SchoolsController::class, 'edit'])->name('schools.edit');
         Route::put('{school}/Update-school', [SchoolsController::class, 'updateSchool'])->name('schools.update.school');
+        Route::get('{id}/Delete-school', [SchoolsController::class, 'destroy'])->name('schools.destroy');
         Route::get('Feedback', [SchoolsController::class, 'showFeedback'])->name('feedback');
         Route::get('{sms}/Delete-feedback', [SchoolsController::class, 'deletePost'])->name('delete.post');
 

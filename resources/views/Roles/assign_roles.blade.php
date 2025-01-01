@@ -30,7 +30,7 @@
                                     <select name="role" id="validationCustom01" class="form-control text-capitalize" required>
                                         <option value="">-- Select role --</option>
                                         @if ($roles->isEmpty())
-                                            <option value="">No Roles found</option>
+                                            <option value="" class="text-danger">No Roles found</option>
                                             @else
                                             @foreach ($roles as $role)
                                                 <option value="{{$role->id}}">{{$role->role_name}}</option>
@@ -46,7 +46,7 @@
                             </div>
                             <div class="">
                                 <div class="">
-                                    <button class="btn btn-primary float-right">Assign Role</button>
+                                    <button class="btn btn-success float-right">Assign</button>
                                 </div>
                             </div>
                         </form>

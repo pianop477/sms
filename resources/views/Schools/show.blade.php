@@ -7,7 +7,7 @@
                     <hr>
                     <div class="row">
                         <div class="col-2">
-                            <img src="{{asset('assets/img/logo/'. $school->logo)}}" alt="" class="profile-img border-radius-lg shadow-sm" style="width: 150px; object-fit:cover;">
+                            <img src="{{asset('assets/img/logo/'. $school->logo)}}" alt="" class="profile-img border-radius-lg shadow-sm" style="width: 100px; object-fit:cover; border-radius:50px">
                         </div>
                         <div class="col-4">
                             <ul>
@@ -32,16 +32,16 @@
                         <div class="col-2">
                             @if ($managers->first()->image == NULL)
                                 @if ($managers->first()->gender == 'male')
-                                    <img src="{{asset('assets/img/profile/avatar.jpg')}}" alt="" class="profile-img" style="width: 120px; object-fit:cover; border: 1px solid black; border-radius: 4xp;">
+                                    <img src="{{asset('assets/img/profile/avatar.jpg')}}" alt="" class="profile-img" style="width: 120px; object-fit:cover; border-radius: 50xp;">
                                     <p class="text-capitalize"><strong>{{$managers->first()->first_name}} {{$managers->first()->last_name}}</strong></p>
                                     <p>Manager</p>
                                 @else
-                                    <img src="{{asset('assets/img/profile/avatar-female.jpg')}}" alt="" class="profile-img" style="width: 120px; object-fit:cover; border: 1px solid black; border-radius: 4xp;">
+                                    <img src="{{asset('assets/img/profile/avatar-female.jpg')}}" alt="" class="profile-img" style="width: 120px; object-fit:cover; border-radius: 50xp;">
                                     <p class="text-capitalize"><strong>{{$managers->first()->first_name}} {{$managers->first()->last_name}}</strong></p>
                                     <p>Manager</p>
                                 @endif
                             @else
-                                <img src="{{asset('assets/img/profile/' .$managers->first()->image)}}" alt="" class="profile-img border-radius-lg shadow-sm" style="width: 150px; object-fit:cover; border: 1px solid black; border-radius: 4px;">
+                                <img src="{{asset('assets/img/profile/' .$managers->first()->image)}}" alt="" class="profile-img border-radius-lg shadow-sm" style="width: 150px; object-fit:cover; border-radius: 50px;">
                                 <p class="text-capitalize"><strong>{{$managers->first()->first_name}} {{$managers->first()->last_name}}</strong></p>
                                 <p>Manager</p>
                             @endif

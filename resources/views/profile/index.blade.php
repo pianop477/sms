@@ -99,7 +99,7 @@
                     </div>
                     @error('image')<span class="text-danger text-sm">{{$message}}</span>@enderror
                 </div>
-                <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                <button type="submit" class="btn btn-success btn-sm">Save</button>
             </form>
             </div>
           </div>

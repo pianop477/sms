@@ -47,9 +47,13 @@
                         <label for="validationCustom01">Teacher's Name</label>
                         <select name="teacher" id="validationCustom01" class="form-control text-uppercase">
                             <option value="{{$classTeacher->teacher_id}}" selected>{{$classTeacher->first_name}} {{$classTeacher->last_name}}</option>
-                            @foreach ($teachers as $teacher )
-                                <option value="{{$teacher->id}}">{{$teacher->first_name}} {{$teacher->last_name}}</option>
-                            @endforeach
+                            @if ($teachers->isEmpty())
+                                <option value="" class="text-danger">No teachers found</option>
+                            @else
+                                @foreach ($teachers as $teacher )
+                                    <option value="{{$teacher->id}}">{{$teacher->first_name}} {{$teacher->last_name}}</option>
+                                @endforeach
+                            @endif
                         </select>
                         @error('class')
                         <div class="invalid-feedback">
