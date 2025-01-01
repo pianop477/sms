@@ -104,7 +104,7 @@
 
 
             </div>
-            <button type="submit" class="btn btn-primary">Update</button>
+            <button type="submit" class="btn btn-success">Save changes</button>
         </form>
     </div>
   </div>

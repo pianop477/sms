@@ -82,11 +82,15 @@
                             @enderror
                         </div>
                         <div class="form-gp">
-                            <select name="school" id="exampleInputEmail1" class="form-control text-uppercase">
+                            <select name="school" id="exampleInputEmail1" class="form-control text-capitalize">
                                 <option value="">--Chagua Jina la Shule ya Mwanao--</option>
-                                @foreach ($schools as $school )
-                                    <option value="{{$school->id}}">{{$school->school_name}}</option>
-                                @endforeach
+                                @if ($schools->isEmpty())
+                                    <option value="" class="text-danger">no schools found</option>
+                                @else
+                                    @foreach ($schools as $school )
+                                        <option value="{{$school->id}}">{{$school->school_name}}</option>
+                                    @endforeach
+                                @endif
                             </select>
                             @error('school')
                                 <div class="text-danger">{{$message}}</div>

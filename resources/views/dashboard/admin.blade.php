@@ -151,13 +151,13 @@
                                                     @method('PUT')
                                                     <li class="mr-3">
                                                         <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to block school {{strtoupper($school->school_name)}}?')">
-                                                            <i class="ti-na text-warning"></i>
+                                                            <i class="ti-na text-info"></i>
                                                         </button>
                                                     </li>
                                                 </form>
                                                 <li>
                                                     <li class="mr-3">
-                                                        <a href=""><i class="ti-trash text-danger" onclick="return confirm('Are you sure you want to delete school {{strtoupper($school->school_name)}}?')"></i></a>
+                                                        <a href="{{route('schools.destroy', $school->id)}}"><i class="ti-trash text-danger" onclick="return confirm('Are you sure you want to delete school {{strtoupper($school->school_name)}}?')"></i></a>
                                                     </li>
                                                 </li>
                                             </ul>
@@ -174,7 +174,7 @@
                                                     </li>
                                                 </form>
                                                 <li class="mr-3">
-                                                    <a href=""><i class="ti-trash text-danger" onclick="return confirm('Are you sure you want to delete school {{strtoupper($school->school_name)}}?')"></i></a>
+                                                    <a href="{{route('schools.destroy', $school->id)}}"><i class="ti-trash text-danger" onclick="return confirm('Are you sure you want to delete school {{strtoupper($school->school_name)}}?')"></i></a>
                                                 </li>
                                             </ul>
                                             @endif

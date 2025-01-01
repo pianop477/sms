@@ -14,7 +14,7 @@ class UsersController extends Controller
 {
     //
     public function index() {
-        $schools = school::where('status', '=', 1)->orderBy('school_name', 'ASC')->get();
+        $schools = school::where('status', '=', 1)->orderBy('school_name')->get();
         return view('auth.register', ['schools' => $schools]);
     }
 
@@ -32,7 +32,7 @@ class UsersController extends Controller
             'street' => 'required|string|max:255',
         ]);
 
-        $parentExists = User::where('phone', $req->phone)->exists();
+        $parentExists = User::where('phone', $req->phone)->where('first_name', $req->fname)->exists();
         if($parentExists) {
             Alert::error('Error', 'This accounts already exists');
             return back();
@@ -75,7 +75,7 @@ class UsersController extends Controller
         $parents->save();
         // return redirect()->back()->with('success', 'User registered successfully, Login now');
 
-        Alert::success('Hongera', 'Taarifa zako zimehifadhiwa kikamilifu, unaweza kuingia sasa!');
+        Alert::success('Success!', 'User Account saved successfully, Login now');
         return redirect()->route('login');
 
     }

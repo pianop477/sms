@@ -13,7 +13,8 @@ class TransportController extends Controller
 {
 
     public function getSchoolBuses() {
-        $transport = Transport::get();
+        $user = Auth::user();
+        $transport = Transport::where('school_id', $user->school_id)->get();
         return view('Transport.index', ['transport' => $transport]);
     }
     /**
@@ -161,6 +162,7 @@ class TransportController extends Controller
 
     public function showStudents(Transport $trans)
     {
+        $user = Auth::user();
         $students = Student::query()->join('grades', 'grades.id', '=', 'students.class_id')
                                     ->join('parents', 'parents.id', '=', 'students.parent_id')
                                     ->leftJoin('users', 'users.id', '=', 'parents.user_id')
@@ -172,6 +174,7 @@ class TransportController extends Controller
                                     )
                                     ->where('students.transport_id', $trans->id)
                                     ->where('students.status', 1)
+                                    ->where('students.school_id', $user->school_id)
                                     ->orderBy('students.first_name')
                                     ->get();
         return view('Transport.students', compact('students', 'trans'));
@@ -180,6 +183,7 @@ class TransportController extends Controller
     public function export (Transport $trans)
     {
         // return response()->json($trans);
+        $user = Auth::user();
         $students = Student::query()
                             ->join('grades', 'grades.id', '=', 'students.class_id')
                             ->join('parents', 'parents.id', '=', 'students.parent_id')
@@ -191,6 +195,7 @@ class TransportController extends Controller
                             )
                             ->where('students.transport_id', $trans->id)
                             ->where('students.status', 1)
+                            ->where('students.school_id', $user->school_id)
                             ->orderBy('first_name')
                             ->get();
         $pdf = \PDF::loadView('Transport.export', compact('students', 'trans'));

@@ -23,7 +23,7 @@
                         </div>
                         <div class="col-4">
                             <button type="button" class="btn btn-xs btn-info float-right" data-toggle="modal" data-target=".bd-example-modal-lg">
-                                <i class="fas fa-plus"></i> Andikisha Mwanafunzi
+                                <i class="fas fa-plus"></i> Andikisha
                             </button>
                             <div class="modal fade bd-example-modal-lg">
                                 <div class="modal-dialog modal-lg">
@@ -94,9 +94,13 @@
                                                         <div class="input-group">
                                                             <select name="grade" id="" class="form-control text-uppercase" required>
                                                                 <option value="">--Chagua Darasa--</option>
-                                                                @foreach ($classes as $class )
-                                                                <option value="{{$class->id}}">{{$class->class_name}}</option>
-                                                                @endforeach
+                                                                @if ($classes->isEmpty())
+                                                                    <option value="" class="text-danger">No classes found</option>
+                                                                @else
+                                                                    @foreach ($classes as $class )
+                                                                        <option value="{{$class->id}}">{{$class->class_name}}</option>
+                                                                    @endforeach
+                                                                @endif
                                                             </select>
                                                             @error('grade')
                                                             <div class="invalid-feedback">
@@ -121,9 +125,13 @@
                                                         <div class="input-group">
                                                             <select name="driver" id="" class="form-control text-capitalize">
                                                                 <option value="">--Chagua ruti ya basi--</option>
-                                                                @foreach ($buses as $bus )
-                                                                <option value="{{$bus->id}}">{{$bus->routine}}</option>
-                                                                @endforeach
+                                                                @if ($buses->isEmpty())
+                                                                    <option value="" class="text-danger">No School Bus Routine</option>
+                                                                @else
+                                                                    @foreach ($buses as $bus )
+                                                                        <option value="{{$bus->id}}">{{$bus->routine}}</option>
+                                                                    @endforeach
+                                                                @endif
                                                             </select>
                                                             @error('driver')
                                                             <div class="invalid-feedback">

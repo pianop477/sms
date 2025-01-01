@@ -296,6 +296,7 @@ class ExamController extends Controller
     //get results by its course=========================
     public function courseResults($id)
     {
+        $user = Auth::user();
         $class_course = class_learning_courses::find($id);
         // return $class_course;
 
@@ -307,6 +308,8 @@ class ExamController extends Controller
         $results = Examination_result::where('course_id', $class_course->course_id)
                                         ->where('class_id', $class_course->class_id)
                                         ->where('teacher_id', $class_course->teacher_id)
+                                        ->where('school_id', $user->school_id)
+                                        ->orderBy('exam_date', 'DESC')
                                         ->get();
 
         // Use distinct to ensure unique years
@@ -320,6 +323,7 @@ class ExamController extends Controller
 
     public function resultByYear(Subject $course, $year)
     {
+        $user = Auth::user();
         $courses = Subject::find($course->id);
         if(! $courses) {
             Alert::error('Error!', 'No such course was found');
@@ -335,6 +339,7 @@ class ExamController extends Controller
                     ->where('class_id', $class_course->class_id)
                     ->where('teacher_id', $class_course->teacher_id)
                     ->whereYear('exam_date', $year)
+                    ->where('examination_results.school_id', $user->school_id)
                     ->distinct()  // Ensure distinct exam types
                     ->get();
 
@@ -349,6 +354,7 @@ class ExamController extends Controller
 
     public function resultByExamType($course, $year, $examType)
     {
+        $user = Auth::user();
         $class_course = class_learning_courses::where('course_id', $course)->first();
         // return ['data' => $class_course];
         $results = Examination_result::where('course_id', $class_course->course_id)
@@ -356,6 +362,7 @@ class ExamController extends Controller
                                 ->where('teacher_id', $class_course->teacher_id)
                                 ->whereYear('exam_date', $year)
                                 ->where('exam_type_id', $examType)
+                                ->where('school_id', $user->school_id)
                                 ->distinct()  // Ensure distinct months
                                 ->get();
 
@@ -370,6 +377,7 @@ class ExamController extends Controller
     public function resultByMonth($course, $year, $examType, $month)
     {
         // return ['data' => $course];
+        $user = Auth::user();
         $subjectCourse = Subject::find($course);
         // return $subjectCourse;
         $class_course = class_learning_courses::where('course_id', $course)->first();
@@ -404,6 +412,7 @@ class ExamController extends Controller
                         ->whereYear('examination_results.exam_date', $year)
                         ->where('examination_results.exam_type_id', $examType)
                         ->whereMonth('examination_results.exam_date', $monthNumber)
+                        ->where('examination_results.school_id', $user->school_id)
                         ->distinct()  // Ensure distinct results
                         ->orderBy('examination_results.score', 'desc')
                         ->get();

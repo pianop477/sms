@@ -123,7 +123,7 @@
                                                     <label for="validationCustom01">Year Joined</label>
                                                     <select name="joined" id="" class="form-control" required>
                                                         <option value="">-- Select Year --</option>
-                                                        @for ($year = date('Y'); $year >= 1990; $year--)
+                                                        @for ($year = date('Y'); $year >= 2010; $year--)
                                                             <option value="{{ $year }}">{{ $year }}</option>
                                                         @endfor
                                                     </select>
@@ -147,8 +147,8 @@
                                             </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-primary">Register</button>
+                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-success">Save</button>
                                     </div>
                                 </div>
                             </form>

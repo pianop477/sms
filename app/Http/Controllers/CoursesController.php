@@ -103,6 +103,7 @@ class CoursesController extends Controller
 
     public function assign($id)
     {
+        $user = Auth::user();
         $classCourse = class_learning_courses::query()
                                             ->join('subjects', 'subjects.id', '=', 'class_learning_courses.course_id')
                                             ->join('grades', 'grades.id', '=', 'class_learning_courses.class_id')
@@ -122,6 +123,7 @@ class CoursesController extends Controller
                                     ->select('teachers.*', 'users.first_name', 'users.last_name')
                                     ->where('teachers.id', '!=', $classCourse->teacherId)
                                     ->where('teachers.role_id', '!=', 2)
+                                    ->where('teachers.school_id', $user->school_id)
                                     ->get();
 
         return view('Courses.admin-edit', compact('classCourse', 'teachers'));
@@ -265,6 +267,8 @@ class CoursesController extends Controller
 
         $class = Grade::find($student->class_id);
 
+        $user = Auth::user();
+
         if(! $class) {
             Alert::error('Haijafanikiwa', 'Hakuna taarifa za darasa hili');
             return back();
@@ -279,6 +283,7 @@ class CoursesController extends Controller
                                                 'users.first_name', 'users.last_name', 'users.phone'
                                             )
                                             ->where('class_learning_courses.class_id', $class->id)
+                                            ->where('class_learning_courses.school_id', $user->school_id)
                                             ->get();
         //fetch class teacher details
 
@@ -289,6 +294,7 @@ class CoursesController extends Controller
                                         ->select('users.first_name', 'users.last_name', 'users.phone', 'users.gender', 'users.image', 'class_teachers.*', 'grades.class_name')
                                         ->where('class_teachers.class_id', $class->id)
                                         ->where('class_teachers.group', $student->group)
+                                        ->where('school_id', $user->school_id)
                                         ->get();
         // return ['data' => $myClassTeacher];
 

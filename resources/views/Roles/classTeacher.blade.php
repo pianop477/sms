@@ -28,11 +28,15 @@
                                             <div class="form-row">
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom01">Teacher's Name</label>
-                                                    <select name="teacher" id="" class="form-control text-uppercase">
+                                                    <select name="teacher" id="" class="form-control text-capitalize">
                                                         <option value="">-- Select Class Teacher --</option>
-                                                        @foreach ($teachers as $teacher)
-                                                            <option value="{{$teacher->id}}">{{$teacher->teacher_first_name. ' '. $teacher->teacher_last_name}}</option>
-                                                        @endforeach
+                                                        @if ($teachers->isEmpty())
+                                                            <option value="" class="text-danger">No teachers found</option>
+                                                        @else
+                                                            @foreach ($teachers as $teacher)
+                                                                <option value="{{$teacher->id}}">{{$teacher->teacher_first_name. ' '. $teacher->teacher_last_name}}</option>
+                                                            @endforeach
+                                                        @endif
                                                     </select>
                                                     @error('fname')
                                                     <div class="invalid-feedback">
@@ -50,13 +54,10 @@
                                                     @enderror
                                                 </div>
                                             </div>
-                                            <div class="form-row">
-                                                <input type="hidden" name="school_id" value="{{Auth::user()->school_id}}">
-                                            </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-primary">Assign</button>
+                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-success">Assign</button>
                                     </div>
                                 </div>
                             </form>

@@ -86,6 +86,7 @@ class RolesController extends Controller
          // Check if the maximum number of teachers is reached for the same class_id and group
          $teacherCount = Class_teacher::where('class_id', $classes)
                                        ->where('group', $request->group)
+                                       ->where('school_id', Auth::user()->school_id)
                                        ->count();
          if ($teacherCount >= 2) {
              Alert::error('Error', 'Maximum number of class teachers has reached to 2');

@@ -23,6 +23,7 @@ class AttendanceController extends Controller
 
     public function index($class)
     {
+        $user = Auth::user();
         $myClass = Class_teacher::findOrFail($class);
         // return $myClass->teacher_id;
         $teacher = Teacher::findOrFail($myClass->teacher_id);
@@ -32,7 +33,7 @@ class AttendanceController extends Controller
         $studentList = Student::where('class_id', '=', $student_class->id)
                                 ->where('group','=', $myClass->group)
                                 ->where('status', '=', 1)
-                                ->where('school_id', '=', Auth::user()->school_id)
+                                ->where('school_id', '=', $user->school_id)
                                 // ->orderBy('first_name', 'ASC')
                                 ->orderBy('gender', 'ASC')
                                 ->orderBy('first_name', 'ASC')
@@ -53,6 +54,8 @@ class AttendanceController extends Controller
     public function store(Request $request, $student_class)
     {
         // Check if the class exists
+        $user = Auth::user();
+
         $class = Grade::findOrFail($student_class);
         $class_id = $class->id;
         $attendanceDate = date('Y-m-d');
@@ -60,7 +63,7 @@ class AttendanceController extends Controller
         $teacher = Teacher::where('user_id', '=', $logged_user->id)->firstOrFail();
 
         // Get the students in the class
-        $students = Student::where('class_id', '=', $student_class)->get();
+        $students = Student::where('class_id', '=', $student_class)->where('school_id', $user->school_id)->get();
         if ($students->isEmpty()) {
             Alert::error('Error', 'No students found in this class.');
             return back();
@@ -128,6 +131,7 @@ class AttendanceController extends Controller
 
     public function show(Student $student, $year)
     {
+        $user = Auth::user();
         $attendanceQuery = Attendance::query()
             ->join('students', 'students.id', '=', 'attendances.student_id')
             ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
@@ -144,6 +148,7 @@ class AttendanceController extends Controller
             )
             ->whereYear('attendances.attendance_date', $year)
             ->where('attendances.student_id', '=', $student->id)
+            ->where('attendances.school_id', $user->school_id)
             ->where('students.status', 1)
             ->orderBy('attendances.attendance_date', 'DESC');
 
@@ -172,6 +177,7 @@ class AttendanceController extends Controller
     //group attendance by year ===========================
     public function attendanceYear (Student $student)
     {
+        $user = Auth::user();
         $attendances = Attendance::query()->join('students', 'students.id', '=', 'attendances.student_id')
                                             ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
                                             ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
@@ -186,8 +192,9 @@ class AttendanceController extends Controller
                                                 'students.last_name as student_lastname'
                                             )
                                             ->where('attendances.student_id', '=', $student->id)
+                                            ->where('attendances.school_id', $user->school_id)
                                             ->where('students.status', 1)
-                                            ->orderBy('attendances.attendance_date', 'ASC')
+                                            ->orderBy('attendances.attendance_date', 'DESC')
                                             ->get();
         $groupedAttendance = $attendances->groupBy(function ($item) {
             return Carbon::parse($item->attendance_date)->format('Y');
@@ -255,6 +262,7 @@ class AttendanceController extends Controller
             ->where('attendances.class_id', $classId)
             ->where('students.group', $group) // Compare 'group' directly
             ->whereBetween('attendances.attendance_date', [$startOfMonth, $endOfMonth])
+            ->where('attendances.school_id', Auth::user()->school_id)
             ->orderBy('attendances.attendance_date', 'ASC')
             ->where('students.status', 1)
             ->orderBy('students.gender', 'DESC')
@@ -378,7 +386,7 @@ class AttendanceController extends Controller
 
 
     public function getField() {
-        $classes = Grade::where('school_id', Auth::user()->school_id)->get();
+        $classes = Grade::where('school_id', Auth::user()->school_id)->orderBy('class_code')->get();
         return view('Attendance.general_attendance', ['classes' => $classes]);
     }
 

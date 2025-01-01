@@ -37,12 +37,13 @@
                                                     <select name="class_id" id="" class="form-control" required>
                                                         <option value="">--Select Class--</option>
                                                         @if ($classes->isEmpty())
-                                                            <option value="">No classes found</option>
+                                                            <option value="" class="text-danger">No more classes found</option>
+                                                            <option value="0" class="text-success font-weight-bold" style="font-size: 20px">🎓 Graduate Class 🎉</option>
                                                         @else
                                                             @foreach ($classes as $class)
                                                                 <option value="{{$class->id}}" class="text-capitalize">{{$class->class_name}}</option>
                                                             @endforeach
-                                                            <option value="0" class="text-danger">Graduate Class</option>
+                                                            <option value="0" class="text-success font-weight-bold" style="font-size: 20px">🎓 Graduate Class 🎉</option>
                                                         @endif
                                                     </select>
                                                     @error('name')
@@ -201,7 +202,7 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-success">Register</button>
+                                        <button type="submit" class="btn btn-success">Save</button>
                                     </div>
                                 </div>
                             </form>
