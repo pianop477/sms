@@ -166,6 +166,7 @@ class RolesController extends Controller
                                                 'users.first_name', 'users.last_name', 'teachers.id as teacher_id'
                                             )
                                             ->where('class_teachers.teacher_id', '=', $teacherId->id)
+                                            ->where('class_teachers.school_id', $teacherId->school_id)
                                             ->firstOrFail();
     $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
                                 ->select('teachers.*', 'users.first_name', 'users.last_name')
@@ -286,7 +287,7 @@ class RolesController extends Controller
 
         $userId = Auth::user()->id;
         if($user->user_id == $userId) {
-            Alert::error('Error!', 'You cannot change your role while you are logged in');
+            Alert::error('Error!', 'Permission denied, you cannot change your role');
             return back();
         }
         $user->role_id = $request->role; // Assuming 'role_id' is the correct field in the 'teachers' table

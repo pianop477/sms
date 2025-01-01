@@ -5,7 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Class Teacher General Attendance Report</title>
+    <link rel="stylesheet" href="{{public_path('assets/css/print_layout.css')}}">
     <style>
+        .footer {
+            position: fixed;
+            bottom: -30px;
+            align-content: space-around;
+            font-size: 12px;
+            /* border-top: 1px solid black; */
+        }
+        .page-number:before {
+            content: "Page " counter(page);
+        }
+
         /* Inline your Bootstrap CSS styles here */
         body {
             font-family: Arial, sans-serif;
@@ -49,29 +61,6 @@
             }
         }
 
-        .container {
-            display: flex;
-            padding: 5px;
-            flex-direction: row;
-            flex-wrap: wrap;
-        }
-        .logo {
-            position: absolute;
-            width: 50px;
-            left: 7px;
-            top: 20px;
-            color: inherit;
-        }
-        .header {
-            text-align: center;
-            position: relative;
-            top: 0;
-            left: 40px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            font-size: 24px;
-            color: #343a40;
-        }
         .table {
             width: 100%;
             border: 1px solid black;
@@ -118,18 +107,14 @@
 </head>
 <body>
     <div class="container">
-        <div class="title">
-            <h3>{{_('the united republic of tanzania')}}</h3>
-            <h4>{{_("the president's office - ralg")}}</h4>
-        </div>
         <div class="logo">
-            <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 80px;">
+            <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 100px; border-radius:50px">
         </div>
         <div class="header">
-            <h4>{{ Auth::user()->school->school_name }} - P.O Box {{ Auth::user()->school->postal_address }}, {{ Auth::user()->school->postal_name }}</h4>
+            <h4>{{ Auth::user()->school->school_name }}</h4>
+            <h5>P.O Box {{ Auth::user()->school->postal_address }}, {{ Auth::user()->school->postal_name }}</h5>
             <h5>class attendance report</h5>
             @forelse ( $datas as $month => $attendances )
-            <h6 class="text-capitalize">time duration: <strong>{{ \Carbon\Carbon::parse($month)->format('F Y') }}</strong></h6>
         </div>
         @if ($attendances->isEmpty())
             <div class="alert alert-warning text-center mt-3" role="alert">
@@ -163,6 +148,7 @@
                     }
                 @endphp
                 <div class="date-section">
+                    <h6 style="text-transform: uppercase; border:1px solid black; border-radius:4px; padding: 2px;">time duration: <strong>{{ \Carbon\Carbon::parse($month)->format('F Y') }}</strong></h6>
                     <div class="summary-header">
                         <p style="line-height: 5px">attendance report summary</p>
                     </div>

@@ -143,8 +143,8 @@
                         <tr>
                             <th style="text-align: center">Member ID</th>
                             <th>Gender</th>
-                            <th>First Name</th>
-                            <th>Last Name</th>
+                            <th>Full Name</th>
+                            <th>Role</th>
                             <th>Dob</th>
                             <th>Phone</th>
                             <th>Email</th>
@@ -159,8 +159,8 @@
                             <tr>
                                 <td style="text-transform: uppercase; text-align:center">{{ $teacher->school_reg_no . '/' . $teacher->joined . '/' .$teacher->member_id }}</td>
                                 <td style="text-transform: uppercase; text-align:center; width:5px;">{{ $teacher->gender[0] }}</td>
-                                <td style="text-transform: capitalize">{{ $teacher->first_name }}</td>
-                                <td style="text-transform: capitalize">{{ $teacher->last_name }}</td>
+                                <td style="text-transform: capitalize">{{ $teacher->first_name }} {{ $teacher->last_name }}</td>
+                                <td style="text-transform: capitalize">{{ $teacher->role_name }}</td>
                                 <td>{{ \Carbon\Carbon::parse($teacher->dob)->format('d/M/Y') }}</td>
                                 <td>{{ $teacher->phone }}</td>
                                 <td>{{ $teacher->email }}</td>

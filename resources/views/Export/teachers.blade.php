@@ -33,8 +33,8 @@
                 <th>#</th>
                 <th>MEMBER ID</th>
                 <th>GENDER</th>
-                <th>FIRST NAME</th>
-                <th>LAST NAME</th>
+                <th>FULL NAME</th>
+                <th>ROLE</th>
                 <th>DATE OF BIRTH</th>
                 <th>PHONE</th>
                 <th>EMAIL</th>
@@ -50,8 +50,8 @@
                     <td>{{ $loop->iteration }}</td>
                     <td class="text-uppercase" style="text-transform: uppercase">{{ $teacher->school_reg_no . '/' . $teacher->joined . '/' . $teacher->member_id }}</td>
                     <td class="text-capitalize" style="text-transform: uppercase">{{ $teacher->gender[0] }}</td>
-                    <td class="text-capitalize" style="text-transform: capitalize">{{ $teacher->first_name }}</td>
-                    <td class="text-capitalize" style="text-transform: capitalize">{{ $teacher->last_name }}</td>
+                    <td class="text-capitalize" style="text-transform: capitalize">{{ $teacher->first_name }} {{ $teacher->last_name }}</td>
+                    <td class="text-capitalize" style="text-transform: capitalize">{{ $teacher->role_name }}</td>
                     <td>{{ \Carbon\Carbon::parse($teacher->dob)->format('d/M/Y') }}</td>
                     <td>{{ $teacher->phone }}</td>
                     <td>{{ $teacher->email }}</td>

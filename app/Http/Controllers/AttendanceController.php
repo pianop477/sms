@@ -307,6 +307,10 @@ class AttendanceController extends Controller
         $datas = $attendances->groupBy(function($item) {
             return Carbon::parse($item->attendance_date)->format('Y-m');
         });
+        $message = "There is no attendance record for the selected time duration! thank you";
+        if($datas->isEmpty()) {
+            return view('Attendance.teacher', compact('message', 'classId'));
+        }
         $pdf = \PDF::loadView('Attendance.teacher_report', compact('datas', 'maleSummary', 'femaleSummary'));
        return $pdf->stream('class_teacher_attendance.pdf');
     }
@@ -426,7 +430,7 @@ class AttendanceController extends Controller
                     ->get();
 
         if($attendances->isEmpty()) {
-            $message = 'No attendance records found';
+            $message = 'No attendance records found for selected time duration, thank you!';
             return view('Attendance.attendance_records', compact('message'));
         }
         else {

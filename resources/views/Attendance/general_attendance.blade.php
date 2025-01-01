@@ -4,7 +4,11 @@
 <div class="card mt-5">
     <div class="card-body">
         <h4 class="header-title text-uppercase text-center">Generate Attendance Report</h4>
-        <form class="needs-validation" novalidate="" action="{{route('manage.attendance')}}" method="POST" enctype="multipart/form-data" onsubmit="showPreloader()">
+        <form class="needs-validation" novalidate
+              action="{{route('manage.attendance')}}"
+              method="POST"
+              enctype="multipart/form-data"
+              onsubmit="showPreloader(event)">
             @csrf
             <div class="form-row">
                 <div class="col-md-4 mb-3">
@@ -23,19 +27,19 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom02">From Month</label>
-                    <input type="month" name="start" class="form-control" id="validationCustom02" placeholder="Last name" required value="{{old('start_date')}}">
+                    <input type="month" name="start" class="form-control" id="validationCustom02" required value="{{old('start_date')}}">
                     @error('start_date')
                     <div class="invalid-feedback">
-                       {{$message}}
+                        {{$message}}
                     </div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom02">To Month</label>
-                    <input type="month" name="end" class="form-control" id="validationCustom02" placeholder="Last name" required value="{{old('end_date')}}">
+                    <input type="month" name="end" class="form-control" id="validationCustom02" required value="{{old('end_date')}}">
                     @error('end_date')
                     <div class="invalid-feedback">
-                       {{$message}}
+                        {{$message}}
                     </div>
                     @enderror
                 </div>
@@ -61,34 +65,23 @@
 </div>
 
 <script>
-    // Prevent caching of the preloader state
-    if (performance.navigation.type === 2) {
-        // If back/forward navigation is detected
-        window.location.reload(); // Force a page reload
-    }
-
-    // Alternative for browsers that support `pageshow`
-    window.addEventListener("pageshow", function (event) {
-        if (event.persisted) {
-            window.location.reload();
-        }
-    });
-
-    // Ensure the preloader is not shown unnecessarily
-    document.addEventListener("DOMContentLoaded", function () {
-        const preloader = document.getElementById('preloader');
-        if (preloader) {
-            preloader.style.display = 'none';
-        }
-    });
     // Hide preloader on page load
     document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('preloader').style.display = 'none';
     });
 
-    // Show preloader when the form is submitted
-    function showPreloader() {
-        document.getElementById('preloader').style.display = 'block';
+    // Show preloader when form submission is valid
+    function showPreloader(event) {
+        const form = event.target; // Get the form element
+
+        if (form.checkValidity()) {
+            // Form is valid; show the preloader
+            document.getElementById('preloader').style.display = 'block';
+        } else {
+            // Form is invalid; prevent submission
+            event.preventDefault();
+            form.classList.add('was-validated'); // Add Bootstrap validation styles
+        }
     }
 </script>
 @endsection

@@ -22,13 +22,11 @@ class TeachersExport implements FromView, WithStyles, WithTitle
         $teachers = Teacher::query()
             ->join('users', 'users.id', '=', 'teachers.user_id')
             ->join('schools', 'schools.id', '=', 'teachers.school_id')
+            ->join('roles', 'roles.id', '=', 'teachers.role_id')
             ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.email',
-            'teachers.qualification', 'schools.school_reg_no', 'teachers.address')
+            'teachers.qualification', 'schools.school_reg_no', 'teachers.address', 'roles.role_name')
             ->where('teachers.school_id', '=', $userLogged->school_id)
-            ->where(function ($query) {
-                $query->where('teachers.status', 1)
-                    ->orWhere('teachers.status', 0);
-            })
+            ->whereIn('teachers.status', [0,1])
             ->orderBy('users.first_name', 'ASC')
             ->get();
 
@@ -69,10 +67,10 @@ class TeachersExport implements FromView, WithStyles, WithTitle
     $sheet->getColumnDimension('A')->setWidth(5);
     $sheet->getColumnDimension('B')->setWidth(20);
     $sheet->getColumnDimension('C')->setWidth(10);
-    $sheet->getColumnDimension('D')->setWidth(20);
-    $sheet->getColumnDimension('E')->setWidth(20);
+    $sheet->getColumnDimension('D')->setWidth(30);
+    $sheet->getColumnDimension('E')->setWidth(10);
     $sheet->getColumnDimension('F')->setWidth(15);
-    $sheet->getColumnDimension('G')->setWidth(15);
+    $sheet->getColumnDimension('G')->setWidth(10);
     $sheet->getColumnDimension('H')->setWidth(25);
     $sheet->getColumnDimension('I')->setWidth(20);
     $sheet->getColumnDimension('J')->setWidth(15);

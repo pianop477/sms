@@ -83,7 +83,7 @@
                         </div>
                         <div class="form-gp">
                             <select name="school" id="exampleInputEmail1" class="form-control text-capitalize">
-                                <option value="">--Chagua Jina la Shule ya Mwanao--</option>
+                                <option value="">--Chagua Jina la Shule--</option>
                                 @if ($schools->isEmpty())
                                     <option value="" class="text-danger">no schools found</option>
                                 @else
