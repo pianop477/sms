@@ -6,6 +6,7 @@ use App\Models\Parents;
 use App\Models\school;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -145,10 +146,16 @@ class UsersController extends Controller
     public function blockAdminAccount(Request $request, $id)
     {
         $user = User::find($id);
+        $loggedUser = Auth::user();
         $status = 0;
 
         if(! $user) {
             ALert::error('Error', 'No such user was found');
+            return back();
+        }
+
+        if($loggedUser->id == $user->id) {
+            Alert::error('Error', 'You cannot block your own account');
             return back();
         }
 
@@ -183,9 +190,16 @@ class UsersController extends Controller
     public function deleteAdminAccount(Request $request, $id)
     {
         $user = User::find($id);
+        $loggedUser = Auth::user();
+
 
         if(! $user) {
             ALert::error('Error', 'No such user was found');
+            return back();
+        }
+
+        if($loggedUser->id == $user->id) {
+            Alert::error('Error', 'You cannot delete your own account');
             return back();
         }
 

@@ -13,7 +13,7 @@
                     </a>
                 </div>
             </div>
-            <form class="needs-validation" novalidate="" action="{{ route('attendance.generate.report', $classTeacher->id) }}" method="POST" enctype="multipart/form-data" onsubmit="showPreloader()">
+            <form class="needs-validation" novalidate="" action="{{ route('attendance.generate.report', $classTeacher->id) }}" method="POST" enctype="multipart/form-data" onsubmit="showPreloader(event)">
                 @csrf
                 <div class="form-row">
                     <div class="col-md-4 mb-3">
@@ -44,8 +44,8 @@
                         @enderror
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <button class="btn btn-primary" type="submit"><i class="ti-settings"></i> Generate</button>
+                <div class="col-md-12 mb-3">
+                    <button class="btn btn-primary float-right" type="submit"><i class="ti-settings"></i> Generate</button>
                 </div>
             </form>
             <div id="preloader" style="display:none;">
@@ -62,8 +62,17 @@
     </div>
 
     <script>
-        function showPreloader() {
-            document.getElementById('preloader').style.display = 'block';
+        function showPreloader(event) {
+            const form = event.target; // Get the form element
+
+            if (form.checkValidity()) {
+                // Form is valid; show the preloader
+                document.getElementById('preloader').style.display = 'block';
+            } else {
+                // Form is invalid; prevent submission
+                event.preventDefault();
+                form.classList.add('was-validated'); // Add Bootstrap validation styles
+            }
         }
     </script>
 

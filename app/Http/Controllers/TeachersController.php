@@ -24,12 +24,11 @@ class TeachersController extends Controller
         $teachers = Teacher::query()
                             ->join('users', 'users.id', '=', 'teachers.user_id')
                             ->join('schools', 'schools.id', '=', 'teachers.school_id')
-                            ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.email')
+                            ->join('roles', 'roles.id', '=', 'teachers.role_id')
+                            ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.email', 'roles.role_name',)
                             ->where('teachers.school_id', '=', $userLogged->school_id)
-                            ->where(function ($query) {
-                                $query->where('teachers.status', 1)
-                                    ->orWhere('teachers.status', 0);
-                            })
+                            ->whereIn('teachers.status', [0,1])
+                            ->where('teachers.role_id', '!=', 2)
                             ->orderBy('users.first_name', 'ASC')
                             ->get();
         return view('Teachers.index', ['teachers' => $teachers]);
@@ -41,13 +40,11 @@ class TeachersController extends Controller
         $teachers = Teacher::query()
                             ->join('users', 'users.id', '=', 'teachers.user_id')
                             ->join('schools', 'schools.id', '=', 'teachers.school_id')
+                            ->join('roles', 'roles.id', '=', 'teachers.role_id')
                             ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.email',
-                            'schools.school_name', 'schools.school_reg_no')
+                            'schools.school_name', 'schools.school_reg_no', 'roles.role_name')
                             ->where('teachers.school_id', '=', $userLogged->school_id)
-                            ->where(function ($query) {
-                                $query->where('teachers.status', 1)
-                                    ->orWhere('teachers.status', 0);
-                            })
+                            ->whereIn('teachers.status', [0,1])
                             ->orderBy('users.first_name', 'ASC')
                             ->get();
         $pdf = \PDF::loadView('Teachers.teachers_pdf', compact('teachers'));
@@ -277,6 +274,11 @@ class TeachersController extends Controller
             return back();
         }
 
+        if($teacher->role_id == 2) {
+            Alert::error('Error!', 'You do not have permission to block this teacher.');
+            return back();
+        }
+
         // Retrieve the status from the request, default to 0 if not provided
         $status = $request->input('status', 0);
 
@@ -347,7 +349,7 @@ class TeachersController extends Controller
         }
 
          //check role of logged user compare with role of deleted user=======
-         if($teacher->role_id != 1) {
+         if($teacher->role_id == 2) {
             Alert::error('Error!', 'You do not have permission to delete this teacher.');
             return back();
          }

@@ -164,6 +164,7 @@
                                     <th scope="col">#</th>
                                     <th scope="col">Teacher's Name</th>
                                     <th scope="col">Gender</th>
+                                    <th scope="col">role</th>
                                     <th scope="col">Phone</th>
                                     <th scope="col">Email</th>
                                     <th scope="col">Joined</th>
@@ -177,6 +178,15 @@
                                         <td>{{$loop->iteration}}</td>
                                         <td class="text-capitalize">{{$teacher->first_name. ' '. $teacher->last_name}}</td>
                                         <td class="text-capitalize">{{$teacher->gender[0]}}</td>
+                                        <td class="text-capitalize text-white">
+                                            @if ($teacher->role_id == 1)
+                                                <span class="badge bg-danger">{{$teacher->role_name}}</span>
+                                            @elseif ($teacher->role_id == 3)
+                                                <span class="badge bg-info">{{$teacher->role_name}}</span>
+                                            @else
+                                                <span class="badge bg-success">{{$teacher->role_name}}</span>
+                                            @endif
+                                        </td>
                                         <td>{{$teacher->phone}}</td>
                                         <td>{{$teacher->email}}</td>
                                         <td>{{$teacher->joined}}</td>
@@ -184,7 +194,7 @@
                                             @if ($teacher->status ==1)
                                                 <span class="badge bg-success text-white">{{_('Active')}}</span>
                                                 @else
-                                                <span class="badge bg-secondary text-white">{{_('Blocked')}}</span>
+                                                <span class="badge bg-danger text-white">{{_('Blocked')}}</span>
                                             @endif
                                         </td>
                                         @if ($teacher->status == 1)

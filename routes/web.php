@@ -1,5 +1,5 @@
 <?php
-
+use App\Exports\StudentsExport;
 use App\Exports\TeachersExport;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ClassesController;
@@ -320,4 +320,5 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1')->group(function () {
             return Excel::download(new TeachersExport, 'teachers.xlsx');
         })->name('teachers.excel.export');
         Route::get('/teachers/pdf', [TeachersController::class, 'export'])->name('teachers.pdf.export');
+
 });
