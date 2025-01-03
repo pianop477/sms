@@ -14,10 +14,10 @@
                         @endif
                     </div>
                     <div class="col-2">
-                        <a href="{{route('courses.index')}}"><i class="fas fa-circle-arrow-left text-secondary"></i> Back</a>
+                        <a href="{{route('courses.index')}}" class="btn btn-info text-white btn-xs"><i class="fas fa-circle-arrow-left"></i> Back</a>
                     </div>
                     <div class="col-2">
-                        <button type="button" class="btn btn-xs btn-primary float-right" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus"></i> Assign New
+                        <button type="button" class="btn btn-xs btn-primary float-right" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus"></i> Assign
                         </button>
                         <div class="modal fade bd-example-modal-lg">
                             <div class="modal-dialog modal-lg">
