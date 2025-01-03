@@ -45,7 +45,7 @@ class ResultsController extends Controller
              ->distinct()
              ->whereYear('exam_date', $year)
              ->where('student_id', $student->id)
-             ->where('school_id', $user->school_id)
+             ->where('examination_results.school_id', $user->school_id)
              ->orderBy('examinations.exam_type', 'asc')
              ->paginate(10);
 

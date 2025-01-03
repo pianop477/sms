@@ -294,7 +294,7 @@ class CoursesController extends Controller
                                         ->select('users.first_name', 'users.last_name', 'users.phone', 'users.gender', 'users.image', 'class_teachers.*', 'grades.class_name')
                                         ->where('class_teachers.class_id', $class->id)
                                         ->where('class_teachers.group', $student->group)
-                                        ->where('school_id', $user->school_id)
+                                        ->where('class_teachers.school_id', $user->school_id)
                                         ->get();
         // return ['data' => $myClassTeacher];
 
