@@ -65,7 +65,7 @@
                 <h5 class="text-center text-uppercase">Taarifa za Mwalimu wa Darasa</h5>
                 <hr>
                 @if ($myClassTeacher->isEmpty())
-                    <h6 class="text-center">Hakuna mwalimu wa darasa aliyechaguliwa kwa darasa hili!</h6>
+                    <h6 class="text-center">Hakuna mwalimu wa darasa aliyeteuliwa kwa darasa hili!</h6>
                 @else
                     <div class="img-container float-right">
                         @if ($myClassTeacher->first()->image == NULL)
