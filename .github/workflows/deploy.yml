@@ -19,4 +19,4 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./ # Adjust if your project is in a subfolder
-          server-dir: /htdocs/sms # Replace with your actual server directory
+          server-dir: /htdocs/sms/ # Replace with your actual server directory
