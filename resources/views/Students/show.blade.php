@@ -70,11 +70,11 @@
                                 <div class="modal-dialog modal-lg">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title">ANGALIA RUTI YA BASI</h5>
+                                            <h5 class="modal-title">TAARIFA ZA RUTI YA BASI</h5>
                                             <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                         </div>
                                         <div class="modal-body">
-                                            <div class="col-md-6 mt-5">
+                                            <div class="col-md-12 mt-5">
                                                 <div class="card">
                                                         <div class="list-group">
                                                             <button type="button" class="list-group-item list-group-item-action">
@@ -87,7 +87,7 @@
                                                                 Namba ya simu: <span class="text-uppercase font-weight-bold">{{$data->driver_phone}}</span>
                                                             </button>
                                                             <button type="button" class="list-group-item list-group-item-action">
-                                                                Namba ya Basi: <span class="text-uppercase font-weight-bold">{{$data->bus_number}}</span>
+                                                                Basi Namba: <span class="text-uppercase font-weight-bold">{{$data->bus_number}}</span>
                                                             </button>
                                                             <button type="button" class="list-group-item list-group-item-action" disabled="">
                                                                 Ruti ya Basi: <span class="text-uppercase font-weight-bold">{{$data->bus_routine}}</span>
