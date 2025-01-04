@@ -3,10 +3,10 @@
         <div class="row align-items-center">
             <div class="col-md-8">
                 @if(Auth::user()->school && Auth::user()->school->school_name)
-                    <img src="{{asset('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" class="rounded-circle" style="width:70px; object-ft-cover;">
+                    <img src="{{asset('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" class="rounded-circle" style="max-width:50px; object-ft-cover; border-radius: 50px;">
                     <a href="{{route('home')}}" class="navbar-brand font-weight-bold text-capitalize">{{ Auth::user()->school->school_name }}</a>
                         @else
-                            <img src="{{asset('assets/img/logo/shuleApp.png')}}" alt="" class="rounded-circle" style="width:70px; object-ft-cover;">
+                            <img src="{{asset('assets/img/logo/shuleApp.png')}}" alt="" class="rounded-circle" style="max-width:50px" object-ft-cover; border-radius: 50px;">
                             <a href="{{route('home')}}" class="navbar-brand font-weight-bold">ShuleApp - Admin</a>
                 @endif
             </div>

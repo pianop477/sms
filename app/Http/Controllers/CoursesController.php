@@ -226,7 +226,15 @@ class CoursesController extends Controller
                                                         ->where('school_id', $request->school_id)
                                                         ->exists();
         if($hasAlreadyAssigned) {
-            Alert::error('Error!', 'Course already assigned to this class');
+            Alert::error('Error!', 'Course already exists to this class');
+            return back();
+        }
+        //check for if teacher id has reached to maximum of 3 classes
+        $teacher = class_learning_courses::where('teacher_id', $request->teacher_id)
+                                            ->where('school_id', $request->school_id)
+                                            ->count();
+        if($teacher >= 3) {
+            Alert::error('Error!', 'The selected teacher has already assigned to maximum of 3 subjects to teach');
             return back();
         }
         $class_course = class_learning_courses::create([
@@ -236,7 +244,7 @@ class CoursesController extends Controller
             'school_id' => $request->school_id
         ]);
 
-        Alert::success('Success!', 'Data saved successfully');
+        Alert::success('Success!', 'Subject teacher saved successfully');
         return back();
     }
 

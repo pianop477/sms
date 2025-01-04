@@ -68,7 +68,7 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom01">Chagua Ruti za Mabasi: <span class="text-danger">Chagua kama anatumia usafiri/Kubadilisha ruti</span></label>
-                    <select name="driver" id="validationCustom01" class="form-control text-uppercase">
+                    <select name="driver" id="validationCustom01" class="form-control text-capitalize">
                         <option value="">--Hatumii Usafiri--</option>
                         @if ($students->transport == NULL)
                             <option value="">-- Chagua Ruti --</option>
@@ -127,7 +127,7 @@
 
             </div>
             <div class="col-md-4 mb-3">
-                <button class="btn btn-success" type="submit">Hifadhi Taarifa</button>
+                <button class="btn btn-success" type="submit">Hifadhi</button>
             </div>
 
 @endsection
