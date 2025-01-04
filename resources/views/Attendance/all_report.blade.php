@@ -117,7 +117,7 @@
             </div>
             <div class="header">
                 <h3>{{ Auth::user()->school->school_name }}</h3>
-                <h4>P.O Box {{ Auth::user()->school->postal_address }}</h4>
+                <h4>{{ Auth::user()->school->postal_address }}</h4>
                 <h4>{{ Auth::user()->school->postal_name }} - {{Auth::user()->school->country}}</h4>
                 <h4>attendance report Month: {{\Carbon\Carbon::parse($attendances->first()->attendance_date)->format('F, Y')}} </h4>
                 <h4>Class: {{$attendances->first()->class_name}}</h4>

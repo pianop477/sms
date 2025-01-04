@@ -137,7 +137,7 @@
                                                         <form action="{{route('block.assigned.course', $course->id)}}" method="POST">
                                                             @csrf
                                                             @method('PUT')
-                                                            <button class="btn btn-link p-0"onclick="return confirm('Are you sure you want to block {{strtoupper($course->course_name)}} Course?')"><i class="ti-na text-warning"></i></button>
+                                                            <button class="btn btn-link p-0"onclick="return confirm('Are you sure you want to block {{strtoupper($course->course_name)}} Course?')"><i class="ti-na text-info"></i></button>
                                                         </form>
                                                     </li>
                                                     <li>

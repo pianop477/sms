@@ -340,6 +340,7 @@ class ExamController extends Controller
                     ->where('teacher_id', $class_course->teacher_id)
                     ->whereYear('exam_date', $year)
                     ->where('examination_results.school_id', $user->school_id)
+                    ->orderBy('examination_results.exam_date', 'DESC')
                     ->distinct()  // Ensure distinct exam types
                     ->get();
 
