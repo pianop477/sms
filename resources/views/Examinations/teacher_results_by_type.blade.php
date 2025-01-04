@@ -127,7 +127,7 @@
         <div class="header">
             <h3>{{_('the united republic of tanzania')}}</h3>
             <h4>{{_("the president's office - ralg")}}</h4>
-            <h4>{{ Auth::user()->school->school_name }} - P.O Box {{ Auth::user()->school->postal_address }}, {{ Auth::user()->school->postal_name }}</h4>
+            <h4>{{ Auth::user()->school->school_name }} - {{ Auth::user()->school->postal_address }}, {{ Auth::user()->school->postal_name }}</h4>
             <h5>{{ $results->first()->exam_type }} Results for {{ $month }} - {{ $year }}</h5>
         </div>
     </div>
