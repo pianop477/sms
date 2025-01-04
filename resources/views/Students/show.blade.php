@@ -20,12 +20,12 @@
                 Namba ya usajili: <span class="text-uppercase" style="text-decoration: underline">{{$data->school_reg_no. '/'. $data->admission_number}}</span>
             </p>
           </h5>
-          <span>Mwanafunzi</span>
+          Aina ya Akaunti: <span class="badge bg-info text-white">Mwanafunzi</span>
           <p class="mb-0 font-weight-normal text-sm">
             @if ($data->status == 1)
-                <span class="badge bg-success text-white">{{_('Yupo')}}</span>
+                Hali yake: <span class="badge bg-success text-white">{{_('Yupo')}}</span>
                 @else
-                <span class="badge bg-secondary text-white">{{_('Amefungiwa')}}</span>
+                Hali yake: <span class="badge bg-secondary text-white">{{_('Amefungiwa')}}</span>
             @endif
           </p>
         </div>
