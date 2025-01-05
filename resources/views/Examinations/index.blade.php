@@ -53,7 +53,7 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Examination Type</th>
-                                    <th scope="col">Status</th>
+                                    <th scope="col" class="text-center">Status</th>
                                     {{-- @if (Route::has(['exams.block', 'exams.destroy', 'exams.edit', 'exams.unblock', 'exams.update'])) --}}
                                     <th scope="col" class="text-center">Action</th>
                                     {{-- @endif --}}
