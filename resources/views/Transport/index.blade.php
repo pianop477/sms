@@ -125,7 +125,7 @@
                                         <td>
                                             <ul class="d-flex justify-content-center">
                                                 <li class="mr-3">
-                                                    <a href="{{route('students.transport', $trans->id)}}" class="btn btn-primary btn-xs">Student List</a>
+                                                    <a href="{{route('students.transport', $trans->id)}}" class="btn btn-primary btn-xs"><i class="ti-eye"></i> Student List</a>
                                                 </li>
                                                 <li class="mr-3">
                                                     <a href="{{route('transport.edit', $trans->id)}}"><i class="ti-pencil text-primary"></i></a>

@@ -36,7 +36,7 @@
                                                 </div>
                                                 <div class="col-md-6 mb-3">
                                                     <label for="validationCustom02">Class Code</label>
-                                                    <input type="text" required name="code" class="form-control text-uppercase" id="validationCustom02" placeholder="Class Numeric Code" required="" value="{{old('code')}}" required>
+                                                    <input type="text" required name="code" class="form-control text-uppercase" id="validationCustom02" placeholder="Class Code" required="" value="{{old('code')}}" required>
                                                     @error('code')
                                                     <div class="invalid-feedback">
                                                        {{$message}}
@@ -71,7 +71,7 @@
                             @if ($classes->isEmpty())
                                 <tr>
                                     <td colspan="3" class="text-center">
-                                        <div class="alert alert-warning">No classes records found. Please register classes</div>
+                                        <div class="alert alert-warning">No classes records found.</div>
                                     </td>
                                 </tr>
                             @else
@@ -114,12 +114,12 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-10">
-                    <h4 class="header-title text-center text-uppercase">Assigned Class Teachers</h4>
+                    <h4 class="header-title text-center text-uppercase">Assign Class Teachers</h4>
                 </div>
             </div>
             @if ($classes->isEmpty())
                 <div class="alert alert-warning text-center">
-                    <p>No classes records found. Please register classes!</p>
+                    <p>No classes records found.</p>
                 </div>
             @else
             <div class="single-table">

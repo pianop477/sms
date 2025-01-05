@@ -142,7 +142,7 @@
 
   <nav class="navbar navbar-expand-lg navbar-custom navbar-dark">
     <div class="container">
-      <img src="{{ asset('assets/img/logo/shuleapp_transparent.png') }}" alt="" class="rounded-circle" style="width:70px; object-fit:cover;">
+      <img src="{{ asset('assets/img/logo/shuleApp.png') }}" alt="" class="rounded-circle" style="width:70px; object-fit:cover;">
       <a class="navbar-brand" href="{{route('welcome')}}">ShuleApp</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
