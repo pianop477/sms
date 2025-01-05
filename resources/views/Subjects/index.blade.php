@@ -6,7 +6,7 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="header-title text-center text-uppercase">Subjects By Class</h4>
-                    <p class="text-danger">Select class to view Learning Subjects</p>
+                    <p class="text-danger">Select class to view subjects</p>
                     @if ($classes->isEmpty())
                         <div class="alert alert-warning text-center">
                             <p>No Classes records found!</p>
@@ -32,7 +32,7 @@
                     <h4 class="header-title text-center text-uppercase">All Registered Subjects</h4>
                     <div class="row">
                         <div class="col-8">
-                            <p class="text-success">Your Open courses</p>
+                            <p class="text-success">All available courses</p>
                         </div>
                         <div class="col-4">
                             <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus"></i> New Subject
@@ -41,7 +41,7 @@
                                 <div class="modal-dialog modal-lg">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title">Register Subject Details</h5>
+                                            <h5 class="modal-title">Register New Subject</h5>
                                             <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                         </div>
                                         <div class="modal-body">
@@ -60,7 +60,7 @@
                                                     </div>
                                                     <div class="col-md-6 mb-3">
                                                         <label for="validationCustom02">Code</label>
-                                                        <input type="text" required name="scode" class="form-control text-uppercase" id="validationCustom02" placeholder="Class Numeric Code" required="" value="{{old('code')}}" required>
+                                                        <input type="text" required name="scode" class="form-control text-uppercase" id="validationCustom02" placeholder="Class Code" required="" value="{{old('code')}}" required>
                                                         @error('scode')
                                                         <div class="invalid-feedback">
                                                            {{$message}}

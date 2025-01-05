@@ -74,7 +74,7 @@
                                     <th scope="col">Class Name</th>
                                     <th scope="col">Class Group</th>
                                     <th scope="col">Teacher Name</th>
-                                    <th scope="col">Action</th>
+                                    <th scope="col" class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -82,7 +82,7 @@
                                     <tr class="text-capitalize">
                                         <td>{{$loop->iteration}}</td>
                                         <td class="text-capitalize">{{$teacher->class_name}}</td>
-                                        <td class="text-capitalize">{{$teacher->group}}</td>
+                                        <td class="text-capitalize text-center">{{$teacher->group}}</td>
                                         <td>{{$teacher->teacher_first_name. ' '. $teacher->teacher_last_name}}</td>
                                         <td>
                                             <ul class="d-flex justify-content-center">

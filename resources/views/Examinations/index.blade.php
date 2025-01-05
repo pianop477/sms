@@ -55,7 +55,7 @@
                                     <th scope="col">Examination Type</th>
                                     <th scope="col">Status</th>
                                     {{-- @if (Route::has(['exams.block', 'exams.destroy', 'exams.edit', 'exams.unblock', 'exams.update'])) --}}
-                                    <th scope="col">Action</th>
+                                    <th scope="col" class="text-center">Action</th>
                                     {{-- @endif --}}
                                 </tr>
                             </thead>
@@ -63,7 +63,7 @@
                                 <tr>
                                     <td>{{$loop->iteration}}</td>
                                     <td class="text-uppercase">{{$exam->exam_type}}</td>
-                                    <td>
+                                    <td class="text-center">
                                         @if ($exam->status ==  1)
                                             <span class="badge bg-success text-white">{{_('Open')}}</span>
                                             @else
