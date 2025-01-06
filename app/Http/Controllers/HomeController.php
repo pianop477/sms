@@ -50,7 +50,28 @@ class HomeController extends Controller
                 $classes = Grade::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
                 $subjects = Subject::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
                 $buses = Transport::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
-                return view('home', compact('teachers', 'parents', 'students', 'classes', 'subjects', 'buses'));
+                $studentsByClass = Student::query()
+                                ->join('grades', 'grades.id', '=', 'students.class_id')
+                                ->select('grades.class_code', DB::raw('COUNT(students.id) as student_count'))
+                                ->where('students.school_id', '=', $user->school_id)
+                                ->where('students.status', 1)
+                                ->groupBy('grades.class_code')
+                                ->orderBy('grades.class_code', 'ASC')
+                                ->get();
+                $teacherQualifications = Teacher::where('school_id', '=', $user->school_id)
+                                ->where('status', '=', 1)
+                                ->select('qualification', \DB::raw('COUNT(*) as count'))
+                                ->groupBy('qualification')
+                                ->get();
+
+                            // Map the results to labels for easier use in the view
+                $qualificationData = [
+                                'masters' => $teacherQualifications->firstWhere('qualification', 1)?->count ?? 0,
+                                'bachelor' => $teacherQualifications->firstWhere('qualification', 2)?->count ?? 0,
+                                'diploma' => $teacherQualifications->firstWhere('qualification', 3)?->count ?? 0,
+                                'certificate' => $teacherQualifications->firstWhere('qualification', 4)?->count ?? 0,
+                            ];
+                return view('home', compact('teachers', 'parents', 'students', 'classes', 'subjects', 'buses', 'studentsByClass', 'qualificationData'));
             }
             //parents dashboard redirection ----------------------
             elseif ($user->usertype == 4 ) {
@@ -143,9 +164,30 @@ class HomeController extends Controller
                 //summary counts ------------------
                 $totalMaleStudents = Student::where('gender', '=', 'male')->where('status', 1)->where('school_id', '=', $user->school_id)->count();
                 $totalFemaleStudents = Student::where('gender', '=', 'female')->where('status', 1)->where('school_id', '=', $user->school_id)->count();
+                $studentsByClass = Student::query()
+                                ->join('grades', 'grades.id', '=', 'students.class_id')
+                                ->select('grades.class_code', DB::raw('COUNT(students.id) as student_count'))
+                                ->where('students.school_id', '=', $user->school_id)
+                                ->where('students.status', 1)
+                                ->groupBy('grades.class_code')
+                                ->orderBy('grades.class_code', 'ASC')
+                                ->get();
+                $teacherQualifications = Teacher::where('school_id', '=', $user->school_id)
+                                ->where('status', '=', 1)
+                                ->select('qualification', \DB::raw('COUNT(*) as count'))
+                                ->groupBy('qualification')
+                                ->get();
+
+                            // Map the results to labels for easier use in the view
+                $qualificationData = [
+                                'masters' => $teacherQualifications->firstWhere('qualification', 1)?->count ?? 0,
+                                'bachelor' => $teacherQualifications->firstWhere('qualification', 2)?->count ?? 0,
+                                'diploma' => $teacherQualifications->firstWhere('qualification', 3)?->count ?? 0,
+                                'certificate' => $teacherQualifications->firstWhere('qualification', 4)?->count ?? 0,
+                            ];
                 //end of summary -----------------
                 return view('home', compact('courses', 'myClass', 'classes', 'teachers', 'students', 'classes', 'subjects',
-                            'parents', 'buses', 'totalMaleStudents', 'totalFemaleStudents', 'classData',));
+                            'parents', 'buses', 'totalMaleStudents', 'totalFemaleStudents', 'classData', 'studentsByClass', 'qualificationData'));
             }
 
         }
