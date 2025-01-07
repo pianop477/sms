@@ -59,6 +59,8 @@ class StudentsController extends Controller
         {
             // Validate the incoming request data
             $user = Auth::user();
+            $request->merge(['group' => strtoupper($request->input('group'))]);
+
             $request->validate([
                 'fname' => 'required|string|max:255',
                 'middle' => 'required|string|max:255',
@@ -67,7 +69,7 @@ class StudentsController extends Controller
                 'parent' => 'required|exists:parents,id',
                 'dob' => 'required|date|date_format:Y-m-d',
                 'driver' => 'nullable|exists:transports,id',
-                'group' => 'required|string|max:255',
+                'group' => 'required|string|in:A,B,C,D',
                 'image' => 'nullable|image|max:2048',
                 'school_id' => 'exists:schools,id'
             ]);
@@ -160,12 +162,14 @@ class StudentsController extends Controller
      */
     public function updateRecords(Request $request, $students)
     {
+        $request->merge(['group' => strtoupper($request->input('group'))]);
+
         $request->validate([
             'fname' => 'required|string|max:255',
             'middle' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
             'class' => 'required|integer|exists:grades,id',
-            'group' => 'required|max:255',
+            'group' => 'required|in:A,B,C,D',
             'gender' => 'required|max:255',
             'dob' => 'required|date|date_format:Y-m-d',
             'driver' => 'integer|nullable|exists:transports,id',
@@ -386,6 +390,11 @@ class StudentsController extends Controller
     {
         $user = Auth::user();
         $parent = Parents::where('user_id', $user->id)->first();
+
+        $request->merge([
+            'group' => strtoupper($request->input('group')),
+        ]);
+
         $request->validate([
             'fname' => 'required|string|max:255',
             'middle' => 'required|string|max:255',
@@ -394,7 +403,7 @@ class StudentsController extends Controller
             'grade' => 'required|integer|exists:grades,id',
             'dob' => 'required|date|date_format:Y-m-d',
             'driver' => 'nullable|integer|exists:transports,id',
-            'group' => 'required|string|max:255',
+            'group' => 'required|string|in:A,B,C,D',
             'image' => 'nullable|image|max:2048',
             'school_id' => 'exists:schools,id',
         ]);
@@ -505,7 +514,7 @@ class StudentsController extends Controller
                                     ->join('users', 'users.id', '=', 'parents.user_id')
                                     ->join('grades', 'grades.id', '=', 'students.class_id')
                                     ->leftJoin('transports', 'transports.id', '=', 'students.transport_id')
-                                    ->select('students.*', 'grades.class_name', 'grades.class_code', 'transports.driver_name')
+                                    ->select('students.*', 'grades.class_name', 'grades.class_code', 'transports.driver_name', 'transports.bus_no')
                                     ->findOrFail($student);
 
         $buses = Transport::where('status', '=', 1)->where('school_id', $user->school_id)->orderBy('bus_no', 'ASC')->get();

@@ -241,7 +241,7 @@
                             $gradeColor = 'rgb(182, 176, 176)';
                         }
                     @endphp
-                    <p>Performance Grade: <strong><span style="background: {{$gradeColor}}; padding:1px 4px">{{$grade}}</span></strong></p>
+                    <p>Grade Level: <strong><span style="background: {{$gradeColor}}; padding:1px 4px">{{$grade}}</span></strong></p>
                     <p>Ranked: <strong><span style="text-decoration: underline;">{{ $studentRank }}</span></strong> out of <strong><span style="text-decoration: underline">{{ $rankings->count() }}</span></strong>students</p>
                 </div>
                 <div class="thanks" style="">
