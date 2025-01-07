@@ -71,7 +71,7 @@
                     <select name="driver" id="validationCustom01" class="form-control text-capitalize">
                         <option value="">--Yes! I'm Not using school bus--</option>
                         @if ($students->transport == NULL)
-                            <option value="">-- Chagua Ruti --</option>
+                            <option value="">-- Select Bus Number --</option>
                                 @foreach ($buses as $bus )
                                     <option value="{{$bus->id}}">{{$bus->bus_no}}</option>
                                 @endforeach
