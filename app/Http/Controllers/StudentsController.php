@@ -242,7 +242,7 @@ class StudentsController extends Controller
                             ->where('parents.status', '=', 1)
                             ->orderBy('users.first_name', 'ASC')
                             ->get();
-        $buses = Transport::where('school_id', '=', $user->school_id)->where('status', '=', 1)->orderBy('driver_name', 'ASC')->get();
+        $buses = Transport::where('school_id', '=', $user->school_id)->where('status', '=', 1)->orderBy('bus_no', 'ASC')->get();
         $students = Student::query()
                             ->join('parents', 'parents.id', '=', 'students.parent_id')
                             ->join('users', 'users.id', '=', 'parents.user_id')

@@ -56,7 +56,7 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                            <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to promote this class?')">Save changes</button>
+                                            <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to promote this class?')">Upgrade</button>
                                         </div>
                                     </form>
                                 </div>
@@ -168,7 +168,7 @@
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-4 mb-3">
-                                                    <label for="validationCustomUsername">Driver Name :<small class="text-sm text-muted">Select if using School bus</small></label>
+                                                    <label for="validationCustomUsername">Bus Number:<small class="text-sm text-muted">Select if using School bus</small></label>
                                                     <div class="input-group">
                                                         <select name="driver" id="validationCustomUsername" class="form-control text-uppercase">
                                                             <option value="">-- select driver --</option>
@@ -176,7 +176,7 @@
                                                                 <option value="" class="text-danger text-capitalize" disabled>No drivers records found</option>
                                                             @else
                                                                 @foreach ($buses as $bus)
-                                                                    <option value="{{$bus->id}}">{{$bus->driver_name}}</option>
+                                                                    <option value="{{$bus->id}}">Bus No. {{$bus->bus_no}}</option>
                                                                 @endforeach
                                                             @endif
                                                         </select>
