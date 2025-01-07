@@ -121,7 +121,7 @@
                                                         @enderror
                                                     </div>
                                                     <div class="col-md-4 mb-3">
-                                                        <label for="validationCustomUsername">School Bus Number: <small class="text-sm text-danger">Chagua kama anatumia usafiri</small></label>
+                                                        <label for="validationCustomUsername">School Bus Number: <small class="text-sm text-danger">select if using school bus</small></label>
                                                         <div class="input-group">
                                                             <select name="driver" id="" class="form-control text-capitalize">
                                                                 <option value="">--Select School Bus Number--</option>
@@ -141,7 +141,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-md-4 mb-3">
-                                                        <label for="validationCustomUsername">Student Passport :<small class="text-sm text-danger"> (Sio lazima)</small></label>
+                                                        <label for="validationCustomUsername">Student Passport :<small class="text-sm text-danger"> (Optional)</small></label>
                                                         <div class="input-group">
                                                             <input type="file" name="image" id="validationCustomUsername" class="form-control" value="{{old('image')}}">
                                                             @error('image')
@@ -170,7 +170,7 @@
                                 <thead class="text-capitalize">
                                     <tr class="">
                                         <th scope="col">Student Name</th>
-                                        <th scope="col" style="width: 10px;">Class</th>
+                                        <th scope="col" style="">Class</th>
                                         <th scope="col" class="text-center">Action</th>
                                     </tr>
                                 </thead>
