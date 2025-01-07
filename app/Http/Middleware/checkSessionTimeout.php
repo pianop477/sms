@@ -17,21 +17,28 @@ class checkSessionTimeout
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(! Auth::check() || !$request->session()->has('last_activity')) {
+        // Exclude routes like 'login' and 'logout'
+        if ($request->routeIs('login', 'logout')) {
+            return $next($request);
+        }
+
+        // Check if user is authenticated and session has last activity
+        if (!Auth::check() || !$request->session()->has('last_activity')) {
             Auth::logout();
-            Alert::Error('Error', 'Unauthorized request for this resource, please login');
+            Alert::error('Error', 'Unauthorized request for this resource, please login');
             return redirect()->route('login');
         }
 
         $sessionLifeTime = config('session.lifetime') * 60;
         $lastActivity = $request->session()->get('last_activity');
 
-        if(time() - $lastActivity > $sessionLifeTime) {
+        if (time() - $lastActivity > $sessionLifeTime) {
             Auth::logout();
             Alert::error('Error', 'Unauthorized request for this resource, please login');
             return redirect()->route('login');
         }
 
+        // Update last activity time
         $request->session()->put('last_activity', time());
         return $next($request);
     }
