@@ -58,82 +58,84 @@ Auth::routes();
 //end of condition =================================================
 
 Route::middleware('auth', 'activeUser', 'throttle:60,1')->group(function () {
-    Route::middleware('CheckUsertype:1,2,3,4')->group(function () {
-        // Home controller redirection ==============================================================================
-        Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-    });
-    //this routes is special for admin - system administrator only =================================================
-    Route::middleware(['CheckUsertype:1'])->group(function() {
-        Route::get('Registration', [UsersController::class, 'managerForm'])->name('register.manager');
-        Route::post('Manager-register', [ManagerController::class, 'store'])->name('manager.store');
-        Route::put('{school}/Deactivation', [ManagerController::class, 'updateStatus'])->name('deactivate.status');
-        Route::put('{school}/Activate', [ManagerController::class, 'activateStatus'])->name('activate.status');
-        //register new schools or institutions=====================================================================
-        Route::resource('Schools', SchoolsController::class);
-        Route::get('Admin-reset-password', [ManagerController::class, 'reset'])->name('admin.reset.password');
-        Route::put('{user}/Update', [ManagerController::class, 'resetPassword'])->name('admin.update.password');
-        Route::get('{school}/About-school', [SchoolsController::class, 'show'])->name('schools.show');
-        Route::get('{school}/Invoice', [SchoolsController::class, 'invoceCreate'])->name('admin.generate.invoice');
-        //edit school information ===================================================================================
-        Route::get('{school}/Edit-school', [SchoolsController::class, 'edit'])->name('schools.edit');
-        Route::put('{school}/Update-school', [SchoolsController::class, 'updateSchool'])->name('schools.update.school');
-        Route::get('{id}/Delete-school', [SchoolsController::class, 'destroy'])->name('schools.destroy');
-        Route::get('Feedback', [SchoolsController::class, 'showFeedback'])->name('feedback');
-        Route::get('{sms}/Delete-feedback', [SchoolsController::class, 'deletePost'])->name('delete.post');
+    Route::middleware('checkSessionTimeout')->group(function() {
+        Route::middleware('CheckUsertype:1,2,3,4')->group(function () {
+            // Home controller redirection ==============================================================================
+            Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+        });
+        //this routes is special for admin - system administrator only =================================================
+        Route::middleware(['CheckUsertype:1'])->group(function() {
+            Route::get('Registration', [UsersController::class, 'managerForm'])->name('register.manager');
+            Route::post('Manager-register', [ManagerController::class, 'store'])->name('manager.store');
+            Route::put('{school}/Deactivation', [ManagerController::class, 'updateStatus'])->name('deactivate.status');
+            Route::put('{school}/Activate', [ManagerController::class, 'activateStatus'])->name('activate.status');
+            //register new schools or institutions=====================================================================
+            Route::resource('Schools', SchoolsController::class);
+            Route::get('Admin-reset-password', [ManagerController::class, 'reset'])->name('admin.reset.password');
+            Route::put('{user}/Update', [ManagerController::class, 'resetPassword'])->name('admin.update.password');
+            Route::get('{school}/About-school', [SchoolsController::class, 'show'])->name('schools.show');
+            Route::get('{school}/Invoice', [SchoolsController::class, 'invoceCreate'])->name('admin.generate.invoice');
+            //edit school information ===================================================================================
+            Route::get('{school}/Edit-school', [SchoolsController::class, 'edit'])->name('schools.edit');
+            Route::put('{school}/Update-school', [SchoolsController::class, 'updateSchool'])->name('schools.update.school');
+            Route::get('{id}/Delete-school', [SchoolsController::class, 'destroy'])->name('schools.destroy');
+            Route::get('Feedback', [SchoolsController::class, 'showFeedback'])->name('feedback');
+            Route::get('{sms}/Delete-feedback', [SchoolsController::class, 'deletePost'])->name('delete.post');
 
-        //manager assign other teacher to become manager too.
-        Route::put('{user}/Change-usertype', [RolesController::class, 'changeUsertype'])->name('change.usertype');
+            //manager assign other teacher to become manager too.
+            Route::put('{user}/Change-usertype', [RolesController::class, 'changeUsertype'])->name('change.usertype');
 
-        //manage admin accounts
-        Route::get('Admin-accounts', [UsersController::class, 'manageAdminAccounts'])->name('admin.accounts');
-        Route::post('Register-admin-accounts', [UsersController::class, 'addAdminAccount'])->name('admin.accounts.registration');
-        Route::put('{id}/Block-admin-accounts', [UsersController::class, 'blockAdminAccount'])->name('admin.account.block');
-        Route::put('{id}/Unblock-admin-accounts', [UsersController::class, 'unblockAdminAccount'])->name('admin.account.unblock');
-        Route::get('{id}/Delete-admin-accounts', [UsersController::class, 'deleteAdminAccount'])->name('admin.account.destroy');
-    });
-    // end of routes for administrator =============================================================
+            //manage admin accounts
+            Route::get('Admin-accounts', [UsersController::class, 'manageAdminAccounts'])->name('admin.accounts');
+            Route::post('Register-admin-accounts', [UsersController::class, 'addAdminAccount'])->name('admin.accounts.registration');
+            Route::put('{id}/Block-admin-accounts', [UsersController::class, 'blockAdminAccount'])->name('admin.account.block');
+            Route::put('{id}/Unblock-admin-accounts', [UsersController::class, 'unblockAdminAccount'])->name('admin.account.unblock');
+            Route::get('{id}/Delete-admin-accounts', [UsersController::class, 'deleteAdminAccount'])->name('admin.account.destroy');
+        });
+        // end of routes for administrator =============================================================
 
-    /* parents route management==================================================================================
-    route will be managed by school head teacher or school manager==============================================*/
-    Route::middleware(['ManagerOrTeacher'])->group(function(){
-        //teachers panel management =======================================================================
-        // Route::resource('Teachers', TeachersController::class);
-        Route::get('Teachers-list', [TeachersController::class, 'showTeachersList'])->name('Teachers.index');
-        Route::post('Teachers-registration', [TeachersController::class, 'registerTeachers'])->name('Teachers.store');
-        Route::put('{teachers}/Update-teachers', [TeachersController::class, 'updateTeachers'])->name('Update.teachers');
-        Route::put('{teacher}/Block-teacher', [TeachersController::class, 'updateStatus'])->name('update.teacher.status');
-        Route::put('{teacher}/Restore-teacher', [TeachersController::class, 'restoreStatus'])->name('teachers.restore');
-        Route::get('{teacher}/Teacher-show', [TeachersController::class, 'showProfile'])->name('Teachers.show.profile');
-        Route::put('{teacher}/Delete-teacher', [TeachersController::class, 'deleteTeacher'])->name('Teachers.remove');
-        Route::get('Deleted-teachers', [TeachersController::class, 'trashedTeachers'])->name('Teachers.trashed');
+        /* parents route management==================================================================================
+        route will be managed by school head teacher or school manager==============================================*/
+        Route::middleware(['ManagerOrTeacher'])->group(function(){
+            //teachers panel management =======================================================================
+            // Route::resource('Teachers', TeachersController::class);
+            Route::get('Teachers-list', [TeachersController::class, 'showTeachersList'])->name('Teachers.index');
+            Route::post('Teachers-registration', [TeachersController::class, 'registerTeachers'])->name('Teachers.store');
+            Route::put('{teachers}/Update-teachers', [TeachersController::class, 'updateTeachers'])->name('Update.teachers');
+            Route::put('{teacher}/Block-teacher', [TeachersController::class, 'updateStatus'])->name('update.teacher.status');
+            Route::put('{teacher}/Restore-teacher', [TeachersController::class, 'restoreStatus'])->name('teachers.restore');
+            Route::get('{teacher}/Teacher-show', [TeachersController::class, 'showProfile'])->name('Teachers.show.profile');
+            Route::put('{teacher}/Delete-teacher', [TeachersController::class, 'deleteTeacher'])->name('Teachers.remove');
+            Route::get('Deleted-teachers', [TeachersController::class, 'trashedTeachers'])->name('Teachers.trashed');
 
-        //generate general attendance report =============================================================
-        Route::get('Attendance-report', [AttendanceController::class, 'getField'])->name('attendance.fill.form');
-        Route::post('Attendances', [AttendanceController::class, 'genaralAttendance'])->name('manage.attendance');
+            //generate general attendance report =============================================================
+            Route::get('Attendance-report', [AttendanceController::class, 'getField'])->name('attendance.fill.form');
+            Route::post('Attendances', [AttendanceController::class, 'genaralAttendance'])->name('manage.attendance');
 
-        //manage student registration forms and list ===========================================================
-        Route::get('Class-lists', [StudentsController::class, 'index'])->name('classes.list');
-        Route::get('{class}/Create-selected-class', [StudentsController::class, 'showStudent'])->name('create.selected.class');
-        Route::get('{classId}/Student-registration', [StudentsController::class, 'create'])->name('student.create');
-        Route::post('{class}/Student-registration', [StudentsController::class, 'createNew'])->name('student.store');
-        Route::put('{id}/Promote-students', [StudentsController::class, 'promoteClass'])->name('promote.student.class');
-        Route::get('Graduate-student', [StudentsController::class, 'callGraduateStudents'])->name('graduate.students');
-        Route::get('Graduate-students/year/{year}', [StudentsController::class, 'graduatedStudentByYear'])->name('graduate.student.by.year');
-        Route::get('Export-graduate-students/year/{year}', [StudentsController::class, 'exportGraduateStudents'])->name('graduate.students.export');
-        Route::put('{student}/Delete-student', [StudentsController::class, 'destroy'])->name('Students.destroy');
-        Route::get('Student-trash', [StudentsController::class, 'studentTrashList'])->name('students.trash');
-        Route::put('{id}/Restore-trashed-students', [StudentsController::class, 'restoreTrashList'])->name('student.restored.trash');
-        Route::get('{id}/Delete-student-permanent', [StudentsController::class, 'deletePerStudent'])->name('student.delete.permanent');
+            //manage student registration forms and list ===========================================================
+            Route::get('Class-lists', [StudentsController::class, 'index'])->name('classes.list');
+            Route::get('{class}/Create-selected-class', [StudentsController::class, 'showStudent'])->name('create.selected.class');
+            Route::get('{classId}/Student-registration', [StudentsController::class, 'create'])->name('student.create');
+            Route::post('{class}/Student-registration', [StudentsController::class, 'createNew'])->name('student.store');
+            Route::put('{id}/Promote-students', [StudentsController::class, 'promoteClass'])->name('promote.student.class');
+            Route::get('Graduate-student', [StudentsController::class, 'callGraduateStudents'])->name('graduate.students');
+            Route::get('Graduate-students/year/{year}', [StudentsController::class, 'graduatedStudentByYear'])->name('graduate.student.by.year');
+            Route::get('Export-graduate-students/year/{year}', [StudentsController::class, 'exportGraduateStudents'])->name('graduate.students.export');
+            Route::put('{student}/Delete-student', [StudentsController::class, 'destroy'])->name('Students.destroy');
+            Route::get('Student-trash', [StudentsController::class, 'studentTrashList'])->name('students.trash');
+            Route::put('{id}/Restore-trashed-students', [StudentsController::class, 'restoreTrashList'])->name('student.restored.trash');
+            Route::get('{id}/Delete-student-permanent', [StudentsController::class, 'deletePerStudent'])->name('student.delete.permanent');
 
-        //manage classses ========================================================================================
-        // Route::resource('Classes', ClassesController::class);
-        Route::get('Classes-list', [ClassesController::class, 'showAllClasses'])->name('Classes.index');
-        Route::post('Register-class', [ClassesController::class, 'registerClass'])->name('Classes.store');
-        Route::get('{id}/Edit-class', [ClassesController::class, 'editClass'])->name('Classes.edit');
-        Route::put('{id}/Update-class', [ClassesController::class, 'updateClass'])->name('Classes.update');
-        Route::delete('{id}/Delete-class', [ClassesController::class, 'deleteClass'])->name('Classes.destroy');
-    });
-    //manage parents informations ================================================================================
+            //manage classses ========================================================================================
+            // Route::resource('Classes', ClassesController::class);
+            Route::get('Classes-list', [ClassesController::class, 'showAllClasses'])->name('Classes.index');
+            Route::post('Register-class', [ClassesController::class, 'registerClass'])->name('Classes.store');
+            Route::get('{id}/Edit-class', [ClassesController::class, 'editClass'])->name('Classes.edit');
+            Route::put('{id}/Update-class', [ClassesController::class, 'updateClass'])->name('Classes.update');
+            Route::delete('{id}/Delete-class', [ClassesController::class, 'deleteClass'])->name('Classes.destroy');
+        });
+
+        //manage parents informations ================================================================================
     Route::middleware(['ManagerOrTeacher'])->group(function () {
         // Route::resource('Parents', ParentsController::class);
         Route::get('Parents', [ParentsController::class, 'showAllParents'])->name('Parents.index');
@@ -320,5 +322,5 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1')->group(function () {
             return Excel::download(new TeachersExport, 'teachers.xlsx');
         })->name('teachers.excel.export');
         Route::get('/teachers/pdf', [TeachersController::class, 'export'])->name('teachers.pdf.export');
-
+    });
 });

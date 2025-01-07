@@ -36,7 +36,6 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \App\Http\Middleware\checkSessionTimeout::class,
         ],
 
         'api' => [
@@ -72,5 +71,6 @@ class Kernel extends HttpKernel
         'GeneralMiddleware' => \App\Http\Middleware\GeneralMiddleware::class,
         'ManagerOrTeacher' => \App\Http\Middleware\ManagerOrTeacher::class,
         'activeUser' => \App\Http\Middleware\ActiveUserMiddleware::class,
+        'checkSessionTimeout' => \App\Http\Middleware\checkSessionTimeout::class,
     ];
 }
