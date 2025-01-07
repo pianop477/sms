@@ -17,15 +17,15 @@
           <h5 class="mb-1">
             <span class="text-uppercase">{{$data->first_name. ' '. $data->middle_name}}</span>
             <p class="font-weight-bold mb-3 text-sm">
-                Namba ya usajili: <span class="text-uppercase" style="text-decoration: underline">{{$data->school_reg_no. '/'. $data->admission_number}}</span>
+                Admission Number: <span class="text-uppercase" style="text-decoration: underline">{{$data->school_reg_no. '/'. $data->admission_number}}</span>
             </p>
           </h5>
-          Aina ya Akaunti: <span class="badge bg-info text-white">Mwanafunzi</span>
+          Account Type: <span class="badge bg-info text-white">Student</span>
           <p class="mb-0 font-weight-normal text-sm">
             @if ($data->status == 1)
-                Hali yake: <span class="badge bg-success text-white">{{_('Yupo')}}</span>
+                Account Status: <span class="badge bg-success text-white">{{_('Active')}}</span>
                 @else
-                Hali yake: <span class="badge bg-secondary text-white">{{_('Amefungiwa')}}</span>
+                Account Status: <span class="badge bg-secondary text-white">{{_('Blocked')}}</span>
             @endif
           </p>
         </div>
@@ -41,26 +41,26 @@
         <div class="col-md-6 mt-5">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="header-title">Taarifa za Mwanafunzi</h4>
+                    <h4 class="header-title">Other Student Information</h4>
                     <div class="list-group">
                         <button type="button" class="list-group-item list-group-item-action">
-                            Jina la Ukoo: <span class="text-uppercase font-weight-bold">{{$data->last_name}}</span>
+                            Surname: <span class="text-uppercase font-weight-bold">{{$data->last_name}}</span>
                         </button>
                         <button type="button" class="list-group-item list-group-item-action">
-                            Jinsia: <span class="text-uppercase font-weight-bold">{{$data->gender[0]}}</span>
+                            Gender: <span class="text-uppercase font-weight-bold">{{$data->gender[0]}}</span>
                         </button>
                         <button type="button" class="list-group-item list-group-item-action">
-                            Tarehe ya Kuzaliwa: <span class="font-weight-bold">{{\Carbon\Carbon::parse($data->dob)->format('F d, Y')}}</span>
+                            Date of Birth: <span class="font-weight-bold">{{\Carbon\Carbon::parse($data->dob)->format('F d, Y')}}</span>
                         </button>
                         <button type="button" class="list-group-item list-group-item-action">
-                            Darasa: <span class="text-uppercase font-weight-bold">{{$data->grade_class_name}}</span>
+                            Class: <span class="text-uppercase font-weight-bold">{{$data->grade_class_name}}</span>
                         </button>
                         <button type="button" class="list-group-item list-group-item-action" disabled="">
-                            Mkondo: <span class="text-uppercase font-weight-bold">{{$data->group}}</span>
+                            Stream: <span class="text-uppercase font-weight-bold">{{$data->group}}</span>
                         </button>
                         @if ($data->transport_id == NULL)
                         <button type="button" class="list-group-item list-group-item-action" disabled="">
-                            Anatumia Usafiri?: <span class="text-capitalize font-weight-bold text-danger">{{_('Hapana')}}</span>
+                            Is student Using School Bus?: <span class="text-capitalize font-weight-bold text-danger">{{_('No')}}</span>
                         </button>
                         @else
                         <button type="button" class="list-group-item list-group-item-action" disabled="">
@@ -70,7 +70,7 @@
                                 <div class="modal-dialog modal-lg">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title">TAARIFA ZA RUTI YA BASI</h5>
+                                            <h5 class="modal-title">SCHOOL BUS DETAILS</h5>
                                             <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                         </div>
                                         <div class="modal-body">
@@ -78,26 +78,26 @@
                                                 <div class="card">
                                                         <div class="list-group">
                                                             <button type="button" class="list-group-item list-group-item-action">
-                                                                Jina la Dereva: <span class="text-uppercase font-weight-bold">{{$data->driver}}</span>
+                                                                Driver Name: <span class="text-uppercase font-weight-bold">{{$data->driver}}</span>
                                                             </button>
                                                             <button type="button" class="list-group-item list-group-item-action">
-                                                                Jinsia: <span class="text-uppercase font-weight-bold">{{$data->driver_gender[0]}}</span>
+                                                                Driver Gender: <span class="text-uppercase font-weight-bold">{{$data->driver_gender[0]}}</span>
                                                             </button>
                                                             <button type="button" class="list-group-item list-group-item-action">
-                                                                Namba ya simu: <span class="text-uppercase font-weight-bold">{{$data->driver_phone}}</span>
+                                                                Driver Phone Number: <span class="text-uppercase font-weight-bold">{{$data->driver_phone}}</span>
                                                             </button>
                                                             <button type="button" class="list-group-item list-group-item-action">
-                                                                Basi Namba: <span class="text-uppercase font-weight-bold">{{$data->bus_number}}</span>
+                                                                School Bus Number: <span class="text-uppercase font-weight-bold">{{$data->bus_number}}</span>
                                                             </button>
                                                             <button type="button" class="list-group-item list-group-item-action" disabled="">
-                                                                Ruti ya Basi: <span class="text-uppercase font-weight-bold">{{$data->bus_routine}}</span>
+                                                                School Bus Routine: <span class="text-uppercase font-weight-bold">{{$data->bus_routine}}</span>
                                                             </button>
                                                         </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Funga</button>
+                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
                                         </div>
                                     </div>
                                 </form>
@@ -114,19 +114,19 @@
         <div class="col-md-6 mt-5">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="header-title">Taarifa za Mzazi</h4>
+                    <h4 class="header-title">Parents Information</h4>
                     <div class="list-group">
                         <button type="button" class="list-group-item list-group-item-action">
-                            Jina Kamili la Mzazi: <span class="text-uppercase font-weight-bold">{{$data->user_first_name. ' '. $data->user_last_name}}</span>
+                            Parent's full name: <span class="text-uppercase font-weight-bold">{{$data->user_first_name. ' '. $data->user_last_name}}</span>
                         </button>
                         <button type="button" class="list-group-item list-group-item-action">
-                            Jinsia: <span class="text-uppercase font-weight-bold">{{$data->user_gender[0]}}</span>
+                            Parent's gender: <span class="text-uppercase font-weight-bold">{{$data->user_gender[0]}}</span>
                         </button>
                         <button type="button" class="list-group-item list-group-item-action">
-                            Namba ya simu: <span class="text-uppercase font-weight-bold">{{$data->phone}}</span>
+                            Parent's Phone: <span class="text-uppercase font-weight-bold">{{$data->phone}}</span>
                         </button>
                         <button type="button" class="list-group-item list-group-item-action" disabled="">
-                            Mtaa anaoishi: <span class="text-uppercase font-weight-bold">{{$data->parent_address}}</span>
+                            Street Address/Location: <span class="text-uppercase font-weight-bold">{{$data->parent_address}}</span>
                         </button>
                     </div>
                 </div>

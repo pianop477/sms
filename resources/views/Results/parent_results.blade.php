@@ -154,11 +154,11 @@
                         <img src="{{public_path('assets/img/logo/'.$results->first()->logo)}}" alt="" style="max-width: 100px;">
                     </div>
                     <div class="header" style="border-bottom: 2px solid gray">
-                        <h3>jamhuri ya muungano wa tanzania</h3>
-                        <h4>ofisi ya rais - TAMISEMI</h4>
+                        <h3>united republic of tanzania</h3>
+                        <h4>president office - TAMISEMI</h4>
                         <h4>{{$results->first()->school_name}}</h4>
                         <h6>{{$results->first()->postal_address}} - {{$results->first()->postal_name}}, {{$results->first()->country}}</h6>
-                        <h6>Ripoti ya maendeleo ya mwanafunzi</h6>
+                        <h6>student academics progressive report</h6>
                     </div>
                     <div class="student-image">
                         @php
@@ -171,37 +171,37 @@
                         @else
                             <img src="{{ $defaultImagePath }}" alt="" style="max-width: 100px; border-radius:50px;">
                         @endif
-                        <p style="text-transform: capitalize; font-size:10px;">Na. Usajili: <span style="text-decoration: underline;">{{$results->first()->school_reg_no}}/{{ $results->first()->admission_number}}</span></p>
+                        <p style="text-transform: capitalize; font-size:10px;">Admission Number: <span style="text-decoration: underline;">{{$results->first()->school_reg_no}}/{{ $results->first()->admission_number}}</span></p>
                     </div>
                 </div>
                 <div class="" style="border-bottom: 2px solid gray">
                     <div class="info-container student-info">
-                        <p style="text-transform:capitalize; font-weight:bold; text-align:center">A. Taarifa za Mwanafunzi</p>
-                        <p><strong>Jina la Mwanafunzi:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}</span></p>
-                        <p><strong>Jinsia:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $student->gender}}</span></p>
-                        <p><strong>Darasa:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $results->first()->class_name }}({{$results->first()->class_code}})</span></p>
-                        <p><strong>Mkondo:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $student->group }}</span></p>
+                        <p style="text-transform:capitalize; font-weight:bold; text-align:center">A. Student Information</p>
+                        <p><strong>Student Full Name:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}</span></p>
+                        <p><strong>Gender:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $student->gender}}</span></p>
+                        <p><strong>Class:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $results->first()->class_name }}({{$results->first()->class_code}})</span></p>
+                        <p><strong>Stream:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $student->group }}</span></p>
                     </div>
                     <p style="border-bottom: 2px solid gray;"></p>
-                    <p style="text-transform:capitalize; font-weight:bold; text-align:center">B. Taarifa za Jaribio/Mtihani</p>
+                    <p style="text-transform:capitalize; font-weight:bold; text-align:center">B. Examination Details</p>
                     <div class="info-container exam-info">
-                        <p><strong>Aina ya Jaribio/Mtihani:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $results->first()->exam_type }}</span></p>
-                        <p><strong>Mwezi:</strong> <span style="text-decoration:underline">{{ $month }}</span></p>
-                        <p><strong>Mwaka:</strong> <span style="text-decoration:underline">{{ $year }}</span></p>
-                        <p><strong>Muhula:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{$results->first()->Exam_term}}</span></p>
+                        <p><strong>Examination Type:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $results->first()->exam_type }}</span></p>
+                        <p><strong>Exam Month:</strong> <span style="text-decoration:underline">{{ $month }}</span></p>
+                        <p><strong>Year of Study:</strong> <span style="text-decoration:underline">{{ $year }}</span></p>
+                        <p><strong>Term:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{$results->first()->Exam_term}}</span></p>
                     </div>
                 </div>
-                <p style="text-transform:capitalize; font-weight:bold; text-align:center">C. Taarifa za Ufaulu Kimasomo</p>
+                <p style="text-transform:capitalize; font-weight:bold; text-align:center">C. Student overall performance </p>
                 <table>
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Somo</th>
-                            <th>Ufupisho</th>
-                            <th>Alama</th>
-                            <th>Daraja</th>
-                            <th>Maoni ya Mwl.</th>
-                            <th>Nafasi @ somo</th>
+                            <th>subject</th>
+                            <th>code</th>
+                            <th>score</th>
+                            <th>grade</th>
+                            <th>Teacher's comment</th>
+                            <th>rank</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -219,36 +219,36 @@
                     </tbody>
                 </table>
                 <div class="cut" style="border-bottom: 2px dashed gray;">
-                    <p>Jumla ya Alama: <strong>{{ $totalScore }}</strong></p>
-                    <p>Wastani: <strong>{{ number_format($averageScore, 2) }}</strong></p>
+                    <p>Total Marks: <strong>{{ $totalScore }}</strong></p>
+                    <p>Overall Average: <strong>{{ number_format($averageScore, 2) }}</strong></p>
                     @php
                         $grade = '';
                         $gradeColor = '';
                         if ($averageScore >= 41 || $averageScore >= 81) {
-                            $grade = "'A' - BORA SANA";
+                            $grade = "'A' - EXCELLENT";
                             $gradeColor = 'rgb(117, 244, 48)';
                         } elseif ($averageScore >= 31 || $averageScore >= 61) {
-                            $grade = "'B' - BORA";
+                            $grade = "'B' - GOOD";
                             $gradeColor = 'rgb(12, 211, 184)';
                         } elseif ($averageScore >= 21 || $averageScore >= 41) {
-                            $grade = "'C' - WASTANI";
+                            $grade = "'C' - AVERAGE";
                             $gradeColor = 'rgb(237, 220, 113)';
                         } elseif ($averageScore >= 11 || $averageScore >= 21) {
-                            $grade = "'D' - HAIRIDHISHI";
+                            $grade = "'D' - UNSATISFACTORY";
                             $gradeColor = 'rgb(235, 75, 75)';
                         } elseif ($averageScore <= 10 || $averageScore <= 20) {
-                            $grade = "'E' - AMEFELI";
+                            $grade = "'E' - FAIL";
                             $gradeColor = 'rgb(182, 176, 176)';
                         }
                     @endphp
-                    <p>Daraja la Ufaulu: <strong><span style="background: {{$gradeColor}}; padding:1px 4px">{{$grade}}</span></strong></p>
-                    <p>Ameshika Nafasi ya: <strong><span style="text-decoration: underline;">{{ $studentRank }}</span></strong> Kati ya Wanafunzi <strong><span style="text-decoration: underline">{{ $rankings->count() }}</span></strong></p>
+                    <p>Performance Grade: <strong><span style="background: {{$gradeColor}}; padding:1px 4px">{{$grade}}</span></strong></p>
+                    <p>Ranked: <strong><span style="text-decoration: underline;">{{ $studentRank }}</span></strong> out of <strong><span style="text-decoration: underline">{{ $rankings->count() }}</span></strong>students</p>
                 </div>
                 <div class="thanks" style="">
                     <p style="line-height: 1px;">
-                        <i>Mwisho wa Ripoti, Asante Sana!</i>
+                        <i>End of Report, Thank You!</i>
                     </p>
-                    <p>Imechapishwa Tarehe: {{\Carbon\Carbon::parse(now())->format('d-M-Y')}}</p>
+                    <p>Printed on: {{\Carbon\Carbon::parse(now())->format('d-M-Y')}}</p>
                 </div>
         </div>
     </div>

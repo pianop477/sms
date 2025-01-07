@@ -279,13 +279,13 @@ class StudentsController extends Controller
         if ($request->class_id == 0) {
             // Mark students as graduated
             Student::where('class_id', $class->id)->where('school_id', $user->schoo_id)->update(['graduated' => true, 'status' => 0]);
-            Alert::info('Conglaturations🎉', 'Students has graduated and awarded primary education certificate');
+            Alert::info('Conglaturations🎉', 'Students graduate batch has been submitted successfully');
             return back();
         } else {
             // Promote students to the next class
             Student::where('class_id', $class->id)->where('school_id', $user->school_id)->update(['class_id' => $request->class_id]);
 
-            Alert::success('Success!', 'Students have been upgraded to the next class');
+            Alert::success('Success!', 'Students batch have been upgraded to the next class');
             return back();
         }
 
@@ -508,7 +508,7 @@ class StudentsController extends Controller
                                     ->select('students.*', 'grades.class_name', 'grades.class_code', 'transports.driver_name')
                                     ->findOrFail($student);
 
-        $buses = Transport::where('status', '=', 1)->where('school_id', $user->school_id)->orderBy('driver_name', 'ASC')->get();
+        $buses = Transport::where('status', '=', 1)->where('school_id', $user->school_id)->orderBy('bus_no', 'ASC')->get();
         $classes = Grade::where('status', '=', 1)->where('school_id', $user->school_id)->orderBy('class_code')->get();
         return view('Students.edit', ['buses' => $buses, 'students' => $students, 'classes' => $classes ]);
     }

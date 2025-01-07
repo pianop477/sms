@@ -5,7 +5,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-10">
-                    <h4 class="header-title">Taarifa ya Mahudhurio ya: <span class="text-uppercase text-primary">{{$student->first_name. ' '. $student->middle_name. ' '.$student->last_name}}</span></h4>
+                    <h4 class="header-title">Attendance Report For: <span class="text-uppercase text-primary">{{$student->first_name. ' '. $student->middle_name. ' '.$student->last_name}}</span></h4>
                 </div>
                 <div class="col-2">
                     <a href="{{route('attendance.byYear', $student->id)}}"><i class="fa-solid fa-circle-arrow-left text-secondary" style="font-size: 2rem"></i></a>
@@ -16,9 +16,9 @@
                     <table class="table table-bordered text-center" id="myTable">
                         <thead class="text-capitalize bg-primary">
                             <tr class="text-white">
-                                <th>Siku</th>
-                                <th scope="col">Tarehe</th>
-                                <th scope="col">Mahudhurio</th>
+                                <th>Day</th>
+                                <th scope="col">Date</th>
+                                <th scope="col">Attendance Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -33,11 +33,11 @@
                                             <td>{{ \Carbon\Carbon::parse($item->attendance_date)->format('M d, Y') }}</td>
                                             <td>
                                                 @if ($item->attendance_status == 'present')
-                                                    <span class="badge bg-success text-capitalize text-white">Amefika</span>
+                                                    <span class="badge bg-success text-capitalize text-white">Present</span>
                                                 @elseif ($item->attendance_status == 'absent')
-                                                    <span class="badge bg-danger text-capitalize text-white">Hajafika</span>
+                                                    <span class="badge bg-danger text-capitalize text-white">Absent</span>
                                                 @else
-                                                    <span class="badge bg-warning text-capitalize text-white">Ruhusa</span>
+                                                    <span class="badge bg-warning text-capitalize text-white">Permission</span>
                                                 @endif
                                             </td>
                                         </tr>

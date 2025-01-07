@@ -5,7 +5,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-10">
-                        <h4 class="header-title text-center text-uppercase">chagua mwezi - kupakua matokeo mwaka {{$year}}</h4>
+                        <h4 class="header-title text-center text-uppercase">Select Month - to get Results for {{$year}}</h4>
                     </div>
                     <div class="col-2">
                         <a href="{{ route('result.byType', ['student' => $student->id, 'year' => $year]) }}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
@@ -14,7 +14,7 @@
                 <div class="list-group">
                     @if ($months->isEmpty())
                         <div class="alert alert-warning text-center" role="alert">
-                            <h6>Hakuna matokeo ya miezi yoyote kwa mwaka {{$year}}</h6>
+                            <h6>There is no result records for year {{$year}}</h6>
                         </div>
                     @else
                         @foreach ($months as $month)

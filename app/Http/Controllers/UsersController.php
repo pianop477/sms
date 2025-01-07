@@ -76,7 +76,7 @@ class UsersController extends Controller
         $parents->save();
         // return redirect()->back()->with('success', 'User registered successfully, Login now');
 
-        Alert::success('Success!', 'User Account saved successfully, Login now');
+        Alert::success('Success!', 'Your Account has been saved successfully, Login now');
         return redirect()->route('login');
 
     }
