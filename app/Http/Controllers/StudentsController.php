@@ -377,7 +377,7 @@ class StudentsController extends Controller
     public function parentByStudent()
     {
         $user = Auth::user();
-        $buses = Transport::where('school_id', '=', $user->school_id)->where('status', '=', 1)->orderBy('driver_name', 'ASC')->get();
+        $buses = Transport::where('school_id', '=', $user->school_id)->where('status', '=', 1)->orderBy('bus_no', 'ASC')->get();
         $classes = Grade::where('school_id', '=', $user->school_id)->where('status', '=', 1)->orderBy('class_code')->get();
         return view('Students.register', ['buses' => $buses, 'classes' => $classes ]);
     }

@@ -129,6 +129,7 @@
                 </div>
             </div>
         </div>
+        <hr class="dark horizontal py-0">
         <div class="col-lg-12">
             <div class="row">
                 <div class="col-md-6 mt-5 mb-3">
@@ -343,124 +344,103 @@
                 </div>
             </div>
         </div>
-        <hr>
+        <hr class="dark horizontal py-0">
         {{-- academic panel end here =========================================== --}}
         {{-- academic teacher its courses records start here ====================== --}}
-        <div class="col-lg-6 mt-0">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-10"><h4 class="header-title text-uppercase text-center"> My Courses</h4></div>
-                    </div>
-                    <div class="table-responsive-md">
-                        <table class="table table-hover text-center" id="">
-                            <thead>
-                                <tr class="text-capitalize">
-                                    <th>#</th>
-                                    <th>Course name</th>
-                                    <th>Class</th>
-                                    <th class="text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if ($courses->isEmpty())
-                                    <tr>
-                                        <td colspan="5">
-                                            <div class="alert alert-warning text-center">
-                                                No any subject assigned for you
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    @else
-                                    @foreach ($courses as $course )
-                                    <tr>
-                                        <td>{{$loop->iteration}}</td>
-                                        <td class="text-uppercase">
-                                            {{$course->course_name}}
-                                        </td>
-                                        <td class="text-uppercase">{{$course->class_code}}</td>
-                                        <td>
-                                            @if ($course->status == 1)
-                                            <ul class="d-flex justify-content-center">
-                                                <li class="mr-3">
-                                                    <a href="{{route('score.prepare.form', $course->id)}}" class="text-success" onclick="return confirm('Do you want to enter Examination score in {{strtoupper($course->course_name)}} subject?')"><i class="ti-pencil-alt"></i></a>
-                                                </li>
-                                                <li class="mr-3">
-                                                    <a href="{{ route('results_byCourse', $course->id) }}" onclick="return confirm('Do you want to view results in {{strtoupper($course->course_name)}} subject?')">
-                                                        <i class="ti-eye text-primary"></i>
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                            @else
-                                                <span class="badge bg-danger text-white">{{_('Blocked')}}</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                                @endif
-                            </tbody>
-                        </table>
-                    </div>
+        <div class="row">
+            <div class="col-md-6 mt-0 mb-3">
+                <div class="card">
+                    <div id="studentsChart" style="height: 400px;"></div>
+                    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+                    <script>
+                        const chartDom = document.getElementById('studentsChart');
+                        const myChart = echarts.init(chartDom);
+
+                        const option = {
+                            title: {
+                                text: 'Students by Classes'
+                            },
+                            tooltip: {},
+                            xAxis: {
+                                type: 'category',
+                                data: @json($studentsByClass->pluck('class_code'))
+                            },
+                            yAxis: {
+                                type: 'value',
+                                min: 0, // Minimum value on the y-axis
+                                interval: 5, // Set interval to 1
+                                axisLabel: {
+                                    formatter: '{value}' // Format values as integers
+                                }
+                            },
+                            series: [{
+                                data: @json($studentsByClass->pluck('student_count')),
+                                type: 'bar',
+                                itemStyle: {
+                                    color: '#5470C6'
+                                }
+                            }]
+                        };
+
+                        myChart.setOption(option);
+                    </script>
                 </div>
             </div>
-        </div>
-        <div class="col-md-6 mt-5 mb-3">
-            <div class="card">
-                <div id="qualificationChart" style="width: 100%; height: 400px;"></div>
-
-                <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
-                <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
-                <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
-                <script>
-                    am5.ready(function() {
-                        // Create root element
-                        var root = am5.Root.new("qualificationChart");
-
-                        // Set themes
-                        root.setThemes([am5themes_Animated.new(root)]);
-
-                        // Create chart
-                        var chart = root.container.children.push(
-                            am5percent.PieChart.new(root, {
-                                layout: root.verticalLayout
-                            })
-                        );
-
-                        // Add chart title
-                        chart.children.unshift(
-                            am5.Label.new(root, {
-                                text: "Teachers by Qualifications",
-                                fontSize: 20,
-                                fontWeight: "bold",
-                                textAlign: "center",
-                                x: am5.percent(50),
-                                centerX: am5.percent(50)
-                            })
-                        );
-
-                        // Create series
-                        var series = chart.series.push(
-                            am5percent.PieSeries.new(root, {
-                                valueField: "value",
-                                categoryField: "category"
-                            })
-                        );
-
-                        // Add data
-                        series.data.setAll([
-                            { category: "Masters", value: {{ $qualificationData['masters'] }} },
-                            { category: "Degree", value: {{ $qualificationData['bachelor'] }} },
-                            { category: "Diploma", value: {{ $qualificationData['diploma'] }} },
-                            { category: "Certificate", value: {{ $qualificationData['certificate'] }} }
-                        ]);
-
-                        // Add legend
-                        chart.children.push(am5.Legend.new(root, {}));
-
-                        // Animate chart
-                        series.appear(1000, 100);
-                    });
-                </script>
+            <div class="col-lg-6 mt-0">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-10"><h4 class="header-title text-uppercase text-center"> My Courses</h4></div>
+                        </div>
+                        <div class="table-responsive-md">
+                            <table class="table table-hover text-center" id="">
+                                <thead>
+                                    <tr class="text-capitalize">
+                                        <th>Course name</th>
+                                        <th>Class</th>
+                                        <th class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if ($courses->isEmpty())
+                                        <tr>
+                                            <td colspan="5">
+                                                <div class="alert alert-warning text-center">
+                                                    No any subject assigned for you
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @else
+                                        @foreach ($courses as $course )
+                                        <tr>
+                                            <td class="text-uppercase">
+                                                {{$course->course_name}}
+                                            </td>
+                                            <td class="text-uppercase">{{$course->class_code}}</td>
+                                            <td>
+                                                @if ($course->status == 1)
+                                                <ul class="d-flex justify-content-center">
+                                                    <li class="mr-3">
+                                                        <a href="{{route('score.prepare.form', $course->id)}}" class="text-success" onclick="return confirm('Do you want to enter Examination score in {{strtoupper($course->course_name)}} subject?')"><i class="ti-pencil-alt"></i></a>
+                                                    </li>
+                                                    <li class="mr-3">
+                                                        <a href="{{ route('results_byCourse', $course->id) }}" onclick="return confirm('Do you want to view results in {{strtoupper($course->course_name)}} subject?')">
+                                                            <i class="ti-eye text-primary"></i>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                                @else
+                                                    <span class="badge bg-danger text-white">{{_('Blocked')}}</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         {{-- academic teacher courses records end here============================= --}}
@@ -542,7 +522,7 @@
                                                     <ul class="d-flex">
                                                         <li class="">
                                                             <a href="{{ route('attendance.get.form', $class->id) }}" class="btn btn-info btn-xs p-1">
-                                                                <i class="ti-settings"> Generate Report</i>
+                                                                <i class="ti-settings"> Get Report</i>
                                                             </a>
                                                         </li>
                                                     </ul>
@@ -566,7 +546,6 @@
                             <table class="table table-hover text-center" id="">
                                 <thead>
                                     <tr class="text-capitalize">
-                                        <th>#</th>
                                         <th>Course name</th>
                                         <th>Class</th>
                                         <th class="text-center">Action</th>
@@ -584,7 +563,6 @@
                                         @else
                                         @foreach ($courses as $course )
                                         <tr>
-                                            <td>{{$loop->iteration}}</td>
                                             <td class="text-uppercase">
                                                 {{$course->course_name}}
                                             </td>
@@ -648,7 +626,6 @@
                             <table class="table table-hover text-center" id="">
                                 <thead>
                                     <tr class="text-capitalize">
-                                        <th>#</th>
                                         <th>Course name</th>
                                         <th>Class</th>
                                         <th class="text-center">Action</th>
@@ -666,7 +643,6 @@
                                         @else
                                         @foreach ($courses as $course )
                                         <tr>
-                                            <td>{{$loop->iteration}}</td>
                                             <td class="text-uppercase">
                                                 {{$course->course_name}}
                                             </td>

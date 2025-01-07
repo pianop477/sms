@@ -6,7 +6,7 @@
                     <img src="{{asset('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" class="rounded-circle" style="max-width:50px; object-ft-cover; border-radius: 50px;">
                     <a href="{{route('home')}}" class="navbar-brand font-weight-bold text-capitalize">{{ Auth::user()->school->school_name }}</a>
                         @else
-                            <img src="{{asset('assets/img/logo/shuleApp.png')}}" alt="" class="rounded-circle" style="max-width:50px" object-ft-cover; border-radius: 50px;">
+                            <img src="{{asset('assets/img/logo/logo.png')}}" alt="" class="rounded-circle" style="max-width:50px" object-ft-cover; border-radius: 50px;">
                             <a href="{{route('home')}}" class="navbar-brand font-weight-bold">ShuleApp - Admin</a>
                 @endif
             </div>
@@ -24,7 +24,7 @@
                                 <img class="avatar user-thumb" src="{{asset('assets/img/profile/avatar-female.jpg')}}" alt="avatar">
                         @endif
                         @endif
-                        <h4 class="user-name text-capitalize dropdown-toggle" data-toggle="dropdown"> Hello, {{Auth::user()->first_name}}<i class="fa fa-angle-down"></i></h4>
+                        <h4 class="user-name text-capitalize dropdown-toggle" data-toggle="dropdown">  Hello, {{Auth::user()->first_name}}!<i class="fa fa-angle-down"></i></h4>
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="{{route('show.profile')}}"><i class="ti-user"></i> Profile</a>
                             <a class="dropdown-item" href="{{route('change.password')}}"><i class="ti-key"></i> Change Password</a>
