@@ -5,7 +5,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-10">
-                        <h4 class="header-title text-center text-uppercase">Chagua aina ya jaribio/Mtihani - Mwaka {{$year}}</h4>
+                        <h4 class="header-title text-center text-uppercase">Select Examination Type - For Year {{$year}}</h4>
                     </div>
                     <div class="col-2">
                         <a href="{{ route('results.index', $student->id) }}" class="float-right">

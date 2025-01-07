@@ -5,8 +5,8 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-10">
-                            <h4 class="header-title text-center">Taarifa ya Matokeo ya: <span class="text-uppercase text-primary"><strong>({{$student->first_name. ' '. $student->middle_name. ' '. $student->last_name}})</strong></span></h4>
-                            <span class="text-danger">Chagua Mwaka wa Masomo - Kuona Matokeo</span>
+                            <h4 class="header-title text-center">Result Report For: <span class="text-uppercase text-primary"><strong>({{$student->first_name. ' '. $student->middle_name. ' '. $student->last_name}})</strong></span></h4>
+                            <span class="text-danger">Select Year of Study - To view Results</span>
                         </div>
                         <div class="col-2">
                             <a href="{{route('home')}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
@@ -21,7 +21,7 @@
                             @foreach ($groupedData as $year => $year )
                                 <a href="{{route('result.byType', ['year' => $year, $student->id])}}">
                                     <button type="button" class="list-group-item list-group-item-action">
-                                        <h6 class="text-primary"><i class="fas fa-chevron-right"></i> Mwaka wa Masomo - {{$year}}</h6>
+                                        <h6 class="text-primary"><i class="fas fa-chevron-right"></i> Academic Year - {{$year}}</h6>
                                     </button>
                                 </a>
                             @endforeach

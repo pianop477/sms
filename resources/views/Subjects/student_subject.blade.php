@@ -10,7 +10,7 @@
                         @if (isset($message))
                             <h4 class="header-title">{{ $message }}</h4>
                         @else
-                            <h4 class="header-title text-center text-uppercase">Orodha ya Masomo kwa Darasa la: <span class="text-uppercase"><strong>{{$class->class_name}}</strong></span></h4>
+                            <h4 class="header-title text-center text-uppercase">Learning Subjects for Class: <span class="text-uppercase"><strong>{{$class->class_name}}</strong></span></h4>
                         @endif
                     </div>
                     <div class="col-4">
@@ -23,7 +23,7 @@
                     </div>
                 @elseif ($class_course->isEmpty())
                     <div class="alert alert-warning" role="alert">
-                        <h6 class="text-center">Hakuna Taarifa ya masomo yaliyo sajiliwa kwenye darasa hili</h6>
+                        <h6 class="text-center">No any subjects records found</h6>
                     </div>
                 @else
                     <div class="single-table">
@@ -31,11 +31,11 @@
                             <table class="table table-hover table-responsive-md text-center">
                                 <thead class="text-uppercase">
                                     <tr class="">
-                                        <th scope="col">#</th>
-                                        <th scope="col">Somo</th>
-                                        <th scope="col">Ufupisho</th>
-                                        <th scope="col">Jina la Mwalimu wa Somo</th>
-                                        <th scope="col">Na. simu ya Mwalimu</th>
+                                        <th scope="col">No</th>
+                                        <th scope="col">Subject</th>
+                                        <th scope="col">code</th>
+                                        <th scope="col">Subject Teacher Name</th>
+                                        <th scope="col">Teacher's Phone</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -62,10 +62,10 @@
     <div class="col-lg-4 mt-5">
         <div class="card" style="background: #e696d5;">
             <div class="card-body">
-                <h5 class="text-center text-uppercase">Taarifa za Mwalimu wa Darasa</h5>
+                <h5 class="text-center text-uppercase">Class Teacher Particulars</h5>
                 <hr>
                 @if ($myClassTeacher->isEmpty())
-                    <h6 class="text-center">Hakuna mwalimu wa darasa aliyeteuliwa kwa darasa hili!</h6>
+                    <h6 class="text-center">No class teacher has been assigned for this class!</h6>
                 @else
                     <div class="img-container float-right">
                         @if ($myClassTeacher->first()->image == NULL)
@@ -78,11 +78,11 @@
                         @foreach ($myClassTeacher as $classTeacher )
 
                         @endforeach
-                        <li class="list-group-items">Jina la Mwalimu:  <span class="text-uppercase font-weight-bold">{{$classTeacher->first_name}} {{$classTeacher->last_name}}</span></li>
-                        <li class="list-group-items">Jinsia:  <span class="text-uppercase font-weight-bold">@if ($classTeacher->gender =='female') {{"KE"}} @else {{"ME"}} @endif</span></li>
-                        <li class="list-group-items">Namba ya Simu:  <span class="text-uppercase font-weight-bold">{{$classTeacher->phone}}</span></li>
-                        <li class="list-group-items">Darasa:  <span class="text-uppercase font-weight-bold">{{$classTeacher->class_name}}</span></li>
-                        <li class="list-group-items">Mkondo:  <span class="text-uppercase font-weight-bold">{{$classTeacher->group}}</span></li>
+                        <li class="list-group-items">Class Teacher Name:  <span class="text-uppercase font-weight-bold">{{$classTeacher->first_name}} {{$classTeacher->last_name}}</span></li>
+                        <li class="list-group-items">Teacher's Gender:  <span class="text-uppercase font-weight-bold">@if ($classTeacher->gender =='female') {{"KE"}} @else {{"ME"}} @endif</span></li>
+                        <li class="list-group-items">Teacher's Phone:  <span class="text-uppercase font-weight-bold">{{$classTeacher->phone}}</span></li>
+                        <li class="list-group-items">Class:  <span class="text-uppercase font-weight-bold">{{$classTeacher->class_name}}</span></li>
+                        <li class="list-group-items">Stream:  <span class="text-uppercase font-weight-bold">{{$classTeacher->group}}</span></li>
                     </ul>
                 @endif
             </div>
