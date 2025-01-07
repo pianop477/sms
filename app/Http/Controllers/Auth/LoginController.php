@@ -42,15 +42,16 @@ class LoginController extends Controller
     {
         $request->session()->regenerate();
 
+        // Set last_activity in session
+        $request->session()->put('last_activity', time());
+
         $this->clearLoginAttempts($request);
 
         if ($request->filled('remember')) {
             auth()->guard()->login(auth()->user(), true);
         }
 
-        $request->session()->put('last_activity', time());
-
         return $this->authenticated($request, $this->guard()->user())
-                ?: redirect()->intended($this->redirectPath());
+                    ?: redirect()->intended($this->redirectPath());
     }
 }
