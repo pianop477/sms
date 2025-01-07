@@ -94,7 +94,7 @@ class HomeController extends Controller
                                         ->orderBy('students.first_name', 'ASC')
                                         ->get();
                 $classes = Grade::where('status', '=', 1)->where('school_id', $user->school_id)->get();
-                $buses = Transport::where('status', '=', 1)->where('school_id', $user->school_id)->orderBy('driver_name', 'ASC')->get();
+                $buses = Transport::where('status', '=', 1)->where('school_id', $user->school_id)->orderBy('bus_no', 'ASC')->get();
                 return view('home', ['students' => $students, 'classes' => $classes, 'buses' => $buses]);
             }
 

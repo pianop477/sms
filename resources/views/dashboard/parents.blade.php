@@ -121,15 +121,15 @@
                                                         @enderror
                                                     </div>
                                                     <div class="col-md-4 mb-3">
-                                                        <label for="validationCustomUsername">Ruti za Mabasi  :<small class="text-sm text-danger">Chagua kama anatumia usafiri</small></label>
+                                                        <label for="validationCustomUsername">Basi Namba: <small class="text-sm text-danger">Chagua kama anatumia usafiri</small></label>
                                                         <div class="input-group">
                                                             <select name="driver" id="" class="form-control text-capitalize">
-                                                                <option value="">--Chagua ruti ya basi--</option>
+                                                                <option value="">--Chagua namba ya basi--</option>
                                                                 @if ($buses->isEmpty())
-                                                                    <option value="" class="text-danger">No School Bus Routine</option>
+                                                                    <option value="" class="text-danger">Hakuna Mabasi yaliyosajiliwa</option>
                                                                 @else
                                                                     @foreach ($buses as $bus )
-                                                                        <option value="{{$bus->id}}">{{$bus->routine}}</option>
+                                                                        <option value="{{$bus->id}}">Basi Namba {{$bus->bus_no}}</option>
                                                                     @endforeach
                                                                 @endif
                                                             </select>
@@ -170,7 +170,6 @@
                                 <thead class="text-capitalize">
                                     <tr class="">
                                         <th scope="col">Jina</th>
-                                        <th scope="col" style="width: 10px;">Jinsi</th>
                                         <th scope="col" style="width: 10px;">Darasa</th>
                                         <th scope="col" class="text-center">Vitendo</th>
                                     </tr>
@@ -181,7 +180,6 @@
                                             <td class="text-uppercase">
                                                 <a href="{{route('Students.show', $student->id)}}">{{$student->first_name. ' '.$student->middle_name.' ' .$student->last_name}}</a>
                                             </td>
-                                            <td class="text-uppercase">{{$student->gender[0]}}</td>
                                             <td class="text-uppercase">{{$student->class_code}} {{$student->group}}</td>
                                             <td>
                                                 <ul class="d-flex justify-content-center">

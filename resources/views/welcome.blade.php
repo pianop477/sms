@@ -142,8 +142,8 @@
 
   <nav class="navbar navbar-expand-lg navbar-custom navbar-dark">
     <div class="container">
-      <img src="{{ asset('assets/img/logo/shuleApp.png') }}" alt="" class="rounded-circle" style="width:50px; object-fit:cover; border-radius:50px;">
-      <a class="navbar-brand" href="{{route('welcome')}}"> ShuleApp</a>
+      <img src="{{ asset('assets/img/logo/logo.png') }}" alt="" class="rounded-circle" style="width:50px; object-fit:cover; border-radius:50px;">
+       <a class="navbar-brand" href="{{route('welcome')}}">  ShuleApp</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
