@@ -78,9 +78,9 @@
                         @foreach ($myClassTeacher as $classTeacher )
 
                         @endforeach
-                        <li class="list-group-items">Class Teacher Name:  <span class="text-uppercase font-weight-bold">{{$classTeacher->first_name}} {{$classTeacher->last_name}}</span></li>
-                        <li class="list-group-items">Teacher's Gender:  <span class="text-uppercase font-weight-bold">@if ($classTeacher->gender =='female') {{"KE"}} @else {{"ME"}} @endif</span></li>
-                        <li class="list-group-items">Teacher's Phone:  <span class="text-uppercase font-weight-bold">{{$classTeacher->phone}}</span></li>
+                        <li class="list-group-items">Teacher's Name:  <span class="text-uppercase font-weight-bold">{{$classTeacher->first_name}} {{$classTeacher->last_name}}</span></li>
+                        <li class="list-group-items">Gender:  <span class="text-uppercase font-weight-bold">@if ($classTeacher->gender =='female') {{"KE"}} @else {{"ME"}} @endif</span></li>
+                        <li class="list-group-items">Phone Number:  <span class="text-uppercase font-weight-bold">{{$classTeacher->phone}}</span></li>
                         <li class="list-group-items">Class:  <span class="text-uppercase font-weight-bold">{{$classTeacher->class_name}}</span></li>
                         <li class="list-group-items">Stream:  <span class="text-uppercase font-weight-bold">{{$classTeacher->group}}</span></li>
                     </ul>
