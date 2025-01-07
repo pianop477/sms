@@ -48,6 +48,8 @@ class LoginController extends Controller
             auth()->guard()->login(auth()->user(), true);
         }
 
+        $request->session()->put('last_activity', time());
+
         return $this->authenticated($request, $this->guard()->user())
                 ?: redirect()->intended($this->redirectPath());
     }
