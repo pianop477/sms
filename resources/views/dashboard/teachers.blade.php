@@ -520,8 +520,8 @@
                                                 <td class="text-uppercase text-center">{{ $class->group }}</td>
                                                 <td>
                                                     <ul class="d-flex">
-                                                        <li class="">
-                                                            <a href="{{ route('attendance.get.form', $class->id) }}" class="btn btn-info btn-xs p-1 text-center">
+                                                        <li class="text-center">
+                                                            <a href="{{ route('attendance.get.form', $class->id) }}" class="btn btn-info btn-xs p-1">
                                                                 <i class="ti-settings"> GENERATE REPORT</i>
                                                             </a>
                                                         </li>
