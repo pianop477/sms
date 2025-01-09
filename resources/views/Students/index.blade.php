@@ -171,9 +171,9 @@
                                                     <label for="validationCustomUsername">Bus Number:<small class="text-sm text-muted">Select if using School bus</small></label>
                                                     <div class="input-group">
                                                         <select name="driver" id="validationCustomUsername" class="form-control text-uppercase">
-                                                            <option value="">-- select driver --</option>
+                                                            <option value="">-- select bus number --</option>
                                                             @if ($buses->isEmpty())
-                                                                <option value="" class="text-danger text-capitalize" disabled>No drivers records found</option>
+                                                                <option value="" class="text-danger text-capitalize" disabled>No school bus records found</option>
                                                             @else
                                                                 @foreach ($buses as $bus)
                                                                     <option value="{{$bus->id}}">Bus No. {{$bus->bus_no}}</option>
