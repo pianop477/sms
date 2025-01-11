@@ -1,6 +1,9 @@
 @extends('SRTDashboard.frame')
-
 @section('content')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
 <div class="row">
     <div class="col-12 mt-5">
         <div class="card">
@@ -139,17 +142,19 @@
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustomUsername">Parent/Guardian Name</label>
                                                     <div class="input-group">
-                                                        <select name="parent" id="validationCustomUsername" class="form-control text-uppercase" required>
+                                                        <select name="parent" id="parentSelect" class="form-control select2 text-capitalize" required>
                                                             <option value="">-- Select Parent --</option>
                                                             @if ($parents->isEmpty())
                                                                 <option value="" disabled class="text-danger text-capitalize">No parents records found</option>
                                                             @else
-                                                            @foreach ($parents as $parent)
-                                                                <option value="{{$parent->id}}" class="text-uppercase">{{$parent->first_name. ' '. $parent->last_name}}</option>
-                                                            @endforeach
+                                                                @foreach ($parents as $parent)
+                                                                    <option value="{{$parent->id}}" class="">
+                                                                        {{$parent->first_name . ' ' . $parent->last_name}}
+                                                                    </option>
+                                                                @endforeach
                                                             @endif
                                                         </select>
-                                                        @error('school')
+                                                        @error('parent')
                                                         <div class="invalid-feedback">
                                                             {{$message}}
                                                         </div>
@@ -161,7 +166,7 @@
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom01">Class Group</label>
                                                     <input type="text" name="group" required id="validationCustomUsername" class="form-control text-uppercase" placeholder="Enter Group A, B or C" id="validationCustom02" value="{{old('dob')}}" required>
-                                                    @error('dob')
+                                                    @error('group')
                                                     <div class="invalid-feedback">
                                                         {{$message}}
                                                     </div>
@@ -180,7 +185,7 @@
                                                                 @endforeach
                                                             @endif
                                                         </select>
-                                                        @error('street')
+                                                        @error('driver')
                                                         <div class="invalid-feedback">
                                                             {{$message}}
                                                         </div>
@@ -268,4 +273,13 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function() {
+            $('#parentSelect').select2({
+                placeholder: "-- Select Parent --",
+                allowClear: true,
+            });
+        });
+
+</script>
 @endsection

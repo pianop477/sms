@@ -50,6 +50,16 @@ class HomeController extends Controller
                 $classes = Grade::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
                 $subjects = Subject::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
                 $buses = Transport::where('school_id', '=', $user->school_id)->where('status', '=', 1)->get();
+                $teacherByGender = Teacher::query()
+                                ->join('users', 'users.id', '=', 'teachers.user_id')
+                                ->select(
+                                    'users.gender',
+                                    DB::raw("COUNT(*) as teacher_count")
+                                )
+                                ->where('teachers.school_id', $user->school_id)
+                                ->groupBy('users.gender')
+                                ->get();
+
                 $studentsByClass = Student::query()
                                 ->join('grades', 'grades.id', '=', 'students.class_id')
                                 ->select('grades.class_code', DB::raw('COUNT(students.id) as student_count'))
@@ -63,7 +73,18 @@ class HomeController extends Controller
                                 ->select('qualification', \DB::raw('COUNT(*) as count'))
                                 ->groupBy('qualification')
                                 ->get();
-
+                $studentsByClassAndGender = Student::query()
+                                    ->join('grades', 'grades.id', '=', 'students.class_id')
+                                    ->select(
+                                        'grades.class_code',
+                                        DB::raw("SUM(CASE WHEN students.gender = 'male' THEN 1 ELSE 0 END) as male_count"),
+                                        DB::raw("SUM(CASE WHEN students.gender = 'female' THEN 1 ELSE 0 END) as female_count")
+                                    )
+                                    ->where('students.school_id', '=', $user->school_id)
+                                    ->where('students.status', 1)
+                                    ->groupBy('grades.class_code')
+                                    ->orderBy('grades.class_code', 'ASC')
+                                    ->get();
                             // Map the results to labels for easier use in the view
                 $qualificationData = [
                                 'masters' => $teacherQualifications->firstWhere('qualification', 1)?->count ?? 0,
@@ -71,7 +92,19 @@ class HomeController extends Controller
                                 'diploma' => $teacherQualifications->firstWhere('qualification', 3)?->count ?? 0,
                                 'certificate' => $teacherQualifications->firstWhere('qualification', 4)?->count ?? 0,
                             ];
-                return view('home', compact('teachers', 'parents', 'students', 'classes', 'subjects', 'buses', 'studentsByClass', 'qualificationData'));
+
+                $chartData = [];
+                    foreach ($studentsByClassAndGender as $row) {
+                        $chartData[] = [
+                            'category' => $row->class_code . ' (Male)',
+                            'value' => $row->male_count,
+                        ];
+                    $chartData[] = [
+                        'category' => $row->class_code . ' (Female)',
+                        'value' => $row->female_count,
+                        ];
+                }
+                return view('home', compact('teachers', 'parents', 'teacherByGender', 'students', 'studentsByClass', 'classes', 'subjects', 'buses', 'chartData', 'qualificationData'));
             }
             //parents dashboard redirection ----------------------
             elseif ($user->usertype == 4 ) {
@@ -132,6 +165,15 @@ class HomeController extends Controller
                             ->where('class_teachers.school_id', '=', $teachers->school_id)
                             ->get();
 
+                $teacherByGender = Teacher::query()
+                            ->join('users', 'users.id', '=', 'teachers.user_id')
+                            ->select(
+                                'users.gender',
+                                DB::raw("COUNT(*) as teacher_count")
+                            )
+                            ->where('teachers.school_id', $user->school_id)
+                            ->groupBy('users.gender')
+                            ->get();
                     $classData = [];
                     foreach ($myClass as $class) {
                         $maleCount = Student::where('class_id', $class->class_id)
@@ -164,6 +206,24 @@ class HomeController extends Controller
                 //summary counts ------------------
                 $totalMaleStudents = Student::where('gender', '=', 'male')->where('status', 1)->where('school_id', '=', $user->school_id)->count();
                 $totalFemaleStudents = Student::where('gender', '=', 'female')->where('status', 1)->where('school_id', '=', $user->school_id)->count();
+                $studentsByClassAndGender = Student::query()
+                                    ->join('grades', 'grades.id', '=', 'students.class_id')
+                                    ->select(
+                                        'grades.class_code',
+                                        DB::raw("SUM(CASE WHEN students.gender = 'male' THEN 1 ELSE 0 END) as male_count"),
+                                        DB::raw("SUM(CASE WHEN students.gender = 'female' THEN 1 ELSE 0 END) as female_count")
+                                    )
+                                    ->where('students.school_id', '=', $user->school_id)
+                                    ->where('students.status', 1)
+                                    ->groupBy('grades.class_code')
+                                    ->orderBy('grades.class_code', 'ASC')
+                                    ->get();
+                $teacherQualifications = Teacher::where('school_id', '=', $user->school_id)
+                                ->where('status', '=', 1)
+                                ->select('qualification', \DB::raw('COUNT(*) as count'))
+                                ->groupBy('qualification')
+                                ->get();
+
                 $studentsByClass = Student::query()
                                 ->join('grades', 'grades.id', '=', 'students.class_id')
                                 ->select('grades.class_code', DB::raw('COUNT(students.id) as student_count'))
@@ -171,11 +231,6 @@ class HomeController extends Controller
                                 ->where('students.status', 1)
                                 ->groupBy('grades.class_code')
                                 ->orderBy('grades.class_code', 'ASC')
-                                ->get();
-                $teacherQualifications = Teacher::where('school_id', '=', $user->school_id)
-                                ->where('status', '=', 1)
-                                ->select('qualification', \DB::raw('COUNT(*) as count'))
-                                ->groupBy('qualification')
                                 ->get();
 
                             // Map the results to labels for easier use in the view
@@ -185,9 +240,20 @@ class HomeController extends Controller
                                 'diploma' => $teacherQualifications->firstWhere('qualification', 3)?->count ?? 0,
                                 'certificate' => $teacherQualifications->firstWhere('qualification', 4)?->count ?? 0,
                             ];
+                $chartData = [];
+                    foreach ($studentsByClassAndGender as $row) {
+                        $chartData[] = [
+                            'category' => $row->class_code . ' (Male)',
+                            'value' => $row->male_count,
+                        ];
+                    $chartData[] = [
+                        'category' => $row->class_code . ' (Female)',
+                        'value' => $row->female_count,
+                        ];
+                }
                 //end of summary -----------------
-                return view('home', compact('courses', 'myClass', 'classes', 'teachers', 'students', 'classes', 'subjects',
-                            'parents', 'buses', 'totalMaleStudents', 'totalFemaleStudents', 'classData', 'studentsByClass', 'qualificationData'));
+                return view('home', compact('courses', 'myClass', 'teacherByGender', 'classes', 'teachers', 'students', 'classes', 'subjects', 'studentsByClass',
+                            'parents', 'buses', 'totalMaleStudents', 'chartData', 'totalFemaleStudents', 'classData', 'qualificationData'));
             }
 
         }
