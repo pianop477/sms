@@ -57,6 +57,7 @@ class HomeController extends Controller
                                     DB::raw("COUNT(*) as teacher_count")
                                 )
                                 ->where('teachers.school_id', $user->school_id)
+                                ->where('teachers.status', 1)
                                 ->groupBy('users.gender')
                                 ->get();
 
@@ -172,6 +173,7 @@ class HomeController extends Controller
                                 DB::raw("COUNT(*) as teacher_count")
                             )
                             ->where('teachers.school_id', $user->school_id)
+                            ->where('teachers.status', 1)
                             ->groupBy('users.gender')
                             ->get();
                     $classData = [];
