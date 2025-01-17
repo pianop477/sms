@@ -18,7 +18,7 @@
             @elseif ($contract->status == 'pending')
                 <p class="text-capitalize alert alert-info">contract status: <strong> {{$contract->status}}</strong> | view <a href="{{route('contract.index')}}"> here</a></p>
             @else
-                <p class="text-capitalize alert alert-success">contract status: <strong>active</strong></p>
+                <p class="text-capitalize alert alert-success">contract status: <strong>active</strong> | view contract <a href="{{route('contract.index')}}"> here</a></p>
             @endif
     @endif
             <div class="row">
