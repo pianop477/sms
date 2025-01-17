@@ -119,14 +119,14 @@ class ContractController extends Controller
             return back();
         }
 
-        $filePath = asset('storage/' . $contract->application_file); // Generate public URL
+        $filePath = 'public/' . $contract->application_file; // Adjust path as needed
 
         if (!file_exists(storage_path('app/public/' . $contract->application_file))) {
             Alert::error('Error', 'The application file is missing');
             return back();
         }
 
-        return view('Contract.preview', compact('filePath'));
+        return response()->file(storage_path('app/' . $filePath));
     }
 
     public function edit($id)
@@ -286,14 +286,14 @@ class ContractController extends Controller
 
         $user = Auth::user();
 
-        $filePath = asset('storage/' . $contract->application_file); // Generate public URL
+        $filePath = 'public/' . $contract->application_file; // Adjust path as needed
 
         if (!file_exists(storage_path('app/public/' . $contract->application_file))) {
             Alert::error('Error', 'The application file is missing');
             return back();
         }
 
-        return view('Contract.preview', compact('filePath'));
+        return response()->file(storage_path('app/' . $filePath));
     }
 
     public function approveContract (Request $request, $id)
