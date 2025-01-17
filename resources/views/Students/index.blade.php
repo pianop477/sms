@@ -41,12 +41,12 @@
                                                         <option value="">--Select Class--</option>
                                                         @if ($classes->isEmpty())
                                                             <option value="" class="text-danger">No more classes found</option>
-                                                            <option value="0" class="text-success font-weight-bold" style="font-size: 20px">🎓 Graduate Class 🎉</option>
+                                                            <option value="0" class="text-success font-weight-bold" style="font-size: 15px">🎓 Graduate Class 🎉</option>
                                                         @else
                                                             @foreach ($classes as $class)
                                                                 <option value="{{$class->id}}" class="text-capitalize">{{$class->class_name}}</option>
                                                             @endforeach
-                                                            <option value="0" class="text-success font-weight-bold" style="font-size: 20px">🎓 Graduate Class 🎉</option>
+                                                            <option value="0" class="text-success font-weight-bold" style="font-size: 15px">🎓 Graduate Class 🎉</option>
                                                         @endif
                                                     </select>
                                                     @error('name')
