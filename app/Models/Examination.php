@@ -12,5 +12,5 @@ class Examination extends Model
         'exam_type', 'school_id', 'status',
     ];
 
-    protected $guarded = ['id'];
+    protected $guarded = ['id', 'created_at', 'updated_at'];
 }

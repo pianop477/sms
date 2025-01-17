@@ -16,7 +16,7 @@ class Parents extends Model
         'status'
     ];
 
-    protected $guarded = ['id'];
+    protected $guarded = ['id', 'created_at', 'updated_at'];
 
     /**
      * Get all of the students for the Parents

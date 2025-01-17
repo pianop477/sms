@@ -24,7 +24,7 @@ class Student extends Model
         'status'
     ];
 
-    protected $guarded = ['id'];
+    protected $guarded = ['id', 'created_at', 'updated_at'];
 
     /**
      * Get the user that owns the Student
