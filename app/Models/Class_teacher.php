@@ -13,5 +13,5 @@ class Class_teacher extends Model
         'teacher_id', 'class_id', 'group', 'school_id'
     ];
 
-    protected $guarded = ['id'];
+    protected $guarded = ['id', 'created_at', 'updated_at'];
 }

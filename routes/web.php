@@ -3,6 +3,7 @@ use App\Exports\StudentsExport;
 use App\Exports\TeachersExport;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\ClassesController;
+use App\Http\Controllers\ContractController;
 use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\HomeController;
@@ -136,191 +137,214 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1')->group(function () {
         });
 
         //manage parents informations ================================================================================
-    Route::middleware(['ManagerOrTeacher'])->group(function () {
-        // Route::resource('Parents', ParentsController::class);
-        Route::get('Parents', [ParentsController::class, 'showAllParents'])->name('Parents.index');
-        Route::post('Register-parents', [ParentsController::class, 'registerParents'])->name('Parents.store');
-        Route::put('{parent}/Update-teachers-status', [ParentsController::class, 'updateStatus'])->name('Update.parents.status');
-        Route::put('{parent}/Restore-parents-status', [ParentsController::class, 'restoreStatus'])->name('restore.parents.status');
-        Route::put('{parent}/Delete-permanent', [ParentsController::class, 'deleteParent'])->name('Parents.remove');
-        Route::get('{parent}/Edit-parents', [ParentsController::class, 'editParent'])->name('Parents.edit');
-        Route::put('{parents}/Update-parents', [ParentsController::class, 'updateParent'])->name('Parents.update');
-    });
-
-    Route::middleware(['CheckUsertype:1,2,3,4'])->group(function () {
-        Route::prefix('Profile-management')->group(function () {
-            Route::get('Change-password', [HomeController::class, 'changepassword'])->name('change.password');
-            Route::post('Change-password', [HomeController::class, 'storePassword'])->name('change.new.password');
-            Route::get('Persona-details', [HomeController::class, 'showProfile'])->name('show.profile');
-            Route::put('{user}/Personal-details', [HomeController::class, 'updateProfile'])->name('update.profile');
-        });
-    });
-
-    //parents its self manage its students individually ====================================================
-    Route::middleware(['CheckUsertype:4'])->group(function () {
-        Route::get('Register-student', [StudentsController::class, 'parentByStudent'])->name('parent.student.registration');
-        Route::post('Register-students', [StudentsController::class, 'registerStudent'])->name('register.student');
-    });
-
-    //free role routes for edit students
-    Route::get('{student}/Edit-student', [StudentsController::class, 'modify'])->name('students.modify');
-    Route::put('{students}/Update-student', [StudentsController::class, 'updateRecords'])->name('students.update.records');
-
-    //access students information ===========================================================================
-    Route::middleware(['CheckUsertype:2,3,4'])->group(function () {
-        Route::get('{student}/Show-Students', [StudentsController::class, 'showRecords'])->name('Students.show');
-    });
-
-    //assign class teachers======================================================================================
-    Route::middleware(['CheckUsertype:3'])->group(function () {
-        Route::middleware('CheckRoleType:3')->group(function () {
-            Route::get('{teacher}/Edit', [RolesController::class, 'edit'])->name('roles.edit');
-            Route::put('{classTeacher}/Update-class-teacher', [RolesController::class, 'update'])->name('roles.update.class.teacher');
-            Route::get('{teacher}/Delete', [RolesController::class, 'destroy'])->name('roles.destroy');
-        });
-    });
-
-    //assign class teacher ===========
-   Route::middleware(['CheckUsertype:3'])->group(function () {
-        Route::middleware('CheckRoleType:2,3')->group(function () {
-            Route::post('{classes}/Assign-Teacher', [RolesController::class, 'store'])->name('Class.teacher.assign');
-        });
-   });
-
-    //teacher manager attendance .......................======================================================
-    Route::middleware(['CheckUsertype:3'])->group(function() {
-        Route::middleware('CheckRoleType:4')->group(function () {
-            Route::get('{class}/Student-list', [AttendanceController::class, 'index'])->name('get.student.list');
-            Route::post('{student_class}/Create-Attendance', [AttendanceController::class, 'store'])->name('store.attendance');
-            Route::get('{class}/Class-attendance', [AttendanceController::class, 'teacherAttendance'])->name('teachers.show.attendance');
-            Route::get('{class}/Download-Attendance-PDF', [AttendanceController::class, 'downloadAttendancePDF'])->name('download.attendance.pdf');
-            Route::get('{class}/Generate-attendance-report', [AttendanceController::class, 'getFormReport'])->name('attendance.get.form');
-            Route::get('{student_class}/Today-summary-report', [AttendanceController::class, 'todayAttendance'])->name('today.attendance');
-            Route::post('{classTeacher}/Generate-attendance-report', [AttendanceController::class, 'generateReport'])->name('attendance.generate.report');
-        });
-    });
-
-    //parents view attendance of specific student============================================================
-    Route::middleware(['CheckUsertype:4'])->group(function() {
-        Route::get('Student-attendance/{student}/{year}', [AttendanceController::class, 'show'])->name('students.show.attendance');
-        Route::get('{student}/Attendance-year', [AttendanceController::class, 'attendanceYear'])->name('attendance.byYear');
-    });
-
-    Route::middleware(['CheckUsertype:3'])->group(function() {
-        Route::middleware('CheckRoleType:1,3,4')->group(function () {
-            Route::get('{id}/Prepare', [ExamController::class, 'prepare'])->name('score.prepare.form');
-            Route::post('Examination-result-create', [ExamController::class, 'captureValues'])->name('score.captured.values');
-            Route::post('Upload/results', [ExamController::class, 'storeScore'])->name('exams.store.score');
-            Route::get('/Results-saved', [ExamController::class, 'savedDataForm'])->name('form.saved.values');
-            //teachers  examination results =============================
-            Route::get('course{id}/Results', [ExamController::class, 'courseResults'])->name('results_byCourse');
-            Route::get('/Results/course{course}/&year{year}', [ExamController::class, 'resultByYear'])->name('results.byYear');
-            Route::get('/Results/course{course}/&year{year}/&examination{examType}', [ExamController::class, 'resultByExamType'])->name('results.byExamType');
-            Route::get('/Results/course{course}/&year{year}/&examination{examType}/{month}', [ExamController::class, 'resultByMonth'])->name('results.byMonth');
-        });
-    });
-
-    //access this routes for subjects if the usertype as manager of school head teacher only ==========
-    Route::middleware(['ManagerOrTeacher'])->group(function () {
-        Route::get('View-all', [CoursesController::class, 'index'])->name('courses.index');
-        Route::get('{id}/Class-courses', [CoursesController::class, 'classCourses'])->name('courses.view.class');
-        Route::get('{id}/Delete-course', [CoursesController::class, 'deleteCourse'])->name('courses.delete');
-        Route::put('{id}/Block', [CoursesController::class, 'blockCourse'])->name('courses.block');
-        Route::put('{id}/Unblock', [CoursesController::class, 'unblockCourse'])->name('courses.unblock');
-        Route::get('{id}/Assign-teacher', [CoursesController::class, 'assign'])->name('courses.assign');
-        Route::put('{id}/Assigned-teacher', [CoursesController::class, 'assignedTeacher'])->name('courses.assigned.teacher');
-        //view class teachers-----------------------
-        Route::get('{class}/Class-Teacher', [RolesController::class, 'index'])->name('Class.Teachers');
-        Route::put('{id}/Block-assigned-class-course', [CoursesController::class, 'blockAssignedCourse'])->name('block.assigned.course');
-        Route::put('{id}/Unblock-assigned-class-course', [CoursesController::class, 'unblockAssignedCourse'])->name('unblock.assigned.course');
-
-    });
-    //end of condition =================================================================================
-
-    //anothe routes for registering examination and this is performed by academic only ============================
-    Route::middleware(['CheckUsertype:3'])->group(function () {
-        Route::middleware('CheckRoleType:3')->group(function () {
-            Route::post('/Examination-type/Register', [ExamController::class, 'store'])->name('exams.store');
-            Route::get('{exam}/Examination-type/Delete', [ExamController::class, 'destroy'])->name('exams.destroy');
-            Route::put('{exam}/Examination-type/Block', [ExamController::class, 'blockExams'])->name('exams.block');
-            Route::put('{exam}/Examination-type/Unblock', [ExamController::class, 'unblockExams'])->name('exams.unblock');
-            Route::get('{exam}/Examination-type/Edit', [ExamController::class, 'edit'])->name('exams.type.edit');
-            Route::put('{exams}/Examination-type/Update', [ExamController::class, 'update'])->name('exams.update');
-        });
-    });
-    //manage examination results in general schools ========================================================
-    Route::middleware(['ManagerOrTeacher'])->group(function () {
-        // view examination lists =========================================================================
-        Route::get('Examination-test', [ExamController::class, 'index'])->name('exams.index');
-        //end or examination lists =======================================================================
-        Route::get('General-results/{school}', [ResultsController::class, 'general'])->name('results.general');
-        Route::get('General-results/{school}/year/{year}', [ResultsController::class, 'classesByYear'])->name('results.classesByYear');
-        Route::get('General-results/{school}/year/{year}/class/{class}', [ResultsController::class, 'examTypesByClass'])->name('results.examTypesByClass');
-        Route::get('General-results/{school}/year/{year}/class/{class}/exam-type/{examType}/months', [ResultsController::class, 'monthsByExamType'])->name('results.monthsByExamType');
-        Route::get('General-results/{school}/year/{year}/class/{class}/exam-type/{examType}/month/{month}', [ResultsController::class, 'resultsByMonth'])->name('results.resultsByMonth');
-    });
-    //end of condition ===========================================================================================
-
-    //error page routes redirection==================================
-    Route::get('Error', [UsersController::class, 'errorPage'])->name('error.page');
-
-    //results viewing by parents routes redirection ==================================================================
-    Route::middleware(['CheckUsertype:4'])->group(function () {
-        Route::get('Exam-results/Student/{student}', [ResultsController::class, 'index'])->name('results.index');
-        Route::get('Result-type/Student/{student}/Year/{year}', [ResultsController::class, 'resultByType'])->name('result.byType');
-        // For displaying months
-        Route::get('Result-months/Student/{student}/Year/{year}/Type/{exam_type}', [ResultsController::class, 'resultByMonth'])->name('result.byMonth');
-        Route::get('Results/Student/{student}/Year/{year}/Exam-type/{type}/Month/{month}', [ResultsController::class, 'viewStudentResult'])->name('results.student.get');
-        Route::get('student/{id}/Courses-list', [CoursesController::class, 'viewStudentCourses'])->name('student.courses.list');
-
-    });
-    //End of condition ==============================================================================================
-
-    //delete students records =======================================================================================
-    Route::middleware(['GeneralMiddleware'])->group(function () {
-        //reset users passwords =====================================================================================
-        Route::prefix('User-management')->group(function () {
-            Route::get('Password-Reset', [RolesController::class, 'userPassword'])->name('users.lists');
-            Route::put('{user}/Reset', [RolesController::class, 'resetPassword'])->name('users.reset.password');
+        Route::middleware(['ManagerOrTeacher'])->group(function () {
+            // Route::resource('Parents', ParentsController::class);
+            Route::get('Parents', [ParentsController::class, 'showAllParents'])->name('Parents.index');
+            Route::post('Register-parents', [ParentsController::class, 'registerParents'])->name('Parents.store');
+            Route::put('{parent}/Update-teachers-status', [ParentsController::class, 'updateStatus'])->name('Update.parents.status');
+            Route::put('{parent}/Restore-parents-status', [ParentsController::class, 'restoreStatus'])->name('restore.parents.status');
+            Route::put('{parent}/Delete-permanent', [ParentsController::class, 'deleteParent'])->name('Parents.remove');
+            Route::get('{parent}/Edit-parents', [ParentsController::class, 'editParent'])->name('Parents.edit');
+            Route::put('{parents}/Update-parents', [ParentsController::class, 'updateParent'])->name('Parents.update');
         });
 
-        //students using school bus==================================================================================
-        Route::get('{trans}/Student-tranport', [TransportController::class, 'showStudents'])->name('students.transport');
-        // Route::resource('Transportation', TransportController::class);
-        Route::get('Transport', [TransportController::class, 'getSchoolBuses'])->name('Transportation.index');
-        Route::post('Register-transport', [TransportController::class, 'registerDrivers'])->name('Transportation.store');
-        Route::put('{trans}/Transport-block', [TransportController::class, 'update'])->name('transport.update');
-        Route::put('{trans}/Transport-unblock', [TransportController::class, 'restore'])->name('transport.restore');
-        Route::get('{trans}/Delete-permanent', [TransportController::class, 'destroy'])->name('transport.remove');
-        Route::get('{trans}/Transport-Edit', [TransportController::class, 'Edit'])->name('transport.edit');
-        Route::put('{transport}/Update', [TransportController::class, 'UpdateRecords'])->name('transport.update.records');
-        Route::get('{trans}/Export-transport', [TransportController::class, 'export'])->name('transport.export');
+        Route::middleware(['CheckUsertype:1,2,3,4'])->group(function () {
+            Route::prefix('Profile-management')->group(function () {
+                Route::get('Change-password', [HomeController::class, 'changepassword'])->name('change.password');
+                Route::post('Change-password', [HomeController::class, 'storePassword'])->name('change.new.password');
+                Route::get('Persona-details', [HomeController::class, 'showProfile'])->name('show.profile');
+                Route::put('{user}/Personal-details', [HomeController::class, 'updateProfile'])->name('update.profile');
+            });
+        });
 
-        //assign new roles ==========================================================================================
-        Route::get('Update-roles', [RolesController::class, 'updateRoles'])->name('roles.updateRole');
-        Route::get('{user}/Assign-role', [RolesController::class, 'assignRole'])->name('roles.assign');
-        Route::put('{user}/Update-role', [RolesController::class, 'AssignNewRole'])->name('roles.assign.new');
-    });
+        //parents its self manage its students individually ====================================================
+        Route::middleware(['CheckUsertype:4'])->group(function () {
+            Route::get('Register-student', [StudentsController::class, 'parentByStudent'])->name('parent.student.registration');
+            Route::post('Register-students', [StudentsController::class, 'registerStudent'])->name('register.student');
+        });
 
-    Route::middleware(['ManagerOrTeacher'])->group(function() {
-        Route::put('Publish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'publishResult'])->name('publish.results');
-        Route::put('Unpublish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'unpublishResult'])->name('unpublish.results');
-        //export students records to PDF
-        Route::get('{classId}/Export-students', [StudentsController::class, 'exportPdf'])->name('export.student.pdf');
+        //free role routes for edit students
+        Route::get('{student}/Edit-student', [StudentsController::class, 'modify'])->name('students.modify');
+        Route::put('{students}/Update-student', [StudentsController::class, 'updateRecords'])->name('students.update.records');
 
-        //register school courses/manage all
-        Route::post('Register-courses', [CoursesController::class, 'addCourse'])->name('course.registration');
-        Route::get('{id}/Edit-courses', [CoursesController::class, 'editCourse'])->name('course.edit');
-        Route::put('{id}/Update-courses', [CoursesController::class, 'updateCourse'])->name('course.update');
-        Route::post('Assign-class-course', [CoursesController::class, 'assignClassCourse'])->name('course.assign');
+        //access students information ===========================================================================
+        Route::middleware(['CheckUsertype:2,3,4'])->group(function () {
+            Route::get('{student}/Show-Students', [StudentsController::class, 'showRecords'])->name('Students.show');
+        });
 
-    });
-    //end of condition =========================================================================================
+        //assign class teachers======================================================================================
+        Route::middleware(['CheckUsertype:3'])->group(function () {
+            Route::middleware('CheckRoleType:3')->group(function () {
+                Route::get('{teacher}/Edit', [RolesController::class, 'edit'])->name('roles.edit');
+                Route::put('{classTeacher}/Update-class-teacher', [RolesController::class, 'update'])->name('roles.update.class.teacher');
+                Route::get('{teacher}/Delete', [RolesController::class, 'destroy'])->name('roles.destroy');
+            });
+        });
 
-     //generate /export teachers excel template====================
-        Route::get('/teachers/export', function () {
-            return Excel::download(new TeachersExport, 'teachers.xlsx');
-        })->name('teachers.excel.export');
-        Route::get('/teachers/pdf', [TeachersController::class, 'export'])->name('teachers.pdf.export');
+        //assign class teacher ===========
+        Route::middleware(['CheckUsertype:3'])->group(function () {
+                Route::middleware('CheckRoleType:2,3')->group(function () {
+                    Route::post('{classes}/Assign-Teacher', [RolesController::class, 'store'])->name('Class.teacher.assign');
+                });
+        });
+
+        //teacher manager attendance .......................======================================================
+        Route::middleware(['CheckUsertype:3'])->group(function() {
+            Route::middleware('CheckRoleType:4')->group(function () {
+                Route::get('{class}/Student-list', [AttendanceController::class, 'index'])->name('get.student.list');
+                Route::post('{student_class}/Create-Attendance', [AttendanceController::class, 'store'])->name('store.attendance');
+                Route::get('{class}/Class-attendance', [AttendanceController::class, 'teacherAttendance'])->name('teachers.show.attendance');
+                Route::get('{class}/Download-Attendance-PDF', [AttendanceController::class, 'downloadAttendancePDF'])->name('download.attendance.pdf');
+                Route::get('{class}/Generate-attendance-report', [AttendanceController::class, 'getFormReport'])->name('attendance.get.form');
+                Route::get('{student_class}/Today-summary-report', [AttendanceController::class, 'todayAttendance'])->name('today.attendance');
+                Route::post('{classTeacher}/Generate-attendance-report', [AttendanceController::class, 'generateReport'])->name('attendance.generate.report');
+            });
+        });
+
+        //parents view attendance of specific student============================================================
+        Route::middleware(['CheckUsertype:4'])->group(function() {
+            Route::get('Student-attendance/{student}/{year}', [AttendanceController::class, 'show'])->name('students.show.attendance');
+            Route::get('{student}/Attendance-year', [AttendanceController::class, 'attendanceYear'])->name('attendance.byYear');
+        });
+
+        Route::middleware(['CheckUsertype:3'])->group(function() {
+            Route::middleware('CheckRoleType:1,3,4')->group(function () {
+                Route::get('{id}/Prepare', [ExamController::class, 'prepare'])->name('score.prepare.form');
+                Route::post('Examination-result-create', [ExamController::class, 'captureValues'])->name('score.captured.values');
+                Route::post('Upload/results', [ExamController::class, 'storeScore'])->name('exams.store.score');
+                Route::get('/Results-saved', [ExamController::class, 'savedDataForm'])->name('form.saved.values');
+                //teachers  examination results =============================
+                Route::get('course{id}/Results', [ExamController::class, 'courseResults'])->name('results_byCourse');
+                Route::get('/Results/course{course}/&year{year}', [ExamController::class, 'resultByYear'])->name('results.byYear');
+                Route::get('/Results/course{course}/&year{year}/&examination{examType}', [ExamController::class, 'resultByExamType'])->name('results.byExamType');
+                Route::get('/Results/course{course}/&year{year}/&examination{examType}/{month}', [ExamController::class, 'resultByMonth'])->name('results.byMonth');
+            });
+        });
+
+        //access this routes for subjects if the usertype as manager of school head teacher only ==========
+        Route::middleware(['ManagerOrTeacher'])->group(function () {
+            Route::get('View-all', [CoursesController::class, 'index'])->name('courses.index');
+            Route::get('{id}/Class-courses', [CoursesController::class, 'classCourses'])->name('courses.view.class');
+            Route::get('{id}/Delete-course', [CoursesController::class, 'deleteCourse'])->name('courses.delete');
+            Route::put('{id}/Block', [CoursesController::class, 'blockCourse'])->name('courses.block');
+            Route::put('{id}/Unblock', [CoursesController::class, 'unblockCourse'])->name('courses.unblock');
+            Route::get('{id}/Assign-teacher', [CoursesController::class, 'assign'])->name('courses.assign');
+            Route::put('{id}/Assigned-teacher', [CoursesController::class, 'assignedTeacher'])->name('courses.assigned.teacher');
+            //view class teachers-----------------------
+            Route::get('{class}/Class-Teacher', [RolesController::class, 'index'])->name('Class.Teachers');
+            Route::put('{id}/Block-assigned-class-course', [CoursesController::class, 'blockAssignedCourse'])->name('block.assigned.course');
+            Route::put('{id}/Unblock-assigned-class-course', [CoursesController::class, 'unblockAssignedCourse'])->name('unblock.assigned.course');
+
+        });
+        //end of condition =================================================================================
+
+        //anothe routes for registering examination and this is performed by academic only ============================
+        Route::middleware(['CheckUsertype:3'])->group(function () {
+            Route::middleware('CheckRoleType:3')->group(function () {
+                Route::post('/Examination-type/Register', [ExamController::class, 'store'])->name('exams.store');
+                Route::get('{exam}/Examination-type/Delete', [ExamController::class, 'destroy'])->name('exams.destroy');
+                Route::put('{exam}/Examination-type/Block', [ExamController::class, 'blockExams'])->name('exams.block');
+                Route::put('{exam}/Examination-type/Unblock', [ExamController::class, 'unblockExams'])->name('exams.unblock');
+                Route::get('{exam}/Examination-type/Edit', [ExamController::class, 'edit'])->name('exams.type.edit');
+                Route::put('{exams}/Examination-type/Update', [ExamController::class, 'update'])->name('exams.update');
+            });
+        });
+        //manage examination results in general schools ========================================================
+        Route::middleware(['ManagerOrTeacher'])->group(function () {
+            // view examination lists =========================================================================
+            Route::get('Examination-test', [ExamController::class, 'index'])->name('exams.index');
+            //end or examination lists =======================================================================
+            Route::get('General-results/{school}', [ResultsController::class, 'general'])->name('results.general');
+            Route::get('General-results/{school}/year/{year}', [ResultsController::class, 'classesByYear'])->name('results.classesByYear');
+            Route::get('General-results/{school}/year/{year}/class/{class}', [ResultsController::class, 'examTypesByClass'])->name('results.examTypesByClass');
+            Route::get('General-results/{school}/year/{year}/class/{class}/exam-type/{examType}/months', [ResultsController::class, 'monthsByExamType'])->name('results.monthsByExamType');
+            Route::get('General-results/{school}/year/{year}/class/{class}/exam-type/{examType}/month/{month}', [ResultsController::class, 'resultsByMonth'])->name('results.resultsByMonth');
+        });
+        //end of condition ===========================================================================================
+
+        //error page routes redirection==================================
+        Route::get('Error', [UsersController::class, 'errorPage'])->name('error.page');
+
+        //results viewing by parents routes redirection ==================================================================
+        Route::middleware(['CheckUsertype:4'])->group(function () {
+            Route::get('Exam-results/Student/{student}', [ResultsController::class, 'index'])->name('results.index');
+            Route::get('Result-type/Student/{student}/Year/{year}', [ResultsController::class, 'resultByType'])->name('result.byType');
+            // For displaying months
+            Route::get('Result-months/Student/{student}/Year/{year}/Type/{exam_type}', [ResultsController::class, 'resultByMonth'])->name('result.byMonth');
+            Route::get('Results/Student/{student}/Year/{year}/Exam-type/{type}/Month/{month}', [ResultsController::class, 'viewStudentResult'])->name('results.student.get');
+            Route::get('student/{id}/Courses-list', [CoursesController::class, 'viewStudentCourses'])->name('student.courses.list');
+
+        });
+        //End of condition ==============================================================================================
+
+        //delete students records =======================================================================================
+        Route::middleware(['GeneralMiddleware'])->group(function () {
+            //reset users passwords =====================================================================================
+            Route::prefix('User-management')->group(function () {
+                Route::get('Password-Reset', [RolesController::class, 'userPassword'])->name('users.lists');
+                Route::put('{user}/Reset', [RolesController::class, 'resetPassword'])->name('users.reset.password');
+            });
+
+            //students using school bus==================================================================================
+            Route::get('{trans}/Student-tranport', [TransportController::class, 'showStudents'])->name('students.transport');
+            // Route::resource('Transportation', TransportController::class);
+            Route::get('Transport', [TransportController::class, 'getSchoolBuses'])->name('Transportation.index');
+            Route::post('Register-transport', [TransportController::class, 'registerDrivers'])->name('Transportation.store');
+            Route::put('{trans}/Transport-block', [TransportController::class, 'update'])->name('transport.update');
+            Route::put('{trans}/Transport-unblock', [TransportController::class, 'restore'])->name('transport.restore');
+            Route::get('{trans}/Delete-permanent', [TransportController::class, 'destroy'])->name('transport.remove');
+            Route::get('{trans}/Transport-Edit', [TransportController::class, 'Edit'])->name('transport.edit');
+            Route::put('{transport}/Update', [TransportController::class, 'UpdateRecords'])->name('transport.update.records');
+            Route::get('{trans}/Export-transport', [TransportController::class, 'export'])->name('transport.export');
+
+            //assign new roles ==========================================================================================
+            Route::get('Update-roles', [RolesController::class, 'updateRoles'])->name('roles.updateRole');
+            Route::get('{user}/Assign-role', [RolesController::class, 'assignRole'])->name('roles.assign');
+            Route::put('{user}/Update-role', [RolesController::class, 'AssignNewRole'])->name('roles.assign.new');
+        });
+
+        Route::middleware(['ManagerOrTeacher'])->group(function() {
+            Route::put('Publish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'publishResult'])->name('publish.results');
+            Route::put('Unpublish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'unpublishResult'])->name('unpublish.results');
+            //export students records to PDF
+            Route::get('{classId}/Export-students', [StudentsController::class, 'exportPdf'])->name('export.student.pdf');
+
+            //register school courses/manage all
+            Route::post('Register-courses', [CoursesController::class, 'addCourse'])->name('course.registration');
+            Route::get('{id}/Edit-courses', [CoursesController::class, 'editCourse'])->name('course.edit');
+            Route::put('{id}/Update-courses', [CoursesController::class, 'updateCourse'])->name('course.update');
+            Route::post('Assign-class-course', [CoursesController::class, 'assignClassCourse'])->name('course.assign');
+
+        });
+        //end of condition =========================================================================================
+
+        //generate /export teachers excel template====================
+            Route::get('/teachers/export', function () {
+                return Excel::download(new TeachersExport, 'teachers.xlsx');
+            })->name('teachers.excel.export');
+            Route::get('/teachers/pdf', [TeachersController::class, 'export'])->name('teachers.pdf.export');
+
+            //contract application =====================
+
+            Route::middleware(['CheckUsertype:3'])->group(function() {
+                Route::middleware(['CheckRoleType:1,2,3,4'])->group(function() {
+                    Route::get('Contract-application', [ContractController::class, 'index'])->name('contract.index');
+                    Route::post('Contract-submission', [ContractController::class, 'store'])->name('contract.store');
+                    Route::get('{id}/Preview-application', [ContractController::class, 'previewMyApplication'])->name('preview.my.application');
+                    Route::get('{id}/Edit-contract-application', [ContractController::class, 'edit'])->name('contract.edit');
+                    Route::put('{id}/Update-contract-application', [ContractController::class, 'update'])->name('contract.update');
+                    Route::get('{id}/Delete-contract-application', [ContractController::class, 'destroy'])->name('contract.destroy');
+                    Route::get('{id}/Download-approved-contract', [ContractController::class, 'downloadContract'])->name('contract.download');
+                });
+            });
+
+            Route::middleware(['ManagerOrTeacher'])->group(function() {
+                Route::get('Contracts-management', [ContractController::class, 'contractManager'])->name('contract.management');
+                Route::get('{id}/Admin-preview-file', [ContractController::class, 'adminPreviewFile'])->name('contract.admin.preview');
+                Route::put('{id}/Approve-contract', [ContractController::class, 'approveContract'])->name('contract.approval');
+                Route::put('{id}/Reject-contract', [ContractController::class, 'rejectContract'])->name('contract.rejection');
+                Route::get('year/{year}/Contracts-group', [ContractController::class, 'contractByMonths'])->name('contract.by.months');
+                Route::get('year/{year}/month/{month}/All-approved-contract', [ContractController::class, 'getAllApprovedContract'])->name('contract.approved.all');
+            });
     });
 });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\class_learning_courses;
 use App\Models\Class_teacher;
+use App\Models\Contract;
 use App\Models\Grade;
 use App\Models\Parents;
 use App\Models\school;
@@ -12,6 +13,7 @@ use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\Transport;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -61,6 +63,19 @@ class HomeController extends Controller
                                 ->groupBy('users.gender')
                                 ->get();
 
+                $today = Carbon::today();
+                $attendanceData = DB::table('attendances')
+                                                    ->select('attendance_status', DB::raw('count(*) as count'))
+                                                    ->where('school_id', $user->school_id)
+                                                    ->whereDate('attendance_date', $today)
+                                                    ->groupBy('attendance_status')
+                                                    ->get();
+
+                $attendanceCounts = [
+                                    'present' => $attendanceData->where('attendance_status', 'present')->pluck('count')->first() ?? 0,
+                                    'absent' => $attendanceData->where('attendance_status', 'absent')->pluck('count')->first() ?? 0,
+                                    'permission' => $attendanceData->where('attendance_status', 'permission')->pluck('count')->first() ?? 0,
+                                ];
                 $studentsByClass = Student::query()
                                 ->join('grades', 'grades.id', '=', 'students.class_id')
                                 ->select('grades.class_code', DB::raw('COUNT(students.id) as student_count'))
@@ -69,6 +84,10 @@ class HomeController extends Controller
                                 ->groupBy('grades.class_code')
                                 ->orderBy('grades.class_code', 'ASC')
                                 ->get();
+
+                $totalMaleStudents = Student::where('gender', '=', 'male')->where('status', 1)->where('school_id', '=', $user->school_id)->count();
+                $totalFemaleStudents = Student::where('gender', '=', 'female')->where('status', 1)->where('school_id', '=', $user->school_id)->count();
+
                 $teacherQualifications = Teacher::where('school_id', '=', $user->school_id)
                                 ->where('status', '=', 1)
                                 ->select('qualification', \DB::raw('COUNT(*) as count'))
@@ -105,7 +124,7 @@ class HomeController extends Controller
                         'value' => $row->female_count,
                         ];
                 }
-                return view('home', compact('teachers', 'parents', 'teacherByGender', 'students', 'studentsByClass', 'classes', 'subjects', 'buses', 'chartData', 'qualificationData'));
+                return view('home', compact('teachers', 'attendanceCounts', 'today', 'parents', 'totalMaleStudents', 'totalFemaleStudents', 'teacherByGender', 'students', 'studentsByClass', 'classes', 'subjects', 'buses', 'chartData', 'qualificationData'));
             }
             //parents dashboard redirection ----------------------
             elseif ($user->usertype == 4 ) {
@@ -134,7 +153,26 @@ class HomeController extends Controller
 
             //teachers dashboard redirection ---------------------------------------------------------
             elseif ($user->usertype == 3) {
+                $today = Carbon::today();
+                $attendanceData = DB::table('attendances')
+                                    ->select('attendance_status', DB::raw('count(*) as count'))
+                                    ->where('school_id', $user->school_id)
+                                    ->whereDate('attendance_date', $today)
+                                    ->groupBy('attendance_status')
+                                    ->get();
+
+                $attendanceCounts = [
+                    'present' => $attendanceData->where('attendance_status', 'present')->pluck('count')->first() ?? 0,
+                    'absent' => $attendanceData->where('attendance_status', 'absent')->pluck('count')->first() ?? 0,
+                    'permission' => $attendanceData->where('attendance_status', 'permission')->pluck('count')->first() ?? 0,
+                ];
+
+                // return $attendanceCounts;
+
                 $teachers = Teacher::where('user_id', $user->id)->first();
+
+                //check for contract status
+                $contract = Contract::where('teacher_id', $teachers->id)->first();
 
                 //return class teachers course assigned-------------------
                 $courses = class_learning_courses::query()
@@ -254,7 +292,7 @@ class HomeController extends Controller
                         ];
                 }
                 //end of summary -----------------
-                return view('home', compact('courses', 'myClass', 'teacherByGender', 'classes', 'teachers', 'students', 'classes', 'subjects', 'studentsByClass',
+                return view('home', compact('courses', 'contract', 'attendanceCounts', 'today', 'myClass', 'teacherByGender', 'classes', 'teachers', 'students', 'classes', 'subjects', 'studentsByClass',
                             'parents', 'buses', 'totalMaleStudents', 'chartData', 'totalFemaleStudents', 'classData', 'qualificationData'));
             }
 

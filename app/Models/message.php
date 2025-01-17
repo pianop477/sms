@@ -13,5 +13,5 @@ class message extends Model
         'name', 'email', 'message'
     ];
 
-    protected $guard = ['id'];
+    protected $guarded = ['id', 'created_at', 'updated_at'];
 }

@@ -46,7 +46,7 @@
                                 </ul>
                             </li>
                             <li>
-                                <a href="{{route('attendance.fill.form')}}"><i class="ti-notepad"></i><span> Attendance Report</span></a>
+                                <a href="{{route('attendance.fill.form')}}"><i class="ti-notepad"></i><span> Attendance Reports</span></a>
                             </li>
                             <li>
                                 <a href="javascript:void(0)"><i class="ti-stats-up"></i><span>Exams & Results</span></a>
@@ -58,8 +58,9 @@
                             <li>
                                 <a href="javascript:void(0)"><i class="fa fa-cogs"></i><span>Advanced</span></a>
                                 <ul class="submenu">
-                                    <li><a href="{{route('graduate.students')}}"><i class="fas fa-user-graduate"></i>Graduate Students</a></li>
-                                    <li><a href="{{route('Teachers.trashed')}}"><i class="fas fa-trash"></i>Recycle bin</a></li>
+                                    <li><a href="{{route('graduate.students')}}"><i class="fas fa-user-graduate"></i> Graduate Students</a></li>
+                                    <li><a href="{{route('contract.index')}}"><i class="fa fa-exchange-alt"></i> Contract Requests</a></li>
+                                    <li><a href="{{route('Teachers.trashed')}}"><i class="fas fa-trash"></i> Recycle bin</a></li>
                                 </ul>
                             </li>
                         @endif
@@ -81,7 +82,7 @@
                                 </ul>
                             </li>
                             <li>
-                                <a href="javascript:void(0)"><i class="ti-stats-up"></i><span>Report</span></a>
+                                <a href="javascript:void(0)"><i class="ti-stats-up"></i><span>Reports</span></a>
                                 <ul class="submenu">
                                     <li><a href="{{route('attendance.fill.form')}}"><i class="ti-notepad"></i>Attendance</a></li>
                                     <a href="{{route('Transportation.index')}}"><i class="fas fa-bus"></i><span> School Bus</span></a>
@@ -102,6 +103,14 @@
                                     <li><a href="{{route('graduate.students')}}"><i class="fas fa-user-graduate"></i>Graduate Students</a></li>
                                     <li><a href="{{route('Teachers.trashed')}}"><i class="fas fa-trash"></i>Recycle bin</a></li>
                                 </ul>
+                            </li>
+                            <li>
+                                <a href="{{route('contract.management')}}"><i class="fa fa-exchange-alt"></i><span> Manage Contracts</span></a>
+                            </li>
+                        @endif
+                        @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 1 || Auth::user()->usertype ==3 && Auth::user()->teacher->role_id == 4)
+                            <li>
+                                <a href="{{route('contract.index')}}"><i class="fa fa-exchange-alt"></i><span> Contract Requests</span></a>
                             </li>
                         @endif
                     </ul>

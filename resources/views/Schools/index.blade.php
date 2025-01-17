@@ -3,8 +3,8 @@
 @section('content')
     <div class="col-12">
         <div class="card mt-5">
-            <div class="card-title">
-                <h4 class="text-uppercase text-center">Register school school</h4>
+            <div class="card-title mt-2">
+                <h4 class="text-uppercase text-center">School registration form</h4>
             </div>
             <div class="card-body">
                 <h6 class="header-title">School's information</h6>

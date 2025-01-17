@@ -18,7 +18,7 @@
                                     ->count();
         @endphp
 
-        <div class="col-md-4 mt-5 mb-3">
+        <div class="col-md-4 mt-3 mb-3">
             <div class="card" style="background: #e176a6">
                 <div class="">
                     <div class="p-4 d-flex justify-content-between align-items-center">
@@ -35,7 +35,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mt-md-5 mb-3">
+        <div class="col-md-4 mt-md-3 mb-3">
             <div class="card" style="background: #c84fe0">
                 <div class="">
                     <div class="p-4 d-flex justify-content-between align-items-center">
@@ -52,7 +52,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mt-md-5 mb-3">
+        <div class="col-md-4 mt-md-3 mb-3">
             <div class="card" style="background: #098ddf">
                 <div class="">
                     <div class="p-4 d-flex justify-content-between align-items-center">
@@ -64,24 +64,6 @@
                                 {{count($students)}}
                             @endif
                         </h2>
-                        <ul style="font-size: 10px;">
-                            <li><span class="text-white text-sm">M:
-                                <strong>
-                                    @if ($maleStudents > 99)
-                                        100+
-                                    @else
-                                        {{$maleStudents}}
-                                    @endif
-                                </strong></span></li>
-                            <li><span class="text-white text-sm">F:
-                                <strong>
-                                    @if ($femaleStudents > 99)
-                                        100+
-                                    @else
-                                        {{$femaleStudents}}
-                                    @endif
-                                </strong></span></li>
-                        </ul>
                     </div>
                     <canvas id="" height="50"></canvas>
                 </div>
@@ -91,7 +73,7 @@
 </div>
 <div class="col-lg-12">
     <div class="row">
-        <div class="col-md-4 mt-5 mb-3">
+        <div class="col-md-4 mt-2 mb-3">
             <div class="card" style="background: #9fbc71">
                 <div class="">
                     <div class="p-4 d-flex justify-content-between align-items-center">
@@ -108,7 +90,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mt-md-5 mb-3">
+        <div class="col-md-4 mt-md-2 mb-3">
             <div class="card" style="background: #bf950a">
                 <div class="">
                     <div class="p-4 d-flex justify-content-between align-items-center">
@@ -125,7 +107,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mt-md-5 mb-3">
+        <div class="col-md-4 mt-md-2 mb-3">
             <div class="card" style="background: #329688">
                 <div class="">
                     <div class="p-4 d-flex justify-content-between align-items-center">
@@ -147,7 +129,7 @@
 <hr class="dark horizontal py-0">
 <div class="col-lg-12">
     <div class="row">
-        <div class="col-md-6 mt-5 mb-3">
+        <div class="col-md-6 mt-2 mb-3">
             <div class="card">
                 <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
                 <div id="studentChart" style="width: 100%; height: 400px;"></div>
@@ -239,7 +221,7 @@
             </div>
 
         </div>
-        <div class="col-md-6 mt-5 mb-3">
+        <div class="col-md-6 mt-2 mb-3">
             <div class="card">
                 <div id="qualificationChart" style="width: 100%; height: 400px;"></div>
 
@@ -303,35 +285,46 @@
 <hr class="dark horizontal py-0">
 <div class="col-lg-12">
     <div class="row">
-        <div class="col-md-6 mt-5 mb-3">
+        <div class="col-md-4 mt-2 mb-3">
             <div class="card">
-                <div class="card-title">
+                <div class="card-title mt-2">
                     <h6 class="text-center">Students Registration</h6>
                 </div>
-                <table class="table table-hover table-responsive-sm table-bordered table-sm" style="background: #e3d39e">
+                <table class="table table-sm table-hover table-responsive-sm table-bordered table-sm" style="background: #e3d39e">
+                    @if ($studentsByClass->isEmpty())
+                    <thead>
+                        <tr>
+                            <th>Class</th>
+                            <th>Number of Students</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="2" class="text-center">No records Available</td>
+                        </tr>
+                    </tbody>
+                    @else
                     <thead>
                         <tr class="text-center">
                             <th>Class</th>
                             @foreach ($studentsByClass as $class)
-                                <th>{{$class->class_code}}</th>
+                                <th class="text-uppercase">{{$class->class_code}}</th>
                             @endforeach
                         </tr>
                     </thead>
                     <tbody>
                         <tr class="text-center">
-                            <td>No of Students</td>
+                            <td>Number of Students</td>
                             @foreach ($studentsByClass as $class )
                                 <td>{{$class->student_count}}</td>
                             @endforeach
                         </tr>
                     </tbody>
+                    @endif
                 </table>
-            </div>
-        </div>
-        <div class="col-md-6 mt-5 mb-3">
-            <div class="card">
+                <hr class="dark horizontal py-0">
                 <div class="card-title">
-                    <h6 class="text-center">Teachers Registration</h6>
+                    <h6 class="text-center mt-2">Teachers Registration</h6>
                 </div>
                 <table class="table table-sm table-responsive-sm table-bordered table-hover" style="background: #e4abcf;">
                     <thead>
@@ -341,14 +334,176 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($teacherByGender as $teacher)
+                        @if ($teacherByGender->isEmpty())
+                        <tr>
+                            <td colspan="2" class="text-center">No records Available</td>
+                        </tr>
+                        @else
+                            @foreach ($teacherByGender as $teacher)
                             <tr class="text-center">
                                 <td>{{ ucfirst($teacher->gender) }}</td>
                                 <td>{{ $teacher->teacher_count }}</td>
                             </tr>
                         @endforeach
+                        @endif
                     </tbody>
                 </table>
+            </div>
+        </div>
+        <div class="col-md-4 mt-2 mb-3">
+            <div class="card">
+                <div class="card-title mt-2">
+                    <h6 class="text-center">Total Students</h6>
+                </div>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+                <div style="width: 280px; height: 280px; margin: 0 auto;">
+                    <canvas id="genderChart"></canvas>
+                </div>
+                <script>
+                    const totalMaleStudents = @json($totalMaleStudents);
+                    const totalFemaleStudents = @json($totalFemaleStudents);
+
+                    const ctx = document.getElementById('genderChart').getContext('2d');
+                    const genderChart = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Male Students', 'Female Students'],
+                            datasets: [{
+                                label: 'Student Gender Distribution',
+                                data: [totalMaleStudents, totalFemaleStudents],
+                                backgroundColor: [
+                                    'rgba(54, 162, 235, 0.7)', // Blue
+                                    'rgba(255, 99, 132, 0.7)'  // Red
+                                ],
+                                borderColor: [
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 99, 132, 1)'
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const label = context.label || '';
+                                            const value = context.raw || 0;
+                                            return `${label}: ${value}`;
+                                        }
+                                    }
+                                },
+                                datalabels: {
+                                    color: '#fff', // Label text color
+                                    formatter: (value, ctx) => {
+                                        return value; // Display the raw value
+                                    },
+                                    font: {
+                                        weight: 'bold',
+                                        size: 12
+                                    },
+                                    anchor: 'center', // Position inside the curve
+                                    align: 'center'
+                                }
+                            }
+                        },
+                        plugins: [ChartDataLabels] // Register the plugin
+                    });
+                </script>
+            </div>
+        </div>
+        <div class="col-lg-4 mt-2 mb-3">
+            <div class="card">
+                <div class="card-title mt-2">
+                    <h6 class="text-center">Today's Attendance Report: {{\Carbon\Carbon::parse($today)->format('d-m-Y')}}</h6>
+                </div>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+                <div style="width: 280px; height: 280px; margin: 0 auto;">
+                    @if ($attendanceCounts['present'] > 0 || $attendanceCounts['absent'] > 0 || $attendanceCounts['permission'] > 0)
+                        <canvas id="attendanceChart" width="400" height="400"></canvas>
+                    @else
+                        <p class="text-center mt-5 text-danger">No records available.</p>
+                    @endif
+
+                </div>
+                <script>
+                    (function() {
+                        // Check if attendance data exists
+                        const attendanceData = @json($attendanceCounts);
+
+                        // Ensure data exists and at least one value is greater than zero
+                        const hasData = attendanceData.present > 0 || attendanceData.absent > 0 || attendanceData.permission > 0;
+
+                        // Find the canvas element
+                        const ctxAttendance = document.getElementById('attendanceChart');
+
+                        if (ctxAttendance && hasData) { // Only proceed if canvas and data are valid
+                            const attendanceChart = new Chart(ctxAttendance.getContext('2d'), {
+                                type: 'doughnut',
+                                data: {
+                                    labels: ['Present', 'Absent', 'Permission'],
+                                    datasets: [{
+                                        label: 'Today\'s Attendance',
+                                        data: [attendanceData.present, attendanceData.absent, attendanceData.permission],
+                                        backgroundColor: [
+                                            'rgba(75, 192, 192, 0.7)', // Green for Present
+                                            'rgba(255, 99, 132, 0.7)', // Red for Absent
+                                            'rgba(255, 206, 86, 0.7)'  // Yellow for Permission
+                                        ],
+                                        borderColor: [
+                                            'rgba(75, 192, 192, 1)',
+                                            'rgba(255, 99, 132, 1)',
+                                            'rgba(255, 206, 86, 1)'
+                                        ],
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            position: 'top',
+                                        },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(context) {
+                                                    const label = context.label || '';
+                                                    const value = context.raw || 0;
+                                                    return `${label}: ${value}`;
+                                                }
+                                            }
+                                        },
+                                        datalabels: {
+                                            color: '#fff',
+                                            formatter: (value, ctxAttendance) => {
+                                                return value;
+                                            },
+                                            font: {
+                                                weight: 'bold',
+                                                size: 12
+                                            },
+                                            anchor: 'center',
+                                            align: 'center'
+                                        }
+                                    }
+                                },
+                                plugins: [ChartDataLabels] // Register the plugin
+                            });
+                        } else if (!hasData) {
+                            // Optional: Display a message if no attendance data
+                            document.getElementById('attendance-container').innerHTML = `
+                                <p class="text-center text-muted">No attendance records found for today.</p>`;
+                        }
+                    })();
+                </script>
             </div>
         </div>
     </div>

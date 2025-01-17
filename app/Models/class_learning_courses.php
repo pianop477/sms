@@ -11,5 +11,5 @@ class class_learning_courses extends Model
 
     protected $fillable = ['class_id', 'teacher_id', 'course_id', 'school_id', 'status'];
 
-    protected $guard = ['id'];
+    protected $guard = ['id', 'created_at', 'updated_at'];
 }
