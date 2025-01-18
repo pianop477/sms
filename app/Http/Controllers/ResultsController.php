@@ -122,36 +122,36 @@ class ResultsController extends Controller
             if ($result->marking_style == 1) {
                 if ($result->score >= 41) {
                     $result->grade = 'A';
-                    $result->remarks = 'Vizuri sana';
+                    $result->remarks = 'Excellent';
                 } elseif ($result->score >= 31) {
                     $result->grade = 'B';
-                    $result->remarks = 'Vizuri';
+                    $result->remarks = 'Good';
                 } elseif ($result->score >= 21) {
                     $result->grade = 'C';
-                    $result->remarks = 'Wastani';
+                    $result->remarks = 'Average';
                 } elseif ($result->score >= 11) {
                     $result->grade = 'D';
-                    $result->remarks = 'Hairidhishi';
+                    $result->remarks = 'Unsatisfactory';
                 } else {
                     $result->grade = 'E';
-                    $result->remarks = 'Ameshindwa';
+                    $result->remarks = 'Fail';
                 }
             } else {
                 if ($result->score >= 81) {
                     $result->grade = 'A';
-                    $result->remarks = 'Vizuri sana';
+                    $result->remarks = 'Excellent';
                 } elseif ($result->score >= 61) {
                     $result->grade = 'B';
-                    $result->remarks = 'Vizuri';
+                    $result->remarks = 'Good';
                 } elseif ($result->score >= 41) {
                     $result->grade = 'C';
-                    $result->remarks = 'Wastani';
+                    $result->remarks = 'Average';
                 } elseif ($result->score >= 21) {
                     $result->grade = 'D';
-                    $result->remarks = 'Hairidhishi';
+                    $result->remarks = 'Unsatisfactory';
                 } else {
                     $result->grade = 'E';
-                    $result->remarks = 'Ameshindwa';
+                    $result->remarks = 'Unsatisfactory';
                 }
             }
 
