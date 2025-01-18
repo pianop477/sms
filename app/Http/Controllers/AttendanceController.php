@@ -104,7 +104,8 @@ class AttendanceController extends Controller
 
         if (!empty($existingAttendance)) {
             Alert::error('Error', 'Attendance already taken and Submitted.');
-            return redirect()->route('get.student.list', $student_class);
+            // return redirect()->route('get.student.list', $student_class);
+            return back();
         }
 
         // Save the attendance data
