@@ -16,10 +16,10 @@
     <div class="error-area ptb--100 text-center">
         <div class="container">
             <div class="error-content p-1">
-                <h4 class="text-danger">401</h4>
-                <p class="text-danger p-3">Error! Permission Access Denied</p>
+                <h4 class="text-danger">Error</h4>
+                <p class="text-danger p-3">You Don't have Permission to Access this Resource</p>
                 <p><i class="fas fa-ban text-danger text-center" style="font-size: 2.5rem;"></i></p>
-                <a href="{{url()->previous()}}" class="btn btn-sm"><i class="ti-angle-double-left"></i> Go Back</a>
+                <a href="{{url()->previous()}}" class="btn btn-xs"><i class="ti-angle-double-left"></i> Go Back</a>
             </div>
         </div>
     </div>
