@@ -144,6 +144,10 @@ This page is displayed once if user want to perform a certain request which the 
 In general the middleware set rules for user to access a certain request in this program, and once the validation for this middleware fails it return error as show here below;
 ![image](https://github.com/user-attachments/assets/d47c94c5-860c-45cc-881b-d0ad2015ad4e)
 
+##BEEM API DOCS
+API KEY = 947863ca54be8767
+SECRET KEY = YjJhZjcyYmIxNzllNDlmMDhiOTFkNzRlMTUyN2IwNDdiN2NhYWEyNGNiYWE5MjhhYmViMjRhZGQwMzc4MjRjOA==
+
 ## CONTACT
 
 For any suggestion you can contact me through the following alternatives;
