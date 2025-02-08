@@ -243,7 +243,7 @@
                 <table class="table results">
                     <thead>
                         <tr>
-                            <th>Admission No.</th>
+                            <th>Reg No.</th>
                             <th style="" class="">sex</th>
                             <th style="">Student Name</th>
                             @foreach ($results->groupBy('course_id')->keys() as $courseId)
@@ -273,16 +273,16 @@
                     </tbody>
                 </table>
                 <div class="final-summary">
-                    <table class="table results" style="width:80%">
+                    <table class="table results" style="width:100%">
                         <tr>
                             <th colspan="5">SUBJECTWISE PERFORMANCE</th>
                         </tr>
                         <tr style="">
-                            <th style="text-transform: uppercase">Subject Name</th>
-                            <th style="text-transform: uppercase">Subject code</th>
-                            <th style="text-align:center">Subject average</th>
-                            <th style="text-align:center">subjects ranking</th>
-                            <th style="text-align:center">subject grade</th>
+                            <th style="text-transform: capitalize">Subject Name</th>
+                            <th style="text-transform: capitalize">code</th>
+                            <th style="text-align:center">average</th>
+                            <th style="text-align:center">position</th>
+                            <th style="text-align:center">grade</th>
                         </tr>
                         @foreach ($sortedCourses as $course)
                             <tr>
@@ -293,11 +293,11 @@
                                     @if ($course['grade']=='A')
                                         <td style="background:rgb(117, 244, 48); padding:2px 10px ">grade {{ $course['grade']}} (EXCELLENT)</td>
                                     @elseif ($course['grade']=='B')
-                                        <td style="background:rgb(12, 211, 184); padding:2px 10px ">grade {{ $course['grade']}} (GOOD)</td>
+                                        <td style="background:rgb(12, 211, 184); padding:2px 10px ">grade {{ $course['grade']}} (VERY GOOD)</td>
                                     @elseif ($course['grade']=='C')
                                         <td style="background:rgb(237, 220, 113); padding:2px 10px ">grade {{ $course['grade']}} (PASS)</td>
                                     @elseif ($course['grade']=='D')
-                                        <td style="background:rgb(235, 75, 75); padding:2px 10px ">grade {{ $course['grade']}} (UNSATISFACTORY)</td>
+                                        <td style="background:rgb(235, 75, 75); padding:2px 10px ">grade {{ $course['grade']}} (POOR)</td>
                                     @else
                                         <td style="background:rgb(182, 176, 176); padding:2px 10px ">grade {{ $course['grade']}} (FAIL)</td>
                                     @endif

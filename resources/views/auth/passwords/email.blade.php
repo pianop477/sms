@@ -26,9 +26,6 @@
                             <label for="exampleInputEmail1">Email address</label>
                             <input type="email" id="exampleInputEmail1" name="email" value="{{old('email')}}">
                             <i class="ti-email"></i>
-                            @error('email')
-                            <div class="text-danger">{{$message}}</div>
-                            @enderror
                         </div>
 
                         <div class="submit-btn-area">

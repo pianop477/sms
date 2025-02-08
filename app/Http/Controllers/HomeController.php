@@ -346,14 +346,15 @@ class HomeController extends Controller
 
         public function updateProfile(Request $request, $user)
         {
+            $userData = User::findOrFail($user);
+
             $request->validate([
                 'fname' => 'required|string|max:255',
                 'lname' => 'required|string|max:255',
-                'phone' => 'required|string|min:10|max:15',
-                'image' => 'nullable|image|max:2048'
+                'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,' .$userData->phone,
+                'image' => 'nullable|image|max:512|mimes:jpg,jpeg,png'
             ]);
 
-            $userData = User::findOrFail($user);
             $userData->first_name = $request->fname;
             $userData->last_name = $request->lname;
             $userData->phone = $request->phone;

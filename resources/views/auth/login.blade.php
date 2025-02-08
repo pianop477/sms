@@ -25,11 +25,11 @@
                     @enderror
                     <div class="login-form-body">
                         <div class="form-gp">
-                            <label for="exampleInputEmail1">Email</label>
-                            <input type="email" id="exampleInputEmail1" name="email" value="{{old('email')}}">
+                            <label for="exampleInputEmail1">Email or Phone</label>
+                            <input type="text" id="exampleInputEmail1" name="username" value="{{old('username')}}">
                             <i class="ti-email"></i>
-                            @error('email')
-                            {{-- <div class="text-danger">{{$message}}</div> --}}
+                            @error('username')
+                            <div class="text-danger">{{$message}}</div>
                             @enderror
                         </div>
                         <div class="form-gp">

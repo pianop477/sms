@@ -167,7 +167,6 @@ class ExamController extends Controller
             // Check for duplicate records
             $existingRecord = Examination_result::where('student_id', $studentId)
                                             ->where('course_id', $courseId)
-                                            ->where('exam_type_id', $examTypeId)
                                             ->whereMonth('exam_date', Carbon::parse($examDate)->month)
                                             ->exists();
 

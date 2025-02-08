@@ -71,7 +71,7 @@ class TeachersController extends Controller
             'email' => 'required|string|email|unique:users,email',
             'gender' => 'required|string|max:255',
             'dob' => 'required|date|date_format:Y-m-d',
-            'phone' => 'required|string|min:10|max:15',
+            'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone',
             'qualification' => 'required|integer|max:20',
             'street' => 'required|string|max:255',
             'joined' => 'required|date_format:Y',
@@ -81,7 +81,6 @@ class TeachersController extends Controller
         $user = Auth::user();
 
         $existingRecords = User::where('phone', $request->phone)
-                    ->where('first_name', $request->fname)
                     ->where('school_id', Auth::user()->school_id)
                     ->exists();
 
@@ -181,6 +180,10 @@ class TeachersController extends Controller
 
      public function updateTeachers(Request $request, $teachers)
      {
+         // Find teacher and user
+         $teacher = Teacher::findOrFail($teachers);
+         $user = User::findOrFail($teacher->user_id);
+
         try {
             // Log the start of the method
 
@@ -189,18 +192,13 @@ class TeachersController extends Controller
                 'fname' => 'required|string|max:255',
                 'lname' => 'required|string|max:255',
                 'dob' => 'required|date|date_format:Y-m-d',
-                'phone' => 'required|string|min:10|max:15',
+                'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,'.$user->phone,
                 'qualification' => 'required|integer|max:20',
                 'street' => 'required|string|max:255',
                 'gender' => 'required|max:20',
                 'joined_at' => 'required|date_format:Y',
                 'image' => 'nullable|image|max:2048',
             ]);
-
-
-            // Find teacher and user
-            $teacher = Teacher::findOrFail($teachers);
-            $user = User::findOrFail($teacher->user_id);
 
             // Update user
             $user->first_name = $request->fname;

@@ -14,6 +14,7 @@ use App\Http\Controllers\ResultsController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SchoolsController;
 use App\Http\Controllers\SendMessageController;
+use App\Http\Controllers\SmsController;
 use App\Http\Controllers\StudentsController;
 use App\Http\Controllers\SubjectsController;
 use App\Http\Controllers\TeachersController;
@@ -50,8 +51,8 @@ Auth::routes();
 
 // User registration controller redirection ===================================================================
     Route::prefix('Register')->group(function () {
-        Route::get('Users', [UsersController::class, 'index'])->name('users.form');
-        Route::post('Users', [UsersController::class, 'create'])->name('users.create');
+        Route::get('Parents', [UsersController::class, 'index'])->name('users.form');
+        Route::post('Parents', [UsersController::class, 'create'])->name('users.create');
     });
 //end of condition ===========================================================================================
 //any user to send message as feedback ==============================
@@ -146,6 +147,13 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1')->group(function () {
             Route::put('{parent}/Delete-permanent', [ParentsController::class, 'deleteParent'])->name('Parents.remove');
             Route::get('{parent}/Edit-parents', [ParentsController::class, 'editParent'])->name('Parents.edit');
             Route::put('{parents}/Update-parents', [ParentsController::class, 'updateParent'])->name('Parents.update');
+
+            //send sms to specific class
+            Route::get('Send-messages-by-class', [SmsController::class, 'smsForm'])->name('sms.form');
+            Route::post('Send-sms', [SmsController::class, 'sendSms'])->name('send.sms');
+
+            //send sms results to parents
+            Route::post('Send-results-sms/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/student/{student}', [ResultsController::class, 'sendResultSms'])->name('sms.results');
         });
 
         Route::middleware(['CheckUsertype:1,2,3,4'])->group(function () {
@@ -306,8 +314,14 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1')->group(function () {
         Route::middleware(['ManagerOrTeacher'])->group(function() {
             Route::put('Publish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'publishResult'])->name('publish.results');
             Route::put('Unpublish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'unpublishResult'])->name('unpublish.results');
+            //delete results if not necessary
+            Route::get('Delete-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'deleteResults'])->name('delete.results');
             //export students records to PDF
             Route::get('{classId}/Export-students', [StudentsController::class, 'exportPdf'])->name('export.student.pdf');
+            //post compiled results to the database table
+            Route::post('Submit-compiled-results/school/{school}/year/{year}/class/{class}', [ResultsController::class, 'saveCompiledResults'])->name('submit.compiled.results');
+            Route::get('Individual-student-reports/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'individualStudentReports'])->name('individual.student.reports');
+            Route::get('Download-individual-report/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/student/{student}', [ResultsController::class, 'downloadIndividualReport'])->name('download.individual.report');
 
             //register school courses/manage all
             Route::post('Register-courses', [CoursesController::class, 'addCourse'])->name('course.registration');

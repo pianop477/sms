@@ -31,10 +31,20 @@
                                         </a>
                                     </td>
                                     <td>
+                                        <a href="{{route('individual.student.reports', ['school' => $school, 'year' => $year, 'examType' => $examType, 'class' => $class, 'month' => $month])}}" class="float-right btn btn-primary btn-xs">
+                                            Students
+                                        </a>
+                                    </td>
+                                    <td>
                                         <label class="switch float-right">
                                             <input type="checkbox" class="toggle-status" data-school="{{ $school->id }}" data-year="{{ $year }}" data-class="{{ $class->id }}" data-exam-type="{{ $examType }}" data-month="{{ $month }}" {{ $firstResult->status == 2 ? 'checked' : '' }}>
                                             <span class="slider round"></span>
                                         </label>
+                                    </td>
+                                    <td>
+                                        <a href="{{route('delete.results', ['school' => $school->id, 'year' => $year, 'class' => $class->id, 'examType' => $examType, 'month' => $month])}}" class="float-right btn btn-danger btn-xs" onclick="return confirm('Are you sure you want to delete this results?')">
+                                            Delete
+                                        </a>
                                     </td>
                                 </tr>
                             @endforeach
