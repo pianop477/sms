@@ -20,11 +20,11 @@ class UsersController extends Controller
     }
 
     public function create(Request $req) {
-        $req->validate([
+        $this->validate($req, [
             'fname' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
-            'email' => 'required|string|unique:users,email',
-            'phone' => 'required|string|min:10|max:255',
+            'email' => 'nullable|string|unique:users,email',
+            'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone',
             'gender' => 'required|string|max:255',
             'school' => 'required|integer|exists:schools,id',
             'password' => 'required|min:8',
@@ -33,7 +33,7 @@ class UsersController extends Controller
             'street' => 'required|string|max:255',
         ]);
 
-        $parentExists = User::where('phone', $req->phone)->where('first_name', $req->fname)->exists();
+        $parentExists = User::where('phone', $req->phone)->where('school_id', $req->school)->exists();
         if($parentExists) {
             Alert::error('Error', 'This accounts already exists');
             return back();
@@ -109,9 +109,9 @@ class UsersController extends Controller
         $validator = Validator::make($request->all(), [
             'fname' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
+            'email' => 'nullable|email|unique:users,email',
             'gender' => 'required|string|max:10',
-            'phone' => 'required|string|min:10|max:15',
+            'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone',
             'password' => 'string|min:8',
         ]);
 

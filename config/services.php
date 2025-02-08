@@ -31,4 +31,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'beem' => [
+        'api_key' => env('BEEM_API_KEY'),
+        'secret_key' => env('BEEM_SECRET_KEY'),
+        'sms_url' => env('BEEM_SMS_URL'),
+        'sender_id' => env('BEEM_SENDER_ID'),
+    ],
+
 ];

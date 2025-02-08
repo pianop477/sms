@@ -179,11 +179,11 @@
             }
             if($averageGrade == 'C') {
                 $bgColor = 'rgb(237, 220, 113)';
-                $comment = 'Average';
+                $comment = 'Pass';
             }
             if($averageGrade == 'D') {
                 $bgColor = 'rgb(235, 75, 75)';
-                $comment = 'Unsatisfactory';
+                $comment = 'Poor';
             }
             if($averageGrade == 'E') {
                 $bgColor = 'rgb(182, 176, 176)';
@@ -199,7 +199,7 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th style="text-align:center">Admission No.</th>
+                <th style="text-align:center">Reg No.</th>
                 <th>Student Name</th>
                 <th style="text-align:center">Gender</th>
                 <th style="text-align:center">Stream</th>

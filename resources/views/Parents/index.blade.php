@@ -17,16 +17,18 @@
                             <div class="modal-dialog modal-lg">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title">Parents Registration Form</h5>
+                                        <h5 class="modal-title"> Parents Registration Form</h5>
                                         <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                     </div>
                                     <div class="modal-body">
                                         <form class="needs-validation" novalidate="" action="{{route('Parents.store')}}" method="POST" enctype="multipart/form-data">
                                             @csrf
+                                            <p class="text-danger">A. Parent or Guardian Information</p>
+                                            <hr class="dark horizontal py-0">
                                             <div class="form-row">
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom01">First name</label>
-                                                    <input type="text" name="fname" class="form-control" id="validationCustom01" placeholder="First name" value="{{old('fname')}}" required="">
+                                                    <input type="text" name="fname" class="form-control" id="validationCustom01" placeholder="Parent First name" value="{{old('fname')}}" required="">
                                                     @error('fname')
                                                     <div class="invalid-feedback">
                                                         {{$message}}
@@ -35,7 +37,7 @@
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom02">Last name</label>
-                                                    <input type="text" name="lname" class="form-control" id="validationCustom02" placeholder="Last name" required="" value="{{old('lname')}}">
+                                                    <input type="text" name="lname" class="form-control" id="validationCustom02" placeholder="Parent Last name" required="" value="{{old('lname')}}">
                                                     @error('lname')
                                                     <div class="invalid-feedback">
                                                        {{$message}}
@@ -48,7 +50,7 @@
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text" id="inputGroupPrepend">@</span>
                                                         </div>
-                                                        <input type="email" name="email" class="form-control" id="validationCustomUsername" placeholder="Email ID" aria-describedby="inputGroupPrepend" required="" value="{{old('email')}}">
+                                                        <input type="email" name="email" class="form-control" id="validationCustomUsername" placeholder="Parent Email address " aria-describedby="inputGroupPrepend" value="{{old('email')}}">
                                                         @error('email')
                                                         <div class="invalid-feedback">
                                                             {{$message}}
@@ -61,7 +63,7 @@
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom01">Gender</label>
                                                     <select name="gender" id="validationCustom01" class="form-control text-capitalize" required>
-                                                        <option value="">-- select gender --</option>
+                                                        <option value="">-- select Parent gender --</option>
                                                         <option value="male">male</option>
                                                         <option value="female">female</option>
                                                     </select>
@@ -73,7 +75,7 @@
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom02">Mobile Phone</label>
-                                                    <input type="text" name="phone" class="form-control" id="validationCustom02" placeholder="Phone Number" required="" value="{{old('phone')}}">
+                                                    <input type="text" name="phone" class="form-control" id="validationCustom02" placeholder="Parent Phone Number" required="" value="{{old('phone')}}">
                                                     @error('phone')
                                                     <div class="invalid-feedback">
                                                        {{$message}}
@@ -83,7 +85,7 @@
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustomUsername">Street/Village</label>
                                                     <div class="input-group">
-                                                        <input type="text" name="street" class="form-control" id="validationCustom02" value="{{old('street')}}" placeholder="Street Address">
+                                                        <input type="text" name="street" class="form-control" id="validationCustom02" value="{{old('street')}}" placeholder="Parent Street Address" required>
                                                         @error('street')
                                                         <div class="invalid-feedback">
                                                             {{$message}}
@@ -92,6 +94,109 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <hr class="dark horizontal py-0">
+                                            <p class="text-danger">B. Student Information</p>
+                                            <hr class="dark horizontal py-0">
+                                            <div class="form-row">
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="validationCustomerUsername">Student First name</label>
+                                                    <input type="text" name="student_first_name" class="form-control" id="validationCustomer02" value="{{old('student_first_name')}}" placeholder="Student First Name" required="">
+                                                    @error('student_first_name')
+                                                        <div class="invalid-feedback">{{$message}}</div>
+                                                    @enderror
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="validationCustomerUsername">Student Middle name</label>
+                                                    <input type="text" name="student_middle_name" class="form-control" id="validationCustomer02" value="{{old('student_middle_name')}}" placeholder="Student Middle Name" required="">
+                                                    @error('student_middle_name')
+                                                        <div class="invalid-feedback">{{$message}}</div>
+                                                    @enderror
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label for="validationCustomerUsername">Student Last name</label>
+                                                    <input type="text" name="student_last_name" class="form-control" id="validationCustomer02" value="{{old('student_last_name')}}" placeholder="Student Last Name" required="">
+                                                    @error('student_last_name')
+                                                        <div class="invalid-feedback">{{$message}}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="form-row">
+                                                <div class="col-md-3 mb-3">
+                                                    <label for="validationCustom01">Student Gender</label>
+                                                    <select name="student_gender" id="validationCustom01" class="form-control text-capitalize" required>
+                                                        <option value="">-- select Student gender --</option>
+                                                        <option value="male">male</option>
+                                                        <option value="female">female</option>
+                                                    </select>
+                                                    @error('student_gender')
+                                                    <div class="invalid-feedback">
+                                                        {{$message}}
+                                                    </div>
+                                                    @enderror
+                                                </div>
+                                                <div class="col-md-3 mb-3">
+                                                    <label for="validationCustomerUsername">Student Date of Birth</label>
+                                                    <input type="date" name="dob" class="form-control" id="validationCustomer02" value="{{old('dob')}}" placeholder="Student Date of Birth" required="">
+                                                    @error('dob')
+                                                        <div class="invalid-feedback">{{$message}}</div>
+                                                    @enderror
+                                                </div>
+                                                <div class="col-md-3 mb-3">
+                                                    <label for="validationCustom01">Student Class</label>
+                                                    <select name="class" id="validationCustom01" class="form-control text-capitalize" required>
+                                                        <option value="">-- select Student Class --</option>
+                                                        {{-- classes --}}
+                                                        @if ($classes->isEmpty())
+                                                            <option value="" disabled class="text-danger">No classes found</option>
+                                                        @else
+                                                            @foreach ($classes as $class )
+                                                                <option value="{{$class->id}}">{{$class->class_name}}</option>
+                                                            @endforeach
+                                                        @endif
+                                                    </select>
+                                                    @error('class')
+                                                    <div class="invalid-feedback">
+                                                        {{$message}}
+                                                    </div>
+                                                    @enderror
+                                                </div>
+                                                <div class="col-md-3 mb-3">
+                                                    <label for="validationCustomerUsername">Class Stream</label>
+                                                    <input type="text" name="group" class="form-control" id="validationCustomer02" value="{{old('dob')}}" placeholder="Class stream A, B or C" required="">
+                                                    @error('group')
+                                                        <div class="invalid-feedback">{{$message}}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="form-row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="validationCustom01">Student Bus Number</label>
+                                                    <select name="bus_no" id="validationCustom01" class="form-control text-capitalize">
+                                                        <option value="">-- select Student Bus --</option>
+                                                        {{-- bus number --}}
+                                                        @if ($buses->isEmpty())
+                                                            <option value="" class="text-danger" disabled>No buses found</option>
+                                                        @else
+                                                            @foreach ($buses as $bus )
+                                                                <option value="{{$bus->id}}">{{$bus->bus_no}}</option>
+                                                            @endforeach
+                                                        @endif
+                                                    </select>
+                                                    @error('bus_no')
+                                                    <div class="invalid-feedback">
+                                                        {{$message}}
+                                                    </div>
+                                                    @enderror
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="validationCustomerUsername">Student Photo</label>
+                                                    <input type="file" name="passport" class="form-control" id="validationCustomer02" value="{{old('dob')}}" placeholder="Student Photo">
+                                                    @error('passport')
+                                                        <div class="invalid-feedback">{{$message}}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
@@ -124,7 +229,7 @@
                                         <td class="text-capitalize">{{$parent->first_name. ' '. $parent->last_name}}</td>
                                         <td class="text-capitalize">{{$parent->gender[0]}}</td>
                                         <td>{{$parent->phone}}</td>
-                                        <td>{{$parent->email}}</td>
+                                        <td>{{$parent->email ?? 'null'}}</td>
                                         <td>
                                             @if ($parent->status ==1)
                                                 <span class="badge bg-success text-white">{{_('Active')}}</span>

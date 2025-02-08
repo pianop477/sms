@@ -57,6 +57,7 @@ class CoursesController extends Controller
                                     ->select('users.first_name', 'users.last_name', 'teachers.*')
                                     ->orderBy('users.first_name')
                                     ->where('teachers.school_id', $class->school_id)
+                                    ->whereIn('role_id', [1,3,4])
                                     ->get();
         return view('Courses.index', compact('classCourse', 'class', 'courses', 'teachers'));
      }

@@ -42,17 +42,24 @@ class SchoolsController extends Controller
             $request->validate([
                 'name' => 'required|string|max:255',
                 'reg_no' => 'required|string|max:255',
-                'logo' => 'image|max:4096',
+                'logo' => 'image|max:1024|mimes:png,jpg,jpeg',
                 'postal' => 'required|string|max:255',
                 'postal_name' => 'required|string|max:255',
                 'country' => 'required|string',
                 'fname' => 'required|string|max:255',
                 'lname' => 'required|string|max:255',
-                'email' => 'required|string|unique:users,email',
-                'phone' => 'required|string|min:10|max:15',
+                'email' => 'nullable|string|unique:users,email',
+                'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone',
                 'gender' => 'required|string|max:255',
             ]);
 
+            //check if exists
+            $schoolExists = school::where('school_reg_no', $request->reg_no)->exists();
+
+            if($schoolExists) {
+                Alert::error('Error', 'This school already exists');
+                return back();
+            }
             //store schools information
             $school = new school();
             $school->school_name = $request->name;
@@ -165,7 +172,7 @@ class SchoolsController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'reg_no' => 'required|string|max:255',
-            'logo' => 'image|max:4096',
+            'logo' => 'image|max:1024|mimes:png,jpg,jpeg',
             'postal' => 'required|string|max:255',
             'postal_name' => 'required|string|max:255',
             'country' => 'required|string'

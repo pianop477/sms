@@ -41,12 +41,12 @@ class TransportController extends Controller
             $request->validate([
                 'fullname' => 'required|string|max:255',
                 'gender' => 'string|required|max:255',
-                'phone' => 'required|string|min:10|max:15',
+                'phone' => 'required|regex:/^[0-9]{10}$/|unique:transports,phone',
                 'bus' => 'required|string|max:255',
                 'routine' => 'required|string|max:255',
             ]);
 
-            $existingRecord = Transport::where('bus_no', $request->bus)
+            $existingRecord = Transport::where('phone', $request->phone)
                                         ->where('school_id', Auth::user()->school_id)
                                         ->exists();
 
@@ -137,15 +137,15 @@ class TransportController extends Controller
 
     public function UpdateRecords(Request $request, $transport)
     {
+        $trans = Transport::findOrFail($transport);
         try {
             $request->validate([
                 'fullname' => 'required|string|max:255',
                 'gender' => 'required|string|max:255',
-                'phone' => 'required|string|min:10|max:15',
+                'phone' => 'required|regex:/^[0-9]{10}$/|unique:transports,phone,'.$trans->phone,
                 'bus_no' => 'required|string|max|255',
                 'routine' => 'required|string|max:255'
             ]);
-            $trans = Transport::findOrFail($transport);
             $trans->driver_name = $request->fullname;
             $trans->gender = $request->gender;
             $trans->phone = $request->phone;

@@ -201,7 +201,7 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th class="text-center" style="text-align: center">Admission No</th>
+                                <th class="text-center" style="text-align: center">Reg No</th>
                                 <th>Student's Name</th>
                                 <th class="text-center" style="text-align:center">Gender</th>
                                 <th class="text-center" style="text-align:center">Stream</th>

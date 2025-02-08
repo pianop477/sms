@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 // use GuzzleHttp\Psr7\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 class LoginController extends Controller
 {
     /*
@@ -38,20 +40,37 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-    protected function sendLoginResponse(Request $request)
+    public function username()
     {
-        $request->session()->regenerate();
+        $login = request()->input('username');
+        return filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+    }
 
-        // Set last_activity in session
-        $request->session()->put('last_activity', time());
+    public function login(Request $request)
+    {
+        $this->validate($request, [
+            'username' => 'required|string',
+            'password' => 'required|string',
+        ]);
 
-        $this->clearLoginAttempts($request);
+        $loginType = $this->username();
 
-        if ($request->filled('remember')) {
-            auth()->guard()->login(auth()->user(), true);
+        $credentials = [
+            $loginType => $request->username,
+            'password' => $request->password,
+        ];
+
+        if(Auth::attempt($credentials, $request->remember)) {
+            $request->session()->regenerate();
+
+            //set active session
+            $request->session()->put('last_activity', time());
+
+            $this->clearLoginAttempts($request);
+
+            return redirect()->intended($this->redirectPath());
         }
 
-        return $this->authenticated($request, $this->guard()->user())
-                    ?: redirect()->intended($this->redirectPath());
+        return back()->with('error', 'Invalid credentials');
     }
 }

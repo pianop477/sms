@@ -195,7 +195,7 @@
                 <table class="table table-bordered table-hover">
                     <thead>
                         <th style="width: 5px">#</th>
-                        <th class="text-center" style="text-align: center">Admission No</th>
+                        <th class="text-center" style="text-align: center">Reg No</th>
                         <th>Student Name</th>
                         <th style="width: 10px" style="text-align: center" class="text-center">Gender</th>
                         <th style="width: 10px" style="text-align: center" class="text-center">Stream</th>
