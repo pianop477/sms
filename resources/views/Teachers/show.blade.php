@@ -17,7 +17,7 @@
           <h5 class="mb-1">
             <span class="text-capitalize">{{$teachers->first_name. ' '. $teachers->last_name}}</span>
             <p class="mb-2">
-                Member ID: <span class="text-uppercase">{{$teachers->school_reg_no.'/'.$teachers->joined.'/'. $teachers->member_id}}</span>
+                Member ID: <span class="text-uppercase">{{$teachers->member_id}}</span>
             </p>
           </h5>
           <p class="mb-0 font-weight-normal text-sm"> Qualification:
@@ -83,7 +83,7 @@
             <div class="form-row">
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom01">Date of Birth</label>
-                    <input type="date" name="dob" class="form-control text-capitalize" value="{{$teachers->dob}}" required>
+                    <input type="date" name="dob" class="form-control text-capitalize" value="{{$teachers->dob}}" required min="{{\Carbon\Carbon::now()->subYears(50)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(18)->format('Y-m-d')}}">
                     @error('dob')
                     <div class="invalid-feedback">
                         {{$message}}

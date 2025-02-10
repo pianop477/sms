@@ -87,6 +87,15 @@ class TransportController extends Controller
     {
         //
         $transport = Transport::findOrFail($trans);
+
+        //check for existing students in this bus routine
+
+        $hasStudents = Student::where('transport_id', $transport->id)->where('status', 1)->where('graduated', 0)->exists();
+
+        if($hasStudents) {
+            Alert::info('Info', 'This school bus already have active students, cannot be blocked');
+            return back();
+        }
         $transport->status = $request->input('status', 0);
         $transport->save();
         if($transport) {
@@ -115,7 +124,7 @@ class TransportController extends Controller
         // abort(404);
         $transport = Transport::findOrFail($trans);
 
-        $hasStudentTake = Student::where('transport_id', $transport->id)->where('status', 1)->count();
+        $hasStudentTake = Student::where('transport_id', $transport->id)->where('status', 1)->where('graduated', 0)->count();
 
         if($hasStudentTake > 0) {
             Alert::info('Info', 'Cannot delete this route because they have active students');

@@ -112,7 +112,7 @@
                                             <div class="form-row">
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom01">Date of Birth</label>
-                                                    <input type="date" required name="dob" class="form-control" id="validationCustom02" value="{{old('dob')}}" required>
+                                                    <input type="date" required name="dob" class="form-control" id="validationCustom02" value="{{old('dob')}}" required min="{{\Carbon\Carbon::now()->subYears(50)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(18)->format('Y-m-d')}}">
                                                     @error('dob')
                                                     <div class="invalid-feedback">
                                                         {{$message}}

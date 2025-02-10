@@ -132,7 +132,7 @@
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom02">Date of Birth</label>
-                                                    <input type="date" required id="customDatePicker" name="dob" class="form-control" id="validationCustom02" placeholder="Enter your birth date" required="" value="{{old('dob')}}">
+                                                    <input type="date" required id="customDatePicker" name="dob" class="form-control" id="validationCustom02" placeholder="Enter your birth date" required="" value="{{old('dob')}}" min="{{\Carbon\Carbon::now()->subYears(14)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(2)->format('Y-m-d')}}">
                                                     @error('dob')
                                                     <div class="invalid-feedback">
                                                        {{$message}}

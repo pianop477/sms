@@ -23,8 +23,17 @@
                         </div>
                         @enderror
                     </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="validationCustom01">Symbolic Abbreviation</label>
+                        <input type="text" name="abbreviation" class="form-control text-uppercase" id="validationCustom01" placeholder="Examination Abbreviation" value="{{ $exam->symbolic_abbr}}" required="">
+                        @error('abbreviation')
+                        <div class="invalid-feedback">
+                            {{$message}}
+                        </div>
+                        @enderror
+                    </div>
                 </div>
-                <button class="btn btn-primary" type="submit">Update</button>
+                <button class="btn btn-success float-right" type="submit">Save Changes</button>
             </form>
         </div>
     </div>

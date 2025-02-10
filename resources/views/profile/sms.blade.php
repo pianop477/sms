@@ -1,7 +1,7 @@
 @extends('SRTDashboard.frame')
 @section('content')
 <div class="col-12">
-    <div class="card mt-5 col-10">
+    <div class="card mt-5 col-12">
         <div class="card-body">
             <h4 class="header-title text-center">Send Announcement Via SMS</h4>
             @if (session('error'))

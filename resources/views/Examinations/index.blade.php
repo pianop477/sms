@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="row">
-    <div class="col-9 mt-5">
+    <div class="col-12 mt-5">
         <div class="card">
             <div class="card-body">
                 <div class="row">
@@ -33,6 +33,15 @@
                                                     </div>
                                                     @enderror
                                                 </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="validationCustom01">Symbolic Abbreviation</label>
+                                                    <input type="text" name="abbreviation" class="form-control text-uppercase" id="validationCustom01" placeholder="Examination Abbreviation" value="{{old('abbreviation')}}" required="">
+                                                    @error('abbreviation')
+                                                    <div class="invalid-feedback">
+                                                        {{$message}}
+                                                    </div>
+                                                    @enderror
+                                                </div>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
@@ -53,6 +62,7 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Examination Type</th>
+                                    <th scope="col" class="text-center">symbolic abbreviation</th>
                                     <th scope="col" class="text-center">Status</th>
                                     {{-- @if (Route::has(['exams.block', 'exams.destroy', 'exams.edit', 'exams.unblock', 'exams.update'])) --}}
                                     <th scope="col" class="text-center">Action</th>
@@ -63,6 +73,7 @@
                                 <tr>
                                     <td>{{$loop->iteration}}</td>
                                     <td class="text-uppercase">{{$exam->exam_type}}</td>
+                                    <td class="text-uppercase text-center">{{$exam->symbolic_abbr}}</td>
                                     <td class="text-center">
                                         @if ($exam->status ==  1)
                                             <span class="badge bg-success text-white">{{_('Open')}}</span>

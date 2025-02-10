@@ -53,7 +53,7 @@ class ExamController extends Controller
         $term = session()->get('term');
         $markingStyle = session()->get('marking_style');
 
-        $students = Student::where('class_id', $classId)->where('status', 1)->orderBy('first_name', 'ASC')->get();
+        $students = Student::where('class_id', $classId)->where('status', 1)->where('graduated', 0)->orderBy('first_name', 'ASC')->get();
         $className = Grade::find($classId)->class_code;
         $courseName = Subject::find($courseId)->course_code;
         $examName = Examination::find($examTypeId)->exam_type;
@@ -203,10 +203,11 @@ class ExamController extends Controller
     {
         // abort(404);
         $request->validate([
-            'name' => 'required|string|max:255'
+            'name' => 'required|string|max:255',
+            'abbreviation' => 'required|string|max:4'
         ]);
 
-        $existingRecords = Examination::where('exam_type', '=', $request->name)->where('school_id', '='. Auth::user()->school_id)->exists();
+        $existingRecords = Examination::where('exam_type', '=', $request->name)->where('symbolic_abbr', $request->abbreviation)->where('school_id', '='. Auth::user()->school_id)->exists();
         if($existingRecords) {
             Alert::error('Error!', 'The Examination type already Exists');
             return back();
@@ -214,6 +215,7 @@ class ExamController extends Controller
 
         $exams = new Examination();
         $exams->exam_type = $request->name;
+        $exams->symbolic_abbr = $request->abbreviation;
         $exams->school_id = Auth::user()->school_id;
         $exams->save();
         Alert::success('Success!', 'Exmination test Saved successfully');
@@ -247,11 +249,13 @@ class ExamController extends Controller
     public function update(Request $request, $exams)
     {
         $request->validate([
-            'name' => 'required|string|max:255'
+            'name' => 'required|string|max:255',
+            'abbreviation' => 'required|string|max:4'
         ]);
 
         $exam = Examination::findOrFail($exams);
         $exam->exam_type = $request->name;
+        $exam->symbolic_abbr = $request->abbreviation;
         $exam->save();
         Alert::success('Success!', 'Examination test updated successfully');
         return redirect()->route('exams.index');

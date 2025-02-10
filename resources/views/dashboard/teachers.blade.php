@@ -7,7 +7,7 @@
 
         {{-- display contract status for head teacher --}}
         <div class="row">
-            <div class="col-8">
+            <div class="col-6">
                 @if ($contract == null)
                     <p class="alert alert-danger text-capitalize">contract status: <strong>Not applied.</strong> | please apply <a href="{{route('contract.index')}}">here</a></p>
                 @else
@@ -24,10 +24,10 @@
                     @endif
                 @endif
             </div>
-            <div class="col-4">
+            <div class="col-6">
                 <p>
                     <a href="{{route('sms.form')}}" class="float-right alert alert-primary animated-colors">
-                        <i class="ti-announcement" style="font-size: 1.2rem"></i>
+                        <i class="ti-announcement" style=""></i>
                         Public Notice
                     </a>
                 </p>
@@ -544,7 +544,7 @@
 
         {{-- check for academic contract  --}}
         <div class="row">
-            <div class="col-8">
+            <div class="col-6">
                 @if ($contract == null)
                     <p class="alert alert-danger text-capitalize">contract status: <strong>Not applied.</strong> | please apply <a href="{{route('contract.index')}}">here</a></p>
                 @else
@@ -561,10 +561,10 @@
                     @endif
                 @endif
             </div>
-            <div class="col-4">
+            <div class="col-6">
                 <p>
                     <a href="{{route('sms.form')}}" class="float-right alert alert-primary animated-colors">
-                        <i class="ti-announcement" style="font-size: 1.2rem"></i>
+                        <i class="ti-announcement" style=""></i>
                         Public Notice
                     </a>
                 </p>

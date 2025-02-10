@@ -30,7 +30,11 @@ class SmsController extends Controller
 
     public function smsForm ()
     {
-        $classes = Grade::whereIn('id', Student::select('class_id')->distinct()->pluck('class_id'))
+        $classes = Grade::where('status', 1)
+                    ->whereIn('id', Student::where('graduated', 0) // Only include students who are not graduated
+                        ->select('class_id')
+                        ->distinct()
+                        ->pluck('class_id'))
                     ->orderBy('class_code')
                     ->get();
 
@@ -64,6 +68,8 @@ class SmsController extends Controller
                 ->leftJoin('users', 'users.id', '=', 'parents.user_id')
                 ->select('students.*', 'users.phone')
                 ->where('students.school_id', $user->school_id)
+                ->where('students.graduated', 0) // Only include students who are not graduated
+                ->where('students.status', 1)
                 ->get();
         } else {
             // Fetch students and parents for the selected class
@@ -72,6 +78,8 @@ class SmsController extends Controller
                 ->leftJoin('users', 'users.id', '=', 'parents.user_id')
                 ->select('users.phone', 'students.*')
                 ->where('students.class_id', $request->class)
+                ->where('students.graduated', 0)
+                ->where('students.status', 1)
                 ->where('students.school_id', $user->school_id)
                 ->get();
         }
@@ -134,7 +142,9 @@ class SmsController extends Controller
                 ->join('parents', 'parents.id', '=', 'students.parent_id')
                 ->leftJoin('users', 'users.id', '=', 'parents.user_id')
                 ->select('students.*', 'users.phone')
+                ->where('students.status', 1)
                 ->where('students.school_id', $user->school_id)
+                ->where('students.graduated', 0)
                 ->get();
         } else {
             // Fetch students and parents for the selected class
@@ -142,6 +152,8 @@ class SmsController extends Controller
                 ->join('parents', 'parents.id', '=', 'students.parent_id')
                 ->leftJoin('users', 'users.id', '=', 'parents.user_id')
                 ->select('users.phone', 'students.*')
+                ->where('students.graduated', 0)
+                ->where('students.status', 1)
                 ->where('students.class_id', $request->class)
                 ->where('students.school_id', $user->school_id)
                 ->get();
