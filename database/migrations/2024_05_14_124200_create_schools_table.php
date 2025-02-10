@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('school_name');
             $table->string('school_reg_no');
+            $table->string('abbriv_code');
             $table->string('postal_address');
             $table->string('postal_name');
             $table->string('country');

@@ -17,7 +17,7 @@
           <h5 class="mb-1">
             <span class="text-uppercase">{{$data->first_name. ' '. $data->middle_name}}</span>
             <p class="font-weight-bold mb-3 text-sm">
-                Admission Number: <span class="text-uppercase" style="text-decoration: underline">{{$data->school_reg_no. '/'. $data->admission_number}}</span>
+                Admission Number: <span class="text-uppercase" style="text-decoration: underline">{{$data->admission_number}}</span>
             </p>
           </h5>
           Account Type: <span class="badge bg-info text-white">Student</span>

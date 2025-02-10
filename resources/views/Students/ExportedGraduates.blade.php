@@ -160,7 +160,7 @@
                                         <img src="{{public_path('assets/img/students/'. $student->image)}}" alt="" style="width: 40px;">
                                     </td>
                                 @endif
-                                <td style="text-transform: uppercase; text-align:center">{{ $student->school_reg_no . '/' . $student->admission_number }}</td>
+                                <td style="text-transform: uppercase; text-align:center">{{ $student->admission_number }}</td>
                                 <td style="text-transform: uppercase; text-align:center; width:5px;">{{ $student->gender[0] }}</td>
                                 <td style="text-transform: capitalize">{{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}</td>
                                 <td class="" style="text-transform: capitalize; font-style:italic">{{ ('Graduated') }}</td>

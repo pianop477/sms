@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Grade;
 use App\Models\Student;
 use App\Services\BeemSmsService;
+use App\Services\NextSmsService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,10 +20,12 @@ class SmsController extends Controller
     //
 
     protected $beemSmsService;
+    protected $nextSmsService;
 
-    public function __construct(BeemSmsService $beemSmsService)
+    public function __construct(BeemSmsService $beemSmsService, NextSmsService $nextSmsService)
     {
         $this->beemSmsService = $beemSmsService;
+        $this->nextSmsService = $nextSmsService;
     }
 
     public function smsForm ()
@@ -34,6 +37,8 @@ class SmsController extends Controller
         return view('profile.sms', compact('classes'));
     }
 
+
+    //send sms using beem api service***************************************************************************
     public function sendSms(Request $request, BeemSmsService $beemSmsService)
     {
         $user = Auth::user();
@@ -107,6 +112,76 @@ class SmsController extends Controller
             Alert::error('Error', $e->getMessage());
             return redirect()->back();
         }
+    }
+
+
+
+    //send sms using nextSms api service***************************************************************************
+    public function sendSmsUsingNextSms(Request $request, NextSmsService $nextSmsService)
+    {
+        $user = Auth::user();
+
+        $this->validate($request, [
+            'class' => 'nullable|required_if:send_to_all,0|integer|exists:grades,id',
+            'message_content' => 'required|string',
+        ]);
+
+        $sendToAll = $request->has('send_to_all');
+
+        if ($sendToAll) {
+            // Fetch students and parents for all classes
+            $students = Student::query()
+                ->join('parents', 'parents.id', '=', 'students.parent_id')
+                ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+                ->select('students.*', 'users.phone')
+                ->where('students.school_id', $user->school_id)
+                ->get();
+        } else {
+            // Fetch students and parents for the selected class
+            $students = Student::query()
+                ->join('parents', 'parents.id', '=', 'students.parent_id')
+                ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+                ->select('users.phone', 'students.*')
+                ->where('students.class_id', $request->class)
+                ->where('students.school_id', $user->school_id)
+                ->get();
+        }
+
+        // Check if any students were found
+        if ($students->isEmpty()) {
+            return response()->json(['error' => 'No phone numbers found for this class'], 400);
+        }
+
+        //prepare payload
+        $sender = 'N-SMS';
+        $dest = [];
+        $reference = uniqid();
+
+        // Ondoa namba zinazojirudia kwa kutumia unique()
+        $uniquePhones = $students->pluck('phone')->map(function ($phone) {
+            return $this->formatPhoneNumber($phone); // Hakikisha namba zina format sahihi
+        })->unique();
+
+        // Kujaza list ya wapokeaji
+        foreach ($uniquePhones as $phone) {
+            $dest[] = [
+                'to' => $phone,
+            ];
+        }
+
+        try {
+
+            $response = $nextSmsService->sendMultipleDestination($sender, $dest, $request->message_content, $reference);
+
+            Alert::success('Done', 'Message Sent Successfully');
+            return redirect()->back();
+        }
+        catch(Exception $e) {
+            Alert::error('Error', $e->getMessage());
+            return back();
+        }
+
+
     }
 
     /**

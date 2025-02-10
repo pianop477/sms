@@ -15,6 +15,7 @@ class school extends Model
         'postal_name',
         'country',
         'logo',
+        'abbriv_code',
         'status'
     ];
 

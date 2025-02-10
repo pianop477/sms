@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Services\BeemSmsService;
+use App\Services\NextSmsService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -15,6 +16,10 @@ class AppServiceProvider extends ServiceProvider
         //
         $this->app->singleton(BeemSmsService::class, function ($app) {
             return new BeemSmsService();
+        });
+
+        $this->app->singleton(NextSmsService::class, function($app) {
+            return new NextSmsService();
         });
     }
 

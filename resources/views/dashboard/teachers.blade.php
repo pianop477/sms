@@ -6,21 +6,48 @@
         {{-- school head teacher panel start here --}}
 
         {{-- display contract status for head teacher --}}
-        @if ($contract == null)
-            <p class="alert alert-danger text-capitalize">contract status: <strong>Not applied.</strong> | please apply <a href="{{route('contract.index')}}">here</a></p>
-        @else
-            @if($contract->status == 'expired')
-                <p class="text-capitalize alert alert-danger">contract status: <strong>{{$contract->status}}</strong></p>
-            @elseif ($contract->status == 'rejected')
-                <p class="text-capitalize alert alert-secondary">contract status: <strong>{{$contract->status}}</strong> | view <a href="{{route('contract.index')}}">here</a></p>
-            @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
-                <p class="text-capitalize alert alert-warning">contract status: <strong>expiring soon</strong></p>
-            @elseif ($contract->status == 'pending')
-                <p class="text-capitalize alert alert-info">contract status: <strong> {{$contract->status}}</strong> | view <a href="{{route('contract.index')}}"> here</a></p>
-            @else
-                <p class="text-capitalize alert alert-success">contract status: <strong>active</strong> | view contract <a href="{{route('contract.index')}}"> here</a></p>
-            @endif
-    @endif
+        <div class="row">
+            <div class="col-8">
+                @if ($contract == null)
+                    <p class="alert alert-danger text-capitalize">contract status: <strong>Not applied.</strong> | please apply <a href="{{route('contract.index')}}">here</a></p>
+                @else
+                    @if($contract->status == 'expired')
+                        <p class="text-capitalize alert alert-danger">contract status: <strong>{{$contract->status}}</strong></p>
+                        @elseif ($contract->status == 'rejected')
+                            <p class="text-capitalize alert alert-secondary">contract status: <strong>{{$contract->status}}</strong> | view <a href="{{route('contract.index')}}">here</a></p>
+                        @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
+                            <p class="text-capitalize alert alert-warning">contract status: <strong>expiring soon</strong></p>
+                        @elseif ($contract->status == 'pending')
+                            <p class="text-capitalize alert alert-info">contract status: <strong> {{$contract->status}}</strong> | view <a href="{{route('contract.index')}}"> here</a></p>
+                        @else
+                        <p class="text-capitalize alert alert-success">contract status: <strong>active</strong> | view contract <a href="{{route('contract.index')}}"> here</a></p>
+                    @endif
+                @endif
+            </div>
+            <div class="col-4">
+                <p>
+                    <a href="{{route('sms.form')}}" class="float-right alert alert-primary animated-colors">
+                        <i class="ti-announcement" style="font-size: 1.2rem"></i>
+                        Public Notice
+                    </a>
+                </p>
+            </div>
+
+            <style>
+            @keyframes colorChange {
+                0% { background-color: #007bff; } /* Primary Blue */
+                25% { background-color: #e47beb; } /* Green */
+                50% { background-color: #ffc107; } /* Yellow */
+                75% { background-color: #ef1128; } /* Red */
+                100% { background-color: #007bff; } /* Back to Blue */
+            }
+
+            .animated-colors {
+                animation: colorChange 5s infinite alternate;
+                transition: background-color 0.5s ease-in-out;
+            }
+            </style>
+        </div>
             <div class="row">
                 <div class="col-md-4 mt-3 mb-3">
                     <div class="card" style="background: #e176a6;">
@@ -516,21 +543,48 @@
         {{-- academic teacher panel start here =================== --}}
 
         {{-- check for academic contract  --}}
-        @if ($contract == null)
-            <p class="alert alert-danger text-capitalize">contract status: <strong>Not applied.</strong> | please apply <a href="{{route('contract.index')}}">here</a></p>
-        @else
-            @if($contract->status == 'expired')
-                <p class="text-capitalize alert alert-danger">contract status: <strong>{{$contract->status}}</strong></p>
-            @elseif ($contract->status == 'rejected')
-                <p class="text-capitalize alert alert-secondary">contract status: <strong>{{$contract->status}}</strong> | view <a href="{{route('contract.index')}}">here</a></p>
-            @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
-                <p class="text-capitalize alert alert-warning">contract status: <strong>expiring soon</strong></p>
-            @elseif ($contract->status == 'pending')
-                <p class="text-capitalize alert alert-info">contract status: <strong> {{$contract->status}}</strong> | view <a href="{{route('contract.index')}}"> here</a></p>
-            @else
-                <p class="text-capitalize alert alert-success">contract status: <strong>active</strong></p>
-            @endif
-    @endif
+        <div class="row">
+            <div class="col-8">
+                @if ($contract == null)
+                    <p class="alert alert-danger text-capitalize">contract status: <strong>Not applied.</strong> | please apply <a href="{{route('contract.index')}}">here</a></p>
+                @else
+                    @if($contract->status == 'expired')
+                        <p class="text-capitalize alert alert-danger">contract status: <strong>{{$contract->status}}</strong></p>
+                        @elseif ($contract->status == 'rejected')
+                            <p class="text-capitalize alert alert-secondary">contract status: <strong>{{$contract->status}}</strong> | view <a href="{{route('contract.index')}}">here</a></p>
+                        @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
+                            <p class="text-capitalize alert alert-warning">contract status: <strong>expiring soon</strong></p>
+                        @elseif ($contract->status == 'pending')
+                            <p class="text-capitalize alert alert-info">contract status: <strong> {{$contract->status}}</strong> | view <a href="{{route('contract.index')}}"> here</a></p>
+                        @else
+                        <p class="text-capitalize alert alert-success">contract status: <strong>active</strong> | view contract <a href="{{route('contract.index')}}"> here</a></p>
+                    @endif
+                @endif
+            </div>
+            <div class="col-4">
+                <p>
+                    <a href="{{route('sms.form')}}" class="float-right alert alert-primary animated-colors">
+                        <i class="ti-announcement" style="font-size: 1.2rem"></i>
+                        Public Notice
+                    </a>
+                </p>
+            </div>
+
+            <style>
+            @keyframes colorChange {
+                0% { background-color: #007bff; } /* Primary Blue */
+                25% { background-color: #e47beb; } /* Green */
+                50% { background-color: #ffc107; } /* Yellow */
+                75% { background-color: #ef1128; } /* Red */
+                100% { background-color: #007bff; } /* Back to Blue */
+            }
+
+            .animated-colors {
+                animation: colorChange 5s infinite alternate;
+                transition: background-color 0.5s ease-in-out;
+            }
+            </style>
+        </div>
             <div class="row">
                 <div class="col-md-4 mt-3 mb-3">
                     <div class="card" style="background: #e176a6">

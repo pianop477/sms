@@ -18,7 +18,7 @@
                         </div>
                         @enderror
                     </div>
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-3 mb-3">
                         <label for="validationCustom02">Registration No</label>
                         <input type="text" name="reg_no" class="form-control text-uppercase" id="validationCustom02" placeholder="Registration Number" required="" value="{{old('reg_no', $school->school_reg_no)}}">
                         @error('reg_no')
@@ -27,10 +27,19 @@
                         </div>
                         @enderror
                     </div>
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-3 mb-3">
                         <label for="validationCustom01">Postal Address</label>
                         <input type="text" name="postal" class="form-control" id="userInput validationCustom01" onblur="addPrefix()" placeholder="P.O Box 123" value="{{old('postal', $school->postal_address)}}" required="">
                         @error('postal')
+                        <div class="invalid-feedback">
+                            {{$message}}
+                        </div>
+                        @enderror
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label for="validationCustom01">Abbreviation Code</label>
+                        <input type="text" name="abbriv" class="form-control" id="userInput validationCustom01" onblur="addPrefix()" placeholder="" value="{{old('abbriv', $school->abbriv_code)}}" required="">
+                        @error('abbriv')
                         <div class="invalid-feedback">
                             {{$message}}
                         </div>
