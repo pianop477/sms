@@ -212,7 +212,7 @@
             @foreach ($results as $result)
                 <tr>
                     <td>{{$loop->iteration}}</td>
-                    <td style="text-align:center"><span style="text-transform: uppercase">{{$result->school_reg_no}}</span>/{{$result->admission_number}}</td>
+                    <td style="text-align:center"><span style="text-transform: uppercase">{{$result->admission_number}}</td>
                     <td>{{$result->first_name}} {{$result->middle_name}} {{$result->last_name}}</td>
                     <td style="text-align:center">{{$result->gender[0]}}</td>
                     <td style="text-align:center">{{$result->group}}</td>

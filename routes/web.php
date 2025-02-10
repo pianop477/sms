@@ -151,6 +151,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1')->group(function () {
             //send sms to specific class
             Route::get('Send-messages-by-class', [SmsController::class, 'smsForm'])->name('sms.form');
             Route::post('Send-sms', [SmsController::class, 'sendSms'])->name('send.sms');
+            Route::post('Send-message', [SmsController::class, 'sendSmsUsingNextSms'])->name('Send.message.byNext');
 
             //send sms results to parents
             Route::post('Send-results-sms/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/student/{student}', [ResultsController::class, 'sendResultSms'])->name('sms.results');

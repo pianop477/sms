@@ -29,6 +29,7 @@
                             <thead class="text-uppercase">
                                 <tr class="text-center">
                                     <th>#</th>
+                                    <th scope="col">Admission No</th>
                                     <th scope="col">First Name</th>
                                     <th scope="col">Middle Name</th>
                                     <th scope="col">Last Name</th>
@@ -41,6 +42,7 @@
                                 @foreach ($studentsResults as $student)
                                     <tr class="text-center">
                                         <td>{{$loop->iteration}}</td>
+                                        <td class="text-uppercase">{{$student->admission_number}}</td>
                                         <td class="text-uppercase">{{$student->first_name}}</td>
                                         <td class="text-uppercase">{{$student->middle_name}}</td>
                                         <td class="text-uppercase">{{$student->last_name}}</td>

@@ -258,7 +258,7 @@
                     <tbody>
                         @foreach ($sortedStudentsResults as $index => $studentResult)
                             <tr>
-                                <td style="text-align: center; text-transform:uppercase">{{Auth::user()->school->school_reg_no}}/{{ $studentResult['admission_number']}}</td>
+                                <td style="text-align: center; text-transform:uppercase">{{$studentResult['admission_number']}}</td>
                                 <td style="text-align: center">{{ $studentResult['gender'][0] }}</td>
                                 <td style="text-transform:capitalize">{{ $studentResult['student_name'] }}</td>
                                 @foreach ($studentResult['courses'] as $course)

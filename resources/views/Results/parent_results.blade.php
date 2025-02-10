@@ -171,7 +171,7 @@
                         @else
                             <img src="{{ $defaultImagePath }}" alt="" style="max-width: 100px; border-radius:50px;">
                         @endif
-                        <p style="text-transform: capitalize; font-size:10px;">Reg No: <span style="text-decoration: underline;">{{$results->first()->school_reg_no}}/{{ $results->first()->admission_number}}</span></p>
+                        <p style="text-transform: capitalize; font-size:10px;">Reg No: <span style="text-decoration: underline;">{{$results->first()->admission_number}}</span></p>
                     </div>
                 </div>
                 <div class="" style="border-bottom: 2px solid gray">
@@ -197,6 +197,7 @@
                         <tr>
                             <th>#</th>
                             <th>Subject</th>
+                            <th>Teacher</th>
                             <th>Code</th>
                             <th>Score</th>
                             <th>Grade</th>
@@ -209,6 +210,7 @@
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td style="text-align: left; text-transform: capitalize">{{ $result->course_name }}</td>
+                                <td style="text-transform: capitalize">{{ $result->teacher_first_name[0] }}.{{ $result->teacher_last_name }}</td>
                                 <td style="text-transform: uppercase">{{ $result->course_code }}</td>
                                 <td>{{ $result->score }}</td>
                                 <td>{{ $result->grade }}</td>

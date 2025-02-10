@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Grade;
 use App\Models\Parents;
+use App\Models\school;
 use App\Models\Student;
 use App\Models\Transport;
 use Carbon\Carbon;
@@ -131,6 +132,8 @@ class StudentsController extends Controller
         //generate uniqe student admission number randomly
     protected function getAdmissionNumber ()
     {
+        $user = Auth::user();
+        $schoolData = school::where('id', $user->school_id)->first();
         do {
             // Generate a random 4-digit number between 1000 and 9999
             $admissionNumber = mt_rand(1000, 9999);
@@ -138,7 +141,7 @@ class StudentsController extends Controller
             // Check if this admission number already exists
         } while (Student::where('admission_number', $admissionNumber)->exists());
 
-        return $admissionNumber; // Return the unique admission number
+        return $schoolData->abbriv_code.'-'.$admissionNumber; // Return the unique admission number
     }
 
     /**
@@ -255,7 +258,7 @@ class StudentsController extends Controller
                             ->leftJoin('transports', 'transports.id', '=', 'students.transport_id')
                             ->select('students.id', 'students.first_name', 'students.middle_name', 'students.admission_number', 'students.last_name', 'students.gender', 'students.dob',
                                 'transports.driver_name', 'transports.gender as driver_gender', 'transports.phone as driver_phone', 'transports.bus_no',
-                                'transports.routine', 'schools.school_reg_no')
+                                'transports.routine', 'schools.school_reg_no', 'schools.abbriv_code')
                             ->where('students.class_id', '=', $classId->id)
                             ->where('students.school_id', '=', $user->school_id)
                             ->where('students.status', 1)
@@ -317,7 +320,7 @@ class StudentsController extends Controller
 
         $GraduatedStudents = Student::query()
                                     ->join('schools', 'schools.id', '=', 'students.school_id')
-                                    ->select('students.*', 'schools.school_reg_no')
+                                    ->select('students.*', 'schools.school_reg_no', 'schools.abbriv_code')
                                     ->where('school_id', $user->school_id)
                                     ->where('students.graduated', true)
                                     ->where('students.status', 0)
@@ -334,7 +337,7 @@ class StudentsController extends Controller
 
         $studentExport = Student::query()
                                     ->join('schools', 'schools.id', '=', 'students.school_id')
-                                    ->select('students.*', 'schools.school_reg_no')
+                                    ->select('students.*', 'schools.school_reg_no', 'schools.abbriv_code')
                                     ->where('school_id', $user->school_id)
                                     ->where('students.graduated', true)
                                     ->where('students.status', 0)
@@ -358,7 +361,7 @@ class StudentsController extends Controller
                                         'students.*',
                                         'grades.class_name', 'grades.class_code',
                                         'schools.school_name', 'schools.school_reg_no', 'schools.logo', 'schools.postal_address',
-                                        'schools.postal_name', 'schools.country',
+                                        'schools.postal_name', 'schools.country', 'schools.abbriv_code',
                                         'parents.address', 'users.phone'
                                     )
                                     ->where('students.class_id', $classId)
@@ -484,7 +487,7 @@ class StudentsController extends Controller
                             'transports.driver_name as driver', 'transports.gender as driver_gender', 'transports.phone as driver_phone', 'transports.bus_no as bus_number',
                             'transports.routine as bus_routine',
                             'grades.id as grade_class_id',
-                            'schools.school_reg_no',
+                            'schools.school_reg_no', 'schools.abbriv_code'
                         )
                         ->where('students.id', '=', $student)
                         ->where('students.school_id', $user->school_id)

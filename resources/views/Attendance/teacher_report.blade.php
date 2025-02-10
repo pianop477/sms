@@ -212,7 +212,7 @@
                             @foreach ( $records as $attendance )
                             <tr>
                                 <td>{{$loop->iteration}}</td>
-                                <td class="text-center" style="text-align: center; text-transform:uppercase">{{$attendance->school_reg_no}}/{{ $attendance->admission_number }}</td>
+                                <td class="text-center" style="text-align: center; text-transform:uppercase">{{$attendance->admission_number }}</td>
                                 <td style="text-transform: capitalize">{{ $attendance->first_name }} {{$attendance->middle_name}} {{ $attendance->last_name }}</td>
                                 <td style="text-align: center; text-transform:capitalize">{{ ucfirst($attendance->gender[0]) }}</td>
                                 <td style="text-align: center; text-transform:capitalize">{{ucfirst($attendance->class_group)}}</td>

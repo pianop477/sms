@@ -98,6 +98,8 @@ class ResultsController extends Controller
             ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
             ->join('grades', 'grades.id', '=', 'examination_results.class_id')
             ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+            ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
+            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
             ->join('schools', 'schools.id', '=', 'examination_results.school_id')
             ->select(
                 'examination_results.*',
@@ -106,6 +108,7 @@ class ResultsController extends Controller
                 'subjects.course_name', 'subjects.course_code',
                 'grades.class_name', 'grades.class_code',
                 'examinations.exam_type',
+                'users.first_name as teacher_first_name', 'users.last_name as teacher_last_name',
                 'schools.school_name', 'schools.school_reg_no', 'schools.postal_address', 'schools.postal_name', 'schools.logo', 'schools.country',
             )
             ->where('examination_results.student_id', $studentId->id)
@@ -773,7 +776,7 @@ class ResultsController extends Controller
                     ->leftJoin('users', 'users.id', '=', 'parents.user_id')
                     ->select(
                         'students.id as student_id',
-                        'students.first_name', 'students.middle_name', 'students.last_name',
+                        'students.first_name', 'students.middle_name', 'students.last_name', 'students.admission_number',
                         'students.gender', 'grades.class_name', 'users.phone'
                     )
                         ->whereYear('examination_results.exam_date', $year)
@@ -803,6 +806,8 @@ class ResultsController extends Controller
                 ->join('grades', 'grades.id', '=', 'examination_results.class_id')
                 ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
                 ->join('schools', 'schools.id', '=', 'examination_results.school_id')
+                ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
+                ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
                 ->select(
                     'examination_results.*',
                     'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.admission_number',
@@ -810,6 +815,7 @@ class ResultsController extends Controller
                     'subjects.course_name', 'subjects.course_code',
                     'grades.class_name', 'grades.class_code',
                     'examinations.exam_type',
+                    'users.first_name as teacher_first_name', 'users.last_name as teacher_last_name',
                     'schools.school_name', 'schools.school_reg_no', 'schools.postal_address', 'schools.postal_name', 'schools.logo', 'schools.country',
                 )
                 ->where('examination_results.student_id', $studentId->id)

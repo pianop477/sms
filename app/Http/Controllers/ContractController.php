@@ -429,7 +429,7 @@ class ContractController extends Controller
         }
 
         $pdf = \PDF::loadView('Contract.contract_file', compact('contract'));
-        return $pdf->stream($contract->approved_at.'pdf');
+        return $pdf->stream('Report.pdf');
     }
 
 }

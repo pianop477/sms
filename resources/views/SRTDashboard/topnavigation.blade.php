@@ -13,20 +13,6 @@
             <!-- profile info & task notification -->
             <div class="col-md-6 clearfix text-md-right">
                 <div class="clearfix d-md-inline-block d-block">
-                    @if (Route::has('sms.form'))
-                        <div class="d-md-inline-block d-block mr-md-4">
-                            <ul class="notification-area">
-                                <li class="dropdown">
-                                    <i class="ti-announcement text-success dropdown-toggle" data-toggle="dropdown">
-                                        <span class="text-sm">New</span>
-                                    </i>
-                                    <div class="dropdown-menu bell-notify-box notify-box">
-                                        <span class="notify-title">Publish <a href="{{route('sms.form')}}">Public Notice</a></span>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                    @endif
                     <div class="clearfix d-md-inline-block d-block">
                         <div class="user-profile m-0">
                             {{-- <img class="avatar user-thumb" src="assets/images/author/avatar.png" alt="avatar"> --}}

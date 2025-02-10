@@ -42,6 +42,7 @@ class SchoolsController extends Controller
             $request->validate([
                 'name' => 'required|string|max:255',
                 'reg_no' => 'required|string|max:255',
+                'abbriv' => 'required|string|max:4',
                 'logo' => 'image|max:1024|mimes:png,jpg,jpeg',
                 'postal' => 'required|string|max:255',
                 'postal_name' => 'required|string|max:255',
@@ -64,6 +65,7 @@ class SchoolsController extends Controller
             $school = new school();
             $school->school_name = $request->name;
             $school->school_reg_no = $request->reg_no;
+            $school->abbriv_code = $request->abbriv;
             $school->postal_address = $request->postal;
             $school->postal_name = $request->postal_name;
             $school->country = $request->country;
@@ -173,6 +175,7 @@ class SchoolsController extends Controller
             'name' => 'required|string|max:255',
             'reg_no' => 'required|string|max:255',
             'logo' => 'image|max:1024|mimes:png,jpg,jpeg',
+            'abbriv' => 'required|string|max:4',
             'postal' => 'required|string|max:255',
             'postal_name' => 'required|string|max:255',
             'country' => 'required|string'
@@ -180,6 +183,7 @@ class SchoolsController extends Controller
 
         $schools = school::findOrFail($school);
         $schools->school_name = $request->name;
+        $schools->abbriv_code = $request->abbriv;
         $schools->school_reg_no = $request->reg_no;
         $schools->postal_address = $request->postal;
         $schools->postal_name = $request->postal_name;
