@@ -33,7 +33,7 @@
                                             <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                         </div>
                                         <div class="modal-body">
-                                            <p class="text-danger text-center text-capitalize">Please fill the form by providing correct information</p>
+                                            <p class="text-danger text-center text-capitalize">Please fill the form with valid information</p>
                                             <hr>
                                             <form class="needs-validation" novalidate="" action="{{route('register.student')}}" method="POST" enctype="multipart/form-data">
                                                 @csrf
@@ -82,7 +82,7 @@
                                                     </div>
                                                     <div class="col-md-4 mb-3">
                                                         <label for="validationCustom02">Date of Birth</label>
-                                                        <input type="date" name="dob" class="form-control" id="validationCustom02" placeholder="Student Birth Date" required="" value="{{old('dob')}}">
+                                                        <input type="date" name="dob" class="form-control" id="validationCustom02" placeholder="Student Birth Date" required="" value="{{old('dob')}}" min="{{\Carbon\Carbon::now()->subYears(14)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(2)->format('Y-m-d')}}">
                                                         @error('dob')
                                                         <div class="invalid-feedback">
                                                            {{$message}}

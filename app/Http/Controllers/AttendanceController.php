@@ -34,6 +34,7 @@ class AttendanceController extends Controller
                                 ->where('group','=', $myClass->group)
                                 ->where('status', '=', 1)
                                 ->where('school_id', '=', $user->school_id)
+                                ->where('graduated', 0)
                                 // ->orderBy('first_name', 'ASC')
                                 ->orderBy('gender', 'ASC')
                                 ->orderBy('first_name', 'ASC')
@@ -391,7 +392,7 @@ class AttendanceController extends Controller
 
 
     public function getField() {
-        $classes = Grade::where('school_id', Auth::user()->school_id)->orderBy('class_code')->get();
+        $classes = Grade::where('school_id', Auth::user()->school_id)->where('status', 1)->orderBy('class_code')->get();
         return view('Attendance.general_attendance', ['classes' => $classes]);
     }
 

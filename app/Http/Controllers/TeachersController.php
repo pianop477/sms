@@ -129,16 +129,19 @@ class TeachersController extends Controller
         }
     }
 
-    protected function getMemberId ()
+    protected function getMemberId (Request $request)
     {
+
+        $user = Auth::user();
+        $schoolData = school::find($user->school_id);
         do {
             // Generate a random 4-digit number between 1000 and 9999
-            $memberIdNumber = mt_rand(1000, 9999);
+            $memberIdNumber = mt_rand(100, 999);
 
             // Check if this admission number already exists
         } while (Teacher::where('member_id', $memberIdNumber)->exists());
 
-        return $memberIdNumber; // Return the unique admission number
+        return $schoolData->abbriv_code.'-'.$memberIdNumber; // Return the unique admission number
     }
 
     /**
