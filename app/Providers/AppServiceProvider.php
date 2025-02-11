@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Services\BeemSmsService;
 use App\Services\NextSmsService;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -28,6 +29,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // force https on production
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
     }
 }
