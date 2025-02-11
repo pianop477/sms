@@ -27,7 +27,7 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom02">From Month</label>
-                    <input type="month" name="start" class="form-control" id="validationCustom02" required value="{{old('start_date')}}">
+                    <input type="month" name="start" class="form-control" id="validationCustom02" required value="{{old('start_date')}}" max="{{\Carbon\Carbon::now()->format('Y-m')}}">
                     @error('start_date')
                     <div class="invalid-feedback">
                         {{$message}}
@@ -36,7 +36,7 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom02">To Month</label>
-                    <input type="month" name="end" class="form-control" id="validationCustom02" required value="{{old('end_date')}}">
+                    <input type="month" name="end" class="form-control" id="validationCustom02" required value="{{old('end_date')}}" max="{{\Carbon\Carbon::now()->format('Y-m')}}">
                     @error('end_date')
                     <div class="invalid-feedback">
                         {{$message}}
