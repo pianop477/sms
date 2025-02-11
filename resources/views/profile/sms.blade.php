@@ -17,7 +17,7 @@
             <form class="needs-validation" novalidate="" action="{{route('send.sms')}}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="form-row">
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label for="validationCustom01">Select Class</label>
                         <select name="class" id="validationCustom01" class="form-control text-capitalize">
                             <option value="">--Select class--</option>
@@ -39,7 +39,7 @@
                             <input type="checkbox" name="send_to_all" value="1" class=""> Send to all Classes?
                         </label>
                     </div>
-                    <div class="col-md-8 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label for="validationCustom02">Your Message</label>
                         <textarea name="message_content" id="message_content" cols="30" rows="5" class="form-control" required maxlength="160">{{ old('message_content') }}</textarea>
                         <small id="charCount" class="text-muted">160 characters remaining</small>
