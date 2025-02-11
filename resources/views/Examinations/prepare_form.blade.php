@@ -39,7 +39,7 @@
                     <!-- Exam Date -->
                     <div class="col-md-3 mb-3">
                         <label for="validationCustom02">Examination Date</label>
-                        <input type="date" name="exam_date" class="form-control" id="validationCustom02" placeholder="" required value="{{ old('exam_date') }}" min="{{\Carbon\Carbon::now()->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+                        <input type="date" name="exam_date" class="form-control" id="validationCustom02" placeholder="" required value="{{ old('exam_date') }}" min="{{\Carbon\Carbon::now()->subYears(1)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
                         @error('exam_date')
                         <div class="invalid-feedback">
                             {{ $message }}
