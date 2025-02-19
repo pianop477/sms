@@ -100,10 +100,6 @@
                                 <p><strong>Tigo Lipa Number</strong></p>
                                 <p>Merchant Acc. Number: <strong>15966786</strong></p>
                                 <p>Merchant Acc. Name: <strong>Piano Shop</strong></p>
-                                <hr>
-                                <p><strong>M - Pesa Lipa Number</strong></p>
-                                <p>Merchant Acc. Number: <strong>3391086</strong></p>
-                                <p>Merchant Acc. Name: <strong>Lipa Masaka Shop Vieyura</strong></p>
                             </div>
                         </div>
                         <hr>
