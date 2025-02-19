@@ -164,7 +164,7 @@
                                                 </li>
                                             </ul>
 
-                                            @else
+                                            @elseif($school->status == 2)
                                             <ul class="d-flex justify-content-center">
                                                 <form action="{{route('activate.status', $school->id)}}" method="POST">
                                                 @csrf
@@ -175,6 +175,12 @@
                                                         </button>
                                                     </li>
                                                 </form>
+                                                <li class="mr-3">
+                                                    <a href="{{route('schools.destroy', $school->id)}}"><i class="ti-trash text-danger" onclick="return confirm('Are you sure you want to delete school {{strtoupper($school->school_name)}}?')"></i></a>
+                                                </li>
+                                            </ul>
+                                            @else
+                                            <ul class="d-flex justify-content-center">
                                                 <li class="mr-3">
                                                     <a href="{{route('schools.destroy', $school->id)}}"><i class="ti-trash text-danger" onclick="return confirm('Are you sure you want to delete school {{strtoupper($school->school_name)}}?')"></i></a>
                                                 </li>
