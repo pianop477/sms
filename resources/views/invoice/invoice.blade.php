@@ -46,10 +46,10 @@
                                 <thead>
                                     <tr class="text-capitalize">
                                         <th class="text-center" style="width: 5%;">id</th>
-                                        <th class="text-left" style="width: 45%;">description</th>
+                                        <th class="text-left" style="">description</th>
                                         <th class="text-left">Service Time Duration</th>
                                         <th>No.Students</th>
-                                        <th style="min-width: 100px">Unit Cost</th>
+                                        <th style="">Unit Cost</th>
                                         <th>total</th>
                                     </tr>
                                 </thead>
@@ -63,7 +63,7 @@
                                         @php
                                             $total = count($students) * 3500
                                         @endphp
-                                        <td>TZS. {{number_format($total)}}</td>
+                                        <td>{{number_format($total)}}</td>
                                     </tr>
                                 </tbody>
                                 <tfoot>
