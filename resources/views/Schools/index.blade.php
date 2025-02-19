@@ -240,7 +240,7 @@
                                                                 <div class="row">
                                                                     <div class="col-md-12">
                                                                         <div class="form-group">
-                                                                            <input type="hidden" name="school" value="{{$school->id}}">
+                                                                            <input type="text" name="school" value="{{$school->id}}">
                                                                             <label for="" class="control-label">Set Months</label>
                                                                             <input type="number" class="form-control" name="service_duration" id="validationCustom01" required>
                                                                             @error('service_duration')
