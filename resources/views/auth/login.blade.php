@@ -12,7 +12,6 @@
                     @csrf
                     <div class="login-form-head">
                         <h4>Sign In</h4>
-                        <p>Hello there, Sign in and start Session</p>
                     </div>
                     @if (Session::has('error'))
                     <div class="alert alert-danger text-center" role="alert">{{Session::get('error')}}</div>

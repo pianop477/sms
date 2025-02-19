@@ -37,8 +37,10 @@
                                                 <span class="alert alert-primary">{{$user->role_name}}</span>
                                             @elseif ($user->role_id == 2)
                                                 <span class="alert alert-success">{{$user->role_name}}</span>
-                                                @else
-                                                <span class="">{{$user->role_name}}</span>
+                                            @elseif ($user->role_id == 4)
+                                                <span class="alert alert-warning">{{$user->role_name}}</span>
+                                            @else
+                                                <span class="alert alert-secondary">{{$user->role_name}}</span>
                                             @endif
                                         </td>
                                         <td>

@@ -18,7 +18,7 @@
                             <div class="form-row">
                                 <div class="col-md-6 mb-3">
                                     <label for="validationCustom01">Teacher's Name</label>
-                                    <input type="text" name="teacher" disabled class="form-control text-uppercase" id="validationCustom01" placeholder="First name" value="{{old('teacher', $teachers->first_name. ' '. $teachers->last_name)}}" required="">
+                                    <input type="text" name="teacher" disabled class="form-control text-uppercase" id="validationCustom01" placeholder="First name" value="{{old('teacher', $teachers->first_name. ' '. $teachers->last_name)}} - {{$teachers->role_name ?? ''}}" required="">
                                     @error('teacher')
                                     <div class="invalid-feedback">
                                         {{$message}}

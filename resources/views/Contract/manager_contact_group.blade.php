@@ -5,7 +5,7 @@
         <div class="col-md-4 mt-5">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="header-title text-center text-uppercase">Contract Groups</h4>
+                    <h4 class="header-title text-center text-capitalize">Approved Contract Groups</h4>
                     <p class="text-danger">Select Year</p>
                     @if ($contractsByYear->isEmpty())
                     <div class="alert alert-danger" role="alert">
@@ -26,7 +26,7 @@
         <div class="col-md-8 mt-5">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="header-title text-center text-uppercase">Contracts Request List</h4>
+                    <h4 class="header-title text-center text-capitalize">all Contracts Requests</h4>
                     @if ($contractRequests->isEmpty())
                         <div class="alert alert-warning text-center">
                             <p class="text-danger">There is no new contract request!</p>
@@ -34,9 +34,10 @@
                         @else
                         <table class="table table-responsive-md table-bordered table-hover" id="myTable">
                             <thead>
-                                <tr>
+                                <tr class="text-center">
                                     <th>Teacher's Name</th>
                                     <th>Applied_at</th>
+                                    <th>Updated_at</th>
                                     <th>Status</th>
                                     <th>Attachment</th>
                                     <th>Action</th>
@@ -44,14 +45,18 @@
                             </thead>
                             <tbody>
                                 @foreach ($contractRequests as $row )
-                                    <tr>
+                                    <tr class="text-center">
                                         <td class="text-capitalize">{{$row->first_name}} {{$row->last_name}}</td>
-                                        <td>{{\Carbon\Carbon::parse($row->applied_at)->format('d-m-Y H:i:s')}}</td>
+                                        <td>{{\Carbon\Carbon::parse($row->applied_at)->format('d-m-Y H:i')}}</td>
+                                        <td>{{\Carbon\Carbon::parse($row->updated_at)->format('d-m-Y H:i')}}</td>
                                         <td>
                                             <span class="badge bg-warning text-white text-capitalize">{{$row->status}}</span>
                                         </td>
                                         <td>
-                                            <a href="{{route('contract.admin.preview', $row->id)}}" target="_blank" class="btn btn-info btn-xs"> view</a>
+                                            {{-- <a href="{{route('contract.admin.preview', $row->id)}}" target="_blank" class="btn btn-info btn-xs"> view</a> --}}
+                                            <a href="{{route('contract.admin.preview', $row->id)}}" target="_blank" class="">
+                                                <i class="fas fa-paperclip text-success"></i>
+                                            </a>
                                         </td>
                                         <td>
                                             <ul class="d-flex">

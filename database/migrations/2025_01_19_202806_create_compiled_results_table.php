@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('student_id');
             $table->foreign('student_id')->references('id')->on('students')->onDelete('cascade');
-            $table->unsignedBigInteger('exam_type_id');
-            $table->foreign('exam_type_id')->references('id')->on('examinations')->onDelete('cascade');
+            $table->date('report_date');
+            $table->string('report_name');
             $table->unsignedBigInteger('class_id');
             $table->foreign('class_id')->references('id')->on('grades')->onDelete('cascade');
             $table->unsignedBigInteger('school_id');

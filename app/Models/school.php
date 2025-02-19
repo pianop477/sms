@@ -16,7 +16,12 @@ class school extends Model
         'country',
         'logo',
         'abbriv_code',
-        'status'
+        'status',
+        'reg_date',
+        'service_start_date',
+        'service_end_date',
+        'service_duration',
+        'sender_id'
     ];
 
     protected $guarded = ['id', 'created_at', 'updated_at'];

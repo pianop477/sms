@@ -19,6 +19,11 @@ return new class extends Migration
             $table->string('postal_address');
             $table->string('postal_name');
             $table->string('country');
+            $table->string('sender_id')->nullable();
+            $table->date('reg_date');
+            $table->date('service_start_date')->nullable();
+            $table->date('service_end_date')->nullable();
+            $table->integer('service_duration')->nullable();
             $table->integer('status')->default(1);
             $table->string('logo');
             $table->timestamps();
