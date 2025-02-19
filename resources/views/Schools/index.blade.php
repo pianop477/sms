@@ -60,7 +60,7 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="validationCustom01">Sender Name</label>
-                                <input type="text" required name="sender_name" class="form-control" id="validationCustom01" placeholder="Enter Sender ID" value="{{old('sender_name')}}">
+                                <input type="text" name="sender_name" class="form-control" id="validationCustom01" placeholder="Enter Sender ID" value="{{old('sender_name')}}">
                                 @error('sender_name')
                                 <div class="invalid-feedback">
                                     {{$message}}
