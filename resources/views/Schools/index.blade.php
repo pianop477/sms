@@ -20,7 +20,7 @@
                                 </div>
                                 @enderror
                             </div>
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label for="validationCustom02">Registration No</label>
                                 <input type="text" required name="reg_no" class="form-control text-uppercase" id="validationCustom02" placeholder="Registration Number" required="" value="{{old('reg_no')}}">
                                 @error('reg_no')
@@ -29,22 +29,13 @@
                                 </div>
                                 @enderror
                             </div>
-                            <div class="col-md-3 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label for="validationCustom01">Postal Address</label>
-                                <input type="text" required name="postal" class="form-control" id="userInput validationCustom01" onblur="addPrefix()" placeholder="P.O Box 123" value="{{old('postal')}}" required="">
+                                <input type="text" required name="postal" class="form-control" id="userInput validationCustom01" placeholder="P.O Box 123" value="{{old('postal')}}" required="">
                                 @error('postal')
                                 <div class="invalid-feedback">
                                     {{$message}}
                                 </div>
-                                @enderror
-                            </div>
-                            <div class="col-md-2 mb-3">
-                                <label for="validationCustom01">Abbreviation Code</label>
-                                <input type="text" name="abbriv" class="form-control" id="userInput validationCustom01" onblur="" value="{{old('abbriv')}}" required>
-                                @error('abbriv')
-                                    <div class="invalid-feedback">
-                                        {{$message}}
-                                    </div>
                                 @enderror
                             </div>
                         </div>
@@ -58,6 +49,26 @@
                                 </div>
                                 @enderror
                             </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="validationCustom01">Abbreviation Code</label>
+                                <input type="text" name="abbriv" class="form-control" id="userInput validationCustom01" onblur="" value="{{old('abbriv')}}" required>
+                                @error('abbriv')
+                                    <div class="invalid-feedback">
+                                        {{$message}}
+                                    </div>
+                                @enderror
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="validationCustom01">Sender Name</label>
+                                <input type="text" required name="sender_name" class="form-control" id="validationCustom01" placeholder="Enter Sender ID" value="{{old('sender_name')}}" required="">
+                                @error('sender_name')
+                                <div class="invalid-feedback">
+                                    {{$message}}
+                                </div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="form-row">
                             <div class="col-md-4 mb-3">
                                 <label for="validationCustom01">Select Country</label>
                                 <select name="country" id="validationCustom01" class="form-control text-capitalize" required>
@@ -160,11 +171,12 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">School Name</th>
+                                    <th scope="col">sender id</th>
                                     <th scope="col">Abbreviation</th>
                                     <th scope="col">Registration No</th>
-                                    <th scope="col">Address</th>
                                     <th class="text-center">School Logo</th>
                                     <th scope="col">status</th>
+                                    <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -175,21 +187,120 @@
                                             {{$school->school_name}}
                                         </td>
                                         <td class="text-uppercase">
+                                            {{$school->sender_id}}
+                                        </td>
+                                        <td class="text-uppercase">
                                             {{$school->abbriv_code}}
                                         </td>
                                         <td class="text-uppercase">{{$school->school_reg_no}}</td>
-                                        <td class="text-uppercase">P.O Box {{$school->postal_address}} - {{$school->postal_name}}</td>
                                         <td class="text-center">
                                             <img src="{{asset('assets/img/logo/' .$school->logo)}}" alt="" class="profile-img rounded-circle" style="width: 50px; object-fit: cover;">
                                         </td>
                                         <td>
                                             @if ($school->status == 1)
                                             <span class="status-p bg-success">Open</span>
+                                            @elseif($school->status == 0)
+                                            <span class="status-p bg-danger">Closed</span>
                                             @else
-                                            <span class="status-p bg-secondary">Closed</span>
+                                            <span class="status-p bg-secondary">Inactive</span>
                                             @endif
                                         </td>
+                                        <td>
+                                           @if ($school->status == 2)
+                                                {{-- <a href="" class="btn btn-success btn-xs">Approve</a> --}}
+                                                <button type="button" class="btn btn-xs btn-success" data-toggle="modal" data-target="#exampleModal1">
+                                                    Manage
+                                                </button>
 
+                                                <!-- Modal -->
+                                                <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLabel">Add Service Time Duration </h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <p class="text-center text-danger">School Details</p>
+                                                                    <ul class="list-group">
+                                                                        <li class="list-group-item text-uppercase">School Name: <strong>{{$school->school_name}}</strong></li>
+                                                                        <li class="list-group-item text-uppercase">Regitration ID: <strong>{{$school->school_reg_no}}</strong></li>
+                                                                      </ul>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="dark horizontal py-0">
+                                                            <p class="text-center text-danger">Complete Approval Actions</p>
+                                                            <form action="{{route('approve.school.request', $school->id)}}" method="POST" novalidate="" class="needs-validation" enctype="multipart/form-data" role="form">
+                                                                @csrf
+                                                                @method('PUT')
+                                                                <div class="row">
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group">
+                                                                            <input type="hidden" name="school" value="{{$school->id}}">
+                                                                            <label for="" class="control-label">Set Months</label>
+                                                                            <input type="number" class="form-control" name="service_duration" id="validationCustom01" required>
+                                                                            @error('service_duration')
+                                                                                <span class="text-danger">{{$message}}</span>
+                                                                            @enderror
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                        </div>
+                                                            <div class="modal-footer">
+                                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                                            <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to Approve this request?')">Save changes</button>
+                                                        </form>
+                                                        </div>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                             @else
+                                                {{-- <a href="{{route('schools.show', $school->id)}}" class="btn btn-warning btn-xs">View</a> --}}
+                                                <button type="button" class="btn btn-xs btn-warning" data-toggle="modal" data-target="#exampleModal1">
+                                                    View
+                                                </button>
+
+                                                <!-- Modal -->
+                                                <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLabel">Payment Status </h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <p class="text-center text-danger">School Details</p>
+                                                                    <ul class="list-group">
+                                                                        <li class="list-group-item text-capitalize">School Name: <strong>{{$school->school_name}}</strong></li>
+                                                                        <li class="list-group-item text-capitalize">Regitration ID: <strong>{{$school->school_reg_no}}</strong></li>
+                                                                        <li class="list-group-item">Sender ID: <strong>{{$school->sender_id ?? NULL}}</strong></li>
+                                                                        <li class="list-group-item text-capitalize">Service Start Date: <strong>{{$school->service_start_date}}</strong></li>
+                                                                        <li class="list-group-item text-capitalize">Service Expiry Date: <strong>{{$school->service_end_date}}</strong></li>
+                                                                        <li class="list-group-item text-capitalize">Time Duration: <strong>{{$school->service_duration}} Months</strong></li>
+                                                                      </ul>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="dark horizontal py-0">
+                                                            <form action="" method="POST" novalidate="" class="needs-validation" enctype="multipart/form-data" role="form">
+
+                                                                <div class="modal-footer">
+                                                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                                                <button type="submit" class="btn btn-success">Save changes</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                           @endif
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>

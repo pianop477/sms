@@ -18,7 +18,7 @@
             <div class="error-content p-1">
                 <h4 class="text-danger">Error</h4>
                 <p class="text-danger p-3">You Don't have Permission to Access this Resource</p>
-                <a href="{{url()->previous()}}" class="btn btn-xs"><i class="ti-angle-double-left"></i> Home</a>
+                <a href="{{route('home')}}" class="btn btn-xs"><i class="ti-angle-double-left"></i> Home</a>
             </div>
         </div>
     </div>

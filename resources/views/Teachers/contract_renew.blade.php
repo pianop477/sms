@@ -66,7 +66,8 @@
                                 <thead class="text-capitalize">
                                     <th scope="col">#</th>
                                     <th scope="col">Contract Type</th>
-                                    <th scope="col">Applied on</th>
+                                    <th scope="col">Applied_at</th>
+                                    <th scope="col">Updated_at</th>
                                     <th scope="col">Status</th>
                                     <th scope="col">Action</th>
                                 </thead>
@@ -84,6 +85,7 @@
                                             <th scope="col">#</th>
                                             <th scope="col">Contract Type</th>
                                             <th scope="col">Applied on</th>
+                                            <th scope="col">Updated_at</th>
                                             <th scope="col" class="text-center">Status</th>
                                             <th scope="col">Attachment</th>
                                             <th scope="col" class="text-center">Action</th>
@@ -94,7 +96,8 @@
                                             <tr class="text-capitalize text-center">
                                                 <td>{{$loop->iteration}}</td>
                                                 <td>{{$row->contract_type}} contract</td>
-                                                <td>{{$row->applied_at}}</td>
+                                                <td>{{\Carbon\Carbon::parse($row->applied_at)->format('d-m-Y H:i')}}</td>
+                                                <td>{{\Carbon\Carbon::parse($row->updated_at)->format('d-m-Y H:i')}}</td>
                                                 <td class="text-center text-white">
                                                     @if ($row->status == 'pending')
                                                         <span class="badge bg-warning">{{$row->status}}</span>
@@ -107,7 +110,10 @@
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    <a href="{{route('preview.my.application', $row->id)}}" class="btn btn-info btn-xs" target="_blank"> View</a>
+                                                    {{-- <a href="{{route('preview.my.application', $row->id)}}" class="btn btn-info btn-xs" target="_blank"> View</a> --}}
+                                                    <a href="{{route('preview.my.application', $row->id)}}" class="" target="_blank">
+                                                        <i class="fas fa-paperclip text-success"></i>
+                                                    </a>
                                                 </td>
                                                 <td>
                                                     <ul class="d-flex justify-content-center">

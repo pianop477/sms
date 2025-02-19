@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Grade;
+use App\Models\school;
 use App\Models\Student;
 use App\Services\BeemSmsService;
 use App\Services\NextSmsService;
@@ -47,6 +48,9 @@ class SmsController extends Controller
     {
         $user = Auth::user();
 
+        //fetch school
+        $school = school::findOrFail($user->school_id);
+
         // Log the entire request payload for debugging
         // Log::info('Request Data:', $request->all());
 
@@ -90,7 +94,7 @@ class SmsController extends Controller
         }
 
         // Prepare recipients array for Beem API
-        $sourceAddr = 'shuleApp'; // Correctly set the source address
+        $sourceAddr = $school->sender_id ?? 'shuleApp'; // Correctly set the source address
         $recipients = [];
         $recipient_id = 1;
 
@@ -129,6 +133,9 @@ class SmsController extends Controller
     {
         $user = Auth::user();
 
+        //fetch school details
+        $school = school::findOrFail($user->school_id);
+
         $this->validate($request, [
             'class' => 'nullable|required_if:send_to_all,0|integer|exists:grades,id',
             'message_content' => 'required|string',
@@ -165,7 +172,7 @@ class SmsController extends Controller
         }
 
         //prepare payload
-        $sender = 'N-SMS';
+        $sender = $school->sender_id ?? 'SHULE APP';
         $dest = [];
         $reference = uniqid();
 

@@ -77,16 +77,35 @@
                                                                 @enderror
                                                             </div>
                                                             <div class="col-md-4">
-                                                                <label for="validationCustom02">Combine Report as:</label>
-                                                                <select name="exam_type" id="" class="form-control text-capitalize" required>
-                                                                    <option value="">--Select Exam type--</option>
-                                                                    @foreach ($exams as $row)
-                                                                        <option value="{{$row->id}}">{{$row->exam_type}}</option>
-                                                                    @endforeach
+                                                                <label for="validationCustom02">Report Type:</label>
+                                                                <select name="exam_type" id="report-type" class="form-control text-capitalize" required>
+                                                                    <option value="">--Select Report Type--</option>
+                                                                    <option value="mid-term">Mid-Term Assessment</option>
+                                                                    <option value="terminal">Terminal Assessment</option>
+                                                                    <option value="annual">Annual Assessment</option>
+                                                                    <option value="custom">Custom</option>
                                                                 </select>
                                                             </div>
-                                                            <div class="col-md-4">
-                                                                <label for="validationCustom02">Combined Report Term</label>
+                                                            <!-- Placeholder for Dynamic Input Field -->
+                                                            <div class="col-md-4" id="custom-input-container" style="display: none;">
+                                                                <label for="custom-report-type">Custom Report Type</label>
+                                                                <input type="text" name="custom_exam_type" id="custom-report-type" class="form-control" placeholder="Enter Report Type Name">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-row">
+                                                            <div class="col-md-6 mb-3">
+                                                                <label for="validationCustom01">Report Date</label>
+                                                                <input type="date" name="report_date" class="form-control" value=""
+                                                                    min="{{ \Carbon\Carbon::create($year)->startOfYear()->format('Y-m-d') }}"
+                                                                    max="{{ \Carbon\Carbon::create($year)->endOfYear()->format('Y-m-d') }}">
+                                                                @error('report_date')
+                                                                <div class="invalid-feedback">
+                                                                    {{$message}}
+                                                                </div>
+                                                                @enderror
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label for="validationCustom02">Report Term</label>
                                                                 <select name="term" id="" class="form-control text-capitalize" required>
                                                                     <option value="">--Select Term--</option>
                                                                     <option value="i">term 1</option>
@@ -104,7 +123,7 @@
                                                                                 <option value="" disabled class="text-danger">{{ _('No results record found') }}</option>
                                                                             @else
                                                                                 @foreach ($groupedByMonth as $month => $monthsResult)
-                                                                                    <option value="{{ $month }}">{{ $month }}</option>
+                                                                                    <option value="{{ $month }}">{{ strtoupper($month) }} - {{strtoupper($monthsResult->first()->symbolic_abbr)}} ({{strtoupper('term '.$monthsResult->first()->Exam_term)}})</option>
                                                                                 @endforeach
                                                                             @endif
                                                                         </select>
@@ -134,16 +153,80 @@
                                     </div>
                                 </div>
                             </div>
-                            <p class="text-danger">Select Examination type to view results</p>
-                            <div class="list-group">
+                            <p class="text-danger text-center">Fetch Combined Results</p>
+                            <hr>
+                            <!-- Loader GIF -->
+                            <div id="preloader" style="
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background: rgba(255, 255, 255, 0.8); /* Optional: semi-transparent background */
+                            display: none; /* Ensure it is hidden by default */
+                            justify-content: center;
+                            align-items: center;
+                            z-index: 9999; /* Ensures it stays on top */
+                        ">
+                            <img src="{{ asset('assets/img/loader/loader.gif') }}" alt="Loading..." width="100">
+                        </div>
 
-                            </div>
+
+                            <form action="{{ route('fetch.report', ['class' => $class, 'year' => $year, 'school' => $school->id]) }}" method="POST" role="form" class="needs-validation" novalidate id="" onsubmit="showPreloader(event)">
+                                @csrf
+                                <!-- Loader GIF -->
+                                <div id="loaderContainer" style="display: none; text-align: center; margin-top: 10px;">
+                                    <img src="{{ asset('assets/img/loader/loader.gif') }}" alt="Loading..." width="50">
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-6">
+                                        <label for="">Class</label>
+                                        <select name="class" id="class-id" class="form-control text-capitalize" required>
+                                            <option value="{{$class}}" selected>{{$grades->class_name}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="">Report Type</label>
+                                        <select name="exam_type" id="" class="form-control" required>
+                                            <option value="">--Select--</option>
+                                            @foreach ($compiledGroupByExam as $report_type => $compiled_results )
+                                                <option value="{{$report_type}}">{{$report_type}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="col-md-6">
+                                        <label for="">Report Date</label>
+                                        <input type="date" name="report_date" class="form-control" required
+                                            min="{{ \Carbon\Carbon::create($year)->startOfYear()->format('Y-m-d') }}"
+                                            max="{{ \Carbon\Carbon::create($year)->endOfYear()->format('Y-m-d') }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="">Term</label>
+                                        <select name="term" id="term" class="form-control">
+                                            <option value="">--Select--</option>
+                                            <option value="i">Term 1</option>
+                                            <option value="ii">Term 2</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <hr class="">
+                                <div class="form-row">
+                                    <div class="col-md-12 d-flex justify-content-center">
+                                        <button type="submit" class="btn btn-success" id="searchBtn">
+                                            <i class="fas fa-search"></i> Search
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <script>
+            //handle moving options between select elements**************************************
             document.addEventListener('DOMContentLoaded', function () {
                 const btnAdd = document.getElementById('btn-add');
                 const btnRemove = document.getElementById('btn-remove');
@@ -167,6 +250,53 @@
                     });
                 }
             });
+
+            //handle dynamic adding input type text***********************************************
+            document.getElementById('report-type').addEventListener('change', function () {
+                var customInputContainer = document.getElementById('custom-input-container');
+
+                if (this.value === 'custom') {
+                    customInputContainer.style.display = 'block';
+                    document.getElementById('custom-report-type').setAttribute('required', 'required');
+                } else {
+                    customInputContainer.style.display = 'none';
+                    document.getElementById('custom-report-type').removeAttribute('required');
+                }
+            });
+
+            //display preloader*************************************************************
+            document.addEventListener("DOMContentLoaded", function () {
+                let preloader = document.getElementById('preloader');
+
+                // Ensure preloader is hidden on page load
+                if (preloader) {
+                    preloader.style.display = 'none';
+                }
+
+                // Handle back button navigation or reload
+                window.addEventListener("pageshow", function (event) {
+                    if (event.persisted) {
+                        preloader.style.display = 'none';
+                    }
+                });
+
+                // Optional: Ensure preloader hides on complete page load
+                window.onload = function () {
+                    preloader.style.display = 'none';
+                };
+            });
+
+            // Show preloader when form submission is valid
+            function showPreloader(event) {
+                const form = event.target;
+
+                if (form.checkValidity()) {
+                    document.getElementById('preloader').style.display = 'flex'; // Show preloader
+                } else {
+                    event.preventDefault();
+                    form.classList.add('was-validated'); // Add validation styles
+                }
+            }
         </script>
 
     @endsection

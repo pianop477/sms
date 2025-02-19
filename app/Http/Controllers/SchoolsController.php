@@ -11,6 +11,7 @@ use App\Models\Subject;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -52,6 +53,7 @@ class SchoolsController extends Controller
                 'email' => 'nullable|string|unique:users,email',
                 'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone',
                 'gender' => 'required|string|max:255',
+                'sender_name' => 'nullable|string|max:11'
             ]);
 
             //check if exists
@@ -66,8 +68,11 @@ class SchoolsController extends Controller
             $school->school_name = $request->name;
             $school->school_reg_no = $request->reg_no;
             $school->abbriv_code = $request->abbriv;
+            $school->sender_id = $request->sender_name;
+            $school->reg_date = Carbon::now()->format('Y-m-d');
             $school->postal_address = $request->postal;
             $school->postal_name = $request->postal_name;
+            $school->status = 2;
             $school->country = $request->country;
             if ($request->hasFile('logo')) {
                 $image = $request->file('logo');
@@ -178,7 +183,8 @@ class SchoolsController extends Controller
             'abbriv' => 'required|string|max:4',
             'postal' => 'required|string|max:255',
             'postal_name' => 'required|string|max:255',
-            'country' => 'required|string'
+            'country' => 'required|string',
+            'sender_name' => 'nullable|string|max:11'
         ]);
 
         $schools = school::findOrFail($school);
@@ -187,6 +193,7 @@ class SchoolsController extends Controller
         $schools->school_reg_no = $request->reg_no;
         $schools->postal_address = $request->postal;
         $schools->postal_name = $request->postal_name;
+        $schools->sender_id = $request->sender_name;
         $schools->country = $request->country;
         if ($request->hasFile('logo')) {
             $image = $request->file('logo');
@@ -251,5 +258,36 @@ class SchoolsController extends Controller
         $message->delete();
         Alert::success('Success!', 'Post has been moved to trash');
         return back();
+    }
+
+    public function addActiveTime(Request $request, $id)
+    {
+        $request->validate([
+            'school_id' => 'exists:schools,id',
+            'service_duration' => 'required|integer',
+        ]);
+
+        $startDate = Carbon::now();
+        $endDate = $startDate->copy()->addMonth($request->service_duration);
+
+        $school = school::findOrFail($id);
+        $school->service_start_date = $startDate;
+        $school->service_end_date = $endDate;
+        $school->service_duration = $request->service_duration;
+        $school->status = 1;
+        $school->save();
+
+        //update users who disabled
+        User::where('school_id', $id)->where('status', 0)->update(['status', 1]);
+
+        Alert::success('Success!', 'Active time has been updated successfully');
+        return back();
+    }
+
+    public function approveSchool ($id)
+    {
+        $school = school::find($id);
+
+        return view('Schools.approval', compact('school'));
     }
 }

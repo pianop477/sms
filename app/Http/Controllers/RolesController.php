@@ -273,7 +273,8 @@ class RolesController extends Controller
     public function assignRole(Teacher $user)
     {
         $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
-                                    ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.usertype')
+                                    ->join('roles', 'roles.id', '=', 'teachers.role_id')
+                                    ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.usertype', 'roles.role_name')
                                     ->findOrFail($user->id);
         $roles = Role::where('role_name', '!=', 'class teacher')->orderBy('role_name')->get();
         return view('Roles.assign_roles', compact('user', 'teachers', 'roles'));
@@ -285,16 +286,46 @@ class RolesController extends Controller
             'role' => 'required|exists:roles,id',
         ]);
 
-        $userId = Auth::user()->id;
-        if($user->user_id == $userId) {
+        $userId = Auth::user()->id; // Logged-in user ID
+
+        if ($user->user_id == $userId) {
             Alert::error('Error!', 'Permission denied, you cannot change your role');
             return back();
         }
-        $user->role_id = $request->role; // Assuming 'role_id' is the correct field in the 'teachers' table
+
+        // Check if user already has another role
+        if ($user->role_id == 2 || $user->role_id == 3 || $user->role_id == 4) {
+            session()->put('confirm_role_change', [
+                'teacher_id' => $user->id,
+                'new_role' => $request->role
+            ]);
+            return redirect()->route('roles.confirmation');
+        }
+
+        // Assign the new role
+        $user->role_id = $request->role;
         $user->save();
 
-        Alert::success('Success!', 'Role has been assigned successfully');
+        Alert::success('Done!', 'Role has been assigned successfully');
         return redirect()->route('roles.updateRole');
     }
+
+    public function confirmProceed(Request $request)
+    {
+        $teacher = Teacher::findOrFail($request->teacher_id);
+
+        //check if the teacher_id has role 4 as class teacher, delete from classTeachers table first
+        if($teacher->role_id == 4) {
+            $classTeacher = Class_teacher::where('teacher_id', $teacher->id)->delete();
+        }
+        $teacher->role_id = $request->new_role;
+        $teacher->save();
+
+        session()->forget('confirm_role_change'); // Clear session after confirmation
+
+        Alert::success('Done!', 'Role has been assigned successfully');
+        return redirect()->route('roles.updateRole');
+    }
+
 
 }

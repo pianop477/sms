@@ -84,6 +84,10 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1')->group(function () {
             Route::get('Feedback', [SchoolsController::class, 'showFeedback'])->name('feedback');
             Route::get('{sms}/Delete-feedback', [SchoolsController::class, 'deletePost'])->name('delete.post');
 
+            //upprove or reject school registration ====================================================================
+            Route::get('Approve-school/{id}', [SchoolsController::class, 'approveSchool'])->name('approve.school');
+            Route::put('Approve-school-request/{id}', [SchoolsController::class, 'addActiveTime'])->name('approve.school.request');
+
             //manager assign other teacher to become manager too.
             Route::put('{user}/Change-usertype', [RolesController::class, 'changeUsertype'])->name('change.usertype');
 
@@ -150,8 +154,8 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1')->group(function () {
 
             //send sms to specific class
             Route::get('Send-messages-by-class', [SmsController::class, 'smsForm'])->name('sms.form');
-            Route::post('Send-sms', [SmsController::class, 'sendSms'])->name('send.sms');
-            Route::post('Send-message', [SmsController::class, 'sendSmsUsingNextSms'])->name('Send.message.byNext');
+            Route::post('Send-sms', [SmsController::class, 'sendSms'])->name('send.sms'); //send using beem api
+            Route::post('Send-message', [SmsController::class, 'sendSmsUsingNextSms'])->name('Send.message.byNext'); //send using nextSms api
 
             //send sms results to parents
             Route::post('Send-results-sms/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/student/{student}', [ResultsController::class, 'sendResultSms'])->name('sms.results');
@@ -310,6 +314,23 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1')->group(function () {
             Route::get('Update-roles', [RolesController::class, 'updateRoles'])->name('roles.updateRole');
             Route::get('{user}/Assign-role', [RolesController::class, 'assignRole'])->name('roles.assign');
             Route::put('{user}/Update-role', [RolesController::class, 'AssignNewRole'])->name('roles.assign.new');
+
+            Route::get('/roles/confirmation', function () {
+                if (!session()->has('confirm_role_change')) {
+                    return redirect()->route('roles.updateRole');
+                }
+                return view('roles.confirm');
+            })->name('roles.confirmation');
+
+            // cancel the condition
+            Route::get('/roles/cancel-confirmation', function () {
+                session()->forget('confirm_role_change'); // Clear session when canceling
+                return redirect()->route('roles.updateRole');
+            })->name('roles.cancelConfirmation');
+
+
+            Route::post('/roles/confirmProceed', [RolesController::class, 'confirmProceed'])->name('roles.confirmProceed');
+
         });
 
         Route::middleware(['ManagerOrTeacher'])->group(function() {
@@ -319,10 +340,16 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1')->group(function () {
             Route::get('Delete-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'deleteResults'])->name('delete.results');
             //export students records to PDF
             Route::get('{classId}/Export-students', [StudentsController::class, 'exportPdf'])->name('export.student.pdf');
+
             //post compiled results to the database table
             Route::post('Submit-compiled-results/school/{school}/year/{year}/class/{class}', [ResultsController::class, 'saveCompiledResults'])->name('submit.compiled.results');
             Route::get('Individual-student-reports/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'individualStudentReports'])->name('individual.student.reports');
             Route::get('Download-individual-report/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/student/{student}', [ResultsController::class, 'downloadIndividualReport'])->name('download.individual.report');
+
+            //fetch report combined************************************
+            Route::post('Fetch-report/class/{class}/year/{year}/school/{school}', [ResultsController::class, 'fetchReport'])->name('fetch.report');
+            Route::get('Combine-results-by-months/class/{class}/year/{year}/school/{school}/exam/{exam}', [ResultsController::class, 'compileResultByMonth'])->name('combinedResults.byMonth');
+            Route::get('Delete-combined_results/class/{class}/year/{year}/school/{school}/exam/{exam}/month/{month}', [ResultsController::class, 'deleteCombinedResults'])->name('delete.combinedResults');
 
             //register school courses/manage all
             Route::post('Register-courses', [CoursesController::class, 'addCourse'])->name('course.registration');

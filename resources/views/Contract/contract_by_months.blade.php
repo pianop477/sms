@@ -7,7 +7,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-8">
-                            <h4 class="header-title text-center text-uppercase">Contract By Months</h4>
+                            <h4 class="header-title text-center text-uppercase">Approved Contract By Months</h4>
                         </div>
                         <div class="col-md-4">
                             <a href="{{route('contract.management')}}" class="float-right btn btn-info"><i class="fas fa-arrow-circle-left"></i> Back</a>

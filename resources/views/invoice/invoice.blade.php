@@ -46,7 +46,8 @@
                                 <thead>
                                     <tr class="text-capitalize">
                                         <th class="text-center" style="width: 5%;">id</th>
-                                        <th class="text-left" style="width: 45%; min-width: 130px;">description</th>
+                                        <th class="text-left" style="width: 45%;">description</th>
+                                        <th class="text-left">Service Time Duration</th>
                                         <th>No.Students</th>
                                         <th style="min-width: 100px">Unit Cost</th>
                                         <th>total</th>
@@ -56,10 +57,11 @@
                                     <tr>
                                         <td class="text-center">1</td>
                                         <td class="text-left">System Running Cost for Year - {{\Carbon\Carbon::now()->format('Y')}}</td>
+                                        <td class="text-left">{{\Carbon\Carbon::parse($school->service_start_date)->format('d/m/Y')}} - {{\Carbon\Carbon::parse($school->service_end_date)->format('d/m/Y')}}</td>
                                         <td class="">{{count($students)}}</td>
-                                        <td class="">{{number_format(3000)}}</td>
+                                        <td class="">{{number_format(3500)}}</td>
                                         @php
-                                            $total = count($students) * 3000
+                                            $total = count($students) * 3500
                                         @endphp
                                         <td>TZS. {{number_format($total)}}</td>
                                     </tr>

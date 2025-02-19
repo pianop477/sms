@@ -255,7 +255,7 @@ class ResultsController extends Controller
         //query examination_results by for the specific class which exists in the db table
         $monthsResult = Examination_result::query()
                                             ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                                            ->select('examination_results.*', 'examinations.exam_type')
+                                            ->select('examination_results.*', 'examinations.exam_type', 'examinations.symbolic_abbr')
                                             ->where('class_id', $class)
                                             ->whereYear('examination_results.exam_date', $year)
                                             ->where('examination_results.school_id', $school->id)
@@ -269,14 +269,13 @@ class ResultsController extends Controller
         //get compiled results
         $compiled_results = compiled_results::where('school_id', $school->id)
                                             ->where('class_id', $class)
-                                            ->where('compiled_term', 'term1')
-                                            ->whereRaw('JSON_CONTAINS(source_results, ?)', [json_encode([1, 2, 3])])
                                             ->get();
 
 
-        $groupedByExamType = $results->groupBy('exam_type_id');
+        $groupedByExamType = $results->groupBy('exam_type_id'); // Group by exam type using results
+        $compiledGroupByExam = $compiled_results->groupBy('report_name'); // Group by exam type using compiled results
 
-        return view('Results.general_result_type', compact('school', 'groupedByMonth', 'year', 'exams', 'grades', 'class', 'groupedByExamType'));
+        return view('Results.general_result_type', compact('school', 'groupedByMonth', 'compiledGroupByExam', 'year', 'exams', 'grades', 'class', 'groupedByExamType'));
     }
 
     //send compiled results to the table compiled_results table
@@ -285,10 +284,19 @@ class ResultsController extends Controller
         $selectedMonths = $request->input('months', []);
         $compiledTerm = $request->input('term');
         $examType = $request->input('exam_type');
+        $customExamType = $request->input('custom_exam_type'); // Capture custom exam type
+        $reportDate = $request->input('report_date'); // Capture report date
+
+        // return $reportDate;
 
         if (empty($selectedMonths)) {
             Alert::error('Fail', 'No months selected');
             return back();
+        }
+
+        // If "Custom" is selected, use custom exam type instead
+        if ($examType === 'custom' && !empty($customExamType)) {
+            $examType = $customExamType;
         }
 
         $months = [
@@ -301,13 +309,13 @@ class ResultsController extends Controller
         $sourceResults = json_encode($monthsArray);
 
         $results = DB::table('examination_results')
-            ->where('school_id', $school->id)
-            ->where('class_id', $class)
-            ->whereYear('exam_date', $year)
-            ->whereIn(DB::raw('MONTH(exam_date)'), $monthsArray)
-            ->select('student_id', 'course_id', 'score')
-            ->get()
-            ->groupBy(['student_id', 'course_id']);
+                    ->where('school_id', $school->id)
+                    ->where('class_id', $class)
+                    ->whereYear('exam_date', $year)
+                    ->whereIn(DB::raw('MONTH(exam_date)'), $monthsArray)
+                    ->select('student_id', 'course_id', 'score')
+                    ->get()
+                    ->groupBy(['student_id', 'course_id']);
 
         if ($results->isEmpty()) {
             Alert::error('Fail', 'No results found for the selected months');
@@ -319,13 +327,13 @@ class ResultsController extends Controller
         foreach ($results as $studentId => $courses) {
             foreach ($courses as $courseId => $studentResults) {
                 $exists = compiled_results::where('student_id', $studentId)
-                                            ->where('class_id', $class)
-                                            ->where('school_id', $school->id)
-                                            ->where('course_id', $courseId)
-                                            ->where('compiled_term', $compiledTerm)
-                                            ->where('exam_type_id', $examType)
-                                            ->where('source_results', $sourceResults)
-                                            ->exists();
+                    ->where('class_id', $class)
+                    ->where('school_id', $school->id)
+                    ->where('course_id', $courseId)
+                    ->where('compiled_term', $compiledTerm)
+                    ->where('report_name', $examType)
+                    ->whereDate('report_date', $reportDate) // Check if report_date exists
+                    ->exists();
 
                 if ($exists) {
                     $duplicateFound = true;
@@ -347,20 +355,94 @@ class ResultsController extends Controller
                     'class_id' => $class,
                     'school_id' => $school->id,
                     'course_id' => $courseId,
-                    'exam_type_id' => $examType,
+                    'report_name' => $examType,
                     'source_results' => $sourceResults,
                     'compiled_term' => $compiledTerm,
                     'total_score' => $studentResults->sum('score'),
                     'average_score' => $studentResults->avg('score'),
+                    'report_date' => $reportDate, // Store the report date
                 ]);
             }
         }
 
-        Alert::success('Done', 'Compiled results saved successfully');
-        return redirect()->back();
-
+        Alert::success('Done', 'Report saved successfully');
+        return redirect()->route('fetch.report', ['class' => $class, 'year' => $year, 'school' => $school]);
     }
 
+    //here function for displaying combined report results by exam type ************************************
+    public function fetchReport (Request $request, $class, $year, school $school)
+    {
+        //declare variables
+        $reportMonth = Carbon::parse($request->report_date)->format('m');
+        $reportName = $request->input('exam_type');
+
+        $reportTerm = $request->input('term');
+        $termArray = ['i', 'ii'];
+        // return $termArray;
+
+        //fetch results
+        $compiledResultsQuery = compiled_results::whereMonth('report_date', $reportMonth)
+                                            ->where('report_name', $reportName)
+                                            ->where('class_id', $class)
+                                            ->where('school_id', $school->id)
+                                            ->whereYear('report_date', $year)
+                                            ->whereIn('status', [0,1]);
+
+            // Apply term filter only if a specific term is selected
+            if (!empty($reportTerm)) {
+                $compiledResultsQuery->where('compiled_term', $reportTerm);
+            } else {
+                $compiledResultsQuery->whereIn('compiled_term', $termArray); // Return results for both terms if none selected
+            }
+
+            // Execute the query
+            $combinedResults = $compiledResultsQuery->get();
+
+        // return $combinedResults;
+        $groupedReportName = $combinedResults->groupBy('report_name')->sortBy('report_name');
+
+        return view('Results.combined_exam_type', compact('combinedResults', 'groupedReportName', 'year', 'school', 'class'));
+    }
+    // end of combine report display
+
+    // function for displaying compiled results by month ***************************************
+    public function compileResultByMonth ($class, $year, school $school, $exam)
+    {
+        $results = compiled_results::where('school_id', $school->id)
+                                    ->where('class_id', $class)
+                                    ->where('report_name', $exam)
+                                    ->whereYear('report_date', $year)
+                                    ->get();
+        // return $results;
+        $groupedByMonth = $results->groupBy(function ($item) {
+            return Carbon::parse($item->report_date)->format('F');
+        });
+
+        return view('Results.combined_result_month', compact('school', 'year', 'class', 'exam', 'groupedByMonth', 'results'));
+    }
+    // end of compiled results by month
+
+    // function to delete compiled results*************************************************
+    public function deleteCombinedResults($class, $year, school $school, $exam, $month)
+    {
+        $monthNumber = Carbon::parse($month)->format('m');
+        // return $monthNumber;
+        $results = compiled_results::where('school_id', $school->id)
+                                    ->where('class_id', $class)
+                                    ->where('report_name', $exam)
+                                    ->whereYear('report_date', $year)
+                                    ->whereMonth('report_date', $monthNumber)
+                                    ->delete();
+
+        if($results){
+            Alert::success('Success!', 'Results deleted successfully');
+            return redirect()->route('results.byExamType', ['school' => $school, 'year' => $year, 'class' => $class,]);
+        } else {
+            Alert::error('Error!', 'No results found to delete.' );
+            return redirect()->back();
+        }
+    }
+    //function for displaying general results by term ***************************************
     public function monthsByExamType(School $school, $year, Grade $class, $examType)
     {
         $results = Examination_result::query()
@@ -555,8 +637,7 @@ class ResultsController extends Controller
     }
     //end of results in general ==============================================
 
-    //publishing results to be visible to parents
-
+    //publishing results to be visible to parents and send sms via Beem api  ***************************************************
     public function publishResult(School $school, $year, $class, $examType, $month, BeemSmsService $beemSmsService)
     {
         try {
@@ -625,7 +706,7 @@ class ResultsController extends Controller
                 $studentsData = $studentsData->map(fn($student, $index) => tap($student, fn($s) => $s->rank = $index + 1));
 
                 // URL ya shule
-                $url = "https://shuleapptech.rf.gd";
+                $url = "shuleapp.tech";
 
                 //find total of students
                 $totalStudents = $studentsData->count();
@@ -643,7 +724,7 @@ class ResultsController extends Controller
                     $messageContent .= "Mtihani: " . strtoupper($student->exam_type) ." => ". strtoupper($month) . "  => Muhula " . strtoupper($term) . " - {$year}: ";
                     $messageContent .= strtoupper("{$student->courses}") . ". ";
                     $messageContent .= "Jumla: {$student->total_marks}, Wastani: " . number_format($student->average_marks,1) . ", Nafasi: {$student->rank} kati ya: {$totalStudents}. ";
-                    $messageContent .= "Asante kwa kuchagua " . strtoupper($student->school_name) . ". Zaidi bofya: $url.";
+                    $messageContent .= "Zaidi tembelea: $url.";
 
                     // Prepare the recipients array
                     $recipients = [
@@ -654,7 +735,9 @@ class ResultsController extends Controller
                     ];
 
                     // Send SMS to each parent individually
-                    $beemSmsService->sendSms('shuleApp', $messageContent, $recipients);
+                    $sender = $school->sender_id ?? 'shuleApp';
+
+                    $beemSmsService->sendSms($sender, $messageContent, $recipients);
                 }
 
                 // return response()->json($response);
@@ -969,9 +1052,9 @@ class ResultsController extends Controller
             }
 
             $totalStudents = $rankings->count();
-            $url = 'https://shuleapptech.rf.gd';
+            $url = 'https://shuleapp.tech';
             $messageContent = "Habari! Matokeo ya ". strtoupper($fullName ).", Mtihani: ". strtoupper($examination)." => ". strtoupper($month). ", Muhula ". strtoupper($term). " - ". $year." ni:" . implode(', ', array_map('strtoupper', $courseScores));
-            $messageContent .= ". Jumla: $totalScore, Wastani: ". number_format($averageScore, 1) .", Nafasi: $studentRank kati ya: $totalStudents. Asante kwa kuchagua ". strtoupper($schoolName) ." . Zaidi bofya: $url";
+            $messageContent .= ". Jumla: $totalScore, Wastani: ". number_format($averageScore, 1) .", Nafasi: $studentRank kati ya: $totalStudents. Zaidi tembelea: $url";
 
             // Output the message content (or send it via SMS)
             // return $messageContent;
@@ -984,7 +1067,7 @@ class ResultsController extends Controller
             // return $users->phone;
 
             //prepare send sms payload
-            $sourceAddr = 'shuleApp';
+            $sourceAddr = $school->sender_id ?? 'shuleApp';
             $recipient_id = 1;
             $phone = $this->formatPhoneNumber($users->phone);
             $recipients = [

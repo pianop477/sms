@@ -132,12 +132,14 @@
                                             <a href="{{route('schools.show', $school->id)}}">{{$school->school_name}}</a>
                                         </td>
                                         <td class="text-uppercase">{{$school->school_reg_no}}</td>
-                                        <td class="text-uppercase">P.O box {{$school->postal_address}} - {{$school->postal_name}}</td>
+                                        <td class="text-uppercase">{{$school->postal_address}} - {{$school->postal_name}}</td>
                                         <td>
                                             @if ($school->status == 1)
                                             <span class="status-p bg-success">Active</span>
+                                            @elseIF($school->status == 2)
+                                            <span class="status-p bg-danger">Unpaid</span>
                                             @else
-                                            <span class="status-p bg-danger">Closed</span>
+                                            <span class="status-p bg-secondary">Closed</span>
                                             @endif
                                         </td>
                                         <td>
