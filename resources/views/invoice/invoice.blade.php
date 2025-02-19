@@ -57,7 +57,7 @@
                                     <tr>
                                         <td class="text-center">1</td>
                                         <td class="text-left">System Running Cost for Year - {{\Carbon\Carbon::now()->format('Y')}}</td>
-                                        <td class="text-left">{{\Carbon\Carbon::parse($school->service_start_date)->format('d/m/Y')}} - {{\Carbon\Carbon::parse($school->service_end_date)->format('d/m/Y')}}</td>
+                                        <td class="text-left">{{\Carbon\Carbon::parse($school->service_start_date)->format('d/m/Y') ?? '-'}} - {{\Carbon\Carbon::parse($school->service_end_date)->format('d/m/Y') ?? '-'}}</td>
                                         <td class="">{{count($students)}}</td>
                                         <td class="">{{number_format(3500)}}</td>
                                         @php
