@@ -60,7 +60,7 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="validationCustom01">Sender Name</label>
-                                <input type="text" required name="sender_name" class="form-control" id="validationCustom01" placeholder="Enter Sender ID" value="{{old('sender_name')}}" required="">
+                                <input type="text" required name="sender_name" class="form-control" id="validationCustom01" placeholder="Enter Sender ID" value="{{old('sender_name')}}">
                                 @error('sender_name')
                                 <div class="invalid-feedback">
                                     {{$message}}
@@ -208,12 +208,12 @@
                                         <td>
                                            @if ($school->status == 2)
                                                 {{-- <a href="" class="btn btn-success btn-xs">Approve</a> --}}
-                                                <button type="button" class="btn btn-xs btn-success" data-toggle="modal" data-target="#exampleModal1">
+                                                <button type="button" class="btn btn-xs btn-success" data-toggle="modal" data-target="#exampleModal{{$school->id}}">
                                                     Manage
                                                 </button>
 
                                                 <!-- Modal -->
-                                                <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal fade" id="exampleModal{{$school->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{$school->id}}" aria-hidden="true">
                                                     <div class="modal-dialog" role="document">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
@@ -240,7 +240,7 @@
                                                                 <div class="row">
                                                                     <div class="col-md-12">
                                                                         <div class="form-group">
-                                                                            <input type="text" name="school" value="{{$school->id}}">
+                                                                            <input type="hidden" name="school" value="{{$school->id}}">
                                                                             <label for="" class="control-label">Set Months</label>
                                                                             <input type="number" class="form-control" name="service_duration" id="validationCustom01" required>
                                                                             @error('service_duration')
@@ -252,7 +252,7 @@
                                                         </div>
                                                             <div class="modal-footer">
                                                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                                            <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to Approve this request?')">Save changes</button>
+                                                            <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to send this request?')">Save changes</button>
                                                         </form>
                                                         </div>
                                                     </div>
@@ -260,12 +260,12 @@
                                                 </div>
                                              @else
                                                 {{-- <a href="{{route('schools.show', $school->id)}}" class="btn btn-warning btn-xs">View</a> --}}
-                                                <button type="button" class="btn btn-xs btn-warning" data-toggle="modal" data-target="#exampleModal1">
+                                                <button type="button" class="btn btn-xs btn-warning" data-toggle="modal" data-target="#exampleModal{{$school->id}}">
                                                     View
                                                 </button>
 
                                                 <!-- Modal -->
-                                                <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal fade" id="exampleModal{{$school->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{$school->id}}" aria-hidden="true">
                                                     <div class="modal-dialog" role="document">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
@@ -284,7 +284,7 @@
                                                                         <li class="list-group-item">Sender ID: <strong>{{$school->sender_id ?? NULL}}</strong></li>
                                                                         <li class="list-group-item text-capitalize">Service Start Date: <strong>{{$school->service_start_date}}</strong></li>
                                                                         <li class="list-group-item text-capitalize">Service Expiry Date: <strong>{{$school->service_end_date}}</strong></li>
-                                                                        <li class="list-group-item text-capitalize">Time Duration: <strong>{{$school->service_duration}} Months</strong></li>
+                                                                        <li class="list-group-item text-capitalize">Active Time Duration: <strong>{{$school->service_duration}} Months</strong></li>
                                                                       </ul>
                                                                 </div>
                                                             </div>
