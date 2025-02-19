@@ -12,6 +12,7 @@ use App\Models\Teacher;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -262,26 +263,33 @@ class SchoolsController extends Controller
 
     public function addActiveTime(Request $request, $id)
     {
-        $request->validate([
-            'school' => 'exists:schools,id',
-            'service_duration' => 'required|integer',
-        ]);
+        try {
+            $request->validate([
+                'school' => 'exists:schools,id',
+                'service_duration' => 'required|integer',
+            ]);
 
-        $startDate = Carbon::now();
-        $endDate = $startDate->copy()->addMonth($request->service_duration);
+            $startDate = Carbon::now();
+            $endDate = $startDate->copy()->addMonth($request->service_duration);
 
-        $school = school::findOrFail($id);
-        $school->service_start_date = $startDate;
-        $school->service_end_date = $endDate;
-        $school->service_duration = $request->service_duration;
-        $school->status = 1;
-        $school->save();
+            $school = school::findOrFail($id);
+            $school->service_start_date = $startDate;
+            $school->service_end_date = $endDate;
+            $school->service_duration = $request->service_duration;
+            $school->status = 1;
+            $school->save();
 
-        //update users who disabled
-        User::where('school_id', $id)->update(['status', 1]);
+            //update users who disabled
+            User::where('school_id', $id)->where('status', 0)->update(['status' => 1]);
 
-        Alert::success('Success!', 'Active time has been updated successfully');
-        return back();
+            Alert::success('Success!', 'Active time has been updated successfully');
+            return back();
+        }
+        catch(Exception $e) {
+            Alert::error('Error', $e->getMessage());
+            return back();
+        }
+
     }
 
     public function approveSchool ($id)
