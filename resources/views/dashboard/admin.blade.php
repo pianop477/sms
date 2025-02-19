@@ -163,7 +163,6 @@
                                                     </li>
                                                 </li>
                                             </ul>
-
                                             @elseif($school->status == 0)
                                             <ul class="d-flex justify-content-center">
                                                 <form action="{{route('activate.status', $school->id)}}" method="POST">

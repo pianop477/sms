@@ -263,7 +263,7 @@ class SchoolsController extends Controller
     public function addActiveTime(Request $request, $id)
     {
         $request->validate([
-            'school_id' => 'exists:schools,id',
+            'school' => 'exists:schools,id',
             'service_duration' => 'required|integer',
         ]);
 
@@ -278,7 +278,7 @@ class SchoolsController extends Controller
         $school->save();
 
         //update users who disabled
-        User::where('school_id', $id)->where('status', 0)->update(['status', 1]);
+        User::where('school_id', $id)->update(['status', 1]);
 
         Alert::success('Success!', 'Active time has been updated successfully');
         return back();
