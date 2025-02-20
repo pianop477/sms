@@ -136,7 +136,7 @@
                                                 </div>
                                                 <div class="col-md-3 mb-3">
                                                     <label for="validationCustomerUsername">Student Date of Birth</label>
-                                                    <input type="date" name="dob" class="form-control" id="validationCustomer02" value="{{old('dob')}}" placeholder="Student Date of Birth" required="">
+                                                    <input type="date" name="dob" class="form-control" id="validationCustomer02" value="{{old('dob')}}" required="" min="{{\Carbon\Carbon::now()->subYears(14)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(3)->format('Y-m-d')}}">
                                                     @error('dob')
                                                         <div class="invalid-feedback">{{$message}}</div>
                                                     @enderror
@@ -150,7 +150,7 @@
                                                             <option value="" disabled class="text-danger">No classes found</option>
                                                         @else
                                                             @foreach ($classes as $class )
-                                                                <option value="{{$class->id}}">{{$class->class_name}}</option>
+                                                                <option value="{{$class->id}}" class="text-uppercase">{{$class->class_name}}</option>
                                                             @endforeach
                                                         @endif
                                                     </select>
@@ -162,7 +162,13 @@
                                                 </div>
                                                 <div class="col-md-3 mb-3">
                                                     <label for="validationCustomerUsername">Class Stream</label>
-                                                    <input type="text" name="group" class="form-control" id="validationCustomer02" value="{{old('dob')}}" placeholder="Class stream A, B or C" required="">
+                                                    <select name="group" id="validationCustom02" required class="form-control">
+                                                        <option value="">--Select Stream--</option>
+                                                        <option value="a">A</option>
+                                                        <option value="b">B</option>
+                                                        <option value="c">C</option>
+                                                    </select>
+                                                    {{-- <input type="text" name="group" class="form-control" id="validationCustomer02" value="{{old('dob')}}" placeholder="Class stream A, B or C" required=""> --}}
                                                     @error('group')
                                                         <div class="invalid-feedback">{{$message}}</div>
                                                     @enderror

@@ -108,7 +108,13 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom01">Stream</label>
-                    <input type="text" name="group" class="form-control text-capitalize" id="validationCustom01" value="{{$students->group}}">
+                    {{-- <input type="text" name="group" class="form-control text-capitalize" id="validationCustom01" value="{{$students->group}}"> --}}
+                    <select name="group" id="validationCustom02" required class="form-control">
+                        <option value="{{$students->group}}" selected>{{$students->group}}</option>
+                        <option value="a">A</option>
+                        <option value="b">B</option>
+                        <option value="c">C</option>
+                    </select>
                     @error('group')
                     <div class="invalid-feedback">
                         {{$message}}

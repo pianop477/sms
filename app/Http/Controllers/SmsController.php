@@ -179,18 +179,20 @@ class SmsController extends Controller
         // Ondoa namba zinazojirudia kwa kutumia unique()
         $uniquePhones = $students->pluck('phone')->map(function ($phone) {
             return $this->formatPhoneNumber($phone); // Hakikisha namba zina format sahihi
-        })->unique();
+        })->unique()->values()->all(); // Hakikisha ni array safi
 
-        // Kujaza list ya wapokeaji
-        foreach ($uniquePhones as $phone) {
-            $dest[] = [
-                'to' => $phone,
-            ];
-        }
+        // Tengeneza payload katika format inayofaa
+        $payload = [
+            "from" => $sender,
+            "to" => $uniquePhones, // Array ya strings badala ya array ya arrays
+            "text" => $request->message_content, // Ujumbe wa SMS
+            "reference" => $reference
+        ];
 
         try {
 
-            $response = $nextSmsService->sendMultipleDestination($sender, $dest, $request->message_content, $reference);
+           // Tuma SMS
+            $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
             Alert::success('Done', 'Message Sent Successfully');
             return redirect()->back();

@@ -6,19 +6,25 @@ use App\Models\Parents;
 use App\Models\school;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Services\BeemSmsService;
+use App\Services\NextSmsService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Unique;
+use PhpOffice\PhpSpreadsheet\Calculation\Engine\FormattedNumber;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class UsersController extends Controller
 {
-    //
+    // get schools list for user registration and show form ********************************************
     public function index() {
         $schools = school::where('status', '=', 1)->orderBy('school_name')->get();
         return view('auth.register', ['schools' => $schools]);
     }
 
+    // register parents out of the system, in the sign up page *****************************************
     public function create(Request $req) {
         $this->validate($req, [
             'fname' => 'required|string|max:255',
@@ -29,7 +35,7 @@ class UsersController extends Controller
             'school' => 'required|integer|exists:schools,id',
             'password' => 'required|min:8',
             'password_confirmation' => 'same:password',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable|image|max:512',
             'street' => 'required|string|max:255',
         ]);
 
@@ -76,11 +82,45 @@ class UsersController extends Controller
         $parents->save();
         // return redirect()->back()->with('success', 'User registered successfully, Login now');
 
-        Alert::success('Success!', 'Your Account has been saved successfully, Login now');
-        return redirect()->route('login');
+        $url = "https://shuleapp.tech"; //url for application
+        //send sms after registration using Beem API *******************************************************
+        $beemSmsService = new BeemSmsService();
+        $sourceAddr = $school->sender_id ?? 'shuleApp'; // Get sender ID
+            $formattedPhone = $this->formatPhoneNumber($users->phone); // Validate phone before sending
+
+            // Check if phone number is valid after formatting
+            if (strlen($formattedPhone) !== 12 || !preg_match('/^255\d{9}$/', $formattedPhone)) {
+                Log::error('Invalid phone number format', ['phone' => $formattedPhone]);
+            } else {
+                $recipients = [
+                    [
+                        'recipient_id' => 1,
+                        'dest_addr' => $formattedPhone, // Use validated phone number
+                    ]
+                ];
+            }
+
+            $message = "Dear Parent Welcome to ShuleApp System". strtoupper($users->first_name) .", Your Username: {$req->phone}, Password: {$req->password}. Click here {$url} to Login.";
+            $response = $beemSmsService->sendSms($sourceAddr, $message, $recipients);
+
+        // send sms using NextSMS API *****************************************************************************
+        $nextSmsService = new NextSmsService();
+        $dest = $this->formatPhoneNumber($users->phone);
+        $payload = [
+            'from' => $school->sender_id ?? 'SHULE APP',
+            'to' => $dest,
+            'text' => "Dear Parent Welcome to ShuleApp System". strtoupper($users->first_name) .", Your Username: {$req->phone}, Password: {$req->password}. Click here {$url} to Login.",
+            'reference' => uniqid(),
+        ];
+
+        $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+
+        Alert::success('Success!', 'Your Account has been saved successfully');
+        return redirect()->route('home');
 
     }
 
+    // managers registration form, but now this is not working any more *************************************
     public function managerForm() {
         $schools = school::where('status', '=', 1)->orderBy('school_name', 'ASC')->get();
         $managers = User::query()
@@ -93,17 +133,20 @@ class UsersController extends Controller
         return view('Managers.index', ['managers' => $managers], ['schools' => $schools]);
     }
 
+    // showing error page for restricted areas user to access ****************************************
     public function errorPage()
     {
         return view('Error.403');
     }
 
+    // Admin manage managers list *******************************************************************
     public function manageAdminAccounts()
     {
         $users = User::where('usertype', 1)->orderBy('first_name')->get();
         return view('Admin.index', compact('users'));
     }
 
+    // add super admin account to manage all schools ************************************************
     public function addAdminAccount(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -138,11 +181,39 @@ class UsersController extends Controller
             'usertype' => $request->input('usertype', 1),
             'password' => Hash::make($request->input('password', 'shule@2024')),
         ]);
+
+        // use nextSMS API to send sms
+        $nextSmsService = new NextSmsService();
+        $url = "https://shulapp.tech";
+        $sender = 'SHULE APP';
+        $phone = $this->formatPhoneNumber($user->phone);
+        $message = "Hello!". strtoupper($user->first_name). " Welcome to ShuleApp System. Your Username: {$user->phone} and Password: shul@2024. Click here {$url} to login";
+        $reference = uniqid();
+
+        $response = $nextSmsService->sendSmsByNext($sender, $phone, $message, $reference);
+
         Alert::success('Success!', 'User admin saved successfully');
         return back();
 
     }
 
+    //  phone number format according to Beem API **************************************************
+    private function formatPhoneNumber($phone)
+    {
+        // Remove any non-numeric characters
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+
+        // Ensure the number starts with the country code (e.g., 255 for Tanzania)
+        if (strlen($phone) == 9) {
+            $phone = '255' . $phone;
+        } elseif (strlen($phone) == 10 && substr($phone, 0, 1) == '0') {
+            $phone = '255' . substr($phone, 1);
+        }
+
+        return $phone;
+    }
+
+    // block user account ***********************************************************************
     public function blockAdminAccount(Request $request, $id)
     {
         $user = User::find($id);
@@ -168,6 +239,7 @@ class UsersController extends Controller
 
     }
 
+    // unblock user account **************************************************************************
     public function unblockAdminAccount(Request $request, $id)
     {
         $user = User::find($id);
@@ -187,6 +259,7 @@ class UsersController extends Controller
 
     }
 
+    // delete user account ****************************************************************************
     public function deleteAdminAccount(Request $request, $id)
     {
         $user = User::find($id);

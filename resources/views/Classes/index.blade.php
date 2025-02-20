@@ -77,7 +77,7 @@
                             @else
                             @foreach ($classes as $class )
                                 <tr>
-                                    <td>
+                                    <td class="text-uppercase">
                                         <i class="ti-angle-double-right"></i> {{$class->class_name}}
                                     </td>
                                     <td class="text-uppercase">{{$class->class_code}}</td>
