@@ -17,7 +17,7 @@ class NextSmsService
        $this->apiPassword = 'Veronica 24#';
     }
 
-    public function sendMultipleDestination($sender, $destination, $message, $reference)
+    public function sendSmsByNext($sender, $destination, $message, $reference)
     {
         try {
             $url = "https://messaging-service.co.tz/api/sms/v1/text/single";
@@ -28,10 +28,10 @@ class NextSmsService
                 'reference' => $reference,
             ];
 
-            Log::info($postData);
+            // Log::info($postData);
 
             $response = Http::withHeaders([
-                'Authorization' => 'Basic UGlhbm86VmVyb25pY2EgMjQj',
+                'Authorization' => 'Basic ' . base64_encode($this->apiUsername . ':' . $this->apiPassword),
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
             ])->post($url, $postData);

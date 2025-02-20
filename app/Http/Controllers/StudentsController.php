@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Storage;
 class StudentsController extends Controller
 {
 
+    // show classes list for students to display **************************************************
     public function index()
     {
         // Get all classes with their respective student counts
@@ -36,6 +37,8 @@ class StudentsController extends Controller
     /**
      * Show the form for creating the resource.
      */
+
+    //  create or get form new student record ******************************************************************
     public function create($classId)
     {
         // abort(404);
@@ -56,6 +59,8 @@ class StudentsController extends Controller
     /**
      * Store the newly created resource in storage.
      */
+
+    //  store and save new student records *****************************************************************
     public function createNew(Request $request, $class)
         {
             // Validate the incoming request data
@@ -124,12 +129,14 @@ class StudentsController extends Controller
 
             // Save the new student record
            $student =  $new_student->save();
+
            if($student) {
-            Alert::success('Success', 'Student records saved successfully');
-            return redirect()->route('create.selected.class', $class->id);
+                Alert::success('Success', 'Student records saved successfully');
+                return redirect()->route('create.selected.class', $class->id);
            }
     }
-        //generate uniqe student admission number randomly
+
+    //generate uniqe student admission number randomly*******************************************************
     protected function getAdmissionNumber ()
     {
         $user = Auth::user();
@@ -163,6 +170,8 @@ class StudentsController extends Controller
     /**
      * Update the resource in storage.
      */
+
+    //  update students records *************************************************************************
     public function updateRecords(Request $request, $students)
     {
         $request->merge(['group' => strtoupper($request->input('group'))]);
@@ -224,6 +233,8 @@ class StudentsController extends Controller
     /**
      * Remove the resource from storage.
      */
+
+    //  destroy or delete student records and move to trash ***********************************************
      public function destroy($student)
      {
          // Find the student record
@@ -237,6 +248,7 @@ class StudentsController extends Controller
          return back();
      }
 
+    //  get students information and compile to the form *******************************************************
     public function showStudent($class)
     {
         $user = Auth::user();
@@ -269,7 +281,7 @@ class StudentsController extends Controller
         return view('Students.index', ['students' => $students, 'classId' => $classId, 'parents' => $parents, 'buses' => $buses, 'classes' => $classes]);
     }
 
-    //promote students to the next class
+    //promote students to the next class *******************************************************************
     public function promoteClass($id, Request $request)
     {
         $user = Auth::user();
@@ -298,7 +310,7 @@ class StudentsController extends Controller
 
     }
 
-    //call graduate class list by year updated_at
+    //call graduate class list by year updated_at ****************************************************************
     public function callGraduateStudents()
     {
         $user = Auth::user();
@@ -313,7 +325,7 @@ class StudentsController extends Controller
 
     }
 
-    //show graduated students in a specific year
+    //show graduated students in a specific year **************************************************************
     public function graduatedStudentByYear($year)
     {
         $user = Auth::user();
@@ -330,7 +342,7 @@ class StudentsController extends Controller
         return view('Students.graduate_students_list', compact('GraduatedStudents', 'year'));
     }
 
-    //export graduated students in a specific year
+    //export graduated students in a specific year**********************************************************
     public function exportGraduateStudents($year)
     {
         $user = Auth::user();
@@ -348,7 +360,7 @@ class StudentsController extends Controller
         return $pdf->stream('Graduate_students_'.$year.'.pdf');
     }
 
-    //export to pdf ======================
+    //export to pdf ======================********************************************************************
     public function exportPdf($classId)
     {
         // return $classId;
@@ -381,6 +393,7 @@ class StudentsController extends Controller
         return $pdf->stream($fileName);
     }
 
+    // get information for parent to register him or herself ************************************************
     public function parentByStudent()
     {
         $user = Auth::user();
@@ -389,6 +402,7 @@ class StudentsController extends Controller
         return view('Students.register', ['buses' => $buses, 'classes' => $classes ]);
     }
 
+    // parent to register students **************************************************************************
     public function registerStudent (Request $request)
     {
         $user = Auth::user();
@@ -463,6 +477,7 @@ class StudentsController extends Controller
         return redirect()->route('home');
     }
 
+    // show student profile *****************************************************************************
     public function showRecords($student)
     {
         $user = Auth::user();
@@ -510,6 +525,7 @@ class StudentsController extends Controller
         ]);
     }
 
+    // parent modify student data ****************************************************************************
     public function modify($student)
     {
         $user = Auth::user();
@@ -525,6 +541,7 @@ class StudentsController extends Controller
         return view('Students.edit', ['buses' => $buses, 'students' => $students, 'classes' => $classes ]);
     }
 
+    // show student list in the trash *****************************************************************
     public function studentTrashList()
     {
         $user = Auth::user();
@@ -539,6 +556,8 @@ class StudentsController extends Controller
                             ->get();
         return view('Students.trash', compact('students'));
     }
+
+    // restore student in the trash *************************************************************************
 
     public function restoreTrashList ($id, Request $request)
     {
@@ -555,6 +574,7 @@ class StudentsController extends Controller
         return back();
     }
 
+    // delete student partmently ***************************************************************************
     public function deletePerStudent($id)
     {
         $student = Student::find($id);

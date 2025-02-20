@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Events\PasswordResetEvent;
 use App\Models\Grade;
 use App\Models\Parents;
+use App\Models\school;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\Transport;
 use App\Models\User;
+use App\Services\BeemSmsService;
+use App\Services\NextSmsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -20,6 +23,7 @@ use Illuminate\Support\Facades\Validator;
 class ParentsController extends Controller
 {
 
+    // Display a listing of the resource *******************PARENTS ***************************************.
     public function showAllParents() {
         $user = Auth::user();
         $classes = Grade::where('school_id', '=', $user->school_id, 'AND', 'status', '=', 1)->orderBy('class_code')->get();
@@ -49,9 +53,12 @@ class ParentsController extends Controller
     /**
      * Store the newly created resource in storage.
      */
+
+    //  register new parents with new student and send sms via Beem API **************************************************
     public function registerParents(Request $request)
     {
         $user = Auth::user();
+        $school = school::findOrFail($user->school_id);
 
         try {
             $dataValidation = $request->validate([
@@ -138,8 +145,48 @@ class ParentsController extends Controller
                 'school_id' => $parents->school_id
             ]);
 
-            Alert::success('Success', 'Parent and student information saved successfully');
-            return redirect()->route('Parents.index');
+            // check if phone number already exists in the database and prevent from sending message again;
+            $phoneNumberExists = User::where('phone', $user->phone)->exists();
+
+            if($phoneNumberExists) {
+                Alert::success('Success', 'Parent and student information saved successfully');
+                return redirect()->route('Parents.index');
+            }
+            else {
+                $url = "https://shuleapp.tech";
+                //send sms via Beem API********************************************************************
+                $beemSmService = new BeemSmsService();
+                $sourceAddr = $school->sender_id ?? 'shuleApp'; // Get sender ID
+                $formattedPhone = $this->formatPhoneNumber($users->phone); // Validate phone before sending
+
+                // Check if phone number is valid after formatting
+                if (strlen($formattedPhone) !== 12 || !preg_match('/^255\d{9}$/', $formattedPhone)) {
+                    Log::error('Invalid phone number format', ['phone' => $formattedPhone]);
+                } else {
+                    $recipients = [
+                        [
+                            'recipient_id' => 1,
+                            'dest_addr' => $formattedPhone, // Use validated phone number
+                        ]
+                    ];
+                }
+
+                $message = "Dear Parent Welcome to ShuleApp System". strtoupper($users->first_name) .", Your Username: {$users->phone}, Password: shule@2024. Click here {$url} to Login.";
+                $response = $beemSmService->sendSms($sourceAddr, $message, $recipients);
+
+                // send sms using nextSms API ************************************************
+                $nextSmsService = new NextSmsService();
+                $destination = $this->formatPhoneNumber($user->phone);
+
+                $payload = [
+                    'from' => $school->sender_id ?? "SHULE APP",
+                    'to' => $destination,
+                    'text' => "Dear Parent Welcome to ShuleApp System". strtoupper($users->first_name) .", Your Username: {$users->phone}, Password: shule@2024. Click here {$url} to Login.",
+                    'reference' => uniqid(),
+                ];
+
+                $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+            }
 
         } catch (\Exception $e) {
             Alert::error('Error', $e->getMessage());
@@ -147,8 +194,27 @@ class ParentsController extends Controller
         }
     }
 
+    //  phone number format according to Beem API **************************************************
+    private function formatPhoneNumber($phone)
+    {
+        // Remove any non-numeric characters
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+
+        // Ensure the number starts with the country code (e.g., 255 for Tanzania)
+        if (strlen($phone) == 9) {
+            $phone = '255' . $phone;
+        } elseif (strlen($phone) == 10 && substr($phone, 0, 1) == '0') {
+            $phone = '255' . substr($phone, 1);
+        }
+
+        return $phone;
+    }
+
+    // format for registration number **************************************************
     protected function getAdmissionNumber ()
     {
+        $user = Auth::user();
+        $schoolData = school::where('id', $user->school_id)->first();
         do {
             // Generate a random 4-digit number between 1000 and 9999
             $admissionNumber = mt_rand(1000, 9999);
@@ -156,7 +222,7 @@ class ParentsController extends Controller
             // Check if this admission number already exists
         } while (Student::where('admission_number', $admissionNumber)->exists());
 
-        return $admissionNumber; // Return the unique admission number
+        return $schoolData->abbriv_code.'-'.$admissionNumber; // Return the unique admission number
     }
 
     /**
@@ -170,6 +236,7 @@ class ParentsController extends Controller
     /**
      * Show the form for editing the resource.
      */
+    // edit parents get form **************************************************
     public function editParent($parent)
     {
         //
@@ -183,6 +250,8 @@ class ParentsController extends Controller
     /**
      * Update the resource in storage.
      */
+
+    //  update parents records set to inactive mode **************************************************
     public function updateStatus(Request $request, $parent)
     {
         //
@@ -200,6 +269,7 @@ class ParentsController extends Controller
         }
     }
 
+    // update parents records set to active mode **************************************************
     public function restoreStatus(Request $request, $parent) {
         $parents = Parents::findOrFail($parent);
         $user = User::findOrFail($parents->user_id);
@@ -217,6 +287,8 @@ class ParentsController extends Controller
     /**
      * Remove the resource from storage.
      */
+
+    //  delete parents records **************************************************
     public function deleteParent($parentId)
     {
         try {
@@ -266,7 +338,7 @@ class ParentsController extends Controller
         }
     }
 
-
+    // update full data for parents **************************************************
     public function updateParent (Request $request, $parents)
     {
         $parent = Parents::findOrFail($parents);

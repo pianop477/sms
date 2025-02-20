@@ -14,7 +14,7 @@
                     {{Session::get('success')}}
                 </div>
             @endif
-            <form class="needs-validation" novalidate="" action="{{route('send.sms')}}" method="POST" enctype="multipart/form-data">
+            <form class="needs-validation" novalidate="" action="{{route('Send.message.byNext')}}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="form-row">
                     <div class="col-md-6 mb-3">

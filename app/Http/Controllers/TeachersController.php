@@ -7,6 +7,8 @@ use App\Models\Class_teacher;
 use App\Models\school;
 use App\Models\Teacher;
 use App\Models\User;
+use App\Services\BeemSmsService;
+use App\Services\NextSmsService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,6 +21,7 @@ use Barryvdh\DomPDF\PDF as PDF;
 class TeachersController extends Controller
 {
 
+    // Display teachers list in the school ***********************************************************
     public function showTeachersList() {
         $userLogged = Auth::user();
         $teachers = Teacher::query()
@@ -34,6 +37,7 @@ class TeachersController extends Controller
         return view('Teachers.index', ['teachers' => $teachers]);
     }
 
+    // Export teachers list to PDF in the school ***********************************************************
     public function export ()
     {
         $userLogged = Auth::user();
@@ -63,6 +67,8 @@ class TeachersController extends Controller
     /**
      * Store the newly created resource in storage.
      */
+
+    //  register new teacher in the school and send sms via  ***********************************************************
     public function registerTeachers(Request $request)
     {
         $validatedData = $request->validate([
@@ -79,6 +85,7 @@ class TeachersController extends Controller
         ]);
 
         $user = Auth::user();
+        $school = school::findOrFail($user->school_id);
 
         $existingRecords = User::where('phone', $request->phone)
                     ->where('school_id', Auth::user()->school_id)
@@ -120,8 +127,45 @@ class TeachersController extends Controller
             $teachers->save();
 
             DB::commit();
-            Alert::success('Success', 'Teacher records saved successfully');
-            return redirect()->back();
+
+            // notify teacher through sms using Beem API *************************************************
+            $url = "https://shuleapp.tech";
+
+            $beemSmsService = new BeemSmsService();
+            $sourceAddr = $school->sender_id ?? 'shuleApp'; // Get sender ID
+            $formattedPhone = $this->formatPhoneNumber($users->phone); // Validate phone before sending
+
+            // Check if phone number is valid after formatting
+            if (strlen($formattedPhone) !== 12 || !preg_match('/^255\d{9}$/', $formattedPhone)) {
+                    Log::error('Invalid phone number format', ['phone' => $formattedPhone]);
+                } else {
+                    $recipients = [
+                        [
+                            'recipient_id' => 1,
+                            'dest_addr' => $formattedPhone, // Use validated phone number
+                        ]
+                    ];
+
+                }
+
+                $message = "Dear Teacher ". strtoupper($users->first_name) .", Welcome to ShuleApp System. Your username: {$users->phone} and your password: shule@2024. Click here {$url} to Login.";
+                $response = $beemSmsService->sendSms($sourceAddr, $message, $recipients);
+
+                // send SMS using nextSMS API ***********************************************
+                $nextSmsService = new NextSmsService();
+                $destination = $this->formatPhoneNumber($user->phone);
+
+                $payload = [
+                    'from' => $school->sender_id ?? "SHULE APP",
+                    'to' => $destination,
+                    'text' => "Dear Teacher ". strtoupper($users->first_name) .", Welcome to ShuleApp System. Your username: {$users->phone} and your password: shule@2024. Click here {$url} to Login.",
+                    'reference' => uniqid(),
+                ];
+                $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+
+                Alert::success('Success', 'Teacher records saved successfully');
+                return redirect()->back();
+
         } catch (\Exception $e) {
             DB::rollBack();
             Alert::error('Error', $e->getMessage());
@@ -129,7 +173,25 @@ class TeachersController extends Controller
         }
     }
 
-    protected function getMemberId (Request $request)
+    // format number according to Beem API documentation ***********************************************************
+
+    private function formatPhoneNumber($phone)
+    {
+        // Remove any non-numeric characters
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+
+        // Ensure the number starts with the country code (e.g., 255 for Tanzania)
+        if (strlen($phone) == 9) {
+            $phone = '255' . $phone;
+        } elseif (strlen($phone) == 10 && substr($phone, 0, 1) == '0') {
+            $phone = '255' . substr($phone, 1);
+        }
+
+        return $phone;
+    }
+
+    // prepare unique member id for teacher ***********************************************************
+    protected function getMemberId ()
     {
 
         $user = Auth::user();
@@ -147,6 +209,8 @@ class TeachersController extends Controller
     /**
      * Display the resource.
      */
+
+    //  show teacher profile in the school ***********************************************************
     public function showProfile($teacher)
         {
             // Find the teacher by ID
@@ -181,6 +245,7 @@ class TeachersController extends Controller
      * Update the resource in storage.
      */
 
+    //  update teacher profile in the school ***********************************************************
      public function updateTeachers(Request $request, $teachers)
      {
          // Find teacher and user
@@ -260,6 +325,7 @@ class TeachersController extends Controller
      }
 
 
+    //  update teacher status to inactive in the school ***********************************************************
     public function updateStatus(Request $request, $teacher)
     {
         // Find the teacher record
@@ -302,6 +368,7 @@ class TeachersController extends Controller
         return back();
     }
 
+    // update teacher status to active in the school ***********************************************************
     public function restoreStatus(Request $request, $teacher) {
         // Find the teacher record
         $teacher = Teacher::findOrFail($teacher);
@@ -331,6 +398,7 @@ class TeachersController extends Controller
         return back();
     }
 
+    // delete and move to trash teacher in the school ***********************************************************
     public function deleteTeacher($teacher)
     {
         // Find the teacher record or fail
@@ -389,6 +457,7 @@ class TeachersController extends Controller
         return back();
     }
 
+    // display trashed teachers in the school ***********************************************************
     public function trashedTeachers ()
     {
         $userLogged = Auth::user();

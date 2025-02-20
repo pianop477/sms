@@ -113,7 +113,13 @@
                                                 <div class="form-row">
                                                     <div class="col-md-4 mb-3">
                                                         <label for="validationCustom01">Stream</label>
-                                                        <input type="text" name="group" id="validationCustomUsername" class="form-control" placeholder="Enter A, B or C" id="validationCustom02" value="{{old('group')}}" required>
+                                                        {{-- <input type="text" name="group" id="validationCustomUsername" class="form-control" placeholder="Enter A, B or C" id="validationCustom02" value="{{old('group')}}" required> --}}
+                                                        <select name="group" id="validationCustom02" required class="form-control">
+                                                            <option value="">--Select Stream--</option>
+                                                            <option value="a">A</option>
+                                                            <option value="b">B</option>
+                                                            <option value="c">C</option>
+                                                        </select>
                                                         @error('group')
                                                         <div class="invalid-feedback">
                                                             {{$message}}
