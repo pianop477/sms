@@ -23,8 +23,8 @@
                             <option value="{{$contract->contract_type}}" selected>{{$contract->contract_type}}</option>
                             <option value="new">New contract</option>
                             <option value="probation">Probation Contract</option>
-                            <option value="renew">Renew Contract</option>
-                            <option value="extension"> Extend Contract</option>
+                            <option value="renewal">Renew Contract</option>
+                            {{-- <option value="extension"> Extend Contract</option> --}}
                         </select>
                         @error('contract_type')
                         <div class="invalid-feedback">

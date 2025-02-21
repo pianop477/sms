@@ -18,6 +18,15 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class UsersController extends Controller
 {
+    protected $beemSmsService;
+    protected $nextSmsService;
+
+    public function __construct(BeemSmsService $beemSmsService, NextSmsService $nextSmsService)
+    {
+        $this->beemSmsService = $beemSmsService;
+        $this->nextSmsService = $nextSmsService;
+    }
+
     // get schools list for user registration and show form ********************************************
     public function index() {
         $schools = school::where('status', '=', 1)->orderBy('school_name')->get();
@@ -101,7 +110,7 @@ class UsersController extends Controller
             }
 
             $message = "Dear Parent Welcome to ShuleApp System". strtoupper($users->first_name) .", Your Username: {$req->phone}, Password: {$req->password}. Click here {$url} to Login.";
-            $response = $beemSmsService->sendSms($sourceAddr, $message, $recipients);
+            // $response = $beemSmsService->sendSms($sourceAddr, $message, $recipients);
 
         // send sms using NextSMS API *****************************************************************************
         $nextSmsService = new NextSmsService();

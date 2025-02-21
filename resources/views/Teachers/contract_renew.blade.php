@@ -30,7 +30,7 @@
                                                         <option value="">-- Select Contract Type --</option>
                                                         <option value="new">New contract</option>
                                                         <option value="probation">Probation Contract</option>
-                                                        <option value="renew">Renew Contract</option>
+                                                        <option value="renewal">Renew Contract</option>
                                                     </select>
                                                     @error('contract_type')
                                                     <div class="invalid-feedback">
@@ -73,7 +73,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td colspan="5" class="text-center">No Contract record found</td>
+                                        <td colspan="6" class="text-center text-danger">No Contract record found</td>
                                     </tr>
                                 </tbody>
                             </table>
