@@ -11,6 +11,7 @@ use App\Models\school;
 use App\Models\Student;
 use App\Models\User;
 use App\Services\BeemSmsService;
+use App\Services\NextSmsService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -23,10 +24,12 @@ use RealRashid\SweetAlert\Facades\Alert;
 class ResultsController extends Controller
 {
     protected $beemSmsService;
+    protected $nextSmsService;
 
-    public function __construct(BeemSmsService $beemSmsService)
+    public function __construct(BeemSmsService $beemSmsService, NextSmsService $nextSmsService)
     {
         $this->beemSmsService = $beemSmsService;
+        $this->nextSmsService = $nextSmsService;
     }
 
     public function index(Student $student)
@@ -734,14 +737,28 @@ class ResultsController extends Controller
                         ]
                     ];
 
-                    // Send SMS to each parent individually
-                    $sender = $school->sender_id ?? 'shuleApp';
+                    // Send SMS to each parent individually using Beem API
+                    $source_Addr = $school->sender_id ?? 'shuleApp';
+                    // $beemSmsService->sendSms($source_Addr, $messageContent, $recipients);
 
-                    $beemSmsService->sendSms($sender, $messageContent, $recipients);
+                    // send by using nextSMS API *************************************
+                    $nextSmsService = new NextSmsService();
+                    $payload = [
+                        'from' => $school->sender_id ?? "SHULE APP",
+                        'to' => $phoneNumber,
+                        'text' => $messageContent,
+                        'reference' => $student->student_id
+                    ];
+
+                    $response = $nextSmsService->sendSmsByNext(
+                        $payload['from'],
+                        $payload['to'],
+                        $payload['text'],
+                        $payload['reference']
+                    );
                 }
 
                 // return response()->json($response);
-
                 if($updatedRows){
                     Alert::success('Success!', 'Results published successfully');
                     return back();
@@ -1066,7 +1083,7 @@ class ResultsController extends Controller
             $users = User::where('id', $parent->user_id)->first();
             // return $users->phone;
 
-            //prepare send sms payload
+            //prepare send sms payload to send via Beem API *************************************
             $sourceAddr = $school->sender_id ?? 'shuleApp';
             $recipient_id = 1;
             $phone = $this->formatPhoneNumber($users->phone);
@@ -1077,8 +1094,26 @@ class ResultsController extends Controller
                 ],
             ];
 
-            //send sms
-            $response = $beemSmsService->sendSms($sourceAddr, $messageContent, $recipients);
+            //send sms by Beem API
+            // $response = $beemSmsService->sendSms($sourceAddr, $messageContent, $recipients);
+
+            // send sms via NextSMS API ************************************************************
+            $nextSmsService = new NextSmsService();
+            $sender = $school->sender_id ?? "SHULE APP";
+            $destination = $this->formatPhoneNumber($users->phone);
+            $messageContent = "Habari! Matokeo ya ". strtoupper($fullName ).", Mtihani: ". strtoupper($examination)." => ". strtoupper($month). ", Muhula ". strtoupper($term). " - ". $year." ni:" . implode(', ', array_map('strtoupper', $courseScores));
+            $messageContent .= ". Jumla: $totalScore, Wastani: ". number_format($averageScore, 1) .", Nafasi: $studentRank kati ya: $totalStudents. Zaidi tembelea: $url";
+            $reference = uniqid();
+
+            $payload = [
+                'from' => $sender,
+                'to' => $destination,
+                'text' => $messageContent,
+                'reference' => $reference
+            ];
+
+            $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+            // return $response;
             Alert::success('Done', 'Message sent successfully');
             return redirect()->back();
 

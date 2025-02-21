@@ -23,6 +23,15 @@ use Illuminate\Support\Facades\Validator;
 class ParentsController extends Controller
 {
 
+    protected $beemSmsService;
+    protected $nextSmsService;
+
+    public function __construct(BeemSmsService $beemSmsService, NextSmsService $nextSmsService)
+    {
+        $this->beemSmsService = $beemSmsService;
+        $this->nextSmsService = $nextSmsService;
+    }
+
     // Display a listing of the resource *******************PARENTS ***************************************.
     public function showAllParents() {
         $user = Auth::user();
@@ -161,7 +170,7 @@ class ParentsController extends Controller
 
                 // Check if phone number is valid after formatting
                 if (strlen($formattedPhone) !== 12 || !preg_match('/^255\d{9}$/', $formattedPhone)) {
-                    Log::error('Invalid phone number format', ['phone' => $formattedPhone]);
+                    // Alert::error('Invalid phone number format', ['phone' => $formattedPhone]);
                 } else {
                     $recipients = [
                         [
@@ -172,7 +181,7 @@ class ParentsController extends Controller
                 }
 
                 $message = "Dear Parent Welcome to ShuleApp System". strtoupper($users->first_name) .", Your Username: {$users->phone}, Password: shule@2024. Click here {$url} to Login.";
-                $response = $beemSmService->sendSms($sourceAddr, $message, $recipients);
+                // $response = $beemSmService->sendSms($sourceAddr, $message, $recipients);
 
                 // send sms using nextSms API ************************************************
                 $nextSmsService = new NextSmsService();

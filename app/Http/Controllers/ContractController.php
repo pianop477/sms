@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Contract;
 use App\Models\Teacher;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -27,79 +28,85 @@ class ContractController extends Controller
     public function store(Request $request)
     {
         // Get authenticated teacher
-        $user = Auth::user();
-        $teacher = Teacher::where('user_id', $user->id)->firstOrFail();
+        try {
+            $user = Auth::user();
+            $teacher = Teacher::where('user_id', $user->id)->firstOrFail();
 
-        // Validate the input
-        $validator = Validator::make($request->all(), [
-            'contract_type' => 'required|string|in:probation,new,renewal,extension',
-            'application_letter' => 'required|file|mimes:pdf|max:512', // Max 512 KB
-        ]);
+            // Validate the input
+            $validator = Validator::make($request->all(), [
+                'contract_type' => 'required|string|in:probation,new,renewal',
+                'application_letter' => 'required|file|mimes:pdf|max:512', // Max 512 KB
+            ]);
 
-        // Check validation errors
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            foreach($errors as $error) {
-                Alert::error('Validation Fails', $error);
-                return back();
-            }
-        }
-
-        // Check if there is an existing pending request
-        $existingRequest = Contract::where('teacher_id', $teacher->id)
-                                ->whereIn('status', ['pending', 'rejected'])
-                                ->exists();
-
-        if ($existingRequest) {
-            Alert::error('Request Denied', 'You already have a pending contract request. Please wait for approval.');
-            return redirect()->back();
-        }
-
-        // Check for active contract with at least 2 months or more
-        $activeContract = Contract::where('teacher_id', $teacher->id)
-                                    ->whereIn('status', ['approved', 'completed'])
-                                    ->whereRaw('DATEDIFF(end_date, NOW()) > 30') // Active for at least 1 months
-                                    ->first();
-
-        if ($activeContract) {
-            Alert::info(
-                'Info',
-                'Your request failed because you still have an active contract. Your contract will expire on ' .
-                Carbon::parse($activeContract->end_date)->format('d-m-Y H:i')
-            );
-            return redirect()->back();
-        }
-
-
-        // Handle file upload
-        $filePath = '';
-        if ($request->hasFile('application_letter')) {
-            $applicationFile = $request->file('application_letter');
-            $fileName = time() . '.' . $applicationFile->getClientOriginalExtension();
-            $destinationPath = storage_path('app/public/contracts/contract_application');
-
-            // Ensure the directory exists
-            if (!file_exists($destinationPath)) {
-                mkdir($destinationPath, 0755, true);
+            // Check validation errors
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                foreach($errors as $error) {
+                    Alert::error('Validation Fails', $error);
+                    return back();
+                }
             }
 
-            // Move the file to the destination
-            $applicationFile->move($destinationPath, $fileName);
-            $filePath = 'contracts/contract_application/' . $fileName; // Path to store in the database
+            // Check if there is an existing pending request
+            $existingRequest = Contract::where('teacher_id', $teacher->id)
+                                    ->whereIn('status', ['pending', 'rejected'])
+                                    ->exists();
+
+            if ($existingRequest) {
+                Alert::error('Request Denied', 'You already have a pending contract request. Please wait for approval.');
+                return redirect()->back();
+            }
+
+            // Check for active contract with at least 2 months or more
+            $activeContract = Contract::where('teacher_id', $teacher->id)
+                                        ->whereIn('status', ['approved', 'completed'])
+                                        ->whereRaw('DATEDIFF(end_date, NOW()) > 30') // Active for at least 1 months
+                                        ->first();
+
+            if ($activeContract) {
+                Alert::info(
+                    'Info',
+                    'Your request failed because you still have an active contract. Your contract will expire on ' .
+                    Carbon::parse($activeContract->end_date)->format('d-m-Y H:i')
+                );
+                return redirect()->back();
+            }
+
+
+            // Handle file upload
+            $filePath = '';
+            if ($request->hasFile('application_letter')) {
+                $applicationFile = $request->file('application_letter');
+                $fileName = time() . '.' . $applicationFile->getClientOriginalExtension();
+                $destinationPath = storage_path('app/public/contracts/contract_application');
+
+                // Ensure the directory exists
+                if (!file_exists($destinationPath)) {
+                    mkdir($destinationPath, 0755, true);
+                }
+
+                // Move the file to the destination
+                $applicationFile->move($destinationPath, $fileName);
+                $filePath = 'contracts/contract_application/' . $fileName; // Path to store in the database
+            }
+
+            // Save contract data
+            Contract::create([
+                'teacher_id' => $teacher->id,
+                'school_id' => $teacher->school_id,
+                'contract_type' => $request->input('contract_type'),
+                'application_file' => $filePath,
+                'applied_at' => now(),
+            ]);
+
+            // Notify success
+            Alert::success('Done', 'Your application has been submitted successfully.');
+            return redirect()->back();
         }
-
-        // Save contract data
-        Contract::create([
-            'teacher_id' => $teacher->id,
-            'school_id' => $teacher->school_id,
-            'contract_type' => $request->input('contract_type'),
-            'application_file' => $filePath,
-            'applied_at' => now(),
-        ]);
-
-        // Notify success
-        Alert::success('Done', 'Your application has been submitted successfully.');
-        return redirect()->back();
+        catch (Exception $e) {
+            Alert::error('Error', $e->getMessage());
+            return redirect()->back();
+        }
     }
 
     //preview teachers his/her contract application

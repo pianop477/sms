@@ -20,6 +20,15 @@ use Barryvdh\DomPDF\PDF as PDF;
 
 class TeachersController extends Controller
 {
+    protected $beemSmsService;
+    protected $nextSmsService;
+
+    public function __construct(BeemSmsService $beemSmsService, NextSmsService $nextSmsService)
+    {
+        $this->beemSmsService = $beemSmsService;
+        $this->nextSmsService = $nextSmsService;
+    }
+
 
     // Display teachers list in the school ***********************************************************
     public function showTeachersList() {
@@ -137,7 +146,7 @@ class TeachersController extends Controller
 
             // Check if phone number is valid after formatting
             if (strlen($formattedPhone) !== 12 || !preg_match('/^255\d{9}$/', $formattedPhone)) {
-                    Log::error('Invalid phone number format', ['phone' => $formattedPhone]);
+                    // Alert::error('Invalid phone number format', ['phone' => $formattedPhone]);
                 } else {
                     $recipients = [
                         [
@@ -149,7 +158,7 @@ class TeachersController extends Controller
                 }
 
                 $message = "Dear Teacher ". strtoupper($users->first_name) .", Welcome to ShuleApp System. Your username: {$users->phone} and your password: shule@2024. Click here {$url} to Login.";
-                $response = $beemSmsService->sendSms($sourceAddr, $message, $recipients);
+                // $response = $beemSmsService->sendSms($sourceAddr, $message, $recipients);
 
                 // send SMS using nextSMS API ***********************************************
                 $nextSmsService = new NextSmsService();
@@ -295,7 +304,7 @@ class TeachersController extends Controller
 
             // Save user
             if ($user->save()) {
-                Log::info('User updated successfully');
+                // Log::info('User updated successfully');
 
                 // Update teacher
                 $teacher->dob = $request->dob;
@@ -304,21 +313,21 @@ class TeachersController extends Controller
                 $teacher->qualification = $request->qualification;
 
                 if ($teacher->save()) {
-                    Log::info('Teacher updated successfully');
+                    // Log::info('Teacher updated successfully');
                     Alert::success('Success', 'Teacher records updated successfully');
                     return back();
                 } else {
-                    Log::error('Failed to update teacher');
+                    // Log::error('Failed to update teacher');
                     Alert::error('Error', 'Failed to update teacher records');
                     return back();
                 }
             } else {
-                Log::error('Failed to update user');
+                // Log::error('Failed to update user');
                 Alert::error('Error', 'Failed to update user records');
                 return back();
             }
         } catch (\Exception $e) {
-            Log::error('An error occurred', ['message' => $e->getMessage()]);
+            // Log::error('An error occurred', ['message' => $e->getMessage()]);
             Alert::error('Error', 'An error occurred: ' . $e->getMessage());
             return back();
         }
