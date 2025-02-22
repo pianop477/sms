@@ -48,28 +48,32 @@
                                         <th class="text-center" style="width: 5%;">id</th>
                                         <th class="text-left" style="">description</th>
                                         <th class="text-left">Service Time Duration</th>
-                                        <th>No.Students</th>
-                                        <th style="">Unit Cost</th>
+                                        <th style="">No.Students</th>
+                                        <th style="" style="max-width: 10px">Unit Cost</th>
                                         <th>total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
                                         <td class="text-center">1</td>
-                                        <td class="text-left">System Running Cost for Year - {{\Carbon\Carbon::now()->format('Y')}}</td>
-                                        <td class="text-left">{{\Carbon\Carbon::parse($school->service_start_date)->format('d/m/Y') ?? '-'}} - {{\Carbon\Carbon::parse($school->service_end_date)->format('d/m/Y') ?? '-'}}</td>
-                                        <td class="">{{count($students)}}</td>
-                                        <td class="">{{number_format(3500)}}</td>
-                                        @php
-                                            $total = count($students) * 3500
-                                        @endphp
-                                        <td>{{number_format($total)}}</td>
+                                        <td class="text-left">System Running Cost for Year - {{ \Carbon\Carbon::now()->format('Y') }}</td>
+                                        <td class="text-left">
+                                            {{ \Carbon\Carbon::parse($school->service_start_date)->format('d/m/Y') ?? '-' }} -
+                                            {{ \Carbon\Carbon::parse($school->service_end_date)->format('d/m/Y') ?? '-' }}
+                                        </td>
+                                        <td class="text-center">{{ count($students) }}</td>
+                                        <td class="text-center">
+                                            <form action="" role="form">
+                                                <input type="number" id="unit_cost" class="form-control text-right" placeholder="Enter Unit Amount" min="0" value="">
+                                            </form>
+                                        </td>
+                                        <td id="total_cost">0</td>
                                     </tr>
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <td colspan="4">total balance :</td>
-                                        <td>TZS. {{number_format($total)}}</td>
+                                        <td colspan="4"><strong>Total Balance:</strong></td>
+                                        <td><strong>TZS. <span id="total_balance">0</span></strong></td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -78,7 +82,7 @@
                         <div class="row">
                             <div class="col-12">
                                 <div class="text-center">
-                                    <h4>Mode of Payments</h4>
+                                    <h4>Payments</h4>
                                 </div>
                             </div>
                         </div>
@@ -149,3 +153,18 @@
             }
         }
     </style>
+    <!-- jQuery Script -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#unit_cost").on("keyup", function() {
+                let unitCost = parseFloat($(this).val()) || 0; // Ikiwa input ni tupu, iwe 0
+                let totalStudents = {{ count($students) }};
+                let total = unitCost * totalStudents;
+
+                // Weka thamani mpya kwenye total cost na total balance
+                $("#total_cost").text(total.toLocaleString());
+                $("#total_balance").text(total.toLocaleString());
+            });
+        });
+    </script>
