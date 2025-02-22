@@ -189,9 +189,13 @@
                                         <label for="">Report Type</label>
                                         <select name="exam_type" id="" class="form-control" required>
                                             <option value="">--Select--</option>
-                                            @foreach ($compiledGroupByExam as $report_type => $compiled_results )
-                                                <option value="{{$report_type}}">{{$report_type}}</option>
-                                            @endforeach
+                                            @if ($compiledGroupByExam->isEmpty())
+                                                <option value="" disabled class="text-danger">{{ _('No results record found') }}</option>
+                                            @else
+                                                @foreach ($compiledGroupByExam as $report_type => $compiled_results )
+                                                    <option value="{{$report_type}}">{{$report_type}}</option>
+                                                @endforeach
+                                            @endif
                                         </select>
                                     </div>
                                 </div>
