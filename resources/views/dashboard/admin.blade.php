@@ -181,6 +181,11 @@
                                             @else
                                             <ul class="d-flex justify-content-center">
                                                 <li class="mr-3">
+                                                    <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to block school {{strtoupper($school->school_name)}}?')">
+                                                        <i class="ti-na text-info"></i>
+                                                    </button>
+                                                </li>
+                                                <li class="mr-3">
                                                     <a href="{{route('schools.destroy', $school->id)}}"><i class="ti-trash text-danger" onclick="return confirm('Are you sure you want to delete school {{strtoupper($school->school_name)}}?')"></i></a>
                                                 </li>
                                             </ul>
