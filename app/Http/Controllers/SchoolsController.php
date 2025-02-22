@@ -11,6 +11,8 @@ use App\Models\Subject;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Services\BeemSmsService;
+use App\Services\NextSmsService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Hash;
@@ -20,6 +22,14 @@ use RealRashid\SweetAlert\Facades\Alert;
 
 class SchoolsController extends Controller
 {
+    protected $beemSmsService;
+    protected $nextSmsService;
+
+    public function __construct(BeemSmsService $beemSmsService, NextSmsService $nextSmsService)
+    {
+        $this->beemSmsService = $beemSmsService;
+        $this->nextSmsService = $nextSmsService;
+    }
 
     public function index() {
         $schools = school::orderBy('school_name', 'ASC')->orderBy('school_name', 'ASC')->get();
@@ -106,6 +116,37 @@ class SchoolsController extends Controller
             $users->school_id = $school->id;
             $saveData = $users->save();
 
+            //notify manager using nextSms API
+            $nextSmsService = new NextSmsService();
+            $url = "https://shuleapp.tech";
+            $sender = 'SHULE APP';
+            $message = "Welcome to Shule App. Your login details are: Username: $users->phone, Password: shule@2024, Thanks for choosing us. Visit; $url";
+            $destinations = $this->formatPhoneNumber($users->phone);
+            $reference = uniqid();
+
+            $payload = [
+                'from' => $sender,
+                'to' => $destinations,
+                'text' => $message,
+                'reference' => $reference
+            ];
+            $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+
+            // send sms  by Beem API
+            //prepare send sms payload to send via Beem API *************************************
+            $sourceAddr = 'shuleApp';
+            $recipient_id = 1;
+            $phone = $this->formatPhoneNumber($users->phone);
+            $recipients = [
+                [
+                    'recipient_id' => $recipient_id++,
+                    'dest_addr' => $phone
+                ],
+            ];
+
+            //send sms by Beem API
+            // $response = $beemSmsService->sendSms($sourceAddr, $messageContent, $recipients);
+
             Alert::success('Success!', 'School information saved successfully');
             return redirect()->back();
         }
@@ -113,6 +154,21 @@ class SchoolsController extends Controller
             Alert::error('Error', $e->getMessage());
             return back();
         }
+    }
+
+    private function formatPhoneNumber($phone)
+    {
+        // Remove any non-numeric characters
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+
+        // Ensure the number starts with the country code (e.g., 255 for Tanzania)
+        if (strlen($phone) == 9) {
+            $phone = '255' . $phone;
+        } elseif (strlen($phone) == 10 && substr($phone, 0, 1) == '0') {
+            $phone = '255' . substr($phone, 1);
+        }
+
+        return $phone;
     }
 
     /**
