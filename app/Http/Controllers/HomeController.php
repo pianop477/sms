@@ -312,13 +312,13 @@ class HomeController extends Controller
 
                 if(!(Hash::check($request->get('current_password'), Auth::user()->password))) {
                     // return back()->with('error', 'Current password does not match');
-                    Alert::error('Error', 'Current password does not match');
+                    Alert()->toast('Current password does not match', 'error');
                     return back();
                 }
 
                 if(strcmp($request->get('current_password'), $request->get('new_password')) == 0) {
                     // return back()->with('error', 'This password you have already used, choose new one');
-                    Alert::error('Error', 'This password you have already used, choose new one');
+                    Alert()->toast('This password you have already used, choose new one', 'error');
                     return back();
                 }
                 $user = Auth::user();
@@ -326,7 +326,7 @@ class HomeController extends Controller
                 $new_password = $user->save();
 
                 if($new_password) {
-                    Alert::success('Password Updated successfully');
+                    Alert()->toast('Password Updated successfully', 'success');
                     Auth::logout();
                     return redirect()->route('login');
                 }
@@ -387,7 +387,7 @@ class HomeController extends Controller
             // Update user data
             $saveData = $userData->save();
             if($saveData) {
-                Alert::success('Success', 'Profile Updated successfully');
+                Alert()->toast('Profile Updated successfully', 'success');
                 return back();
             }
         }

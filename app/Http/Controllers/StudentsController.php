@@ -88,7 +88,7 @@ class StudentsController extends Controller
                                     ->exists();
 
             if ($existingRecords) {
-                Alert::error('Error','Student with the same records already exists in our records');
+                Alert()->toast('Student with the same records already exists in our records', 'error');
                 return back();
             }
 
@@ -131,7 +131,7 @@ class StudentsController extends Controller
            $student =  $new_student->save();
 
            if($student) {
-                Alert::success('Success', 'Student records saved successfully');
+                Alert()->toast('Student records saved successfully', 'success');
                 return redirect()->route('create.selected.class', $class->id);
            }
     }
@@ -224,7 +224,7 @@ class StudentsController extends Controller
         }
 
         $student->save();
-        Alert::success('Success', 'Student records updated successfully');
+        Alert()->toast('Student records updated successfully', 'success');
         return redirect()->route('Students.show', $students);
 
     }
@@ -244,7 +244,7 @@ class StudentsController extends Controller
          $student->status = 2;
          $student->save();
          // Show success message
-         Alert::success('Success', 'Student records deleted successfully');
+         Alert()->toast('Student records deleted successfully', 'success');
          return back();
      }
 
@@ -287,7 +287,7 @@ class StudentsController extends Controller
         $user = Auth::user();
         $class = Grade::find($id);
         if (! $class) {
-            Alert::error('Error!', 'No such class was found');
+            Alert()->toast('No such class was found', 'error');
             return back();
         }
 
@@ -298,13 +298,13 @@ class StudentsController extends Controller
         if ($request->class_id == 0) {
             // Mark students as graduated
             Student::where('class_id', $class->id)->where('school_id', $user->schoo_id)->update(['graduated' => true, 'status' => 0]);
-            Alert::info('Conglaturations🎉', 'Students graduate batch has been submitted successfully');
+            Alert()->toast('Students graduate batch has been submitted successfully', 'success');
             return back();
         } else {
             // Promote students to the next class
             Student::where('class_id', $class->id)->where('school_id', $user->school_id)->update(['class_id' => $request->class_id]);
 
-            Alert::success('Success!', 'Students batch have been upgraded to the next class');
+            Alert()->toast('Students batch have been upgraded to the next class', 'success');
             return back();
         }
 
@@ -433,7 +433,7 @@ class StudentsController extends Controller
                                     ->exists();
 
         if ($existingRecords) {
-            Alert::error('Error', 'Student with the same records already exists');
+            Alert()->toast('Student with the same records already exists', 'error');
             return back();
         }
 
@@ -473,7 +473,7 @@ class StudentsController extends Controller
         $students->save();
 
         // Return success message
-        Alert::success('Success', 'Student records saved successfully');
+        Alert()->toast('Student records saved successfully', 'success');
         return redirect()->route('home');
     }
 
@@ -512,7 +512,7 @@ class StudentsController extends Controller
         // Check if the data is found
         if (!$data) {
             // Handle the case where no data is found, e.g., return a 404 response
-            Alert::error('404', 'No student found');
+            Alert()->toast('No student found', 'error');
             return back();
         }
 
@@ -564,13 +564,13 @@ class StudentsController extends Controller
         $student = Student::find($id);
 
         if(! $student ) {
-            Alert::error('Error!', 'No such student was found');
+            Alert()->toast('No such student was found', 'error');
             return back();
         }
 
         $status = 1;
         $student->update(['status' => $request->input('status', $status)]);
-        Alert::success('Success!', 'Student has been restored successfully');
+        Alert()->toast('Student has been restored successfully', 'success');
         return back();
     }
 
@@ -580,12 +580,12 @@ class StudentsController extends Controller
         $student = Student::find($id);
 
         if(! $student) {
-            Alert::error('Error!', 'No such student was found');
+            Alert()->toast('No such student was found', 'error');
             return back();
         }
 
         $student->delete();
-        Alert::success('Done!', 'Student has been deleted permanently');
+        Alert()->toast('Student has been deleted permanently', 'success');
         return back();
     }
 

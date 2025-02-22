@@ -8,7 +8,7 @@
                         <h4 class="header-title text-center text-uppercase">daily Attendance report</h4>
                     </div>
                     <div class="col-2">
-                        <a href="{{route('get.student.list', $class->id)}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                        <a href="{{url()->previous()}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
                     </div>
                 </div>
                 <div class="list-group">

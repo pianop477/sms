@@ -42,7 +42,8 @@ class ClassesController extends Controller
 
             // If a record with the same combination exists, return validation error
             if ($existingRecord) {
-                Alert::error('Error', 'A record with the same data already exists.');
+                // Alert::error('Error', 'A record with the same data already exists.');
+                Alert()->toast('A record with the same data already exists.', 'error');
                 return back();
 
             }
@@ -53,7 +54,8 @@ class ClassesController extends Controller
             $New_class->school_id = Auth::user()->school_id;
             $New_class->save();
 
-        Alert::success('Success', 'Class saved successfully');
+        // Alert::success('Success', 'Class saved successfully');
+        Alert()->toast('Class saved successfully', 'success');
         return redirect()->route('Classes.index');
     }
 
@@ -95,7 +97,8 @@ class ClassesController extends Controller
             'class_name' => $request->cname,
             'class_code' => $request->ccode,
         ]);
-        Alert::success('success', 'Class details updated successfully');
+        // Alert::success('success', 'Class details updated successfully');
+        Alert()->toast('Class details updated successfully', 'success');
         return redirect()->route('Classes.index');
     }
 
@@ -109,7 +112,8 @@ class ClassesController extends Controller
         // return $class;
         $students = Student::where('class_id', $class->id)->where('status', 1)->exists();
         if($students) {
-            Alert::info('Info', 'Cannot delete this class because has active students');
+            // Alert::info('Info', 'Cannot delete this class because has active students');
+            Alert()->toast('Cannot delete this class because has active students', 'info');
             return back();
         }
 
@@ -120,13 +124,15 @@ class ClassesController extends Controller
             if($notActiveStudents->isEmpty()) {
                 //delete class
                 $class->delete();
-                Alert::success('Success', 'Class has been deleted successfully');
+                // Alert::success('Success', 'Class has been deleted successfully');
+                Alert()->toast('Class has been deleted successfully', 'success');
                 return back();
             } else {
                 $notActiveStudents->delete();
                 //delete class
                 $class->delete();
-                Alert::success('Success', 'Class has been deleted successfully');
+                // Alert::success('Success', 'Class has been deleted successfully');
+                Alert()->toast('Class has been deleted successfully', 'success');
                 return back();
             }
 

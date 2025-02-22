@@ -62,10 +62,10 @@ class ManagerController extends Controller
         $saveData = $users->save();
 
         if($saveData) {
-            Alert::success('Success', 'User registered successfully');
+            Alert()->toast('User registered successfully', 'success');
             return back();
         } else {
-            Alert::error('Error', 'Something went wrong, try again');
+            Alert()->toast('Something went wrong, try again', 'error');
             return back();
         }
     }
@@ -94,7 +94,7 @@ class ManagerController extends Controller
         $users->password = Hash::make($request->input('password', 'shule@2024'));
         $users->save();
         event(new PasswordResetEvent($user));
-        Alert::success('Success!', 'User Password reset successfully');
+        Alert()->toast('User Password reset successfully', 'success');
         return back();
     }
 
@@ -146,10 +146,10 @@ class ManagerController extends Controller
             //update the status of all transport associated with the school
             Transport::where('school_id', $school_info->id)->update(['status' => $status]);
         if($school_info) {
-            Alert::success('Success', 'User Blocked Successfully');
+            Alert()->toast('User Blocked Successfully', 'success');
             return back();
         } else {
-            Alert::error('Error', 'Something went wrong, try again');
+            Alert()->toast('Something went wrong, try again', 'error');
             return back();
         }
 
@@ -188,7 +188,7 @@ class ManagerController extends Controller
             Transport::where('school_id', $school_info->id)->update(['status' => $status]);
 
         if($school_info) {
-            Alert::success('Success', 'User Unblocked successfully');
+            Alert()->toast('User Unblocked successfully', 'success');
             return back();
         }
     }

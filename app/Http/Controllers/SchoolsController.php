@@ -71,7 +71,7 @@ class SchoolsController extends Controller
             $schoolExists = school::where('school_reg_no', $request->reg_no)->exists();
 
             if($schoolExists) {
-                Alert::error('Error', 'This school already exists');
+                Alert()->toast('This school already exists', 'error');
                 return back();
             }
             //store schools information
@@ -147,7 +147,7 @@ class SchoolsController extends Controller
             //send sms by Beem API
             // $response = $beemSmsService->sendSms($sourceAddr, $messageContent, $recipients);
 
-            Alert::success('Success!', 'School information saved successfully');
+            Alert()->toast('School information saved successfully', 'success');
             return redirect()->back();
         }
         catch(\Exception $e){
@@ -275,7 +275,7 @@ class SchoolsController extends Controller
             $schools->logo = $imageFile;
         }
         $schools->save();
-        Alert::success('Success!', 'School information updated successfully');
+        Alert()->toast('School information updated successfully', 'success');
         return redirect()->route('home');
     }
 
@@ -288,7 +288,7 @@ class SchoolsController extends Controller
         $school = school::find($id);
 
         if(! $school) {
-            Alert::error('Error', 'This school is not found');
+            Alert()->toast('This school is not found', 'error');
             return back();
         }
         $logoPath = public_path('assets/img/logo');
@@ -298,7 +298,7 @@ class SchoolsController extends Controller
         }
         //delete school
         $school->delete();
-        Alert::success('School has been deleted successfully');
+        Alert()->toast('School has been deleted successfully', 'success');
         return redirect()->back();
 
     }
@@ -313,7 +313,7 @@ class SchoolsController extends Controller
     {
         $message = message::findOrFail($sms->id);
         $message->delete();
-        Alert::success('Success!', 'Post has been moved to trash');
+        Alert()->toast('Post has been moved to trash', 'success');
         return back();
     }
 
@@ -338,11 +338,11 @@ class SchoolsController extends Controller
             //update users who disabled
             User::where('school_id', $id)->where('status', 0)->update(['status' => 1]);
 
-            Alert::success('Success!', 'Active time has been updated successfully');
+            Alert()->toast('Active time has been updated successfully', 'success');
             return back();
         }
         catch(Exception $e) {
-            Alert::error('Error', $e->getMessage());
+            Alert()->toast($e->getMessage(), 'error');
             return back();
         }
 

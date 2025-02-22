@@ -281,18 +281,18 @@ class ExamController extends Controller
         // abort(404);
        $examination = Examination::find($exam);
        if(! $examination) {
-            Alert::error('Error', 'No such examination type was found');
+            Alert()->toast('No such examination type was found', 'error');
             return back();
        }
 
        $hasResults = Examination_result::where('exam_type_id', $examination)->exists();
        if($hasResults) {
-            Alert::info('Info', 'Cannot delete this examination because has results payload for this school');
+            Alert()->toast('Cannot delete this examination because has results payload for this school', 'info');
             return back();
        }
 
        $examination->delete();
-       Alert::success('Success!', 'Examination type has been deleted successfully');
+       Alert()->toast('Examination type has been deleted successfully', 'success');
        return back();
     }
 
@@ -304,7 +304,7 @@ class ExamController extends Controller
         // return $class_course;
 
         if(! $class_course) {
-            Alert::error('Error!', 'No such course was found');
+            Alert()->toast('No such course was found', 'error');
             return back();
         }
 
@@ -329,7 +329,7 @@ class ExamController extends Controller
         $user = Auth::user();
         $courses = Subject::find($course->id);
         if(! $courses) {
-            Alert::error('Error!', 'No such course was found');
+            Alert()->toast('No such course was found', 'error');
             return back();
         }
         // return ['data' => $courses];

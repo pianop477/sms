@@ -33,7 +33,7 @@ class SendMessageController extends Controller
         $sendFeeback->message = $request->message;
         $sendFeeback->save();
         // return back()->with('success', 'Message sent! Thank you for your feedback. Happy enjoy our Services');
-        Alert::success('Message Sent!', 'Thank you for your feedback. Happy enjoy our Services');
+        Alert()->toast('Thank you for your feedback. Happy enjoy our Services', 'success');
         return back();
     }
 
