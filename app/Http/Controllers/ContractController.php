@@ -42,7 +42,8 @@ class ContractController extends Controller
             if ($validator->fails()) {
                 $errors = $validator->errors();
                 foreach($errors as $error) {
-                    Alert::error('Validation Fails', $error);
+                    // Alert::error('Validation Fails', $error);
+                    Alert()->toast($error, 'error');
                     return back();
                 }
             }
@@ -53,7 +54,8 @@ class ContractController extends Controller
                                     ->exists();
 
             if ($existingRequest) {
-                Alert::error('Request Denied', 'You already have a pending contract request. Please wait for approval.');
+                // Alert::error('Request Denied', 'You already have a pending contract request. Please wait for approval.');
+                Alert()->toast('You already have a pending contract request. Please wait for approval.', 'info');
                 return redirect()->back();
             }
 
@@ -100,7 +102,8 @@ class ContractController extends Controller
             ]);
 
             // Notify success
-            Alert::success('Done', 'Your application has been submitted successfully.');
+            // Alert::success('Done', 'Your application has been submitted successfully.');
+            Alert()->toast('Your application has been submitted successfully.', 'success');
             return redirect()->back();
         }
         catch (Exception $e) {
@@ -115,21 +118,24 @@ class ContractController extends Controller
         $contract = Contract::find($id);
 
         if (!$contract) {
-            Alert::error('Failed', 'No such contract records found');
+            // Alert::error('Failed', 'No such contract records found');
+            Alert()->toast('No such contract records found', 'error');
             return back();
         }
 
         $user = Auth::user();
         $teacher = Teacher::where('user_id', $user->id)->firstOrFail();
         if ($contract->teacher_id != $teacher->id) {
-            Alert::error('Error', 'The selected Contract is not uploaded by you');
+            // Alert::error('Error', 'The selected Contract is not uploaded by you');
+            Alert()->toast('The selected Contract is not uploaded by you', 'error');
             return back();
         }
 
         $filePath = 'public/' . $contract->application_file; // Adjust path as needed
 
         if (!file_exists(storage_path('app/public/' . $contract->application_file))) {
-            Alert::error('Error', 'The application file is missing');
+            // Alert::error('Error', 'The application file is missing');
+            Alert()->toast('The application file is missing', 'error');
             return back();
         }
 
@@ -141,14 +147,16 @@ class ContractController extends Controller
         $contract = Contract::find($id);
 
         if (!$contract) {
-            Alert::error('Failed', 'No such contract records found');
+            // Alert::error('Failed', 'No such contract records found');
+            Alert()->toast('No such contract records found', 'error');
             return back();
         }
 
         $user = Auth::user();
         $teacher = Teacher::where('user_id', $user->id)->firstOrFail();
         if ($contract->teacher_id != $teacher->id) {
-            Alert::error('Error', 'The selected Contract is not uploaded by you');
+            // Alert::error('Error', 'The selected Contract is not uploaded by you');
+            Alert()->toast('The selected Contract is not uploaded by you', 'error');
             return back();
         }
 
@@ -159,7 +167,8 @@ class ContractController extends Controller
     {
         $contract = Contract::find($id);
         if(!$contract) {
-            Alert::error('Failed', 'No such contract records found');
+            // Alert::error('Failed', 'No such contract records found');
+            Alert()->toast('No such contract records found', 'error');
             return back();
         }
 
@@ -219,7 +228,8 @@ class ContractController extends Controller
                 'application_file' => $filePath,
             ]);
 
-            Alert::success('Done', 'Application has been updated successfully');
+            // Alert::success('Done', 'Application has been updated successfully');
+            Alert()->toast('Application has been updated successfully', 'success');
             return redirect()->route('contract.index');
         }
         catch(\Exception $e){
@@ -232,7 +242,8 @@ class ContractController extends Controller
     {
         $contract = Contract::find($id);
         if(! $contract) {
-            Alert::error('Failed', 'No such contract found');
+            // Alert::error('Failed', 'No such contract found');
+            Alert()->toast('No such contract found', 'error');
             return back();
         }
 
@@ -246,7 +257,8 @@ class ContractController extends Controller
             }
 
             $contract->delete();
-            Alert::success('Done', 'Application has been deleted successfully');
+            // Alert::success('Done', 'Application has been deleted successfully');
+            Alert()->toast('Application has been deleted successfully', 'success');
             return redirect()->route('contract.index');
         }
         catch(\Exception $e) {
@@ -287,7 +299,8 @@ class ContractController extends Controller
         $contract = Contract::find($id);
 
         if (!$contract) {
-            Alert::error('Failed', 'No such contract records found');
+            // Alert::error('Failed', 'No such contract records found');
+            Alert()->toast('No such contract records found', 'error');
             return back();
         }
 
@@ -308,7 +321,8 @@ class ContractController extends Controller
         $contract = Contract::find($id);
 
         if(! $contract ) {
-            Alert::error('Error', 'No such contract was found');
+            // Alert::error('Error', 'No such contract was found');
+            Alert()->toast('No such contract was found', 'error');
             return redirect()->back();
         }
 
@@ -336,7 +350,8 @@ class ContractController extends Controller
             'remarks' => $request->input('remark'),
         ]);
 
-        Alert::success('Done', 'The request has been approved successfully');
+        // Alert::success('Done', 'The request has been approved successfully');
+        Alert()->toast('The request has been approved successfully', 'success');
         return redirect()->back();
     }
 
@@ -345,7 +360,8 @@ class ContractController extends Controller
         $contract = Contract::find($id);
 
         if(! $contract ) {
-            Alert::error('Error', 'No such contract was found');
+            // Alert::error('Error', 'No such contract was found');
+            Alert()->toast('No such contract was found', 'error');
             return redirect()->back();
         }
 
@@ -366,7 +382,8 @@ class ContractController extends Controller
             'remarks' => $request->input('remark'),
         ]);
 
-        Alert::success('Done', 'The request has been rejected successfully');
+        // Alert::success('Done', 'The request has been rejected successfully');
+        Alert()->toast('The request has been rejected successfully', 'success');
         return redirect()->back();
     }
 
@@ -431,7 +448,8 @@ class ContractController extends Controller
                             ->where('contracts.teacher_id', $teacher->id)
                             ->find($id);
         if(! $contract) {
-            Alert::error('Failed', 'No such contract record was found');
+            // Alert::error('Failed', 'No such contract record was found');
+            Alert()->toast('No such contract record was found', 'error');
             return redirect()->back();
         }
 

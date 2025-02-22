@@ -66,7 +66,8 @@ class AttendanceController extends Controller
         // Get the students in the class
         $students = Student::where('class_id', '=', $student_class)->where('school_id', $user->school_id)->get();
         if ($students->isEmpty()) {
-            Alert::error('Error', 'No students found in this class.');
+            // Alert::error('Error', 'No students found in this class.');
+            Alert()->toast('No students found in this class', 'error');
             return back();
         }
 
@@ -104,7 +105,8 @@ class AttendanceController extends Controller
                                         ->toArray();
 
         if (!empty($existingAttendance)) {
-            Alert::error('Error', 'Attendance already taken and Submitted.');
+            // Alert::error('Error', 'Attendance already taken and Submitted.');
+            Alert()->toast('Attendance already taken and Submitted', 'error');
             // return redirect()->route('get.student.list', $student_class);
             return back();
         }
@@ -127,7 +129,8 @@ class AttendanceController extends Controller
 
         Attendance::insert($attendanceData);
 
-        Alert::success('Success', 'Attendance Submitted and Saved successfully');
+        // Alert::success('Success', 'Attendance Submitted and Saved successfully');
+        Alert()->toast('Attendance Submitted and Saved successfully', 'success');
         return redirect()->back();
     }
 

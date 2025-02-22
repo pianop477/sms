@@ -99,7 +99,7 @@ class ParentsController extends Controller
                                     ->exists();
 
             if($userExists || $studentExists) {
-                Alert::info('Info', 'Parents or Student information already exists in our records');
+                Alert()->toast('Parents or Student information already exists in our records', 'error');
                 return back();
             }
 
@@ -158,7 +158,7 @@ class ParentsController extends Controller
             $phoneNumberExists = User::where('phone', $user->phone)->exists();
 
             if($phoneNumberExists) {
-                Alert::success('Success', 'Parent and student information saved successfully');
+                Alert()->toast('Parent and student information saved successfully', 'success');
                 return redirect()->route('Parents.index');
             }
             else {
@@ -195,10 +195,13 @@ class ParentsController extends Controller
                 ];
 
                 $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+
+                Alert()->toast('Parent and student information saved successfully', 'success');
+                return redirect()->route('Parents.index');
             }
 
         } catch (\Exception $e) {
-            Alert::error('Error', $e->getMessage());
+            Alert()->toast($e->getMessage(), 'error');
             return back();
         }
     }
@@ -272,7 +275,7 @@ class ParentsController extends Controller
 
             if($parents->save()) {
                 event(new PasswordResetEvent($user->id));
-                Alert::success('Success', 'Parent blocked successfully');
+                Alert()->toast('Parent blocked successfully', 'success');
                 return back();
             }
         }
@@ -287,7 +290,7 @@ class ParentsController extends Controller
             $parents->status = $request->input('status', 1);
 
             if($parents->save()) {
-                Alert::success('Success', 'Parent unblocked successfully');
+                Alert()->toast('Parent unblocked successfully', 'success');
                 return back();
             }
         }
@@ -305,14 +308,14 @@ class ParentsController extends Controller
             $parent = Parents::find($parentId);
 
             if (!$parent) {
-                Alert::error('Error', 'No such parent was found');
+                Alert()->toast('No such parent was found', 'error');
                 return back();
             }
 
             // Find the associated user
             $user = User::find($parent->user_id);
             if (!$user) {
-                Alert::error('Error', 'No associated user was found');
+                Alert()->toast('No associated user was found', 'error');
                 return back();
             }
 
@@ -320,7 +323,7 @@ class ParentsController extends Controller
             $activeStudents = Student::where('parent_id', $parent->id)->where('status', 1)->count();
 
             if ($activeStudents > 0) {
-                Alert::info('Info', 'Cannot delete this parent because has active children.');
+                Alert()->toast('Cannot delete this parent because has active children', 'info');
                 return back();
             }
 
@@ -339,10 +342,10 @@ class ParentsController extends Controller
             $user->delete();
             $parent->delete();
 
-            Alert::success('Success', 'Parent data has been deleted successfully');
+            Alert()->toast('Parent data has been deleted successfully', 'success');
             return back();
         } catch (\Exception $e) {
-            Alert::error('Error', 'An error occurred: ' . $e->getMessage());
+            Alert()->toast($e->getMessage(), 'error');
             return back();
         }
     }
@@ -402,21 +405,21 @@ class ParentsController extends Controller
 
                 if ($parent->save()) {
                     // Log::info('Teacher updated successfully');
-                    Alert::success('Success', 'Parent records updated successfully');
+                    Alert()->toast('Parent records updated successfully', 'success');
                     return back();
                 } else {
                     // Log::error('Failed to update teacher information');
-                    Alert::error('Error', 'Failed to updated Parent records');
+                    Alert()->toast('Failed to updated Parent records', 'error');
                     return back();
                 }
             } else {
                 // Log::error('Failed to update user information');
-                Alert::error('Error', 'Failed to update parent records');
+                Alert()->toast('Failed to update parent records', 'error');
                 return back();
             }
         } catch (\Exception $e) {
             // Log::error('An error occurred: ' . $e->getMessage());
-            Alert::error('Error', 'An error occured: ' . $e->getMessage());
+            Alert()->toast($e->getMessage(), 'error');
             return back();
         }
     }

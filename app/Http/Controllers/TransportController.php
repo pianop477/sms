@@ -52,7 +52,7 @@ class TransportController extends Controller
 
             // If a record with the same combination exists, return validation error
             if ($existingRecord) {
-                Alert::error('Error', 'A record with the same data already exists.');
+                Alert()->toast('A record with the same data already exists.', 'error');
                 return back();
 
             }
@@ -66,7 +66,7 @@ class TransportController extends Controller
                 'school_id' => $user->school_id
             ]);
 
-            Alert::success('Success', 'School bus routine saved successfully');
+            Alert()->toast('School bus routine saved successfully', 'success');
             return back();
 
         } catch (\Exception $e) {
@@ -93,13 +93,13 @@ class TransportController extends Controller
         $hasStudents = Student::where('transport_id', $transport->id)->where('status', 1)->where('graduated', 0)->exists();
 
         if($hasStudents) {
-            Alert::info('Info', 'This school bus already have active students, cannot be blocked');
+            Alert()->toast('This school bus already have active students, cannot be blocked', 'info');
             return back();
         }
         $transport->status = $request->input('status', 0);
         $transport->save();
         if($transport) {
-            Alert::success('Success', 'Bus routine Blocked successfully');
+            Alert()->toast('Bus routine Blocked successfully', 'success');
             return back();
         }
     }
@@ -110,7 +110,7 @@ class TransportController extends Controller
         $transport->status = $request->input('status', 1);
         $transport->save();
         if($transport) {
-            Alert::success('Success', 'Bus routine Unblocked successfully');
+            Alert()->toast('Bus routine Unblocked successfully', 'success');
             return back();
         }
 
@@ -127,13 +127,13 @@ class TransportController extends Controller
         $hasStudentTake = Student::where('transport_id', $transport->id)->where('status', 1)->where('graduated', 0)->count();
 
         if($hasStudentTake > 0) {
-            Alert::info('Info', 'Cannot delete this route because they have active students');
+            Alert()->toast('Cannot delete this route because they have active students', 'info');
             return back();
         }
 
         $transport->delete();
        if($transport) {
-            Alert::success('Success', 'School bus routine deleted successfully');
+            Alert()->toast('School bus routine deleted successfully', 'success');
             return back();
        }
     }
@@ -161,10 +161,10 @@ class TransportController extends Controller
             $trans->bus_no = $request->bus_no;
             $trans->routine = $request->routine;
             $trans->save();
-            Alert::success('Success!', 'School bus information updated successfully');
+            Alert()->toast('School bus information updated successfully', 'success');
             return redirect()->route('Transportation.index');
         } catch (\Exception $e) {
-            Alert::error('Errors', $e->getMessage());
+            Alert()->toast($e->getMessage(), 'error');
             return back();
         }
     }

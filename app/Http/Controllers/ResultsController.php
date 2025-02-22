@@ -321,7 +321,7 @@ class ResultsController extends Controller
                     ->groupBy(['student_id', 'course_id']);
 
         if ($results->isEmpty()) {
-            Alert::error('Fail', 'No results found for the selected months');
+            Alert()->toast('No results found for the selected months', 'error');
             return back();
         }
 
@@ -346,7 +346,7 @@ class ResultsController extends Controller
         }
 
         if ($duplicateFound) {
-            Alert::error('Fail', 'Some results already exist in the database');
+            Alert()->toast('Some results already exist in the database', 'error');
             return back();
         }
 
@@ -368,7 +368,7 @@ class ResultsController extends Controller
             }
         }
 
-        Alert::success('Done', 'Report saved successfully');
+        Alert()->toast('Report saved successfully', 'success');
         return redirect()->route('fetch.report', ['class' => $class, 'year' => $year, 'school' => $school]);
     }
 
@@ -438,10 +438,10 @@ class ResultsController extends Controller
                                     ->delete();
 
         if($results){
-            Alert::success('Success!', 'Results deleted successfully');
+            Alert()->toast('Results deleted successfully', 'success');
             return redirect()->route('results.byExamType', ['school' => $school, 'year' => $year, 'class' => $class,]);
         } else {
-            Alert::error('Error!', 'No results found to delete.' );
+            Alert()->toast('No results found to delete.', 'error');
             return redirect()->back();
         }
     }
@@ -760,20 +760,20 @@ class ResultsController extends Controller
 
                 // return response()->json($response);
                 if($updatedRows){
-                    Alert::success('Success!', 'Results published successfully');
+                    Alert()->toast('Results published successfully', 'success');
                     return back();
                 } else {
-                    Alert::error('Error!', 'No results found to publish.' );
+                    Alert()->toast('No results found to publish.', 'error');
                     return redirect()->back();
                 }
             } else {
-                Alert::error('Error!', 'Invalid month name provided.' );
+                Alert()->toast('Invalid month name provided.', 'error' );
                 return redirect()->back();
             }
 
         }
         catch (\Exception $e) {
-            Alert::error('Error!', $e->getMessage());
+            Alert()->toast($e->getMessage(), 'error');
             return back();
         }
     }
@@ -799,20 +799,20 @@ class ResultsController extends Controller
                                                 ->whereMonth('exam_date', $monthNumber)
                                                 ->update(['status' => 1]);
                 if($updatedRows){
-                    Alert::success('Success!', 'Results unpublished successfully');
+                    Alert()->toast('Results unpublished successfully', 'success');
                     return back();
                 } else {
-                    Alert::error('Error!', 'No results found to unpublish.' );
+                    Alert()->toast('No results found to unpublish.', 'error' );
                     return redirect()->back();
                 }
             } else {
-                Alert::error('Error!', 'Invalid month name provided.' );
+                Alert()->toast('Invalid month name provided.', 'error');
                 return redirect()->back();
             }
 
         }
         catch (\Exception $e) {
-            Alert::error('Error publishing results', ['error' => $e->getMessage()]);
+            Alert()->toast($e->getMessage(), 'error');
             return back();
         }
     }
@@ -838,18 +838,18 @@ class ResultsController extends Controller
                                                 ->whereMonth('exam_date', $monthNumber)
                                                 ->delete();
                 if($results) {
-                    Alert::success('Done', 'Results has deleted successfully');
+                    Alert()->toast('Results has deleted successfully', 'success');
                     return redirect()->back();
                 }
 
             } else {
-                Alert::error('Error!', 'Invalid month name provided.' );
+                Alert()->toast('Invalid month name provided.', 'error' );
                 return redirect()->back();
             }
 
         }
         catch(\Exception $e){
-            Alert::error('Error', $e->getMessage());
+            Alert()->error($e->getMessage(), 'error');
             return back();
         }
     }
@@ -1038,7 +1038,7 @@ class ResultsController extends Controller
             // Hakikisha kuwa kuna data kwenye $results
             if ($results->isEmpty()) {
                 // Log::error("Hakuna matokeo yaliyopatikana kwa mwanafunzi: {$studentInfo->id}");
-                Alert::error('Error', 'No results found for the selected student or Selected results are blocked');
+                Alert()->toast('Error', 'No results found for the selected student or Selected results are blocked', 'error');
                 return redirect()->back();
             }
 
@@ -1114,11 +1114,11 @@ class ResultsController extends Controller
 
             $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
             // return $response;
-            Alert::success('Done', 'Message sent successfully');
+            Alert()->toast('Message sent successfully', 'success');
             return redirect()->back();
 
         } catch (Exception $e) {
-            Alert::error('Error', $e->getMessage());
+            Alert()->toast($e->getMessage(), 'error');
             return redirect()->back();
         }
     }

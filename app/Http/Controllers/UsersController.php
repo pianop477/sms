@@ -50,7 +50,7 @@ class UsersController extends Controller
 
         $parentExists = User::where('phone', $req->phone)->where('school_id', $req->school)->exists();
         if($parentExists) {
-            Alert::error('Error', 'This accounts already exists');
+            Alert()->toast('This accounts already exists', 'error');
             return back();
         }
 
@@ -99,7 +99,7 @@ class UsersController extends Controller
 
             // Check if phone number is valid after formatting
             if (strlen($formattedPhone) !== 12 || !preg_match('/^255\d{9}$/', $formattedPhone)) {
-                Log::error('Invalid phone number format', ['phone' => $formattedPhone]);
+                // Log('Invalid phone number format', ['phone' => $formattedPhone]);
             } else {
                 $recipients = [
                     [
@@ -124,7 +124,7 @@ class UsersController extends Controller
 
         $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
-        Alert::success('Success!', 'Your Account has been saved successfully');
+        Alert()->toast('Your Account has been saved successfully', 'success');
         return redirect()->route('home');
 
     }
@@ -170,14 +170,14 @@ class UsersController extends Controller
         if($validator->fails()) {
             $errors = $validator->errors();
             foreach($errors as $error) {
-                Alert::error('Validation Error', $error);
+                Alert()->toast($error, 'error');
             }
             return back();
         }
 
         $isExisting = User::where('phone', $request->phone)->exists();
         if($isExisting) {
-            Alert::error('Duplicate Data', 'User information already exist');
+            Alert()->toast('User information already exist', 'error');
             return back();
         }
 
@@ -201,7 +201,7 @@ class UsersController extends Controller
 
         $response = $nextSmsService->sendSmsByNext($sender, $phone, $message, $reference);
 
-        Alert::success('Success!', 'User admin saved successfully');
+        Alert()->toast('User admin saved successfully', 'success');
         return back();
 
     }
@@ -230,12 +230,12 @@ class UsersController extends Controller
         $status = 0;
 
         if(! $user) {
-            ALert::error('Error', 'No such user was found');
+            ALert()->toast('No such user was found', 'error');
             return back();
         }
 
         if($loggedUser->id == $user->id) {
-            Alert::error('Error', 'You cannot block your own account');
+            Alert()->toast('You cannot block your own account', 'error');
             return back();
         }
 
@@ -243,7 +243,7 @@ class UsersController extends Controller
             'status' => $status
         ]);
 
-        Alert::success('Success', 'Admin Account has been blocked successufully');
+        Alert()->toast('Admin Account has been blocked successufully', 'success');
         return back();
 
     }
@@ -255,7 +255,7 @@ class UsersController extends Controller
         $status = 1;
 
         if(! $user) {
-            ALert::error('Error', 'No such user was found');
+            ALert()->toast('No such user was found', 'error');
             return back();
         }
 
@@ -263,7 +263,7 @@ class UsersController extends Controller
             'status' => $status
         ]);
 
-        Alert::success('Success', 'Admin Account has been unblocked successufully');
+        Alert()->toast('Admin Account has been unblocked successufully', 'success');
         return back();
 
     }
@@ -276,18 +276,18 @@ class UsersController extends Controller
 
 
         if(! $user) {
-            ALert::error('Error', 'No such user was found');
+            ALert()->toast('No such user was found', 'error');
             return back();
         }
 
         if($loggedUser->id == $user->id) {
-            Alert::error('Error', 'You cannot delete your own account');
+            Alert()->toast('You cannot delete your own account', 'error');
             return back();
         }
 
         $user->delete();
 
-        Alert::success('Success', 'Admin Account has been deleted successufully');
+        Alert()->toast('Admin Account has been deleted successufully', 'success');
         return back();
 
     }

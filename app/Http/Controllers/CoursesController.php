@@ -33,7 +33,8 @@ class CoursesController extends Controller
      {
         $class = Grade::find($id);
         if(! $class) {
-            Alert::error('Error!', 'No such class was found');
+            // Alert::error('Error!', 'No such class was found');
+            Alert()->toast('No such class was found', 'error');
             return back();
         }
 
@@ -76,14 +77,16 @@ class CoursesController extends Controller
     {
         $course = Subject::find($id);
         if(! $course) {
-            Alert::error('Error', 'No such course was found');
+            // Alert::error('Error', 'No such course was found');
+            Alert()->toast('No such course was found', 'error');
             return back();
         }
         $course->update([
             'status' => $request->input('status', 0)
         ]);
 
-        Alert::success('Success!', 'Course has been blocked successfully');
+        // Alert::success('Success!', 'Course has been blocked successfully');
+        Alert()->toast('Course has been blocked successfully', 'success');
         return back();
     }
 
@@ -91,14 +94,16 @@ class CoursesController extends Controller
     {
         $course = Subject::find($id);
         if(! $course) {
-            Alert::error('Error', 'No such course was found');
+            // Alert::error('Error', 'No such course was found');
+            Alert()->toast('No such course was found', 'error');
             return back();
         }
         $course->update([
             'status' => $request->input('status', 1)
         ]);
 
-        Alert::success('Success!', 'Course has been unblocked successfully');
+        // Alert::success('Success!', 'Course has been unblocked successfully');
+        Alert()->toast('Course has been unblocked successfully', 'success');
         return back();
     }
 
@@ -117,7 +122,8 @@ class CoursesController extends Controller
                                             )
                                             ->find($id);
         if(! $classCourse) {
-            Alert::error('Error', 'No such course was found');
+            // Alert::error('Error', 'No such course was found');
+            Alert()->toast('No such course was found', 'error');
             return back();
         }
         $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
@@ -135,14 +141,16 @@ class CoursesController extends Controller
     {
         $class_course = class_learning_courses::find($id);
         if(! $class_course) {
-            Alert::error('Error!', 'No such course was found');
+            // Alert::error('Error!', 'No such course was found');
+            Alert()->toast('No such course was found', 'error');
             return back();
         }
 
         $class_course->update([
             'teacher_id' => $request->teacher_id
         ]);
-        Alert::success('Success!', 'Subject teacher has been saved successfully');
+        // Alert::success('Success!', 'Subject teacher has been saved successfully');
+        Alert()->toast('Subject teacher has been saved successfully', 'success');
         return redirect()->route('courses.view.class', $class_course->class_id);
     }
 
@@ -152,7 +160,8 @@ class CoursesController extends Controller
         $courses = Subject::findOrFail($course->id);
         $courses->status = $request->input('status', 2);
         $courses->save();
-        Alert::success('Success!', 'Your course has been moved to trash!');
+        // Alert::success('Success!', 'Your course has been moved to trash!');
+        Alert()->toast('Your course has been moved to trash!', 'success');
         return back();
     }
 
@@ -170,7 +179,8 @@ class CoursesController extends Controller
                             ->exists();
 
         if($ifExists) {
-            Alert::error('Error!', 'Course details already exists');
+            // Alert::error('Error!', 'Course details already exists');
+            Alert()->toast('Course details already exists', 'error');
             return back();
         }
         $course = Subject::create([
@@ -179,7 +189,7 @@ class CoursesController extends Controller
             'school_id' => $request->school_id
         ]);
 
-        Alert::success('Success!', 'Course has been saved successfully');
+        Alert()->toast('Course has been saved successfully', 'success');
         return back();
     }
 
@@ -194,7 +204,7 @@ class CoursesController extends Controller
         $course = Subject::find($id);
 
         if(! $course) {
-            Alert::error('Error', 'No such course was found');
+            Alert()->toast('No such course was found', 'error');
             return back();
         }
 
@@ -208,7 +218,7 @@ class CoursesController extends Controller
             'course_code' => $request->scode,
         ]);
 
-        Alert::success('Success!', 'Course information has been updated successfully');
+        Alert()->toast('Course information has been updated successfully', 'success');
         return redirect()->route('courses.index');
     }
 
@@ -227,7 +237,7 @@ class CoursesController extends Controller
                                                         ->where('school_id', $request->school_id)
                                                         ->exists();
         if($hasAlreadyAssigned) {
-            Alert::error('Error!', 'Course already exists to this class');
+            Alert()->toast('Course already exists to this class', 'error');
             return back();
         }
         //check for if teacher id has reached to maximum of 3 classes
@@ -235,7 +245,7 @@ class CoursesController extends Controller
                                             ->where('school_id', $request->school_id)
                                             ->count();
         if($teacher >= 3) {
-            Alert::error('Error!', 'The selected teacher has already assigned to maximum of 3 subjects to teach');
+            Alert()->toast('The selected teacher has already assigned to maximum of 3 subjects to teach', 'error');
             return back();
         }
         $class_course = class_learning_courses::create([
@@ -245,7 +255,7 @@ class CoursesController extends Controller
             'school_id' => $request->school_id
         ]);
 
-        Alert::success('Success!', 'Subject teacher saved successfully');
+        Alert()->toast('Subject teacher saved successfully', 'success');
         return back();
     }
 
@@ -254,13 +264,13 @@ class CoursesController extends Controller
         $class_course = class_learning_courses::find($id);
 
         if(! $class_course) {
-            Alert::error('Error', 'No such course was found in the records');
+            Alert()->toast('No such course was found in the records', 'error');
             return back();
         }
 
         $class_course->delete();
 
-        Alert::success('Success!', 'Subject deleted successfully to this class');
+        Alert()->toast('Subject deleted successfully to this class', 'success');
         return back();
     }
 
@@ -270,7 +280,7 @@ class CoursesController extends Controller
         $student = Student::find($id);
         // return $student;
         if(! $student) {
-            Alert::error('Haijafanikiwa', 'Hakuna taarifa za mwanafunzi huyu');
+            Alert()->toast('No such student was found', 'error');
             return back();
         }
 
@@ -279,7 +289,7 @@ class CoursesController extends Controller
         $user = Auth::user();
 
         if(! $class) {
-            Alert::error('Haijafanikiwa', 'Hakuna taarifa za darasa hili');
+            Alert()->toast('No class details was found', 'error');
             return back();
         }
         $class_course = class_learning_courses::query()
@@ -315,7 +325,7 @@ class CoursesController extends Controller
         $class_course = class_learning_courses::find($id);
 
         if(! $class_course) {
-            Alert::error('Error!', 'No such class course was found');
+            Alert()->toast('No such class course was found', 'error');
             return back();
         }
 
@@ -325,7 +335,7 @@ class CoursesController extends Controller
             'status' => $status,
         ]);
 
-        Alert::success('Success!', 'Class course has been blocked successfully');
+        Alert()->toast('Class course has been blocked successfully', 'success');
         return back();
     }
 
@@ -334,7 +344,7 @@ class CoursesController extends Controller
         $class_course = class_learning_courses::find($id);
 
         if(! $class_course) {
-            Alert::error('Error!', 'No such class course was found');
+            Alert()->toast('No such class course was found', 'error');
             return back();
         }
 
@@ -344,7 +354,7 @@ class CoursesController extends Controller
             'status' => $status,
         ]);
 
-        Alert::success('Success!', 'Class course has been blocked successfully');
+        Alert()->toast('Class course has been blocked successfully', 'success');
         return back();
     }
 }

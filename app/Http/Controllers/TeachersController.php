@@ -103,7 +103,7 @@ class TeachersController extends Controller
         if ($existingRecords) {
             // Log::info('Duplicate record detected for DOB: ' . $request->dob);
 
-            Alert::error('Error', 'Teacher with the same records already exists');
+            Alert()->toast('Teacher with the same records already exists', 'error');
             return back();
         }
 
@@ -172,12 +172,12 @@ class TeachersController extends Controller
                 ];
                 $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
-                Alert::success('Success', 'Teacher records saved successfully');
+                Alert()->toast('Teacher records saved successfully', 'success');
                 return redirect()->back();
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Alert::error('Error', $e->getMessage());
+            Alert()->toast($e->getMessage(), 'error');
             return back();
         }
     }
@@ -314,21 +314,21 @@ class TeachersController extends Controller
 
                 if ($teacher->save()) {
                     // Log::info('Teacher updated successfully');
-                    Alert::success('Success', 'Teacher records updated successfully');
+                    Alert()->toast('Teacher records updated successfully', 'success');
                     return back();
                 } else {
                     // Log::error('Failed to update teacher');
-                    Alert::error('Error', 'Failed to update teacher records');
+                    Alert()->toast('Failed to update teacher records', 'error');
                     return back();
                 }
             } else {
                 // Log::error('Failed to update user');
-                Alert::error('Error', 'Failed to update user records');
+                Alert()->toast('Failed to update teacher records', 'error');
                 return back();
             }
         } catch (\Exception $e) {
             // Log::error('An error occurred', ['message' => $e->getMessage()]);
-            Alert::error('Error', 'An error occurred: ' . $e->getMessage());
+            Alert()->toast($e->getMessage(), 'error');
             return back();
         }
      }
@@ -346,12 +346,12 @@ class TeachersController extends Controller
         // return $user;
 
         if(Auth::user()->id == $user->id) {
-            Alert::error('Error!', 'You cannot block your own account');
+            Alert()->toast('You cannot block your own account', 'error');
             return back();
         }
 
         if($teacher->role_id == 2) {
-            Alert::error('Error!', 'You do not have permission to block this teacher.');
+            Alert()->toast('You do not have permission to block this teacher.', 'error');
             return back();
         }
 
@@ -371,7 +371,7 @@ class TeachersController extends Controller
         event(new PasswordResetEvent($user->id));
 
         // Show success message
-        Alert::success('Success', 'Teacher has been blocked successfully');
+        Alert()->toast('Teacher has been blocked successfully', 'success');
 
         // Redirect back
         return back();
@@ -401,7 +401,7 @@ class TeachersController extends Controller
         });
 
         // Show success message
-        Alert::success('Success', 'Teacher has been unblocked successfully');
+        Alert()->toast('Teacher has been unblocked successfully', 'success');
 
         // Redirect back
         return back();
@@ -422,13 +422,13 @@ class TeachersController extends Controller
 
         // Check if the selected teacher is logged in and trying to update their status themselves
         if ($teacher->user_id == $userId) {
-            Alert::error('Error!', 'You cannot delete your own account');
+            Alert()->toast('You cannot delete your own account', 'error');
             return back();
         }
 
          //check role of logged user compare with role of deleted user=======
          if($teacher->role_id == 2) {
-            Alert::error('Error!', 'You do not have permission to delete this teacher.');
+            Alert()->toast('You do not have permission to delete this teacher.', 'error');
             return back();
          }
 
@@ -455,12 +455,12 @@ class TeachersController extends Controller
             // Commit the transaction
             DB::commit();
 
-            Alert::success('Success', 'Teacher deleted successfully');
+            Alert()->toast('Teacher deleted successfully', 'success');
         } catch (\Exception $e) {
             // Rollback the transaction if there's an error
             DB::rollBack();
 
-            Alert::error('Error', 'Failed to delete teacher');
+            Alert()->toast()('Failed to delete teacher', 'error');
         }
 
         return back();

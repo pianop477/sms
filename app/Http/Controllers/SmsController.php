@@ -90,7 +90,9 @@ class SmsController extends Controller
 
         // Check if any students were found
         if ($students->isEmpty()) {
-            return response()->json(['error' => 'No phone numbers found for this class'], 400);
+            // return response()->json(['error' => 'No phone numbers found for this class'], 400);
+            Alert()->toast('No phone numbers found for this class', 'error');
+            return back();
         }
 
         // Prepare recipients array for Beem API
@@ -116,12 +118,12 @@ class SmsController extends Controller
             $response = $beemSmsService->sendSms($sourceAddr, $request->message_content, $recipients);
 
             // Session::flash('success', 'Message sent successfully');
-            Alert::success('Done', 'Message sent successfully');
+            Alert()->toast('Message sent successfully', 'success');
             return redirect()->back();
 
         } catch (Exception $e) {
             // Session::flash('error', $e->getMessage());
-            Alert::error('Error', $e->getMessage());
+            Alert()->toast($e->getMessage(), 'error');
             return redirect()->back();
         }
     }
@@ -168,7 +170,9 @@ class SmsController extends Controller
 
         // Check if any students were found
         if ($students->isEmpty()) {
-            return response()->json(['error' => 'No phone numbers found for this class'], 400);
+            // return response()->json(['error' => 'No phone numbers found for this class'], 400);
+            Alert()->toast('No phone numbers found for this class', 'error');
+            return back();
         }
 
         //prepare payload
@@ -194,11 +198,11 @@ class SmsController extends Controller
            // Tuma SMS
             $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
-            Alert::success('Done', 'Message Sent Successfully');
+            Alert()->toast('Message Sent Successfully', 'success');
             return redirect()->back();
         }
         catch(Exception $e) {
-            Alert::error('Error', $e->getMessage());
+            Alert()->toast($e->getMessage(), 'error');
             return back();
         }
 

@@ -70,7 +70,7 @@ class RolesController extends Controller
                                      ->where('school_id', Auth::user()->school_id)
                                      ->exists();
          if ($ifExisting) {
-             Alert::error('Error', 'Selected Teacher already assigned in another class');
+             Alert()->toast('Selected Teacher already assigned in another class', 'error');
              return back();
          }
 
@@ -79,7 +79,7 @@ class RolesController extends Controller
                                     ->whereIn('role_id', [2, 3])
                                     ->exists();
          if ($ifTeacherHasRole) {
-             Alert::error('Error!', 'Selected teacher has been assigned another role, cannot be a class teacher!');
+             Alert()->toast('Selected teacher has been assigned another role, cannot be a class teacher!', 'error');
              return back();
          }
 
@@ -89,7 +89,7 @@ class RolesController extends Controller
                                        ->where('school_id', Auth::user()->school_id)
                                        ->count();
          if ($teacherCount >= 2) {
-             Alert::error('Error', 'Maximum number of class teachers has reached to 2');
+             Alert()->toast('Maximum number of class teachers has reached to 2', 'error');
              return back();
          }
 
@@ -107,7 +107,7 @@ class RolesController extends Controller
          $teacher->role_id = 4;
          $teacher->save();
 
-         Alert::success('Success', 'Class Teacher assigned Successfully');
+         Alert()->toast('Class Teacher assigned Successfully', 'success');
          return back();
      }
 
@@ -143,7 +143,7 @@ class RolesController extends Controller
         $users->save();
         //dispatch event to logout user after password reset
         event(new PasswordResetEvent($user));
-        Alert::success('Success!', 'Password reset successfully');
+        Alert()->toast('Password reset successfully', 'success');
         return back();
     }
 
@@ -188,7 +188,7 @@ class RolesController extends Controller
         $ifExisting = Class_teacher::where('teacher_id', '=', $request->teacher)
                                     ->where('school_id', Auth::user()->school_id)->exists();
         if($ifExisting) {
-            Alert::error('Error!', 'Selected Teacher already assigned in another class');
+            Alert()->toast('Selected Teacher already assigned in another class', 'error');
             return back();
         }
 
@@ -196,7 +196,7 @@ class RolesController extends Controller
                                     ->where('role_id', '=', 3)
                                     ->exists();
         if($ifTeacherHasRole) {
-            Alert::error('Error!', 'Selected teacher has been assigned another role, cannot be a class teacher');
+            Alert()->toast('Selected teacher has been assigned another role, cannot be a class teacher', 'error');
             return back();
         }
 
@@ -220,7 +220,7 @@ class RolesController extends Controller
             $oldTeacher->save();
         }
 
-        Alert::success('Success!', 'Class teacher Changed successfully');
+        Alert()->toast('Class teacher Changed successfully', 'success');
         return redirect()->route('Class.Teachers', $class_teacher->class_id);
     }
 
@@ -242,7 +242,7 @@ class RolesController extends Controller
             $teachers->save();
         }
 
-        Alert::success('Success!', 'Class teacher removed successfully');
+        Alert()->toast('Class teacher removed successfully','success');
         return back();
     }
 
@@ -289,7 +289,7 @@ class RolesController extends Controller
         $userId = Auth::user()->id; // Logged-in user ID
 
         if ($user->user_id == $userId) {
-            Alert::error('Error!', 'Permission denied, you cannot change your role');
+            Alert()->toast('Permission denied, you cannot change your role', 'error');
             return back();
         }
 
@@ -306,7 +306,7 @@ class RolesController extends Controller
         $user->role_id = $request->role;
         $user->save();
 
-        Alert::success('Done!', 'Role has been assigned successfully');
+        Alert()->toast('Role has been assigned successfully', 'success');
         return redirect()->route('roles.updateRole');
     }
 
@@ -323,7 +323,7 @@ class RolesController extends Controller
 
         session()->forget('confirm_role_change'); // Clear session after confirmation
 
-        Alert::success('Done!', 'Role has been assigned successfully');
+        Alert()->toast('Role has been assigned successfully', 'success');
         return redirect()->route('roles.updateRole');
     }
 
