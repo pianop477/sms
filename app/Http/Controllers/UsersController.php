@@ -109,7 +109,7 @@ class UsersController extends Controller
                 ];
             }
 
-            $message = "Dear Parent Welcome to ShuleApp System". strtoupper($users->first_name) .", Your Username: {$req->phone}, Password: {$req->password}. Click here {$url} to Login.";
+            $message = "Dear Parent Welcome to ShuleApp System, Your Username: {$req->phone}, Password: {$req->password}. Click here {$url} to Login.";
             // $response = $beemSmsService->sendSms($sourceAddr, $message, $recipients);
 
         // send sms using NextSMS API *****************************************************************************
@@ -118,13 +118,15 @@ class UsersController extends Controller
         $payload = [
             'from' => $school->sender_id ?? 'SHULE APP',
             'to' => $dest,
-            'text' => "Dear Parent Welcome to ShuleApp System". strtoupper($users->first_name) .", Your Username: {$req->phone}, Password: {$req->password}. Click here {$url} to Login.",
+            'text' => "Dear Parent Welcome to ShuleApp System, Your Username: {$req->phone}, Password: {$req->password}. Click here {$url} to Login.",
             'reference' => uniqid(),
         ];
 
         $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
+
         Alert()->toast('Your Account has been saved successfully', 'success');
+        Auth::login($users);
         return redirect()->route('home');
 
     }
@@ -161,7 +163,7 @@ class UsersController extends Controller
         $validator = Validator::make($request->all(), [
             'fname' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
-            'email' => 'nullable|email|unique:users,email',
+            'email' => 'nullable|unique:users,email',
             'gender' => 'required|string|max:10',
             'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone',
             'password' => 'string|min:8',

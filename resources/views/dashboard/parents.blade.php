@@ -191,7 +191,7 @@
                                                 <ul class="d-flex justify-content-center">
                                                     <div class="btn-group" role="group">
                                                         <button id="btnGroupDrop" type="button" class="btn btn-success btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            VIEW
+                                                            Manage
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
                                                             <a class="dropdown-item" href="{{route('students.modify', $student->id)}}"><i class="ti-pencil text-primary"></i> Edit</a>

@@ -11,8 +11,7 @@
                 <form role="form" method="POST" action="{{route('users.create')}}" enctype="multipart/form-data">
                     @csrf
                     <div class="login-form-head">
-                        <h4>ShuleApp</h4>
-                        <p>Parents Registration Form</p>
+                        <h4>Parents Registration Form</h4>
                     </div>
                     <div class="login-form-body">
                         <div class="form-gp">
@@ -45,7 +44,7 @@
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
                             </select>
-                            @error('email')
+                            @error('gender')
                                 <div class="text-danger">{{$message}}</div>
                             @enderror
                         </div>
