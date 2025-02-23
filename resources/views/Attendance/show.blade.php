@@ -1,6 +1,6 @@
 @extends('SRTDashboard.frame')
 @section('content')
-<div class="col-lg-8 mt-5 align-content-between">
+<div class="col-lg-12 mt-5 align-content-between">
     <div class="card">
         <div class="card-body">
             <div class="row">
