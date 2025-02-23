@@ -5,7 +5,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-10">
-                            <h4 class="header-title">Chagua Mwaka - Kuona Mahudhurio</h4>
+                            <h4 class="header-title">Select Year - Attendance Report</h4>
                         </div>
                         <div class="col-2">
                             <a href="{{route('home')}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
@@ -20,7 +20,7 @@
                             @foreach ($groupedAttendance as $year => $year )
                                 <a href="{{ route('students.show.attendance', ['year' => $year, $student->id])}}">
                                     <button type="button" class="list-group-item list-group-item-action">
-                                        <h6 class="text-primary"><i class="fas fa-chevron-right"></i> Mahudhurio Mwaka - {{$year}}</h6>
+                                        <h6 class="text-primary"><i class="fas fa-chevron-right"></i> Attendance For Academic Year - {{$year}}</h6>
                                     </button>
                                 </a>
                             @endforeach
