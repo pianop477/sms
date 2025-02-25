@@ -16,37 +16,20 @@ class checkSessionTimeout
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
 
-     public function handle(Request $request, Closure $next): Response
+     public function handle(Request $request, Closure $next)
     {
-        // Exclude routes like login and logout
-        if ($request->routeIs('login', 'logout')) {
-            return $next($request);
+        if(Auth::check()) {
+            $lastActivity = session('last_activity');
+            $sessionLifeTime = 60 * 60;
+
+            if(time() - $lastActivity > $sessionLifeTime) {
+                Auth::logout();
+                session()->flush();
+                return redirect()->route('login')->with('error', 'Session Expired, Please login again');
+            }
         }
 
-        // Check if the user is authenticated
-        if (!Auth::check()) {
-            Auth::logout();
-            Alert::error('Error', 'Unauthorized request for this resource, please login');
-            return redirect()->route('login');
-        }
-
-        // Check for the last_activity session key
-        if (!$request->session()->has('last_activity')) {
-            $request->session()->put('last_activity', time());
-        }
-
-        $sessionLifeTime = config('session.lifetime') * 60; // Convert minutes to seconds
-        $lastActivity = $request->session()->get('last_activity');
-
-        // Check if the session has expired
-        if (time() - $lastActivity > $sessionLifeTime) {
-            Auth::logout();
-            Alert::error('Error', 'Session expired. Please log in again.');
-            return redirect()->route('login');
-        }
-
-        // Update last activity
-        $request->session()->put('last_activity', time());
+        session(['last_activity' => time()]);
 
         return $next($request);
     }

@@ -21,6 +21,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         PasswordResetEvent::class => [
             'App\Listeners\logoutUserListener',
+            'App\Listeners\CheckSessionTimeoutListener',
         ],
     ];
 
