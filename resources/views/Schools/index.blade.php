@@ -242,7 +242,7 @@
                                                                         <div class="form-group">
                                                                             <input type="hidden" name="school" value="{{$school->id}}">
                                                                             <label for="" class="control-label">Set Months</label>
-                                                                            <input type="number" class="form-control" name="service_duration" id="validationCustom01" required>
+                                                                            <input type="number" class="form-control" name="service_duration" id="validationCustom01" required placeholder="Number of Months for Service" value="{{old('service_duration')}}">
                                                                             @error('service_duration')
                                                                                 <span class="text-danger">{{$message}}</span>
                                                                             @enderror
