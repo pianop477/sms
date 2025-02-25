@@ -130,10 +130,11 @@ class SchoolsController extends Controller
                 'text' => $message,
                 'reference' => $reference
             ];
-            $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+            // $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
             // send sms  by Beem API
             //prepare send sms payload to send via Beem API *************************************
+            $beemSmsService = new BeemSmsService();
             $sourceAddr = 'shuleApp';
             $recipient_id = 1;
             $phone = $this->formatPhoneNumber($users->phone);
@@ -145,7 +146,7 @@ class SchoolsController extends Controller
             ];
 
             //send sms by Beem API
-            // $response = $beemSmsService->sendSms($sourceAddr, $messageContent, $recipients);
+            $response = $beemSmsService->sendSms($sourceAddr, $message, $recipients);
 
             Alert()->toast('School information saved successfully', 'success');
             return redirect()->back();

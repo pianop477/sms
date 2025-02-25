@@ -154,7 +154,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1')->group(function () {
 
             //send sms to specific class
             Route::get('Send-messages-by-class', [SmsController::class, 'smsForm'])->name('sms.form');
-            Route::post('Send-sms', [SmsController::class, 'sendSms'])->name('send.sms'); //send using beem api
+            Route::post('Send-sms', [SmsController::class, 'sendSms'])->name('send.message.byBeem'); //send using beem api
             Route::post('Send-message', [SmsController::class, 'sendSmsUsingNextSms'])->name('Send.message.byNext'); //send using nextSms api
 
             //send sms results to parents

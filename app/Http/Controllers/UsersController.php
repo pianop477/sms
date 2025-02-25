@@ -110,7 +110,7 @@ class UsersController extends Controller
             }
 
             $message = "Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: {$req->password}. Visit {$url} to Login.";
-            // $response = $beemSmsService->sendSms($sourceAddr, $message, $recipients);
+            $response = $beemSmsService->sendSms($sourceAddr, $message, $recipients);
 
         // send sms using NextSMS API *****************************************************************************
         $nextSmsService = new NextSmsService();
@@ -122,7 +122,7 @@ class UsersController extends Controller
             'reference' => uniqid(),
         ];
 
-        $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+        // $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
 
         Alert()->toast('Your Account has been saved successfully', 'success');
