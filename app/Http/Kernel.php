@@ -64,6 +64,7 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'checkSessionTimeout' => \App\Http\Middleware\checkSessionTimeout::class,
     ];
 
     protected $routeMiddleware = [
@@ -72,6 +73,5 @@ class Kernel extends HttpKernel
         'GeneralMiddleware' => \App\Http\Middleware\GeneralMiddleware::class,
         'ManagerOrTeacher' => \App\Http\Middleware\ManagerOrTeacher::class,
         'activeUser' => \App\Http\Middleware\ActiveUserMiddleware::class,
-        'checkSessionTimeout' => \App\Http\Middleware\checkSessionTimeout::class,
     ];
 }
