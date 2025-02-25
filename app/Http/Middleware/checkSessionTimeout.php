@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use RealRashid\SweetAlert\Facades\Alert;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -18,20 +19,22 @@ class checkSessionTimeout
 
      public function handle(Request $request, Closure $next)
     {
-        if(Auth::check()) {
-            $lastActivity = session('last_activity') ?? time();
-            $sessionLifeTime = 60 * 60;
+        if (Auth::check()) {
+            $lastActivity = Session::get('last_activity', time()); // Hii itahakikisha haipo null
+            $sessionLifeTime = 60 * 60; // 1 hour
 
-            if(time() - $lastActivity > $sessionLifeTime) {
+            if (time() - $lastActivity > $sessionLifeTime) {
                 Auth::logout();
-                session()->flush();
+                Session::flush();
                 return redirect()->route('login')->with('error', 'Session Expired, Please login again');
             }
+
+            // Update session activity time
+            Session::put('last_activity', time());
         }
 
-        session(['last_activity' => time()]);
-
         return $next($request);
+
     }
 
 }
