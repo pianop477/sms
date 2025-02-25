@@ -19,7 +19,7 @@ class checkSessionTimeout
      public function handle(Request $request, Closure $next)
     {
         if(Auth::check()) {
-            $lastActivity = session('last_activity');
+            $lastActivity = session('last_activity') ?? time();
             $sessionLifeTime = 60 * 60;
 
             if(time() - $lastActivity > $sessionLifeTime) {
