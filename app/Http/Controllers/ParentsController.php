@@ -181,7 +181,7 @@ class ParentsController extends Controller
                 }
 
                 $message = "Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: shule@2024. Visit {$url} to Login.";
-                // $response = $beemSmService->sendSms($sourceAddr, $message, $recipients);
+                $response = $beemSmService->sendSms($sourceAddr, $message, $recipients);
 
                 // send sms using nextSms API ************************************************
                 $nextSmsService = new NextSmsService();
@@ -194,7 +194,7 @@ class ParentsController extends Controller
                     'reference' => uniqid(),
                 ];
 
-                $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+                // $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
                 Alert()->toast('Parent and student information saved successfully', 'success');
                 return redirect()->route('Parents.index');
