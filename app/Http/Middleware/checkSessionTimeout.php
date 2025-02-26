@@ -18,23 +18,31 @@ class checkSessionTimeout
      */
 
      public function handle(Request $request, Closure $next)
-    {
-        if (Auth::check()) {
-            $lastActivity = Session::get('last_activity', time()); // Hii itahakikisha haipo null
-            $sessionLifeTime = 60 * 60; // 1 hour
+	{
+	    if (Auth::check()) {
+	        $lastActivity = Session::get('last_activity', time());
+	        $sessionLifeTime = 60 * 60; // 1 hour
 
-            if (time() - $lastActivity > $sessionLifeTime) {
-                Auth::logout();
-                Session::flush();
-                return redirect()->route('login')->with('error', 'Session Expired, Please login again');
-            }
+	       /* dd([
+	            'last_activity' => $lastActivity,
+	            'time_now' => time(),
+	            'time_difference' => time() - $lastActivity,
+	            'sessionLifeTime' => $sessionLifeTime
+	        ]); */
 
-            // Update session activity time
-            Session::put('last_activity', time());
-        }
+	        if (time() - $lastActivity > $sessionLifeTime) {
+	            Auth::logout();
+	            session()->invalidate();
+	            session()->regenerateToken();
+	            return redirect()->route('login')->with('error', 'Session Expired, Please login');
+	        }
 
-        return $next($request);
+	        if (!Session::has('last_activity')) {
+		    Session::put('last_activity', time());
+		}
+	    }
 
-    }
+	    return $next($request);
+	}
 
 }
