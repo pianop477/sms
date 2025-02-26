@@ -198,7 +198,7 @@ class UsersController extends Controller
         $url = "https://shulapp.tech";
         $sender = 'SHULE APP';
         $phone = $this->formatPhoneNumber($user->phone);
-        $message = "Hello!". strtoupper($user->first_name). " Welcome to ShuleApp System. Your Username: {$user->phone} and Password: shul@2024. Click here {$url} to login";
+        $message = "Hello!". strtoupper($user->first_name). " Welcome to ShuleApp System. Your Username: {$user->phone} and Password: shule2025. Click here {$url} to login";
         $reference = uniqid();
 
         $response = $nextSmsService->sendSmsByNext($sender, $phone, $message, $reference);

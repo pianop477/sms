@@ -112,7 +112,7 @@ class SchoolsController extends Controller
             $users->gender = $request->gender;
             $users->usertype = $request->input('usertype', 2);
             $users->school_id = $request->school;
-            $users->password = Hash::make($request->input('password', 'shule@2024'));
+            $users->password = Hash::make($request->input('password', 'shule2025'));
             $users->school_id = $school->id;
             $saveData = $users->save();
 
@@ -120,7 +120,7 @@ class SchoolsController extends Controller
             $nextSmsService = new NextSmsService();
             $url = "https://shuleapp.tech";
             $sender = 'SHULE APP';
-            $message = "Welcome to Shule App. Your login details are: Username: $users->phone, Password: shule@2024, Thanks for choosing us. Visit; $url";
+            $message = "Welcome to Shule App. Your login details are: Username: $users->phone, Password: shule2025, Thanks for choosing us. Visit; $url";
             $destinations = $this->formatPhoneNumber($users->phone);
             $reference = uniqid();
 
