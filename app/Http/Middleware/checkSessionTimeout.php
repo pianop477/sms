@@ -38,8 +38,8 @@ class checkSessionTimeout
 	        }
 
 	        if (!Session::has('last_activity')) {
-		    Session::put('last_activity', time());
-		}
+		        Session::put('last_activity', time());
+		    }
 	    }
 
 	    return $next($request);

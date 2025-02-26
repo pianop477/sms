@@ -292,8 +292,8 @@
                                                             <form action="" method="POST" novalidate="" class="needs-validation" enctype="multipart/form-data" role="form">
 
                                                                 <div class="modal-footer">
-                                                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                                                <button type="submit" class="btn btn-success">Save changes</button>
+                                                                {{-- <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button> --}}
+                                                                <button type="button" class="btn btn-danger">Close</button>
                                                             </form>
                                                         </div>
                                                     </div>
