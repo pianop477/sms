@@ -20,9 +20,9 @@ class CheckSessionTimeoutListener
     /**
      * Handle the event.
      */
-    // public function handle(Login $event): void
-    // {
-    //     //
-    //     Session::put('last_activity', time());
-    // }
+    public function handle($event): void
+    {
+        //
+        Session::put('last_activity', time());
+    }
 }
