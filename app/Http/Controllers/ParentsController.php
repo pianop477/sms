@@ -110,7 +110,7 @@ class ParentsController extends Controller
                 'phone' => $request->phone,
                 'gender' => $request->gender,
                 'usertype' => $request->input('usertype', 4),
-                'password' => Hash::make($request->input('password', 'shule@2024')),
+                'password' => Hash::make($request->input('password', 'shule2025')),
                 'school_id' => $user->school_id,
             ]);
 
@@ -180,7 +180,7 @@ class ParentsController extends Controller
                     ];
                 }
 
-                $message = "Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: shule@2024. Visit {$url} to Login.";
+                $message = "Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: shule2025. Visit {$url} to Login.";
                 $response = $beemSmService->sendSms($sourceAddr, $message, $recipients);
 
                 // send sms using nextSms API ************************************************
@@ -190,7 +190,7 @@ class ParentsController extends Controller
                 $payload = [
                     'from' => $school->sender_id ?? "SHULE APP",
                     'to' => $destination,
-                    'text' => "Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: shule@2024. Visit {$url} to Login.",
+                    'text' => "Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: shule2025. Visit {$url} to Login.",
                     'reference' => uniqid(),
                 ];
 
