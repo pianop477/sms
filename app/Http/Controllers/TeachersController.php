@@ -269,7 +269,7 @@ class TeachersController extends Controller
                 'fname' => 'required|string|max:255',
                 'lname' => 'required|string|max:255',
                 'dob' => 'required|date|date_format:Y-m-d',
-                'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,'.$user->phone,
+                'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,'.$user->id,
                 'qualification' => 'required|integer|max:20',
                 'street' => 'required|string|max:255',
                 'gender' => 'required|max:20',
