@@ -139,7 +139,7 @@ class RolesController extends Controller
     {
         $users = User::findOrFail($user);
 
-        $users->password = Hash::make($request->input('password', 'shule@2024'));
+        $users->password = Hash::make($request->input('password', 'shule2025'));
         $users->save();
         //dispatch event to logout user after password reset
         event(new PasswordResetEvent($user));
