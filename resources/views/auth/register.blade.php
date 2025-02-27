@@ -23,8 +23,8 @@
                             @enderror
                         </div>
                         <div class="form-gp">
-                            <label for="exampleInputName1">Last Name</label>
-                            <input type="text" id="exampleInputName1" name="lname" value="{{old('lname')}}">
+                            <label for="exampleInputName2">Last Name</label>
+                            <input type="text" id="exampleInputName2" name="lname" value="{{old('lname')}}">
                             <i class="ti-user"></i>
                             @error('lname')
                                 <div class="text-danger">{{$message}}</div>
@@ -39,7 +39,8 @@
                             @enderror
                         </div>
                         <div class="form-gp">
-                            <select name="gender" id="exampleInputEmail1" class="form-control">
+                            {{-- <label for="exampleInputGender">Gender</label> --}}
+                            <select name="gender" id="exampleInputGender" class="form-control">
                                 <option value="">--Select Gender--</option>
                                 <option value="male">Male</option>
                                 <option value="female">Female</option>
@@ -49,42 +50,60 @@
                             @enderror
                         </div>
                         <div class="form-gp">
-                            <label for="exampleInputEmail1">Phone Number</label>
-                            <input type="tel" id="exampleInputEmail1" name="phone" value="{{old('phone')}}">
+                            <label for="exampleInputPhone">Phone Number</label>
+                            <input type="tel" id="exampleInputPhone" name="phone" value="{{old('phone')}}">
                             <i class="ti-mobile"></i>
                             @error('phone')
                                 <div class="text-danger">{{$message}}</div>
                             @enderror
                         </div>
                         <div class="form-gp">
-                            <label for="exampleInputEmail1">Street Name/Location</label>
-                            <input type="text" id="exampleInputEmail1" name="street" value="{{old('street')}}">
+                            <label for="exampleInputStreet">Street Name/Location</label>
+                            <input type="text" id="exampleInputStreet" name="street" value="{{old('street')}}">
                             <i class="ti-location-pin"></i>
                             @error('street')
                                 <div class="text-danger">{{$message}}</div>
                             @enderror
                         </div>
+
+                        <!-- Password -->
                         <div class="form-gp">
                             <label for="exampleInputPassword1">Password</label>
-                            <input type="password" id="exampleInputPassword1" name="password">
-                            <i class="ti-lock"></i>
+                            <div class="input-group">
+                                <input type="password" id="exampleInputPassword1" name="password" class="form-control">
+                                <div class="input-group-append">
+                                    <span class="input-group-text toggle-password" data-target="exampleInputPassword1">
+                                        <i class="fa fa-eye"></i>
+                                    </span>
+                                </div>
+                            </div>
                             @error('password')
                                 <div class="text-danger">{{$message}}</div>
                             @enderror
                         </div>
+
+                        <!-- Confirm Password -->
                         <div class="form-gp">
                             <label for="exampleInputPassword2">Repeat Password</label>
-                            <input type="password" id="exampleInputPassword2" name="password_confirmation">
-                            <i class="ti-lock"></i>
+                            <div class="input-group">
+                                <input type="password" id="exampleInputPassword2" name="password_confirmation" class="form-control">
+                                <div class="input-group-append">
+                                    <span class="input-group-text toggle-password" data-target="exampleInputPassword2">
+                                        <i class="fa fa-eye"></i>
+                                    </span>
+                                </div>
+                            </div>
                             @error('password_confirmation')
                                 <div class="text-danger">{{$message}}</div>
                             @enderror
                         </div>
+
                         <div class="form-gp">
-                            <select name="school" id="exampleInputEmail1" class="form-control text-capitalize">
+                            {{-- <label for="exampleInputSchool">School Name</label> --}}
+                            <select name="school" id="exampleInputSchool" class="form-control text-capitalize">
                                 <option value="">--Select School Name--</option>
                                 @if ($schools->isEmpty())
-                                    <option value="" class="text-danger">no schools found</option>
+                                    <option value="" class="text-danger">No schools found</option>
                                 @else
                                     @foreach ($schools as $school )
                                         <option value="{{$school->id}}">{{$school->school_name}}</option>
@@ -104,6 +123,21 @@
                         </div>
                     </div>
                 </form>
+                <!-- JavaScript to Toggle Password Visibility -->
+                <script>
+                    document.querySelectorAll(".toggle-password").forEach(item => {
+                        item.addEventListener("click", function() {
+                            let input = document.getElementById(this.getAttribute("data-target"));
+                            if (input.type === "password") {
+                                input.type = "text";
+                                this.innerHTML = '<i class="fa fa-eye-slash"></i>';
+                            } else {
+                                input.type = "password";
+                                this.innerHTML = '<i class="fa fa-eye"></i>';
+                            }
+                        });
+                    });
+                </script>
             </div>
         </div>
     </div>

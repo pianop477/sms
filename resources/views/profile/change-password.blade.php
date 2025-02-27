@@ -12,35 +12,79 @@
             <form class="needs-validation" novalidate="" action="{{route('change.new.password')}}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="form-row">
+                    <!-- Current Password -->
                     <div class="col-md-4 mb-3">
-                        <label for="validationCustom01">Current Password</label>
-                        <input type="password" name="current_password" class="form-control" id="validationCustom01" placeholder="Current Password" value="{{old('current_password')}}" required="">
+                        <label for="currentPassword">Current Password</label>
+                        <div class="input-group">
+                            <input type="password" name="current_password" class="form-control" id="currentPassword" placeholder="" value="{{old('current_password')}}" required>
+                            <div class="input-group-append">
+                                <span class="input-group-text toggle-password" data-target="currentPassword">
+                                    <i class="fa fa-eye"></i>
+                                </span>
+                            </div>
+                        </div>
                         @error('current_password')
                         <div class="invalid-feedback">
                             <span>{{$message}}</span>
                         </div>
                         @enderror
                     </div>
+                    <!-- New Password -->
                     <div class="col-md-4 mb-3">
-                        <label for="validationCustom02">New Password</label>
-                        <input type="password" name="new_password" class="form-control" id="validationCustom02" placeholder="New Password" required="" value="{{old('new_password')}}">
+                        <label for="newPassword">New Password</label>
+                        <div class="input-group">
+                            <input type="password" name="new_password" class="form-control" id="newPassword" placeholder="" required value="{{old('new_password')}}">
+                            <div class="input-group-append">
+                                <span class="input-group-text toggle-password" data-target="newPassword">
+                                    <i class="fa fa-eye"></i>
+                                </span>
+                            </div>
+                        </div>
                         @error('new_password')
                         <div class="invalid-feedback">
-                           <span>{{$message}}</span>
+                            <span>{{$message}}</span>
                         </div>
                         @enderror
                     </div>
+
+                    <!-- Confirm Password -->
                     <div class="col-md-4 mb-3">
-                        <label for="validationCustom02">Confirm Password</label>
-                        <input type="password" name="confirm_password" class="form-control" id="validationCustom02" placeholder="Confirm Password" required="" value="{{old('confirm_password')}}">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <div class="input-group">
+                            <input type="password" name="confirm_password" class="form-control" id="confirmPassword" placeholder="" required value="{{old('confirm_password')}}">
+                            <div class="input-group-append">
+                                <span class="input-group-text toggle-password" data-target="confirmPassword">
+                                    <i class="fa fa-eye"></i>
+                                </span>
+                            </div>
+                        </div>
                         @error('confirm_password')
                         <div class="invalid-feedback">
-                           <span>{{$message}}</span>
+                            <span>{{$message}}</span>
                         </div>
                         @enderror
                     </div>
                 </div>
+
                 <div class="col-md-4 mb-3">
-                    <button class="btn btn-success" type="submit">Save</button>
+                    <button class="btn btn-success" type="submit">Save Password</button>
                 </div>
+            </form>
+
+            <!-- FontAwesome Icons -->
+            <!-- JavaScript for Show/Hide Password -->
+            <script>
+                document.querySelectorAll(".toggle-password").forEach(item => {
+                    item.addEventListener("click", function() {
+                        let input = document.getElementById(this.getAttribute("data-target"));
+                        if (input.type === "password") {
+                            input.type = "text";
+                            this.innerHTML = '<i class="fa fa-eye-slash"></i>';
+                        } else {
+                            input.type = "password";
+                            this.innerHTML = '<i class="fa fa-eye"></i>';
+                        }
+                    });
+                });
+            </script>
 @endsection

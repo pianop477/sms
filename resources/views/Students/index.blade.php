@@ -1,9 +1,44 @@
 @extends('SRTDashboard.frame')
 @section('content')
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<!-- Pakia Select2 CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<!-- Pakia Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<style>
+    /* Override Select2 default styles to match Bootstrap form-control */
+.select2-container .select2-selection--single {
+        height: 38px !important;  /* Ensure same height as form-control */
+        border: 1px solid #ccc !important; /* Border to match Bootstrap */
+        border-radius: 4px !important; /* Rounded corners to match Bootstrap */
+        padding: 6px 12px !important; /* Padding to match form-control */
+    }
+    .select2-container {
+    width: 100% !important; /* Ensure Select2 takes full width of the parent */
+    }
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
+    .select2-container {
+        width: 100% !important; /* Set full width for Select2 container */
+        max-width: 100% !important; /* Ensure it does not exceed container */
+    }
+
+    .select2-selection--single {
+        width: 100% !important; /* Set width of the selection box */
+    }
+    .select2-selection--single {
+        width: 100% !important; /* Ensure selection box inside Select2 also takes full width */
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #495057; /* Match the default text color */
+        line-height: 26px; /* Align text */
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 30px; /* Arrow should be aligned */
+    }
+
+</style>
 <div class="row">
     <div class="col-12 mt-5">
         <div class="card">
@@ -141,14 +176,13 @@
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustomUsername">Parent/Guardian Name</label>
-                                                    <div class="input-group">
                                                         <select name="parent" id="parentSelect" class="form-control select2 text-capitalize" required>
-                                                            <option value="">-- Select Parent --</option>
+                                                            <option value="">Select Parent</option>
                                                             @if ($parents->isEmpty())
                                                                 <option value="" disabled class="text-danger text-capitalize">No parents records found</option>
                                                             @else
                                                                 @foreach ($parents as $parent)
-                                                                    <option value="{{$parent->id}}" class="">
+                                                                    <option value="{{$parent->id}}">
                                                                         {{$parent->first_name . ' ' . $parent->last_name}}
                                                                     </option>
                                                                 @endforeach
@@ -159,7 +193,6 @@
                                                             {{$message}}
                                                         </div>
                                                         @enderror
-                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-row">
@@ -279,13 +312,21 @@
         </div>
     </div>
 </div>
-<script>
-    $(document).ready(function() {
-            $('#parentSelect').select2({
-                placeholder: "-- Select Parent --",
-                allowClear: true,
-            });
+ <script>
+    window.onload = function() {
+    // Hakikisha jQuery na Select2 inapatikana
+    if (typeof $.fn.select2 !== 'undefined') {
+        // Fanya initialization ya Select2
+        $('#parentSelect').select2({
+            placeholder: "Search Parent...",
+            allowClear: true
+        }).on('select2:open', function () {
+            $('.select2-results__option').css('text-transform', 'capitalize');  // Capitalize option text
         });
+    } else {
+        console.error("Select2 haijapakiwa!");
+    }
+};
 
 </script>
 @endsection
