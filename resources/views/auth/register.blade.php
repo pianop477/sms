@@ -70,7 +70,7 @@
                         <div class="form-gp">
                             <label for="exampleInputPassword1">Password</label>
                             <div class="input-group">
-                                <input type="password" id="exampleInputPassword1" name="password" class="form-control">
+                                <input type="password" id="exampleInputPassword1" name="password" placeholder="Password" class="form-control">
                                 <div class="input-group-append">
                                     <span class="input-group-text toggle-password" data-target="exampleInputPassword1">
                                         <i class="fa fa-eye"></i>
@@ -86,7 +86,7 @@
                         <div class="form-gp">
                             <label for="exampleInputPassword2">Repeat Password</label>
                             <div class="input-group">
-                                <input type="password" id="exampleInputPassword2" name="password_confirmation" class="form-control">
+                                <input type="password" id="exampleInputPassword2" name="password_confirmation" placeholder="Repeat Password" class="form-control">
                                 <div class="input-group-append">
                                     <span class="input-group-text toggle-password" data-target="exampleInputPassword2">
                                         <i class="fa fa-eye"></i>
