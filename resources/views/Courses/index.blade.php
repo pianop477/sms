@@ -53,7 +53,7 @@
                                                     <input type="hidden" name="school_id" value="{{Auth::user()->school_id}}">
                                                     <label for="validationCustom01">Select Class</label>
                                                         <select name="class_id" id="validationCustom01" class="form-control text-capitalize" required>
-                                                            <option value="{{$class->id}}" selected>{{$class->class_name}}</option>
+                                                            <option value="{{$class->id}}" selected class="text-uppercase">{{$class->class_name}}</option>
                                                         </select>
                                                         @error('class_id')
                                                         <div class="invalid-feedback">
