@@ -405,76 +405,82 @@ class StudentsController extends Controller
     // parent to register students **************************************************************************
     public function registerStudent (Request $request)
     {
-        $user = Auth::user();
-        $parent = Parents::where('user_id', $user->id)->first();
+        try {
+            $user = Auth::user();
+            $parent = Parents::where('user_id', $user->id)->first();
 
-        $request->merge([
-            'group' => strtoupper($request->input('group')),
-        ]);
+            $request->merge([
+                'group' => strtoupper($request->input('group')),
+            ]);
 
-        $request->validate([
-            'fname' => 'required|string|max:255',
-            'middle' => 'required|string|max:255',
-            'lname' => 'required|string|max:255',
-            'gender' => 'required|string|max:255',
-            'grade' => 'required|integer|exists:grades,id',
-            'dob' => 'required|date|date_format:Y-m-d',
-            'driver' => 'nullable|integer|exists:transports,id',
-            'group' => 'required|string|in:A,B,C,D',
-            'image' => 'nullable|image|max:512|jpg,jpeg,png',
-            'school_id' => 'exists:schools,id',
-        ]);
+            $request->validate([
+                'fname' => 'required|string|max:255',
+                'middle' => 'required|string|max:255',
+                'lname' => 'required|string|max:255',
+                'gender' => 'required|string|max:255',
+                'grade' => 'required|integer|exists:grades,id',
+                'dob' => 'required|date|date_format:Y-m-d',
+                'driver' => 'nullable|integer|exists:transports,id',
+                'group' => 'required|string|in:A,B,C,D',
+                'image' => 'nullable|image|max:512|jpg,jpeg,png',
+                'school_id' => 'exists:schools,id',
+            ]);
 
-         // Check for existing student records
-         $existingRecords = Student::where('first_name', '=', $request->fname)
-                                    ->where('middle_name', '=', $request->middle)
-                                    ->where('last_name', '=', $request->lname)
-                                    ->where('school_id', '=', $user->school_id)
-                                    ->exists();
+            // Check for existing student records
+            $existingRecords = Student::where('first_name', '=', $request->fname)
+                                        ->where('middle_name', '=', $request->middle)
+                                        ->where('last_name', '=', $request->lname)
+                                        ->where('school_id', '=', $user->school_id)
+                                        ->exists();
 
-        if ($existingRecords) {
-            Alert()->toast('Student with the same records already exists', 'error');
-            return back();
-        }
-
-        $students = new Student();
-        $students->admission_number = $this->getAdmissionNumber();
-        $students->first_name = $request->fname;
-        $students->middle_name = $request->middle;
-        $students->last_name = $request->lname;
-        $students->gender = $request->gender;
-        $students->dob = $request->dob;
-        $students->class_id = $request->grade;
-        $students->group = $request->group;
-        $students->transport_id = $request->driver;
-        $parents = Parents::where('user_id', '=', Auth::user()->id)->first();
-        $students->parent_id = $parents->id;
-        $students->school_id = $parent->school_id;
-
-        // Handle file upload if present
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageFile = time() . '.' . $image->getClientOriginalExtension();
-            $imagePath = public_path('assets/img/students');
-
-            // Ensure the directory exists
-            if (!file_exists($imagePath)) {
-                mkdir($imagePath, 0775, true);
+            if ($existingRecords) {
+                Alert()->toast('Student with the same records already exists', 'error');
+                return back();
             }
 
-            // Move the file
-            $image->move($imagePath, $imageFile);
+            $students = new Student();
+            $students->admission_number = $this->getAdmissionNumber();
+            $students->first_name = $request->fname;
+            $students->middle_name = $request->middle;
+            $students->last_name = $request->lname;
+            $students->gender = $request->gender;
+            $students->dob = $request->dob;
+            $students->class_id = $request->grade;
+            $students->group = $request->group;
+            $students->transport_id = $request->driver;
+            $parents = Parents::where('user_id', '=', Auth::user()->id)->first();
+            $students->parent_id = $parents->id;
+            $students->school_id = $parent->school_id;
 
-            // Set the image file name on the student record
-            $students->image = $imageFile;
+            // Handle file upload if present
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $imageFile = time() . '.' . $image->getClientOriginalExtension();
+                $imagePath = public_path('assets/img/students');
+
+                // Ensure the directory exists
+                if (!file_exists($imagePath)) {
+                    mkdir($imagePath, 0775, true);
+                }
+
+                // Move the file
+                $image->move($imagePath, $imageFile);
+
+                // Set the image file name on the student record
+                $students->image = $imageFile;
+            }
+
+            // Save the new student record
+            $students->save();
+
+            // Return success message
+            Alert()->toast('Student records saved successfully', 'success');
+            return redirect()->route('home');
         }
-
-        // Save the new student record
-        $students->save();
-
-        // Return success message
-        Alert()->toast('Student records saved successfully', 'success');
-        return redirect()->route('home');
+        catch (\Exception $e) {
+            Alert::error('Error', $e->getMessage());
+            return back();
+        }
     }
 
     // show student profile *****************************************************************************
