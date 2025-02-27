@@ -65,7 +65,7 @@
                                                 <div class="modal-body">
                                                     <form class="needs-validation" novalidate="" action="{{route('submit.compiled.results', ['school' => $school, 'year' => $year, 'class' => $class])}}" method="POST" enctype="multipart/form-data">
                                                         @csrf
-                                                        <div class="form-row">
+                                                        {{-- <div class="form-row">
                                                             <div class="col-md-4 mb-3">
                                                                 <label for="validationCustom01">Class</label>
                                                                 <input type="hidden" name="class_id" value="{{$class}}">
@@ -141,11 +141,12 @@
                                                                 </div>
 
                                                             </div>
-                                                        </div>
+                                                        </div> --}}
+                                                        <p class="text-danger">Under Construction</p>
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="clear" class="btn btn-danger" data-dismiss="modal">Clear</button>
-                                                    <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to generate compiled results?')">Generate</button>
+                                                    {{-- <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to generate compiled results?')">Generate</button> --}}
                                                 </div>
                                             </div>
                                         </form>
