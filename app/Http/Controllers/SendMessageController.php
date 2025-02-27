@@ -24,12 +24,12 @@ class SendMessageController extends Controller
         // abort(404);
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+            'phone' => 'required|regex:/^[0-9]{10}$/',
             'message' => 'required|string|max:500'
         ]);
         $sendFeeback = new message();
         $sendFeeback->name = $request->name;
-        $sendFeeback->email = $request->email;
+        $sendFeeback->email = $request->phone;
         $sendFeeback->message = $request->message;
         $sendFeeback->save();
         // return back()->with('success', 'Message sent! Thank you for your feedback. Happy enjoy our Services');

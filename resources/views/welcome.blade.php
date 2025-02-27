@@ -265,9 +265,9 @@
               @enderror
             </div>
             <div class="form-group">
-              <label for="email">Email:</label>
-              <input type="email" class="form-control" id="email" placeholder="Enter your Email Address" name="email" value="{{old('email')}}">
-              @error('email')
+              <label for="email">Phone:</label>
+              <input type="text" class="form-control" id="" placeholder="Enter your Email Address" name="phone" value="{{old('phone')}}">
+              @error('phone')
                   <div class="text-danger">{{$message}}</div>
               @enderror
             </div>
