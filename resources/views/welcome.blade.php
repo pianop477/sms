@@ -266,7 +266,7 @@
             </div>
             <div class="form-group">
               <label for="email">Phone:</label>
-              <input type="text" class="form-control" id="" placeholder="Enter your Email Address" name="phone" value="{{old('phone')}}">
+              <input type="text" class="form-control" id="" placeholder="Enter your Phone" name="phone" value="{{old('phone')}}">
               @error('phone')
                   <div class="text-danger">{{$message}}</div>
               @enderror
