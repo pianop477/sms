@@ -158,7 +158,7 @@ class TeachersController extends Controller
                 }
 
                 $message = 'Welcome Teacher '. strtoupper($users->first_name) .', to ShuleApp. Your Login Details are; username: {$users->phone}, password: shule2025. Visit {$url} to Login.';
-                $response = $beemSmsService->sendSms($sourceAddr, $message, $recipients);
+                // $response = $beemSmsService->sendSms($sourceAddr, $message, $recipients);
 
                 // send SMS using nextSMS API ***********************************************
                 $nextSmsService = new NextSmsService();
@@ -170,7 +170,7 @@ class TeachersController extends Controller
                     'text' => 'Welcome Teacher '. strtoupper($users->first_name) .', to ShuleApp. Your Login Details are; username: {$users->phone}, password: shule2025. Visit {$url} to Login.',
                     'reference' => uniqid(),
                 ];
-                // $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+                $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
                 Alert()->toast('Teacher records saved successfully', 'success');
                 return redirect()->back();
