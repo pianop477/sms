@@ -137,7 +137,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="justify-content-center float-right">
-                <a href="{{route('students.modify', Crypt::encryptString($data->id))}}" class="btn btn-primary">Edit</a>
+                <a href="{{route('students.modify', $data->id)}}" class="btn btn-primary">Edit</a>
             </div>
         </div>
     </div>
