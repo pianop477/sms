@@ -22,6 +22,7 @@ class RolesController extends Controller
      //shows class teachers lists ======================================
     public function index ($class)
     {
+        $user = Auth::user();
         $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
                                     ->select('teachers.*', 'users.first_name as teacher_first_name', 'users.last_name as teacher_last_name', 'users.phone as teacher_phone', 'users.email as teacher_email')
                                     ->where('teachers.status', '=', 1)
@@ -138,6 +139,12 @@ class RolesController extends Controller
     public function resetPassword (Request $request, $user)
     {
         $users = User::findOrFail($user);
+        $loggedUser = Auth::user();
+
+        if($users->school_id != $loggedUser->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
+        }
 
         $users->password = Hash::make($request->input('password', 'shule2025'));
         $users->save();

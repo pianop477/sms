@@ -35,7 +35,15 @@ class ResultsController extends Controller
     public function index(Student $student)
     {
         $user = Auth::user();
-        $results = Examination_result::where('student_id', $student->id)->where('school_id', $user->school_id)->orderBy('exam_date', 'DESC')->get();
+        $parent = Parents::where('user_id', $user->id)->first();
+        $results = Examination_result::query()
+                                    ->join('students', 'students.id', '=', 'examination_results.student_id')
+                                    ->select('examination_results.*', 'students.parent_id')
+                                    ->where('student_id', $student->id)
+                                    ->where('students.parent_id', $parent->id)
+                                    ->where('examination_results.school_id', $user->school_id)
+                                    ->orderBy('examination_results.exam_date', 'DESC')
+                                    ->get();
 
         $groupedData = $results->groupBy(function ($item) {
             return Carbon::parse($item->exam_date)->format('Y');
@@ -54,15 +62,18 @@ class ResultsController extends Controller
      public function resultByType(Student $student, $year)
      {
         $user = Auth::user();
+        $parent = Parents::where('user_id', $user->id)->first();
          $examTypes = Examination_result::query()
-             ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-             ->select('examinations.exam_type', 'examinations.id as exam_id')
-             ->distinct()
-             ->whereYear('exam_date', $year)
-             ->where('student_id', $student->id)
-             ->where('examination_results.school_id', $user->school_id)
-             ->orderBy('examinations.exam_type', 'asc')
-             ->paginate(10);
+                    ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+                    ->join('students', 'students.id', '=', 'examination_results.student_id')
+                    ->select('examinations.exam_type', 'examinations.id as exam_id', 'students.parent_id')
+                    ->distinct()
+                    ->whereYear('exam_date', $year)
+                    ->where('student_id', $student->id)
+                    ->where('examination_results.school_id', $user->school_id)
+                    ->where('students.parent_id', $parent->id)
+                    ->orderBy('examinations.exam_type', 'asc')
+                    ->paginate(10);
 
          return view('Results.result_type', compact('student', 'year', 'examTypes'));
      }
@@ -70,16 +81,22 @@ class ResultsController extends Controller
      public function resultByMonth(Student $student, $year, $exam_type)
     {
         $user = Auth::user();
+        $parent = Parents::where('user_id', $user->id)->first();
         $months = Examination_result::query()
-            ->selectRaw('MONTH(exam_date) as month')
-            ->distinct()
-            ->whereYear('exam_date', $year)
-            ->where('exam_type_id', $exam_type)
-            ->where('student_id', $student->id)
-            ->where('status', 2)
-            ->where('school_id', $user->school_id)
-            ->orderBy('month')
-            ->get();
+                                ->join('students', 'students.id', '=', 'examination_results.student_id')
+                                ->select([
+                                    'examination_results.*',
+                                    'students.parent_id'
+                                ])
+                                ->selectRaw('MONTH(exam_date) as month')
+                                ->distinct()
+                                ->whereYear('examination_results.exam_date', $year)
+                                ->where('examination_results.exam_type_id', $exam_type)
+                                ->where('examination_results.status', 2)
+                                ->where('examination_results.school_id', $user->school_id)
+                                ->where('students.parent_id', $parent->id)
+                                ->orderBy('month')
+                                ->get();
 
             $examType = Examination::find($exam_type);
 
@@ -96,6 +113,7 @@ class ResultsController extends Controller
         $studentId = Student::findOrFail($student);
         // return $studentId;
         $user = Auth::user();
+        $parent = Parents::where('user_id', $user->id)->first();
         $results = Examination_result::query()
             ->join('students', 'students.id', '=', 'examination_results.student_id')
             ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
@@ -107,7 +125,7 @@ class ResultsController extends Controller
             ->select(
                 'examination_results.*',
                 'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.admission_number',
-                'students.group', 'students.image', 'students.gender', 'students.admission_number',
+                'students.group', 'students.image', 'students.gender', 'students.admission_number', 'students.parent_id',
                 'subjects.course_name', 'subjects.course_code',
                 'grades.class_name', 'grades.class_code',
                 'examinations.exam_type',
@@ -119,6 +137,7 @@ class ResultsController extends Controller
             ->whereYear('examination_results.exam_date', $year)
             ->whereMonth('examination_results.exam_date', $month)
             ->where('examination_results.school_id', $user->school_id)
+            ->where('students.parent_id', $parent->id)
             ->get();
 
         // Calculate the sum of all scores
@@ -195,90 +214,116 @@ class ResultsController extends Controller
     //general results are intialized here ====================================
     public function general(school $school)
     {
-        $results = Examination_result::query()
-            ->join('students', 'students.id', '=', 'examination_results.student_id')
-            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-            ->select(
-                'examination_results.*',
-                'grades.id as class_id', 'grades.class_name', 'grades.class_code'
-            )
-            ->where('examination_results.school_id', $school->id)
-            ->orderBy('examination_results.exam_date', 'DESC')
-            ->get();
+        $user = Auth::user();
 
-        $groupedData = $results->groupBy(function ($item) {
-            return Carbon::parse($item->exam_date)->format('Y');
-        })->map(function ($yearGroup) {
-            return $yearGroup->groupBy('class_id');
-        });
+        if($user->school_id != $school->id){
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return redirect()->route('error.page');
+        }
 
-        return view('Results.general_year_result', compact('school', 'results', 'groupedData'));
+        else {
+            $results = Examination_result::query()
+                                ->join('students', 'students.id', '=', 'examination_results.student_id')
+                                ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+                                ->select(
+                                    'examination_results.*',
+                                    'grades.id as class_id', 'grades.class_name', 'grades.class_code'
+                                )
+                                ->where('examination_results.school_id', $school->id)
+                                ->orderBy('examination_results.exam_date', 'DESC')
+                                ->get();
+
+            $groupedData = $results->groupBy(function ($item) {
+                return Carbon::parse($item->exam_date)->format('Y');
+            })->map(function ($yearGroup) {
+                return $yearGroup->groupBy('class_id');
+            });
+
+            return view('Results.general_year_result', compact('school', 'results', 'groupedData'));
+        }
     }
 
     public function classesByYear(school $school, $year)
     {
-        $results = Examination_result::query()
-                    ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                    ->select(
-                        'examination_results.*',
-                        'grades.id as class_id', 'grades.class_name', 'grades.class_code'
-                    )
-                    ->where('examination_results.school_id', $school->id)
-                    ->whereYear('examination_results.exam_date', $year)
-                    ->orderBy('grades.class_code', 'ASC')
-                    ->get();
+        $user = Auth::user();
 
-        $groupedByClass = $results->groupBy('class_id');
+        if($user->school_id != $school->id){
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return redirect()->route('error.page');
+        }
+        else {
+            $results = Examination_result::query()
+                        ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+                        ->select(
+                            'examination_results.*',
+                            'grades.id as class_id', 'grades.class_name', 'grades.class_code'
+                        )
+                        ->where('examination_results.school_id', $school->id)
+                        ->whereYear('examination_results.exam_date', $year)
+                        ->orderBy('grades.class_code', 'ASC')
+                        ->get();
 
-        return view('Results.results_grouped_byYear', compact('school', 'year', 'groupedByClass'));
+            $groupedByClass = $results->groupBy('class_id');
+
+            return view('Results.results_grouped_byYear', compact('school', 'year', 'groupedByClass'));
+        }
     }
 
     public function examTypesByClass(school $school, $year, $class)
     {
-        $results = Examination_result::query()
-            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-            ->select(
-                'examination_results.*',
-                'examinations.id as exam_type_id', 'examinations.exam_type'
-            )
-            ->where('examination_results.school_id', $school->id)
-            ->whereYear('examination_results.exam_date', $year)
-            ->where('examination_results.class_id', $class)
-            ->get();
-        $grades = Grade::find($class);
+        $user = Auth::user();
 
-        $months = [
-            'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4, 'May' => 5, 'June' => 6,
-            'July' => 7, 'August' => 8, 'September' => 9, 'October' => 10, 'November' => 11, 'December' => 12
-        ];
+        if($user->school_id != $school->id){
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return redirect()->route('error.page');
+        }
 
-        //query examination lists
-        $exams = Examination::where('status', 1)->where('school_id', Auth::user()->school_id)->orderBy('exam_type')->get();
+        else {
+                $results = Examination_result::query()
+                                    ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+                                    ->select(
+                                        'examination_results.*',
+                                        'examinations.id as exam_type_id', 'examinations.exam_type'
+                                    )
+                                    ->where('examination_results.school_id', $school->id)
+                                    ->whereYear('examination_results.exam_date', $year)
+                                    ->where('examination_results.class_id', $class)
+                                    ->get();
 
-        //query examination_results by for the specific class which exists in the db table
-        $monthsResult = Examination_result::query()
-                                            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                                            ->select('examination_results.*', 'examinations.exam_type', 'examinations.symbolic_abbr')
-                                            ->where('class_id', $class)
-                                            ->whereYear('examination_results.exam_date', $year)
-                                            ->where('examination_results.school_id', $school->id)
-                                            ->orderBy('examination_results.exam_date')
-                                            ->get();
+                $grades = Grade::find($class);
 
-        $groupedByMonth = $monthsResult->groupBy(function ($item) {
-            return Carbon::parse($item->exam_date)->format('F');
-        });
+                $months = [
+                    'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4, 'May' => 5, 'June' => 6,
+                    'July' => 7, 'August' => 8, 'September' => 9, 'October' => 10, 'November' => 11, 'December' => 12
+                ];
 
-        //get compiled results
-        $compiled_results = compiled_results::where('school_id', $school->id)
-                                            ->where('class_id', $class)
-                                            ->get();
+                //query examination lists
+                $exams = Examination::where('status', 1)->where('school_id', Auth::user()->school_id)->orderBy('exam_type')->get();
 
+                //query examination_results by for the specific class which exists in the db table
+                $monthsResult = Examination_result::query()
+                                                    ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+                                                    ->select('examination_results.*', 'examinations.exam_type', 'examinations.symbolic_abbr')
+                                                    ->where('class_id', $class)
+                                                    ->whereYear('examination_results.exam_date', $year)
+                                                    ->where('examination_results.school_id', $school->id)
+                                                    ->orderBy('examination_results.exam_date')
+                                                    ->get();
 
-        $groupedByExamType = $results->groupBy('exam_type_id'); // Group by exam type using results
-        $compiledGroupByExam = $compiled_results->groupBy('report_name'); // Group by exam type using compiled results
+                $groupedByMonth = $monthsResult->groupBy(function ($item) {
+                    return Carbon::parse($item->exam_date)->format('F');
+                });
 
-        return view('Results.general_result_type', compact('school', 'groupedByMonth', 'compiledGroupByExam', 'year', 'exams', 'grades', 'class', 'groupedByExamType'));
+                //get compiled results
+                $compiled_results = compiled_results::where('school_id', $school->id)
+                                                    ->where('class_id', $class)
+                                                    ->get();
+
+                $groupedByExamType = $results->groupBy('exam_type_id'); // Group by exam type using results
+                $compiledGroupByExam = $compiled_results->groupBy('report_name'); // Group by exam type using compiled results
+
+                return view('Results.general_result_type', compact('school', 'groupedByMonth', 'compiledGroupByExam', 'year', 'exams', 'grades', 'class', 'groupedByExamType'));
+        }
     }
 
     //send compiled results to the table compiled_results table
@@ -445,9 +490,18 @@ class ResultsController extends Controller
             return redirect()->back();
         }
     }
+
     //function for displaying general results by term ***************************************
     public function monthsByExamType(School $school, $year, Grade $class, $examType)
     {
+
+        $user = Auth::user();
+
+        if($user->school_id != $school->id){
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return redirect()->route('error.page');
+        }
+
         $results = Examination_result::query()
                             ->join('students', 'students.id', '=', 'examination_results.student_id')
                             ->join('grades', 'grades.id', '=', 'examination_results.class_id')
@@ -477,6 +531,15 @@ class ResultsController extends Controller
 
     public function resultsByMonth(School $school, $year, $class, $examType, $month)
     {
+
+
+        $user = Auth::user();
+
+        if($user->school_id != $school->id){
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return redirect()->route('error.page');
+        }
+
         // return $month;
         $monthsArray = [
             'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
@@ -645,6 +708,13 @@ class ResultsController extends Controller
     {
         try {
 
+            $user = Auth::user();
+
+            if($user->school_id != $school->id){
+                Alert()->toast('You are not authorized to view this page', 'error');
+                return redirect()->route('error.page');
+            }
+
             $monthsArray = [
                 'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
                 'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8, 'September' => 9,
@@ -781,6 +851,15 @@ class ResultsController extends Controller
     public function unpublishResult (School $school, $year, $class, $examType, $month)
     {
         try {
+
+
+            $user = Auth::user();
+
+            if($user->school_id != $school->id){
+                Alert()->toast('You are not authorized to view this page', 'error');
+                return redirect()->route('error.page');
+            }
+
             $monthsArray = [
                 'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
                 'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8, 'September' => 9,
@@ -820,6 +899,14 @@ class ResultsController extends Controller
     public function deleteResults(School $school, $year, $class, $examType, $month)
     {
         try {
+
+            $user = Auth::user();
+
+            if($user->school_id != $school->id){
+                Alert()->toast('You are not authorized to view this page', 'error');
+                return redirect()->route('error.page');
+            }
+
             $monthsArray = [
                 'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
                 'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8, 'September' => 9,
@@ -857,6 +944,14 @@ class ResultsController extends Controller
     //individual students reports show list
     public function individualStudentReports(school $school, $year, $class, $examType, $month)
     {
+
+        $user = Auth::user();
+
+        if($user->school_id != $school->id){
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return redirect()->route('error.page');
+        }
+
          // Mwezi kwa namba
         $monthsArray = [
             'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
@@ -891,6 +986,14 @@ class ResultsController extends Controller
 
     public function downloadIndividualReport(school $school, $year, $class, $examType, $month, $student)
     {
+
+        $user = Auth::user();
+
+        if($user->school_id != $school->id){
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return redirect()->route('error.page');
+        }
+
         $studentId = Student::findOrFail($student);
         //
         $monthsArray = [
@@ -1002,6 +1105,14 @@ class ResultsController extends Controller
     public function sendResultSms(School $school, $year, $class, $examType, $month, $student_id, BeemSmsService $beemSmsService)
     {
         try {
+
+            $user = Auth::user();
+
+            if($user->school_id != $school->id){
+                Alert()->toast('You are not authorized to view this page', 'error');
+                return redirect()->route('error.page');
+            }
+
             // Fetch student information
             $studentInfo = Student::findOrFail($student_id);
 

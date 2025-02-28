@@ -174,6 +174,8 @@ class StudentsController extends Controller
     //  update students records *************************************************************************
     public function updateRecords(Request $request, $students)
     {
+        $user = Auth::user();
+
         $request->merge(['group' => strtoupper($request->input('group'))]);
 
         $request->validate([
@@ -188,6 +190,11 @@ class StudentsController extends Controller
             'image' => 'nullable|max:512|image|mimesjpg,jpeg,png',
         ]);
         $student = Student::findOrFail($students);
+
+        if($student->school_id != $user->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
+        }
         // return $student->first_name . ' '. $student->school_id. ' '. $student->parent_id;
         $student->first_name = $request->fname;
         $student->middle_name = $request->middle;
@@ -238,8 +245,13 @@ class StudentsController extends Controller
      public function destroy($student)
      {
          // Find the student record
+         $user = Auth::user();
          $student = Student::findOrFail($student);
 
+         if($student->school_id != $user->school_id) {
+             Alert()->toast('You are not authorized to perform this action', 'error');
+             return back();
+         }
          //update status ------------
          $student->status = 2;
          $student->save();
@@ -288,6 +300,11 @@ class StudentsController extends Controller
         $class = Grade::find($id);
         if (! $class) {
             Alert()->toast('No such class was found', 'error');
+            return back();
+        }
+
+        if($class->school_id != $user->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
             return back();
         }
 
@@ -487,6 +504,9 @@ class StudentsController extends Controller
     public function showRecords($student)
     {
         $user = Auth::user();
+        // return $user;
+        $parent = Parents::where('user_id', $user->id)->first();
+        // return $parent;
         $data = Student::query()
                         ->join('parents', 'parents.id', '=', 'students.parent_id')
                         ->join('grades', 'grades.id', '=', 'students.class_id')
@@ -511,6 +531,7 @@ class StudentsController extends Controller
                             'schools.school_reg_no', 'schools.abbriv_code'
                         )
                         ->where('students.id', '=', $student)
+                        ->where('students.parent_id', $parent->id)
                         ->where('students.school_id', $user->school_id)
                         ->where('students.status', 1)
                         ->first();
@@ -535,11 +556,13 @@ class StudentsController extends Controller
     public function modify($student)
     {
         $user = Auth::user();
+        $parent = Parents::where('user_id', $user->id)->first();
         $students = Student::query()->join('parents', 'parents.id', '=', 'students.parent_id')
                                     ->join('users', 'users.id', '=', 'parents.user_id')
                                     ->join('grades', 'grades.id', '=', 'students.class_id')
                                     ->leftJoin('transports', 'transports.id', '=', 'students.transport_id')
                                     ->select('students.*', 'grades.class_name', 'grades.class_code', 'transports.driver_name', 'transports.bus_no')
+                                    ->where('students.parent_id', $parent->id)
                                     ->findOrFail($student);
 
         $buses = Transport::where('status', '=', 1)->where('school_id', $user->school_id)->orderBy('bus_no', 'ASC')->get();
@@ -574,6 +597,12 @@ class StudentsController extends Controller
             return back();
         }
 
+        $user = Auth::user();
+        if($student->school_id != $user->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
+        }
+
         $status = 1;
         $student->update(['status' => $request->input('status', $status)]);
         Alert()->toast('Student has been restored successfully', 'success');
@@ -585,8 +614,15 @@ class StudentsController extends Controller
     {
         $student = Student::find($id);
 
+
         if(! $student) {
             Alert()->toast('No such student was found', 'error');
+            return back();
+        }
+
+        $user = Auth::user();
+        if($student->school_id != $user->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
             return back();
         }
 

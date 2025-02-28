@@ -224,7 +224,12 @@ class TeachersController extends Controller
         {
             // Find the teacher by ID
             $teacher = Teacher::findOrFail($teacher);
+            $user = Auth::user();
 
+            if($teacher->school_id != $user->school_id) {
+                Alert()->toast('You are not authorized to perform this action', 'error');
+                return back();
+            }
             // Join the teacher with the users table and get the necessary fields
             $teachers = Teacher::query()
                 ->join('users', 'users.id', '=', 'teachers.user_id')
@@ -260,6 +265,13 @@ class TeachersController extends Controller
          // Find teacher and user
          $teacher = Teacher::findOrFail($teachers);
          $user = User::findOrFail($teacher->user_id);
+
+         $loggedUser = Auth::user();
+
+         if($teacher->school_id != $loggedUser->school_id) {
+             Alert()->toast('You are not authorized to perform this action', 'error');
+             return back();
+         }
 
         try {
             // Log the start of the method
@@ -338,7 +350,13 @@ class TeachersController extends Controller
     public function updateStatus(Request $request, $teacher)
     {
         // Find the teacher record
+        $userLogged = Auth::user();
         $teacher = Teacher::findOrFail($teacher);
+
+        if($teacher->school_id != $userLogged->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
+        }
         // return $teacher; user user_id
 
         // Find the associated user record
@@ -382,9 +400,15 @@ class TeachersController extends Controller
         // Find the teacher record
         $teacher = Teacher::findOrFail($teacher);
 
+        $userLogged = Auth::user();
+
+        if ($teacher->school_id != $userLogged->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
+        }
+
         // Find the associated user record
         $user = User::findOrFail($teacher->user_id);
-
 
         // Retrieve the status from the request, default to 0 if not provided
         $status = $request->input('status', 1);
@@ -412,6 +436,13 @@ class TeachersController extends Controller
     {
         // Find the teacher record or fail
         $teacher = Teacher::findOrFail($teacher);
+
+        $userLogged = Auth::user();
+
+        if($teacher->school_id != $userLogged->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
+        }
 
         // Find the associated user or fail
         $user = User::where('id', $teacher->user_id)->first();
