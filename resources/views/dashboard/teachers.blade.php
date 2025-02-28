@@ -842,7 +842,7 @@
                             <thead>
                                 <tr>
                                     <th>Class</th>
-                                    <th>Number of Students</th>
+                                    <th>Students</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -861,7 +861,7 @@
                             </thead>
                             <tbody>
                                 <tr class="text-center">
-                                    <td>Number of Students</td>
+                                    <td>Students</td>
                                     @foreach ($studentsByClass as $class )
                                         <td>{{$class->student_count}}</td>
                                     @endforeach
