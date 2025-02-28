@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Attendance;
 use App\Models\Class_teacher;
 use App\Models\Grade;
+use App\Models\Parents;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
@@ -24,9 +25,18 @@ class AttendanceController extends Controller
     public function index($class)
     {
         $user = Auth::user();
+        $teacherLoggedIn = Teacher::where('user_id', '=', $user->id)->firstOrFail();
         $myClass = Class_teacher::findOrFail($class);
         // return $myClass->teacher_id;
         $teacher = Teacher::findOrFail($myClass->teacher_id);
+
+        //reject if not class teacher
+        if($teacherLoggedIn->id != $teacher->id) {
+            // Alert::error('Error', 'You are not the class teacher for this class.');
+            Alert()->toast('You are not the class teacher for this class', 'error');
+            return back();
+        }
+
         // return $teacher->id;
         $student_class = Grade::findOrFail($myClass->class_id);
         // return $student_class->id;
@@ -62,6 +72,14 @@ class AttendanceController extends Controller
         $attendanceDate = date('Y-m-d');
         $logged_user = Auth::user();
         $teacher = Teacher::where('user_id', '=', $logged_user->id)->firstOrFail();
+
+        //check if the teacher logged in is the class teacher
+        $class_teacher = Class_teacher::where('class_id', '=', $class_id)->where('teacher_id', '=', $teacher->id)->first();
+        if (!$class_teacher) {
+            // Alert::error('Error', 'You are not the class teacher for this class.');
+            Alert()->toast('You are not the class teacher for this class', 'error');
+            return back();
+        }
 
         // Get the students in the class
         $students = Student::where('class_id', '=', $student_class)->where('school_id', $user->school_id)->get();
@@ -137,6 +155,7 @@ class AttendanceController extends Controller
     public function show(Student $student, $year)
     {
         $user = Auth::user();
+        $parent = Parents::where('user_id', '=', $user->id)->firstOrFail();
         $attendanceQuery = Attendance::query()
             ->join('students', 'students.id', '=', 'attendances.student_id')
             ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
@@ -147,13 +166,14 @@ class AttendanceController extends Controller
                 'users.first_name as teacher_firstname',
                 'users.last_name as teacher_lastname',
                 'users.phone as teacher_phone',
-                'students.first_name as student_firstname',
+                'students.first_name as student_firstname', 'students.parent_id',
                 'students.middle_name as student_middlename',
                 'students.last_name as student_lastname', 'students.status',
             )
             ->whereYear('attendances.attendance_date', $year)
             ->where('attendances.student_id', '=', $student->id)
             ->where('attendances.school_id', $user->school_id)
+            ->where('students.parent_id', $parent->id)
             ->where('students.status', 1)
             ->orderBy('attendances.attendance_date', 'DESC');
 
@@ -183,6 +203,7 @@ class AttendanceController extends Controller
     public function attendanceYear (Student $student)
     {
         $user = Auth::user();
+        $parent = Parents::where('user_id', '=', $user->id)->firstOrFail();
         $attendances = Attendance::query()->join('students', 'students.id', '=', 'attendances.student_id')
                                             ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
                                             ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
@@ -194,10 +215,11 @@ class AttendanceController extends Controller
                                                 'users.phone as teacher_phone',
                                                 'students.first_name as student_firstname', 'students.admission_number',
                                                 'students.middle_name as student_middlename', 'students.status',
-                                                'students.last_name as student_lastname'
+                                                'students.last_name as student_lastname', 'students.parent_id',
                                             )
                                             ->where('attendances.student_id', '=', $student->id)
                                             ->where('attendances.school_id', $user->school_id)
+                                            ->where('students.parent_id', $parent->id)
                                             ->where('students.status', 1)
                                             ->orderBy('attendances.attendance_date', 'DESC')
                                             ->get();
@@ -213,6 +235,8 @@ class AttendanceController extends Controller
     public function getFormReport($class)
     {
         // return $class;
+        $user = Auth::user();
+        $teacher = Teacher::where('user_id', '=', $user->id)->firstOrFail();
         $classTeacher = Class_teacher::query()->join('grades', 'grades.id', '=', 'class_teachers.class_id')
                                             ->select('class_teachers.*', 'grades.id as class_id', 'grades.class_name')
                                             ->findOrFail($class);

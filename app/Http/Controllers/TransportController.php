@@ -86,10 +86,14 @@ class TransportController extends Controller
     public function update(Request $request, $trans)
     {
         //
+        $user = Auth::user();
         $transport = Transport::findOrFail($trans);
 
+        if($transport->school_id != $user->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
+        }
         //check for existing students in this bus routine
-
         $hasStudents = Student::where('transport_id', $transport->id)->where('status', 1)->where('graduated', 0)->exists();
 
         if($hasStudents) {
@@ -106,7 +110,13 @@ class TransportController extends Controller
 
     public function restore(Request $request, $trans)
     {
+        $user = Auth::user();
         $transport = Transport::findOrFail($trans);
+
+        if($transport->school_id != $user->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
+        }
         $transport->status = $request->input('status', 1);
         $transport->save();
         if($transport) {
@@ -122,8 +132,13 @@ class TransportController extends Controller
     public function destroy($trans)
     {
         // abort(404);
+        $user = Auth::user();
         $transport = Transport::findOrFail($trans);
 
+        if($transport->school_id != $user->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
+        }
         $hasStudentTake = Student::where('transport_id', $transport->id)->where('status', 1)->where('graduated', 0)->count();
 
         if($hasStudentTake > 0) {
@@ -140,14 +155,25 @@ class TransportController extends Controller
 
     public function Edit(Transport $trans)
     {
+        $user = Auth::user();
         $transport = Transport::findOrFail($trans);
+
+        if($transport->school_id != $user->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
+        }
         return view('Transport.Edit', ['transport' => $transport]);
     }
 
     public function UpdateRecords(Request $request, $transport)
     {
-        $trans = Transport::findOrFail($transport);
         try {
+            $user = Auth::user();
+            $trans = Transport::findOrFail($transport);
+            if($trans->school_id != $user->school_id) {
+                Alert()->toast('You are not authorized to perform this action', 'error');
+                return back();
+            }
             $request->validate([
                 'fullname' => 'required|string|max:255',
                 'gender' => 'required|string|max:255',
