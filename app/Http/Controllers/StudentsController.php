@@ -427,10 +427,10 @@ class StudentsController extends Controller
             ]);
 
             // Check for existing student records
-            $existingRecords = Student::where('first_name', '=', $request->fname)
-                                        ->where('middle_name', '=', $request->middle)
-                                        ->where('last_name', '=', $request->lname)
-                                        ->where('school_id', '=', $user->school_id)
+            $existingRecords = Student::where('first_name', $request->fname)
+                                        ->where('middle_name',  $request->middle)
+                                        ->where('last_name',  $request->lname)
+                                        ->where('school_id', $user->school_id)
                                         ->exists();
 
             if ($existingRecords) {
