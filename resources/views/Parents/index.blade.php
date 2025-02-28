@@ -177,14 +177,14 @@
                                             <div class="form-row">
                                                 <div class="col-md-6 mb-3">
                                                     <label for="validationCustom01">Student Bus Number</label>
-                                                    <select name="bus_no" id="validationCustom01" class="form-control text-capitalize">
+                                                    <select name="bus_no" id="validationCustom01" class="form-control text-uppercase">
                                                         <option value="">-- select Student Bus --</option>
                                                         {{-- bus number --}}
                                                         @if ($buses->isEmpty())
                                                             <option value="" class="text-danger" disabled>No buses found</option>
                                                         @else
                                                             @foreach ($buses as $bus )
-                                                                <option value="{{$bus->id}}">{{$bus->bus_no}}</option>
+                                                                <option value="{{$bus->id}}">bus no. {{$bus->bus_no}}</option>
                                                             @endforeach
                                                         @endif
                                                     </select>
