@@ -35,16 +35,15 @@ class TransportController extends Controller
     {
         // abort(404);
         $user = Auth::user();
+        $request->validate([
+            'fullname' => 'required|string|max:255',
+            'gender' => 'string|required|max:255',
+            'phone' => 'required|regex:/^[0-9]{10}$/|unique:transports,phone',
+            'bus' => 'required|string|max:255',
+            'routine' => 'required|string|max:255',
+        ]);
 
         try {
-
-            $request->validate([
-                'fullname' => 'required|string|max:255',
-                'gender' => 'string|required|max:255',
-                'phone' => 'required|regex:/^[0-9]{10}$/|unique:transports,phone',
-                'bus' => 'required|string|max:255',
-                'routine' => 'required|string|max:255',
-            ]);
 
             $existingRecord = Transport::where('phone', $request->phone)
                                         ->where('school_id', Auth::user()->school_id)
@@ -167,6 +166,14 @@ class TransportController extends Controller
 
     public function UpdateRecords(Request $request, $transport)
     {
+        $request->validate([
+            'fullname' => 'required|string|max:255',
+            'gender' => 'required|string|max:255',
+            'phone' => 'required|regex:/^[0-9]{10}$/|unique:transports,phone,'.$trans->phone,
+            'bus_no' => 'required|string|max|255',
+            'routine' => 'required|string|max:255'
+        ]);
+
         try {
             $user = Auth::user();
             $trans = Transport::findOrFail($transport);
@@ -174,13 +181,7 @@ class TransportController extends Controller
                 Alert()->toast('You are not authorized to perform this action', 'error');
                 return back();
             }
-            $request->validate([
-                'fullname' => 'required|string|max:255',
-                'gender' => 'required|string|max:255',
-                'phone' => 'required|regex:/^[0-9]{10}$/|unique:transports,phone,'.$trans->phone,
-                'bus_no' => 'required|string|max|255',
-                'routine' => 'required|string|max:255'
-            ]);
+
             $trans->driver_name = $request->fullname;
             $trans->gender = $request->gender;
             $trans->phone = $request->phone;

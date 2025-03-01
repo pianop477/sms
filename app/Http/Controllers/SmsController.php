@@ -10,6 +10,7 @@ use App\Services\NextSmsService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -31,13 +32,18 @@ class SmsController extends Controller
 
     public function smsForm ()
     {
+        $user = auth()->user();
+
         $classes = Grade::where('status', 1)
-                    ->whereIn('id', Student::where('graduated', 0) // Only include students who are not graduated
-                        ->select('class_id')
-                        ->distinct()
-                        ->pluck('class_id'))
-                    ->orderBy('class_code')
-                    ->get();
+            ->where('school_id', $user->school_id)
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('students')
+                    ->whereRaw('students.class_id = grades.id')
+                    ->where('graduated', 0);
+            })
+            ->orderBy('class_code')
+            ->get();
 
         return view('profile.sms', compact('classes'));
     }

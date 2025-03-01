@@ -20,7 +20,7 @@
                                     <label for="validationCustom01">Teacher's Name</label>
                                     <input type="text" name="teacher" disabled class="form-control text-uppercase" id="validationCustom01" placeholder="First name" value="{{old('teacher', $teachers->first_name. ' '. $teachers->last_name)}} - {{$teachers->role_name ?? ''}}" required="">
                                     @error('teacher')
-                                    <div class="invalid-feedback">
+                                    <div class="text-danger">
                                         {{$message}}
                                     </div>
                                     @enderror
@@ -38,7 +38,7 @@
                                         @endif
                                     </select>
                                     @error('role')
-                                    <div class="invalid-feedback">
+                                    <div class="text-danger">
                                         {{$message}}
                                     </div>
                                     @enderror

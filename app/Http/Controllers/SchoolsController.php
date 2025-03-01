@@ -15,6 +15,7 @@ use App\Services\BeemSmsService;
 use App\Services\NextSmsService;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -50,22 +51,22 @@ class SchoolsController extends Controller
     public function store(Request $request)
     {
         // abort(404);
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'reg_no' => 'required|string|max:255',
+            'abbriv' => 'required|string|max:4',
+            'logo' => 'image|max:1024|mimes:png,jpg,jpeg',
+            'postal' => 'required|string|max:255',
+            'postal_name' => 'required|string|max:255',
+            'country' => 'required|string',
+            'fname' => 'required|string|max:255',
+            'lname' => 'required|string|max:255',
+            'email' => 'nullable|string|unique:users,email',
+            'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone',
+            'gender' => 'required|string|max:255',
+            'sender_name' => 'nullable|string|max:11'
+        ]);
         try {
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'reg_no' => 'required|string|max:255',
-                'abbriv' => 'required|string|max:4',
-                'logo' => 'image|max:1024|mimes:png,jpg,jpeg',
-                'postal' => 'required|string|max:255',
-                'postal_name' => 'required|string|max:255',
-                'country' => 'required|string',
-                'fname' => 'required|string|max:255',
-                'lname' => 'required|string|max:255',
-                'email' => 'nullable|string|unique:users,email',
-                'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone',
-                'gender' => 'required|string|max:255',
-                'sender_name' => 'nullable|string|max:11'
-            ]);
 
             //check if exists
             $schoolExists = school::where('school_reg_no', $request->reg_no)->exists();
@@ -320,11 +321,11 @@ class SchoolsController extends Controller
 
     public function addActiveTime(Request $request, $id)
     {
+        $request->validate([
+            'school' => 'exists:schools,id',
+            'service_duration' => 'required|integer',
+        ]);
         try {
-            $request->validate([
-                'school' => 'exists:schools,id',
-                'service_duration' => 'required|integer',
-            ]);
 
             $startDate = Carbon::now();
             $endDate = $startDate->copy()->addMonth($request->service_duration);

@@ -18,7 +18,7 @@
                         <label for="validationCustom01">Class Name</label>
                         <input type="text" name="name" disabled class="form-control text-uppercase" id="validationCustom01" placeholder="course name" value="{{$classTeacher->class_name}}" required="">
                         @error('name')
-                        <div class="invalid-feedback">
+                        <div class="text-danger">
                             {{$message}}
                         </div>
                         @enderror
@@ -27,7 +27,7 @@
                         <label for="validationCustom02">Class Code</label>
                         <input type="text" name="code" disabled class="form-control text-uppercase" id="validationCustom02" placeholder="Last name" required="" value="{{$classTeacher->class_code}}">
                         @error('code')
-                        <div class="invalid-feedback">
+                        <div class="text-danger">
                            {{$message}}
                         </div>
                         @enderror
@@ -35,10 +35,11 @@
                 </div>
                 <div class="form-row">
                     <div class="col-md-4 mb-3">
-                        <label for="validationCustom02">Class Group</label>
+                        <label for="validationCustom02">Stream</label>
                         <input type="text" disabled name="group" class="form-control text-uppercase" id="validationCustom02" placeholder="" required="" value="{{$classTeacher->group}}">
+                        </select>
                         @error('group')
-                        <div class="invalid-feedback">
+                        <div class="text-danger">
                            {{$message}}
                         </div>
                         @enderror
@@ -56,7 +57,7 @@
                             @endif
                         </select>
                         @error('class')
-                        <div class="invalid-feedback">
+                        <div class="text-danger">
                             {{$message}}
                         </div>
                         @enderror

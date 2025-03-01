@@ -56,27 +56,21 @@
                     <label for="validationCustom01">First Name</label>
                     <input type="text" name="fname" class="form-control text-uppercase" value="{{$teachers->first_name}}" required>
                     @error('fname')
-                    <div class="invalid-feedback">
-                        {{$message}}
-                    </div>
+                    <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom01">Last Name</label>
                     <input type="text" name="lname" class="form-control text-uppercase" value="{{$teachers->last_name}}" required>
                     @error('lname')
-                    <div class="invalid-feedback">
-                        {{$message}}
-                    </div>
+                    <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom01">Phone</label>
                     <input type="text" name="phone" class="form-control text-capitalize" value="{{$teachers->phone}}" required>
                     @error('phone')
-                    <div class="invalid-feedback">
-                        {{$message}}
-                    </div>
+                    <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
             </div>
@@ -85,9 +79,7 @@
                     <label for="validationCustom01">Date of Birth</label>
                     <input type="date" name="dob" class="form-control text-capitalize" value="{{$teachers->dob}}" required min="{{\Carbon\Carbon::now()->subYears(50)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(18)->format('Y-m-d')}}">
                     @error('dob')
-                    <div class="invalid-feedback">
-                        {{$message}}
-                    </div>
+                    <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
@@ -105,18 +97,14 @@
                         <option value="4">masters</option>
                     </select>
                     @error('qualification')
-                    <div class="invalid-feedback">
-                        {{$message}}
-                    </div>
+                    <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom01">Street/Village</label>
                     <input type="text" name="street" class="form-control text-uppercase" value="{{$teachers->address}}" required>
                     @error('street')
-                    <div class="invalid-feedback">
-                        {{$message}}
-                    </div>
+                    <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
             </div>
@@ -129,9 +117,7 @@
                         <option value="female">female</option>
                     </select>
                     @error('gender')
-                    <div class="invalid-feedback">
-                        {{$message}}
-                    </div>
+                    <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
@@ -143,18 +129,14 @@
                         @endfor
                     </select>
                     @error('joined')
-                    <div class="invalid-feedback">
-                        {{$message}}
-                    </div>
+                    <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom01">Passport Size</label>
                     <input type="file" name="image" class="form-control text-capitalize" value="{{old('image')}}">
                     @error('image')
-                    <div class="invalid-feedback">
-                        {{$message}}
-                    </div>
+                    <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
             </div>
