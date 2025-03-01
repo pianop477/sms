@@ -174,65 +174,71 @@ class StudentsController extends Controller
     //  update students records *************************************************************************
     public function updateRecords(Request $request, $students)
     {
-        $user = Auth::user();
+        try {
+            $user = Auth::user();
 
-        $request->merge(['group' => strtoupper($request->input('group'))]);
+            $request->merge(['group' => strtoupper($request->input('group'))]);
 
-        $request->validate([
-            'fname' => 'required|string|max:255',
-            'middle' => 'required|string|max:255',
-            'lname' => 'required|string|max:255',
-            'class' => 'required|integer|exists:grades,id',
-            'group' => 'required|in:A,B,C,D',
-            'gender' => 'required|max:255',
-            'dob' => 'required|date|date_format:Y-m-d',
-            'driver' => 'integer|nullable|exists:transports,id',
-            'image' => 'nullable|max:512|image|mimesjpg,jpeg,png',
-        ]);
-        $student = Student::findOrFail($students);
+            $request->validate([
+                'fname' => 'required|string|max:255',
+                'middle' => 'required|string|max:255',
+                'lname' => 'required|string|max:255',
+                'class' => 'required|integer|exists:grades,id',
+                'group' => 'required|in:A,B,C,D',
+                'gender' => 'required|max:255',
+                'dob' => 'required|date|date_format:Y-m-d',
+                'driver' => 'integer|nullable|exists:transports,id',
+                'image' => 'nullable|image|mimes:jpg,png,jpeg|max:512',
+            ]);
+            $student = Student::findOrFail($students);
 
-        if($student->school_id != $user->school_id) {
-            Alert()->toast('You are not authorized to perform this action', 'error');
+            if($student->school_id != $user->school_id) {
+                Alert()->toast('You are not authorized to perform this action', 'error');
+                return back();
+            }
+            // return $student->first_name . ' '. $student->school_id. ' '. $student->parent_id;
+            $student->first_name = $request->fname;
+            $student->middle_name = $request->middle;
+            $student->last_name = $request->lname;
+            $student->class_id = $request->class;
+            $student->group = $request->group;
+            $student->gender = $request->gender;
+            $student->dob = $request->dob;
+            $student->transport_id = $request->driver;
+
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $imageFile = time() . '.' . $image->getClientOriginalExtension();
+                $imagePath = public_path('assets/img/students');
+
+                // Ensure the directory exists
+                if (!file_exists($imagePath)) {
+                    mkdir($imagePath, 0775, true);
+                }
+
+                // Check if the existing file exists and delete it
+                if (!empty($student->image)) {
+                    $existingFile = $imagePath . '/' . $student->image;
+                    if (file_exists($existingFile) && is_file($existingFile)) {
+                        unlink($existingFile);
+                    }
+                }
+
+                // Move the new file
+                $image->move($imagePath, $imageFile);
+
+                // Save the file name to the database
+                $student->image = $imageFile;
+            }
+
+            $student->save();
+            Alert()->toast('Student records updated successfully', 'success');
+            return redirect()->route('Students.show', $students);
+        }
+        catch(\Exception $e) {
+            Alert()->toast($e->getMessage(), 'error');
             return back();
         }
-        // return $student->first_name . ' '. $student->school_id. ' '. $student->parent_id;
-        $student->first_name = $request->fname;
-        $student->middle_name = $request->middle;
-        $student->last_name = $request->lname;
-        $student->class_id = $request->class;
-        $student->group = $request->group;
-        $student->gender = $request->gender;
-        $student->dob = $request->dob;
-        $student->transport_id = $request->driver;
-
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageFile = time() . '.' . $image->getClientOriginalExtension();
-            $imagePath = public_path('assets/img/students');
-
-            // Ensure the directory exists
-            if (!file_exists($imagePath)) {
-                mkdir($imagePath, 0775, true);
-            }
-
-            // Check if the existing file exists and delete it
-            if (!empty($student->image)) {
-                $existingFile = $imagePath . '/' . $student->image;
-                if (file_exists($existingFile) && is_file($existingFile)) {
-                    unlink($existingFile);
-                }
-            }
-
-            // Move the new file
-            $image->move($imagePath, $imageFile);
-
-            // Save the file name to the database
-            $student->image = $imageFile;
-        }
-
-        $student->save();
-        Alert()->toast('Student records updated successfully', 'success');
-        return redirect()->route('Students.show', $students);
 
     }
 
@@ -439,7 +445,7 @@ class StudentsController extends Controller
                 'dob' => 'required|date|date_format:Y-m-d',
                 'driver' => 'nullable|integer|exists:transports,id',
                 'group' => 'required|string|in:A,B,C,D',
-                'image' => 'nullable|image|max:512|jpg,jpeg,png',
+                'image' => 'nullable|image|mimes:jpg,png,jpeg|max:512',
                 'school_id' => 'exists:schools,id',
             ]);
 

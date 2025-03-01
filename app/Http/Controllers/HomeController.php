@@ -352,7 +352,7 @@ class HomeController extends Controller
                 'fname' => 'required|string|max:255',
                 'lname' => 'required|string|max:255',
                 'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,' .$userData->phone,
-                'image' => 'nullable|image|max:512|mimes:jpg,jpeg,png'
+                'nullable|image|mimes:jpg,png,jpeg|max:512',
             ]);
 
             $userData->first_name = $request->fname;
