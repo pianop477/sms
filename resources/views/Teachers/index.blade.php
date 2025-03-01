@@ -39,18 +39,14 @@
                                                     <label for="validationCustom01">First name</label>
                                                     <input type="text" required name="fname" class="form-control" id="validationCustom01" placeholder="First name" value="{{old('fname')}}" required="">
                                                     @error('fname')
-                                                    <div class="invalid-feedback">
-                                                        {{$message}}
-                                                    </div>
+                                                    <div class="text-danger">{{$message}}</div>
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom02">Last name</label>
                                                     <input type="text" required name="lname" class="form-control" id="validationCustom02" placeholder="Last name" required="" value="{{old('lname')}}">
                                                     @error('lname')
-                                                    <div class="invalid-feedback">
-                                                       {{$message}}
-                                                    </div>
+                                                    <div class="text-danger">{{$message}}</div>
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-4 mb-3">
@@ -61,9 +57,7 @@
                                                         </div>
                                                         <input type="email" name="email" class="form-control" id="validationCustomUsername" placeholder="Email ID" aria-describedby="inputGroupPrepend" value="{{old('email')}}">
                                                         @error('email')
-                                                        <div class="invalid-feedback">
-                                                            {{$message}}
-                                                        </div>
+                                                        <div class="text-danger">{{$message}}</div>
                                                         @enderror
                                                     </div>
                                                 </div>
@@ -77,18 +71,14 @@
                                                         <option value="female">female</option>
                                                     </select>
                                                     @error('gender')
-                                                    <div class="invalid-feedback">
-                                                        {{$message}}
-                                                    </div>
+                                                    <div class="text-danger">{{$message}}</div>
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom02">Mobile Phone</label>
                                                     <input type="text" required name="phone" class="form-control" id="validationCustom02" placeholder="Phone Number" required="" value="{{old('phone')}}">
                                                     @error('phone')
-                                                    <div class="invalid-feedback">
-                                                       {{$message}}
-                                                    </div>
+                                                    <div class="text-danger">{{$message}}</div>
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-4 mb-3">
@@ -102,9 +92,7 @@
                                                             <option value="4">Certificate</option>
                                                         </select>
                                                         @error('school')
-                                                        <div class="invalid-feedback">
-                                                            {{$message}}
-                                                        </div>
+                                                        <div class="text-danger">{{$message}}</div>
                                                         @enderror
                                                     </div>
                                                 </div>
@@ -114,9 +102,7 @@
                                                     <label for="validationCustom01">Date of Birth</label>
                                                     <input type="date" required name="dob" class="form-control" id="validationCustom02" value="{{old('dob')}}" required min="{{\Carbon\Carbon::now()->subYears(50)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(18)->format('Y-m-d')}}">
                                                     @error('dob')
-                                                    <div class="invalid-feedback">
-                                                        {{$message}}
-                                                    </div>
+                                                    <div class="text-danger">{{$message}}</div>
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-4 mb-3">
@@ -128,9 +114,7 @@
                                                         @endfor
                                                     </select>
                                                     @error('joined')
-                                                    <div class="invalid-feedback">
-                                                        {{$message}}
-                                                    </div>
+                                                    <div class="text-danger">{{$message}}</div>
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-4 mb-3">
@@ -138,9 +122,7 @@
                                                     <div class="input-group">
                                                         <input type="text" required name="street" class="form-control" id="validationCustom02" value="{{old('street')}}" placeholder="Street Address" required>
                                                         @error('street')
-                                                        <div class="invalid-feedback">
-                                                            {{$message}}
-                                                        </div>
+                                                        <div class="text-danger">{{$message}}</div>
                                                         @enderror
                                                     </div>
                                                 </div>

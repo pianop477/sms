@@ -15,27 +15,21 @@
                                 <label for="validationCustom01">School name</label>
                                 <input type="text" required name="name" class="form-control text-uppercase" id="validationCustom01" placeholder="School Name" value="{{old('name')}}" required="">
                                 @error('name')
-                                <div class="invalid-feedback">
-                                    {{$message}}
-                                </div>
+                                <div class="text-danger">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="validationCustom02">Registration No</label>
                                 <input type="text" required name="reg_no" class="form-control text-uppercase" id="validationCustom02" placeholder="Registration Number" required="" value="{{old('reg_no')}}">
                                 @error('reg_no')
-                                <div class="invalid-feedback">
-                                {{$message}}
-                                </div>
+                                <div class="text-danger">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="validationCustom01">Postal Address</label>
                                 <input type="text" required name="postal" class="form-control" id="userInput validationCustom01" placeholder="P.O Box 123" value="{{old('postal')}}" required="">
                                 @error('postal')
-                                <div class="invalid-feedback">
-                                    {{$message}}
-                                </div>
+                                <div class="text-danger">{{$message}}</div>
                                 @enderror
                             </div>
                         </div>
@@ -44,27 +38,21 @@
                                 <label for="validationCustom01">Address Name</label>
                                 <input type="text" required name="postal_name" class="form-control text-capitalize" id="validationCustom01" placeholder="Dodoma" value="{{old('postal_name')}}" required="">
                                 @error('postal_name')
-                                <div class="invalid-feedback">
-                                    {{$message}}
-                                </div>
+                                <div class="text-danger">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="validationCustom01">Abbreviation Code</label>
                                 <input type="text" name="abbriv" class="form-control" id="userInput validationCustom01" onblur="" value="{{old('abbriv')}}" required>
                                 @error('abbriv')
-                                    <div class="invalid-feedback">
-                                        {{$message}}
-                                    </div>
+                                <div class="text-danger">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="validationCustom01">Sender Name</label>
                                 <input type="text" name="sender_name" class="form-control" id="validationCustom01" placeholder="Enter Sender ID" value="{{old('sender_name')}}">
                                 @error('sender_name')
-                                <div class="invalid-feedback">
-                                    {{$message}}
-                                </div>
+                                <div class="text-danger">{{$message}}</div>
                                 @enderror
                             </div>
                         </div>
@@ -75,18 +63,14 @@
                                     <option value="Tanzania" selected>Tanzania</option>
                                 </select>
                                 @error('country')
-                                <div class="invalid-feedback">
-                                    {{$message}}
-                                </div>
+                                <div class="text-danger">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="validationCustom02">School Logo</label>
                                 <input type="file" required name="logo" class="form-control" id="validationCustom02" placeholder="Last name" required="" value="{{old('logo')}}">
                                 @error('logo')
-                                <div class="invalid-feedback">
-                                {{$message}}
-                                </div>
+                                <div class="text-danger">{{$message}}</div>
                                 @enderror
                             </div>
                         </div>
@@ -97,18 +81,14 @@
                                 <label for="validationCustom01">First name</label>
                                 <input type="text" name="fname" class="form-control text-capitalize" id="validationCustom01" placeholder="First name" value="{{old('fname')}}" required="">
                                 @error('fname')
-                                <div class="invalid-feedback">
-                                    {{$message}}
-                                </div>
+                                <div class="text-danger">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="validationCustom02">Last name</label>
                                 <input type="text" name="lname" class="form-control text-capitalize" id="validationCustom02" placeholder="Last name" required="" value="{{old('lname')}}">
                                 @error('lname')
-                                <div class="invalid-feedback">
-                                {{$message}}
-                                </div>
+                                <div class="text-danger">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-4 mb-3">
@@ -119,9 +99,7 @@
                                     </div>
                                     <input type="text" name="email" class="form-control" id="validationCustomUsername" placeholder="Email ID" aria-describedby="inputGroupPrepend" required="" value="{{old('email')}}">
                                     @error('email')
-                                    <div class="invalid-feedback">
-                                        {{$message}}
-                                    </div>
+                                    <div class="text-danger">{{$message}}</div>
                                     @enderror
                                 </div>
                             </div>
@@ -135,18 +113,14 @@
                                     <option value="female">female</option>
                                 </select>
                                 @error('gender')
-                                <div class="invalid-feedback">
-                                    {{$message}}
-                                </div>
+                                <div class="text-danger">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="validationCustom02">Mobile Phone</label>
                                 <input type="text" name="phone" class="form-control" id="validationCustom02" placeholder="Phone Number" required="" value="{{old('phone')}}">
                                 @error('phone')
-                                <div class="invalid-feedback">
-                                {{$message}}
-                                </div>
+                                <div class="text-danger">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-4 mb-3">

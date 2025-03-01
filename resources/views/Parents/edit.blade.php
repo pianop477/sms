@@ -43,27 +43,21 @@
                     <label for="validationCustom01">First Name</label>
                     <input type="text" name="fname" class="form-control text-uppercase" value="{{$parents->first_name}}" required>
                     @error('fname')
-                    <div class="invalid-feedback">
-                        {{$message}}
-                    </div>
+                    <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom01">Last Name</label>
                     <input type="text" name="lname" class="form-control text-uppercase" value="{{$parents->last_name}}" required>
                     @error('lname')
-                    <div class="invalid-feedback">
-                        {{$message}}
-                    </div>
+                    <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom01">Phone</label>
                     <input type="text" name="phone" class="form-control text-capitalize" value="{{$parents->phone}}" required>
                     @error('phone')
-                    <div class="invalid-feedback">
-                        {{$message}}
-                    </div>
+                    <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
             </div>
@@ -72,9 +66,7 @@
                     <label for="validationCustom01">Street/Village</label>
                     <input type="text" name="street" class="form-control text-uppercase" value="{{$parents->address}}" required>
                     @error('street')
-                    <div class="invalid-feedback">
-                        {{$message}}
-                    </div>
+                    <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
@@ -85,24 +77,18 @@
                         <option value="female">female</option>
                     </select>
                     @error('gender')
-                    <div class="invalid-feedback">
-                        {{$message}}
-                    </div>
+                    <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom01">Photo</label>
                     <input type="file" name="image" class="form-control text-capitalize" value="{{old('image')}}">
                     @error('image')
-                    <div class="invalid-feedback">
-                        {{$message}}
-                    </div>
+                    <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
             </div>
             <div class="form-row">
-
-
             </div>
             <button type="submit" class="btn btn-success">Save changes</button>
         </form>

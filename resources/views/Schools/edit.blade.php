@@ -13,27 +13,21 @@
                         <label for="validationCustom01">School name</label>
                         <input type="text" name="name" class="form-control text-uppercase" id="validationCustom01" placeholder="School Name" value="{{old('name', $school->school_name)}}" required="">
                         @error('name')
-                        <div class="invalid-feedback">
-                            {{$message}}
-                        </div>
+                        <div class="text-danger">{{$message}}</div>
                         @enderror
                     </div>
                     <div class="col-md-4 mb-3">
                         <label for="validationCustom02">Registration No</label>
                         <input type="text" name="reg_no" class="form-control text-uppercase" id="validationCustom02" placeholder="Registration Number" required="" value="{{old('reg_no', $school->school_reg_no)}}">
                         @error('reg_no')
-                        <div class="invalid-feedback">
-                           {{$message}}
-                        </div>
+                        <div class="text-danger">{{$message}}</div>
                         @enderror
                     </div>
                     <div class="col-md-4 mb-3">
                         <label for="validationCustom01">Postal Address</label>
                         <input type="text" name="postal" class="form-control" id="userInput validationCustom01" onblur="addPrefix()" placeholder="P.O Box 123" value="{{old('postal', $school->postal_address)}}" required="">
                         @error('postal')
-                        <div class="invalid-feedback">
-                            {{$message}}
-                        </div>
+                        <div class="text-danger">{{$message}}</div>
                         @enderror
                     </div>
                 </div>
@@ -42,18 +36,14 @@
                         <label for="validationCustom01">Address Name</label>
                         <input type="text" name="postal_name" class="form-control text-capitalize" id="validationCustom01" placeholder="Dodoma" value="{{old('postal_name', $school->postal_name)}}" required="">
                         @error('postal_name')
-                        <div class="invalid-feedback">
-                            {{$message}}
-                        </div>
+                        <div class="text-danger">{{$message}}</div>
                         @enderror
                     </div>
                     <div class="col-md-4 mb-3">
                         <label for="validationCustom01">Abbreviation Code</label>
                         <input type="text" name="abbriv" class="form-control" id="userInput validationCustom01" onblur="" placeholder="" value="{{old('abbriv', $school->abbriv_code)}}" required="">
                         @error('abbriv')
-                        <div class="invalid-feedback">
-                            {{$message}}
-                        </div>
+                        <div class="text-danger">{{$message}}</div>
                         @enderror
                     </div>
                     <div class="col-md-4 mb-3">
@@ -62,9 +52,7 @@
                             <option value="{{$school->country}}" selected>{{$school->country}}</option>
                         </select>
                         @error('country')
-                        <div class="invalid-feedback">
-                            {{$message}}
-                        </div>
+                        <div class="text-danger">{{$message}}</div>
                         @enderror
                     </div>
                 </div>
@@ -73,18 +61,14 @@
                         <label for="validationCustom02">Sender Name</label>
                         <input type="text" name="sender_name" class="form-control" id="validationCustom02" placeholder="Last name" value="{{old('logo', $school->sender_id)}}">
                         @error('sender_name')
-                        <div class="invalid-feedback">
-                           {{$message}}
-                        </div>
+                        <div class="text-danger">{{$message}}</div>
                         @enderror
                     </div>
                     <div class="col-md-4 mb-3">
                         <label for="validationCustom02">School Logo</label>
                         <input type="file" name="logo" class="form-control" id="validationCustom02" placeholder="Last name" value="{{old('logo')}}">
                         @error('logo')
-                        <div class="invalid-feedback">
-                           {{$message}}
-                        </div>
+                        <div class="text-danger">{{$message}}</div>
                         @enderror
                     </div>
                 </div>

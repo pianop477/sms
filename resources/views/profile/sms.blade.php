@@ -30,7 +30,7 @@
                             @endif
                         </select>
                         @error('class')
-                        <div class="invalid-feedback">
+                        <div class="text-danger">
                             <span>{{$message}}</span>
                         </div>
                         @enderror
@@ -44,7 +44,7 @@
                         <textarea name="message_content" id="message_content" cols="30" rows="5" class="form-control" required maxlength="160">{{ old('message_content') }}</textarea>
                         <small id="charCount" class="text-muted">160 characters remaining</small>
                         @error('message_content')
-                        <div class="invalid-feedback">
+                        <div class="text-danger">
                             <span>{{ $message }}</span>
                         </div>
                         @enderror

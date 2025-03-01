@@ -210,7 +210,10 @@ class TeachersController extends Controller
             $memberIdNumber = mt_rand(100, 999);
 
             // Check if this admission number already exists
-        } while (Teacher::where('member_id', $memberIdNumber)->exists());
+        } while (Teacher::where('member_id', $memberIdNumber)
+                        ->where('school_id', $user->school_id)
+                        ->where('status', 1)
+                        ->exists());
 
         return $schoolData->abbriv_code.'-'.$memberIdNumber; // Return the unique admission number
     }
@@ -273,22 +276,20 @@ class TeachersController extends Controller
              return back();
          }
 
+         $validated = $request->validate([
+            'fname' => 'required|string|max:255',
+            'lname' => 'required|string|max:255',
+            'dob' => 'required|date|date_format:Y-m-d',
+            'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,'.$user->id,
+            'qualification' => 'required|integer|max:20',
+            'street' => 'required|string|max:255',
+            'gender' => 'required|max:20',
+            'joined_at' => 'required|date_format:Y',
+            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:512',
+        ]);
+
+
         try {
-            // Log the start of the method
-
-            // Validation
-            $validated = $request->validate([
-                'fname' => 'required|string|max:255',
-                'lname' => 'required|string|max:255',
-                'dob' => 'required|date|date_format:Y-m-d',
-                'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,'.$user->id,
-                'qualification' => 'required|integer|max:20',
-                'street' => 'required|string|max:255',
-                'gender' => 'required|max:20',
-                'joined_at' => 'required|date_format:Y',
-                'image' => 'nullable|image|mimes:jpg,png,jpeg|max:512',
-            ]);
-
             // Update user
             $user->first_name = $request->fname;
             $user->last_name = $request->lname;

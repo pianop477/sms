@@ -29,21 +29,21 @@
                     <label for="validationCustom01">First Name</label>
                     <input type="text" name="fname" class="form-control text-capitalize" id="validationCustom01" value="{{$students->first_name}}" required>
                     @error('fname')
-                        <div class="invalid-feedback">{{$message}}</div>
+                        <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom01">Middle Name</label>
                     <input type="text" name="middle" class="form-control text-capitalize" id="validationCustom01" value="{{$students->middle_name}}" required>
                     @error('middle')
-                        <div class="invalid-feedback">{{$message}}</div>
+                        <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom01">Last Name</label>
                     <input type="text" name="lname" class="form-control text-capitalize" id="validationCustom01" value="{{$students->last_name}}" required>
                     @error('lname')
-                        <div class="invalid-feedback">{{$message}}</div>
+                        <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
             </div>
@@ -56,14 +56,14 @@
                         <option value="female">Female</option>
                     </select>
                     @error('gender')
-                        <div class="invalid-feedback">{{$message}}</div>
+                        <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom01">Date of Birth</label>
                     <input type="date" name="dob" class="form-control" id="validationCustom01" value="{{$students->dob}}" required min="{{\Carbon\Carbon::now()->subYears(14)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(2)->format('Y-m-d')}}">
                     @error('dob')
-                        <div class="invalid-feedback">{{$message}}</div>
+                        <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
@@ -83,7 +83,7 @@
                         @endif
                     </select>
                     @error('driver')
-                        <div class="invalid-feeback">{{$message}}</div>
+                    <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
             </div>
@@ -101,9 +101,7 @@
                         @endif
                     </select>
                     @error('class')
-                    <div class="invalid-feedback">
-                        {{$message}}
-                    </div>
+                    <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
@@ -116,18 +114,14 @@
                         <option value="c">C</option>
                     </select>
                     @error('group')
-                    <div class="invalid-feedback">
-                        {{$message}}
-                    </div>
+                    <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom01">Student Passport</label>
                     <input type="file" name="image" class="form-control text-capitalize" id="validationCustom01" value="{{old('image')}}">
                     @error('image')
-                    <div class="invalid-feedback">
-                        {{$message}}
-                    </div>
+                    <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
             </div>

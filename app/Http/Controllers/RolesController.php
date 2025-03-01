@@ -61,6 +61,13 @@ class RolesController extends Controller
      //register / assign class teachers ===============================================
      public function store(Request $request, $classes)
      {
+        $class = Grade::findOrFail($classes);
+        $user = Auth::user();
+
+        if($class->school_id != $user->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
+        }
          $this->validate($request, [
              'teacher' => 'integer|exists:teachers,id',
              'group' => 'required|string|max:1',
@@ -95,7 +102,6 @@ class RolesController extends Controller
          }
 
          // Assign the class teacher
-         $class = Grade::findOrFail($classes);
          $assignedTeacher = new Class_teacher();
          $assignedTeacher->class_id = $class->id;
          $assignedTeacher->teacher_id = $request->teacher;
@@ -163,7 +169,13 @@ class RolesController extends Controller
     public function edit($teacher)
     {
         //
+        $user = Auth::user();
         $teacherId = Teacher::findOrFail($teacher);
+        if($teacherId->school_id != $user->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
+        }
+
         $classTeacher = Class_teacher::query()->join('grades', 'grades.id', '=', 'class_teachers.class_id')
                                             ->join('teachers', 'teachers.id', '=', 'class_teachers.teacher_id')
                                             ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
@@ -192,6 +204,13 @@ class RolesController extends Controller
         $request->validate(['teacher' => 'required|integer|exists:teachers,id']);
 
         $class_teacher = Class_teacher::findOrFail($classTeacher);
+        $user = Auth::user();
+
+        if($class_teacher->school_id != $user->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
+        }
+
         $ifExisting = Class_teacher::where('teacher_id', '=', $request->teacher)
                                     ->where('school_id', Auth::user()->school_id)->exists();
         if($ifExisting) {
@@ -236,7 +255,14 @@ class RolesController extends Controller
      */
     public function destroy($teacher)
     {
+        $user = Auth::user();
         $teachers = Teacher::findOrFail($teacher);
+
+        if($teacher->school_id != $user->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
+        }
+
         $class_teacher = Class_teacher::where('teacher_id', '=', $teachers->id)->firstOrFail();
         $class_teacher->delete();
 
@@ -279,26 +305,41 @@ class RolesController extends Controller
 
     public function assignRole(Teacher $user)
     {
+        $user = Auth::user();
         $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
                                     ->join('roles', 'roles.id', '=', 'teachers.role_id')
                                     ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.usertype', 'roles.role_name')
                                     ->findOrFail($user->id);
+        if($teachers->school_id != $user->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
+        }
+
         $roles = Role::where('role_name', '!=', 'class teacher')->orderBy('role_name')->get();
         return view('Roles.assign_roles', compact('user', 'teachers', 'roles'));
     }
 
     public function AssignNewRole(Teacher $user, Request $request)
     {
+        $userId = Auth::user(); // Logged-in user ID
+
+        $teacher = Teacher::findorFail($user->id);
+
+        if($teacher->school_id != $userId->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
+        }
+
         $request->validate([
             'role' => 'required|exists:roles,id',
         ]);
 
-        $userId = Auth::user()->id; // Logged-in user ID
 
-        if ($user->user_id == $userId) {
+        if ($user->user_id == $userId->id) {
             Alert()->toast('Permission denied, you cannot change your role', 'error');
             return back();
         }
+
 
         // Check if user already has another role
         if ($user->role_id == 2 || $user->role_id == 3 || $user->role_id == 4) {
@@ -319,7 +360,13 @@ class RolesController extends Controller
 
     public function confirmProceed(Request $request)
     {
+        $user = Auth::user();
         $teacher = Teacher::findOrFail($request->teacher_id);
+
+        if($teacher->school_id != $user->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
+        }
 
         //check if the teacher_id has role 4 as class teacher, delete from classTeachers table first
         if($teacher->role_id == 4) {

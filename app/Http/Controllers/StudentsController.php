@@ -137,18 +137,24 @@ class StudentsController extends Controller
     }
 
     //generate uniqe student admission number randomly*******************************************************
-    protected function getAdmissionNumber ()
+    protected function getAdmissionNumber()
     {
         $user = Auth::user();
-        $schoolData = school::where('id', $user->school_id)->first();
+        $schoolData = School::findOrFail($user->school_id);
+
+        // Count existing unique admission numbers
+        if (Student::count() >= 9000) { // Keeping some buffer
+            throw new \Exception("All admission numbers are taken. Please use a larger range.");
+        }
+
         do {
-            // Generate a random 4-digit number between 1000 and 9999
             $admissionNumber = mt_rand(1000, 9999);
+        } while (Student::where('admission_number', $admissionNumber)
+                        ->where('status', 1)
+                        ->where('school_id', $user->school_id)
+                        ->exists());
 
-            // Check if this admission number already exists
-        } while (Student::where('admission_number', $admissionNumber)->exists());
-
-        return $schoolData->abbriv_code.'-'.$admissionNumber; // Return the unique admission number
+        return $schoolData->abbriv_code . '-' . $admissionNumber;
     }
 
     /**
@@ -174,8 +180,7 @@ class StudentsController extends Controller
     //  update students records *************************************************************************
     public function updateRecords(Request $request, $students)
     {
-        try {
-            $user = Auth::user();
+        $user = Auth::user();
 
             $request->merge(['group' => strtoupper($request->input('group'))]);
 
@@ -234,11 +239,6 @@ class StudentsController extends Controller
             $student->save();
             Alert()->toast('Student records updated successfully', 'success');
             return redirect()->route('Students.show', $students);
-        }
-        catch(\Exception $e) {
-            Alert()->toast($e->getMessage(), 'error');
-            return back();
-        }
 
     }
 
@@ -428,7 +428,6 @@ class StudentsController extends Controller
     // parent to register students **************************************************************************
     public function registerStudent (Request $request)
     {
-        try {
             $user = Auth::user();
             $parent = Parents::where('user_id', $user->id)->first();
 
@@ -499,11 +498,6 @@ class StudentsController extends Controller
             // Return success message
             Alert()->toast('Student records saved successfully', 'success');
             return redirect()->route('home');
-        }
-        catch (\Exception $e) {
-            Alert::error('Error', $e->getMessage());
-            return back();
-        }
     }
 
     // show student profile *****************************************************************************
