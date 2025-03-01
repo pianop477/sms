@@ -44,7 +44,7 @@ class UsersController extends Controller
             'school' => 'required|integer|exists:schools,id',
             'password' => 'required|min:8',
             'password_confirmation' => 'same:password',
-            'image' => 'nullable|image|max:512',
+            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:512',
             'street' => 'required|string|max:255',
         ]);
 

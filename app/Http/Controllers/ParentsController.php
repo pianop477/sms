@@ -365,7 +365,7 @@ class ParentsController extends Controller
                 'gender' => 'required|string|max:255',
                 'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,'.$user->id,
                 'street' => 'required|string|max:255',
-                'image' => 'nullable|image|max:2048',
+                'nullable|image|mimes:jpg,png,jpeg|max:512',
             ]);
 
             $user->first_name = $request->fname;

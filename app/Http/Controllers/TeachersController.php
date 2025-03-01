@@ -286,7 +286,7 @@ class TeachersController extends Controller
                 'street' => 'required|string|max:255',
                 'gender' => 'required|max:20',
                 'joined_at' => 'required|date_format:Y',
-                'image' => 'nullable|image|max:2048',
+                'image' => 'nullable|image|mimes:jpg,png,jpeg|max:512',
             ]);
 
             // Update user
