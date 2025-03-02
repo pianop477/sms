@@ -85,13 +85,13 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         //edit school information ===================================================================================
         Route::get('{school}/Edit-school', [SchoolsController::class, 'edit'])->name('schools.edit');
         Route::put('{school}/Update-school', [SchoolsController::class, 'updateSchool'])->name('schools.update.school');
-        Route::get('{id}/Delete-school', [SchoolsController::class, 'destroy'])->name('schools.destroy');
+        Route::get('{school}/Delete-school', [SchoolsController::class, 'destroy'])->name('schools.destroy');
         Route::get('Feedback', [SchoolsController::class, 'showFeedback'])->name('feedback');
         Route::get('{sms}/Delete-feedback', [SchoolsController::class, 'deletePost'])->name('delete.post');
 
         //upprove or reject school registration ====================================================================
-        Route::get('Approve-school/{id}', [SchoolsController::class, 'approveSchool'])->name('approve.school');
-        Route::put('Approve-school-request/{id}', [SchoolsController::class, 'addActiveTime'])->name('approve.school.request');
+        Route::get('Approve-school/{school}', [SchoolsController::class, 'approveSchool'])->name('approve.school');
+        Route::put('Approve-school-request/{school}', [SchoolsController::class, 'addActiveTime'])->name('approve.school.request');
 
         //manager assign other teacher to become manager too.
         Route::put('{user}/Change-usertype', [RolesController::class, 'changeUsertype'])->name('change.usertype');
@@ -99,9 +99,9 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         //manage admin accounts
         Route::get('Admin-accounts', [UsersController::class, 'manageAdminAccounts'])->name('admin.accounts');
         Route::post('Register-admin-accounts', [UsersController::class, 'addAdminAccount'])->name('admin.accounts.registration');
-        Route::put('{id}/Block-admin-accounts', [UsersController::class, 'blockAdminAccount'])->name('admin.account.block');
-        Route::put('{id}/Unblock-admin-accounts', [UsersController::class, 'unblockAdminAccount'])->name('admin.account.unblock');
-        Route::get('{id}/Delete-admin-accounts', [UsersController::class, 'deleteAdminAccount'])->name('admin.account.destroy');
+        Route::put('{user}/Block-admin-accounts', [UsersController::class, 'blockAdminAccount'])->name('admin.account.block');
+        Route::put('{user}/Unblock-admin-accounts', [UsersController::class, 'unblockAdminAccount'])->name('admin.account.unblock');
+        Route::get('{user}/Delete-admin-accounts', [UsersController::class, 'deleteAdminAccount'])->name('admin.account.destroy');
     });
     // end of routes for administrator =============================================================
 
@@ -128,14 +128,14 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         Route::get('{class}/Create-selected-class', [StudentsController::class, 'showStudent'])->name('create.selected.class');
         Route::get('{classId}/Student-registration', [StudentsController::class, 'create'])->name('student.create');
         Route::post('{class}/Student-registration', [StudentsController::class, 'createNew'])->name('student.store');
-        Route::put('{id}/Promote-students', [StudentsController::class, 'promoteClass'])->name('promote.student.class');
+        Route::put('{class}/Promote-students', [StudentsController::class, 'promoteClass'])->name('promote.student.class');
         Route::get('Graduate-student', [StudentsController::class, 'callGraduateStudents'])->name('graduate.students');
         Route::get('Graduate-students/year/{year}', [StudentsController::class, 'graduatedStudentByYear'])->name('graduate.student.by.year');
         Route::get('Export-graduate-students/year/{year}', [StudentsController::class, 'exportGraduateStudents'])->name('graduate.students.export');
         Route::put('{student}/Delete-student', [StudentsController::class, 'destroy'])->name('Students.destroy');
         Route::get('Student-trash', [StudentsController::class, 'studentTrashList'])->name('students.trash');
-        Route::put('{id}/Restore-trashed-students', [StudentsController::class, 'restoreTrashList'])->name('student.restored.trash');
-        Route::get('{id}/Delete-student-permanent', [StudentsController::class, 'deletePerStudent'])->name('student.delete.permanent');
+        Route::put('{student}/Restore-trashed-students', [StudentsController::class, 'restoreTrashList'])->name('student.restored.trash');
+        Route::get('{student}/Delete-student-permanent', [StudentsController::class, 'deletePerStudent'])->name('student.delete.permanent');
 
         //manage classses ========================================================================================
         // Route::resource('Classes', ClassesController::class);
@@ -344,7 +344,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         //delete results if not necessary
         Route::get('Delete-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'deleteResults'])->name('delete.results');
         //export students records to PDF
-        Route::get('{classId}/Export-students', [StudentsController::class, 'exportPdf'])->name('export.student.pdf');
+        Route::get('{class}/Export-students', [StudentsController::class, 'exportPdf'])->name('export.student.pdf');
 
         //post compiled results to the database table
         Route::post('Submit-compiled-results/school/{school}/year/{year}/class/{class}', [ResultsController::class, 'saveCompiledResults'])->name('submit.compiled.results');

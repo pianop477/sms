@@ -3,15 +3,15 @@
         <div class="col-md-12">
             <div class="card mt-4 mb-3">
                 <div class="card-body">
-                    <h4 class="text-center text-capitalize">About {{$school->school_name}}</h4>
+                    <h4 class="text-center text-capitalize">About {{$schools->school_name}}</h4>
                     <hr>
                     <div class="row">
                         <div class="col-2">
-                            <img src="{{asset('assets/img/logo/'. $school->logo)}}" alt="" class="profile-img border-radius-lg shadow-sm" style="width: 100px; object-fit:cover; border-radius:50px">
+                            <img src="{{asset('assets/img/logo/'. $schools->logo)}}" alt="" class="profile-img border-radius-lg shadow-sm" style="width: 100px; object-fit:cover; border-radius:50px">
                         </div>
                         <div class="col-4">
                             <ul>
-                                <li>Registration Number: <span class="font-weight-bold text-uppercase">{{$school->school_reg_no}}</span></li>
+                                <li>Registration Number: <span class="font-weight-bold text-uppercase">{{$schools->school_reg_no}}</span></li>
                                 <li>School Manager: <span class="font-weight-bold text-uppercase">{{$managers->first()->first_name}} {{$managers->first()->last_name}}</span></li>
                                 <li>Gender: <span class="font-weight-bold text-uppercase">{{$managers->first()->gender}}</span></li>
                                 @if ($managers->first()->status == 1)
@@ -25,8 +25,8 @@
                             <ul>
                                 <li>Phone Number: <span class="font-weight-bold text-uppercase">{{$managers->first()->phone}}</span></li>
                                 <li>Email Address: <span class="font-weight-bold">{{$managers->first()->email}}</span></li>
-                                <li>Address: <span class="font-weight-bold text-uppercase">P.O Box {{$school->postal_address}} - {{$school->postal_name}}</span></li>
-                                <li>Country: <span class="font-weight-bold text-capitalize">{{$school->country}}</span></li>
+                                <li>Address: <span class="font-weight-bold text-uppercase">P.O Box {{$schools->postal_address}} - {{$schools->postal_name}}</span></li>
+                                <li>Country: <span class="font-weight-bold text-capitalize">{{$schools->country}}</span></li>
                             </ul>
                         </div>
                         <div class="col-2">
@@ -84,7 +84,7 @@
                     </div>
                     <hr>
                     <div class="row justify-content-center">
-                        <a href="{{route('admin.generate.invoice', $school->id)}}" class="btn btn-primary">Genderate Invoice</a>
+                        <a href="{{route('admin.generate.invoice', ['school' => Hashids::encode($schools->id)])}}" class="btn btn-primary">Genderate Invoice</a>
                     </div>
                 </div>
             </div>

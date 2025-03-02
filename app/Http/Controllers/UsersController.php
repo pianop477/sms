@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Unique;
 use PhpOffice\PhpSpreadsheet\Calculation\Engine\FormattedNumber;
 use RealRashid\SweetAlert\Facades\Alert;
+use Vinkla\Hashids\Facades\Hashids;
 
 class UsersController extends Controller
 {
@@ -160,22 +161,13 @@ class UsersController extends Controller
     // add super admin account to manage all schools ************************************************
     public function addAdminAccount(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $this->validate($request, [
             'fname' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
             'email' => 'nullable|unique:users,email',
             'gender' => 'required|string|max:10',
             'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone',
-            'password' => 'string|min:8',
         ]);
-
-        if($validator->fails()) {
-            $errors = $validator->errors();
-            foreach($errors as $error) {
-                Alert()->toast($error, 'error');
-            }
-            return back();
-        }
 
         $isExisting = User::where('phone', $request->phone)->exists();
         if($isExisting) {
@@ -196,12 +188,19 @@ class UsersController extends Controller
         // use nextSMS API to send sms
         $nextSmsService = new NextSmsService();
         $url = "https://shulapp.tech";
-        $sender = 'SHULE APP';
+        $sender = "SHULE APP";
         $phone = $this->formatPhoneNumber($user->phone);
         $message = "Hello!". strtoupper($user->first_name). " Welcome to ShuleApp System. Your Username: {$user->phone} and Password: shule2025. Click here {$url} to login";
         $reference = uniqid();
+        //create payload
+        $payload = [
+            'from' => $sender,
+            'to' => $phone,
+            'text' => $message,
+            'reference' => $reference
+        ];
 
-        $response = $nextSmsService->sendSmsByNext($sender, $phone, $message, $reference);
+        $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
         Alert()->toast('User admin saved successfully', 'success');
         return back();
@@ -225,9 +224,10 @@ class UsersController extends Controller
     }
 
     // block user account ***********************************************************************
-    public function blockAdminAccount(Request $request, $id)
+    public function blockAdminAccount(Request $request, $user)
     {
-        $user = User::find($id);
+        $decoded = Hashids::decode($user);
+        $user = User::find($decoded[0]);
         $loggedUser = Auth::user();
         $status = 0;
 
@@ -251,9 +251,10 @@ class UsersController extends Controller
     }
 
     // unblock user account **************************************************************************
-    public function unblockAdminAccount(Request $request, $id)
+    public function unblockAdminAccount(Request $request, $user)
     {
-        $user = User::find($id);
+        $decoded = Hashids::decode($user);
+        $user = User::find($decoded[0]);
         $status = 1;
 
         if(! $user) {
@@ -271,9 +272,11 @@ class UsersController extends Controller
     }
 
     // delete user account ****************************************************************************
-    public function deleteAdminAccount(Request $request, $id)
+    public function deleteAdminAccount(Request $request, $user)
     {
-        $user = User::find($id);
+        $decoded = Hashids::decode($user);
+        $user = User::find($decoded[0]);
+
         $loggedUser = Auth::user();
 
 

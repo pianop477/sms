@@ -28,18 +28,14 @@
                                                     <label for="validationCustom01">First name</label>
                                                     <input type="text" name="fname" class="form-control" id="validationCustom01" placeholder="First name" value="{{old('fname')}}" required="">
                                                     @error('fname')
-                                                    <div class="invalid-feedback">
-                                                        {{$message}}
-                                                    </div>
+                                                    <div class="text-danger">{{$message}}</div>
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom02">Last name</label>
                                                     <input type="text" name="lname" class="form-control" id="validationCustom02" placeholder="Last name" required="" value="{{old('lname')}}">
                                                     @error('lname')
-                                                    <div class="invalid-feedback">
-                                                       {{$message}}
-                                                    </div>
+                                                    <div class="text-danger">{{$message}}</div>
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-4 mb-3">
@@ -50,9 +46,7 @@
                                                         </div>
                                                         <input type="email" name="email" class="form-control" id="validationCustomUsername" placeholder="Email ID" aria-describedby="inputGroupPrepend" required="" value="{{old('email')}}">
                                                         @error('email')
-                                                        <div class="invalid-feedback">
-                                                            {{$message}}
-                                                        </div>
+                                                        <div class="text-danger">{{$message}}</div>
                                                         @enderror
                                                     </div>
                                                 </div>
@@ -66,18 +60,14 @@
                                                         <option value="female">female</option>
                                                     </select>
                                                     @error('gender')
-                                                    <div class="invalid-feedback">
-                                                        {{$message}}
-                                                    </div>
+                                                    <div class="text-danger">{{$message}}</div>
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom02">Mobile Phone</label>
                                                     <input type="text" name="phone" class="form-control" id="validationCustom02" placeholder="Phone Number" required="" value="{{old('phone')}}">
                                                     @error('phone')
-                                                    <div class="invalid-feedback">
-                                                       {{$message}}
-                                                    </div>
+                                                    <div class="text-danger">{{$message}}</div>
                                                     @enderror
                                                 </div>
                                             </div>
@@ -130,26 +120,26 @@
                                             <td>
                                                 <ul class="d-flex justify-content-center">
                                                     <li class="mr-3">
-                                                        <form action="{{route('admin.account.block', $user->id)}}" method="POST">
+                                                        <form action="{{route('admin.account.block', ['user' => Hashids::encode($user->id)])}}" method="POST">
                                                             @csrf
                                                             @method('PUT')
                                                             <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Block {{strtoupper($user->first_name)}} {{strtoupper($user->last_name)}}?')"><i class="fas fa-ban text-info"></i></button>
                                                         </form>
                                                     </li>
-                                                    <li><a href="{{route('admin.account.destroy', $user->id)}}" onclick="return confirm('Are you sure you want to delete {{strtoupper($user->first_name)}} {{strtoupper($user->last_name)}} Permanently?')" class="text-danger"><i class="ti-trash"></i></a></li>
+                                                    <li><a href="{{route('admin.account.destroy', ['user' => Hashids::encode($user->id)])}}" onclick="return confirm('Are you sure you want to delete {{strtoupper($user->first_name)}} {{strtoupper($user->last_name)}} Permanently?')" class="text-danger"><i class="ti-trash"></i></a></li>
                                                 </ul>
                                             </td>
                                             @else
                                             <td>
                                                 <ul class="d-flex justify-content-center">
                                                     <li class="mr-3">
-                                                        <form action="{{route('admin.account.unblock', $user->id)}}" method="POST">
+                                                        <form action="{{route('admin.account.unblock', ['user' => Hashids::encode($user->id)])}}" method="POST">
                                                             @csrf
                                                             @method('PUT')
                                                             <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Unblock {{strtoupper($user->first_name)}} {{strtoupper($user->last_name)}}?')"><i class="ti-reload text-success"></i></button>
                                                         </form>
                                                     </li>
-                                                    <li><a href="{{route('admin.account.destroy', $user->id)}}" onclick="return confirm('Are you sure you want to delete {{strtoupper($user->first_name)}} {{strtoupper($user->last_name)}} Permanently?')" class="text-danger"><i class="ti-trash"></i></a></li>
+                                                    <li><a href="{{route('admin.account.destroy', ['user' => Hashids::encode($user->id)])}}" onclick="return confirm('Are you sure you want to delete {{strtoupper($user->first_name)}} {{strtoupper($user->last_name)}} Permanently?')" class="text-danger"><i class="ti-trash"></i></a></li>
                                                 </ul>
                                             </td>
                                             @endif

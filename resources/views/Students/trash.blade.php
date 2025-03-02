@@ -60,7 +60,7 @@
                                             <td>
                                                 <ul class="d-flex">
                                                     <li class="mr-3">
-                                                        <form action="{{route('student.restored.trash', $student->id)}}" method="POST">
+                                                        <form action="{{route('student.restored.trash', ['student' => Hashids::encode($student->id)])}}" method="POST">
                                                             @csrf
                                                             @method('PUT')
                                                             <button type="submit" class="btn btn-link p-0" onclick="return confirm('Do you want to restore this student account?')">
@@ -69,7 +69,7 @@
                                                         </form>
                                                     </li>
                                                     <li>
-                                                        <a href="{{route('student.delete.permanent', $student->id)}}"><i class="fas fa-trash text-danger" onclick="return confirm('Do you want to delete this student account permanently?')"></i></a>
+                                                        <a href="{{route('student.delete.permanent', ['student' => Hashids::encode($student->id)])}}"><i class="fas fa-trash text-danger" onclick="return confirm('Do you want to delete this student account permanently?')"></i></a>
                                                     </li>
                                                 </ul>
                                             </td>

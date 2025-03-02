@@ -66,20 +66,20 @@
                                     </div>
                                     <div class="modal-body">
                                         <span class="text-danger text-capitalize">select class you want to promote students</span>
-                                        <form class="needs-validation" novalidate="" action="{{route('promote.student.class', $classId->id)}}" method="POST" enctype="multipart/form-data">
+                                        <form class="needs-validation" novalidate="" action="{{route('promote.student.class', ['class' => Hashids::encode($classId->id)])}}" method="POST" enctype="multipart/form-data">
                                             @csrf
                                             @method('PUT')
                                             <div class="form-row">
                                                 <div class="col-md-12 mb-3">
                                                     <label for="validationCustom01">Class name</label>
-                                                    <select name="class_id" id="" class="form-control" required>
+                                                    <select name="class_id" id="" class="form-control text-uppercase" required>
                                                         <option value="">--Select Class--</option>
                                                         @if ($classes->isEmpty())
                                                             <option value="" class="text-danger">No more classes found</option>
                                                             <option value="0" class="text-success font-weight-bold" style="font-size: 15px">🎓 Graduate Class 🎉</option>
                                                         @else
                                                             @foreach ($classes as $class)
-                                                                <option value="{{$class->id}}" class="text-capitalize">{{$class->class_name}}</option>
+                                                                <option value="{{$class->id}}" class="">{{$class->class_name}}</option>
                                                             @endforeach
                                                             <option value="0" class="text-success font-weight-bold" style="font-size: 15px">🎓 Graduate Class 🎉</option>
                                                         @endif
@@ -102,11 +102,11 @@
                             </div>
                         </div>
                         <div class="col-2">
-                            <a href="{{route('export.student.pdf', $classId->id)}}" target="_blank" class="float-right btn btn-primary btn-xs"><i class="fas fa-cloud-arrow-down"></i> Export</a>
+                            <a href="{{route('export.student.pdf', ['class' => Hashids::encode($classId->id)])}}" target="_blank" class="float-right btn btn-primary btn-xs"><i class="fas fa-cloud-arrow-down"></i> Export</a>
                         </div>
                         @endif
                     <div class="col-1">
-                        <a href="{{route('classes.list', $classId->id)}}" class="float-right"><i class="fas fa-arrow-circle-left"></i> Back</a>
+                        <a href="{{route('classes.list', ['class' => Hashids::encode($classId->id)])}}" class="float-right"><i class="fas fa-arrow-circle-left"></i> Back</a>
                     </div>
                     @if (Route::has('student.create'))
                     <div class="col-1">
@@ -120,7 +120,7 @@
                                         <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                     </div>
                                     <div class="modal-body">
-                                        <form class="needs-validation" novalidate="" action="{{route('student.store', $classId->id)}}" method="POST" enctype="multipart/form-data">
+                                        <form class="needs-validation" novalidate="" action="{{route('student.store', ['class' => Hashids::encode($classId->id)])}}" method="POST" enctype="multipart/form-data">
                                             @csrf
                                             <div class="form-row">
                                                 <div class="col-md-4 mb-3">
@@ -285,14 +285,14 @@
                                         <td>
                                             <ul class="d-flex justify-content-center">
                                                 <li class="mr-3">
-                                                    <a href="{{route('students.modify', $student->id)}}"><i class="ti-pencil text-primary"></i></a>
+                                                    <a href="{{route('students.modify', ['students' => Hashids::encode($student->id)])}}"><i class="ti-pencil text-primary"></i></a>
                                                 </li>
                                                 <li class="mr-3">
-                                                    <a href="{{route('Students.show', $student->id)}}"><i class="ti-eye text-secondary"></i></a>
+                                                    <a href="{{route('Students.show', ['student' => Hashids::encode($student->id)])}}"><i class="ti-eye text-secondary"></i></a>
                                                 </li>
 
                                                 <li>
-                                                    <form action="{{route('Students.destroy', $student->id)}}" method="POST">
+                                                    <form action="{{route('Students.destroy', ['student' => Hashids::encode($student->id)])}}" method="POST">
                                                         @csrf
                                                         @method('PUT')
                                                         <button class="btn btn-link p-0" onclick="return confirm('Are you sure you want to delete {{strtoupper($student->first_name)}} {{strtoupper($student->middle_name)}} {{strtoupper($student->last_name)}} Permanently?')">
