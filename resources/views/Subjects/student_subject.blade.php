@@ -59,36 +59,64 @@
         </div>
     </div>
     <!-- table primary end -->
-    <div class="col-lg-4 mt-5">
-        <div class="card" style="background: #e696d5;">
-            <div class="card-body">
-                <h5 class="text-center text-uppercase">Class Teacher Particulars</h5>
-                <hr>
-                @if ($myClassTeacher->isEmpty())
-                    <h6 class="text-center">No class teacher has been assigned for this class!</h6>
-                @else
-                    <div class="img-container float-right">
-                        @if ($myClassTeacher->first()->image == NULL)
-                        <i class="fas fa-user-tie" style="font-size: 5rem;"></i>
-                        @else
-                            <img src="{{asset('assets/img/profile/'.$myClassTeacher->first()->image)}}" alt="" class="" style="max-width: 100px; border-radius:50px;">
-                        @endif
-                    </div>
-                    <ul class="list-group">
-                        @foreach ($myClassTeacher as $classTeacher )
-
-                        @endforeach
-                        <li class="list-group-items">Teacher's Name:  <span class="text-uppercase font-weight-bold">{{$classTeacher->first_name}} {{$classTeacher->last_name}}</span></li>
-                        <li class="list-group-items">Gender:  <span class="text-uppercase font-weight-bold">@if ($classTeacher->gender =='female') {{"KE"}} @else {{"ME"}} @endif</span></li>
-                        <li class="list-group-items">Phone Number:  <span class="text-uppercase font-weight-bold">{{$classTeacher->phone}}</span></li>
-                        <li class="list-group-items">Class:  <span class="text-uppercase font-weight-bold">{{$classTeacher->class_name}}</span></li>
-                        <li class="list-group-items">Stream:  <span class="text-uppercase font-weight-bold">{{$classTeacher->group}}</span></li>
-                    </ul>
-                @endif
+    @if ($myClassTeacher->isEmpty())
+        <div class="col-lg-12 mt-5">
+            <div class="card" style="background: #e696d5;">
+                <div class="card-body text-center">
+                    <h5 class="text-uppercase">Class Teacher Particulars</h5>
+                    <hr>
+                    <h6>No class teacher has been assigned for this class!</h6>
+                </div>
             </div>
-
         </div>
-    </div>
-
+    @else
+        @foreach ($myClassTeacher as $classTeacher)
+            <div class="col-lg-4 mt-5">
+                <div class="card" style="background: #e696d5;">
+                    <div class="card-body">
+                        <h5 class="text-center text-uppercase">Class Teacher Particulars</h5>
+                        <hr>
+                        <div class="img-container float-right">
+                            @if ($classTeacher->image == NULL)
+                                <i class="fas fa-user-tie" style="font-size: 5rem;"></i>
+                            @else
+                                <img src="{{ asset('assets/img/profile/' . $classTeacher->image) }}"
+                                    alt=""
+                                    class=""
+                                    style="max-width: 100px; border-radius:50px;">
+                            @endif
+                        </div>
+                        <ul class="list-group">
+                            <li class="list-group-items">Teacher's Name:
+                                <span class="text-uppercase font-weight-bold">
+                                    {{ $classTeacher->first_name }} {{ $classTeacher->last_name }}
+                                </span>
+                            </li>
+                            <li class="list-group-items">Gender:
+                                <span class="text-uppercase font-weight-bold">
+                                    {{ $classTeacher->gender[0] }}
+                                </span>
+                            </li>
+                            <li class="list-group-items">Phone Number:
+                                <span class="text-uppercase font-weight-bold">
+                                    {{ $classTeacher->phone }}
+                                </span>
+                            </li>
+                            <li class="list-group-items">Class:
+                                <span class="text-uppercase font-weight-bold">
+                                    {{ $classTeacher->class_name }}
+                                </span>
+                            </li>
+                            <li class="list-group-items">Stream:
+                                <span class="text-uppercase font-weight-bold">
+                                    {{ $classTeacher->group }}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    @endif
 </div>
 @endsection
