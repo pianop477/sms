@@ -320,7 +320,7 @@ class SchoolsController extends Controller
         return view('Schools.feedback', compact('message'));
     }
 
-    public function deletePost (message $sms)
+    public function deletePost ($sms)
     {
         $decoded = Hashids::decode($sms);
 
