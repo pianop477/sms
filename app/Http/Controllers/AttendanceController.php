@@ -208,7 +208,6 @@ class AttendanceController extends Controller
     {
         // $studentId = Student::findOrFail($student->id);
         $decoded = Hashids::decode($student);
-        return $decoded;
 
         $user = Auth::user();
         $parent = Parents::where('user_id', '=', $user->id)->firstOrFail();
