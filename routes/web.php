@@ -46,6 +46,11 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
+Route::get('/check-session', function () {
+    return response()->json(['active' => auth()->check()]);
+});
+
+
 
 Auth::routes();
 

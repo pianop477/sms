@@ -67,6 +67,18 @@
         </div>
     </div>
     <!-- login area end -->
+    <script>
+        setInterval(function() {
+            fetch("{{ url('/check-session') }}")
+            .then(response => response.json())
+            .then(data => {
+                if (!data.active) {
+                    alert("Session Expired! Please login.");
+                    window.location.reload(); // Refresh page ili kupata CSRF token mpya
+                }
+            });
+        }, 1000 * 60 * 5); // Angalia session kila baada ya dakika 5
+    </script>
 
     @include('SRTDashboard.script')
     @include('sweetalert::alert')
