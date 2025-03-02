@@ -59,7 +59,7 @@
         </div>
     </div>
     <!-- table primary end -->
-    <div class="col-lg-4 mt-5">
+    <div class="col-sm-4 mt-5">
         <div class="card" style="background: #e696d5;">
             <div class="card-body">
                 <h5 class="text-center text-uppercase">Class Teacher Particulars</h5>
