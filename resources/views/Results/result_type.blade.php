@@ -8,7 +8,7 @@
                         <h4 class="header-title text-center text-uppercase">Select Examination Type - For Year {{$year}}</h4>
                     </div>
                     <div class="col-2">
-                        <a href="{{ route('results.index', $student->id) }}" class="float-right">
+                        <a href="{{ route('results.index', ['student' => Hashids::encode($student->id)]) }}" class="float-right">
                             <i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i>
                         </a>
                     </div>
@@ -20,7 +20,7 @@
                         </div>
                     @else
                         @foreach ($examTypes as $exam)
-                            <a href="{{ route('result.byMonth', ['student' => $student->id, 'year' => $year, 'exam_type' => $exam->exam_id]) }}">
+                            <a href="{{ route('result.byMonth', ['student' => Hashids::encode($student->id), 'year' => $year, 'exam_type' => Hashids::encode($exam->exam_id)]) }}">
                                 <button type="button" class="list-group-item list-group-item-action">
                                     <h6 class="text-primary text-capitalize"><i class="fas fa-chevron-right"></i> {{$exam->exam_type}}</h6>
                                 </button>

@@ -177,7 +177,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
     });
 
     //free role routes for edit students
-    Route::get('{student}/Edit-student', [StudentsController::class, 'modify'])->name('students.modify');
+    Route::get('Edit-student/{students}', [StudentsController::class, 'modify'])->name('students.modify');
     Route::put('{students}/Update-student', [StudentsController::class, 'updateRecords'])->name('students.update.records');
 
     //access students information ===========================================================================
@@ -285,7 +285,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         // For displaying months
         Route::get('Result-months/Student/{student}/Year/{year}/Type/{exam_type}', [ResultsController::class, 'resultByMonth'])->name('result.byMonth');
         Route::get('Results/Student/{student}/Year/{year}/Exam-type/{type}/Month/{month}', [ResultsController::class, 'viewStudentResult'])->name('results.student.get');
-        Route::get('student/{id}/Courses-list', [CoursesController::class, 'viewStudentCourses'])->name('student.courses.list');
+        Route::get('student/{student}/Courses-list', [CoursesController::class, 'viewStudentCourses'])->name('student.courses.list');
 
     });
     //End of condition ==============================================================================================

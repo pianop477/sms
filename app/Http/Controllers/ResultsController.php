@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use RealRashid\SweetAlert\Facades\Alert as FacadesAlert;
 use RealRashid\SweetAlert\Facades\Alert;
+use Vinkla\Hashids\Facades\Hashids;
 
 class ResultsController extends Controller
 {
@@ -32,14 +33,22 @@ class ResultsController extends Controller
         $this->nextSmsService = $nextSmsService;
     }
 
-    public function index(Student $student)
+    public function index($student)
     {
+        $decoded = Hashids::decode($student);
+
+        $students = Student::find($decoded[0]);
+        if(! $students) {
+            Alert()->toast('No such student was found', 'error');
+            return back();
+        }
+
         $user = Auth::user();
         $parent = Parents::where('user_id', $user->id)->first();
         $results = Examination_result::query()
                                     ->join('students', 'students.id', '=', 'examination_results.student_id')
                                     ->select('examination_results.*', 'students.parent_id')
-                                    ->where('student_id', $student->id)
+                                    ->where('student_id', $students->id)
                                     ->where('students.parent_id', $parent->id)
                                     ->where('examination_results.school_id', $user->school_id)
                                     ->orderBy('examination_results.exam_date', 'DESC')
@@ -51,7 +60,7 @@ class ResultsController extends Controller
             return $yearGroup->groupBy('exam_type');
         });
 
-        return view('Results.parent_grouped_results', compact('groupedData', 'student'));
+        return view('Results.parent_grouped_results', compact('groupedData', 'students', 'student'));
     }
 
     /**
@@ -59,8 +68,16 @@ class ResultsController extends Controller
      */
 
 
-     public function resultByType(Student $student, $year)
+     public function resultByType($student, $year)
      {
+        $decoded = Hashids::decode($student);
+
+        $students = Student::find($decoded[0]);
+
+        if(! $students ) {
+            Alert()->toast('No such student was found in the attendance', 'error');
+            return back();
+        }
         $user = Auth::user();
         $parent = Parents::where('user_id', $user->id)->first();
          $examTypes = Examination_result::query()
@@ -69,7 +86,7 @@ class ResultsController extends Controller
                     ->select('examinations.exam_type', 'examinations.id as exam_id', 'students.parent_id')
                     ->distinct()
                     ->whereYear('exam_date', $year)
-                    ->where('student_id', $student->id)
+                    ->where('student_id', $students->id)
                     ->where('examination_results.school_id', $user->school_id)
                     ->where('students.parent_id', $parent->id)
                     ->orderBy('examinations.exam_type', 'asc')
@@ -78,8 +95,12 @@ class ResultsController extends Controller
          return view('Results.result_type', compact('student', 'year', 'examTypes'));
      }
 
-     public function resultByMonth(Student $student, $year, $exam_type)
+     public function resultByMonth($student, $year, $exam_type)
     {
+        $student_id = Hashids::decode($student);
+        $exam_id = Hashids::decode($exam_type);
+
+        $students = Student::find($student_id[0]);
         $user = Auth::user();
         $parent = Parents::where('user_id', $user->id)->first();
         $months = Examination_result::query()
@@ -91,10 +112,11 @@ class ResultsController extends Controller
                                 ->selectRaw('MONTH(exam_date) as month')
                                 ->distinct()
                                 ->whereYear('examination_results.exam_date', $year)
-                                ->where('examination_results.exam_type_id', $exam_type)
+                                ->where('examination_results.exam_type_id', $exam_id)
                                 ->where('examination_results.status', 2)
                                 ->where('examination_results.school_id', $user->school_id)
                                 ->where('students.parent_id', $parent->id)
+                                ->where('examination_results.student_id', $students->id)
                                 ->orderBy('month')
                                 ->get();
 
@@ -110,7 +132,9 @@ class ResultsController extends Controller
     public function viewStudentResult($student, $year, $type, $month)
     {
         // Retrieve examination results for the specific student
-        $studentId = Student::findOrFail($student);
+        $exam_id = Hashids::decode($type);
+        $student_id = Hashids::decode($student);
+        $studentId = Student::findOrFail($student_id[0]);
         // return $studentId;
         $user = Auth::user();
         $parent = Parents::where('user_id', $user->id)->first();
@@ -133,7 +157,7 @@ class ResultsController extends Controller
                 'schools.school_name', 'schools.school_reg_no', 'schools.postal_address', 'schools.postal_name', 'schools.logo', 'schools.country',
             )
             ->where('examination_results.student_id', $studentId->id)
-            ->where('examination_results.exam_type_id', $type)
+            ->where('examination_results.exam_type_id', $exam_id[0])
             ->whereYear('examination_results.exam_date', $year)
             ->whereMonth('examination_results.exam_date', $month)
             ->where('examination_results.school_id', $user->school_id)

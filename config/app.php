@@ -195,6 +195,8 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
+        Vinkla\Hashids\HashidsServiceProvider::class,
+
 
 
     ],
@@ -213,6 +215,7 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
 
         'PDF' => Barryvdh\DomPDF\Facade::class,
+        'Hashids' => Vinkla\Hashids\Facades\Hashids::class,
 
     ])->toArray(),
 

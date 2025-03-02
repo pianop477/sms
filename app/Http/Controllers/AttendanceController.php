@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Vinkla\Hashids\Facades\Hashids;
 
 class AttendanceController extends Controller
 {
@@ -152,35 +153,36 @@ class AttendanceController extends Controller
         return redirect()->back();
     }
 
-    public function show(Student $student, $year)
+    public function show($student, $year)
     {
+        $decoded = Hashids::decode($student);
         $user = Auth::user();
         $parent = Parents::where('user_id', '=', $user->id)->firstOrFail();
         $attendanceQuery = Attendance::query()
-            ->join('students', 'students.id', '=', 'attendances.student_id')
-            ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
-            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-            ->join('grades', 'grades.id', '=', 'attendances.class_id')
-            ->select(
-                'attendances.*',
-                'users.first_name as teacher_firstname',
-                'users.last_name as teacher_lastname',
-                'users.phone as teacher_phone',
-                'students.first_name as student_firstname', 'students.parent_id',
-                'students.middle_name as student_middlename',
-                'students.last_name as student_lastname', 'students.status',
-            )
-            ->whereYear('attendances.attendance_date', $year)
-            ->where('attendances.student_id', '=', $student->id)
-            ->where('attendances.school_id', $user->school_id)
-            ->where('students.parent_id', $parent->id)
-            ->where('students.status', 1)
-            ->orderBy('attendances.attendance_date', 'DESC');
+                    ->join('students', 'students.id', '=', 'attendances.student_id')
+                    ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
+                    ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+                    ->join('grades', 'grades.id', '=', 'attendances.class_id')
+                    ->select(
+                        'attendances.*',
+                        'users.first_name as teacher_firstname',
+                        'users.last_name as teacher_lastname',
+                        'users.phone as teacher_phone',
+                        'students.first_name as student_firstname', 'students.parent_id',
+                        'students.middle_name as student_middlename',
+                        'students.last_name as student_lastname', 'students.status',
+                    )
+                    ->whereYear('attendances.attendance_date', $year)
+                    ->where('attendances.student_id', '=', $decoded[0])
+                    ->where('attendances.school_id', $user->school_id)
+                    ->where('students.parent_id', $parent->id)
+                    ->where('students.status', 1)
+                    ->orderBy('attendances.attendance_date', 'DESC');
 
-        // Paginate the raw data
-        $perPage =5;
-        $page = request()->get('page', 1);
-        $rawData = $attendanceQuery->paginate($perPage, ['*'], 'page', $page);
+                // Paginate the raw data
+                $perPage =5;
+                $page = request()->get('page', 1);
+                $rawData = $attendanceQuery->paginate($perPage, ['*'], 'page', $page);
 
         // Group the paginated data by week
         $grouped = $rawData->getCollection()->groupBy(function($date) {
@@ -196,12 +198,18 @@ class AttendanceController extends Controller
             ['path' => request()->url(), 'query' => request()->query()]
         );
 
-        return view('Attendance.show', compact('groupedData', 'student'));
+        $firstRecord = $rawData->first();
+
+        return view('Attendance.show', compact('groupedData', 'student', 'firstRecord'));
     }
 
     //group attendance by year ===========================
-    public function attendanceYear (Student $student)
+    public function attendanceYear ($student)
     {
+        // $studentId = Student::findOrFail($student->id);
+        $decoded = Hashids::decode($student);
+        return $decoded;
+
         $user = Auth::user();
         $parent = Parents::where('user_id', '=', $user->id)->firstOrFail();
         $attendances = Attendance::query()->join('students', 'students.id', '=', 'attendances.student_id')
@@ -217,7 +225,7 @@ class AttendanceController extends Controller
                                                 'students.middle_name as student_middlename', 'students.status',
                                                 'students.last_name as student_lastname', 'students.parent_id',
                                             )
-                                            ->where('attendances.student_id', '=', $student->id)
+                                            ->where('attendances.student_id', '=', $decoded[0])
                                             ->where('attendances.school_id', $user->school_id)
                                             ->where('students.parent_id', $parent->id)
                                             ->where('students.status', 1)
