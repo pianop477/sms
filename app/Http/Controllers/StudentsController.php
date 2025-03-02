@@ -64,6 +64,11 @@ class StudentsController extends Controller
     //  store and save new student records *****************************************************************
     public function createNew(Request $request, $class)
         {
+            $decoded = Hashids::decode($class);
+            if(empty($decoded)) {
+                Alert()->toast('No such class was found', 'error');
+                return back();
+            }
             // Validate the incoming request data
             $user = Auth::user();
             $request->merge(['group' => strtoupper($request->input('group'))]);
@@ -94,7 +99,7 @@ class StudentsController extends Controller
             }
 
             // Retrieve the class
-            $class = Grade::findOrFail($class);
+            $class = Grade::findOrFail($decoded[0]);
 
             // Create a new student record
             $new_student = new Student();
@@ -133,7 +138,7 @@ class StudentsController extends Controller
 
            if($student) {
                 Alert()->toast('Student records saved successfully', 'success');
-                return redirect()->route('create.selected.class', $class->id);
+                return redirect()->route('create.selected.class', Hashids::encode($class->id));
            }
     }
 
@@ -255,8 +260,13 @@ class StudentsController extends Controller
      public function destroy($student)
      {
          // Find the student record
+         $decoded = Hashids::decode($student);
+         if(empty($decoded)) {
+             Alert()->toast('No such student was found', 'error');
+             return back();
+         }
          $user = Auth::user();
-         $student = Student::findOrFail($student);
+         $student = Student::findOrFail($decoded[0]);
 
          if($student->school_id != $user->school_id) {
              Alert()->toast('You are not authorized to perform this action', 'error');
@@ -273,8 +283,10 @@ class StudentsController extends Controller
     //  get students information and compile to the form *******************************************************
     public function showStudent($class)
     {
+        $decoded = Hashids::decode($class);
+        // return $decoded;
         $user = Auth::user();
-        $classId = Grade::findOrFail($class);
+        $classId = Grade::findOrFail($decoded[0]);
         $parents = Parents::query()
                             ->join('users', 'users.id', '=', 'parents.user_id')
                             ->join('schools', 'schools.id', '=', 'parents.school_id')
@@ -304,10 +316,12 @@ class StudentsController extends Controller
     }
 
     //promote students to the next class *******************************************************************
-    public function promoteClass($id, Request $request)
+    public function promoteClass($class, Request $request)
     {
+        $decoded = Hashids::decode($class);
+
         $user = Auth::user();
-        $class = Grade::find($id);
+        $class = Grade::find($decoded[0]);
         if (! $class) {
             Alert()->toast('No such class was found', 'error');
             return back();
@@ -388,8 +402,10 @@ class StudentsController extends Controller
     }
 
     //export to pdf ======================********************************************************************
-    public function exportPdf($classId)
+    public function exportPdf($class)
     {
+        $decoded_class = Hashids::decode($class);
+
         // return $classId;
         $user = Auth::user();
         $students = Student::query()->join('grades', 'grades.id', '=', 'students.class_id')
@@ -403,7 +419,7 @@ class StudentsController extends Controller
                                         'schools.postal_name', 'schools.country', 'schools.abbriv_code',
                                         'parents.address', 'users.phone'
                                     )
-                                    ->where('students.class_id', $classId)
+                                    ->where('students.class_id', $decoded_class[0])
                                     ->where('students.status', 1)
                                     ->where('students.school_id', $user->school_id)
                                     ->orderBy('students.first_name')
@@ -413,7 +429,7 @@ class StudentsController extends Controller
 
         if ($students->isNotEmpty()) {
             $className = $students->first()->class_name;
-            $fileName = "{$className} Attendance Report.pdf";
+            $fileName = "{$className} Student-list.pdf";
         } else {
             $fileName = "Students List.pdf";
         }
@@ -601,9 +617,14 @@ class StudentsController extends Controller
 
     // restore student in the trash *************************************************************************
 
-    public function restoreTrashList ($id, Request $request)
+    public function restoreTrashList ($student, Request $request)
     {
-        $student = Student::find($id);
+        $decoded = Hashids::decode($student);
+        if(empty($decoded)) {
+            Alert()->toast('No such student was found', 'error');
+            return back();
+        }
+        $student = Student::find($decoded[0]);
 
         if(! $student ) {
             Alert()->toast('No such student was found', 'error');
@@ -623,9 +644,14 @@ class StudentsController extends Controller
     }
 
     // delete student partmently ***************************************************************************
-    public function deletePerStudent($id)
+    public function deletePerStudent($student)
     {
-        $student = Student::find($id);
+        $decoded = Hashids::decode($student);
+        if(empty($decoded)) {
+            Alert()->toast('No such student was found', 'error');
+            return back();
+        }
+        $student = Student::find($decoded[0]);
 
 
         if(! $student) {

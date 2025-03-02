@@ -24,10 +24,10 @@
                             <div class="col-6">
                                 <div class="invoice-address">
                                     <h4>Billed To</h4>
-                                    <h5 class="text-uppercase">{{$school->school_name}}</h5>
+                                    <h5 class="text-uppercase">{{$schools->school_name}}</h5>
                                     <p class="text-capitalize">{{$managers->first()->first_name}} {{$managers->first()->last_name}} - Manager</p>
-                                    <p class="text-capitalize">P.O Box {{$school->postal_address}} - {{$school->postal_name}}</p>
-                                    <p class="text-capitalize">{{$school->country}}</p>
+                                    <p class="text-capitalize">P.O Box {{$schools->postal_address}} - {{$schools->postal_name}}</p>
+                                    <p class="text-capitalize">{{$schools->country}}</p>
                                     <p>{{$managers->first()->email}}</p>
                                 </div>
                             </div>
@@ -58,8 +58,8 @@
                                         <td class="text-center">1</td>
                                         <td class="text-left">System Running Cost for Year - {{ \Carbon\Carbon::now()->format('Y') }}</td>
                                         <td class="text-left">
-                                            {{ \Carbon\Carbon::parse($school->service_start_date)->format('d/m/Y') ?? '-' }} -
-                                            {{ \Carbon\Carbon::parse($school->service_end_date)->format('d/m/Y') ?? '-' }}
+                                            {{ \Carbon\Carbon::parse($schools->service_start_date)->format('d/m/Y') ?? '-' }} -
+                                            {{ \Carbon\Carbon::parse($schools->service_end_date)->format('d/m/Y') ?? '-' }}
                                         </td>
                                         <td class="text-center">{{ count($students) }}</td>
                                         <td class="text-center">

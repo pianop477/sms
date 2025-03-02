@@ -26,7 +26,7 @@
                                             <strong>Posted on:</strong> <span>{{\Carbon\Carbon::parse($sms->created_at)->format('d-F-Y H:i')}}</span>
                                         </li>
                                         <li>
-                                            <a href="{{route('delete.post', $sms->id)}}" onclick="return confirm('Are you sure you want to delete this post?')"><i class="ti-trash text-danger"></i></a>
+                                            <a href="{{route('delete.post', ['sms' => Hashids::encode($sms->id)])}}" onclick="return confirm('Are you sure you want to delete this post?')"><i class="ti-trash text-danger"></i></a>
                                         </li>
                                     </ul>
                                 </div>

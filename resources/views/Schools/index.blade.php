@@ -208,13 +208,12 @@
                                                             </div>
                                                             <hr class="dark horizontal py-0">
                                                             <p class="text-center text-danger">Complete Approval Actions</p>
-                                                            <form action="{{route('approve.school.request', $school->id)}}" method="POST" novalidate="" class="needs-validation" enctype="multipart/form-data" role="form">
+                                                            <form action="{{route('approve.school.request', ['school' => Hashids::encode($school->id)])}}" method="POST" novalidate="" class="needs-validation" enctype="multipart/form-data" role="form">
                                                                 @csrf
                                                                 @method('PUT')
                                                                 <div class="row">
                                                                     <div class="col-md-12">
                                                                         <div class="form-group">
-                                                                            <input type="hidden" name="school" value="{{$school->id}}">
                                                                             <label for="" class="control-label">Set Months</label>
                                                                             <input type="number" class="form-control" name="service_duration" id="validationCustom01" required placeholder="Number of Months for Service" value="{{old('service_duration')}}">
                                                                             @error('service_duration')

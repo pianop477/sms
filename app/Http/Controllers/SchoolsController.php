@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use RealRashid\SweetAlert\Facades\Alert;
+use Vinkla\Hashids\Facades\Hashids;
 
 class SchoolsController extends Controller
 {
@@ -176,57 +177,63 @@ class SchoolsController extends Controller
     /**
      * Display the resource.
      */
-    public function show(school $school)
+    public function show($school)
     {
+        $decoded = Hashids::decode($school);
+        $schools = school::find($decoded[0]);
         $managers = User::query()->join('schools', 'schools.id', '=', 'users.school_id')
                             ->select(
                                 'users.*', 'schools.school_name', 'schools.school_reg_no', 'schools.logo'
                             )
                             ->where('users.usertype', 2)
-                            ->where('users.school_id', $school->id)
+                            ->where('users.school_id', $schools->id)
                             ->get();
         $parents = Parents::query()->join('users', 'users.id', '=', 'parents.user_id')
                                     ->select(
                                         'parents.*', 'users.first_name', 'users.last_name', 'users.usertype'
                                     )
                                     ->where('users.usertype', 4)
-                                    ->where('parents.school_id', $school->id)
+                                    ->where('parents.school_id', $schools->id)
                                     ->get();
         $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
                                     ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.usertype')
                                     ->where('users.usertype', 3)
-                                    ->where('teachers.school_id', $school->id)
+                                    ->where('teachers.school_id', $schools->id)
                                     ->get();
-        $students = Student::where('school_id', $school->id)->where('status', 1)->get();
-        $courses = Subject::where('school_id', $school->id)->get();
-        $classes = Grade::where('school_id', $school->id)->get();
-        return view('Schools.show', compact('managers', 'parents', 'teachers', 'students', 'courses', 'classes', 'school'));
+        $students = Student::where('school_id', $schools->id)->where('status', 1)->get();
+        $courses = Subject::where('school_id', $schools->id)->get();
+        $classes = Grade::where('school_id', $schools->id)->get();
+        return view('Schools.show', compact('managers', 'parents', 'teachers', 'students', 'courses', 'classes', 'schools'));
     }
 
     /**
      * Show the form for editing the resource.
      */
-    public function invoceCreate(school $school)
+    public function invoceCreate($school)
     {
         //
+        $decoded = Hashids::decode($school);
+        $schools = school::find($decoded[0]);
         $managers = User::query()->join('schools', 'schools.id', '=', 'users.school_id')
                             ->select(
                                 'users.*', 'schools.school_name', 'schools.school_reg_no', 'schools.logo'
                             )
                             ->where('users.usertype', 2)
-                            ->where('users.school_id', $school->id)
+                            ->where('users.school_id', $schools->id)
                             ->get();
-        $students = Student::where('school_id', $school->id)->where('status', 1)->get();
-        return view('invoice.invoice', compact('school', 'managers', 'students'));
+        $students = Student::where('school_id', $schools->id)->where('status', 1)->get();
+        return view('invoice.invoice', compact('schools', 'managers', 'students'));
     }
 
     /**
      * Edit the resource in storage
     */
 
-    public function edit (school $school)
+    public function edit ($school)
     {
-        return view('Schools.edit', ['school' => $school]);
+        $decoded = Hashids::decode($school);
+        $schools = school::find($decoded[0]);
+        return view('Schools.edit', compact('schools'));
     }
 
      /** Update the resource in storage.
@@ -235,6 +242,7 @@ class SchoolsController extends Controller
     public function updateSchool($school, Request $request)
     {
         //
+        $decoded = Hashids::decode($school);
         $request->validate([
             'name' => 'required|string|max:255',
             'reg_no' => 'required|string|max:255',
@@ -246,7 +254,7 @@ class SchoolsController extends Controller
             'sender_name' => 'nullable|string|max:11'
         ]);
 
-        $schools = school::findOrFail($school);
+        $schools = school::findOrFail($decoded[0]);
         $schools->school_name = $request->name;
         $schools->abbriv_code = $request->abbriv;
         $schools->school_reg_no = $request->reg_no;
@@ -284,22 +292,23 @@ class SchoolsController extends Controller
     /**
      * Remove the resource from storage.
      */
-    public function destroy($id)
+    public function destroy($school)
     {
         // abort(404);
-        $school = school::find($id);
+        $decoded = Hashids::decode($school);
+        $schools = school::find($decoded[0]);
 
-        if(! $school) {
+        if(! $schools) {
             Alert()->toast('This school is not found', 'error');
             return back();
         }
         $logoPath = public_path('assets/img/logo');
-        $existingFile = $logoPath . '/' . $school->logo;
+        $existingFile = $logoPath . '/' . $schools->logo;
         if(file_exists($existingFile)) {
             unlink($existingFile);
         }
         //delete school
-        $school->delete();
+        $schools->delete();
         Alert()->toast('School has been deleted successfully', 'success');
         return redirect()->back();
 
@@ -313,14 +322,17 @@ class SchoolsController extends Controller
 
     public function deletePost (message $sms)
     {
-        $message = message::findOrFail($sms->id);
+        $decoded = Hashids::decode($sms);
+
+        $message = message::findOrFail($decoded[0]);
         $message->delete();
         Alert()->toast('Post has been moved to trash', 'success');
         return back();
     }
 
-    public function addActiveTime(Request $request, $id)
+    public function addActiveTime(Request $request, $school)
     {
+        $decoded = Hashids::decode($school);
         $request->validate([
             'school' => 'exists:schools,id',
             'service_duration' => 'required|integer',
@@ -330,15 +342,15 @@ class SchoolsController extends Controller
             $startDate = Carbon::now();
             $endDate = $startDate->copy()->addMonth($request->service_duration);
 
-            $school = school::findOrFail($id);
-            $school->service_start_date = $startDate;
-            $school->service_end_date = $endDate;
-            $school->service_duration = $request->service_duration;
-            $school->status = 1;
-            $school->save();
+            $schools = school::findOrFail($decoded[0]);
+            $schools->service_start_date = $startDate;
+            $schools->service_end_date = $endDate;
+            $schools->service_duration = $request->service_duration;
+            $schools->status = 1;
+            $schools->save();
 
             //update users who disabled
-            User::where('school_id', $id)->where('status', 0)->update(['status' => 1]);
+            User::where('school_id', $schools->id)->where('status', 0)->update(['status' => 1]);
 
             Alert()->toast('Active time has been updated successfully', 'success');
             return back();
@@ -350,10 +362,4 @@ class SchoolsController extends Controller
 
     }
 
-    public function approveSchool ($id)
-    {
-        $school = school::find($id);
-
-        return view('Schools.approval', compact('school'));
-    }
 }

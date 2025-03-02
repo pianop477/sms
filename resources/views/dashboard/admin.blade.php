@@ -129,7 +129,7 @@
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
                                         <td class="text-uppercase">
-                                            <a href="{{route('schools.show', $school->id)}}">{{$school->school_name}}</a>
+                                            <a href="{{route('schools.show', ['school' => Hashids::encode($school->id)])}}">{{$school->school_name}}</a>
                                         </td>
                                         <td class="text-uppercase">{{$school->school_reg_no}}</td>
                                         <td class="text-uppercase">{{$school->postal_address}} - {{$school->postal_name}}</td>
@@ -146,9 +146,9 @@
                                             @if ($school->status == 1)
                                             <ul class="d-flex justify-content-center">
                                                 <li class="mr-3">
-                                                    <a href="{{route('schools.edit', $school->id)}}"><i class="ti-pencil text-primary"></i></a>
+                                                    <a href="{{route('schools.edit', ['school' => Hashids::encode($school->id)])}}"><i class="ti-pencil text-primary"></i></a>
                                                 </li>
-                                                <form action="{{route('deactivate.status', $school->id)}}" method="POST">
+                                                <form action="{{route('deactivate.status', ['school' => Hashids::encode($school->id)])}}" method="POST">
                                                     @csrf
                                                     @method('PUT')
                                                     <li class="mr-3">
@@ -159,13 +159,13 @@
                                                 </form>
                                                 <li>
                                                     <li class="mr-3">
-                                                        <a href="{{route('schools.destroy', $school->id)}}"><i class="ti-trash text-danger" onclick="return confirm('Are you sure you want to delete school {{strtoupper($school->school_name)}}?')"></i></a>
+                                                        <a href="{{route('schools.destroy', ['school' => Hashids::encode($school->id)])}}"><i class="ti-trash text-danger" onclick="return confirm('Are you sure you want to delete school {{strtoupper($school->school_name)}}?')"></i></a>
                                                     </li>
                                                 </li>
                                             </ul>
                                             @elseif($school->status == 0)
                                             <ul class="d-flex justify-content-center">
-                                                <form action="{{route('activate.status', $school->id)}}" method="POST">
+                                                <form action="{{route('activate.status', ['school' => Hashids::encode($school->id)])}}" method="POST">
                                                 @csrf
                                                 @method('PUT')
                                                     <li class="mr-3">
@@ -175,7 +175,7 @@
                                                     </li>
                                                 </form>
                                                 <li class="mr-3">
-                                                    <a href="{{route('schools.destroy', $school->id)}}"><i class="ti-trash text-danger" onclick="return confirm('Are you sure you want to delete school {{strtoupper($school->school_name)}}?')"></i></a>
+                                                    <a href="{{route('schools.destroy', ['school' => Hashids::encode($school->id)])}}"><i class="ti-trash text-danger" onclick="return confirm('Are you sure you want to delete school {{strtoupper($school->school_name)}}?')"></i></a>
                                                 </li>
                                             </ul>
                                             @else
@@ -186,7 +186,7 @@
                                                     </button>
                                                 </li>
                                                 <li class="mr-3">
-                                                    <a href="{{route('schools.destroy', $school->id)}}"><i class="ti-trash text-danger" onclick="return confirm('Are you sure you want to delete school {{strtoupper($school->school_name)}}?')"></i></a>
+                                                    <a href="{{route('schools.destroy', ['school' => Hashids::encode($school->id)])}}"><i class="ti-trash text-danger" onclick="return confirm('Are you sure you want to delete school {{strtoupper($school->school_name)}}?')"></i></a>
                                                 </li>
                                             </ul>
                                             @endif
