@@ -59,64 +59,62 @@
         </div>
     </div>
     <!-- table primary end -->
-    @if ($myClassTeacher->isEmpty())
-        <div class="col-lg-12 mt-5">
-            <div class="card" style="background: #e696d5;">
-                <div class="card-body text-center">
-                    <h5 class="text-uppercase">Class Teacher Particulars</h5>
-                    <hr>
-                    <h6>No class teacher has been assigned for this class!</h6>
-                </div>
+    <div class="col-lg-12 mt-5">
+        <div class="card" style="background: #e696d5;">
+            <div class="card-body">
+                <h5 class="text-center text-uppercase">Class Teacher Particulars</h5>
+                <hr>
+
+                @if ($myClassTeacher->isEmpty())
+                    <h6 class="text-center">No class teacher has been assigned for this class!</h6>
+                @else
+                    @foreach ($myClassTeacher as $classTeacher)
+                        <div class="d-flex align-items-center">
+                            <div class="img-container mr-3">
+                                @if ($classTeacher->image == NULL)
+                                    <i class="fas fa-user-tie" style="font-size: 5rem;"></i>
+                                @else
+                                    <img src="{{ asset('assets/img/profile/' . $classTeacher->image) }}"
+                                         alt=""
+                                         style="max-width: 80px; border-radius:50px;">
+                                @endif
+                            </div>
+                            <ul class="list-group w-100">
+                                <li class="list-group-item">Teacher's Name:
+                                    <span class="text-uppercase font-weight-bold">
+                                        {{ $classTeacher->first_name }} {{ $classTeacher->last_name }}
+                                    </span>
+                                </li>
+                                <li class="list-group-item">Gender:
+                                    <span class="text-uppercase font-weight-bold">
+                                        {{ $classTeacher->gender[0] }}
+                                    </span>
+                                </li>
+                                <li class="list-group-item">Phone Number:
+                                    <span class="text-uppercase font-weight-bold">
+                                        {{ $classTeacher->phone }}
+                                    </span>
+                                </li>
+                                <li class="list-group-item">Class:
+                                    <span class="text-uppercase font-weight-bold">
+                                        {{ $classTeacher->class_name }}
+                                    </span>
+                                </li>
+                                <li class="list-group-item">Stream:
+                                    <span class="text-uppercase font-weight-bold">
+                                        {{ $classTeacher->group }}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                        @if (!$loop->last)
+                            <hr> {{-- Separator between teachers --}}
+                        @endif
+                    @endforeach
+                @endif
             </div>
         </div>
-    @else
-        @foreach ($myClassTeacher as $classTeacher)
-            <div class="col-lg-4 mt-5">
-                <div class="card" style="background: #e696d5;">
-                    <div class="card-body">
-                        <h5 class="text-center text-uppercase">Class Teacher Particulars</h5>
-                        <hr>
-                        <div class="img-container float-right">
-                            @if ($classTeacher->image == NULL)
-                                <i class="fas fa-user-tie" style="font-size: 5rem;"></i>
-                            @else
-                                <img src="{{ asset('assets/img/profile/' . $classTeacher->image) }}"
-                                    alt=""
-                                    class=""
-                                    style="max-width: 100px; border-radius:50px;">
-                            @endif
-                        </div>
-                        <ul class="list-group">
-                            <li class="list-group-items">Teacher's Name:
-                                <span class="text-uppercase font-weight-bold">
-                                    {{ $classTeacher->first_name }} {{ $classTeacher->last_name }}
-                                </span>
-                            </li>
-                            <li class="list-group-items">Gender:
-                                <span class="text-uppercase font-weight-bold">
-                                    {{ $classTeacher->gender[0] }}
-                                </span>
-                            </li>
-                            <li class="list-group-items">Phone Number:
-                                <span class="text-uppercase font-weight-bold">
-                                    {{ $classTeacher->phone }}
-                                </span>
-                            </li>
-                            <li class="list-group-items">Class:
-                                <span class="text-uppercase font-weight-bold">
-                                    {{ $classTeacher->class_name }}
-                                </span>
-                            </li>
-                            <li class="list-group-items">Stream:
-                                <span class="text-uppercase font-weight-bold">
-                                    {{ $classTeacher->group }}
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        @endforeach
-    @endif
+    </div>
+
 </div>
 @endsection
