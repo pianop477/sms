@@ -31,7 +31,7 @@
         </div>
       </div>
       <div class="col-lg-2 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
-        <a href="{{ url()->previous() }}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+        <a href="{{ route('home') }}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
       </div>
     </div>
     <hr class="dark horizontal my-0">
@@ -137,7 +137,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="justify-content-center float-right">
-                <a href="{{route('students.modify', $data->id)}}" class="btn btn-primary">Edit</a>
+                <a href="{{route('students.modify', ['students' => Hashids::encode($data->id)])}}" class="btn btn-primary">Edit</a>
             </div>
         </div>
     </div>

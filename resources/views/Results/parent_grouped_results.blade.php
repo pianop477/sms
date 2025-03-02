@@ -5,7 +5,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-10">
-                            <h4 class="header-title text-center">Result Report For: <span class="text-uppercase text-primary"><strong>({{$student->first_name. ' '. $student->middle_name. ' '. $student->last_name}})</strong></span></h4>
+                            <h4 class="header-title text-center">Result Report For: <span class="text-uppercase text-primary"><strong>({{$students->first_name. ' '. $students->middle_name. ' '. $students->last_name}})</strong></span></h4>
                             <span class="text-danger">Select Year of Study - To view Results</span>
                         </div>
                         <div class="col-2">
@@ -19,7 +19,7 @@
                         </div>
                         @else
                             @foreach ($groupedData as $year => $year )
-                                <a href="{{route('result.byType', ['year' => $year, $student->id])}}">
+                                <a href="{{route('result.byType', ['year' => $year, 'student' => Hashids::encode($student->id)])}}">
                                     <button type="button" class="list-group-item list-group-item-action">
                                         <h6 class="text-primary"><i class="fas fa-chevron-right"></i> Academic Year - {{$year}}</h6>
                                     </button>

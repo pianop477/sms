@@ -10,7 +10,7 @@
                 <a href="{{url()->previous()}}" class=""><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
             </div>
         </div>
-        <form class="needs-validation" novalidate="" action="{{route('students.update.records', $students->id)}}" method="POST" enctype="multipart/form-data">
+        <form class="needs-validation" novalidate="" action="{{route('students.update.records', ['students' => Hashids::encode($students->id)])}}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="form-row">
@@ -69,17 +69,25 @@
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom01">Select Bus Number: <span class="text-danger">if using/change school bus</span></label>
                     <select name="driver" id="validationCustom01" class="form-control text-capitalize">
-                        <option value="">--Yes! I'm Not using school bus--</option>
+                        <option value="">--Home Alone--</option>
                         @if ($students->transport == NULL)
                             <option value="">-- Select Bus Number --</option>
+                               @if ($buses->isEmpty())
+                                   <option value="" class="text-danger">No buses found</option>
+                               @else
                                 @foreach ($buses as $bus )
                                     <option value="{{$bus->id}}">{{$bus->bus_no}}</option>
                                 @endforeach
+                               @endif
                         @else
                             <option value="{{$students->transport_id}}" selected>{{$students->bus_no}}</option>
-                            @foreach ($buses as $bus)
-                                <option value="{{$bus->id}}">{{$bus->bus_no}}</option>
-                            @endforeach
+                            @if ($buses->isEmpty())
+                                <option value="" class="text-danger">No buses found</option>
+                            @else
+                                @foreach ($buses as $bus)
+                                    <option value="{{$bus->id}}">{{$bus->bus_no}}</option>
+                                @endforeach
+                            @endif
                         @endif
                     </select>
                     @error('driver')

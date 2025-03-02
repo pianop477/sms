@@ -166,7 +166,7 @@
                                     @foreach ($students as $student )
                                         <tr>
                                             <td class="text-uppercase">
-                                                <a href="{{route('Students.show', $student->id)}}">{{$student->first_name. ' '.$student->middle_name.' ' .$student->last_name}}</a>
+                                                <a href="{{route('Students.show', ['student' => Hashids::encode($student->id)])}}">{{$student->first_name. ' '.$student->middle_name.' ' .$student->last_name}}</a>
                                             </td>
                                             <td class="text-uppercase">{{$student->class_code}} {{$student->group}}</td>
                                             <td>
@@ -176,10 +176,10 @@
                                                             Manage
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                                            <a class="dropdown-item" href="{{route('students.modify', $student->id)}}"><i class="ti-pencil text-primary"></i> Edit</a>
-                                                            <a class="dropdown-item" href="{{route('attendance.byYear', $student->id)}}"><i class="fa fa-list-check text-success"></i> Attendance</a>
-                                                            <a class="dropdown-item" href="{{route('results.index', $student->id)}}"><i class="ti-file text-info"></i> Results</a>
-                                                            <a class="dropdown-item" href="{{route('student.courses.list', $student->id)}}"><i class="ti-book text-warning"></i> Subjects</a>
+                                                            <a class="dropdown-item" href="{{route('students.modify', ['students' => Hashids::encode($student->id)])}}"><i class="ti-pencil text-primary"></i> Edit</a>
+                                                            <a class="dropdown-item" href="{{route('attendance.byYear', ['student' => Hashids::encode($student->id)])}}"><i class="fa fa-list-check text-success"></i> Attendance</a>
+                                                            <a class="dropdown-item" href="{{route('results.index', ['student' => Hashids::encode($student->id)])}}"><i class="ti-file text-info"></i> Results</a>
+                                                            <a class="dropdown-item" href="{{route('student.courses.list', ['student' => Hashids::encode($student->id)])}}"><i class="ti-book text-warning"></i> Subjects</a>
                                                         </div>
                                                     </div>
                                                 </ul>

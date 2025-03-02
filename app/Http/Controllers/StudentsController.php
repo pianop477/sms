@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Psy\Command\WhereamiCommand;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Storage;
+use Vinkla\Hashids\Facades\Hashids;
 
 class StudentsController extends Controller
 {
@@ -180,7 +181,15 @@ class StudentsController extends Controller
     //  update students records *************************************************************************
     public function updateRecords(Request $request, $students)
     {
-        $user = Auth::user();
+        $decoded = Hashids::decode($students);
+        // return $decoded;
+        if(empty($decoded)) {
+            Alert()->toast('No such student was found', 'error');
+            return back();
+        }
+        $studentId = $decoded[0];
+
+        $student = Student::find($studentId);
 
             $request->merge(['group' => strtoupper($request->input('group'))]);
 
@@ -195,12 +204,7 @@ class StudentsController extends Controller
                 'driver' => 'integer|nullable|exists:transports,id',
                 'image' => 'nullable|image|mimes:jpg,png,jpeg|max:512',
             ]);
-            $student = Student::findOrFail($students);
 
-            if($student->school_id != $user->school_id) {
-                Alert()->toast('You are not authorized to perform this action', 'error');
-                return back();
-            }
             // return $student->first_name . ' '. $student->school_id. ' '. $student->parent_id;
             $student->first_name = $request->fname;
             $student->middle_name = $request->middle;
@@ -238,7 +242,7 @@ class StudentsController extends Controller
 
             $student->save();
             Alert()->toast('Student records updated successfully', 'success');
-            return redirect()->route('Students.show', $students);
+            return redirect()->route('Students.show', Hashids::encode($student->id));
 
     }
 
@@ -503,6 +507,8 @@ class StudentsController extends Controller
     // show student profile *****************************************************************************
     public function showRecords($student)
     {
+        $decoded = Hashids::decode($student);
+        // return $decoded;
         $user = Auth::user();
         // return $user;
         $parent = Parents::where('user_id', $user->id)->first();
@@ -530,8 +536,8 @@ class StudentsController extends Controller
                             'grades.id as grade_class_id',
                             'schools.school_reg_no', 'schools.abbriv_code'
                         )
-                        ->where('students.id', '=', $student)
-                        ->where('students.parent_id', $parent->id)
+                        ->where('students.id', '=', $decoded[0])
+                        // ->where('students.parent_id', $parent->id)
                         ->where('students.school_id', $user->school_id)
                         ->where('students.status', 1)
                         ->first();
@@ -557,13 +563,20 @@ class StudentsController extends Controller
     {
         $user = Auth::user();
         $parent = Parents::where('user_id', $user->id)->first();
+
+        $decoded = Hashids::decode($student);
+
+        if(empty($decoded)) {
+            Alert()->toast('No such student was found', 'error');
+            return back();
+        }
+        // return $user;
         $students = Student::query()->join('parents', 'parents.id', '=', 'students.parent_id')
                                     ->join('users', 'users.id', '=', 'parents.user_id')
                                     ->join('grades', 'grades.id', '=', 'students.class_id')
                                     ->leftJoin('transports', 'transports.id', '=', 'students.transport_id')
                                     ->select('students.*', 'grades.class_name', 'grades.class_code', 'transports.driver_name', 'transports.bus_no')
-                                    ->where('students.parent_id', $parent->id)
-                                    ->findOrFail($student);
+                                    ->findOrFail($decoded[0]);
 
         $buses = Transport::where('status', '=', 1)->where('school_id', $user->school_id)->orderBy('bus_no', 'ASC')->get();
         $classes = Grade::where('status', '=', 1)->where('school_id', $user->school_id)->orderBy('class_code')->get();

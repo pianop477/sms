@@ -8,10 +8,12 @@ use App\Models\Grade;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Teacher;
+use Hashids\Hashids as HashidsHashids;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use RealRashid\SweetAlert\Facades\Alert;
+use Vinkla\Hashids\Facades\Hashids;
 
 class CoursesController extends Controller
 {
@@ -275,9 +277,10 @@ class CoursesController extends Controller
     }
 
     //show lists of courses enrolled by students in a class
-    public function viewStudentCourses ($id)
+    public function viewStudentCourses ($student)
     {
-        $student = Student::find($id);
+        $decoded = Hashids::decode($student);
+        $student = Student::find($decoded[0]);
         // return $student;
         if(! $student) {
             Alert()->toast('No such student was found', 'error');
