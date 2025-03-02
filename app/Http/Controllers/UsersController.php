@@ -189,13 +189,13 @@ class UsersController extends Controller
         $nextSmsService = new NextSmsService();
         $url = "https://shulapp.tech";
         $sender = "SHULE APP";
-        $phone = $this->formatPhoneNumber($user->phone);
+        $destination = $this->formatPhoneNumber($user->phone);
         $message = "Hello!". strtoupper($user->first_name). " Welcome to ShuleApp System. Your Username: {$user->phone} and Password: shule2025. Click here {$url} to login";
         $reference = uniqid();
         //create payload
         $payload = [
             'from' => $sender,
-            'to' => $phone,
+            'to' => $destination,
             'text' => $message,
             'reference' => $reference
         ];
