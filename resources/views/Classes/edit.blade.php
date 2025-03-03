@@ -10,7 +10,7 @@
                     <a href="{{route('Classes.index')}}"><i class="fas fa-arrow-circle-left"></i> Back</a>
                 </div>
             </div>
-            <form class="needs-validation" novalidate="" action="{{route('Classes.update', $class->id)}}" method="POST" enctype="multipart/form-data">
+            <form class="needs-validation" novalidate="" action="{{route('Classes.update', ['id' => Hashids::encode($class->id)])}}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="form-row">
@@ -18,7 +18,7 @@
                         <label for="validationCustom01">Class Name</label>
                         <input type="text" name="cname" class="form-control text-uppercase" id="validationCustom01" value="{{$class->class_name}}" required="">
                         @error('name')
-                        <div class="invalid-feedback">
+                        <div class="text-danger">
                             {{$message}}
                         </div>
                         @enderror
@@ -27,7 +27,7 @@
                         <label for="validationCustom01">Class Code</label>
                         <input type="text" name="ccode" class="form-control text-uppercase" id="validationCustom01" placeholder="" value="{{$class->class_code}}" required="">
                         @error('name')
-                        <div class="invalid-feedback">
+                        <div class="text-danger">
                             {{$message}}
                         </div>
                         @enderror

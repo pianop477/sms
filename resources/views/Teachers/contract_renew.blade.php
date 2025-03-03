@@ -33,7 +33,7 @@
                                                         <option value="renewal">Renew Contract</option>
                                                     </select>
                                                     @error('contract_type')
-                                                    <div class="invalid-feedback">
+                                                    <div class="text-danger">
                                                         {{$message}}
                                                     </div>
                                                     @enderror
@@ -42,7 +42,7 @@
                                                     <label for="validationCustom02">Application Letter</label>
                                                     <input type="file" required name="application_letter" class="form-control" id="validationCustom02" placeholder="" required="" value="">
                                                     @error('application_letter')
-                                                    <div class="invalid-feedback">
+                                                    <div class="text-danger">
                                                        {{$message}}
                                                     </div>
                                                     @enderror
@@ -110,14 +110,13 @@
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    {{-- <a href="{{route('preview.my.application', $row->id)}}" class="btn btn-info btn-xs" target="_blank"> View</a> --}}
-                                                    <a href="{{route('preview.my.application', $row->id)}}" class="" target="_blank">
+                                                    <a href="{{route('preview.my.application', ['id' => Hashids::encode($row->id)])}}" class="" target="_blank">
                                                         <i class="fas fa-paperclip text-success"></i>
                                                     </a>
                                                 </td>
                                                 <td>
                                                     <ul class="d-flex justify-content-center">
-                                                        <li class="mr-3"><a href="{{route('contract.edit', $row->id)}}" class="text-primary"><i class="ti-pencil"></i></a></li>
+                                                        <li class="mr-3"><a href="{{route('contract.edit', ['id' => Hashids::encode($row->id)])}}" class="text-primary"><i class="ti-pencil"></i></a></li>
                                                         <li class="mr-3"><a href="{{route('contract.destroy', $row->id)}}" onclick="return confirm('Are you sure you want to delete this application?')" class="text-danger"><i class="ti-trash"></i></a></li>
                                                     </ul>
                                                 </td>
@@ -160,7 +159,7 @@
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    <a href="{{route('contract.download', $row->id)}}" class="btn btn-info btn-xs" target="_blank"> Preview</a>
+                                                    <a href="{{route('contract.download', ['id' => Hashids::encode($row->id)])}}" class="btn btn-info btn-xs" target="_blank"> Preview</a>
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -190,10 +189,10 @@
                                                    <span class="badge bg-danger">{{$row->status}}</span>
                                                 </td>
                                                 <td>
-                                                    <a href="{{route('preview.my.application', $row->id)}}" class="btn btn-info btn-xs" target="_blank"> View</a>
+                                                    <a href="{{route('preview.my.application', ['id' => Hashids::encode($row->id)])}}" class="btn btn-info btn-xs" target="_blank"> View</a>
                                                 </td>
                                                 <td>
-                                                    <a href="{{route('contract.edit', $row->id)}}" class="btn btn-success btn-xs" target=""> Re-apply</a>
+                                                    <a href="{{route('contract.edit', ['id' => Hashids::encode($row->id)])}}" class="btn btn-success btn-xs" target=""> Re-apply</a>
                                                 </td>
                                             </tr>
                                         @endforeach

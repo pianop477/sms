@@ -54,7 +54,7 @@
                                         </td>
                                         <td>
                                             {{-- <a href="{{route('contract.admin.preview', $row->id)}}" target="_blank" class="btn btn-info btn-xs"> view</a> --}}
-                                            <a href="{{route('contract.admin.preview', $row->id)}}" target="_blank" class="">
+                                            <a href="{{route('contract.admin.preview', ['id' => Hashids::encode($row->id)])}}" target="_blank" class="">
                                                 <i class="fas fa-paperclip text-success"></i>
                                             </a>
                                         </td>
@@ -89,21 +89,26 @@
                                                                 </div>
                                                                 <hr class="dark horizontal py-0">
                                                                 <p class="text-center text-danger">Complete Approval Actions</p>
-                                                                <form action="{{route('contract.approval', $row->id)}}" method="POST" novalidate="" class="needs-validation" enctype="multipart/form-data" role="form">
+                                                                <form action="{{route('contract.approval', ['id' => Hashids::encode($row->id)])}}" method="POST" novalidate="" class="needs-validation" enctype="multipart/form-data" role="form">
                                                                     @csrf
                                                                     @method('PUT')
                                                                     <div class="row">
                                                                         <div class="col-md-4">
                                                                             <div class="form-group">
-                                                                                <input type="hidden" name="contract_id" value="{{$row->id}}">
                                                                                 <label for="" class="control-label">Set Months</label>
-                                                                                <input type="number" class="form-control" name="duration" id="validationCustom01" required>
+                                                                                <input type="number" class="form-control" name="duration" id="validationCustom01" required value="{{old('duration')}}">
+                                                                                @error('duration')
+                                                                                    <div class="text-danger">{{$message}}</div>
+                                                                                @enderror
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-md-8">
                                                                             <div class="form-group">
                                                                                 <label for="" class="control-label">Remarks</label>
-                                                                                <textarea name="remark" id="" cols="30" rows="2" class="form-control" id="validationCustom01" required></textarea>
+                                                                                <textarea name="remark" id="" cols="30" rows="2" class="form-control" id="validationCustom01" required>{{old('remark')}}</textarea>
+                                                                                @error('remark')
+                                                                                    <div class="text-danger">{{$message}}</div>
+                                                                                @enderror
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -146,15 +151,17 @@
                                                                 </div>
                                                                 <hr class="dark horizontal py-0">
                                                                 <p class="text-center text-danger">Complete Reject Actions</p>
-                                                                <form action="{{route('contract.rejection', $row->id)}}" method="POST" novalidate="" class="needs-validation" enctype="multipart/form-data" role="form">
+                                                                <form action="{{route('contract.rejection', ['id' => Hashids::encode($row->id)])}}" method="POST" novalidate="" class="needs-validation" enctype="multipart/form-data" role="form">
                                                                     @csrf
                                                                     @method('PUT')
                                                                     <div class="row">
                                                                         <div class="col-md-12">
                                                                             <div class="form-group">
-                                                                                <input type="hidden" name="contract_id" value="{{$row->id}}">
                                                                                 <label for="" class="control-label">Reason for Rejection</label>
-                                                                                <textarea name="remark" id="" cols="30" rows="2" class="form-control" id="validationCustom01" required></textarea>
+                                                                                <textarea name="remark" id="" cols="30" rows="2" class="form-control" id="validationCustom01" required>{{old('remark')}}</textarea>
+                                                                                @error('remark')
+                                                                                    <div class="text-danger">{{$message}}</div>
+                                                                                @enderror
                                                                             </div>
                                                                         </div>
                                                                     </div>

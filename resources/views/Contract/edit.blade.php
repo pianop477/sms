@@ -13,7 +13,7 @@
                     <p><strong>Reason: </strong>{{$contract->remarks}}</p>
                 </div>
             @endif
-            <form class="needs-validation" novalidate="" action="{{route('contract.update', $contract->id)}}" method="POST" enctype="multipart/form-data">
+            <form class="needs-validation" novalidate="" action="{{route('contract.update', ['id' => Hashids::encode($contract->id)])}}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="form-row">
@@ -27,7 +27,7 @@
                             {{-- <option value="extension"> Extend Contract</option> --}}
                         </select>
                         @error('contract_type')
-                        <div class="invalid-feedback">
+                        <div class="text-danger">
                             <span>{{$message}}</span>
                         </div>
                         @enderror
@@ -36,7 +36,7 @@
                         <label for="validationCustom02">Application Letter</label>
                         <input type="file" name="application_letter" class="form-control" id="validationCustom02" placeholder="New Password" required="" value="">
                         @error('application_letter')
-                        <div class="invalid-feedback">
+                        <div class="text-danger">
                            <span>{{$message}}</span>
                         </div>
                         @enderror

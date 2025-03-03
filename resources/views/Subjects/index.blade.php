@@ -15,7 +15,7 @@
                         @else
                         <ul class="list-group">
                             @foreach ($classes as $class)
-                            <a href="{{route('courses.view.class', $class->id)}}">
+                            <a href="{{route('courses.view.class', ['id' => Hashids::encode($class->id)])}}">
                                 <li class="list-group-item text-primary align-items-center text-uppercase">
                                     <i class="ti-angle-double-right"></i> {{$class->class_name}}
                                 </li>
@@ -53,7 +53,7 @@
                                                         <label for="validationCustom01">Subject Name</label>
                                                         <input type="text" required name="sname" class="form-control text-uppercase" id="validationCustom01" placeholder="Class Name" value="{{old('name')}}" required="">
                                                         @error('sname')
-                                                        <div class="invalid-feedback">
+                                                        <div class="text-danger">
                                                             {{$message}}
                                                         </div>
                                                         @enderror
@@ -62,12 +62,11 @@
                                                         <label for="validationCustom02">Code</label>
                                                         <input type="text" required name="scode" class="form-control text-uppercase" id="validationCustom02" placeholder="Class Code" required="" value="{{old('code')}}" required>
                                                         @error('scode')
-                                                        <div class="invalid-feedback">
+                                                        <div class="text-danger">
                                                            {{$message}}
                                                         </div>
                                                         @enderror
                                                     </div>
-
                                                 </div>
                                         </div>
                                         <div class="modal-footer">
@@ -113,10 +112,10 @@
                                             <ul class="d-flex">
                                                 @if ($course->status == 1)
                                                     <li class="mr-3">
-                                                        <a href="{{route('course.edit', $course->id)}}"><i class="fas fa-pencil text-primary"></i></a>
+                                                        <a href="{{route('course.edit', ['id' => Hashids::encode($course->id)])}}"><i class="fas fa-pencil text-primary"></i></a>
                                                     </li>
                                                     <li class="mr-3">
-                                                        <form action="{{route('courses.block', $course->id)}}" method="POST">
+                                                        <form action="{{route('courses.block', ['id' => Hashids::encode($course->id)])}}" method="POST">
                                                             @csrf
                                                             @method('PUT')
                                                             <button type="submit" class=" btn btn-link p-0" onclick="return confirm('Are you sure you want to Block {{strtoupper($course->course_name)}} Course?')"><i class="ti-na text-danger"></i></button>
@@ -124,7 +123,7 @@
                                                     </li>
                                                 @else
                                                     <li class="mr-3">
-                                                        <form action="{{route('courses.unblock', $course->id)}}" method="POST">
+                                                        <form action="{{route('courses.unblock', ['id' => Hashids::encode($course->id)])}}" method="POST">
                                                             @csrf
                                                             @method('PUT')
                                                             <button type="submit" class=" btn btn-link p-0" onclick="return confirm('Are you sure you want to unblock {{strtoupper($course->course_name)}} Course?')"><i class="ti-reload text-success"></i></button>
