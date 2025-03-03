@@ -7,6 +7,7 @@ use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
+use Vinkla\Hashids\Facades\Hashids;
 
 class ClassesController extends Controller
 {
@@ -70,10 +71,11 @@ class ClassesController extends Controller
     /**
      * Show the form for editing the resource.
      */
-    public function editClass(string $id)
+    public function editClass($id)
     {
         //
-        $class = Grade::findOrFail($id);
+        $decoded = Hashids::decode($id);
+        $class = Grade::findOrFail($decoded[0]);
         return view('Classes.edit', compact('class'));
     }
 
@@ -83,7 +85,8 @@ class ClassesController extends Controller
     public function updateClass(Request $request, $id)
     {
         //
-        $class = Grade::findOrFail($id);
+        $decoded = Hashids::decode($id);
+        $class = Grade::findOrFail($decoded[0]);
         if(! $class) {
             Alert::error('Error', 'No class found');
             return back();
@@ -108,7 +111,8 @@ class ClassesController extends Controller
     public function deleteClass($id)
     {
         // abort(404);
-        $class = Grade::find($id);
+        $decoded = Hashids::decode($id);
+        $class = Grade::find($decoded[0]);
         // return $class;
         $students = Student::where('class_id', $class->id)->where('status', 1)->exists();
         if($students) {
@@ -135,7 +139,6 @@ class ClassesController extends Controller
                 Alert()->toast('Class has been deleted successfully', 'success');
                 return back();
             }
-
 
         } catch(\Exception $e) {
             Alert::error('Error', $e->getMessage());

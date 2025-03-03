@@ -29,7 +29,7 @@
                                                     <label for="validationCustom01">Class name</label>
                                                     <input type="text" required name="name" class="form-control text-uppercase" id="validationCustom01" placeholder="Class Name" value="{{old('name')}}" required="">
                                                     @error('name')
-                                                    <div class="invalid-feedback">
+                                                    <div class="text-danger">
                                                         {{$message}}
                                                     </div>
                                                     @enderror
@@ -38,7 +38,7 @@
                                                     <label for="validationCustom02">Class Code</label>
                                                     <input type="text" required name="code" class="form-control text-uppercase" id="validationCustom02" placeholder="Class Code" required="" value="{{old('code')}}" required>
                                                     @error('code')
-                                                    <div class="invalid-feedback">
+                                                    <div class="text-danger">
                                                        {{$message}}
                                                     </div>
                                                     @enderror

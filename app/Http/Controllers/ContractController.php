@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use RealRashid\SweetAlert\Facades\Alert;
+use Vinkla\Hashids\Facades\Hashids;
 
 class ContractController extends Controller
 {
@@ -28,25 +29,14 @@ class ContractController extends Controller
     public function store(Request $request)
     {
         // Get authenticated teacher
+        $this->validate($request, [
+            'contract_type' => 'required|string|in:probation,new,renewal',
+            'application_letter' => 'required|file|mimes:pdf|max:512', // Max 512 KB
+        ]);
+
         try {
             $user = Auth::user();
             $teacher = Teacher::where('user_id', $user->id)->firstOrFail();
-
-            // Validate the input
-            $validator = Validator::make($request->all(), [
-                'contract_type' => 'required|string|in:probation,new,renewal',
-                'application_letter' => 'required|file|mimes:pdf|max:512', // Max 512 KB
-            ]);
-
-            // Check validation errors
-            if ($validator->fails()) {
-                $errors = $validator->errors();
-                foreach($errors as $error) {
-                    // Alert::error('Validation Fails', $error);
-                    Alert()->toast($error, 'error');
-                    return back();
-                }
-            }
 
             // Check if there is an existing pending request
             $existingRequest = Contract::where('teacher_id', $teacher->id)
@@ -115,7 +105,8 @@ class ContractController extends Controller
     //preview teachers his/her contract application
     public function previewMyApplication($id)
     {
-        $contract = Contract::find($id);
+        $decode = Hashids::decode($id);
+        $contract = Contract::find($decode[0]);
 
         if (!$contract) {
             // Alert::error('Failed', 'No such contract records found');
@@ -144,7 +135,8 @@ class ContractController extends Controller
 
     public function edit($id)
     {
-        $contract = Contract::find($id);
+        $decode = Hashids::decode($id);
+        $contract = Contract::find($decode[0]);
 
         if (!$contract) {
             // Alert::error('Failed', 'No such contract records found');
@@ -165,28 +157,20 @@ class ContractController extends Controller
 
     public function update(Request $request, $id)
     {
-        $contract = Contract::find($id);
+        $decode = Hashids::decode($id);
+        $contract = Contract::find($decode[0]);
         if(!$contract) {
             // Alert::error('Failed', 'No such contract records found');
             Alert()->toast('No such contract records found', 'error');
             return back();
         }
 
+        $this->validate($request, [
+            'contract_type' => 'required|string|in:new,renewal, extension, probation',
+            'application_letter' => 'required|file|mimes:pdf|max:512'
+        ]);
+
         try {
-            $validator = Validator::make($request->all(), [
-                'contract_type' => 'required|string|in:new,renewal, extension, probation',
-                'application_letter' => 'required|file|mimes:pdf|max:512',
-            ]);
-
-            if($validator->fails()){
-                $errors = $validator->errors();
-
-                foreach($errors as $error) {
-                    Alert::error('Validation Fails', $error);
-                    return back();
-                }
-            }
-
             $filePath = '';
 
             if ($request->hasFile('application_letter')) {
@@ -240,7 +224,8 @@ class ContractController extends Controller
 
     public function destroy($id)
     {
-        $contract = Contract::find($id);
+        $decode = Hashids::decode($id);
+        $contract = Contract::find($decode[0]);
         if(! $contract) {
             // Alert::error('Failed', 'No such contract found');
             Alert()->toast('No such contract found', 'error');
@@ -270,7 +255,6 @@ class ContractController extends Controller
     public function contractManager()
     {
         $user = Auth::user();
-
         $contractsByYear = Contract::where('status', 'approved')
                         ->where('school_id', $user->school_id)
                         ->orderBy('approved_at', 'DESC')
@@ -296,7 +280,8 @@ class ContractController extends Controller
 
     public function adminPreviewFile($id)
     {
-        $contract = Contract::find($id);
+        $decode = Hashids::decode($id);
+        $contract = Contract::find($decode[0]);
 
         if (!$contract) {
             // Alert::error('Failed', 'No such contract records found');
@@ -318,7 +303,8 @@ class ContractController extends Controller
 
     public function approveContract (Request $request, $id)
     {
-        $contract = Contract::find($id);
+        $decode = Hashids::decode($id);
+        $contract = Contract::find($decode[0]);
 
         if(! $contract ) {
             // Alert::error('Error', 'No such contract was found');
@@ -326,18 +312,11 @@ class ContractController extends Controller
             return redirect()->back();
         }
 
-        $validator = Validator::make($request->all(), [
+        $this->validate($request, [
             'duration' => 'required|integer',
             'remark' => 'required|string|max:255',
         ]);
 
-        if($validator->fails()) {
-            $errors = $validator->errors();
-            foreach($errors as $error) {
-                Alert::error('Validation Fails', $error);
-                return back();
-            }
-        }
         $approved_at = Carbon::now();
         $endDate = $approved_at->copy()->addMonth($request->duration);
 
@@ -357,7 +336,8 @@ class ContractController extends Controller
 
     public function rejectContract (Request $request, $id)
     {
-        $contract = Contract::find($id);
+        $decode = Hashids::decode($id);
+        $contract = Contract::find($decode[0]);
 
         if(! $contract ) {
             // Alert::error('Error', 'No such contract was found');
@@ -365,17 +345,9 @@ class ContractController extends Controller
             return redirect()->back();
         }
 
-        $validator = Validator::make($request->all(), [
+        $this->validate($request, [
             'remark' => 'required|string|max:255',
         ]);
-
-        if($validator->fails()) {
-            $errors = $validator->errors();
-            foreach($errors as $error) {
-                Alert::error('Validation Fails', $error);
-                return back();
-            }
-        }
 
         $contract->update([
             'status' => $request->input('status', 'rejected'),
@@ -433,6 +405,7 @@ class ContractController extends Controller
 
     public function downloadContract($id)
     {
+        $decode = Hashids::decode($id);
         $user = Auth::user();
         $teacher = Teacher::where('user_id', $user->id)->first();
 
@@ -446,7 +419,7 @@ class ContractController extends Controller
                                 'schools.postal_address', 'schools.postal_name', 'schools.logo', 'schools.country'
                             )
                             ->where('contracts.teacher_id', $teacher->id)
-                            ->find($id);
+                            ->find($decode[0]);
         if(! $contract) {
             // Alert::error('Failed', 'No such contract record was found');
             Alert()->toast('No such contract record was found', 'error');

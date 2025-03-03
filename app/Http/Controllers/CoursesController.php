@@ -33,7 +33,8 @@ class CoursesController extends Controller
      //view courses by each class============================
      public function classCourses($id)
      {
-        $class = Grade::find($id);
+        $decode = Hashids::decode($id);
+        $class = Grade::find($decode[0]);
         if(! $class) {
             // Alert::error('Error!', 'No such class was found');
             Alert()->toast('No such class was found', 'error');
@@ -55,13 +56,17 @@ class CoursesController extends Controller
                                                 ->where('class_learning_courses.school_id', $class->school_id)
                                                 ->orderBy('subjects.course_name')
                                                 ->get();
+
         $courses = Subject::where('school_id', $class->school_id)->where('status', 1)->orderBy('course_name')->get();
+
         $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
                                     ->select('users.first_name', 'users.last_name', 'teachers.*')
                                     ->orderBy('users.first_name')
                                     ->where('teachers.school_id', $class->school_id)
                                     ->whereIn('role_id', [1,3,4])
+                                    ->orderBy('users.first_name')
                                     ->get();
+
         return view('Courses.index', compact('classCourse', 'class', 'courses', 'teachers'));
      }
 
@@ -77,7 +82,8 @@ class CoursesController extends Controller
 
     public function blockCourse($id, Request $request)
     {
-        $course = Subject::find($id);
+        $decode = Hashids::decode($id);
+        $course = Subject::find($decode[0]);
         if(! $course) {
             // Alert::error('Error', 'No such course was found');
             Alert()->toast('No such course was found', 'error');
@@ -94,7 +100,8 @@ class CoursesController extends Controller
 
     public function unblockCourse(Request $request, $id)
     {
-        $course = Subject::find($id);
+        $decode = Hashids::decode($id);
+        $course = Subject::find($decode[0]);
         if(! $course) {
             // Alert::error('Error', 'No such course was found');
             Alert()->toast('No such course was found', 'error');
@@ -111,6 +118,7 @@ class CoursesController extends Controller
 
     public function assign($id)
     {
+        $decode = Hashids::decode($id);
         $user = Auth::user();
         $classCourse = class_learning_courses::query()
                                             ->join('subjects', 'subjects.id', '=', 'class_learning_courses.course_id')
@@ -122,7 +130,7 @@ class CoursesController extends Controller
                                                 'grades.class_name', 'subjects.course_name', 'users.first_name', 'users.last_name',
                                                 'teachers.id as teacherId'
                                             )
-                                            ->find($id);
+                                            ->find($decode[0]);
         if(! $classCourse) {
             // Alert::error('Error', 'No such course was found');
             Alert()->toast('No such course was found', 'error');
@@ -133,6 +141,7 @@ class CoursesController extends Controller
                                     ->where('teachers.id', '!=', $classCourse->teacherId)
                                     ->where('teachers.role_id', '!=', 2)
                                     ->where('teachers.school_id', $user->school_id)
+                                    ->orderBy('users.first_name')
                                     ->get();
 
         return view('Courses.admin-edit', compact('classCourse', 'teachers'));
@@ -141,7 +150,8 @@ class CoursesController extends Controller
 
     public function assignedTeacher(Request $request, $id)
     {
-        $class_course = class_learning_courses::find($id);
+        $decode = Hashids::decode($id);
+        $class_course = class_learning_courses::find($decode[0]);
         if(! $class_course) {
             // Alert::error('Error!', 'No such course was found');
             Alert()->toast('No such course was found', 'error');
@@ -157,9 +167,10 @@ class CoursesController extends Controller
     }
 
     //teacher remove courses from its lists
-    public function removeCourse(Subject $course, Request $request)
+    public function removeCourse($course, Request $request)
     {
-        $courses = Subject::findOrFail($course->id);
+        $decode = Hashids::decode($course);
+        $courses = Subject::findOrFail($decode[0]);
         $courses->status = $request->input('status', 2);
         $courses->save();
         // Alert::success('Success!', 'Your course has been moved to trash!');
@@ -197,13 +208,15 @@ class CoursesController extends Controller
 
     public function editCourse($id)
     {
-        $course = Subject::find($id);
+        $decode = Hashids::decode($id);
+        $course = Subject::find($decode[0]);
         return view('Subjects.edit', compact('course'));
     }
 
     public function updateCourse (Request $request, $id)
     {
-        $course = Subject::find($id);
+        $decode = Hashids::decode($id);
+        $course = Subject::find($decode[0]);
 
         if(! $course) {
             Alert()->toast('No such course was found', 'error');
@@ -247,7 +260,7 @@ class CoursesController extends Controller
                                             ->where('school_id', $request->school_id)
                                             ->count();
         if($teacher >= 3) {
-            Alert()->toast('The selected teacher has already assigned to maximum of 3 subjects to teach', 'error');
+            Alert()->toast('Only 3 courses allowed to be assigned for single teacher', 'error');
             return back();
         }
         $class_course = class_learning_courses::create([
@@ -263,7 +276,8 @@ class CoursesController extends Controller
 
     public function deleteCourse($id)
     {
-        $class_course = class_learning_courses::find($id);
+        $decode = Hashids::decode($id);
+        $class_course = class_learning_courses::find($decode[0]);
 
         if(! $class_course) {
             Alert()->toast('No such course was found in the records', 'error');
@@ -317,6 +331,7 @@ class CoursesController extends Controller
                                         ->where('class_teachers.class_id', $class->id)
                                         ->where('class_teachers.group', $student->group)
                                         ->where('class_teachers.school_id', $user->school_id)
+                                        ->orderBY('users.first_name')
                                         ->get();
         // return ['data' => $myClassTeacher];
 
@@ -325,7 +340,8 @@ class CoursesController extends Controller
 
     public function blockAssignedCourse($id, Request $request)
     {
-        $class_course = class_learning_courses::find($id);
+        $decode = Hashids::decode($id);
+        $class_course = class_learning_courses::find($decode[0]);
 
         if(! $class_course) {
             Alert()->toast('No such class course was found', 'error');
@@ -344,7 +360,8 @@ class CoursesController extends Controller
 
     public function unblockAssignedCourse($id, Request $request)
     {
-        $class_course = class_learning_courses::find($id);
+        $decode = Hashids::decode($id);
+        $class_course = class_learning_courses::find($decode[0]);
 
         if(! $class_course) {
             Alert()->toast('No such class course was found', 'error');

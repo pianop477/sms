@@ -44,7 +44,7 @@
                                                             @endif
                                                         </select>
                                                         @error('course_id')
-                                                        <div class="invalid-feedback">
+                                                        <div class="text-danger">
                                                             {{$message}}
                                                         </div>
                                                         @enderror
@@ -56,7 +56,7 @@
                                                             <option value="{{$class->id}}" selected class="text-uppercase">{{$class->class_name}}</option>
                                                         </select>
                                                         @error('class_id')
-                                                        <div class="invalid-feedback">
+                                                        <div class="text-danger">
                                                             {{$message}}
                                                         </div>
                                                         @enderror
@@ -74,7 +74,7 @@
                                                             @endif
                                                         </select>
                                                         @error('teacher_id')
-                                                        <div class="invalid-feedback">
+                                                        <div class="text-danger">
                                                             {{$message}}
                                                         </div>
                                                         @enderror
@@ -131,30 +131,30 @@
                                                 @if ($course->status == 1)
                                                 <ul class="d-flex justify-content-center">
                                                     <li class="mr-3">
-                                                        <a href="{{route('courses.assign', $course->id)}}"><i class="ti-pencil text-primary"></i></a>
+                                                        <a href="{{route('courses.assign', ['id' => Hashids::encode($course->id)])}}"><i class="ti-pencil text-primary"></i></a>
                                                     </li>
                                                     <li class="mr-3">
-                                                        <form action="{{route('block.assigned.course', $course->id)}}" method="POST">
+                                                        <form action="{{route('block.assigned.course', ['id' => Hashids::encode($course->id)])}}" method="POST">
                                                             @csrf
                                                             @method('PUT')
                                                             <button class="btn btn-link p-0"onclick="return confirm('Are you sure you want to block {{strtoupper($course->course_name)}} Course?')"><i class="ti-na text-info"></i></button>
                                                         </form>
                                                     </li>
                                                     <li>
-                                                        <a href="{{route('courses.delete', $course->id)}}" onclick="return confirm('Are you sure you want to Delete {{strtoupper($course->course_name)}} Course permanently?')"><i class="ti-trash text-danger"></i></a>
+                                                        <a href="{{route('courses.delete', ['id' => Hashids::encode($course->id)])}}" onclick="return confirm('Are you sure you want to Delete {{strtoupper($course->course_name)}} Course permanently?')"><i class="ti-trash text-danger"></i></a>
                                                     </li>
                                                 </ul>
                                                 @else
                                                 <ul class="d-flex justify-content-center">
                                                     <li class="mr-3">
-                                                        <form action="{{route('unblock.assigned.course', $course->id)}}" method="POST">
+                                                        <form action="{{route('unblock.assigned.course', ['id' => Hashids::encode($course->id)])}}" method="POST">
                                                             @csrf
                                                             @method('PUT')
                                                             <button class="btn btn-link p-0" onclick="return confirm('Are you sure you want to unblock {{strtoupper($course->course_name)}} Course?')"><i class="ti-reload text-success"></i></button>
                                                         </form>
                                                     </li>
                                                     <li>
-                                                        <a href="{{route('courses.delete', $course->id)}}" onclick="return confirm('Are you sure you want to Delete {{strtoupper($course->course_name)}} Course permanently?')"><i class="ti-trash text-danger"></i></a>
+                                                        <a href="{{route('courses.delete', ['id' => Hashids::encode($course->id)])}}" onclick="return confirm('Are you sure you want to Delete {{strtoupper($course->course_name)}} Course permanently?')"><i class="ti-trash text-danger"></i></a>
                                                     </li>
                                                 </ul>
                                                 @endif

@@ -10,15 +10,15 @@
                     <a href="{{route('courses.index')}}"><i class="fas fa-arrow-circle-left"></i> Back</a>
                 </div>
             </div>
-            <form class="needs-validation" novalidate="" action="{{route('course.update', $course->id)}}" method="POST" enctype="multipart/form-data">
+            <form class="needs-validation" novalidate="" action="{{route('course.update', ['id' => Hashids::encode($course->id)])}}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="form-row">
                     <div class="col-md-4 mb-3">
                         <label for="validationCustom01">Course Name</label>
                         <input type="text" required name="sname" class="form-control text-uppercase" id="validationCustom01" value="{{$course->course_name}}" required="">
-                        @error('name')
-                        <div class="invalid-feedback">
+                        @error('sname')
+                        <div class="text-danger">
                             {{$message}}
                         </div>
                         @enderror
@@ -26,8 +26,8 @@
                     <div class="col-md-4 mb-3">
                         <label for="validationCustom01">Course Code</label>
                         <input type="text" required name="scode" class="form-control text-uppercase" id="validationCustom01" placeholder="" value="{{$course->course_code}}" required="">
-                        @error('name')
-                        <div class="invalid-feedback">
+                        @error('scode')
+                        <div class="text-danger">
                             {{$message}}
                         </div>
                         @enderror
