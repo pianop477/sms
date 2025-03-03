@@ -34,6 +34,7 @@ class CoursesController extends Controller
      public function classCourses($id)
      {
         $decode = Hashids::decode($id);
+        // return $decode;
         $class = Grade::find($decode[0]);
         if(! $class) {
             // Alert::error('Error!', 'No such class was found');
@@ -163,7 +164,7 @@ class CoursesController extends Controller
         ]);
         // Alert::success('Success!', 'Subject teacher has been saved successfully');
         Alert()->toast('Subject teacher has been saved successfully', 'success');
-        return redirect()->route('courses.view.class', $class_course->class_id);
+        return redirect()->route('courses.view.class', Hashids::encode($class_course->class_id));
     }
 
     //teacher remove courses from its lists
