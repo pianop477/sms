@@ -296,7 +296,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
     //End of condition ==============================================================================================
 
     //delete students records =======================================================================================
-    Route::middleware(['GeneralMiddleware'])->group(function () {
+    Route::middleware(['ManagerOrTeacher'])->group(function () {
         //reset users passwords =====================================================================================
         Route::prefix('User-management')->group(function () {
             Route::get('Password-Reset', [RolesController::class, 'userPassword'])->name('users.lists');
