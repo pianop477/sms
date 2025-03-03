@@ -205,6 +205,7 @@ class TransportController extends Controller
     public function showStudents($trans)
     {
         $id = Hashids::decode($trans);
+        $transport = Transport::find($id[0]);
         $user = Auth::user();
         $students = Student::query()->join('grades', 'grades.id', '=', 'students.class_id')
                                     ->join('parents', 'parents.id', '=', 'students.parent_id')
@@ -217,18 +218,19 @@ class TransportController extends Controller
                                         'transports.phone', 'transports.bus_no'
 
                                     )
-                                    ->where('students.transport_id', $id[0])
+                                    ->where('students.transport_id', $transport->id)
                                     ->where('students.status', 1)
                                     ->where('students.school_id', $user->school_id)
                                     ->orderBy('students.first_name')
                                     ->get();
-        return view('Transport.students', compact('students'));
+        return view('Transport.students', compact('students', 'transport'));
     }
 
     public function export ($trans)
     {
         // return response()->json($trans);
         $id = Hashids::decode($trans);
+        $transport = Transport::find($id[0]);
         $user = Auth::user();
         $students = Student::query()
                             ->join('grades', 'grades.id', '=', 'students.class_id')
@@ -241,12 +243,12 @@ class TransportController extends Controller
                                 'grades.class_name', 'grades.class_code', 'transports.driver_name',
                                 'transports.phone', 'transports.bus_no', 'transport.routine'
                             )
-                            ->where('students.transport_id', $id[0])
+                            ->where('students.transport_id', $transport->id)
                             ->where('students.status', 1)
                             ->where('students.school_id', $user->school_id)
                             ->orderBy('first_name')
                             ->get();
-        $pdf = \PDF::loadView('Transport.export', compact('students'));
+        $pdf = \PDF::loadView('Transport.export', compact('students', 'transport'));
         return $pdf->stream($trans->driver_name. ' students.pdf');
     }
 }
