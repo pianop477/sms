@@ -76,16 +76,16 @@
                                    <option value="" class="text-danger">No buses found</option>
                                @else
                                 @foreach ($buses as $bus )
-                                    <option value="{{$bus->id}}">{{$bus->bus_no}}</option>
+                                    <option value="{{$bus->id}}">bus {{$bus->bus_no}}</option>
                                 @endforeach
                                @endif
                         @else
-                            <option value="{{$students->transport_id}}" selected>{{$students->bus_no}}</option>
+                            <option value="{{$students->transport_id}}" selected>bus {{$students->bus_no}}</option>
                             @if ($buses->isEmpty())
                                 <option value="" class="text-danger">No buses found</option>
                             @else
                                 @foreach ($buses as $bus)
-                                    <option value="{{$bus->id}}">{{$bus->bus_no}}</option>
+                                    <option value="{{$bus->id}}">bus {{$bus->bus_no}}</option>
                                 @endforeach
                             @endif
                         @endif

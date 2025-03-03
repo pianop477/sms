@@ -126,8 +126,8 @@
                     </div>
                     <div class="header">
                         <h4 class="text-uppercase">{{Auth::user()->school->school_name}}</h4>
-                        <h5 class="text-uppercase">students in Bus Number - {{$trans->bus_no}}</h5>
-                        <h5>Driver Name: {{$trans->driver_name}}</h5>
+                        <h5 class="text-uppercase">students in Bus Number - {{$students->first()->bus_no}}</h5>
+                        <h5>Driver Name: {{$students->first()->driver_name}}</h5>
                     </div>
                 </div>
                 @if ($students->isEmpty())
@@ -139,7 +139,7 @@
                         </div>
                     </div>
                 @else
-                <p>Bus Routine: <span style="font-weight: bold; text-transform:uppercase">{{$trans->routine}}</span></p>
+                <p>Bus Routine: <span style="font-weight: bold; text-transform:uppercase">{{$students->first()->routine}}</span></p>
                 <table class="table">
                     <thead>
                         <tr>

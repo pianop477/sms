@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
 use Spatie\Ignition\Contracts\HasSolutionsForThrowable;
+use Vinkla\Hashids\Facades\Hashids;
 
 class TransportController extends Controller
 {
@@ -85,8 +86,9 @@ class TransportController extends Controller
     public function update(Request $request, $trans)
     {
         //
+        $id = Hashids::decode($trans);
         $user = Auth::user();
-        $transport = Transport::findOrFail($trans);
+        $transport = Transport::findOrFail($id[0]);
 
         if($transport->school_id != $user->school_id) {
             Alert()->toast('You are not authorized to perform this action', 'error');
@@ -109,8 +111,9 @@ class TransportController extends Controller
 
     public function restore(Request $request, $trans)
     {
+        $id = Hashids::decode($trans);
         $user = Auth::user();
-        $transport = Transport::findOrFail($trans);
+        $transport = Transport::findOrFail($id[0]);
 
         if($transport->school_id != $user->school_id) {
             Alert()->toast('You are not authorized to perform this action', 'error');
@@ -131,8 +134,9 @@ class TransportController extends Controller
     public function destroy($trans)
     {
         // abort(404);
+        $id = Hashids::decode($trans);
         $user = Auth::user();
-        $transport = Transport::findOrFail($trans);
+        $transport = Transport::findOrFail($id[0]);
 
         if($transport->school_id != $user->school_id) {
             Alert()->toast('You are not authorized to perform this action', 'error');
@@ -152,10 +156,11 @@ class TransportController extends Controller
        }
     }
 
-    public function Edit(Transport $trans)
+    public function Edit($trans)
     {
+        $id = Hashids::decode($trans);
         $user = Auth::user();
-        $transport = Transport::findOrFail($trans);
+        $transport = Transport::findOrFail($id[0]);
 
         if($transport->school_id != $user->school_id) {
             Alert()->toast('You are not authorized to perform this action', 'error');
@@ -166,6 +171,8 @@ class TransportController extends Controller
 
     public function UpdateRecords(Request $request, $transport)
     {
+        $id = Hashids::decode($transport);
+        $trans = Transport::findOrFail($id[0]);
         $request->validate([
             'fullname' => 'required|string|max:255',
             'gender' => 'required|string|max:255',
@@ -176,7 +183,6 @@ class TransportController extends Controller
 
         try {
             $user = Auth::user();
-            $trans = Transport::findOrFail($transport);
             if($trans->school_id != $user->school_id) {
                 Alert()->toast('You are not authorized to perform this action', 'error');
                 return back();
@@ -196,45 +202,51 @@ class TransportController extends Controller
         }
     }
 
-    public function showStudents(Transport $trans)
+    public function showStudents($trans)
     {
+        $id = Hashids::decode($trans);
         $user = Auth::user();
         $students = Student::query()->join('grades', 'grades.id', '=', 'students.class_id')
                                     ->join('parents', 'parents.id', '=', 'students.parent_id')
                                     ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+                                    ->join('transports', 'transports.id', '=', 'students.transport_id')
                                     ->select(
                                         'students.*',
                                         'grades.id as class_id', 'grades.class_name', 'grades.class_code',
-                                        'parents.address', 'users.phone'
+                                        'parents.address', 'users.phone', 'transports.driver_name',
+                                        'transports.phone', 'transports.bus_no'
 
                                     )
-                                    ->where('students.transport_id', $trans->id)
+                                    ->where('students.transport_id', $id[0])
                                     ->where('students.status', 1)
                                     ->where('students.school_id', $user->school_id)
                                     ->orderBy('students.first_name')
                                     ->get();
-        return view('Transport.students', compact('students', 'trans'));
+        return view('Transport.students', compact('students'));
     }
 
-    public function export (Transport $trans)
+    public function export ($trans)
     {
         // return response()->json($trans);
+        $id = Hashids::decode($trans);
         $user = Auth::user();
         $students = Student::query()
                             ->join('grades', 'grades.id', '=', 'students.class_id')
                             ->join('parents', 'parents.id', '=', 'students.parent_id')
                             ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+                            ->join('transports', 'transports.id', '=', 'students.transport_id')
                             ->select(
                                 'students.*',
                                 'parents.address', 'users.phone',
-                                'grades.class_name', 'grades.class_code'
+                                'grades.class_name', 'grades.class_code', 'transports.driver_name',
+                                'transports.phone', 'transports.bus_no', 'transport.routine'
                             )
-                            ->where('students.transport_id', $trans->id)
+                            ->where('students.transport_id', $id[0])
                             ->where('students.status', 1)
                             ->where('students.school_id', $user->school_id)
                             ->orderBy('first_name')
                             ->get();
-        $pdf = \PDF::loadView('Transport.export', compact('students', 'trans'));
+        $pdf = \PDF::loadView('Transport.export', compact('students'));
         return $pdf->stream($trans->driver_name. ' students.pdf');
     }
 }

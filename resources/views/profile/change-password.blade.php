@@ -67,7 +67,7 @@
                 </div>
 
                 <div class="col-md-4 mb-3">
-                    <button class="btn btn-success" type="submit">Save Password</button>
+                    <button class="btn btn-success float-right" type="submit">Save Password</button>
                 </div>
             </form>
 
