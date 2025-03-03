@@ -249,6 +249,6 @@ class TransportController extends Controller
                             ->orderBy('first_name')
                             ->get();
         $pdf = \PDF::loadView('Transport.export', compact('students', 'transport'));
-        return $pdf->stream($trans->driver_name. ' students.pdf');
+        return $pdf->stream($transport->driver_name. ' students.pdf');
     }
 }
