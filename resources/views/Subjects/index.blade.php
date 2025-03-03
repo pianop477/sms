@@ -100,8 +100,8 @@
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
                                         <td class="text-uppercase">{{$course->course_name}}</td>
-                                        <td class="text-uppercase text-center">{{$course->course_code}}</td>
-                                        <td>
+                                        <td class="text-uppercase">{{$course->course_code}}</td>
+                                        <td class="text-center">
                                             @if ($course->status == 1)
                                                     <span class="badge bg-success text-white">Active</span>
                                                 @else
