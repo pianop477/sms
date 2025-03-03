@@ -19,6 +19,7 @@ use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Vinkla\Hashids\Facades\Hashids;
 
 class ParentsController extends Controller
 {
@@ -88,117 +89,121 @@ class ParentsController extends Controller
             'passport' => 'nullable|image|mimes:jpg,png,jpeg|max:512',
         ]);
 
-        $userExists = User::where('phone', $request->phone)
+        try {
+            $userExists = User::where('phone', $request->phone)
                             ->where('school_id', $user->school_id)
                             ->exists();
-        $studentExists = Student::where('first_name', $request->student_first_name)
-                                ->where('middle_name', $request->student_middle_name)
-                                ->where('last_name', $request->student_last_name)
-                                ->where('school_id', $request->school_id)
-                                ->exists();
+            $studentExists = Student::where('first_name', $request->student_first_name)
+                                    ->where('middle_name', $request->student_middle_name)
+                                    ->where('last_name', $request->student_last_name)
+                                    ->where('school_id', $request->school_id)
+                                    ->exists();
 
-        if($userExists || $studentExists) {
-            Alert()->toast('Parents or Student information already exists in our records', 'error');
+            if($userExists || $studentExists) {
+                Alert()->toast('Parents or Student information already exists in our records', 'error');
+                return back();
+            }
+
+            $users = User::create([
+                'first_name' => $request->fname,
+                'last_name' => $request->lname,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'gender' => $request->gender,
+                'usertype' => $request->input('usertype', 4),
+                'password' => Hash::make($request->input('password', 'shule2025')),
+                'school_id' => $user->school_id,
+            ]);
+
+            $parents = Parents::create([
+                'user_id' => $users->id,
+                'school_id' => $user->school_id,
+                'address' => $request->street,
+            ]);
+
+            $studentImage = '';
+
+            // Handle file upload if present
+            if ($request->hasFile('passport')) {
+                $image = $request->file('passport');
+                $imageFile = time() . '.' . $image->getClientOriginalExtension();
+                $imagePath = public_path('assets/img/students');
+
+                // Ensure the directory exists
+                if (!file_exists($imagePath)) {
+                    mkdir($imagePath, 0775, true);
+                }
+
+                // Move the file
+                $image->move($imagePath, $imageFile);
+
+                // Set the image file name on the student record
+                $studentImage = $imageFile;
+            }
+
+            $students = Student::create([
+                'admission_number' => $this->getAdmissionNumber(),
+                'first_name' => $request->student_first_name,
+                'middle_name' => $request->student_middle_name,
+                'last_name' => $request->student_last_name,
+                'parent_id' => $parents->id,
+                'gender' => $request->student_gender,
+                'dob' => $request->dob,
+                'class_id' => $request->class,
+                'group' => $request->group,
+                'image' => $studentImage,
+                'school_id' => $parents->school_id
+            ]);
+
+            // check if phone number already exists in the database and prevent from sending message again;
+            $phoneNumberExists = User::where('phone', $user->phone)->exists();
+
+            if($phoneNumberExists) {
+                Alert()->toast('Parent and student information saved successfully', 'success');
+                return redirect()->route('Parents.index');
+            }
+            else {
+                $url = "https://shuleapp.tech";
+                //send sms via Beem API********************************************************************
+                $beemSmService = new BeemSmsService();
+                $sourceAddr = $school->sender_id ?? 'shuleApp'; // Get sender ID
+                $formattedPhone = $this->formatPhoneNumber($users->phone); // Validate phone before sending
+
+                // Check if phone number is valid after formatting
+                if (strlen($formattedPhone) !== 12 || !preg_match('/^255\d{9}$/', $formattedPhone)) {
+                    // Alert::error('Invalid phone number format', ['phone' => $formattedPhone]);
+                } else {
+                    $recipients = [
+                        [
+                            'recipient_id' => 1,
+                            'dest_addr' => $formattedPhone, // Use validated phone number
+                        ]
+                    ];
+                }
+
+                $message = 'Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: shule2025. Visit {$url} to Login.';
+                // $response = $beemSmService->sendSms($sourceAddr, $message, $recipients);
+
+                // send sms using nextSms API ************************************************
+                $nextSmsService = new NextSmsService();
+                $destination = $this->formatPhoneNumber($users->phone);
+
+                $payload = [
+                    'from' => $school->sender_id ?? "SHULE APP",
+                    'to' => $destination,
+                    'text' => "Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: shule2025. Visit {$url} to Login.",
+                    'reference' => uniqid(),
+                ];
+
+                $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+
+                Alert()->toast('Parent and student information saved successfully', 'success');
+                return redirect()->route('Parents.index');
+            }
+        } catch (\Exception $e) {
+            Alert()->toast($e->getMessage(), 'error');
             return back();
         }
-
-        $users = User::create([
-            'first_name' => $request->fname,
-            'last_name' => $request->lname,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'gender' => $request->gender,
-            'usertype' => $request->input('usertype', 4),
-            'password' => Hash::make($request->input('password', 'shule2025')),
-            'school_id' => $user->school_id,
-        ]);
-
-        $parents = Parents::create([
-            'user_id' => $users->id,
-            'school_id' => $user->school_id,
-            'address' => $request->street,
-        ]);
-
-        $studentImage = '';
-
-        // Handle file upload if present
-        if ($request->hasFile('passport')) {
-            $image = $request->file('passport');
-            $imageFile = time() . '.' . $image->getClientOriginalExtension();
-            $imagePath = public_path('assets/img/students');
-
-            // Ensure the directory exists
-            if (!file_exists($imagePath)) {
-                mkdir($imagePath, 0775, true);
-            }
-
-            // Move the file
-            $image->move($imagePath, $imageFile);
-
-            // Set the image file name on the student record
-            $studentImage = $imageFile;
-        }
-
-        $students = Student::create([
-            'admission_number' => $this->getAdmissionNumber(),
-            'first_name' => $request->student_first_name,
-            'middle_name' => $request->student_middle_name,
-            'last_name' => $request->student_last_name,
-            'parent_id' => $parents->id,
-            'gender' => $request->student_gender,
-            'dob' => $request->dob,
-            'class_id' => $request->class,
-            'group' => $request->group,
-            'image' => $studentImage,
-            'school_id' => $parents->school_id
-        ]);
-
-        // check if phone number already exists in the database and prevent from sending message again;
-        $phoneNumberExists = User::where('phone', $user->phone)->exists();
-
-        if($phoneNumberExists) {
-            Alert()->toast('Parent and student information saved successfully', 'success');
-            return redirect()->route('Parents.index');
-        }
-        else {
-            $url = "https://shuleapp.tech";
-            //send sms via Beem API********************************************************************
-            $beemSmService = new BeemSmsService();
-            $sourceAddr = $school->sender_id ?? 'shuleApp'; // Get sender ID
-            $formattedPhone = $this->formatPhoneNumber($users->phone); // Validate phone before sending
-
-            // Check if phone number is valid after formatting
-            if (strlen($formattedPhone) !== 12 || !preg_match('/^255\d{9}$/', $formattedPhone)) {
-                // Alert::error('Invalid phone number format', ['phone' => $formattedPhone]);
-            } else {
-                $recipients = [
-                    [
-                        'recipient_id' => 1,
-                        'dest_addr' => $formattedPhone, // Use validated phone number
-                    ]
-                ];
-            }
-
-            $message = 'Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: shule2025. Visit {$url} to Login.';
-            // $response = $beemSmService->sendSms($sourceAddr, $message, $recipients);
-
-            // send sms using nextSms API ************************************************
-            $nextSmsService = new NextSmsService();
-            $destination = $this->formatPhoneNumber($user->phone);
-
-            $payload = [
-                'from' => $school->sender_id ?? "SHULE APP",
-                'to' => $destination,
-                'text' => 'Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: shule2025. Visit {$url} to Login.',
-                'reference' => uniqid(),
-            ];
-
-            $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
-
-            Alert()->toast('Parent and student information saved successfully', 'success');
-            return redirect()->route('Parents.index');
-        }
-
     }
 
     //  phone number format according to Beem API **************************************************
@@ -253,10 +258,11 @@ class ParentsController extends Controller
     public function editParent($parent)
     {
         //
+        $decoded = Hashids::decode($parent);
         $loggedUser = Auth::user();
         $parents = Parents::query()->join('users', 'users.id', '=', 'parents.user_id')
                                     ->select('parents.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.image')
-                                    ->where('parents.id', '=', $parent)
+                                    ->where('parents.id', '=', $decoded[0])
                                     ->first();
         if($parents->school_id != $loggedUser->school_id) {
             Alert()->toast('You are not authorized to edit this parent', 'error');
@@ -273,8 +279,9 @@ class ParentsController extends Controller
     public function updateStatus(Request $request, $parent)
     {
         //
+        $decoded = Hashids::decode($parent);
         $loggedUser = Auth::user();
-        $parents = Parents::findOrFail($parent);
+        $parents = Parents::findOrFail($decoded[0]);
 
         if($parents->school_id != $loggedUser->school_id) {
             Alert()->toast('You are not authorized to block this parent', 'error');
@@ -296,8 +303,9 @@ class ParentsController extends Controller
 
     // update parents records set to active mode **************************************************
     public function restoreStatus(Request $request, $parent) {
+        $decoded = Hashids::decode($parent);
         $loggedUser = Auth::user();
-        $parents = Parents::findOrFail($parent);
+        $parents = Parents::findOrFail($decoded[0]);
 
         if($parents->school_id != $loggedUser->school_id){
             Alert()->toast('You are not authorized to block this parent', 'error');
@@ -323,10 +331,11 @@ class ParentsController extends Controller
     //  delete parents records **************************************************
     public function deleteParent($parentId)
     {
+        $decoded = Hashids::decode($parentId);
         try {
             $loggedUser = Auth::user();
             // Find the parent record
-            $parent = Parents::find($parentId);
+            $parent = Parents::find($decoded[0]);
 
             if($parent->school_id != $loggedUser->school_id) {
                 Alert()->toast('You are not authorized to delete this parent', 'error');
@@ -380,7 +389,8 @@ class ParentsController extends Controller
     // update full data for parents **************************************************
     public function updateParent (Request $request, $parents)
     {
-        $parent = Parents::findOrFail($parents);
+        $decoded = Hashids::decode($parents);
+        $parent = Parents::findOrFail($decoded[0]);
         $loggedUser = Auth::user();
 
         if($parent->school_id != $loggedUser->school_id) {
