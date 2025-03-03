@@ -10,7 +10,7 @@
                         <h4 class="header-title text-uppercase">Class Teacher For {{ $classes->class_name}}</h4>
                     </div>
                     <div class="col-2">
-                        <a href="{{route('Classes.index', $classes->id)}}" class=""><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                        <a href="{{route('Classes.index', ['class' => Hashids::encode($classes->id)])}}" class=""><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
                     </div>
                     <div class="col-2">
                         <button type="button" class="btn btn-link p-0" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-user-plus text-secondary" style="font-size: 2rem;"></i>
@@ -23,7 +23,7 @@
                                         <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                     </div>
                                     <div class="modal-body">
-                                        <form class="needs-validation" novalidate="" action="{{route('Class.teacher.assign', $classes->id)}}" method="POST" enctype="multipart/form-data">
+                                        <form class="needs-validation" novalidate="" action="{{route('Class.teacher.assign', ['classes' => Hashids::encode($classes->id)])}}" method="POST" enctype="multipart/form-data">
                                             @csrf
                                             <div class="form-row">
                                                 <div class="col-md-4 mb-3">
@@ -38,17 +38,22 @@
                                                             @endforeach
                                                         @endif
                                                     </select>
-                                                    @error('fname')
-                                                    <div class="invalid-feedback">
+                                                    @error('teacher')
+                                                    <div class="text-danger">
                                                         {{$message}}
                                                     </div>
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom02">Class Group</label>
-                                                    <input type="text" name="group" class="form-control text-uppercase" id="validationCustom02" placeholder="Enter Class Group A, B or C" required="" value="{{old('lname')}}">
-                                                    @error('lname')
-                                                    <div class="invalid-feedback">
+                                                    <select name="group" id="" class="form-control text-uppercase">
+                                                        <option value="">-- Select Class Group --</option>
+                                                        <option value="A">A</option>
+                                                        <option value="B">B</option>
+                                                        <option value="C">C</option>
+                                                    </select>
+                                                    @error('group')
+                                                    <div class="text-danger">
                                                        {{$message}}
                                                     </div>
                                                     @enderror
@@ -81,16 +86,16 @@
                                 @foreach ($classTeacher as $teacher )
                                     <tr class="text-capitalize">
                                         <td>{{$loop->iteration}}</td>
-                                        <td class="text-capitalize">{{$teacher->class_name}}</td>
-                                        <td class="text-capitalize text-center">{{$teacher->group}}</td>
+                                        <td class="text-uppercase">{{$teacher->class_name}}</td>
+                                        <td class="text-uppercase text-center">{{$teacher->group}}</td>
                                         <td>{{$teacher->teacher_first_name. ' '. $teacher->teacher_last_name}}</td>
                                         <td>
                                             <ul class="d-flex justify-content-center">
                                                 <li class="mr-3">
-                                                    <a href="{{route('roles.edit', $teacher->id)}}"><i class="ti-pencil"></i></a>
+                                                    <a href="{{route('roles.edit', ['teacher' => Hashids::encode($teacher->id)])}}"><i class="ti-pencil"></i></a>
                                                 </li>
                                                 <li>
-                                                    <a href="{{route('roles.destroy', $teacher->id)}}" onclick="return confirm('Are you sure you want to remove {{ strtoupper($teacher->teacher_first_name) }} {{ strtoupper($teacher->teacher_last_name) }} from this class?')">
+                                                    <a href="{{route('roles.destroy', ['teacher' => Hashids::encode($teacher->id)])}}" onclick="return confirm('Are you sure you want to remove {{ strtoupper($teacher->teacher_first_name) }} {{ strtoupper($teacher->teacher_last_name) }} from this class?')">
                                                         <i class="ti-trash text-danger"></i>
                                                     </a>
                                                 </li>

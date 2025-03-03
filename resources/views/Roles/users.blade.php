@@ -48,7 +48,7 @@
                                             </td>
                                         @endif
                                         <td>
-                                            <form action="{{route('users.reset.password', $user->id)}}" method="POST">
+                                            <form action="{{route('users.reset.password', ['user' => Hashids::encode($user->id)])}}" method="POST">
                                                 @csrf
                                                 @method('PUT')
                                                 <button class="btn btn-outline-danger btn-xs" onclick="return confirm('Are you sure you want to reset password for {{strtoupper($user->first_name)}} {{strtoupper($user->last_name)}}?')">
