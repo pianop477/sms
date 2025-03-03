@@ -241,7 +241,7 @@ class TransportController extends Controller
                                 'students.*',
                                 'parents.address', 'users.phone',
                                 'grades.class_name', 'grades.class_code', 'transports.driver_name',
-                                'transports.phone', 'transports.bus_no', 'transport.routine'
+                                'transports.phone', 'transports.bus_no', 'transports.routine'
                             )
                             ->where('students.transport_id', $transport->id)
                             ->where('students.status', 1)
