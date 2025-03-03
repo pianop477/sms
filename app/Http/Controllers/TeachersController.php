@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\PDF as PDF;
+use Vinkla\Hashids\Facades\Hashids;
 
 class TeachersController extends Controller
 {
@@ -83,7 +84,7 @@ class TeachersController extends Controller
         $validatedData = $request->validate([
             'fname' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users,email',
+            'email' => 'string|email|unique:users,email',
             'gender' => 'required|string|max:255',
             'dob' => 'required|date|date_format:Y-m-d',
             'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone',
@@ -162,14 +163,15 @@ class TeachersController extends Controller
 
                 // send SMS using nextSMS API ***********************************************
                 $nextSmsService = new NextSmsService();
-                $destination = $this->formatPhoneNumber($user->phone);
+                $destination = $this->formatPhoneNumber($users->phone);
 
                 $payload = [
                     'from' => $school->sender_id ?? "SHULE APP",
                     'to' => $destination,
-                    'text' => 'Welcome Teacher '. strtoupper($users->first_name) .', to ShuleApp. Your Login Details are; username: {$users->phone}, password: shule2025. Visit {$url} to Login.',
+                    'text' => "Welcome Teacher '. strtoupper($users->first_name) .', to ShuleApp. Your Login Details are; username: {$users->phone}, password: shule2025. Visit {$url} to Login.",
                     'reference' => uniqid(),
                 ];
+
                 $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
                 Alert()->toast('Teacher records saved successfully', 'success');
@@ -225,8 +227,9 @@ class TeachersController extends Controller
     //  show teacher profile in the school ***********************************************************
     public function showProfile($teacher)
         {
+            $decoded = Hashids::decode($teacher);
             // Find the teacher by ID
-            $teacher = Teacher::findOrFail($teacher);
+            $teacherId = Teacher::findOrFail($decoded[0]);
             $user = Auth::user();
 
             if($teacher->school_id != $user->school_id) {
@@ -242,7 +245,7 @@ class TeachersController extends Controller
                     'teachers.*', 'users.first_name', 'users.last_name', 'users.gender',
                     'users.phone', 'users.usertype', 'users.image', 'schools.school_reg_no',
                     'schools.school_name', 'roles.role_name')
-                ->where('teachers.id', '=', $teacher->id)
+                ->where('teachers.id', '=', $teacherId->id)
                 ->where('teachers.school_id', '=', Auth::user()->school_id)
                 ->firstOrFail();
 
@@ -266,7 +269,8 @@ class TeachersController extends Controller
      public function updateTeachers(Request $request, $teachers)
      {
          // Find teacher and user
-         $teacher = Teacher::findOrFail($teachers);
+         $decoded = Hashids::decode($teachers);
+         $teacher = Teacher::findOrFail($decoded[0]);
          $user = User::findOrFail($teacher->user_id);
 
          $loggedUser = Auth::user();
@@ -351,17 +355,18 @@ class TeachersController extends Controller
     public function updateStatus(Request $request, $teacher)
     {
         // Find the teacher record
+        $decoded = Hashids::decode($teacher);
         $userLogged = Auth::user();
-        $teacher = Teacher::findOrFail($teacher);
+        $teachers = Teacher::findOrFail($decoded[0]);
 
-        if($teacher->school_id != $userLogged->school_id) {
+        if($teachers->school_id != $userLogged->school_id) {
             Alert()->toast('You are not authorized to perform this action', 'error');
             return back();
         }
         // return $teacher; user user_id
 
         // Find the associated user record
-        $user = User::findOrFail($teacher->user_id);
+        $user = User::findOrFail($teachers->user_id);
         // return $user;
 
         if(Auth::user()->id == $user->id) {
@@ -369,7 +374,7 @@ class TeachersController extends Controller
             return back();
         }
 
-        if($teacher->role_id == 2) {
+        if($teachers->role_id == 2) {
             Alert()->toast('You do not have permission to block this teacher.', 'error');
             return back();
         }
@@ -378,14 +383,14 @@ class TeachersController extends Controller
         $status = $request->input('status', 0);
 
         // Wrap the updates in a transaction
-        DB::transaction(function () use ($user, $teacher, $status) {
+        DB::transaction(function () use ($user, $teachers, $status) {
             // Update the user status
             $user->status = $status;
             $user->save();
 
             // Update the teacher status
-            $teacher->status = $status;
-            $teacher->save();
+            $teachers->status = $status;
+            $teachers->save();
         });
         event(new PasswordResetEvent($user->id));
 
@@ -399,30 +404,31 @@ class TeachersController extends Controller
     // update teacher status to active in the school ***********************************************************
     public function restoreStatus(Request $request, $teacher) {
         // Find the teacher record
-        $teacher = Teacher::findOrFail($teacher);
+        $decoded = Hashids::decode($teacher);
+        $teachers = Teacher::findOrFail($decoded[0]);
 
         $userLogged = Auth::user();
 
-        if ($teacher->school_id != $userLogged->school_id) {
+        if ($teachers->school_id != $userLogged->school_id) {
             Alert()->toast('You are not authorized to perform this action', 'error');
             return back();
         }
 
         // Find the associated user record
-        $user = User::findOrFail($teacher->user_id);
+        $user = User::findOrFail($teachers->user_id);
 
         // Retrieve the status from the request, default to 0 if not provided
         $status = $request->input('status', 1);
 
         // Wrap the updates in a transaction
-        DB::transaction(function () use ($user, $teacher, $status) {
+        DB::transaction(function () use ($user, $teachers, $status) {
             // Update the user status
             $user->status = $status;
             $user->save();
 
             // Update the teacher status
-            $teacher->status = $status;
-            $teacher->save();
+            $teachers->status = $status;
+            $teachers->save();
         });
 
         // Show success message
@@ -436,36 +442,37 @@ class TeachersController extends Controller
     public function deleteTeacher($teacher)
     {
         // Find the teacher record or fail
-        $teacher = Teacher::findOrFail($teacher);
+        $decoded = Hashids::decode($teacher);
+        $teachers = Teacher::findOrFail($decoded[0]);
 
         $userLogged = Auth::user();
 
-        if($teacher->school_id != $userLogged->school_id) {
+        if($teachers->school_id != $userLogged->school_id) {
             Alert()->toast('You are not authorized to perform this action', 'error');
             return back();
         }
 
         // Find the associated user or fail
-        $user = User::where('id', $teacher->user_id)->first();
+        $user = User::where('id', $teachers->user_id)->first();
         // return $user;
 
         //user id logged in
         $userId = Auth::user()->id;
 
         // Check if the selected teacher is logged in and trying to update their status themselves
-        if ($teacher->user_id == $userId) {
+        if ($teachers->user_id == $userId) {
             Alert()->toast('You cannot delete your own account', 'error');
             return back();
         }
 
          //check role of logged user compare with role of deleted user=======
-         if($teacher->role_id == 2) {
+         if($teachers->role_id == 2) {
             Alert()->toast('You do not have permission to delete this teacher.', 'error');
             return back();
          }
 
         // Check if the user is assigned as a class teacher to any class
-        $assignedClassTeacher = Class_teacher::where('teacher_id', $teacher->id)->first();
+        $assignedClassTeacher = Class_teacher::where('teacher_id', $teachers->id)->first();
         if ($assignedClassTeacher) {
             // Delete the class teacher record
             $assignedClassTeacher->delete();
@@ -476,9 +483,9 @@ class TeachersController extends Controller
 
         try {
             // Update the status column and role_id in the teachers table
-            $teacher->status = 2;
-            $teacher->role_id = 1; // Set to NULL
-            $teacher->save();
+            $teachers->status = 2;
+            $teachers->role_id = 1; // Set to NULL
+            $teachers->save();
 
             // Update the status column in the users table
             $user->status = 2;

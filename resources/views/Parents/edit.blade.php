@@ -35,7 +35,7 @@
         <div class="card-body">
             <h4 class="header-title">Update Parent's Details</h4>
         </div>
-        <form action="{{route('Parents.update', $parents->id)}}" method="POST" enctype="multipart/form-data">
+        <form action="{{route('Parents.update', ['parents' => Hashids::encode($parents->id)])}}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="form-row">
