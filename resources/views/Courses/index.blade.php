@@ -118,7 +118,7 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td class="text-capitalize">{{ $course->course_name }}</td>
-                                            <td class="text-uppercase text-center">{{ $course->course_code }}</td>
+                                            <td class="text-uppercase">{{ $course->course_code }}</td>
                                             <td class="text-capitalize">{{ $course->first_name }} {{ $course->last_name }}</td>
                                             <td>
                                                 @if ($course->status == 1)
