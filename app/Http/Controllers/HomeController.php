@@ -351,8 +351,8 @@ class HomeController extends Controller
             $request->validate([
                 'fname' => 'required|string|max:255',
                 'lname' => 'required|string|max:255',
-                'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,' .$userData->phone,
-                'nullable|image|mimes:jpg,png,jpeg|max:512',
+                'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,' . $userData->id,
+                'image' => 'nullable|image|mimes:jpg,png,jpeg|max:512',
             ]);
 
             $userData->first_name = $request->fname;
