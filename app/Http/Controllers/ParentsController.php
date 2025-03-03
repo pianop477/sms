@@ -164,35 +164,21 @@ class ParentsController extends Controller
             }
             else {
                 $url = "https://shuleapp.tech";
-                //send sms via Beem API********************************************************************
-                $beemSmService = new BeemSmsService();
-                $sourceAddr = $school->sender_id ?? 'shuleApp'; // Get sender ID
-                $formattedPhone = $this->formatPhoneNumber($users->phone); // Validate phone before sending
 
-                // Check if phone number is valid after formatting
-                if (strlen($formattedPhone) !== 12 || !preg_match('/^255\d{9}$/', $formattedPhone)) {
-                    // Alert::error('Invalid phone number format', ['phone' => $formattedPhone]);
-                } else {
-                    $recipients = [
-                        [
-                            'recipient_id' => 1,
-                            'dest_addr' => $formattedPhone, // Use validated phone number
-                        ]
-                    ];
-                }
-
-                $message = 'Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: shule2025. Visit {$url} to Login.';
-                // $response = $beemSmService->sendSms($sourceAddr, $message, $recipients);
-
-                // send sms using nextSms API ************************************************
                 $nextSmsService = new NextSmsService();
-                $destination = $this->formatPhoneNumber($users->phone);
+                $senderId = $school->sender_id ?? "SHULE APP";
+                $message = "Welcome to ShuleApp, Your Login details are: ";
+                $message =" .Username: {$users->phone}";
+                $message =". Password: {$request->password}";
+                $message = ". Visit {$url} to Login";
+                $reference = uniqid();
+                $formattedPhone = $this->formatPhoneNumber($users->phone);
 
                 $payload = [
-                    'from' => $school->sender_id ?? "SHULE APP",
-                    'to' => $destination,
-                    'text' => "Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: shule2025. Visit {$url} to Login.",
-                    'reference' => uniqid(),
+                    'from' => $senderId,
+                    'to' => $formattedPhone,
+                    'text' => $message,
+                    'reference' => $reference
                 ];
 
                 $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);

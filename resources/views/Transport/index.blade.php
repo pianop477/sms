@@ -25,9 +25,9 @@
                                             <div class="form-row">
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom01">Driver name</label>
-                                                    <input type="text" name="fullname" class="form-control text-capitalize" id="validationCustom01" placeholder="Driver Full Name" value="{{old('fname')}}" required="">
-                                                    @error('fname')
-                                                    <div class="invalid-feedback">
+                                                    <input type="text" name="fullname" class="form-control text-capitalize" id="validationCustom01" placeholder="Driver Full Name" value="{{old('fullname')}}" required="">
+                                                    @error('fullname')
+                                                    <div class="text-danger">
                                                         {{$message}}
                                                     </div>
                                                     @enderror
@@ -40,7 +40,7 @@
                                                         <option value="female">female</option>
                                                     </select>
                                                     @error('gender')
-                                                    <div class="invalid-feedback">
+                                                    <div class="text-danger">
                                                         {{$message}}
                                                     </div>
                                                     @enderror
@@ -49,7 +49,7 @@
                                                     <label for="validationCustom02">Mobile Phone</label>
                                                     <input type="text" name="phone" class="form-control" id="validationCustom02" placeholder="Phone Number" required="" value="{{old('phone')}}">
                                                     @error('phone')
-                                                    <div class="invalid-feedback">
+                                                    <div class="text-danger">
                                                        {{$message}}
                                                     </div>
                                                     @enderror
@@ -60,7 +60,7 @@
                                                     <label for="validationCustom01">Bus Number</label>
                                                     <input type="text" name="bus" class="form-control text-uppercase" placeholder="Bus number" id="validationCustom02" value="{{old('bus')}}" required>
                                                     @error('bus')
-                                                    <div class="invalid-feedback">
+                                                    <div class="text-danger">
                                                         {{$message}}
                                                     </div>
                                                     @enderror
@@ -68,9 +68,9 @@
                                                 <div class="col-md-6 mb-3">
                                                     <label for="validationCustomUsername">Bus Routine Description</label>
                                                     <div class="input-group">
-                                                        <textarea name="routine" id="" cols="60" rows="4" class="form-control text-uppercase"></textarea>
+                                                        <textarea name="routine" id="" cols="60" rows="4" class="form-control text-uppercase">{{old('routine')}}</textarea>
                                                         @error('routine')
-                                                        <div class="invalid-feedback">
+                                                        <div class="text-danger">
                                                             {{$message}}
                                                         </div>
                                                         @enderror
@@ -110,7 +110,7 @@
                                         <td class="text-capitalize">{{$trans->driver_name}}</td>
                                         <td class="text-capitalize">{{$trans->gender[0]}}</td>
                                         <td>{{$trans->phone}}</td>
-                                        <td class="text-uppercase">
+                                        <td class="text-uppercase text-center">
                                             {{$trans->bus_no}}
                                         </td>
                                         <td class="text-capitalize">{{$trans->routine}}</td>
@@ -125,32 +125,32 @@
                                         <td>
                                             <ul class="d-flex justify-content-center">
                                                 <li class="mr-3">
-                                                    <a href="{{route('students.transport', $trans->id)}}" class="btn btn-primary btn-xs"><i class="ti-eye"></i> Student List</a>
+                                                    <a href="{{route('students.transport', ['trans' => Hashids::encode($trans->id)])}}" class="btn btn-primary btn-xs"><i class="ti-eye"></i> Student List</a>
                                                 </li>
                                                 <li class="mr-3">
-                                                    <a href="{{route('transport.edit', $trans->id)}}"><i class="ti-pencil text-primary"></i></a>
+                                                    <a href="{{route('transport.edit', ['trans' => Hashids::encode($trans->id)])}}"><i class="ti-pencil text-primary"></i></a>
                                                 </li>
                                                 <li class="mr-3">
-                                                    <form action="{{route('transport.update', $trans->id)}}" method="POST">
+                                                    <form action="{{route('transport.update', ['trans' => Hashids::encode($trans->id)])}}" method="POST">
                                                         @csrf
                                                         @method('PUT')
                                                         <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Block this Bus Routine?')"><i class="fas fa-ban text-secondary"></i></button>
                                                     </form>
                                                 </li>
-                                                <li><a href="{{route('transport.remove', $trans->id)}}" onclick="return confirm('Are you sure you want to delete this Bus Routine Permanently?')" class="text-danger"><i class="ti-trash"></i></a></li>
+                                                <li><a href="{{route('transport.remove', ['trans' => Hashids::encode($trans->id)])}}" onclick="return confirm('Are you sure you want to delete this Bus Routine Permanently?')" class="text-danger"><i class="ti-trash"></i></a></li>
                                             </ul>
                                         </td>
                                         @else
                                         <td>
                                             <ul class="d-flex justify-content-center">
                                                 <li class="mr-3">
-                                                    <form action="{{route('transport.restore', $trans->id)}}" method="POST">
+                                                    <form action="{{route('transport.restore', ['trans' => Hashids::encode($trans->id)])}}" method="POST">
                                                         @csrf
                                                         @method('PUT')
                                                         <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Unblock this Bus Routine?')"><i class="ti-reload text-success"></i></button>
                                                     </form>
                                                 </li>
-                                                <li><a href="{{route('transport.remove', $trans->id)}}" onclick="return confirm('Are you sure you want to delete this Bus Routine Permanently?')" class="text-danger"><i class="ti-trash"></i></a></li>
+                                                <li><a href="{{route('transport.remove', ['trans' => Hashids::encode($trans->id)])}}" onclick="return confirm('Are you sure you want to delete this Bus Routine Permanently?')" class="text-danger"><i class="ti-trash"></i></a></li>
                                             </ul>
                                         </td>
                                         @endif

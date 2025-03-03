@@ -7,12 +7,12 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-8">
-                        <h4 class="header-title text-uppercase text-center">Student Lists - {{$trans->driver_name}}</h4>
+                        <h4 class="header-title text-uppercase text-center">Student Lists - {{$students->first()->driver_name}}</h4>
                     </div>
                     <div class="col-2">
                         @if ($students->isNotEmpty())
                             <h6 class="text-left">
-                                <a href="{{route('transport.export', $trans->id)}}" target="_blank" class="btn btn-primary btn-xs float-right"><i class="fas fa-cloud-arrow-down"></i> Export</a>
+                                <a href="{{route('transport.export', ['trans' => Hashids::encode($trans->id)])}}" target="_blank" class="btn btn-primary btn-xs float-right"><i class="fas fa-cloud-arrow-down"></i> Export</a>
                             </h6>
                         @endif
                     </div>
