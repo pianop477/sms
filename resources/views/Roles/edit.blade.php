@@ -7,10 +7,10 @@
                     <h4 class="header-title text-center text-uppercase">Edit Change Class Teacher</h4>
                 </div>
                 <div class="col-2">
-                    <a href="{{route('Class.Teachers', $classTeacher->class_id)}}"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                    <a href="{{route('Class.Teachers', ['class' => Hashids::encode($classTeacher->class_id)])}}"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
                 </div>
             </div>
-            <form class="needs-validation" novalidate="" action="{{route('roles.update.class.teacher', $classTeacher->id)}}" method="POST" enctype="multipart/form-data">
+            <form class="needs-validation" novalidate="" action="{{route('roles.update.class.teacher', ['classTeacher' => Hashids::encode($classTeacher->id)])}}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="form-row">
@@ -56,14 +56,14 @@
                                 @endforeach
                             @endif
                         </select>
-                        @error('class')
+                        @error('teacher')
                         <div class="text-danger">
                             {{$message}}
                         </div>
                         @enderror
                     </div>
                 </div>
-                <button class="btn btn-primary" type="submit">Save</button>
+                <button class="btn btn-primary" type="submit">Save changes</button>
             </form>
         </div>
     </div>

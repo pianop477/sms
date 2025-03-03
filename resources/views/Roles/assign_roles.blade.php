@@ -12,7 +12,7 @@
                                 <a href="{{route('roles.updateRole')}}"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem"></i></a>
                             </div>
                         </div>
-                        <form action="{{route('roles.assign.new', $user)}}" class="needs-validation" novalidate="" method="POST" enctype="multipart/form-data">
+                        <form action="{{route('roles.assign.new', ['user' => Hashids::encode($teachers->id)])}}" class="needs-validation" novalidate="" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <div class="form-row">

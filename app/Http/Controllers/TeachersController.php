@@ -84,7 +84,7 @@ class TeachersController extends Controller
         $validatedData = $request->validate([
             'fname' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
-            'email' => 'string|email|unique:users,email',
+            'email' => 'nullable|string|email|unique:users,email',
             'gender' => 'required|string|max:255',
             'dob' => 'required|date|date_format:Y-m-d',
             'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone',

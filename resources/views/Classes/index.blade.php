@@ -84,10 +84,10 @@
                                     <td>
                                         <ul class="d-flex justify-content-center">
                                             <li class="mr-3">
-                                                <a href="{{route('Classes.edit', $class->id)}}"><i class="ti-pencil text-secondary"></i></a>
+                                                <a href="{{route('Classes.edit', ['id' => Hashids::encode($class->id)])}}"><i class="ti-pencil text-secondary"></i></a>
                                             </li>
                                             <li>
-                                                <form action="{{route('Classes.destroy', $class->id)}}" method="POST">
+                                                <form action="{{route('Classes.destroy', ['id' => Hashids::encode($class->id)])}}" method="POST">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button class="btn btn-link p-0" onclick="return confirm('Are you sure you want to delete this class Permanently?')">
@@ -134,7 +134,7 @@
                             @foreach ($classes as $class )
                                 <tr>
                                     <td class="">
-                                        <a href="{{route('Class.Teachers', $class->id)}}">
+                                        <a href="{{route('Class.Teachers', ['class' => Hashids::encode($class->id)])}}">
                                             <i class="ti-angle-double-right"></i> {{$class->class_name}} - {{$class->class_code}}
                                         </a>
                                     </td>

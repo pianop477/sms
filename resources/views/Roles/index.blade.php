@@ -20,7 +20,7 @@
                                     <th scope="col" class="text-center">Gender</th>
                                     <th scope="col">Phone</th>
                                     <th scope="col">Email</th>
-                                    <th scope="col">Role Name</th>
+                                    <th scope="col">Role</th>
                                     <th scope="col" class="text-center">Action</th>
                                 </tr>
                             </thead>
@@ -44,7 +44,7 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <a href="{{route('roles.assign', $user->id)}}" class="btn btn-primary btn-xs">Update Role</a>
+                                            <a href="{{route('roles.assign', ['user' => Hashids::encode($user->id)])}}" class="btn btn-primary btn-xs">Update Role</a>
                                         </td>
                                     </tr>
                                 @endforeach
