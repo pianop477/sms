@@ -232,7 +232,7 @@ class TeachersController extends Controller
             $teacherId = Teacher::findOrFail($decoded[0]);
             $user = Auth::user();
 
-            if($teacher->school_id != $user->school_id) {
+            if($teacherId->school_id != $user->school_id) {
                 Alert()->toast('You are not authorized to perform this action', 'error');
                 return back();
             }
