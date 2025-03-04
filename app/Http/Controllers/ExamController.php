@@ -193,7 +193,7 @@ class ExamController extends Controller
         }
 
         Alert::success('Success!', 'Examination results have been submitted successfully');
-        return redirect()->route('score.prepare.form', $courseId)->with(['class_course' => $class_course]);
+        return redirect()->route('score.prepare.form', Hashids::encode($courseId))->with(['class_course' => $class_course]);
         // return redirect()->route('home');
     }
 
