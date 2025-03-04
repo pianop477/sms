@@ -18,7 +18,7 @@
                         </div>
                     @else
                         @foreach ($months as $month)
-                            <a href="{{route('results.student.get', ['student' => Hashids::encode($students->id), 'year' => $year, 'type' => Hashids::encode($examType->id), 'month' => $month->month])}}" target="_blank">
+                            <a href="{{route('results.student.get', ['student' => Hashids::encode($students->id), 'year' => $year, 'type' => Hashids::encode($exam_id), 'month' => $month->month])}}" target="_blank">
                                 <button type="button" class="list-group-item list-group-item-action">
                                     <h6 class="text-primary"><i class="fas fa-chevron-right"></i> {{ \Carbon\Carbon::create()->month($month->month)->format('F') }}</h6>
                                 </button>
