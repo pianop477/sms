@@ -122,7 +122,7 @@ class ResultsController extends Controller
 
             $examType = Examination::find($exam_type);
 
-        return view('Results.result_months', compact('students', 'year', 'examType', 'months'));
+        return view('Results.result_months', compact('students', 'year', 'examType', 'exam_id', 'months'));
     }
 
 
