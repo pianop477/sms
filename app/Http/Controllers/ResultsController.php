@@ -104,21 +104,18 @@ class ResultsController extends Controller
         $user = Auth::user();
         $parent = Parents::where('user_id', $user->id)->first();
         $months = Examination_result::query()
-                                ->join('students', 'students.id', '=', 'examination_results.student_id')
-                                ->select([
-                                    'examination_results.*',
-                                    'students.parent_id'
-                                ])
-                                ->selectRaw('MONTH(exam_date) as month')
-                                ->distinct()
-                                ->whereYear('examination_results.exam_date', $year)
-                                ->where('examination_results.exam_type_id', $exam_id)
-                                ->where('examination_results.status', 2)
-                                ->where('examination_results.school_id', $user->school_id)
-                                ->where('students.parent_id', $parent->id)
-                                ->where('examination_results.student_id', $students->id)
-                                ->orderBy('month')
-                                ->get();
+                        ->join('students', 'students.id', '=', 'examination_results.student_id')
+                        ->selectRaw('MONTH(exam_date) as month')
+                        ->distinct()
+                        ->whereYear('examination_results.exam_date', $year)
+                        ->where('examination_results.exam_type_id', $exam_id)
+                        ->where('examination_results.status', 2)
+                        ->where('examination_results.school_id', $user->school_id)
+                        ->where('students.parent_id', $parent->id)
+                        ->where('examination_results.student_id', $students->id)
+                        ->groupBy('month') // ✅ Grouping by month to remove duplicates
+                        ->orderBy('month')
+                        ->get();
 
             $examType = Examination::find($exam_type);
 
