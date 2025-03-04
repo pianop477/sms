@@ -19,110 +19,122 @@
         @endphp
 
         <div class="col-md-4 mt-3 mb-3">
-            <div class="card" style="background: #e176a6">
-                <div class="">
-                    <div class="p-4 d-flex justify-content-between align-items-center">
-                        <div class="seofct-icon"><i class="fas fa-user-tie"></i> Teachers</div>
-                        <h2 class="text-white">
-                            @if (count($teachers) > 29)
-                                30+
-                            @else
-                                {{count($teachers)}}
-                            @endif
-                        </h2>
+            <a href="{{route('Teachers.index')}}">
+                <div class="card" style="background: #e176a6">
+                    <div class="">
+                        <div class="p-4 d-flex justify-content-between align-items-center">
+                            <div class="seofct-icon"><i class="fas fa-user-tie"></i> Teachers</div>
+                            <h2 class="text-white">
+                                @if (count($teachers) > 29)
+                                    30+
+                                @else
+                                    {{count($teachers)}}
+                                @endif
+                            </h2>
+                        </div>
+                        <canvas id="" height="50"></canvas>
                     </div>
-                    <canvas id="" height="50"></canvas>
                 </div>
-            </div>
+            </a>
         </div>
         <div class="col-md-4 mt-md-3 mb-3">
-            <div class="card" style="background: #c84fe0">
-                <div class="">
-                    <div class="p-4 d-flex justify-content-between align-items-center">
-                        <div class="seofct-icon"><i class="fas fa-user-shield"></i> Parents</div>
-                        <h2 class="text-white">
-                            @if (count($parents) > 999)
-                                1000+
-                            @else
-                                {{count($parents)}}
-                            @endif
-                        </h2>
+            <a href="{{route('Parents.index')}}">
+                <div class="card" style="background: #c84fe0">
+                    <div class="">
+                        <div class="p-4 d-flex justify-content-between align-items-center">
+                            <div class="seofct-icon"><i class="fas fa-user-shield"></i> Parents</div>
+                            <h2 class="text-white">
+                                @if (count($parents) > 999)
+                                    1000+
+                                @else
+                                    {{count($parents)}}
+                                @endif
+                            </h2>
+                        </div>
+                        <canvas id="" height="50"></canvas>
                     </div>
-                    <canvas id="" height="50"></canvas>
                 </div>
-            </div>
+            </a>
         </div>
         <div class="col-md-4 mt-md-3 mb-3">
-            <div class="card" style="background: #098ddf">
-                <div class="">
-                    <div class="p-4 d-flex justify-content-between align-items-center">
-                        <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Students</div>
-                        <h2 class="text-white">
-                            @if (count($students) > 999)
-                                1000+
-                            @else
-                                {{count($students)}}
-                            @endif
-                        </h2>
+            <a href="{{route('classes.list')}}">
+                <div class="card" style="background: #098ddf">
+                    <div class="">
+                        <div class="p-4 d-flex justify-content-between align-items-center">
+                            <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Students</div>
+                            <h2 class="text-white">
+                                @if (count($students) > 999)
+                                    1000+
+                                @else
+                                    {{count($students)}}
+                                @endif
+                            </h2>
+                        </div>
+                        <canvas id="" height="50"></canvas>
                     </div>
-                    <canvas id="" height="50"></canvas>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
 </div>
 <div class="col-lg-12">
     <div class="row">
         <div class="col-md-4 mt-2 mb-3">
-            <div class="card" style="background: #9fbc71">
-                <div class="">
-                    <div class="p-4 d-flex justify-content-between align-items-center">
-                        <div class="seofct-icon"><i class="ti-book"></i> Open Courses</div>
-                        <h2 class="text-white">
-                            @if (count($subjects) > 19)
-                                20+
-                            @else
-                                {{count($subjects)}}
-                            @endif
-                        </h2>
+            <a href="{{route('courses.index')}}">
+                <div class="card" style="background: #9fbc71">
+                    <div class="">
+                        <div class="p-4 d-flex justify-content-between align-items-center">
+                            <div class="seofct-icon"><i class="ti-book"></i> Open Courses</div>
+                            <h2 class="text-white">
+                                @if (count($subjects) > 19)
+                                    20+
+                                @else
+                                    {{count($subjects)}}
+                                @endif
+                            </h2>
+                        </div>
+                        <canvas id="" height="50"></canvas>
                     </div>
-                    <canvas id="" height="50"></canvas>
                 </div>
-            </div>
+            </a>
         </div>
         <div class="col-md-4 mt-md-2 mb-3">
-            <div class="card" style="background: #bf950a">
-                <div class="">
-                    <div class="p-4 d-flex justify-content-between align-items-center">
-                        <div class="seofct-icon"><i class="ti-blackboard"></i> Classes</div>
-                        <h2 class="text-white">
-                            @if (count($classes) > 9)
-                                10+
-                            @else
-                                {{count($classes)}}
-                            @endif
-                        </h2>
+            <a href="{{route('Classes.index')}}">
+                <div class="card" style="background: #bf950a">
+                    <div class="">
+                        <div class="p-4 d-flex justify-content-between align-items-center">
+                            <div class="seofct-icon"><i class="ti-blackboard"></i> Classes</div>
+                            <h2 class="text-white">
+                                @if (count($classes) > 9)
+                                    10+
+                                @else
+                                    {{count($classes)}}
+                                @endif
+                            </h2>
+                        </div>
+                        <canvas id="" height="50"></canvas>
                     </div>
-                    <canvas id="" height="50"></canvas>
                 </div>
-            </div>
+            </a>
         </div>
         <div class="col-md-4 mt-md-2 mb-3">
-            <div class="card" style="background: #329688">
-                <div class="">
-                    <div class="p-4 d-flex justify-content-between align-items-center">
-                        <div class="seofct-icon"><i class="fas fa-bus"></i> School Buses</div>
-                        <h2 class="text-white">
-                            @if (count($buses) > 19)
-                                20+
-                            @else
-                                {{count($buses)}}
-                            @endif
-                        </h2>
+            <a href="{{route('Transportation.index')}}">
+                <div class="card" style="background: #329688">
+                    <div class="">
+                        <div class="p-4 d-flex justify-content-between align-items-center">
+                            <div class="seofct-icon"><i class="fas fa-bus"></i> School Buses</div>
+                            <h2 class="text-white">
+                                @if (count($buses) > 19)
+                                    20+
+                                @else
+                                    {{count($buses)}}
+                                @endif
+                            </h2>
+                        </div>
+                        <canvas id="" height="50"></canvas>
                     </div>
-                    <canvas id="" height="50"></canvas>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
 </div>

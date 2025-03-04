@@ -19,7 +19,7 @@
                 @else
                 <div class="list-group">
                     @foreach ($groupedData as $year => $results)
-                        <a href="{{ route('results.byYear', ['course' => $class_course->course_id, 'year' => $year]) }}">
+                        <a href="{{ route('results.byYear', ['course' => Hashids::encode($class_course->course_id), 'year' => $year]) }}">
                             <button type="button" class="list-group-item list-group-item-action">
                                 <h6 class="text-primary"><i class="fas fa-chevron-right"></i> {{ $year }} Results Link</h6>
                             </button>
