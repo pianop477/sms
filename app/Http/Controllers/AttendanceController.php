@@ -156,6 +156,8 @@ class AttendanceController extends Controller
     public function show($student, $year)
     {
         $decoded = Hashids::decode($student);
+
+        $students = Student::find($decoded[0]);
         $user = Auth::user();
         $parent = Parents::where('user_id', '=', $user->id)->firstOrFail();
         $attendanceQuery = Attendance::query()
@@ -173,7 +175,7 @@ class AttendanceController extends Controller
                         'students.last_name as student_lastname', 'students.status',
                     )
                     ->whereYear('attendances.attendance_date', $year)
-                    ->where('attendances.student_id', '=', $decoded[0])
+                    ->where('attendances.student_id', '=', $students->id)
                     ->where('attendances.school_id', $user->school_id)
                     ->where('students.parent_id', $parent->id)
                     ->where('students.status', 1)
@@ -200,7 +202,7 @@ class AttendanceController extends Controller
 
         $firstRecord = $rawData->first();
 
-        return view('Attendance.show', compact('groupedData', 'student', 'firstRecord'));
+        return view('Attendance.show', compact('groupedData', 'students', 'firstRecord'));
     }
 
     //group attendance by year ===========================
@@ -209,6 +211,7 @@ class AttendanceController extends Controller
         // $studentId = Student::findOrFail($student->id);
         $decoded = Hashids::decode($student);
 
+        $students = Student::find($decoded[0]);
         $user = Auth::user();
         $parent = Parents::where('user_id', '=', $user->id)->firstOrFail();
         $attendances = Attendance::query()->join('students', 'students.id', '=', 'attendances.student_id')
@@ -224,7 +227,7 @@ class AttendanceController extends Controller
                                                 'students.middle_name as student_middlename', 'students.status',
                                                 'students.last_name as student_lastname', 'students.parent_id',
                                             )
-                                            ->where('attendances.student_id', '=', $decoded[0])
+                                            ->where('attendances.student_id', '=', $students->id)
                                             ->where('attendances.school_id', $user->school_id)
                                             ->where('students.parent_id', $parent->id)
                                             ->where('students.status', 1)
@@ -236,7 +239,7 @@ class AttendanceController extends Controller
             return $yearGroup->groupBy('student_id');
         });
 
-        return view('Attendance.parent_grouped', compact('groupedAttendance', 'attendances', 'student'));
+        return view('Attendance.parent_grouped', compact('groupedAttendance', 'attendances', 'students'));
     }
 
     public function getFormReport($class)
