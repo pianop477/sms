@@ -1079,15 +1079,17 @@
     @endif
         <div class="row">
                 <div class="col-md-4 mt-md-3 mb-3">
-                    <div class="card" style="background:#098ddf">
-                        <div class="">
-                            <div class="p-4 d-flex justify-content-between align-items-center">
-                                <div class="seofct-icon"><i class="ti-blackboard"></i> My Class</div>
-                                <h2 class="text-white">{{ $myClass->count() }}</h2>
+                    <a href="{{ route('get.student.list', ['class' => Hashids::encode($class->id)]) }}">
+                        <div class="card" style="background:#098ddf">
+                            <div class="">
+                                <div class="p-4 d-flex justify-content-between align-items-center">
+                                    <div class="seofct-icon"><i class="ti-blackboard"></i> My Class</div>
+                                    <h2 class="text-white">{{ $myClass->count() }}</h2>
+                                </div>
+                                <canvas id="" height="50"></canvas>
                             </div>
-                            <canvas id="" height="50"></canvas>
                         </div>
-                    </div>
+                    </a>
                 </div>
 
                 {{-- second card --}}
@@ -1140,14 +1142,14 @@
                                         @foreach ($myClass as $class)
                                             <tr class="">
                                                 <td class="text-uppercase">
-                                                    <a href="{{ route('get.student.list', $class->id) }}">{{ $class->class_name }}</a>
+                                                    <a href="{{ route('get.student.list', ['class' => Hashids::encode($class->id)]) }}">{{ $class->class_name }}</a>
                                                 </td>
                                                 <td class="text-uppercase text-center">{{ $class->group }}</td>
                                                 <td>
-                                                    <ul class="d-flex">
-                                                        <li class="text-center">
-                                                            <a href="{{ route('attendance.get.form', $class->id) }}" class="btn btn-info btn-xs p-1">
-                                                                <i class="ti-settings"> GENERATE REPORT</i>
+                                                    <ul class="d-flex justify-content-center">
+                                                        <li class="">
+                                                            <a href="{{ route('attendance.get.form', ['class' => Hashids::encode($class->id)]) }}" class="btn btn-info btn-xs p-1">
+                                                                <i class="ti-settings"> REPORT</i>
                                                             </a>
                                                         </li>
                                                     </ul>
