@@ -13,7 +13,7 @@
                     </a>
                 </div>
             </div>
-            <form class="needs-validation" novalidate="" action="{{ route('attendance.generate.report', $classTeacher->id) }}" method="POST" enctype="multipart/form-data" onsubmit="showPreloader(event)">
+            <form class="needs-validation" novalidate="" action="{{ route('attendance.generate.report', ['classTeacher' => Hashids::encode($classTeacher->id)]) }}" method="POST" enctype="multipart/form-data" onsubmit="showPreloader(event)">
                 @csrf
                 <div class="form-row">
                     <div class="col-md-4 mb-3">

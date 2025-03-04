@@ -248,11 +248,12 @@ class AttendanceController extends Controller
     public function getFormReport($class)
     {
         // return $class;
+        $id = Hashids::decode($class);
         $user = Auth::user();
         $teacher = Teacher::where('user_id', '=', $user->id)->firstOrFail();
         $classTeacher = Class_teacher::query()->join('grades', 'grades.id', '=', 'class_teachers.class_id')
                                             ->select('class_teachers.*', 'grades.id as class_id', 'grades.class_name')
-                                            ->findOrFail($class);
+                                            ->findOrFail($id[0]);
         // return $classTeacher;
         return view('Attendance.teacher_attendace', ['classTeacher' => $classTeacher]);
     }
@@ -261,6 +262,7 @@ class AttendanceController extends Controller
 
     public function generateReport(Request $request, $classTeacher)
     {
+        $id = Hashids::decode($classTeacher);
         // Validate the request
         $request->validate([
             'start' => 'required|date_format:Y-m',
@@ -268,7 +270,7 @@ class AttendanceController extends Controller
         ]);
 
         // Retrieve the class teacher's details
-        $class_teacher = Class_teacher::findOrFail($classTeacher);
+        $class_teacher = Class_teacher::findOrFail($id[0]);
         $classId = $class_teacher->class_id;
         $group = $class_teacher->group;
 
