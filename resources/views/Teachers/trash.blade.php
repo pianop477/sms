@@ -56,9 +56,9 @@
                                         @if ($teacher->status == 1)
                                         <td>
                                             <ul class="d-flex justify-content-center">
-                                                <li class="mr-3"><a href="{{route('Teachers.show.profile', $teacher->id)}}" class="text-primary"><i class="fa fa-eye"></i></a></li>
+                                                <li class="mr-3"><a href="{{route('Teachers.show.profile', ['teacher' => Hashids::encode($teacher->id)])}}" class="text-primary"><i class="fa fa-eye"></i></a></li>
                                                 <li class="mr-3">
-                                                    <form action="{{route('update.teacher.status', $teacher->id)}}" method="POST">
+                                                    <form action="{{route('update.teacher.status', ['teacher' => Hashids::encode($teacher->id)])}}" method="POST">
                                                         @csrf
                                                         @method('PUT')
                                                         <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Block {{strtoupper($teacher->first_name)}} {{strtoupper($teacher->last_name)}}?')"><i class="fas fa-ban text-danger"></i></button>
@@ -70,7 +70,7 @@
                                         <td>
                                             <ul class="d-flex justify-content-center">
                                                 <li class="mr-3">
-                                                    <form action="{{route('teachers.restore', $teacher->id)}}" method="POST">
+                                                    <form action="{{route('teachers.restore', ['teacher' => Hashids::encode($teacher->id)])}}" method="POST">
                                                         @csrf
                                                         @method('PUT')
                                                         <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Unblock {{strtoupper($teacher->first_name)}} {{strtoupper($teacher->last_name)}}?')"><i class="ti-reload text-success"></i></button>
