@@ -92,7 +92,7 @@ class ResultsController extends Controller
                     ->orderBy('examinations.exam_type', 'asc')
                     ->paginate(10);
 
-         return view('Results.result_type', compact('student', 'year', 'examTypes'));
+         return view('Results.result_type', compact('students', 'year', 'examTypes'));
      }
 
      public function resultByMonth($student, $year, $exam_type)
@@ -122,7 +122,7 @@ class ResultsController extends Controller
 
             $examType = Examination::find($exam_type);
 
-        return view('Results.result_months', compact('student', 'year', 'examType', 'months'));
+        return view('Results.result_months', compact('students', 'year', 'examType', 'months'));
     }
 
 
