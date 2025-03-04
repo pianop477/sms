@@ -1218,14 +1218,15 @@
                                             <td>
                                                 @if ($course->status == 1)
                                                 <ul class="d-flex justify-content-center">
-                                                    <li class="mr-3">
-                                                        <a href="{{route('score.prepare.form', $course->id)}}" class="text-success" onclick="return confirm('Do you want to enter examination score in {{strtoupper($course->course_name)}} subject?')"><i class="ti-pencil-alt"></i></a>
-                                                    </li>
-                                                    <li class="mr-3">
-                                                        <a href="{{ route('results_byCourse', $course->id) }}" onclick="return confirm('Do you want to view results in {{strtoupper($course->course_name)}} subject?')">
-                                                            <i class="ti-eye text-primary"></i>
-                                                        </a>
-                                                    </li>
+                                                    <div class="btn-group" role="group">
+                                                        <button id="btnGroupDrop" type="button" class="btn btn-success btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            Manage
+                                                        </button>
+                                                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                                            <a class="dropdown-item" href="{{route('score.prepare.form', ['id' => Hashids::encode($course->id)])}}"><i class="ti-pencil-alt"></i> Score</a>
+                                                            <a class="dropdown-item" href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}"><i class="ti-file"></i> Results</a>
+                                                        </div>
+                                                    </div>
                                                 </ul>
                                                 @elseif ($course->status == 0)
                                                     <span class="badge bg-danger text-white">{{_('Blocked')}}</span>
@@ -1385,14 +1386,15 @@
                                             <td>
                                                 @if ($course->status == 1)
                                                 <ul class="d-flex justify-content-center">
-                                                    <li class="mr-3">
-                                                        <a href="{{route('score.prepare.form', $course->id)}}" class="text-success" onclick="return confirm('Do you want to enter examination score in {{strtoupper($course->course_name)}} subject?')"><i class="ti-pencil-alt"></i></a>
-                                                    </li>
-                                                    <li class="mr-3">
-                                                        <a href="{{ route('results_byCourse', $course->id) }}" onclick="return confirm('Do you want to view results in {{strtoupper($course->course_name)}} subject?')">
-                                                            <i class="ti-eye text-primary"></i>
-                                                        </a>
-                                                    </li>
+                                                    <div class="btn-group" role="group">
+                                                        <button id="btnGroupDrop" type="button" class="btn btn-success btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            Manage
+                                                        </button>
+                                                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                                            <a class="dropdown-item" href="{{route('score.prepare.form', ['id' => Hashids::encode($course->id)])}}"><i class="ti-pencil-alt"></i> Score</a>
+                                                            <a class="dropdown-item" href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}"><i class="ti-file"></i> Results</a>
+                                                        </div>
+                                                    </div>
                                                 </ul>
                                                 @else
                                                     <span class="badge bg-danger text-white">{{_('Blocked')}}</span>

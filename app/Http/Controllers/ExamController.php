@@ -174,7 +174,7 @@ class ExamController extends Controller
 
             if ($existingRecord) {
                 Alert::error('Error!', 'Examination Results already submitted for this Course');
-                return redirect()->route('score.prepare.form', $courseId);
+                return redirect()->route('score.prepare.form', Hashids::encode($courseId));
             } else {
                 // Create a new examination result entry
                 Examination_result::create([
@@ -193,7 +193,7 @@ class ExamController extends Controller
         }
 
         Alert::success('Success!', 'Examination results have been submitted successfully');
-        return redirect()->route('score.prepare.form', Hashids::encode($courseId))->with(['class_course' => $class_course]);
+        return redirect()->route('score.prepare.form', Hashids::encode($courseId))->with(['class_course' => Hashids::encode($class_course)]);
         // return redirect()->route('home');
     }
 
