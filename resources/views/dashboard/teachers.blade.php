@@ -1079,7 +1079,7 @@
     @endif
         <div class="row">
                 <div class="col-md-4 mt-md-3 mb-3">
-                    <a href="{{ route('get.student.list', ['class' => Hashids::encode($class->id)]) }}">
+                    <a href="{{ route('get.student.list', ['class' => Hashids::encode($myClass->first()->id)]) }}">
                         <div class="card" style="background:#098ddf">
                             <div class="">
                                 <div class="p-4 d-flex justify-content-between align-items-center">
