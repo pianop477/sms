@@ -80,7 +80,7 @@
                                 @endif
                             </div>
                             <ul class="list-group w-100">
-                                <li class="list-group-item">Teacher's Name:
+                                <li class="list-group-item">Name:
                                     <span class="text-uppercase font-weight-bold">
                                         {{ $classTeacher->first_name }} {{ $classTeacher->last_name }}
                                     </span>
@@ -90,7 +90,7 @@
                                         {{ $classTeacher->gender[0] }}
                                     </span>
                                 </li>
-                                <li class="list-group-item">Phone Number:
+                                <li class="list-group-item">Phone:
                                     <span class="text-uppercase font-weight-bold">
                                         {{ $classTeacher->phone }}
                                     </span>
