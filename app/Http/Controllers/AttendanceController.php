@@ -25,9 +25,11 @@ class AttendanceController extends Controller
 
     public function index($class)
     {
+        $id = Hashids::decode($class);
         $user = Auth::user();
         $teacherLoggedIn = Teacher::where('user_id', '=', $user->id)->firstOrFail();
-        $myClass = Class_teacher::findOrFail($class);
+
+        $myClass = Class_teacher::findOrFail($id[0]);
         // return $myClass->teacher_id;
         $teacher = Teacher::findOrFail($myClass->teacher_id);
 
@@ -65,10 +67,11 @@ class AttendanceController extends Controller
      */
     public function store(Request $request, $student_class)
     {
+        $id = Hashids::decode($student_class);
         // Check if the class exists
         $user = Auth::user();
 
-        $class = Grade::findOrFail($student_class);
+        $class = Grade::findOrFail($id[0]);
         $class_id = $class->id;
         $attendanceDate = date('Y-m-d');
         $logged_user = Auth::user();
@@ -83,7 +86,7 @@ class AttendanceController extends Controller
         }
 
         // Get the students in the class
-        $students = Student::where('class_id', '=', $student_class)->where('school_id', $user->school_id)->get();
+        $students = Student::where('class_id', '=', $class_id)->where('school_id', $user->school_id)->get();
         if ($students->isEmpty()) {
             // Alert::error('Error', 'No students found in this class.');
             Alert()->toast('No students found in this class', 'error');
@@ -127,7 +130,7 @@ class AttendanceController extends Controller
             // Alert::error('Error', 'Attendance already taken and Submitted.');
             Alert()->toast('Attendance already taken and Submitted', 'error');
             // return redirect()->route('get.student.list', $student_class);
-            return back();
+            return redirect()->route('home');
         }
 
         // Save the attendance data
@@ -356,9 +359,10 @@ class AttendanceController extends Controller
 
     public function todayAttendance($student_class)
     {
+        $id = Hashids::decode($student_class);
         $user = Auth::user()->id;
         $teacher = Teacher::where('user_id', '=', $user)->firstOrFail();
-        $class = Grade::findOrFail($student_class);
+        $class = Grade::findOrFail($id[0]);
         // return $class;
         $classTeacher = Class_teacher::where('class_id', '=', $class->id)->firstOrFail();
         $teacher_id = $classTeacher->teacher_id;
