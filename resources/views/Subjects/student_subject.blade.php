@@ -2,7 +2,7 @@
 @section('content')
 <div class="row">
     <!-- table primary start -->
-    <div class="col-lg-8 mt-5">
+    <div class="col-md-8 mt-5">
         <div class="card">
             <div class="card-body">
                 <div class="row">
@@ -10,7 +10,7 @@
                         @if (isset($message))
                             <h4 class="header-title">{{ $message }}</h4>
                         @else
-                            <h4 class="header-title text-center text-uppercase">Learning Subjects for Class: <span class="text-uppercase"><strong>{{$class->class_name}}</strong></span></h4>
+                            <h4 class="header-title text-center text-uppercase">Subject Teachers for: <span class="text-uppercase"><strong>{{$class->class_name}}</strong></span></h4>
                         @endif
                     </div>
                     <div class="col-4">
