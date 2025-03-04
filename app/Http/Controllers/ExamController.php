@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 // use Barryvdh\DomPDF\PDF;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade as PDF;
+use Vinkla\Hashids\Facades\Hashids;
 
 class ExamController extends Controller
 {
@@ -34,7 +35,8 @@ class ExamController extends Controller
     public function prepare($id)
     {
         // abort(404)
-        $class_course = class_learning_courses::find($id);
+        $decoded = Hashids::decode($id);
+        $class_course = class_learning_courses::find($decoded[0]);
 
         $exams = Examination::where('school_id', Auth::user()->school_id)->where('status', 1)->get();
         return view('Examinations.prepare_form', ['exams' => $exams, 'class_course' => $class_course]);
@@ -299,8 +301,9 @@ class ExamController extends Controller
     //get results by its course=========================
     public function courseResults($id)
     {
+        $decoded = Hashids::decode($id);
         $user = Auth::user();
-        $class_course = class_learning_courses::find($id);
+        $class_course = class_learning_courses::find($decoded[0]);
         // return $class_course;
 
         if(! $class_course) {
@@ -324,10 +327,11 @@ class ExamController extends Controller
     }
 
 
-    public function resultByYear(Subject $course, $year)
+    public function resultByYear($course, $year)
     {
+        $id = Hashids::decode($course);
         $user = Auth::user();
-        $courses = Subject::find($course->id);
+        $courses = Subject::find($id[0]);
         if(! $courses) {
             Alert()->toast('No such course was found', 'error');
             return back();
@@ -358,14 +362,16 @@ class ExamController extends Controller
 
     public function resultByExamType($course, $year, $examType)
     {
+        $course_id = Hashids::decode($course);
+        $exam_id = Hashids::decode($examType);
         $user = Auth::user();
-        $class_course = class_learning_courses::where('course_id', $course)->first();
+        $class_course = class_learning_courses::where('course_id', $course_id[0])->first();
         // return ['data' => $class_course];
         $results = Examination_result::where('course_id', $class_course->course_id)
                                 ->where('class_id', $class_course->class_id)
                                 ->where('teacher_id', $class_course->teacher_id)
                                 ->whereYear('exam_date', $year)
-                                ->where('exam_type_id', $examType)
+                                ->where('exam_type_id', $exam_id[0])
                                 ->where('school_id', $user->school_id)
                                 ->distinct()  // Ensure distinct months
                                 ->get();
@@ -375,16 +381,19 @@ class ExamController extends Controller
             return Carbon::parse($item->exam_date)->format('F'); // Full month name
         });
 
-        return view('Examinations.teacher_results_by_month', compact('months', 'year', 'examType', 'course', 'class_course'));
+        return view('Examinations.teacher_results_by_month', compact('months', 'year', 'examType', 'exam_id', 'course', 'class_course'));
     }
 
     public function resultByMonth($course, $year, $examType, $month)
     {
         // return ['data' => $course];
+        $course_id = Hashids::decode($course);
+        $exam_id = Hashids::decode($examType);
+
         $user = Auth::user();
-        $subjectCourse = Subject::find($course);
+        $subjectCourse = Subject::find($course_id[0]);
         // return $subjectCourse;
-        $class_course = class_learning_courses::where('course_id', $course)->first();
+        $class_course = class_learning_courses::where('course_id', $course_id[0])->first();
         // return ['kozi' => $class_course];
         $monthMap = [
             'January' => 1, 'February' => 2, 'March' => 3,
@@ -414,7 +423,7 @@ class ExamController extends Controller
                         ->where('examination_results.teacher_id', $class_course->teacher_id)
                         ->where('students.status', 1)
                         ->whereYear('examination_results.exam_date', $year)
-                        ->where('examination_results.exam_type_id', $examType)
+                        ->where('examination_results.exam_type_id', $exam_id)
                         ->whereMonth('examination_results.exam_date', $monthNumber)
                         ->where('examination_results.school_id', $user->school_id)
                         ->distinct()  // Ensure distinct results

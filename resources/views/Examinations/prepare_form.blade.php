@@ -77,7 +77,7 @@
                 </div>
                 <button class="btn btn-primary float-right" type="submit">Next <i class="ti-arrow-right"></i></button>
             </form>
-            <button id="continueWithSavedData" class="btn btn-warning mt-3" style="display:none;">Continue with Saved Data</button>
+            <button id="continueWithSavedData" class="btn btn-warning mt-3" style="display:none;">Saved Scores</button>
         </div>
     </div>
 </div>
