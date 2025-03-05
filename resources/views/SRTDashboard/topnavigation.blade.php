@@ -25,13 +25,13 @@
                                     <img class="avatar user-thumb" src="{{asset('assets/img/profile/avatar-female.jpg')}}" alt="avatar">
                             @endif
                             @endif
-                            <h4 class="user-name text-capitalize dropdown-toggle" data-toggle="dropdown">  Hello, {{Auth::user()->first_name}}!<i class="fa fa-angle-down"></i></h4>
+                            <h4 class="user-name text-capitalize dropdown-toggle" data-toggle="dropdown">  Hello, {{Auth::user()->first_name}}! <i class="fa fa-angle-down"></i></h4>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" href="{{route('show.profile')}}"><i class="ti-user"></i> Profile</a>
                                 <a class="dropdown-item" href="{{route('change.password')}}"><i class="ti-key"></i> Change Password</a>
                                 <form action="{{route('logout')}}" method="POST">
                                     @csrf
-                                    <a class="dropdown-item" href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();"><i class="ti-power-off"></i> Log Out</a>
+                                    <a class="dropdown-item" href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();"><i class="ti-power-off"></i> Sign Out</a>
                                 </form>
                             </div>
                         </div>

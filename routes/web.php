@@ -296,7 +296,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
     //End of condition ==============================================================================================
 
     //delete students records =======================================================================================
-    Route::middleware(['GeneralMiddleware'])->group(function () {
+    Route::middleware(['ManagerOrTeacher'])->group(function () {
         //reset users passwords =====================================================================================
         Route::prefix('User-management')->group(function () {
             Route::get('Password-Reset', [RolesController::class, 'userPassword'])->name('users.lists');
@@ -321,18 +321,19 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         Route::put('{user}/Update-role', [RolesController::class, 'AssignNewRole'])->name('roles.assign.new');
 
         Route::get('/roles/confirmation', function () {
+            dd(session()->all()); // Itaonyesha session zote
             if (!session()->has('confirm_role_change')) {
                 return redirect()->route('roles.updateRole');
             }
             return view('roles.confirm');
         })->name('roles.confirmation');
 
+
         // cancel the condition
         Route::get('/roles/cancel-confirmation', function () {
             session()->forget('confirm_role_change'); // Clear session when canceling
             return redirect()->route('roles.updateRole');
         })->name('roles.cancelConfirmation');
-
 
         Route::post('/roles/confirmProceed', [RolesController::class, 'confirmProceed'])->name('roles.confirmProceed');
 
