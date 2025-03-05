@@ -321,7 +321,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         Route::put('{user}/Update-role', [RolesController::class, 'AssignNewRole'])->name('roles.assign.new');
 
         Route::get('/roles/confirmation', function () {
-            dd(session()->all()); // Itaonyesha session zote
+            // dd(session()->all()); // Itaonyesha session zote
             if (!session()->has('confirm_role_change')) {
                 return redirect()->route('roles.updateRole');
             }
