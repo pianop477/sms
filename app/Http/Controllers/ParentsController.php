@@ -90,19 +90,24 @@ class ParentsController extends Controller
         ]);
 
         try {
+            // Check if user (parent) exists
             $userExists = User::where('phone', $request->phone)
-                            ->where('school_id', $user->school_id)
-                            ->exists();
-            $studentExists = Student::where('first_name', $request->student_first_name)
-                                    ->where('middle_name', $request->student_middle_name)
-                                    ->where('last_name', $request->student_last_name)
-                                    ->where('school_id', $request->school_id)
-                                    ->exists();
+                        ->where('school_id', $user->school_id)
+                        ->exists();
 
-            if($userExists || $studentExists) {
-                Alert()->toast('Parents or Student information already exists in our records', 'error');
+            // Check if student exists
+            $studentExists = Student::whereRaw('LOWER(first_name) = ?', [strtolower($request->student_first_name)])
+                    ->whereRaw('LOWER(middle_name) = ?', [strtolower($request->student_middle_name)])
+                    ->whereRaw('LOWER(last_name) = ?', [strtolower($request->student_last_name)])
+                    ->where('dob', $request->dob) // Angalia tarehe ya kuzaliwa ili kuwa na uhakika zaidi
+                    ->where('school_id', $request->school_id)
+                    ->first();
+
+            if ($userExists || $studentExists) {
+                Alert()->toast('Parent or Student information already exists in our records', 'error');
                 return back();
             }
+
 
             $users = User::create([
                 'first_name' => $request->fname,
