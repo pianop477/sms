@@ -314,19 +314,28 @@
 </div>
  <script>
     window.onload = function() {
-    // Hakikisha jQuery na Select2 inapatikana
-    if (typeof $.fn.select2 !== 'undefined') {
-        // Fanya initialization ya Select2
-        $('#parentSelect').select2({
-            placeholder: "Search Parent...",
-            allowClear: true
-        }).on('select2:open', function () {
-            $('.select2-results__option').css('text-transform', 'capitalize');  // Capitalize option text
-        });
-    } else {
-        console.error("Select2 haijapakiwa!");
-    }
-};
+        // Hakikisha jQuery na Select2 inapatikana
+        if (typeof $.fn.select2 !== 'undefined') {
+            // Fanya initialization ya Select2
+            $('#parentSelect').select2({
+                placeholder: "Search Parent...",
+                allowClear: true
+            }).on('select2:open', function () {
+                $('.select2-results__option').css('text-transform', 'capitalize');  // Capitalize option text
+            });
+        } else {
+            console.error("Select2 haijapakiwa!");
+        }
+    };
 
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.querySelector(".needs-validation");
+        const submitButton = form.querySelector('button[type="submit"]');
+
+        form.addEventListener("submit", function() {
+            submitButton.disabled = true;
+            submitButton.innerHTML = "Saving..."; // Optional: Badilisha maandishi
+        });
+    });
 </script>
 @endsection
