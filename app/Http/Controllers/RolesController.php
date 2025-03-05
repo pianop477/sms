@@ -361,10 +361,10 @@ class RolesController extends Controller
 
         // Check if user already has another role
         if ($teacher->role_id == 2 || $teacher->role_id == 3 || $teacher->role_id == 4) {
-            session()->put('confirm_role_change', [
+            session(['confirm_role_change' => [
                 'teacher_id' => $teacher->id,
                 'new_role' => $request->role
-            ]);
+            ]]);
             return redirect()->route('roles.confirmation');
         }
 

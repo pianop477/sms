@@ -53,7 +53,7 @@
                             @endif
                         </div>
                         <div class="submit-btn-area">
-                            <button id="form_submit" type="submit">Login <i class="ti-arrow-right"></i></button>
+                            <button id="form_submit" type="submit">Sign in <i class="ti-arrow-right"></i></button>
                         </div>
                         @if (Route::has('users.form'))
                         <div class="form-footer text-center mt-1">
