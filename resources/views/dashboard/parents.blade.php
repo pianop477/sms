@@ -40,21 +40,21 @@
                                                 <div class="form-row">
                                                     <div class="col-md-4 mb-3">
                                                         <label for="validationCustom01">First Name</label>
-                                                        <input type="text" name="fname" class="form-control" id="validationCustom01" placeholder="Student First Name" value="{{old('fname')}}" required="">
+                                                        <input type="text" name="fname" class="form-control" id="validationCustom01" placeholder="" value="{{old('fname')}}" required="">
                                                         @error('fname')
                                                         <div class="text-danger">{{$message}}</div>
                                                         @enderror
                                                     </div>
                                                     <div class="col-md-4 mb-3">
                                                         <label for="validationCustom02">Middle Name</label>
-                                                        <input type="text" name="middle" class="form-control" id="validationCustom02" placeholder="Student Middle Name" required="" value="{{old('middle')}}">
+                                                        <input type="text" name="middle" class="form-control" id="validationCustom02" placeholder="" required="" value="{{old('middle')}}">
                                                         @error('middle')
                                                         <div class="text-danger">{{$message}}</div>
                                                         @enderror
                                                     </div>
                                                     <div class="col-md-4 mb-3">
                                                         <label for="validationCustom02">Last Name</label>
-                                                        <input type="text" name="lname" class="form-control" id="validationCustom02" placeholder="Student Last Name" required="" value="{{old('lname')}}">
+                                                        <input type="text" name="lname" class="form-control" id="validationCustom02" placeholder="" required="" value="{{old('lname')}}">
                                                         @error('lname')
                                                         <div class="text-danger">{{$message}}</div>
                                                         @enderror
@@ -74,7 +74,7 @@
                                                     </div>
                                                     <div class="col-md-4 mb-3">
                                                         <label for="validationCustom02">Date of Birth</label>
-                                                        <input type="date" name="dob" class="form-control" id="validationCustom02" placeholder="Student Birth Date" required="" value="{{old('dob')}}" min="{{\Carbon\Carbon::now()->subYears(14)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(2)->format('Y-m-d')}}">
+                                                        <input type="date" name="dob" class="form-control" id="validationCustom02" placeholder="" required="" value="{{old('dob')}}" min="{{\Carbon\Carbon::now()->subYears(14)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(2)->format('Y-m-d')}}">
                                                         @error('dob')
                                                         <div class="text-danger">{{$message}}</div>
                                                         @enderror
@@ -131,7 +131,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-md-4 mb-3">
-                                                        <label for="validationCustomUsername">Student Passport :<small class="text-sm text-danger"> (Optional)</small></label>
+                                                        <label for="validationCustomUsername">Photo :<small class="text-sm text-danger"> (Optional) - with blue background</small></label>
                                                         <div class="input-group">
                                                             <input type="file" name="image" id="validationCustomUsername" class="form-control" value="{{old('image')}}">
                                                             @error('image')

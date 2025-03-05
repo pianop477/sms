@@ -75,7 +75,7 @@
                         @enderror
                     </div>
                 </div>
-                <button class="btn btn-primary float-right" type="submit">Next <i class="ti-arrow-right"></i></button>
+                <button class="btn btn-primary float-right" type="submit">Next Step<i class="ti-arrow-right"></i></button>
             </form>
             <button id="continueWithSavedData" class="btn btn-warning mt-3" style="display:none;">Saved Scores</button>
         </div>
