@@ -325,9 +325,8 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
             if (!session()->has('confirm_role_change')) {
                 return redirect()->route('roles.updateRole');
             }
-            return view('roles.confirm');
+            return view('Roles.confirm');
         })->name('roles.confirmation');
-
 
         // cancel the condition
         Route::get('/roles/cancel-confirmation', function () {

@@ -197,7 +197,18 @@
     </div>
 </div>
 <div class="col-lg-12">
-
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.querySelector(".needs-validation");
+        const submitButton = form.querySelector('button[type="submit"]');
+
+        form.addEventListener("submit", function() {
+            submitButton.disabled = true;
+            submitButton.innerHTML = "Saving..."; // Optional: Badilisha maandishi
+        });
+    });
+</script>
+
 <hr class="dark horizontal py-0">
 @endsection
