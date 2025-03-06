@@ -110,7 +110,7 @@ class UsersController extends Controller
                 ];
             }
 
-            $message = "Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: {$req->password}. Visit {$url} to Login.";
+            $message = "Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: ". htmlspecialchars($req->password) .". Visit {$url} to Login.";
             $response = $beemSmsService->sendSms($sourceAddr, $message, $recipients);
 
         // send sms using NextSMS API *****************************************************************************
@@ -119,7 +119,7 @@ class UsersController extends Controller
         $payload = [
             'from' => $school->sender_id ?? 'SHULE APP',
             'to' => $dest,
-            'text' => "Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: {$req->password}. Visit {$url} to Login.",
+            'text' => "Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: ". htmlspecialchars($req->password) .". Visit {$url} to Login.",
             'reference' => uniqid(),
         ];
 
@@ -182,7 +182,7 @@ class UsersController extends Controller
             'gender' => $request->input('gender'),
             'phone' => $request->input('phone'),
             'usertype' => $request->input('usertype', 1),
-            'password' => Hash::make($request->input('password', 'shule@2024')),
+            'password' => Hash::make($request->input('password', 'shule2025')),
         ]);
 
         // use nextSMS API to send sms

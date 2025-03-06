@@ -160,20 +160,13 @@ class ParentsController extends Controller
                 'school_id' => $parents->school_id
             ]);
 
-            // check if phone number already exists in the database and prevent from sending message again;
-            $phoneNumberExists = User::where('phone', $users->phone)->exists();
-
-            if($phoneNumberExists) {
-                Alert()->toast('Parent and student information saved successfully', 'success');
-                return redirect()->route('Parents.index');
-            }
                 $url = "https://shuleapp.tech";
 
                 $nextSmsService = new NextSmsService();
                 $senderId = $school->sender_id ?? "SHULE APP";
                 $message = "Welcome to ShuleApp, Your Login details are: ";
                 $message .= " Username: {$users->phone}";
-                $message .= " Password: shule2025"; // Default password
+                $message .= " Password: shule2025."; // Default password
                 $message .= " Visit {$url} to Login";
 
                 $reference = uniqid();
@@ -259,7 +252,12 @@ class ParentsController extends Controller
             Alert()->toast('You are not authorized to edit this parent', 'error');
             return back();
         }
-        return view('Parents.edit', ['parents' => $parents]);
+        $students = Student::query()
+                        ->join('grades', 'grades.id', '=', 'students.class_id')
+                        ->select('students.*', 'grades.class_name', 'grades.class_code')
+                        ->where('students.parent_id', $parents->id)->get();
+
+        return view('Parents.edit', ['parents' => $parents, 'students' => $students]);
     }
 
     /**
