@@ -28,14 +28,14 @@
                                             <div class="form-row">
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom01">First name</label>
-                                                    <input type="text" name="fname" class="form-control" id="validationCustom01" placeholder="Parent First name" value="{{old('fname')}}" required="">
+                                                    <input type="text" name="fname" class="form-control" id="validationCustom01" placeholder="" value="{{old('fname')}}" required="">
                                                     @error('fname')
                                                     <div class="text-danger">{{$message}}</div>
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom02">Last name</label>
-                                                    <input type="text" name="lname" class="form-control" id="validationCustom02" placeholder="Parent Last name" required="" value="{{old('lname')}}">
+                                                    <input type="text" name="lname" class="form-control" id="validationCustom02" placeholder="" required="" value="{{old('lname')}}">
                                                     @error('lname')
                                                     <div class="text-danger">{{$message}}</div>
                                                     @enderror
@@ -46,7 +46,7 @@
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text" id="inputGroupPrepend">@</span>
                                                         </div>
-                                                        <input type="email" name="email" class="form-control" id="validationCustomUsername" placeholder="Parent Email address " aria-describedby="inputGroupPrepend" value="{{old('email')}}">
+                                                        <input type="email" name="email" class="form-control" id="validationCustomUsername" placeholder=" " aria-describedby="inputGroupPrepend" value="{{old('email')}}">
                                                         @error('email')
                                                         <div class="text-danger">{{$message}}</div>
                                                         @enderror
@@ -67,7 +67,7 @@
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom02">Mobile Phone</label>
-                                                    <input type="text" name="phone" class="form-control" id="validationCustom02" placeholder="Parent Phone Number" required="" value="{{old('phone')}}">
+                                                    <input type="text" name="phone" class="form-control" id="validationCustom02" placeholder="" required="" value="{{old('phone')}}">
                                                     @error('phone')
                                                     <div class="text-danger">{{$message}}</div>
                                                     @enderror
@@ -75,7 +75,7 @@
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustomUsername">Street/Village</label>
                                                     <div class="input-group">
-                                                        <input type="text" name="street" class="form-control" id="validationCustom02" value="{{old('street')}}" placeholder="Parent Street Address" required>
+                                                        <input type="text" name="street" class="form-control" id="validationCustom02" value="{{old('street')}}" placeholder="" required>
                                                         @error('street')
                                                         <div class="text-danger">{{$message}}</div>
                                                         @enderror
