@@ -161,7 +161,7 @@ class ParentsController extends Controller
             ]);
 
             // check if phone number already exists in the database and prevent from sending message again;
-            $phoneNumberExists = User::where('phone', $user->phone)->exists();
+            $phoneNumberExists = User::where('phone', $users->phone)->exists();
 
             if($phoneNumberExists) {
                 Alert()->toast('Parent and student information saved successfully', 'success');
@@ -173,9 +173,9 @@ class ParentsController extends Controller
                 $nextSmsService = new NextSmsService();
                 $senderId = $school->sender_id ?? "SHULE APP";
                 $message = "Welcome to ShuleApp, Your Login details are: ";
-                $message =" .Username: {$users->phone}";
-                $message =". Password: {$request->password}";
-                $message = ". Visit {$url} to Login";
+                $message .= " Username: {$users->phone}";
+                $message .= " Password: shule2025"; // Default password
+                $message .= " Visit {$url} to Login";
                 $reference = uniqid();
                 $formattedPhone = $this->formatPhoneNumber($users->phone);
 

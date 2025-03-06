@@ -42,12 +42,12 @@
                                 <tbody>
                                     @foreach ($students as $student )
                                         <tr>
-                                            <td>{{$student->admission_number}}</td>
+                                            <td class="text-uppercase">{{$student->admission_number}}</td>
                                             <td class="text-capitalize">
                                                 {{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}
                                             </td>
                                             <td class="text-capitalize">{{$student->gender[0]}}</td>
-                                            <td>{{$student->class_name}}</td>
+                                            <td class="text-uppercase">{{$student->class_name}}</td>
                                             <td>
                                                 @if ($student->status == 1)
                                                 <span class="status-p bg-success">Active</span>
