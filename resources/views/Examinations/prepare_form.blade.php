@@ -75,7 +75,7 @@
                         @enderror
                     </div>
                 </div>
-                <button class="btn btn-primary float-right" type="submit">Next Step<i class="ti-arrow-right"></i></button>
+                <button class="btn btn-primary float-right" id="saveButton" type="submit">Next Step<i class="ti-arrow-right"></i></button>
             </form>
             <button id="continueWithSavedData" class="btn btn-warning mt-3" style="display:none;">Saved Scores</button>
         </div>
@@ -106,6 +106,35 @@
                 // Redirect to the page with saved data
                 window.location.href = "{{ route('form.saved.values') }}";
             }
+        });
+    });
+
+    //disable button after submission
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector(".needs-validation");
+        const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
+
+        if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Zuia submission ya haraka
+
+            // Disable button na badilisha maandishi
+            submitButton.disabled = true;
+            submitButton.innerHTML = "Please Wait...";
+
+            // Hakikisha form haina errors kabla ya kutuma
+            if (!form.checkValidity()) {
+                form.classList.add("was-validated");
+                submitButton.disabled = false; // Warudishe button kama kuna errors
+                submitButton.innerHTML = "Next Step";
+                return;
+            }
+
+            // Chelewesha submission kidogo ili button ibadilike kwanza
+            setTimeout(() => {
+                form.submit();
+            }, 500);
         });
     });
 </script>

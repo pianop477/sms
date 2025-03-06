@@ -8,7 +8,7 @@
         </div>
     @else
     <p class="text-center text-danger">Attendance Date: {{\Carbon\Carbon::now()->format('d-m-Y')}}</p>
-    <form action="{{ route('store.attendance', ['student_class' => Hashids::encode($student_class->id)]) }}" method="POST" enctype="multipart/form-data" onsubmit="showPreloader()">
+    <form action="{{ route('store.attendance', ['student_class' => Hashids::encode($student_class->id)]) }}" method="POST" enctype="multipart/form-data" onsubmit="showPreloader()" class="needs-validation" novalidate>
         @csrf
         <div class="single-table">
             <div class="table-responsive-lg">
@@ -58,11 +58,39 @@
 
         <div class="card-footer text-center">
             <ul class="d-flex justify-content-center">
-                <li class="mr-3"><button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to submit attendance? You will not able to make any changes')">Submit Attendance</button></li>
+                <li class="mr-3"><button type="submit" id="saveButton" class="btn btn-primary" onclick="return confirm('Are you sure you want to submit attendance? You will not able to make any changes')">Save</button></li>
                 <li><a href="{{route('today.attendance', ['student_class' => Hashids::encode($student_class->id)])}}" target="" class="btn btn-success">Check Today Report</a></li>
             </ul>
         </div>
     </form>
     @endif
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector(".needs-validation");
+            const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
 
+            if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
+
+            form.addEventListener("submit", function (event) {
+                event.preventDefault(); // Zuia submission ya haraka
+
+                // Disable button na badilisha maandishi
+                submitButton.disabled = true;
+                submitButton.innerHTML = "Saving...";
+
+                // Hakikisha form haina errors kabla ya kutuma
+                if (!form.checkValidity()) {
+                    form.classList.add("was-validated");
+                    submitButton.disabled = false; // Warudishe button kama kuna errors
+                    submitButton.innerHTML = "Save";
+                    return;
+                }
+
+                // Chelewesha submission kidogo ili button ibadilike kwanza
+                setTimeout(() => {
+                    form.submit();
+                }, 500);
+            });
+        });
+    </script>
     @endsection

@@ -71,7 +71,7 @@
                 @endif
                 <div class="row">
                     <div class="col-12">
-                        <form id="scoreForm" action="{{ route('exams.store.score') }}" method="POST">
+                        <form id="scoreForm" action="{{ route('exams.store.score') }}" method="POST" class="needs-validation" novalidate>
                             @csrf
                             <table class="table table-responsive-md table-hover table-bordered" style="width: 100%;">
                                 <thead class="table-primary">
@@ -111,10 +111,10 @@
                             <hr>
                             <ul class="d-flex justify-content-center my-3">
                                 <li class="mr-3">
-                                    <button type="button" class="btn btn-danger" id="saveToLocalStorage">Save</button>
+                                    <button type="button" class="btn btn-danger" id="saveToLocalStorage saveToLocal">Save</button>
                                 </li>
                                 <li>
-                                    <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure you want to submit the results? You will not be able to make any changes after submission')">Submit</button>
+                                    <button type="submit" class="btn btn-primary" id="saveButton" onclick="return confirm('Are you sure you want to submit the results? You will not be able to make any changes after submission')">Submit</button>
                                 </li>
                             </ul>
                         </form>
@@ -303,6 +303,64 @@
             scoreInputs.forEach(input => input.disabled = false);
 
             localStorage.removeItem(formKey);
+        });
+    });
+
+    //disable button after submission
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector(".needs-validation");
+        const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
+
+        if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Zuia submission ya haraka
+
+            // Disable button na badilisha maandishi
+            submitButton.disabled = true;
+            submitButton.innerHTML = "Submit scores...";
+
+            // Hakikisha form haina errors kabla ya kutuma
+            if (!form.checkValidity()) {
+                form.classList.add("was-validated");
+                submitButton.disabled = false; // Warudishe button kama kuna errors
+                submitButton.innerHTML = "Submit";
+                return;
+            }
+
+            // Chelewesha submission kidogo ili button ibadilike kwanza
+            setTimeout(() => {
+                form.submit();
+            }, 500);
+        });
+    });
+
+    //save score
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector(".needs-validation");
+        const submitButton = document.getElementById("saveToLocal"); // Tafuta button kwa ID
+
+        if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Zuia submission ya haraka
+
+            // Disable button na badilisha maandishi
+            submitButton.disabled = true;
+            submitButton.innerHTML = "Saving scores...";
+
+            // Hakikisha form haina errors kabla ya kutuma
+            if (!form.checkValidity()) {
+                form.classList.add("was-validated");
+                submitButton.disabled = false; // Warudishe button kama kuna errors
+                submitButton.innerHTML = "Save";
+                return;
+            }
+
+            // Chelewesha submission kidogo ili button ibadilike kwanza
+            setTimeout(() => {
+                form.submit();
+            }, 500);
         });
     });
 

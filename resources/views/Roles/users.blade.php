@@ -48,10 +48,10 @@
                                             </td>
                                         @endif
                                         <td>
-                                            <form action="{{route('users.reset.password', ['user' => Hashids::encode($user->id)])}}" method="POST">
+                                            <form action="{{route('users.reset.password', ['user' => Hashids::encode($user->id)])}}" method="POST" class="needs-validation" novalidate="">
                                                 @csrf
                                                 @method('PUT')
-                                                <button class="btn btn-outline-danger btn-xs" onclick="return confirm('Are you sure you want to reset password for {{strtoupper($user->first_name)}} {{strtoupper($user->last_name)}}?')">
+                                                <button class="btn btn-outline-danger btn-xs" id="saveButton" onclick="return confirm('Are you sure you want to reset password for {{strtoupper($user->first_name)}} {{strtoupper($user->last_name)}}?')">
                                                     <i class="ti-unlock"> Reset Password</i>
                                                 </button>
                                             </form>
@@ -66,4 +66,33 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector(".needs-validation");
+        const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
+
+        if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Zuia submission ya haraka
+
+            // Disable button na badilisha maandishi
+            submitButton.disabled = true;
+            submitButton.innerHTML = "Resetting...";
+
+            // Hakikisha form haina errors kabla ya kutuma
+            if (!form.checkValidity()) {
+                form.classList.add("was-validated");
+                submitButton.disabled = false; // Warudishe button kama kuna errors
+                submitButton.innerHTML = "Reset Password";
+                return;
+            }
+
+            // Chelewesha submission kidogo ili button ibadilike kwanza
+            setTimeout(() => {
+                form.submit();
+            }, 500);
+        });
+    });
+</script>
 @endsection
