@@ -88,7 +88,7 @@
                                             <div class="form-row">
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustomerUsername">Student First name</label>
-                                                    <input type="text" name="student_first_name" class="form-control" id="validationCustomer02" value="{{old('student_first_name')}}" placeholder="Student First Name" required="">
+                                                    <input type="text" name="student_first_name" class="form-control" id="validationCustomer02" value="{{old('student_first_name')}}" placeholder="" required="">
                                                     @error('student_first_name')
                                                     <div class="text-danger">{{$message}}</div>
                                                     @enderror
