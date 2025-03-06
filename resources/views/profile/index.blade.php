@@ -93,7 +93,7 @@
                     @error('phone')<span class="text-danger text-sm">{{$message}}</span>@enderror
                 </div>
                 <div class="">
-                    <label class="form-label">Photo: <span class="text-danger">Max 2MB</span></label>
+                    <label class="form-label">Photo: <span class="text-danger text-sm">Maximum 512KB</span></label>
                     <div class="input-group input-group-outline mb-3">
                         <input type="file" name="image" class="form-control" value="">
                     </div>
@@ -107,5 +107,33 @@
       </div>
     </div>
   </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector(".needs-validation");
+        const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
 
+        if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Zuia submission ya haraka
+
+            // Disable button na badilisha maandishi
+            submitButton.disabled = true;
+            submitButton.innerHTML = "Saving...";
+
+            // Hakikisha form haina errors kabla ya kutuma
+            if (!form.checkValidity()) {
+                form.classList.add("was-validated");
+                submitButton.disabled = false; // Warudishe button kama kuna errors
+                submitButton.innerHTML = "Save";
+                return;
+            }
+
+            // Chelewesha submission kidogo ili button ibadilike kwanza
+            setTimeout(() => {
+                form.submit();
+            }, 500);
+        });
+    });
+</script>
 @endsection

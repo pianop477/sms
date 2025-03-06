@@ -44,10 +44,39 @@
                 </div>
                 <div class="form-row">
                     <div class="col-md-6 mb-3">
-                        <button class="btn btn-success" type="submit">Save Changes</button>
+                        <button class="btn btn-success" id="saveButton" type="submit">Save Changes</button>
                     </div>
                     <div class="col-md-6 mb-3">
                         <a href="{{route('contract.index')}}" class="btn btn-secondary float-right"> Go Back</a>
                     </div>
                 </div>
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        const form = document.querySelector(".needs-validation");
+                        const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
+
+                        if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
+
+                        form.addEventListener("submit", function (event) {
+                            event.preventDefault(); // Zuia submission ya haraka
+
+                            // Disable button na badilisha maandishi
+                            submitButton.disabled = true;
+                            submitButton.innerHTML = "Updating...";
+
+                            // Hakikisha form haina errors kabla ya kutuma
+                            if (!form.checkValidity()) {
+                                form.classList.add("was-validated");
+                                submitButton.disabled = false; // Warudishe button kama kuna errors
+                                submitButton.innerHTML = "Save Changes";
+                                return;
+                            }
+
+                            // Chelewesha submission kidogo ili button ibadilike kwanza
+                            setTimeout(() => {
+                                form.submit();
+                            }, 500);
+                        });
+                    });
+                </script>
 @endsection

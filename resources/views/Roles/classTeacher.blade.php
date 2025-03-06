@@ -62,7 +62,7 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-success">Assign</button>
+                                        <button type="submit" class="btn btn-success" id="saveButton">Assign</button>
                                     </div>
                                 </div>
                             </form>
@@ -111,4 +111,33 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector(".needs-validation");
+        const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
+
+        if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Zuia submission ya haraka
+
+            // Disable button na badilisha maandishi
+            submitButton.disabled = true;
+            submitButton.innerHTML = "Saving...";
+
+            // Hakikisha form haina errors kabla ya kutuma
+            if (!form.checkValidity()) {
+                form.classList.add("was-validated");
+                submitButton.disabled = false; // Warudishe button kama kuna errors
+                submitButton.innerHTML = "Save";
+                return;
+            }
+
+            // Chelewesha submission kidogo ili button ibadilike kwanza
+            setTimeout(() => {
+                form.submit();
+            }, 500);
+        });
+    });
+</script>
 @endsection

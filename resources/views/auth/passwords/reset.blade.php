@@ -8,7 +8,7 @@
     <div class="login-area login-bg">
         <div class="container">
             <div class="login-box ptb--100">
-                <form method="POST" action="{{ route('password.update') }}">
+                <form method="POST" action="{{ route('password.update') }}" class="needs-validation" novalidate>
                     @csrf
                     <div class="login-form-head">
                         <h4>Reset Password</h4>
@@ -47,7 +47,7 @@
                         </div>
 
                         <div class="submit-btn-area">
-                            <button id="form_submit" type="submit">Reset Password <i class="ti-arrow-right"></i></button>
+                            <button id="saveButton" type="submit">Reset Password <i class="ti-arrow-right"></i></button>
                         </div>
                     </div>
                 </form>
@@ -58,6 +58,35 @@
 
     @include('SRTDashboard.script')
     @include('sweetalert::alert')
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector(".needs-validation");
+            const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
+
+            if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
+
+            form.addEventListener("submit", function (event) {
+                event.preventDefault(); // Zuia submission ya haraka
+
+                // Disable button na badilisha maandishi
+                submitButton.disabled = true;
+                submitButton.innerHTML = "Changing Password...";
+
+                // Hakikisha form haina errors kabla ya kutuma
+                if (!form.checkValidity()) {
+                    form.classList.add("was-validated");
+                    submitButton.disabled = false; // Warudishe button kama kuna errors
+                    submitButton.innerHTML = "Reset Password";
+                    return;
+                }
+
+                // Chelewesha submission kidogo ili button ibadilike kwanza
+                setTimeout(() => {
+                    form.submit();
+                }, 500);
+            });
+        });
+    </script>
 </body>
 
 </html>

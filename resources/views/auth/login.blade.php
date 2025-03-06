@@ -8,7 +8,7 @@
     <div class="login-area login-bg">
         <div class="container">
             <div class="login-box ptb--100">
-                <form method="POST" action="{{route('login')}}">
+                <form method="POST" action="{{route('login')}}" class="needs-validation" novalidate>
                     @csrf
                     <div class="login-form-head">
                         <h4>Sign In</h4>
@@ -53,7 +53,7 @@
                             @endif
                         </div>
                         <div class="submit-btn-area">
-                            <button id="form_submit" type="submit">Sign in <i class="ti-arrow-right"></i></button>
+                            <button id="saveButton" type="submit">Sign in <i class="ti-arrow-right"></i></button>
                         </div>
                         @if (Route::has('users.form'))
                         <div class="form-footer text-center mt-1">
@@ -78,6 +78,37 @@
                 }
             });
         }, 1000 * 60 * 5); // Angalia session kila baada ya dakika 5
+
+
+        // Disable button baada ya kubofya ili kuzuia double submission
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector(".needs-validation");
+            const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
+
+            if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
+
+            form.addEventListener("submit", function (event) {
+                event.preventDefault(); // Zuia submission ya haraka
+
+                // Disable button na badilisha maandishi
+                submitButton.disabled = true;
+                submitButton.innerHTML = "Please Wait...";
+
+                // Hakikisha form haina errors kabla ya kutuma
+                if (!form.checkValidity()) {
+                    form.classList.add("was-validated");
+                    submitButton.disabled = false; // Warudishe button kama kuna errors
+                    submitButton.innerHTML = "Sign In";
+                    return;
+                }
+
+                // Chelewesha submission kidogo ili button ibadilike kwanza
+                setTimeout(() => {
+                    form.submit();
+                }, 500);
+            });
+        });
+
     </script>
 
     @include('SRTDashboard.script')
