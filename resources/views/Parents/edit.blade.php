@@ -31,6 +31,18 @@
       </div>
     </div>
     <hr class="dark horizontal my-0">
+    <div class="card mt-1">
+        <h5 class="text-center">Student List</h5>
+        <div class="row">
+            @foreach ($students as $student)
+            <div class="col-4">
+                <p>Name: <span class="text-capitalize">{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}} - {{$student->gender}}</span></p>
+                <p>Class: <span class="text-uppercase">{{$student->class_name}} - {{$student->class_code}}</span></p>
+            </div>
+        @endforeach
+        </div>
+    </div>
+    <hr class="dark horizontal my-0">
     <div class="card mt-5">
         <div class="card-body">
             <h4 class="header-title">Update Parent's Details</h4>
