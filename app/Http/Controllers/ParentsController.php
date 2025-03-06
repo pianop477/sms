@@ -167,7 +167,6 @@ class ParentsController extends Controller
                 Alert()->toast('Parent and student information saved successfully', 'success');
                 return redirect()->route('Parents.index');
             }
-            else {
                 $url = "https://shuleapp.tech";
 
                 $nextSmsService = new NextSmsService();
@@ -176,6 +175,7 @@ class ParentsController extends Controller
                 $message .= " Username: {$users->phone}";
                 $message .= " Password: shule2025"; // Default password
                 $message .= " Visit {$url} to Login";
+
                 $reference = uniqid();
                 $formattedPhone = $this->formatPhoneNumber($users->phone);
 
@@ -190,7 +190,7 @@ class ParentsController extends Controller
 
                 Alert()->toast('Parent and student information saved successfully', 'success');
                 return redirect()->route('Parents.index');
-            }
+
         } catch (\Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
             return back();
