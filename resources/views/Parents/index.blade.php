@@ -95,14 +95,14 @@
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustomerUsername">Student Middle name</label>
-                                                    <input type="text" name="student_middle_name" class="form-control" id="validationCustomer02" value="{{old('student_middle_name')}}" placeholder="Student Middle Name" required="">
+                                                    <input type="text" name="student_middle_name" class="form-control" id="validationCustomer02" value="{{old('student_middle_name')}}" placeholder="" required="">
                                                     @error('student_middle_name')
                                                     <div class="text-danger">{{$message}}</div>
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustomerUsername">Student Last name</label>
-                                                    <input type="text" name="student_last_name" class="form-control" id="validationCustomer02" value="{{old('student_last_name')}}" placeholder="Student Last Name" required="">
+                                                    <input type="text" name="student_last_name" class="form-control" id="validationCustomer02" value="{{old('student_last_name')}}" placeholder="" required="">
                                                     @error('student_last_name')
                                                     <div class="text-danger">{{$message}}</div>
                                                     @enderror
@@ -177,7 +177,7 @@
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-6 mb-3">
-                                                    <label for="validationCustomerUsername">Student Photo</label>
+                                                    <label for="validationCustomerUsername">Photo <span class="text-sm text-danger">Maximum 512KB - Blue background</span></label>
                                                     <input type="file" name="passport" class="form-control" id="validationCustomer02" value="{{old('dob')}}" placeholder="Student Photo">
                                                     @error('passport')
                                                     <div class="text-danger">{{$message}}</div>
