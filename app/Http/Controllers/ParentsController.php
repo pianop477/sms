@@ -218,7 +218,7 @@ class ParentsController extends Controller
         }
 
         do {
-            $admissionNumber = mt_rand(1000, 9999);
+            $admissionNumber = str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
         } while (Student::where('admission_number', $admissionNumber)
                         ->where('status', 1)
                         ->where('school_id', $user->school_id)
