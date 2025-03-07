@@ -58,8 +58,8 @@
 
         <div class="card-footer text-center">
             <ul class="d-flex justify-content-center">
-                <li class="mr-3"><button type="submit" id="saveButton" class="btn btn-primary" onclick="return confirm('Are you sure you want to submit attendance? You will not able to make any changes')">Save</button></li>
-                <li><a href="{{route('today.attendance', ['student_class' => Hashids::encode($student_class->id)])}}" target="" class="btn btn-success">Check Today Report</a></li>
+                <li class="mr-3"><button type="submit" id="saveButton" class="btn btn-primary" onclick="return confirm('Are you sure you want to submit attendance? You will not able to make any changes')">Submit</button></li>
+                <li><a href="{{route('today.attendance', ['student_class' => Hashids::encode($student_class->id)])}}" target="_blank" class="btn btn-success">Check Today Report</a></li>
             </ul>
         </div>
     </form>
@@ -76,13 +76,13 @@
 
                 // Disable button na badilisha maandishi
                 submitButton.disabled = true;
-                submitButton.innerHTML = "Saving...";
+                submitButton.innerHTML = "Sending.....";
 
                 // Hakikisha form haina errors kabla ya kutuma
                 if (!form.checkValidity()) {
                     form.classList.add("was-validated");
                     submitButton.disabled = false; // Warudishe button kama kuna errors
-                    submitButton.innerHTML = "Save";
+                    submitButton.innerHTML = "Submit";
                     return;
                 }
 

@@ -113,7 +113,7 @@
                 <h4>{{_("the president's office - ralg")}}</h4>
             </div>
             <div class="logo">
-                <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 80px;">
+                <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 70px;">
             </div>
             <div class="header">
                 <h3>{{ Auth::user()->school->school_name }}</h3>

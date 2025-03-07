@@ -57,7 +57,7 @@
         }
         .logo {
             position: absolute;
-            width: 50px;
+            width: 70px;
             left: 7px;
             top: 20px;
             color: inherit;
@@ -67,7 +67,7 @@
             position: relative;
             top: 0;
             left: 40px;
-            margin-bottom: 10px;
+            /* margin-bottom: 10px; */
             text-transform: uppercase;
             font-size: 24px;
             color: #343a40;
