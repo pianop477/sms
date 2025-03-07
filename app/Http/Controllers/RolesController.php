@@ -6,8 +6,11 @@ use App\Events\PasswordResetEvent;
 use App\Models\Class_teacher;
 use App\Models\Grade;
 use App\Models\Role;
+use App\Models\school;
 use App\Models\Teacher;
 use App\Models\User;
+use App\Services\BeemSmsService;
+use App\Services\NextSmsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -154,6 +157,7 @@ class RolesController extends Controller
         $users = User::findOrFail($id[0]);
         $loggedUser = Auth::user();
 
+        $school = school::findOrFail($loggedUser->school_id);
         if($users->school_id != $loggedUser->school_id) {
             Alert()->toast('You are not authorized to perform this action', 'error');
             return back();
@@ -163,8 +167,43 @@ class RolesController extends Controller
         $users->save();
         //dispatch event to logout user after password reset
         event(new PasswordResetEvent($user));
+
+        //notify via SMS after password reset
+        $nextSmsService = new NextSmsService();
+        $link = "https://shuleapp.tech";
+
+        $senderId = $school->sender_id ?? "SHULE APP";
+        $message = "Your password has been reset to (shule2025). Kindly visit {$link} login to your account and change your password.";
+        $destination = $this->formatPhoneNumber($users->phone);
+        $reference = uniqid();
+        $payload = [
+            'from' => $senderId,
+            'to' => $destination,
+            'text' => $message,
+            'reference' => $reference,
+        ];
+        // dd($payload);
+
+        $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+
         Alert()->toast('Password reset successfully', 'success');
         return back();
+    }
+
+
+    private function formatPhoneNumber($phone)
+    {
+        // Remove any non-numeric characters
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+
+        // Ensure the number starts with the country code (e.g., 255 for Tanzania)
+        if (strlen($phone) == 9) {
+            $phone = '255' . $phone;
+        } elseif (strlen($phone) == 10 && substr($phone, 0, 1) == '0') {
+            $phone = '255' . substr($phone, 1);
+        }
+
+        return $phone;
     }
 
     /**

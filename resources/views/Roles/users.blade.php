@@ -18,7 +18,7 @@
                                     <th scope="col">#</th>
                                     <th scope="col">Username</th>
                                     <th>User Type</th>
-                                    <th scope="col">Email</th>
+                                    <th scope="col">Phone</th>
                                     <th scope="col">status</th>
                                     <th scope="col">Action</th>
                                 </tr>
@@ -37,7 +37,7 @@
                                                 <span class="badge bg-primary text-white">Parent</span>
                                             </td>
                                         @endif
-                                        <td class="">{{$user->email}}</td>
+                                        <td class="">{{$user->phone}}</td>
                                         @if ($user->status == 1)
                                             <td>
                                                 <span class="badge bg-success text-white">Active</span>

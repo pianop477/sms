@@ -232,7 +232,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
             Route::post('Upload/results', [ExamController::class, 'storeScore'])->name('exams.store.score');
             Route::get('/Results-saved', [ExamController::class, 'savedDataForm'])->name('form.saved.values');
             //teachers  examination results =============================
-            Route::get('course{id}/Results', [ExamController::class, 'courseResults'])->name('results_byCourse');
+            Route::get('course/{id}/Results', [ExamController::class, 'courseResults'])->name('results_byCourse');
             Route::get('/Results/course/{course}/&year/{year}', [ExamController::class, 'resultByYear'])->name('results.byYear');
             Route::get('/Results/course/{course}/&year/{year}/&examination/{examType}', [ExamController::class, 'resultByExamType'])->name('results.byExamType');
             Route::get('/Results/course/{course}/&year/{year}/&examination/{examType}/{month}', [ExamController::class, 'resultByMonth'])->name('results.byMonth');
