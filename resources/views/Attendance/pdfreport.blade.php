@@ -57,7 +57,7 @@
         }
         .logo {
             position: absolute;
-            width: 50px;
+            width: 70px;
             left: 7px;
             top: 20px;
             color: inherit;
@@ -67,7 +67,7 @@
             position: relative;
             top: 0;
             left: 40px;
-            margin-bottom: 10px;
+            /* margin-bottom: 10px; */
             text-transform: uppercase;
             font-size: 24px;
             color: #343a40;
@@ -121,7 +121,7 @@
             <div class="card-body">
                 <div class="container">
                     <div class="logo">
-                        <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 80px;">
+                        <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 70px;">
                     </div>
                     <div class="header">
                         <h4 class="text-uppercase">{{Auth::user()->school->school_name}}</h4>

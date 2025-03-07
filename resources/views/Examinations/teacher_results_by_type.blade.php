@@ -58,7 +58,7 @@
         }
         .logo {
             position: absolute;
-            width: 50px;
+            width: 70px;
             left: 7px;
             top: 5px;
             color: inherit;
@@ -122,7 +122,7 @@
 <body>
     <div class="container">
         <div class="logo">
-            <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 100px;">
+            <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 70px;">
         </div>
         <div class="header">
             <h3>{{_('the united republic of tanzania')}}</h3>

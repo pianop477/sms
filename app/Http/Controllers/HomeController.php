@@ -352,6 +352,7 @@ class HomeController extends Controller
                 'fname' => 'required|string|max:255',
                 'lname' => 'required|string|max:255',
                 'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,' . $userData->id,
+                'gender' => 'required|In:female,male',
                 'image' => 'nullable|image|mimes:jpg,png,jpeg|max:512',
             ]);
 

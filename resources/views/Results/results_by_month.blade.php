@@ -61,7 +61,7 @@
         }
         .logo {
             position: absolute;
-            width: 50px;
+            width: 70px;
             left: 7px;
             top: 5px;
             color: inherit;
@@ -73,12 +73,12 @@
             left: 40px;
             text-transform: uppercase;
             line-height: 1px;
-            margin-bottom: 10px;
+            /* margin-bottom: 10px; */
             font-size: 24px;
             color: #343a40;
         }
         .summary-header {
-            margin-top: 5px;
+            margin-top: 2px;
             text-align: center;
             text-transform: capitalize;
             font-size: 20px;

@@ -75,7 +75,7 @@
             line-height: 1px;
         }
         .summary-header {
-            margin-top: 5px;
+            margin-top: 3px;
             text-align: center;
             text-transform: capitalize;
             font-size: 20px;
@@ -151,7 +151,7 @@
             <div class="card-body">
                 <div class="container">
                     <div class="logo">
-                        <img src="{{public_path('assets/img/logo/'.$results->first()->logo)}}" alt="" style="max-width: 100px;">
+                        <img src="{{public_path('assets/img/logo/'.$results->first()->logo)}}" alt="" style="max-width: 70px;">
                     </div>
                     <div class="header" style="">
                         <h3>united republic of tanzania</h3>

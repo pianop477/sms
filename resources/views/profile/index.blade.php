@@ -93,6 +93,17 @@
                     @error('phone')<span class="text-danger text-sm">{{$message}}</span>@enderror
                 </div>
                 <div class="">
+                    <label class="form-label">Gender</label>
+                    <div class="input-group input-group-outline mb-3">
+                        <select name="gender" id="" class="form-control text-capitalize">
+                            <option value="{{$user->gender}}">{{$user->gender}}</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+                    @error('gender')<span class="text-danger text-sm">{{$message}}</span>@enderror
+                </div>
+                <div class="">
                     <label class="form-label">Photo: <span class="text-danger text-sm">Maximum 512KB</span></label>
                     <div class="input-group input-group-outline mb-3">
                         <input type="file" name="image" class="form-control" value="">

@@ -130,7 +130,7 @@ class AttendanceController extends Controller
             // Alert::error('Error', 'Attendance already taken and Submitted.');
             Alert()->toast('Attendance already taken and Submitted', 'error');
             // return redirect()->route('get.student.list', $student_class);
-            return redirect()->route('home');
+            return back();
         }
 
         // Save the attendance data
@@ -153,7 +153,7 @@ class AttendanceController extends Controller
 
         // Alert::success('Success', 'Attendance Submitted and Saved successfully');
         Alert()->toast('Attendance Submitted and Saved successfully', 'success');
-        return redirect()->back();
+        return redirect()->route('home');
     }
 
     public function show($student, $year)
