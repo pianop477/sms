@@ -7,17 +7,23 @@
             <p><a href="{{route('home')}}" class="btn btn-primary btn-sm">Go Back</a></p>
         </div>
     @else
-    <p class="text-center text-danger">Attendance Date: {{\Carbon\Carbon::now()->format('d-m-Y')}}</p>
+    {{-- <p class="text-center text-danger">Attendance Date: {{\Carbon\Carbon::now()->format('d-m-Y')}}</p> --}}
     <form action="{{ route('store.attendance', ['student_class' => Hashids::encode($student_class->id)]) }}" method="POST" enctype="multipart/form-data" onsubmit="showPreloader()" class="needs-validation" novalidate>
         @csrf
+        <div class="col-md-3 float-right">
+           Date: <input type="date" name="attendance_date" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}" class="form-control" required>
+           @error('attendance_date')
+               <div class="text-danger">{{$message}}</div>
+           @enderror
+        </div>
         <div class="single-table">
             <div class="table-responsive-lg">
                 <table class="table">
                     <thead class="text-capitalize bg-info">
                         <tr class="text-white">
-                            <th scope="col" style="width: 5px;">AdmNo.</th>
+                            <th scope="col" style="width: auto;">AdmNo.</th>
                             <th scope="col">Name</th>
-                            <th scope="col">Sex</th>
+                            <th scope="col" class="text-center">Sex</th>
                             <th scope="col" colspan="3" class="text-center">Attendance Status</th>
                         </tr>
                     </thead>

@@ -42,7 +42,7 @@
                                         <td class="text-uppercase">{{$student->gender[0]}}</td>
                                         <td class="text-uppercase">{{$student->class_code}}</td>
                                         <td class="text-uppercase">{{$student->group}}</td>
-                                        <td>{{$student->phone}}</td>
+                                        <td>{{$student->parent_phone}}</td>
                                         <td class="text-capitalize">{{$student->address}}</td>
                                     </tr>
                                 @endforeach

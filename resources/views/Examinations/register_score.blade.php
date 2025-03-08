@@ -90,7 +90,7 @@
                                         @foreach ($students as $student)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
-                                                <td class="text-center">
+                                                <td class="text-center text-uppercase">
                                                     {{ $student->admission_number }}
                                                     <input type="hidden" name="students[{{ $loop->index }}][student_id]" value="{{ $student->id }}">
                                                 </td>
@@ -111,7 +111,7 @@
                             <hr>
                             <ul class="d-flex justify-content-center my-3">
                                 <li class="mr-3">
-                                    <button type="button" class="btn btn-danger" id="saveToLocalStorage saveToLocal">Save</button>
+                                    <button type="button" class="btn btn-danger" id="saveToLocalStorage">Save</button>
                                 </li>
                                 <li>
                                     <button type="submit" class="btn btn-primary" id="saveButton" onclick="return confirm('Are you sure you want to submit the results? You will not be able to make any changes after submission')">Submit</button>
