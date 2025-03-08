@@ -17,10 +17,7 @@
             .no-print {
                 display: none;
             }
-            h1, h2, h4, h5, h6 {
-                text-transform: uppercase;
-                text-align: center
-            }
+
             .print-only {
                 display: block;
             }
@@ -59,18 +56,14 @@
             position: absolute;
             width: 70px;
             left: 7px;
-            top: 20px;
+            top: 5px;
             color: inherit;
         }
-        .header {
+        .header h4, .header h5, .header h6 {
+            margin: 2px 0; /* Kupunguza nafasi juu na chini */
+            line-height: 1.2; /* Kufanya mistari iwe karibu */
             text-align: center;
-            position: relative;
-            top: 0;
-            left: 40px;
-            /* margin-bottom: 10px; */
             text-transform: uppercase;
-            font-size: 24px;
-            color: #343a40;
         }
         .table {
             width: 100%;
@@ -139,17 +132,17 @@
                         </div>
                     </div>
                 @else
-                <p>Bus Routine: <span style="font-weight: bold; text-transform:uppercase">{{$transport->routine}}</span></p>
+                <p style="margin-top: 30px">Bus Routine: <span style="font-weight: bold; text-transform:uppercase">{{$transport->routine}}</span></p>
                 <table class="table">
                     <thead>
                         <tr>
                             <th>#</th>
                             <th>Student Name</th>
                             <th>Gender</th>
-                            <th>Class Name</th>
+                            <th>Class</th>
                             <th>Stream</th>
                             <th>Street</th>
-                            <th>Parent Phone</th>
+                            <th>Phone</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -161,7 +154,7 @@
                                 <td style="text-transform:uppercase; text-align:center">{{ $student->class_code}}</td>
                                 <td style="text-transform:uppercase; text-align:center">{{ $student->group}}</td>
                                 <td class="" style="text-transform: capitalize">{{ $student->address }}</td>
-                                <td>{{$student->phone}}</td>
+                                <td>{{$student->parent_phone}}</td>
                             </tr>
                         @endforeach
                     </tbody>

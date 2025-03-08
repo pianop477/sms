@@ -207,22 +207,22 @@ class TransportController extends Controller
         $id = Hashids::decode($trans);
         $transport = Transport::find($id[0]);
         $user = Auth::user();
-        $students = Student::query()->join('grades', 'grades.id', '=', 'students.class_id')
-                                    ->join('parents', 'parents.id', '=', 'students.parent_id')
-                                    ->leftJoin('users', 'users.id', '=', 'parents.user_id')
-                                    ->join('transports', 'transports.id', '=', 'students.transport_id')
-                                    ->select(
-                                        'students.*',
-                                        'grades.id as class_id', 'grades.class_name', 'grades.class_code',
-                                        'parents.address', 'users.phone', 'transports.driver_name',
-                                        'transports.phone', 'transports.bus_no'
-
-                                    )
-                                    ->where('students.transport_id', $transport->id)
-                                    ->where('students.status', 1)
-                                    ->where('students.school_id', $user->school_id)
-                                    ->orderBy('students.first_name')
-                                    ->get();
+        $students = Student::query()
+                            ->join('grades', 'grades.id', '=', 'students.class_id')
+                            ->join('parents', 'parents.id', '=', 'students.parent_id')
+                            ->leftJoin('users as parent_user', 'parent_user.id', '=', 'parents.user_id')
+                            ->join('transports', 'transports.id', '=', 'students.transport_id')
+                            ->select(
+                                'students.*',
+                                'grades.id as class_id', 'grades.class_name', 'grades.class_code',
+                                'parents.address', 'parent_user.phone as parent_phone', // Hapa tumebadilisha alias ya phone
+                                'transports.driver_name', 'transports.phone', 'transports.bus_no'
+                            )
+                            ->where('students.transport_id', $transport->id)
+                            ->where('students.status', 1)
+                            ->where('students.school_id', $user->school_id)
+                            ->orderBy('students.first_name')
+                            ->get();
         return view('Transport.students', compact('students', 'transport'));
     }
 
@@ -235,18 +235,18 @@ class TransportController extends Controller
         $students = Student::query()
                             ->join('grades', 'grades.id', '=', 'students.class_id')
                             ->join('parents', 'parents.id', '=', 'students.parent_id')
-                            ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+                            ->leftJoin('users as parent_user', 'parent_user.id', '=', 'parents.user_id')
                             ->join('transports', 'transports.id', '=', 'students.transport_id')
                             ->select(
                                 'students.*',
-                                'parents.address', 'users.phone',
-                                'grades.class_name', 'grades.class_code', 'transports.driver_name',
-                                'transports.phone', 'transports.bus_no', 'transports.routine'
+                                'grades.id as class_id', 'grades.class_name', 'grades.class_code',
+                                'parents.address', 'parent_user.phone as parent_phone', // Hapa tumebadilisha alias ya phone
+                                'transports.driver_name', 'transports.phone', 'transports.bus_no'
                             )
                             ->where('students.transport_id', $transport->id)
                             ->where('students.status', 1)
                             ->where('students.school_id', $user->school_id)
-                            ->orderBy('first_name')
+                            ->orderBy('students.first_name')
                             ->get();
         $pdf = \PDF::loadView('Transport.export', compact('students', 'transport'));
         return $pdf->stream($transport->driver_name. ' students.pdf');

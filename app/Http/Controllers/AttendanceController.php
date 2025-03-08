@@ -73,7 +73,7 @@ class AttendanceController extends Controller
 
         $class = Grade::findOrFail($id[0]);
         $class_id = $class->id;
-        $attendanceDate = date('Y-m-d');
+        $attendanceDate = $request->input('attendance_date');
         $logged_user = Auth::user();
         $teacher = Teacher::where('user_id', '=', $logged_user->id)->firstOrFail();
 
@@ -97,6 +97,7 @@ class AttendanceController extends Controller
         $validator = Validator::make($request->all(), [
             'student_id' => 'required|array',
             'student_id.*' => 'required|integer|exists:students,id',
+            'attendance_date' => 'required|date_format:Y-m-d',
             'attendance_status' => 'required|array',
             'attendance_status.*' => 'required|in:present,absent,permission',
         ], [

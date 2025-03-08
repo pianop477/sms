@@ -433,7 +433,7 @@
         <div class="col-lg-4 mt-2 mb-3">
             <div class="card">
                 <div class="card-title mt-2">
-                    <h6 class="text-center">Today's Attendance Report: {{\Carbon\Carbon::parse($today)->format('d-m-Y')}}</h6>
+                    <h6 class="text-center">Today's Attendance: {{\Carbon\Carbon::parse($today)->format('d-m-Y')}}</h6>
                 </div>
                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>

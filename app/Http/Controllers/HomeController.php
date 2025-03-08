@@ -359,6 +359,7 @@ class HomeController extends Controller
             $userData->first_name = $request->fname;
             $userData->last_name = $request->lname;
             $userData->phone = $request->phone;
+            $userData->gender = $request->gender;
 
             if ($request->hasFile('image')) {
                 $image = $request->file('image');

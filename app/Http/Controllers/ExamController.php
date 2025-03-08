@@ -173,7 +173,8 @@ class ExamController extends Controller
                                             ->exists();
 
             if ($existingRecord) {
-                Alert::error('Error!', 'Examination Results already submitted for this Course');
+                // Alert::error('Error!', 'Examination Results already submitted for this Course');
+                Alert::toast('Examination Results already submitted for this Course', 'error');
                 return redirect()->route('score.prepare.form', Hashids::encode($courseId));
             } else {
                 // Create a new examination result entry
@@ -192,7 +193,8 @@ class ExamController extends Controller
             }
         }
 
-        Alert::success('Success!', 'Examination results have been submitted successfully');
+        // Alert::success('Success!', 'Examination results have been submitted successfully');
+        Alert::toast('Examination results have been submitted successfully', 'success');
         return redirect()->route('score.prepare.form', Hashids::encode($courseId));
         // return redirect()->route('home');
     }
@@ -211,7 +213,8 @@ class ExamController extends Controller
 
         $existingRecords = Examination::where('exam_type', '=', $request->name)->where('symbolic_abbr', $request->abbreviation)->where('school_id', '='. Auth::user()->school_id)->exists();
         if($existingRecords) {
-            Alert::error('Error!', 'The Examination type already Exists');
+            // Alert::error('Error!', 'The Examination type already Exists');
+            Alert::toast('The Examination type already Exists', 'error');
             return back();
         }
 
@@ -220,7 +223,8 @@ class ExamController extends Controller
         $exams->symbolic_abbr = $request->abbreviation;
         $exams->school_id = Auth::user()->school_id;
         $exams->save();
-        Alert::success('Success!', 'Exmination test Saved successfully');
+        // Alert::success('Success!', 'Exmination test Saved successfully');
+        Alert::toast('Examination test Saved successfully', 'success');
         return back();
     }
 
@@ -233,7 +237,8 @@ class ExamController extends Controller
         $exams = Examination::findOrFail($exam);
         $exams->status = $request->input('status', 1);
         $exams->save();
-        Alert::success('Success!', 'Examination test Unblocked successfully');
+        // Alert::success('Success!', 'Examination test Unblocked successfully');
+        Alert::toast('Examination test Unblocked successfully', 'success');
         return back();
     }
 
@@ -259,7 +264,8 @@ class ExamController extends Controller
         $exam->exam_type = $request->name;
         $exam->symbolic_abbr = $request->abbreviation;
         $exam->save();
-        Alert::success('Success!', 'Examination test updated successfully');
+        // Alert::success('Success!', 'Examination test updated successfully');
+        Alert::toast('Examination test updated successfully', 'success');
         return redirect()->route('exams.index');
     }
 
@@ -270,7 +276,8 @@ class ExamController extends Controller
         $exams = Examination::findOrFail($exam);
         $exams->status = $request->input('status', 0);
         $exams->save();
-        Alert::success('Success!', 'Examination test Blocked successfully');
+        // Alert::success('Success!', 'Examination test Blocked successfully');
+        Alert::toast('Examination test Blocked successfully', 'success');
         return back();
 
     }
