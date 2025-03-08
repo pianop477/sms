@@ -28,12 +28,12 @@
                 @else
                     <div class="single-table">
                         <div class="table-responsive">
-                            <table class="table table-hover table-responsive-md text-center">
+                            <table class="table table-hover table-responsive-md">
                                 <thead class="text-uppercase">
                                     <tr class="">
                                         <th scope="col">No</th>
-                                        <th scope="col">Subject</th>
-                                        <th scope="col">code</th>
+                                        <th scope="col" class="">Subject</th>
+                                        <th scope="col" class="">code</th>
                                         <th scope="col">Subject Teacher Name</th>
                                         <th scope="col">Teacher's Phone</th>
                                     </tr>
@@ -44,9 +44,23 @@
                                             <td>{{ $loop->iteration }}</td>
                                             <td class="text-capitalize">{{ $course->course_name }}</td>
                                             <td class="text-uppercase">{{ $course->course_code }}</td>
-                                            <td class="text-capitalize">{{ $course->first_name }} {{ $course->last_name }}</td>
-                                            <td>
-                                                {{$course->phone}}
+                                            <td class="d-flex align-items-center">
+                                                @if (!empty($course->image) && file_exists(public_path('assets/img/profile/' . $course->image)))
+                                                    <img src="{{ asset('assets/img/profile/' . $course->image) }}"
+                                                         alt="Profile Picture"
+                                                         class="rounded-circle"
+                                                         style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px;">
+                                                @else
+                                                    <i class="fas fa-user-tie rounded-circle bg-secondary d-flex justify-content-center align-items-center"
+                                                       style="width: 40px; height: 40px; font-size: 20px; color: white;"></i>
+                                                @endif
+                                                >> <span class="text-capitalize ms-2">{{ $course->first_name }} {{ $course->last_name }}</span>
+                                            </td>
+                                            <td class="">
+                                                <i class="fas fa-phone"></i>
+                                                <a href="tel:{{ $course->teacher_phone }}" class="text-decoration-none text-dark">
+                                                    {{ $course->teacher_phone }}
+                                                </a>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -62,7 +76,7 @@
     <div class="col-sm-4 mt-5">
         <div class="card" style="background: #e696d5;">
             <div class="card-body">
-                <h5 class="text-center text-uppercase">Class Teacher Particulars</h5>
+                <h5 class="text-center text-uppercase">Class Teacher Details</h5>
                 <hr>
 
                 @if ($myClassTeacher->isEmpty())
@@ -86,23 +100,21 @@
                                     </span>
                                 </li>
                                 <li class="list-group-item">Gender:
-                                    <span class="text-uppercase font-weight-bold">
-                                        {{ $classTeacher->gender[0] }}
+                                    <span class="text-capitalize font-weight-bold">
+                                        {{ $classTeacher->gender }}
                                     </span>
                                 </li>
                                 <li class="list-group-item">Phone:
                                     <span class="text-uppercase font-weight-bold">
-                                        {{ $classTeacher->phone }}
+                                        <i class="fas fa-phone"></i>
+                                        <a href="tel:{{ $classTeacher->phone }}" class="text-decoration-none text-dark">
+                                            {{ $classTeacher->phone }}
+                                        </a>
                                     </span>
                                 </li>
                                 <li class="list-group-item">Class:
                                     <span class="text-uppercase font-weight-bold">
-                                        {{ $classTeacher->class_name }}
-                                    </span>
-                                </li>
-                                <li class="list-group-item">Stream:
-                                    <span class="text-uppercase font-weight-bold">
-                                        {{ $classTeacher->group }}
+                                        {{ $classTeacher->class_name }} - {{ $classTeacher->group }}
                                     </span>
                                 </li>
                             </ul>

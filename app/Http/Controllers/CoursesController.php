@@ -317,7 +317,7 @@ class CoursesController extends Controller
                                             ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
                                             ->select(
                                                 'class_learning_courses.*', 'grades.class_name', 'subjects.course_name', 'subjects.course_code',
-                                                'users.first_name', 'users.last_name', 'users.phone'
+                                                'users.first_name', 'users.last_name', 'users.phone as teacher_phone', 'users.image'
                                             )
                                             ->where('class_learning_courses.class_id', $class->id)
                                             ->where('class_learning_courses.school_id', $user->school_id)
