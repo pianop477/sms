@@ -11,7 +11,10 @@
     <form action="{{ route('store.attendance', ['student_class' => Hashids::encode($student_class->id)]) }}" method="POST" enctype="multipart/form-data" onsubmit="showPreloader()" class="needs-validation" novalidate>
         @csrf
         <div class="col-md-3 float-right">
-           Date: <input type="date" name="attendance_date" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}" class="form-control" required>
+           Date: <input type="date" name="attendance_date" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}"
+                max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}"
+                min="{{ \Carbon\Carbon::now()->subWeek()->format('Y-m-d') }}" class="form-control"
+                required>
            @error('attendance_date')
                <div class="text-danger">{{$message}}</div>
            @enderror
