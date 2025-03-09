@@ -1,5 +1,6 @@
 <!doctype html>
 <html class="no-js" lang="en">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 @include('SRTDashboard.header')
 <body>
     @include('SRTDashboard.preloader')
@@ -157,7 +158,7 @@
 
                 // Disable button na badilisha maandishi
                 submitButton.disabled = true;
-                submitButton.innerHTML = `<span class="spinner-border text-white" role="status" aria-hidden="true"></span> Please Wait...`;
+                submitButton.innerHTML = `<span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span> Please Wait...`;
 
                 // Hakikisha form haina errors kabla ya kutuma
                 if (!form.checkValidity()) {
