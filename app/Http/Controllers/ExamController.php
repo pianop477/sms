@@ -309,7 +309,9 @@ class ExamController extends Controller
     public function courseResults($id)
     {
         $decoded = Hashids::decode($id);
+        // return $decoded;
         $user = Auth::user();
+        $loggedTeacher = Teacher::where('user_id', $user->id)->first(); //get teacher id from the logged in user
         $class_course = class_learning_courses::find($decoded[0]);
         // return $class_course;
 
@@ -318,9 +320,14 @@ class ExamController extends Controller
             return back();
         }
 
+        if($class_course->teacher_id != $loggedTeacher->id) {
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return back();
+        }
+
         $results = Examination_result::where('course_id', $class_course->course_id)
                                         ->where('class_id', $class_course->class_id)
-                                        ->where('teacher_id', $class_course->teacher_id)
+                                        ->where('teacher_id', $loggedTeacher->id)
                                         ->where('school_id', $user->school_id)
                                         ->orderBy('exam_date', 'DESC')
                                         ->get();
@@ -339,19 +346,25 @@ class ExamController extends Controller
         $id = Hashids::decode($course);
         $user = Auth::user();
         $courses = Subject::find($id[0]);
+        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
         if(! $courses) {
             Alert()->toast('No such course was found', 'error');
             return back();
         }
         // return ['data' => $courses];
         $class_course = class_learning_courses::where('course_id', $courses->id)->first();
+
+        if($class_course->teacher_id != $loggedTeacher->id) {
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return back();
+        }
         // return ['data' => $class_course];
         $results = Examination_result::query()
                     ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
                     ->select('examination_results.*', 'examinations.exam_type')
                     ->where('course_id', $class_course->course_id)
                     ->where('class_id', $class_course->class_id)
-                    ->where('teacher_id', $class_course->teacher_id)
+                    ->where('teacher_id', $loggedTeacher->id)
                     ->whereYear('exam_date', $year)
                     ->where('examination_results.school_id', $user->school_id)
                     ->orderBy('examination_results.exam_date', 'DESC')
@@ -373,10 +386,17 @@ class ExamController extends Controller
         $exam_id = Hashids::decode($examType);
         $user = Auth::user();
         $class_course = class_learning_courses::where('course_id', $course_id[0])->first();
+
+        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
+
+        if($class_course->teacher_id != $loggedTeacher->id) {
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return back();
+        }
         // return ['data' => $class_course];
         $results = Examination_result::where('course_id', $class_course->course_id)
                                 ->where('class_id', $class_course->class_id)
-                                ->where('teacher_id', $class_course->teacher_id)
+                                ->where('teacher_id', $loggedTeacher->id)
                                 ->whereYear('exam_date', $year)
                                 ->where('exam_type_id', $exam_id[0])
                                 ->where('school_id', $user->school_id)

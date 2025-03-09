@@ -8,7 +8,7 @@
                         <h4 class="header-title text-center text-uppercase">Select Month - to get Results for {{$year}}</h4>
                     </div>
                     <div class="col-2">
-                        <a href="{{ route('result.byType', ['student' => $students->id, 'year' => $year]) }}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                        <a href="{{ route('result.byType', ['student' => Hashids::encode($students->id), 'year' => $year]) }}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
                     </div>
                 </div>
                 <div class="list-group">

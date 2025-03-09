@@ -6,10 +6,10 @@
                     <!-- Logo itaonekana kwenye skrini kubwa pekee -->
                     <img src="{{asset('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" class="rounded-circle d-none d-md-inline" style="max-width:50px; object-fit:cover; border-radius: 50px;">
                     <!-- Jina la shule litabaki kwa skrini ndogo na kubwa -->
-                    <a href="{{route('home')}}" class="navbar-brand font-weight-bold text-capitalize d-block text-center d-md-none" style="font-size: 28px;">
+                    <a href="{{route('home')}}" class="navbar-brand font-weight-bold text-capitalize d-block text-center d-md-none" style="font-size: 25px;">
                         {{ Auth::user()->school->school_name }}
                     </a>
-                    <a href="{{route('home')}}" class="navbar-brand font-weight-bold text-capitalize d-none d-md-inline" style="font-size: 28px;">{{ Auth::user()->school->school_name }}</a>
+                    <a href="{{route('home')}}" class="navbar-brand font-weight-bold text-capitalize d-none d-md-inline" style="font-size: 25px;">{{ Auth::user()->school->school_name }}</a>
                 @else
                     <img src="{{asset('assets/img/logo/logo.png')}}" alt="" class="rounded-circle d-none d-md-inline" style="max-width:50px; object-fit:cover; border-radius: 50px;">
                     <a href="{{route('home')}}" class="navbar-brand font-weight-bold d-inline d-md-none" style="font-size: 20px;">ShuleApp - Admin</a>

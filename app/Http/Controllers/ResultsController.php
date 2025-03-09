@@ -800,7 +800,7 @@ class ResultsController extends Controller
                 $studentsData = $studentsData->map(fn($student, $index) => tap($student, fn($s) => $s->rank = $index + 1));
 
                 // URL ya shule
-                $url = "shuleapp.tech";
+                $url = "https://shuleapp.tech";
 
                 //find total of students
                 $totalStudents = $studentsData->count();
@@ -830,7 +830,7 @@ class ResultsController extends Controller
 
                     // Send SMS to each parent individually using Beem API
                     $source_Addr = $school->sender_id ?? 'shuleApp';
-                    $beemSmsService->sendSms($source_Addr, $messageContent, $recipients);
+                    // $beemSmsService->sendSms($source_Addr, $messageContent, $recipients);
 
                     // send by using nextSMS API *************************************
                     $nextSmsService = new NextSmsService();
@@ -841,12 +841,12 @@ class ResultsController extends Controller
                         'reference' => $student->student_id
                     ];
 
-                    // $response = $nextSmsService->sendSmsByNext(
-                    //     $payload['from'],
-                    //     $payload['to'],
-                    //     $payload['text'],
-                    //     $payload['reference']
-                    // );
+                    $response = $nextSmsService->sendSmsByNext(
+                        $payload['from'],
+                        $payload['to'],
+                        $payload['text'],
+                        $payload['reference']
+                    );
                 }
 
                 // return response()->json($response);
@@ -1227,7 +1227,7 @@ class ResultsController extends Controller
             ];
 
             //send sms by Beem API
-            $response = $beemSmsService->sendSms($sourceAddr, $messageContent, $recipients);
+            // $response = $beemSmsService->sendSms($sourceAddr, $messageContent, $recipients);
 
             // send sms via NextSMS API ************************************************************
             $nextSmsService = new NextSmsService();
