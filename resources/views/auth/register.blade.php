@@ -73,7 +73,7 @@
                                 <input type="password" id="exampleInputPassword1" name="password" placeholder="Password" class="form-control">
                                 <div class="input-group-append">
                                     <span class="input-group-text toggle-password" data-target="exampleInputPassword1">
-                                        <i class="fa fa-eye"></i>
+                                        <i class="ti-eye"></i>
                                     </span>
                                 </div>
                             </div>
@@ -89,7 +89,7 @@
                                 <input type="password" id="exampleInputPassword2" name="password_confirmation" placeholder="Repeat Password" class="form-control">
                                 <div class="input-group-append">
                                     <span class="input-group-text toggle-password" data-target="exampleInputPassword2">
-                                        <i class="fa fa-eye"></i>
+                                        <i class="ti-eye"></i>
                                     </span>
                                 </div>
                             </div>
@@ -133,7 +133,7 @@
                                 this.innerHTML = '<i class="fa fa-eye-slash"></i>';
                             } else {
                                 input.type = "password";
-                                this.innerHTML = '<i class="fa fa-eye"></i>';
+                                this.innerHTML = '<i class="ti-eye"></i>';
                             }
                         });
                     });
@@ -157,7 +157,7 @@
 
                 // Disable button na badilisha maandishi
                 submitButton.disabled = true;
-                submitButton.innerHTML = "Saving...";
+                submitButton.innerHTML = `<span class="spinner-border text-white" role="status" aria-hidden="true"></span> Please Wait...`;
 
                 // Hakikisha form haina errors kabla ya kutuma
                 if (!form.checkValidity()) {

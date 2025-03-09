@@ -11,6 +11,12 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <style>
     /* Navbar customization */
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
     .navbar-custom {
       background-color: #ccdfee;
       color: rgb(39, 75, 109);
@@ -80,12 +86,15 @@
     }
 
     .section {
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 20px; /* Epuka mambo ya margin kuathiri urefu */
+        box-sizing: border-box;
     }
+
 
     .bg-light {
       background-color: #f8f9fa;
@@ -278,12 +287,42 @@
                   <div class="text-danger">{{$message}}</div>
               @enderror
             </div>
-            <button type="submit" class="btn btn-primary">Send Message</button>
+            <button type="submit" id="saveButton" class="btn btn-primary">Send Message</button>
           </form>
         </div>
       </div>
     </div>
   </section>
   @include('sweetalert::alert')
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.querySelector(".needs-validation");
+        const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
+
+        if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Zuia submission ya haraka
+
+            // Disable button na badilisha maandishi
+            submitButton.disabled = true;
+            submitButton.innerHTML = `<span class="spinner-border text-white" role="status" aria-hidden="true"></span> Please Wait...`;
+
+            // Hakikisha form haina errors kabla ya kutuma
+            if (!form.checkValidity()) {
+                form.classList.add("was-validated");
+                submitButton.disabled = false; // Warudishe button kama kuna errors
+                submitButton.innerHTML = "Send Message";
+                return;
+            }
+
+            // Chelewesha submission kidogo ili button ibadilike kwanza
+            setTimeout(() => {
+                form.submit();
+            }, 500);
+        });
+    });
+</script>
 </body>
 </html>

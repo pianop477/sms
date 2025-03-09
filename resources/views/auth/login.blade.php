@@ -33,8 +33,14 @@
                         </div>
                         <div class="form-gp">
                             <label for="exampleInputPassword1">Password</label>
-                            <input type="password" id="exampleInputPassword1" name="password" value="{{old('password')}}">
-                            <i class="ti-lock"></i>
+                            <div class="input-group">
+                                <input type="password" id="exampleInputPassword1" name="password" placeholder="Password" class="form-control">
+                                <div class="input-group-append">
+                                    <span class="input-group-text toggle-password" data-target="exampleInputPassword1">
+                                        <i class="ti-eye"></i>
+                                    </span>
+                                </div>
+                            </div>
                             @error('password')
                                 <div class="text-danger">{{$message}}</div>
                             @enderror
@@ -92,7 +98,7 @@
 
                 // Disable button na badilisha maandishi
                 submitButton.disabled = true;
-                submitButton.innerHTML = "Please Wait...";
+                submitButton.innerHTML = `<span class="spinner-border text-white" role="status" aria-hidden="true"></span> Please Wait...`;
 
                 // Hakikisha form haina errors kabla ya kutuma
                 if (!form.checkValidity()) {
@@ -106,6 +112,20 @@
                 setTimeout(() => {
                     form.submit();
                 }, 500);
+            });
+        });
+
+        //show and hide password field
+        document.querySelectorAll(".toggle-password").forEach(item => {
+            item.addEventListener("click", function() {
+                let input = document.getElementById(this.getAttribute("data-target"));
+                    if (input.type === "password") {
+                        input.type = "text";
+                            this.innerHTML = '<i class="fa fa-eye-slash"></i>';
+                        } else {
+                            input.type = "password";
+                            this.innerHTML = '<i class="ti-eye"></i>';
+                        }
             });
         });
 

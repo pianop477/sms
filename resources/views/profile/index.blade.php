@@ -44,8 +44,8 @@
               <ul class="list-group">
                 <li class="list-group-item border-0 ps-0 pt-0 text-sm text-capitalize"><strong class="text-dark">Full Name:</strong> &nbsp; {{$user->first_name. ' '. Auth::user()->last_name}}</li>
                 <li class="list-group-item border-0 ps-0 text-sm text-capitalize"><strong class="text-dark">Mobile:</strong> &nbsp; {{$user->phone}}</li>
-                <li class="list-group-item border-0 ps-0 text-sm text-capitalize"><strong class="text-dark">Email:</strong> &nbsp; {{$user->email}}</li>
-                <li class="list-group-item border-0 ps-0 text-sm text-capitalize"><strong class="text-dark">Gender:</strong> &nbsp; {{$user->gender[0]}}</li>
+                <li class="list-group-item border-0 ps-0 text-sm"><strong class="text-dark">Email:</strong> &nbsp; {{$user->email ?? 'Null'}}</li>
+                <li class="list-group-item border-0 ps-0 text-sm text-capitalize"><strong class="text-dark">Gender:</strong> &nbsp; {{$user->gender}}</li>
                 <li class="list-group-item border-0 ps-0 pb-0">
                   <strong class="text-dark text-sm">Social:</strong> &nbsp;
                   <a class="btn btn-facebook btn-simple mb-0 ps-1 pe-2 py-0" href="javascript:;">
@@ -68,7 +68,7 @@
               <h6 class="text-uppercase text-body text-xs font-weight-bolder">Edit Profile Details</h6>
             </div>
             <div class="card-body p-2">
-                <form action="{{route('update.profile', $user->id)}}" method="POST" enctype="multipart/form-data">
+                <form action="{{route('update.profile', $user->id)}}" method="POST" enctype="multipart/form-data" class="needs-valiation" novalidate>
                     @csrf
                     @method('PUT')
                 <div class="">
@@ -110,7 +110,7 @@
                     </div>
                     @error('image')<span class="text-danger text-sm">{{$message}}</span>@enderror
                 </div>
-                <button type="submit" class="btn btn-success btn-sm">Save</button>
+                <button type="submit" id="saveButton" class="btn btn-success btn-sm">Save</button>
             </form>
             </div>
           </div>
@@ -130,7 +130,7 @@
 
             // Disable button na badilisha maandishi
             submitButton.disabled = true;
-            submitButton.innerHTML = "Saving...";
+            submitButton.innerHTML = `<span class="spinner-border text-white" role="status" aria-hidden="true"></span> Please Wait...`;
 
             // Hakikisha form haina errors kabla ya kutuma
             if (!form.checkValidity()) {
