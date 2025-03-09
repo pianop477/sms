@@ -21,7 +21,7 @@
                         @foreach ($groupedByClass as $class_id => $results)
                                 <a href="{{ route('results.examTypesByClass', ['school' => $school->id, 'year' => $year, 'class' => $class_id]) }}">
                                     <button type="button" class="list-group-item list-group-item-action">
-                                        <h6 class="text-primary text-capitalize">>> {{ $results->first()->class_name }} - Link</h6>
+                                        <h6 class="text-primary"><span class="text-uppercase">>> {{ $results->first()->class_name }}</span> - Link</h6>
                                     </button>
                                 </a>
                         @endforeach

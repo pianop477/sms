@@ -6,7 +6,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-10">
-                    <h4 class="header-title text-center">Select Month for {{ $year }}</h4>
+                    <h4 class="header-title text-center">Select Date for {{ $year }}</h4>
                 </div>
                 <div class="col-2">
                     <a href="{{route('results.byYear', ['year'=>$year, 'course' => Hashids::encode($class_course->course_id)])}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
