@@ -30,13 +30,13 @@ return [
 
         'main' => [
             'salt' => env('HASHIDS_SALT', 'shuleApp-secret-key'),
-            'length' => 20,
+            'length' => 32,
             'alphabet' => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
         ],
 
         'alternative' => [
             'salt' => env('HASHIDS_SALT', 'shuleApp-secret-key'),
-            'length' => 15, // ID zitakuwa na urefu wa angalau herufi 10
+            'length' => 32, // ID zitakuwa na urefu wa angalau herufi 10
             'alphabet' => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
         ],
 

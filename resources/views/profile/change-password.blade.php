@@ -19,7 +19,7 @@
                             <input type="password" name="current_password" class="form-control" id="currentPassword" placeholder="" value="{{old('current_password')}}" required>
                             <div class="input-group-append">
                                 <span class="input-group-text toggle-password" data-target="currentPassword">
-                                    <i class="fa fa-eye"></i>
+                                    <i class="ti-eye"></i>
                                 </span>
                             </div>
                         </div>
@@ -36,7 +36,7 @@
                             <input type="password" name="new_password" class="form-control" id="newPassword" placeholder="" required value="{{old('new_password')}}">
                             <div class="input-group-append">
                                 <span class="input-group-text toggle-password" data-target="newPassword">
-                                    <i class="fa fa-eye"></i>
+                                    <i class="ti-eye"></i>
                                 </span>
                             </div>
                         </div>
@@ -54,7 +54,7 @@
                             <input type="password" name="confirm_password" class="form-control" id="confirmPassword" placeholder="" required value="{{old('confirm_password')}}">
                             <div class="input-group-append">
                                 <span class="input-group-text toggle-password" data-target="confirmPassword">
-                                    <i class="fa fa-eye"></i>
+                                    <i class="ti-eye"></i>
                                 </span>
                             </div>
                         </div>
@@ -82,7 +82,7 @@
                             this.innerHTML = '<i class="fa fa-eye-slash"></i>';
                         } else {
                             input.type = "password";
-                            this.innerHTML = '<i class="fa fa-eye"></i>';
+                            this.innerHTML = '<i class="ti-eye"></i>';
                         }
                     });
                 });
@@ -99,7 +99,7 @@
 
                 // Disable button na badilisha maandishi
                 submitButton.disabled = true;
-                submitButton.innerHTML = "Updating...";
+                submitButton.innerHTML = `<span class="spinner-border text-white" role="status" aria-hidden="true"></span> Please Wait...`;
 
                 // Hakikisha form haina errors kabla ya kutuma
                 if (!form.checkValidity()) {

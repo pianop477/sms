@@ -85,7 +85,7 @@
 
                 // Disable button na badilisha maandishi
                 submitButton.disabled = true;
-                submitButton.innerHTML = "Sending.....";
+                submitButton.innerHTML = `<span class="spinner-border text-white" role="status" aria-hidden="true"></span> Please Wait...`;
 
                 // Hakikisha form haina errors kabla ya kutuma
                 if (!form.checkValidity()) {
