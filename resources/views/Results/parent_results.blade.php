@@ -136,12 +136,17 @@
     .table td {
             background-color: #fff;
         }
-        .thanks {
+        .footer {
             position: fixed;
-            margin-bottom: 0px;
-            margin-left: 35%;
-            font-size: 10px;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #333; /* Rangi ya background (Dark Gray) */
+            color: white; /* Rangi ya maandishi */
+            font-size: 12px;
             text-align: center;
+            padding: 5px 0; /* Padding juu na chini */
+            box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.2); /* Kuongeza kivuli juu ya footer */
         }
     </style>
 </head>
@@ -158,7 +163,7 @@
                         <h4>president office - TAMISEMI</h4>
                         <h4>{{$results->first()->school_name}}</h4>
                         <h6>{{$results->first()->postal_address}} - {{$results->first()->postal_name}}, {{$results->first()->country}}</h6>
-                        <h6>student academic progressive report</h6>
+                        <h6>academic progressive report</h6>
                     </div>
                     <div class="student-image">
                         @php
@@ -171,23 +176,22 @@
                         @else
                             <img src="{{ $defaultImagePath }}" alt="" style="max-width: 100px; border-radius:50px;">
                         @endif
-                        <p style="text-transform: capitalize; font-size:10px;">Reg No: <span style="text-decoration: underline;">{{$results->first()->admission_number}}</span></p>
+                        <p style="font-size:10px;">Admission No: <span style="text-decoration: underline;">{{ucwords(strtoupper($results->first()->admission_number))}}</span></p>
                     </div>
                 </div>
                 <div class="" style="border-bottom: 2px solid gray">
                     <div class="info-container student-info">
                         <p style="text-transform:capitalize; font-weight:bold; text-align:center">A. Student Information</p>
-                        <p><strong>Student Full Name:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $studentId->first_name }} {{ $studentId->middle_name }} {{ $studentId->last_name }}</span></p>
+                        <p><strong>Student Full Name:</strong> <span style="text-decoration:underline">{{ ucwords(strtoupper($studentId->first_name. ' '.$studentId->middle_name . ' '. $studentId->last_name )) }}</span></p>
                         <p><strong>Gender:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $studentId->gender}}</span></p>
-                        <p><strong>Class:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $results->first()->class_name }}({{$results->first()->class_code}})</span></p>
+                        <p><strong>Class:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $results->first()->class_name }} - ({{$studentId->group}})</span></p>
                         <p><strong>Stream:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $studentId->group }}</span></p>
                     </div>
                     <p style="border-bottom: 2px solid gray;"></p>
                     <p style="text-transform:capitalize; font-weight:bold; text-align:center">B. Examination Details</p>
                     <div class="info-container exam-info">
                         <p><strong>Examination Type:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $results->first()->exam_type }}</span></p>
-                        <p><strong>Exam Month:</strong> <span style="text-decoration:underline">{{ $month }}</span></p>
-                        <p><strong>Year of Study:</strong> <span style="text-decoration:underline">{{ $year }}</span></p>
+                        <p><strong>Exam Date:</strong> <span style="text-decoration:underline">{{ $date }}</span></p>
                         <p><strong>Term:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{$results->first()->Exam_term}}</span></p>
                     </div>
                 </div>
@@ -246,11 +250,10 @@
                     <p>Grade Level: <strong><span style="background: {{$gradeColor}}; padding:1px 4px">{{$grade}}</span></strong></p>
                     <p>Ranked: <strong><span style="text-decoration: underline;">{{ $studentRank }}</span></strong> out of <strong><span style="text-decoration: underline">{{ $rankings->count() }}</span></strong> students</p>
                 </div>
-                <div class="thanks" style="">
+                <div class="footer" style="">
                     <p style="line-height: 1px;">
-                        <i>End of Report, Thank You!</i>
+                        <i>&copy; Copyright {{$results->first()->school_name}} - {{\Carbon\Carbon::now()->format('Y')}}</i>
                     </p>
-                    <p>Printed on: {{\Carbon\Carbon::parse(now())->format('d-M-Y')}}</p>
                 </div>
         </div>
     </div>

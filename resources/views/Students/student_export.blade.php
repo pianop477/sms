@@ -154,7 +154,7 @@
                             <tr>
                                 <td style="text-transform: uppercase; text-align:center">{{ $student->admission_number }}</td>
                                 <td style="text-transform: uppercase; text-align:center; width:5px;">{{ $student->gender[0] }}</td>
-                                <td style="text-transform: capitalize">{{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}</td>
+                                <td style="text-transform: capitalize">{{ ucwords(strtolower($student->first_name. ' '. $student->middle_name. ' '. $student->last_name)) }}</td>
                                 <td>{{ \Carbon\Carbon::parse($student->dob)->format('d/m/Y') }}</td>
                                 <td class="" style="text-transform: capitalize">{{ $student->address }}</td>
                                 <td>{{$student->phone}}</td>

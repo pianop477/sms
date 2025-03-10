@@ -213,7 +213,7 @@
                 <tr>
                     <td>{{$loop->iteration}}</td>
                     <td style="text-align:center"><span style="text-transform: uppercase">{{$result->admission_number}}</td>
-                    <td>{{$result->first_name}} {{$result->middle_name}} {{$result->last_name}}</td>
+                    <td>{{ucwords(strtolower($result->first_name. ' '. $result->middle_name. ' '.$result->last_name  ))}}</td>
                     <td style="text-align:center">{{$result->gender[0]}}</td>
                     <td style="text-align:center">{{$result->group}}</td>
                     <td style="text-align:center">{{$result->score}}</td>

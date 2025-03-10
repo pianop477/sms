@@ -13,6 +13,7 @@
                         </a>
                     </div>
                 </div>
+                <p class="text-danger">Select Examination type</p>
                 <div class="list-group">
                     @if ($examTypes->isEmpty())
                         <div class="alert alert-warning text-center" role="alert">

@@ -12,6 +12,7 @@
                     <a href="{{route('results_byCourse', ['id' => Hashids::encode($class_course->id)])}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
                 </div>
             </div>
+            <p class="text-danger">Click to select Examination type</p>
             <div class="list-group">
                 @foreach ($examTypes as $examType)
                     <a href="{{ route('results.byExamType', ['course' => Hashids::encode($class_course->course_id), 'year' => $year, 'examType' => Hashids::encode($examType->first()->exam_type_id)]) }}">

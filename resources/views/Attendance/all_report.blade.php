@@ -113,7 +113,7 @@
                 <h4>{{_("the president's office - ralg")}}</h4>
             </div>
             <div class="logo">
-                <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 70px;">
+                <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 100px;">
             </div>
             <div class="header">
                 <h3>{{ Auth::user()->school->school_name }}</h3>
@@ -172,7 +172,7 @@
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td style="text-transform: uppercase;">{{$attendance->admission_number }}</td>
-                                    <td style="text-transform:capitalize">{{ $attendance->first_name }} {{ $attendance->middle_name }} {{ $attendance->last_name }}</td>
+                                    <td>{{ ucwords(strtolower($attendance->first_name . ' ' . $attendance->middle_name . ' ' . $attendance->last_name)) }}</td>
                                     <td style="text-align:center; text-transform:capitalize">{{ $attendance->gender[0] }}</td>
                                     <td style="text-align:center; text-transform:capitalize">{{ $attendance->group }}</td>
                                     <td style="text-transform: capitalize; text-align:center">{{ ucfirst($attendance->attendance_status) }}</td>

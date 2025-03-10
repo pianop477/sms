@@ -169,7 +169,7 @@ class ExamController extends Controller
             // Check for duplicate records
             $existingRecord = Examination_result::where('student_id', $studentId)
                                             ->where('course_id', $courseId)
-                                            ->whereMonth('exam_date', Carbon::parse($examDate)->month)
+                                            ->whereDate('exam_date', Carbon::parse($examDate)->format('Y-m-d'))
                                             ->exists();
 
             if ($existingRecord) {
@@ -403,15 +403,20 @@ class ExamController extends Controller
                                 ->distinct()  // Ensure distinct months
                                 ->get();
 
-        // Group by month name
-        $months = $results->groupBy(function ($item) {
-            return Carbon::parse($item->exam_date)->format('F'); // Full month name
+        $months = $results->sortBy('exam_date') // Panga kwa tarehe
+            ->groupBy(function ($item) {
+                return Carbon::parse($item->exam_date)->format('F'); // Group by month
+            })->map(function ($monthData) {
+
+                return $monthData->sortBy('exam_date')->groupBy(function ($item) {
+                 return Carbon::parse($item->exam_date)->format('d F Y'); // Group by specific date
+            });
         });
 
         return view('Examinations.teacher_results_by_month', compact('months', 'year', 'examType', 'exam_id', 'course', 'class_course'));
     }
 
-    public function resultByMonth($course, $year, $examType, $month)
+    public function resultByMonth($course, $year, $examType, $month, $date)
     {
         // return ['data' => $course];
         $course_id = Hashids::decode($course);
@@ -430,6 +435,7 @@ class ExamController extends Controller
         ];
 
         $monthNumber = $monthMap[$month] ?? null;
+        $resultDate = Carbon::parse($date)->format('Y-m-d');
 
         $results = Examination_result::query()
                         ->join('students', 'students.id', '=', 'examination_results.student_id')
@@ -449,14 +455,16 @@ class ExamController extends Controller
                         ->where('examination_results.class_id', $class_course->class_id)
                         ->where('examination_results.teacher_id', $class_course->teacher_id)
                         ->where('students.status', 1)
-                        ->whereYear('examination_results.exam_date', $year)
+                        // ->whereYear('examination_results.exam_date', $year)
                         ->where('examination_results.exam_type_id', $exam_id)
-                        ->whereMonth('examination_results.exam_date', $monthNumber)
+                        // ->whereMonth('examination_results.exam_date', $monthNumber)
                         ->where('examination_results.school_id', $user->school_id)
+                        ->whereDate('examination_results.exam_date', $resultDate)
                         ->distinct()  // Ensure distinct results
                         ->orderBy('examination_results.score', 'desc')
                         ->get();
 
+            // return ['data' => $results];
         // Initialize grade counts
         $gradeCounts = [
             'A' => 0,

@@ -149,7 +149,7 @@
                         @foreach($students as $student)
                             <tr>
                                 <td>{{$loop->iteration}}</td>
-                                <td style="text-transform: capitalize">{{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}</td>
+                                <td style="text-transform: capitalize">{{ ucwords(strtolower($student->first_name. ' '. $student->middle_name. ' '. $student->last_name  )) }}</td>
                                 <td style="text-transform: uppercase; text-align:center; width:5px;">{{ $student->gender[0] }}</td>
                                 <td style="text-transform:uppercase; text-align:center">{{ $student->class_code}}</td>
                                 <td style="text-transform:uppercase; text-align:center">{{ $student->group}}</td>

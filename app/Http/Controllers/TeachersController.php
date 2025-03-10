@@ -209,7 +209,7 @@ class TeachersController extends Controller
         $schoolData = school::find($user->school_id);
         do {
             // Generate a random 4-digit number between 1000 and 9999
-            $memberIdNumber = mt_rand(100, 999);
+            $memberIdNumber = str_pad(mt_rand(1, 999), 4, '0', STR_PAD_LEFT);
 
             // Check if this admission number already exists
         } while (Teacher::where('member_id', $memberIdNumber)
@@ -289,7 +289,7 @@ class TeachersController extends Controller
             'street' => 'required|string|max:255',
             'gender' => 'required|max:20',
             'joined_at' => 'required|date_format:Y',
-            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:512',
+            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
         ]);
 
 

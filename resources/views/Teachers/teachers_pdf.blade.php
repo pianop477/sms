@@ -159,7 +159,7 @@
                             <tr>
                                 <td style="text-transform: uppercase; text-align:center">{{ $teacher->member_id }}</td>
                                 <td style="text-transform: uppercase; text-align:center; width:5px;">{{ $teacher->gender[0] }}</td>
-                                <td style="text-transform: capitalize">{{ $teacher->first_name }} {{ $teacher->last_name }}</td>
+                                <td style="text-transform: capitalize">{{ ucwords(strtolower($teacher->first_name. ' '. $teacher->last_name)) }}</td>
                                 <td style="text-transform: capitalize">{{ $teacher->role_name }}</td>
                                 <td>{{ \Carbon\Carbon::parse($teacher->dob)->format('d/M/Y') }}</td>
                                 <td>{{ $teacher->phone }}</td>

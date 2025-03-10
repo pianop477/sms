@@ -235,7 +235,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
             Route::get('course/{id}/Results', [ExamController::class, 'courseResults'])->name('results_byCourse');
             Route::get('/Results/course/{course}/&year/{year}', [ExamController::class, 'resultByYear'])->name('results.byYear');
             Route::get('/Results/course/{course}/&year/{year}/&examination/{examType}', [ExamController::class, 'resultByExamType'])->name('results.byExamType');
-            Route::get('/Results/course/{course}/&year/{year}/&examination/{examType}/{month}', [ExamController::class, 'resultByMonth'])->name('results.byMonth');
+            Route::get('/Results/course/{course}/&year/{year}/&examination/{examType}/&month/{month}/&date/{date}', [ExamController::class, 'resultByMonth'])->name('results.byMonth');
         });
     });
 
@@ -289,7 +289,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         Route::get('Result-type/Student/{student}/Year/{year}', [ResultsController::class, 'resultByType'])->name('result.byType');
         // For displaying months
         Route::get('Result-months/Student/{student}/Year/{year}/Type/{exam_type}', [ResultsController::class, 'resultByMonth'])->name('result.byMonth');
-        Route::get('Results/Student/{student}/Year/{year}/Exam-type/{type}/Month/{month}', [ResultsController::class, 'viewStudentResult'])->name('results.student.get');
+        Route::get('Result/student/{student}/year/{year}/exam-type/{exam_id}/month/{month}/date/{date}', [ResultsController::class, 'viewStudentResult'])->name('results.student.get');
         Route::get('student/{student}/Courses-list', [CoursesController::class, 'viewStudentCourses'])->name('student.courses.list');
 
     });
