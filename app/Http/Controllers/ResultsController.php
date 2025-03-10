@@ -103,21 +103,30 @@ class ResultsController extends Controller
         $students = Student::find($student_id[0]);
         $user = Auth::user();
         $parent = Parents::where('user_id', $user->id)->first();
-        $months = Examination_result::query()
-                        ->join('students', 'students.id', '=', 'examination_results.student_id')
-                        ->selectRaw('MONTH(exam_date) as month')
-                        ->distinct()
-                        ->whereYear('examination_results.exam_date', $year)
-                        ->where('examination_results.exam_type_id', $exam_id)
-                        ->where('examination_results.status', 2)
-                        ->where('examination_results.school_id', $user->school_id)
-                        ->where('students.parent_id', $parent->id)
-                        ->where('examination_results.student_id', $students->id)
-                        ->groupBy('month') // ✅ Grouping by month to remove duplicates
-                        ->orderBy('month')
-                        ->get();
 
-            $examType = Examination::find($exam_type);
+        // Pata matokeo yote ya mwanafunzi kwa mwaka husika na aina ya mtihani
+        $results = Examination_result::query()
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
+            ->selectRaw('exam_date') // Chukua tarehe kamili pekee
+            ->whereYear('examination_results.exam_date', $year)
+            ->where('examination_results.exam_type_id', $exam_id)
+            ->where('examination_results.status', 2)
+            ->where('examination_results.school_id', $user->school_id)
+            ->where('students.parent_id', $parent->id)
+            ->where('examination_results.student_id', $students->id)
+            ->orderBy('exam_date') // Sorting ya moja kwa moja kabla ya grouping
+            ->get();
+
+        // Grouping kwa mwezi, halafu grouping kwa tarehe ndani ya mwezi
+        $months = $results->sortBy('exam_date')->groupBy(function ($item) {
+            return Carbon::parse($item->exam_date)->format('F'); // Group by mwezi kamili (e.g., January)
+        })->map(function ($monthData) {
+            return $monthData->sortBy('exam_date')->groupBy(function ($item) {
+                return Carbon::parse($item->exam_date)->format('d F Y'); // Group by tarehe kamili
+            });
+        });
+
+        $examType = Examination::find($exam_id);
 
         return view('Results.result_months', compact('students', 'year', 'examType', 'exam_id', 'months'));
     }
@@ -126,8 +135,9 @@ class ResultsController extends Controller
     /**
      * Store the newly created resource in storage.
      */
-    public function viewStudentResult($student, $year, $type, $month)
+    public function viewStudentResult($student, $year, $type, $month, $date)
     {
+        // return $date;
         // Retrieve examination results for the specific student
         $exam_id = Hashids::decode($type);
         $student_id = Hashids::decode($student);
@@ -136,31 +146,32 @@ class ResultsController extends Controller
         $user = Auth::user();
         $parent = Parents::where('user_id', $user->id)->first();
         $results = Examination_result::query()
-            ->join('students', 'students.id', '=', 'examination_results.student_id')
-            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-            ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
-            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-            ->join('schools', 'schools.id', '=', 'examination_results.school_id')
-            ->select(
-                'examination_results.*',
-                'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.admission_number',
-                'students.group', 'students.image', 'students.gender', 'students.admission_number', 'students.parent_id',
-                'subjects.course_name', 'subjects.course_code',
-                'grades.class_name', 'grades.class_code',
-                'examinations.exam_type',
-                'users.first_name as teacher_first_name', 'users.last_name as teacher_last_name',
-                'schools.school_name', 'schools.school_reg_no', 'schools.postal_address', 'schools.postal_name', 'schools.logo', 'schools.country',
-            )
-            ->where('examination_results.student_id', $studentId->id)
-            ->where('examination_results.exam_type_id', $exam_id[0])
-            ->whereYear('examination_results.exam_date', $year)
-            ->whereMonth('examination_results.exam_date', $month)
-            ->where('examination_results.school_id', $user->school_id)
-            ->where('students.parent_id', $parent->id)
-            ->get();
-
+                ->join('students', 'students.id', '=', 'examination_results.student_id')
+                ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+                ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+                ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+                ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
+                ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+                ->join('schools', 'schools.id', '=', 'examination_results.school_id')
+                ->select(
+                    'examination_results.*',
+                    'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.admission_number',
+                    'students.group', 'students.image', 'students.gender', 'students.admission_number', 'students.parent_id',
+                    'subjects.course_name', 'subjects.course_code',
+                    'grades.class_name', 'grades.class_code',
+                    'examinations.exam_type',
+                    'users.first_name as teacher_first_name', 'users.last_name as teacher_last_name',
+                    'schools.school_name', 'schools.school_reg_no', 'schools.postal_address', 'schools.postal_name', 'schools.logo', 'schools.country',
+                )
+                ->where('examination_results.student_id', $studentId->id)
+                ->where('examination_results.exam_type_id', $exam_id[0])
+                // ->whereYear('examination_results.exam_date', $year)
+                // ->whereMonth('examination_results.exam_date', $month)
+                ->whereDate('exam_date', Carbon::parse($date)) // Filtering by date
+                ->where('examination_results.school_id', $user->school_id)
+                ->where('students.parent_id', $parent->id)
+                ->get();
+        // return $results;
         // Calculate the sum of all scores
         $totalScore = $results->sum('score');
 
@@ -227,7 +238,7 @@ class ResultsController extends Controller
         }
 
         // Pass the calculated data to the view
-        $pdf = \PDF::loadView('Results.parent_results', compact('results', 'year', 'studentId', 'type', 'student', 'month', 'totalScore', 'averageScore', 'studentRank', 'rankings'));
+        $pdf = \PDF::loadView('Results.parent_results', compact('results', 'year', 'studentId', 'type', 'student', 'month', 'date', 'totalScore', 'averageScore', 'studentRank', 'rankings'));
 
         return $pdf->stream($results->first()->first_name .' Results '.$month. ' '. $year. '.pdf');
     }

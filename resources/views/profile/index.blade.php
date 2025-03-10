@@ -5,7 +5,7 @@
       <div class="col-auto">
         <div class="avatar avatar-xl position-relative">
             @if ($user->image)
-            <img src="{{asset('assets/img/profile/'. $user->image)}}" alt="profile_image" class="profile-img border-radius-lg shadow-sm" style="width: 150px; object-fit:cover">
+            <img src="{{asset('assets/img/profile/'. $user->image)}}" alt="profile_image" class="profile-img border-radius-lg shadow-sm" style="width: 150px; object-fit:cover; border-radius: 50px;">
 
             @else
                     @if ($user->gender == 'male')
@@ -104,7 +104,7 @@
                     @error('gender')<span class="text-danger text-sm">{{$message}}</span>@enderror
                 </div>
                 <div class="">
-                    <label class="form-label">Photo: <span class="text-danger text-sm">Maximum 512KB</span></label>
+                    <label class="form-label">Photo: <span class="text-danger text-sm">Maximum 1MB</span></label>
                     <div class="input-group input-group-outline mb-3">
                         <input type="file" name="image" class="form-control" value="">
                     </div>

@@ -82,7 +82,7 @@ class StudentsController extends Controller
                 'dob' => 'required|date|date_format:Y-m-d',
                 'driver' => 'nullable|exists:transports,id',
                 'group' => 'required|string|in:A,B,C,D',
-                'image' => 'nullable|image|max:512|mimes:jpg,jpeg,png',
+                'image' => 'nullable|image|max:1024|mimes:jpg,jpeg,png',
                 'school_id' => 'exists:schools,id'
             ]);
 
@@ -208,7 +208,7 @@ class StudentsController extends Controller
                 'gender' => 'required|max:255',
                 'dob' => 'required|date|date_format:Y-m-d',
                 'driver' => 'integer|nullable|exists:transports,id',
-                'image' => 'nullable|image|mimes:jpg,png,jpeg|max:512',
+                'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
             ]);
 
             // return $student->first_name . ' '. $student->school_id. ' '. $student->parent_id;
@@ -465,7 +465,7 @@ class StudentsController extends Controller
                 'dob' => 'required|date|date_format:Y-m-d',
                 'driver' => 'nullable|integer|exists:transports,id',
                 'group' => 'required|string|in:A,B,C,D',
-                'image' => 'nullable|image|mimes:jpg,png,jpeg|max:512',
+                'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
                 'school_id' => 'exists:schools,id',
             ]);
 

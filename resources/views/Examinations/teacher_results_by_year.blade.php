@@ -12,6 +12,7 @@
                     <a href="{{route('home')}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
                 </div>
             </div>
+            <p class="text-danger">Click on Specific Academic Year</p>
             @if ($groupedData->isEmpty())
                 <div class="alert alert-warning text-center" role="alert">
                     <p>No Results records found!</p>

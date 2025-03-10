@@ -211,7 +211,7 @@
                             <tr>
                                 <td style="text-align: center">{{$loop->iteration}}</td>
                                 <td style="text-align: center" class="text-center"><span style="text-transform: uppercase">{{$record->admission_number }}</td>
-                                <td class="text-capitalize">{{ $record->first_name }} {{ $record->middle_name }} {{ $record->last_name }}</td>
+                                <td>{{ucwords(strtolower($record->first_name. ' '. $record->middle_name. ' '.$record->last_name  ))}}</td>
                                 <td style="text-align: center" class="text-capitalize text-center">{{ $record->gender[0] }}</td>
                                 <td style="text-align: center" class="text-capitalize text-center">{{ $record->class_group }}</td>
                                 <td style="text-align: center">{{ ucfirst($record->attendance_status) }}</td>

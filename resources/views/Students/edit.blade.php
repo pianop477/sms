@@ -126,7 +126,7 @@
                     @enderror
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="validationCustom01">Photo <span class="text-sm text-danger">Maximum 512KB - Blue background</span></label>
+                    <label for="validationCustom01">Photo <span class="text-sm text-danger">Maximum 1MB - Blue background</span></label>
                     <input type="file" name="image" class="form-control text-capitalize" id="validationCustom01" value="{{old('image')}}">
                     @error('image')
                     <div class="text-danger">{{$message}}</div>

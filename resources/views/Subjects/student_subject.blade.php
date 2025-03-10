@@ -34,7 +34,7 @@
                                         <th scope="col">No</th>
                                         <th scope="col" class="">Subject</th>
                                         <th scope="col" class="">code</th>
-                                        <th scope="col">Subject Teacher Name</th>
+                                        <th scope="col">Subject Teacher</th>
                                         <th scope="col">Teacher's Phone</th>
                                     </tr>
                                 </thead>
@@ -54,10 +54,10 @@
                                                     <i class="fas fa-user-tie rounded-circle bg-secondary d-flex justify-content-center align-items-center"
                                                        style="width: 40px; height: 40px; font-size: 20px; color: white;"></i>
                                                 @endif
-                                                >> <span class="text-capitalize ms-2">{{ $course->first_name }} {{ $course->last_name }}</span>
+                                                 <span class="text-capitalize ms-2" style="margin-left: 5px">{{ $course->first_name }} {{ $course->last_name }}</span>
                                             </td>
                                             <td class="">
-                                                <i class="fas fa-phone"></i>
+                                                <i class="fas fa-phone"></i> Call:
                                                 <a href="tel:{{ $course->teacher_phone }}" class="text-decoration-none text-dark">
                                                     {{ $course->teacher_phone }}
                                                 </a>
@@ -104,8 +104,8 @@
                                         {{ $classTeacher->gender }}
                                     </span>
                                 </li>
-                                <li class="list-group-item">Phone:
-                                    <span class="text-uppercase font-weight-bold">
+                                <li class="list-group-item">Call:
+                                    <span class="font-weight-bold">
                                         <i class="fas fa-phone"></i>
                                         <a href="tel:{{ $classTeacher->phone }}" class="text-decoration-none text-dark">
                                             {{ $classTeacher->phone }}
