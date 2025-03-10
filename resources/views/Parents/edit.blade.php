@@ -32,14 +32,18 @@
     </div>
     <hr class="dark horizontal my-0">
     <div class="card mt-1">
-        <h5 class="text-center">Student List</h5>
-        <div class="row">
-            @foreach ($students as $student)
-            <div class="col-4">
-                <p>Name: <span class="text-capitalize">{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}} - {{$student->gender}}</span></p>
-                <p>Class: <span class="text-uppercase">{{$student->class_name}} - {{$student->class_code}}</span></p>
+        <div class="card-body">
+            <h5 class="text-center">Student List</h5>
+            <div class="row">
+                @foreach ($students as $student)
+                <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+                    <div class="p-3 border rounded shadow-sm">
+                        <p><strong>Name:</strong> <span class="text-capitalize">{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}} - {{$student->gender}}</span></p>
+                        <p><strong>Class:</strong> <span class="text-uppercase">{{$student->class_name}} - {{$student->class_code}}</span></p>
+                    </div>
+                </div>
+                @endforeach
             </div>
-        @endforeach
         </div>
     </div>
     <hr class="dark horizontal my-0">
