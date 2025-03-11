@@ -470,11 +470,16 @@ class StudentsController extends Controller
             ]);
 
             // Check for existing student records
-            $existingStudent = Student::whereRaw('LOWER(first_name) = ?', [strtolower($request->fname)])
-                                            ->whereRaw('LOWER(middle_name) = ?', [strtolower($request->middle)])
-                                            ->whereRaw('LOWER(last_name) = ?', [strtolower($request->lname)])
-                                            ->where('school_id', $user->school_id)
-                                            ->first();
+            $existingStudent = Student::whereRaw("
+                                LOWER(TRIM(REPLACE(first_name, '  ', ' '))) = ?
+                                AND LOWER(TRIM(REPLACE(middle_name, '  ', ' '))) = ?
+                                AND LOWER(TRIM(REPLACE(last_name, '  ', ' '))) = ?
+                                AND school_id = ?", [
+                                strtolower(preg_replace('/\s+/', ' ', trim($request->fname))),
+                                strtolower(preg_replace('/\s+/', ' ', trim($request->middle))),
+                                strtolower(preg_replace('/\s+/', ' ', trim($request->lname))),
+                                $user->school_id
+                            ])->first();
 
             if ($existingStudent) {
                     Alert()->toast('Student with the same records already exists', 'error');
