@@ -176,7 +176,7 @@
                                                             Manage
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                                            <a class="dropdown-item" href="{{route('students.modify', ['students' => Hashids::encode($student->id)])}}"><i class="ti-pencil text-primary"></i> Edit</a>
+                                                            <a class="dropdown-item" href="{{route('Students.show', ['student' => Hashids::encode($student->id)])}}"><i class="ti-pencil text-primary"></i> Profile</a>
                                                             <a class="dropdown-item" href="{{route('attendance.byYear', ['student' => Hashids::encode($student->id)])}}"><i class="fa fa-list-check text-success"></i> Attendance</a>
                                                             <a class="dropdown-item" href="{{route('results.index', ['student' => Hashids::encode($student->id)])}}"><i class="ti-file text-info"></i> Results</a>
                                                             <a class="dropdown-item" href="{{route('student.courses.list', ['student' => Hashids::encode($student->id)])}}"><i class="ti-book text-warning"></i> Subjects</a>
