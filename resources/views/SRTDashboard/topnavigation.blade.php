@@ -1,5 +1,5 @@
 <div class="mainheader-area">
-    <div id="loading-bar" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgb(147, 237, 125);"></div>
+    <div id="loading-bar" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgb(83, 116, 224);"></div>
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-6">
