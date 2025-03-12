@@ -56,6 +56,14 @@
         height: 'calc(100vh - 158px)'
     });
 
+    /*==================================
+    script for service worker
+    ===================================*/
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js')
+        .then(() => console.log('Service Worker Registered'));
+    }
+
     /*================================
     stickey Header
     ==================================*/
