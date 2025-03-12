@@ -4,6 +4,7 @@
 @include('SRTDashboard.header')
 <body>
     @include('SRTDashboard.preloader')
+    <div id="loading-bar" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgb(83, 116, 224);"></div>
     <!-- preloader area end -->
     <!-- login area start -->
     <div class="login-area login-bg">

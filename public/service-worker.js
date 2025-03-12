@@ -1,7 +1,8 @@
-const CACHE_NAME = 'ShuleApp-cache-v2'; // Badilisha version ikiwa kuna update mpya
+const CACHE_NAME = 'ShuleApp-cache-v3'; // Ongeza version mpya ili kulazimisha update
 
 const ASSETS_TO_CACHE = [
     '/',
+    '/index.php', // Laravel main entry file
     '/assets/css/style.css',
     '/assets/js/scripts.js',
     '/icons/icon.png',
@@ -51,4 +52,9 @@ self.addEventListener('fetch', (event) => {
             })
             .catch(() => caches.match(event.request)) // Kama haipo kwenye mtandao, tumia cache
     );
+});
+
+// Force reload app on update
+self.addEventListener('controllerchange', function () {
+    window.location.reload();
 });
