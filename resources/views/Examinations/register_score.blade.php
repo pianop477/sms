@@ -11,7 +11,7 @@
                         <h3 class="header-title text-uppercase text-center">Students Result Form</h3>
                     </div>
                     <div class="col-2">
-                        <a href="{{ route('score.prepare.form', $courseId) }}" class="float-right">
+                        <a href="{{ route('score.prepare.form', ['id' => Hashids::encode($courseId)]) }}" class="float-right">
                             <i class="fas fa-arrow-circle-left text-secondary" style="font-size: 1.7rem;"></i>
                         </a>
                     </div>
