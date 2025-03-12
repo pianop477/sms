@@ -23,7 +23,7 @@
                     <div class="clearfix d-md-inline-block d-block">
                         <div class="user-profile m-0 d-flex align-items-between">
                             @if (Auth::user()->image)
-                                <img src="{{asset('assets/img/profile/' .Auth::user()->image) }}" alt="profile" class="profile-img rounded-circle" style="width: 45px; object-fit: cover;">
+                                <img src="{{asset('assets/img/profile/' .Auth::user()->image) }}" alt="profile" class="profile-img rounded-circle" style="width: 40px; object-fit: cover;">
                             @else
                                 @if (Auth::user()->gender == 'male')
                                     <img class="avatar user-thumb" src="{{asset('assets/img/profile/avatar.jpg')}}" alt="avatar">

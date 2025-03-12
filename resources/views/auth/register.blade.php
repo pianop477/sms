@@ -1,6 +1,6 @@
 <!doctype html>
 <html class="no-js" lang="en">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    {{-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"> --}}
 @include('SRTDashboard.header')
 <body>
     @include('SRTDashboard.preloader')
