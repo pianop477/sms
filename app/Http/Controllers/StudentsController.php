@@ -86,44 +86,45 @@ class StudentsController extends Controller
                 'school_id' => 'exists:schools,id'
             ]);
 
-            // Check for existing student records
-            $existingStudent = Student::whereRaw('LOWER(first_name) = ?', [strtolower($request->fname)])
-                                    ->whereRaw('LOWER(middle_name) = ?', [strtolower($request->middle)])
-                                    ->whereRaw('LOWER(last_name) = ?', [strtolower($request->lname)])
-                                    ->where('school_id', $user->school_id)
-                                    ->first();
+            try {
+                // Check for existing student records
+                            $existingStudent = Student::whereRaw('LOWER(first_name) = ?', [strtolower($request->fname)])
+                            ->whereRaw('LOWER(middle_name) = ?', [strtolower($request->middle)])
+                            ->whereRaw('LOWER(last_name) = ?', [strtolower($request->lname)])
+                            ->where('school_id', $user->school_id)
+                            ->first();
 
-            if ($existingStudent) {
+                if ($existingStudent) {
                 Alert()->toast('Student with the same records already exists in our records', 'error');
                 return back();
-            }
+                }
 
-            // Retrieve the class
-            $class = Grade::findOrFail($decoded[0]);
+                // Retrieve the class
+                $class = Grade::findOrFail($decoded[0]);
 
-            // Create a new student record
-            $new_student = new Student();
-            $new_student->first_name = $request->fname;
-            $new_student->middle_name = $request->middle;
-            $new_student->last_name = $request->lname;
-            $new_student->gender = $request->gender;
-            $new_student->dob = $request->dob;
-            $new_student->group = $request->group;
-            $new_student->parent_id = $request->parent;
-            $new_student->class_id = $class->id;
-            $new_student->transport_id = $request->driver;
-            $new_student->admission_number = $this->getAdmissionNumber();
-            $new_student->school_id = Auth::user()->school_id;
+                // Create a new student record
+                $new_student = new Student();
+                $new_student->first_name = $request->fname;
+                $new_student->middle_name = $request->middle;
+                $new_student->last_name = $request->lname;
+                $new_student->gender = $request->gender;
+                $new_student->dob = $request->dob;
+                $new_student->group = $request->group;
+                $new_student->parent_id = $request->parent;
+                $new_student->class_id = $class->id;
+                $new_student->transport_id = $request->driver;
+                $new_student->admission_number = $this->getAdmissionNumber();
+                $new_student->school_id = Auth::user()->school_id;
 
-            // Handle file upload if present
-            if ($request->hasFile('image')) {
+                // Handle file upload if present
+                if ($request->hasFile('image')) {
                 $image = $request->file('image');
                 $imageFile = time() . '.' . $image->getClientOriginalExtension();
                 $imagePath = public_path('assets/img/students');
 
                 // Ensure the directory exists
                 if (!file_exists($imagePath)) {
-                    mkdir($imagePath, 0775, true);
+                mkdir($imagePath, 0775, true);
                 }
 
                 // Move the file
@@ -131,15 +132,19 @@ class StudentsController extends Controller
 
                 // Set the image file name on the student record
                 $new_student->image = $imageFile;
-            }
+                }
 
-            // Save the new student record
-           $student =  $new_student->save();
+                // Save the new student record
+                $student =  $new_student->save();
 
-           if($student) {
+                if($student) {
                 Alert()->toast('Student records saved successfully', 'success');
                 return redirect()->route('create.selected.class', Hashids::encode($class->id));
-           }
+                }
+            } catch (\Exception $e) {
+                Alert()->toast($e->getMessage(), 'error');
+                return back();
+            }
     }
 
     //generate uniqe student admission number randomly*******************************************************
