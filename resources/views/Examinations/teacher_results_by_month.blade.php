@@ -21,7 +21,7 @@
                         <h6 class="text-primary"><i class="fas fa-chevron-right"></i> {{ $month }} - {{ $year }}</h6>
                     </button>
                     <div id="{{ Str::slug($month) }}" class="date-list mt-2" style="display: none; padding-left: 20px;">
-                        <p class="text-primary">Select Date to get result</p>
+                        <p class="text-danger">Select Date to get result</p>
                         @foreach ($dates as $date => $results)
                             <a href="{{ route('results.byMonth', ['course' => Hashids::encode($class_course->course_id), 'year' => $year, 'examType' => Hashids::encode($exam_id), 'month' => $month, 'date' => $date]) }}" target="_blank">
                                 <button type="button" class="list-group-item list-group-item-action">

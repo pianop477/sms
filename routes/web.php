@@ -163,7 +163,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         Route::post('Send-message', [SmsController::class, 'sendSmsUsingNextSms'])->name('Send.message.byNext'); //send using nextSms api
 
         //send sms results to parents
-        Route::post('Send-results-sms/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/student/{student}', [ResultsController::class, 'sendResultSms'])->name('sms.results');
+        Route::post('Send-results-sms/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/student/{student}/date/{date}', [ResultsController::class, 'sendResultSms'])->name('sms.results');
     });
 
     Route::middleware(['CheckUsertype:1,2,3,4'])->group(function () {
@@ -276,7 +276,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         Route::get('General-results/{school}/year/{year}', [ResultsController::class, 'classesByYear'])->name('results.classesByYear');
         Route::get('General-results/{school}/year/{year}/class/{class}', [ResultsController::class, 'examTypesByClass'])->name('results.examTypesByClass');
         Route::get('General-results/{school}/year/{year}/class/{class}/exam-type/{examType}/months', [ResultsController::class, 'monthsByExamType'])->name('results.monthsByExamType');
-        Route::get('General-results/{school}/year/{year}/class/{class}/exam-type/{examType}/month/{month}', [ResultsController::class, 'resultsByMonth'])->name('results.resultsByMonth');
+        Route::get('General-results/{school}/year/{year}/class/{class}/exam-type/{examType}/month/{month}/date/{date}', [ResultsController::class, 'resultsByMonth'])->name('results.resultsByMonth');
     });
     //end of condition ===========================================================================================
 
@@ -339,17 +339,18 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
     });
 
     Route::middleware(['ManagerOrTeacher'])->group(function() {
-        Route::put('Publish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'publishResult'])->name('publish.results');
-        Route::put('Unpublish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'unpublishResult'])->name('unpublish.results');
+        Route::put('Publish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/date/{date}', [ResultsController::class, 'publishResult'])->name('publish.results');
+        Route::put('Unpublish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/date/{date}', [ResultsController::class, 'unpublishResult'])->name('unpublish.results');
         //delete results if not necessary
-        Route::get('Delete-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'deleteResults'])->name('delete.results');
+        Route::get('Delete-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/date/{date}', [ResultsController::class, 'deleteResults'])->name('delete.results');
         //export students records to PDF
         Route::get('{class}/Export-students', [StudentsController::class, 'exportPdf'])->name('export.student.pdf');
 
         //post compiled results to the database table
         Route::post('Submit-compiled-results/school/{school}/year/{year}/class/{class}', [ResultsController::class, 'saveCompiledResults'])->name('submit.compiled.results');
-        Route::get('Individual-student-reports/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}', [ResultsController::class, 'individualStudentReports'])->name('individual.student.reports');
-        Route::get('Download-individual-report/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/student/{student}', [ResultsController::class, 'downloadIndividualReport'])->name('download.individual.report');
+        Route::get('Individual-student-reports/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/date/{date}', [ResultsController::class, 'individualStudentReports'])->name('individual.student.reports');
+        Route::get('Download-individual-report/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/student/{student}/date/{date}/', [ResultsController::class, 'downloadIndividualReport'])->name('download.individual.report');
+        Route::post('/update-score', [ResultsController::class, 'updateScore'])->name('update.score');
 
         //fetch report combined************************************
         Route::post('Fetch-report/class/{class}/year/{year}/school/{school}', [ResultsController::class, 'fetchReport'])->name('fetch.report');

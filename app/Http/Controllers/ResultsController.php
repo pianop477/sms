@@ -244,42 +244,47 @@ class ResultsController extends Controller
     }
 
     //general results are intialized here ====================================
-    public function general(school $school)
+    public function general($school)
     {
+        $id = Hashids::decode($school);
+        // return $id;
         $user = Auth::user();
 
-        if($user->school_id != $school->id){
+        $schools = school::find($id[0]);
+        // return $schools;
+        if($user->school_id != $schools->id){
             Alert()->toast('You are not authorized to view this page', 'error');
             return redirect()->route('error.page');
         }
 
-        else {
-            $results = Examination_result::query()
+        $results = Examination_result::query()
                                 ->join('students', 'students.id', '=', 'examination_results.student_id')
                                 ->join('grades', 'grades.id', '=', 'examination_results.class_id')
                                 ->select(
                                     'examination_results.*',
                                     'grades.id as class_id', 'grades.class_name', 'grades.class_code'
                                 )
-                                ->where('examination_results.school_id', $school->id)
+                                ->where('examination_results.school_id', $schools->id)
                                 ->orderBy('examination_results.exam_date', 'DESC')
                                 ->get();
-
+            // return $results;
             $groupedData = $results->groupBy(function ($item) {
                 return Carbon::parse($item->exam_date)->format('Y');
             })->map(function ($yearGroup) {
                 return $yearGroup->groupBy('class_id');
             });
 
-            return view('Results.general_year_result', compact('school', 'results', 'groupedData'));
-        }
+            return view('Results.general_year_result', compact('schools', 'results', 'groupedData'));
     }
 
-    public function classesByYear(school $school, $year)
+    public function classesByYear($school, $year)
     {
+        $id = Hashids::decode($school);
         $user = Auth::user();
 
-        if($user->school_id != $school->id){
+        $schools = school::find($id[0]);
+
+        if($user->school_id != $schools->id){
             Alert()->toast('You are not authorized to view this page', 'error');
             return redirect()->route('error.page');
         }
@@ -290,22 +295,27 @@ class ResultsController extends Controller
                             'examination_results.*',
                             'grades.id as class_id', 'grades.class_name', 'grades.class_code'
                         )
-                        ->where('examination_results.school_id', $school->id)
+                        ->where('examination_results.school_id', $schools->id)
                         ->whereYear('examination_results.exam_date', $year)
                         ->orderBy('grades.class_code', 'ASC')
                         ->get();
 
             $groupedByClass = $results->groupBy('class_id');
 
-            return view('Results.results_grouped_byYear', compact('school', 'year', 'groupedByClass'));
+            return view('Results.results_grouped_byYear', compact('schools', 'year', 'groupedByClass'));
         }
     }
 
-    public function examTypesByClass(school $school, $year, $class)
+    public function examTypesByClass($school, $year, $class)
     {
+        $school_id = Hashids::decode($school);
+        $class_id = Hashids::decode($class);
         $user = Auth::user();
 
-        if($user->school_id != $school->id){
+        $schools = school::find($school_id[0]);
+        $classes = Grade::find($class_id[0]);
+
+        if($user->school_id != $schools->id){
             Alert()->toast('You are not authorized to view this page', 'error');
             return redirect()->route('error.page');
         }
@@ -317,9 +327,9 @@ class ResultsController extends Controller
                                         'examination_results.*',
                                         'examinations.id as exam_type_id', 'examinations.exam_type'
                                     )
-                                    ->where('examination_results.school_id', $school->id)
+                                    ->where('examination_results.school_id', $schools->id)
                                     ->whereYear('examination_results.exam_date', $year)
-                                    ->where('examination_results.class_id', $class)
+                                    ->where('examination_results.class_id', $classes->id)
                                     ->get();
 
                 $grades = Grade::find($class);
@@ -330,15 +340,15 @@ class ResultsController extends Controller
                 ];
 
                 //query examination lists
-                $exams = Examination::where('status', 1)->where('school_id', Auth::user()->school_id)->orderBy('exam_type')->get();
+                $exams = Examination::where('status', 1)->where('school_id', $user->school_id)->orderBy('exam_type')->get();
 
                 //query examination_results by for the specific class which exists in the db table
                 $monthsResult = Examination_result::query()
                                                     ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
                                                     ->select('examination_results.*', 'examinations.exam_type', 'examinations.symbolic_abbr')
-                                                    ->where('class_id', $class)
+                                                    ->where('class_id', $classes->id)
                                                     ->whereYear('examination_results.exam_date', $year)
-                                                    ->where('examination_results.school_id', $school->id)
+                                                    ->where('examination_results.school_id', $schools->id)
                                                     ->orderBy('examination_results.exam_date')
                                                     ->get();
 
@@ -347,14 +357,14 @@ class ResultsController extends Controller
                 });
 
                 //get compiled results
-                $compiled_results = compiled_results::where('school_id', $school->id)
-                                                    ->where('class_id', $class)
+                $compiled_results = compiled_results::where('school_id', $schools->id)
+                                                    ->where('class_id', $classes->id)
                                                     ->get();
 
                 $groupedByExamType = $results->groupBy('exam_type_id'); // Group by exam type using results
                 $compiledGroupByExam = $compiled_results->groupBy('report_name'); // Group by exam type using compiled results
 
-                return view('Results.general_result_type', compact('school', 'groupedByMonth', 'compiledGroupByExam', 'year', 'exams', 'grades', 'class', 'groupedByExamType'));
+                return view('Results.general_result_type', compact('schools', 'groupedByMonth', 'compiledGroupByExam', 'year', 'exams', 'grades', 'classes', 'groupedByExamType'));
         }
     }
 
@@ -524,50 +534,69 @@ class ResultsController extends Controller
     }
 
     //function for displaying general results by term ***************************************
-    public function monthsByExamType(School $school, $year, Grade $class, $examType)
-    {
+    public function monthsByExamType($school, $year, $class, $examType)
+{
+    $school_id = Hashids::decode($school);
+    $class_id = Hashids::decode($class);
+    $exam_id = Hashids::decode($examType);
 
-        $user = Auth::user();
+    $user = Auth::user();
+    $schools = School::find($school_id[0]);
 
-        if($user->school_id != $school->id){
-            Alert()->toast('You are not authorized to view this page', 'error');
-            return redirect()->route('error.page');
-        }
-
-        $results = Examination_result::query()
-                            ->join('students', 'students.id', '=', 'examination_results.student_id')
-                            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                            ->select(
-                                'examination_results.*',
-                                'students.first_name', 'students.middle_name', 'students.last_name', 'students.id as student_id', 'students.admission_number',
-                                'grades.class_name',
-                                'examinations.exam_type'
-                            )
-                            ->where('examination_results.school_id', $school->id)
-                            ->whereYear('examination_results.exam_date', $year)
-                            ->where('examination_results.class_id', $class->id)
-                            ->where('examination_results.exam_type_id', $examType)
-                            ->get();
-
-        // Debugging line
-        // dd($results);
-
-        $groupedByMonth = $results->groupBy(function ($item) {
-            return Carbon::parse($item->exam_date)->format('F'); // Group by month name
-        });
-
-        return view('Results.months_by_exam_type', compact('school', 'year', 'class', 'examType', 'groupedByMonth'));
+    if ($user->school_id != $schools->id) {
+        Alert()->toast('You are not authorized to view this page', 'error');
+        return redirect()->route('error.page');
     }
 
+    $results = Examination_result::query()
+        ->join('students', 'students.id', '=', 'examination_results.student_id')
+        ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+        ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+        ->select(
+            'examination_results.*',
+            'students.first_name', 'students.middle_name', 'students.last_name',
+            'students.id as student_id', 'students.admission_number',
+            'grades.class_name',
+            'examinations.exam_type'
+        )
+        ->where('examination_results.school_id', $schools->id)
+        ->whereYear('examination_results.exam_date', $year)
+        ->where('examination_results.class_id', $class_id[0])
+        ->where('examination_results.exam_type_id', $exam_id[0])
+        ->orderBy('examination_results.exam_date') // Panga kwa tarehe
+        ->get();
 
-    public function resultsByMonth(School $school, $year, $class, $examType, $month)
+    // Group by Month, then by Date
+    $groupedByMonth = $results->groupBy(function ($item) {
+        return Carbon::parse($item->exam_date)->format('F'); // Month name
+    })->map(function ($monthGroup) {
+        return $monthGroup->groupBy(function ($item) {
+            return Carbon::parse($item->exam_date)->format('Y-m-d'); // Group by exact date
+        })->map(function ($dateGroup) {
+            // Amua status kwa kila tarehe
+            $status = $dateGroup->first()->status; // Chukua status ya kwanza ya matokeo ya tarehe hiyo
+            return [
+                'results' => $dateGroup,
+                'status' => $status, // Pita status kwenye view
+            ];
+        });
+    });
+
+    return view('Results.months_by_exam_type', compact('schools', 'results', 'year', 'class_id', 'exam_id', 'groupedByMonth'));
+}
+
+
+    public function resultsByMonth($school, $year, $class, $examType, $month, $date)
     {
-
+        $school_id = Hashids::decode($school);
+        $class_id = Hashids::decode($class);
+        $exam_id = Hashids::decode($examType);
 
         $user = Auth::user();
 
-        if($user->school_id != $school->id){
+        $schools = school::find($school_id[0]);
+
+        if($user->school_id != $schools->id){
             Alert()->toast('You are not authorized to view this page', 'error');
             return redirect()->route('error.page');
         }
@@ -593,11 +622,12 @@ class ResultsController extends Controller
                                 'examinations.exam_type',
                                 'subjects.course_name', 'subjects.course_code'
                             )
-                            ->where('examination_results.school_id', $school->id)
-                            ->whereYear('examination_results.exam_date', $year)
-                            ->where('examination_results.class_id', $class)
-                            ->where('examination_results.exam_type_id', $examType)
-                            ->whereMonth('examination_results.exam_date', $monthNumber)
+                            ->where('examination_results.school_id', $schools->id)
+                            // ->whereYear('examination_results.exam_date', $year)
+                            ->where('examination_results.class_id', $class_id[0])
+                            ->where('examination_results.exam_type_id', $exam_id[0])
+                            ->whereDate('examination_results.exam_date', $date)
+                            // ->whereMonth('examination_results.exam_date', $monthNumber)
                             ->get();
 
         // Total number of students by gender
@@ -697,7 +727,7 @@ class ResultsController extends Controller
 
         $pdf = \PDF::loadView('Results.results_by_month', compact(
             'school', 'year', 'class', 'examType', 'month', 'results', 'totalMaleStudents', 'totalFemaleStudents', 'totalMaleGrades', 'totalFemaleGrades',
-            'averageScoresByCourse', 'evaluationScores', 'totalAverageScore', 'sortedStudentsResults', 'sumOfCourseAverages', 'sortedCourses',
+            'averageScoresByCourse', 'evaluationScores', 'totalAverageScore', 'date', 'sortedStudentsResults', 'sumOfCourseAverages', 'sortedCourses',
             'totalUniqueStudents',
         ));
         $pdf->setOption('isHtml5ParserEnabled', true);
@@ -736,178 +766,157 @@ class ResultsController extends Controller
     //end of results in general ==============================================
 
     //publishing results to be visible to parents and send sms via Beem api  ***************************************************
-    public function publishResult(School $school, $year, $class, $examType, $month, BeemSmsService $beemSmsService)
+    public function publishResult(Request $request, $school, $year, $class, $examType, $month, $date)
     {
         try {
 
-            $user = Auth::user();
+            $school_id = Hashids::decode($school);
+            $class_id = Hashids::decode($class);
+            $exam_id = Hashids::decode($examType);
+            // dd($school_id, $class_id, $exam_id);
 
-            if($user->school_id != $school->id){
-                Alert()->toast('You are not authorized to view this page', 'error');
-                return redirect()->route('error.page');
+            $user = Auth::user();
+            $schools = School::find($school_id[0]);
+
+            if ($user->school_id != $schools->id) {
+                return response()->json(['success' => false, 'message' => 'You are not authorized to perform this action.', 'type' => 'error']);
             }
 
-            $monthsArray = [
-                'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
-                'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8, 'September' => 9,
-                'October' => 10, 'November' => 11, 'December' => 12,
-            ];
+            // Update status in the database
+            $updatedRows = Examination_result::where('school_id', $schools->id)
+                                ->where('class_id', $class_id[0])
+                                ->where('exam_type_id', $exam_id[0])
+                                ->whereDate('exam_date', $date)
+                                ->update(['status' => 2 ]);
 
-            // return $monthsArray;
-            if(array_key_exists($month, $monthsArray)){
-                $monthNumber = $monthsArray[$month];
-                // return $monthNumber;
-
-                $updatedRows = Examination_result::where('school_id', $school->id)
-                                                ->whereYear('exam_date', $year)
-                                                ->where('class_id', $class)
-                                                ->where('exam_type_id', $examType)
-                                                ->whereMonth('exam_date', $monthNumber)
-                                                ->update(['status' => 2]);
-
-                // Fetch student results from the database
+            if ($updatedRows) {
+                // If status is 2 (Published), send SMS notifications
                 $studentResults = Examination_result::join('students', 'students.id', '=', 'examination_results.student_id')
-                    ->join('subjects', 'subjects.id', 'examination_results.course_id')
-                    ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                    ->join('schools', 'schools.id', '=', 'examination_results.school_id')
-                    ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
-                    ->leftJoin('users', 'users.id', '=', 'parents.user_id')
-                    ->select(
-                        'examination_results.*', 'users.phone',
-                        'students.first_name', 'students.middle_name', 'students.last_name', 'students.status',
-                        'examinations.exam_type', 'subjects.course_name', 'subjects.course_code', 'schools.school_name'
-                    )
-                    ->where('examination_results.class_id', $class)
-                    ->where('students.status', 1)
-                    ->where('examination_results.school_id', $school->id)
-                    ->where('examination_results.exam_type_id', $examType)
-                    ->whereMonth('examination_results.exam_date', $monthNumber)
-                    ->get();
+                                ->join('subjects', 'subjects.id', 'examination_results.course_id')
+                                ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+                                ->join('schools', 'schools.id', '=', 'examination_results.school_id')
+                                ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
+                                ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+                                ->select(
+                                    'examination_results.*', 'users.phone',
+                                    'students.first_name', 'students.middle_name', 'students.last_name', 'students.status',
+                                    'examinations.exam_type', 'subjects.course_name', 'subjects.course_code', 'schools.school_name'
+                                )
+                                ->where('examination_results.class_id', $class_id[0])
+                                ->where('students.status', 1)
+                                ->where('examination_results.school_id', $schools->id)
+                                ->where('examination_results.exam_type_id', $exam_id[0])
+                                ->whereDate('examination_results.exam_date', $date)
+                                ->get();
 
                 // Remove duplicate student entries
                 $studentsData = $studentResults->unique('student_id')->values();
 
                 // Calculate ranks based on total marks
                 $studentsData = $studentsData->map(function ($student) use ($studentResults) {
-                    $courses = $studentResults->where('student_id', $student->student_id)
-                        ->map(fn($result) => "{$result->course_code} - {$result->score}")
-                        ->implode(', ');
+                $courses = $studentResults->where('student_id', $student->student_id)
+                    ->map(fn($result) => "{$result->course_code} - {$result->score}")
+                    ->implode(', ');
 
-                    $totalMarks = $studentResults->where('student_id', $student->student_id)->sum('score');
-                    $averageMarks = $totalMarks / $studentResults->where('student_id', $student->student_id)->count();
+                $totalMarks = $studentResults->where('student_id', $student->student_id)->sum('score');
+                $averageMarks = $totalMarks / $studentResults->where('student_id', $student->student_id)->count();
 
-                    $student->courses = $courses;
-                    $student->total_marks = $totalMarks;
-                    $student->average_marks = $averageMarks;
+                $student->courses = $courses;
+                $student->total_marks = $totalMarks;
+                $student->average_marks = $averageMarks;
 
-                    return $student;
+                return $student;
                 });
 
-                // Panga wanafunzi kwa total marks kwa mpangilio wa kushuka
+                // Sort students by total marks in descending order
                 $studentsData = $studentsData->sortByDesc('total_marks')->values();
                 $term = $studentResults->first()->Exam_term;
 
-                // Wapangie ranks
+                // Assign ranks
                 $studentsData = $studentsData->map(fn($student, $index) => tap($student, fn($s) => $s->rank = $index + 1));
 
-                // URL ya shule
+                // School URL
                 $url = "https://shuleapp.tech";
+                $beemSmsService = new BeemSmsService();
 
-                //find total of students
+                // Find total number of students
                 $totalStudents = $studentsData->count();
 
                 // Loop through each student and prepare the payload for each parent
                 foreach ($studentsData as $student) {
-                    $phoneNumber = $this->formatPhoneNumber($student->phone);
-                    if (!$phoneNumber) {
-                        // Log::error("Namba ya simu si sahihi kwa {$student->first_name}: {$student->phone}");
-                        Alert::error('Error!', "Invalid phone number for {$student->first_name}");
-                        continue;
-                    }
-
-                    $messageContent = "Habari! Matokeo ya: " . strtoupper("{$student->first_name} {$student->last_name}"). ", ";
-                    $messageContent .= "Mtihani: " . strtoupper($student->exam_type) ." => ". strtoupper($month) . "  => Muhula " . strtoupper($term) . " - {$year}: ";
-                    $messageContent .= strtoupper("{$student->courses}") . ". ";
-                    $messageContent .= "Jumla: {$student->total_marks}, Wastani: " . number_format($student->average_marks,1) . ", Nafasi: {$student->rank} kati ya: {$totalStudents}. ";
-                    $messageContent .= "Zaidi tembelea: $url.";
-
-                    // Prepare the recipients array
-                    $recipients = [
-                        [
-                            'recipient_id' => $student->student_id, // Unique ID for each recipient
-                            'dest_addr' => $phoneNumber, // Parent's phone number
-                        ]
-                    ];
-
-                    // Send SMS to each parent individually using Beem API
-                    $source_Addr = $school->sender_id ?? 'shuleApp';
-                    // $beemSmsService->sendSms($source_Addr, $messageContent, $recipients);
-
-                    // send by using nextSMS API *************************************
-                    $nextSmsService = new NextSmsService();
-                    $payload = [
-                        'from' => $school->sender_id ?? "SHULE APP",
-                        'to' => $phoneNumber,
-                        'text' => $messageContent,
-                        'reference' => $student->student_id
-                    ];
-
-                    $response = $nextSmsService->sendSmsByNext(
-                        $payload['from'],
-                        $payload['to'],
-                        $payload['text'],
-                        $payload['reference']
-                    );
+                $phoneNumber = $this->formatPhoneNumber($student->phone);
+                if (!$phoneNumber) {
+                    // Log::error("Invalid phone number for {$student->first_name}: {$student->phone}");
+                    return response()->json(['success' => false, 'message' => "Invalid phone number for {$student->first_name}", 'type' => 'error']);
                 }
 
-                // return response()->json($response);
-                if($updatedRows){
-                    Alert()->toast('Results published successfully', 'success');
-                    return back();
-                } else {
-                    Alert()->toast('No results found to publish.', 'error');
-                    return redirect()->back();
+                $messageContent = "Habari! Matokeo ya: " . strtoupper("{$student->first_name} {$student->last_name}"). ", ";
+                $messageContent .= "Mtihani: " . strtoupper($student->exam_type) ." => wa " . Carbon::parse($date)->format('d/m/Y'). "ni:- ";
+                $messageContent .= strtoupper("{$student->courses}") . ". ";
+                $messageContent .= "Jumla: {$student->total_marks}, Wastani: " . number_format($student->average_marks,1) . ", Nafasi: {$student->rank} kati ya: {$totalStudents}. ";
+                $messageContent .= "Zaidi tembelea: $url.";
+
+                // Prepare the recipients array
+                $recipients = [
+                    [
+                        'recipient_id' => $student->student_id, // Unique ID for each recipient
+                        'dest_addr' => $phoneNumber, // Parent's phone number
+                    ]
+                ];
+
+                // Send SMS to each parent individually using Beem API
+                $source_Addr = $schools->sender_id ?? 'shuleApp';
+                $beemSmsService->sendSms($source_Addr, $messageContent, $recipients);
+
+                // Send using nextSMS API (option 2)
+                $nextSmsService = new NextSmsService();
+                $payload = [
+                    'from' => $schools->sender_id ?? "SHULE APP",
+                    'to' => $phoneNumber,
+                    'text' => $messageContent,
+                    'reference' => $student->student_id
+                ];
+                // $response = $nextSmsService->sendSmsByNext(
+                //     $payload['from'],
+                //     $payload['to'],
+                //     $payload['text'],
+                //     $payload['reference']
+                // );
                 }
-            } else {
-                Alert()->toast('Invalid month name provided.', 'error' );
-                return redirect()->back();
+
+                Alert()->toast('Results published successfully', 'success');
+                return back();
             }
-
         }
-        catch (\Exception $e) {
+        catch (Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
             return back();
         }
     }
 
-    public function unpublishResult (School $school, $year, $class, $examType, $month)
+    public function unpublishResult ($school, $year, $class, $examType, $month, $date)
     {
         try {
 
+            $school_id = Hashids::decode($school);
+            $exam_id = Hashids::decode($examType);
+            $class_id = Hashids::decode($class);
 
             $user = Auth::user();
 
-            if($user->school_id != $school->id){
+            $schools = school::find($school_id[0]);
+
+            if($user->school_id != $schools->id){
                 Alert()->toast('You are not authorized to view this page', 'error');
                 return redirect()->route('error.page');
             }
 
-            $monthsArray = [
-                'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
-                'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8, 'September' => 9,
-                'October' => 10, 'November' => 11, 'December' => 12,
-            ];
-
-            // return $monthsArray;
-            if(array_key_exists($month, $monthsArray)){
-                $monthNumber = $monthsArray[$month];
-                // return $monthNumber;
-
-                $updatedRows = Examination_result::where('school_id', $school->id)
-                                                ->whereYear('exam_date', $year)
-                                                ->where('class_id', $class)
-                                                ->where('exam_type_id', $examType)
-                                                ->whereMonth('exam_date', $monthNumber)
+            $updatedRows = Examination_result::where('school_id', $schools->id)
+                                                // ->whereYear('exam_date', $year)
+                                                ->where('class_id', $class_id[0])
+                                                ->where('exam_type_id', $exam_id[0])
+                                                // ->whereMonth('exam_date', $monthNumber)
+                                                ->whereDate('exam_date', $date)
                                                 ->update(['status' => 1]);
                 if($updatedRows){
                     Alert()->toast('Results unpublished successfully', 'success');
@@ -916,11 +925,8 @@ class ResultsController extends Controller
                     Alert()->toast('No results found to unpublish.', 'error' );
                     return redirect()->back();
                 }
-            } else {
-                Alert()->toast('Invalid month name provided.', 'error');
-                return redirect()->back();
-            }
 
+            // return $monthsArray;
         }
         catch (\Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
@@ -928,13 +934,21 @@ class ResultsController extends Controller
         }
     }
 
-    public function deleteResults(School $school, $year, $class, $examType, $month)
+    public function deleteResults($school, $year, $class, $examType, $month, $date)
     {
         try {
+            $school_id = Hashids::decode($school);
+            $class_id = Hashids::decode($class);
+            $exam_id = Hashids::decode($examType);
+
+            // dd($school_id, $class_id, $exam_id);
+            // return $exam_id;
 
             $user = Auth::user();
 
-            if($user->school_id != $school->id){
+            $schools = school::find($school_id[0]);
+
+            if($user->school_id != $schools->id){
                 Alert()->toast('You are not authorized to view this page', 'error');
                 return redirect()->route('error.page');
             }
@@ -950,11 +964,12 @@ class ResultsController extends Controller
                 $monthNumber = $monthsArray[$month];
                 // return $monthNumber;
 
-                $results = Examination_result::where('school_id', $school->id)
-                                                ->whereYear('exam_date', $year)
-                                                ->where('class_id', $class)
-                                                ->where('exam_type_id', $examType)
-                                                ->whereMonth('exam_date', $monthNumber)
+                $results = Examination_result::where('school_id', $schools->id)
+                                                // ->whereYear('exam_date', $year)
+                                                ->where('class_id', $class_id[0])
+                                                ->where('exam_type_id', $exam_id[0])
+                                                // ->whereMonth('exam_date', $monthNumber)\
+                                                ->whereDate('exam_date', $date)
                                                 ->delete();
                 if($results) {
                     Alert()->toast('Results has deleted successfully', 'success');
@@ -974,12 +989,17 @@ class ResultsController extends Controller
     }
 
     //individual students reports show list
-    public function individualStudentReports(school $school, $year, $class, $examType, $month)
+    public function individualStudentReports($school, $year, $class, $examType, $month, $date)
     {
+        $school_id = Hashids::decode($school);
+        $class_id = Hashids::decode($class);
+        $exam_id = Hashids::decode($examType);
 
         $user = Auth::user();
 
-        if($user->school_id != $school->id){
+        $schools = school::find($school_id[0]);
+
+        if($user->school_id != $schools->id){
             Alert()->toast('You are not authorized to view this page', 'error');
             return redirect()->route('error.page');
         }
@@ -991,7 +1011,7 @@ class ResultsController extends Controller
             'October' => 10, 'November' => 11, 'December' => 12,
         ];
 
-        $classId = Grade::findOrFail($class);
+        $classId = Grade::findOrFail($class_id[0]);
 
         $monthNumber = $monthsArray[$month];
 
@@ -1001,32 +1021,43 @@ class ResultsController extends Controller
                     ->join('grades', 'grades.id', '=', 'examination_results.class_id')
                     ->join('parents', 'parents.id', '=', 'students.parent_id')
                     ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+                    ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
                     ->select(
                         'students.id as student_id',
                         'students.first_name', 'students.middle_name', 'students.last_name', 'students.admission_number',
-                        'students.gender', 'grades.class_name', 'users.phone'
+                        'students.gender', 'grades.class_name', 'users.phone',
+                        'examination_results.*',
+                        'subjects.course_code',
                     )
-                        ->whereYear('examination_results.exam_date', $year)
-                        ->whereMonth('examination_results.exam_date', $monthNumber)
-                        ->where('examination_results.class_id', $class)
+                        // ->whereYear('examination_results.exam_date', $year)
+                        // ->whereMonth('examination_results.exam_date', $monthNumber)
+                        ->where('examination_results.class_id', $classId->id)
+                        ->whereDate('examination_results.exam_date', $date)
+                        ->where('examination_results.exam_type_id', $exam_id[0])
                         ->distinct() // Hakikisha data ni ya kipekee kulingana na select fields
                         ->orderBy('students.first_name')
                         ->get();
 
-        return view('Results.results_students_list', compact('school', 'year', 'class', 'classId', 'examType', 'studentsResults', 'month'));
+        return view('Results.results_students_list', compact('schools', 'year', 'date', 'classId', 'exam_id', 'studentsResults', 'month'));
     }
 
-    public function downloadIndividualReport(school $school, $year, $class, $examType, $month, $student)
+    public function downloadIndividualReport($school, $year, $class, $examType, $month, $student, $date)
     {
+        $school_id = Hashids::decode($school);
+        $class_id = Hashids::decode($class);
+        $exam_id = Hashids::decode($examType);
+        $student_id = Hashids::decode($student);
 
+        // return $student_id;
         $user = Auth::user();
+        $schools = school::find($school_id[0]);
 
-        if($user->school_id != $school->id){
+        if($user->school_id != $schools->id){
             Alert()->toast('You are not authorized to view this page', 'error');
             return redirect()->route('error.page');
         }
 
-        $studentId = Student::findOrFail($student);
+        $studentId = Student::findOrFail($student_id[0]);
         //
         $monthsArray = [
             'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4, 'May' => 5, 'June' => 6,
@@ -1054,11 +1085,12 @@ class ResultsController extends Controller
                     'schools.school_name', 'schools.school_reg_no', 'schools.postal_address', 'schools.postal_name', 'schools.logo', 'schools.country',
                 )
                 ->where('examination_results.student_id', $studentId->id)
-                ->where('examination_results.exam_type_id', $examType)
-                ->where('examination_results.class_id', $class)
-                ->whereYear('examination_results.exam_date', $year)
-                ->whereMonth('examination_results.exam_date', $monthValue)
-                ->where('examination_results.school_id', $school->id)
+                ->where('examination_results.exam_type_id', $exam_id[0])
+                ->where('examination_results.class_id', $class_id[0])
+                // ->whereYear('examination_results.exam_date', $year)
+                // ->whereMonth('examination_results.exam_date', $monthValue)
+                ->where('examination_results.school_id', $schools->id)
+                ->where('examination_results.exam_date', $date)
                 ->get();
 
         // return $results;
@@ -1128,25 +1160,33 @@ class ResultsController extends Controller
         }
 
         // Pass the calculated data to the view
-        $pdf = \PDF::loadView('Results.parent_results', compact('results', 'year', 'examType', 'studentId', 'student', 'month', 'totalScore', 'averageScore', 'studentRank', 'rankings'));
+        $pdf = \PDF::loadView('Results.parent_results', compact('results', 'year', 'date', 'examType', 'studentId', 'student', 'month', 'totalScore', 'averageScore', 'studentRank', 'rankings'));
 
         return $pdf->stream($results->first()->first_name .' Results '.$month. ' '. $year. '.pdf');
     }
 
     //Re-send sms results individually
-    public function sendResultSms(School $school, $year, $class, $examType, $month, $student_id, BeemSmsService $beemSmsService)
+    public function sendResultSms($school, $year, $class, $examType, $month, $student_id, $date)
     {
         try {
 
+            $school_id = Hashids::decode($school);
+            $class_id = Hashids::decode($class);
+            $exam_id = Hashids::decode($examType);
+            $student = Hashids::decode($student_id);
+
+            // dd($school_id, $class_id, $student, $exam_id);
+
+            $schools = school::find($school_id[0]);
             $user = Auth::user();
 
-            if($user->school_id != $school->id){
+            if($user->school_id != $schools->id){
                 Alert()->toast('You are not authorized to view this page', 'error');
                 return redirect()->route('error.page');
             }
 
             // Fetch student information
-            $studentInfo = Student::findOrFail($student_id);
+            $studentInfo = Student::findOrFail($student[0]);
 
             // Map month names to their numeric values
             $monthsArray = [
@@ -1156,32 +1196,33 @@ class ResultsController extends Controller
             $monthValue = $monthsArray[$month];
 
             $results = Examination_result::query()
-                ->join('students', 'students.id', '=', 'examination_results.student_id')
-                ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                ->join('schools', 'schools.id', '=', 'examination_results.school_id')
-                ->select(
-                    'examination_results.*',
-                    'students.first_name', 'students.middle_name', 'students.last_name', 'students.status',
-                    'subjects.course_name', 'subjects.course_code',
-                    'examinations.exam_type',
-                    'schools.school_name'
-                )
-                ->where('examination_results.student_id', $studentInfo->id)
-                ->where('examination_results.exam_type_id', $examType)
-                ->where('examination_results.class_id', $class)
-                ->where('students.status', 1)
-                ->whereYear('examination_results.exam_date', $year)
-                ->whereMonth('examination_results.exam_date', $monthValue)
-                ->where('examination_results.school_id', $school->id)
-                ->where('examination_results.status', 2)
-                ->get();
+                        ->join('students', 'students.id', '=', 'examination_results.student_id')
+                        ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+                        ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+                        ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+                        ->join('schools', 'schools.id', '=', 'examination_results.school_id')
+                        ->select(
+                            'examination_results.*',
+                            'students.first_name', 'students.middle_name', 'students.last_name', 'students.status',
+                            'subjects.course_name', 'subjects.course_code',
+                            'examinations.exam_type',
+                            'schools.school_name'
+                        )
+                        ->where('examination_results.student_id', $studentInfo->id)
+                        ->where('examination_results.exam_type_id', $exam_id[0])
+                        ->where('examination_results.class_id', $class_id[0])
+                        ->where('students.status', 1)
+                        // ->whereYear('examination_results.exam_date', $year)
+                        // ->whereMonth('examination_results.exam_date', $monthValue)
+                        ->where('examination_results.school_id', $schools->id)
+                        ->whereDate('examination_results.exam_date', $date)
+                        ->where('examination_results.status', 2)
+                        ->get();
 
             // Hakikisha kuwa kuna data kwenye $results
             if ($results->isEmpty()) {
                 // Log::error("Hakuna matokeo yaliyopatikana kwa mwanafunzi: {$studentInfo->id}");
-                Alert()->toast('Error', 'No results found for the selected student or Selected results are blocked', 'error');
+                Alert()->toast('No results found for the selected student or Selected results are blocked', 'error');
                 return redirect()->back();
             }
 
@@ -1213,7 +1254,8 @@ class ResultsController extends Controller
 
             $totalStudents = $rankings->count();
             $url = 'https://shuleapp.tech';
-            $messageContent = "Habari! Matokeo ya ". strtoupper($fullName ).", Mtihani: ". strtoupper($examination)." => ". strtoupper($month). ", Muhula ". strtoupper($term). " - ". $year." ni:" . implode(', ', array_map('strtoupper', $courseScores));
+            $beemSmsService = new BeemSmsService();
+            $messageContent = "Habari! Matokeo ya ". strtoupper($fullName ).", Mtihani: ". strtoupper($examination)." => wa ". Carbon::parse($date)->format('d/m/Y'). ", ni:- ". implode(', ', array_map('strtoupper', $courseScores));
             $messageContent .= ". Jumla: $totalScore, Wastani: ". number_format($averageScore, 1) .", Nafasi: $studentRank kati ya: $totalStudents. Zaidi tembelea: $url";
 
             // Output the message content (or send it via SMS)
@@ -1255,7 +1297,7 @@ class ResultsController extends Controller
                 'reference' => $reference
             ];
 
-            // $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+            $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
             // return $response;
             Alert()->toast('Message sent successfully', 'success');
             return redirect()->back();
@@ -1278,5 +1320,30 @@ class ResultsController extends Controller
         }
 
         return $phone;
+    }
+
+    public function updateScore(Request $request)
+    {
+        // Thibitisha data
+        $request->validate([
+            'student_id' => 'required|integer',
+            'subject_id' => 'required|integer',
+            'score' => 'required|numeric',
+        ]);
+
+        // Tafuta rekodi ya alama kwenye database
+        $result = Examination_result::where('student_id', $request->student_id)
+                        ->where('id', $request->subject_id)
+                        ->first();
+
+        if ($result) {
+            // Sahihisha alama
+            $result->score = $request->score;
+            $result->save();
+
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false]);
     }
 }
