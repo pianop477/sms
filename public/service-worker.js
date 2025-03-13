@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ShuleApp-cache-v3'; // Ongeza version mpya ili kulazimisha update
+const CACHE_NAME = 'ShuleApp-cache-v4'; // Update version ili kulazimisha update
 
 const ASSETS_TO_CACHE = [
     '/',
@@ -9,7 +9,7 @@ const ASSETS_TO_CACHE = [
     '/icons/icon_2.png'
 ];
 
-// Install event - Cache assets na force update
+// Install event - Cache static assets
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
@@ -33,28 +33,46 @@ self.addEventListener('activate', (event) => {
     self.clients.claim(); // Hakikisha service worker mpya inachukua control ya pages zote
 });
 
-// Fetch event - Jaribu kuleta data mpya kwanza, kama haipo tumia cache
+// Fetch event - Cache-first strategy kwa static files, network-first kwa dynamic content
 self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        fetch(event.request)
-            .then((response) => {
-                // Kama request ni GET, cache response mpya
-                if (!response || response.status !== 200 || response.type !== 'basic') {
-                    return response;
-                }
+    const url = new URL(event.request.url);
 
-                let responseClone = response.clone();
-                caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, responseClone);
+    if (ASSETS_TO_CACHE.includes(url.pathname)) {
+        // Cache-first strategy kwa static assets
+        event.respondWith(
+            caches.match(event.request).then((cachedResponse) => {
+                return cachedResponse || fetch(event.request).then((networkResponse) => {
+                    return caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, networkResponse.clone());
+                        return networkResponse;
+                    });
                 });
-
-                return response;
             })
-            .catch(() => caches.match(event.request)) // Kama haipo kwenye mtandao, tumia cache
-    );
+        );
+    } else {
+        // Network-first strategy kwa dynamic content
+        event.respondWith(
+            fetch(event.request)
+                .then((response) => {
+                    if (!response || response.status !== 200 || response.type !== 'basic') {
+                        return response;
+                    }
+
+                    let responseClone = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, responseClone);
+                    });
+
+                    return response;
+                })
+                .catch(() => caches.match(event.request))
+        );
+    }
 });
 
-// Force reload app on update
-self.addEventListener('controllerchange', function () {
-    window.location.reload();
+// Badala ya kulazimisha page reload, toa notification ya update
+self.addEventListener('controllerchange', () => {
+    self.clients.matchAll().then((clients) => {
+        clients.forEach(client => client.postMessage({ action: "refresh" }));
+    });
 });
