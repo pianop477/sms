@@ -179,8 +179,19 @@ class ParentsController extends Controller
                     'reference' => $reference
                 ];
 
-                $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+                // $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
+                $beemSmsService = new BeemSmsService();
+                $senderId = $school->sender_id ?? 'shuleApp';
+                $Code_id = 1;
+                $recipients = [
+                    [
+                        'recipient_id' => 1,
+                        'dest_addr' => $formattedPhone, // Use validated phone number
+                    ],
+                ];
+
+                $response = $beemSmsService->sendSms($senderId, $message, $recipients);
                 Alert()->toast('Parent and student information saved successfully', 'success');
                 return redirect()->route('Parents.index');
 
