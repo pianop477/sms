@@ -3,7 +3,7 @@ const CACHE_NAME = 'ShuleApp-cache-v4'; // Update version ili kulazimisha update
 const ASSETS_TO_CACHE = [
     '/',
     '/index.php', // Laravel main entry file
-    '/assets/css/style.css',
+    '/assets/css/styles.css',
     '/assets/js/scripts.js',
     '/icons/icon.png',
     '/icons/icon_2.png'
@@ -13,11 +13,18 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(ASSETS_TO_CACHE);
+            return Promise.all(
+                ASSETS_TO_CACHE.map((asset) => {
+                    return cache.add(asset).catch((error) => {
+                        console.error(`Failed to cache: ${asset}`, error);
+                    });
+                })
+            );
         })
     );
-    self.skipWaiting(); // Force service worker mpya kuchukua control mara moja
+    self.skipWaiting();
 });
+
 
 // Activate event - Futa cache za zamani
 self.addEventListener('activate', (event) => {
