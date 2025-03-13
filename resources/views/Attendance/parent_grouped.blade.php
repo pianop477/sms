@@ -5,7 +5,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-10">
-                            <h4 class="header-title">Select Year - Attendance Report</h4>
+                            <h4 class="header-title">Select Year</h4>
                         </div>
                         <div class="col-2">
                             <a href="{{route('home')}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
