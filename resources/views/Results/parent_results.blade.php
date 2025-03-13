@@ -191,7 +191,7 @@
                     <p style="text-transform:capitalize; font-weight:bold; text-align:center">B. Examination Details</p>
                     <div class="info-container exam-info">
                         <p><strong>Examination Type:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $results->first()->exam_type }}</span></p>
-                        <p><strong>Exam Date:</strong> <span style="text-decoration:underline">{{ $date }}</span></p>
+                        <p><strong>Exam Date:</strong> <span style="text-decoration:underline">{{ \Carbon\Carbon::parse($date)->format('d-M-Y') }}</span></p>
                         <p><strong>Term:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{$results->first()->Exam_term}}</span></p>
                     </div>
                 </div>

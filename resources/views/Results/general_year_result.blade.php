@@ -5,7 +5,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-10">
-                            <h4 class="header-title text-center"><span class="text-uppercase text-primary">{{$school->school_name}}</span> Examination Results</h4>
+                            <h4 class="header-title text-center"><span class="text-uppercase text-primary">{{$schools->school_name}}</span> Examination Results</h4>
                         </div>
                         <div class="col-2">
                             <a href="{{route('home')}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
@@ -19,7 +19,7 @@
                         </div>
                         @else
                             @foreach ($groupedData as $year => $classes)
-                                <a href="{{ route('results.classesByYear', ['school' => $school->id, 'year' => $year]) }}">
+                                <a href="{{ route('results.classesByYear', ['school' => Hashids::encode($schools->id), 'year' => $year]) }}">
                                     <button type="button" class="list-group-item list-group-item-action">
                                         <h6 class="text-primary">>> {{$year}} Results Link</h6>
                                     </button>

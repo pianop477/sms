@@ -68,17 +68,17 @@
     /*=========================================
     show loader
     ==========================================*/
-    function showLoading() {
-        document.getElementById("loading-bar").style.display = "block";
-    }
-    function hideLoading() {
-        document.getElementById("loading-bar").style.display = "none";
-    }
+    // function showLoading() {
+    //     document.getElementById("loading-bar").style.display = "block";
+    // }
+    // function hideLoading() {
+    //     document.getElementById("loading-bar").style.display = "none";
+    // }
 
-    document.addEventListener("click", function() {
-        showLoading();
-        setTimeout(hideLoading, 2000); // Simulate loading time
-    });
+    // document.addEventListener("click", function() {
+    //     showLoading();
+    //     setTimeout(hideLoading, 2000); // Simulate loading time
+    // });
 
     /*================================
     stickey Header

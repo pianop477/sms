@@ -27,6 +27,11 @@
     <script src="{{asset('assets/js/vendor/modernizr-2.8.3.min.js')}}"></script>
     <link rel="manifest" href="{{asset('manifest.json')}}">
         <!-- Other head content -->
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <style>
         @media print {
             .no-print {

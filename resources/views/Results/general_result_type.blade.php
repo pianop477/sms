@@ -22,7 +22,7 @@
                                     <h4 class="header-title">Single Month results</h4>
                                 </div>
                                 <div class="col-2">
-                                    <a href="{{route('results.classesByYear', [$school->id, 'year'=>$year])}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                                    <a href="{{route('results.classesByYear', ['school' => Hashids::encode($schools->id), 'year'=>$year])}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
                                 </div>
                             </div>
                             <p class="text-danger">Select Examination type to view results</p>
@@ -33,7 +33,7 @@
                                 </div>
                                 @else
                                     @foreach ($groupedByExamType as $exam_type_id => $results )
-                                        <a href="{{ route('results.monthsByExamType', ['school' => $school->id, 'year' => $year, 'class' => $class, 'examType' => $exam_type_id]) }}">
+                                        <a href="{{ route('results.monthsByExamType', ['school' => Hashids::encode($schools->id), 'year' => $year, 'class' => Hashids::encode($classes->id), 'examType' => Hashids::encode($exam_type_id)]) }}">
                                             <button type="button" class="list-group-item list-group-item-action">
                                                 <h6 class="text-primary text-capitalize">>> {{ $results->first()->exam_type }}</h6>
                                             </button>
@@ -63,7 +63,7 @@
                                                     <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <form class="needs-validation" novalidate="" action="{{route('submit.compiled.results', ['school' => $school, 'year' => $year, 'class' => $class])}}" method="POST" enctype="multipart/form-data">
+                                                    <form class="needs-validation" novalidate="" action="{{route('submit.compiled.results', ['school' => Hashids::encode($schools->id), 'year' => $year, 'class' => Hashids::encode($classes->id)])}}" method="POST" enctype="multipart/form-data">
                                                         @csrf
                                                         {{-- <div class="form-row">
                                                             <div class="col-md-4 mb-3">
@@ -173,7 +173,7 @@
                         </div>
 
 
-                            <form action="{{ route('fetch.report', ['class' => $class, 'year' => $year, 'school' => $school->id]) }}" method="POST" role="form" class="needs-validation" novalidate id="" onsubmit="showPreloader(event)">
+                            <form action="{{ route('fetch.report', ['class' => Hashids::encode($classes->id), 'year' => $year, 'school' => Hashids::encode($schools->id)]) }}" method="POST" role="form" class="needs-validation" novalidate id="" onsubmit="showPreloader(event)">
                                 @csrf
                                 <!-- Loader GIF -->
                                 <div id="loaderContainer" style="display: none; text-align: center; margin-top: 10px;">
@@ -183,7 +183,7 @@
                                     <div class="col-md-6">
                                         <label for="">Class</label>
                                         <select name="class" id="class-id" class="form-control text-capitalize" required>
-                                            <option value="{{$class}}" selected>{{$grades->class_name}}</option>
+                                            <option value="{{$classes->id}}" selected>{{$classes->class_name}}</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">

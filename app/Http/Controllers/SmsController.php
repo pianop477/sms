@@ -50,7 +50,7 @@ class SmsController extends Controller
 
 
     //send sms using beem api service***************************************************************************
-    public function sendSms(Request $request, BeemSmsService $beemSmsService)
+    public function sendSms(Request $request)
     {
         $user = Auth::user();
 
@@ -102,6 +102,7 @@ class SmsController extends Controller
         }
 
         // Prepare recipients array for Beem API
+        $beemSmsService = new BeemSmsService();
         $sourceAddr = $school->sender_id ?? 'shuleApp'; // Correctly set the source address
         $recipients = [];
         $recipient_id = 1;
@@ -137,7 +138,7 @@ class SmsController extends Controller
 
 
     //send sms using nextSms api service***************************************************************************
-    public function sendSmsUsingNextSms(Request $request, NextSmsService $nextSmsService)
+    public function sendSmsUsingNextSms(Request $request)
     {
         $user = Auth::user();
 
@@ -182,6 +183,7 @@ class SmsController extends Controller
         }
 
         //prepare payload
+        $nextSmsService = new NextSmsService();
         $sender = $school->sender_id ?? 'SHULE APP';
         $dest = [];
         $reference = uniqid();

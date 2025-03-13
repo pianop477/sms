@@ -187,7 +187,7 @@
                     </div>
                 </div>
                 <div class="details">
-                    <h4>{{$results->first()->class_name}} {{$results->first()->exam_type}} Results - {{$month}}, {{$year}}</h4>
+                    <h4>{{$results->first()->class_name}} {{$results->first()->exam_type}} Results - {{\Carbon\Carbon::parse($date)->format('d-M-Y')}}</h4>
                     <h5 style="font-weight:normal">TERM: {{$results->first()->Exam_term}}</h5>
                     <h5 style="font-weight:normal">NUMBER OF CANDIDATES: {{$totalUniqueStudents}}</h5>
                     <h5 style="font-weight:normal">CLASS AVERAGE: <strong>{{number_format($sumOfCourseAverages, 4)}}</strong>
