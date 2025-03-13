@@ -201,11 +201,11 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th class="text-center" style="text-align: center">Reg No</th>
+                                <th class="text-center" style="text-align: center">Adm No</th>
                                 <th>Student's Name</th>
                                 <th class="text-center" style="text-align:center">Gender</th>
                                 <th class="text-center" style="text-align:center">Stream</th>
-                                <th style="text-align:center">Attendance Status</th>
+                                <th style="text-align:center">Status</th>
                             </tr>
                         </thead>
                         <tbody>
