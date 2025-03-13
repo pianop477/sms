@@ -154,7 +154,7 @@
                     {{-- table for students lies here --}}
                     <div class="single-table">
                         <div class="table-responsive">
-                            <table class="table" id="myTable">
+                            <table class="table" id="">
                                 <thead class="text-capitalize">
                                     <tr class="">
                                         <th scope="col">Student Name</th>

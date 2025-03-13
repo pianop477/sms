@@ -200,11 +200,11 @@
                 <table class="table table-bordered table-hover">
                     <thead>
                         <th style="width: 5px">#</th>
-                        <th class="text-center" style="text-align: center">Reg No</th>
+                        <th class="text-center" style="text-align: center">Adm No</th>
                         <th>Student Name</th>
                         <th style="width: 10px" style="text-align: center" class="text-center">Gender</th>
                         <th style="width: 10px" style="text-align: center" class="text-center">Stream</th>
-                        <th style="text-align: center">Attendance Status</th>
+                        <th style="text-align: center">Status</th>
                     </thead>
                     <tbody>
                         @foreach ($attendanceRecords as $record )

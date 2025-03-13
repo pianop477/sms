@@ -160,11 +160,11 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th style="text-align: center">Reg No.</th>
+                                <th style="text-align: center">Adm No.</th>
                                 <th>Student Name</th>
                                 <th style="text-align:center" class="text-center">Gender</th>
                                 <th style="text-align:center" class="text-center">Stream</th>
-                                <th style="text-align: center;">attendance Status</th>
+                                <th style="text-align: center;">Status</th>
                             </tr>
                         </thead>
                         <tbody>
