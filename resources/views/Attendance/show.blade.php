@@ -5,7 +5,8 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-10">
-                    <h5 class="header-title">Student Name: <span class="text-uppercase text-primary">{{ $firstRecord->student_firstname }} {{ $firstRecord->student_middlename }} {{ $firstRecord->student_lastname }}</span></h5>
+                    <h6 class="header-title">Student Name:</h6>
+                    <h5 class="text-primary">{{ $firstRecord->student_firstname }} {{ $firstRecord->student_middlename }} {{ $firstRecord->student_lastname }}</h5>
                 </div>
                 <div class="col-2">
                     <a href="{{route('attendance.byYear', ['student' => Hashids::encode($students->id)])}}"><i class="fa-solid fa-circle-arrow-left text-secondary" style="font-size: 2rem"></i></a>
