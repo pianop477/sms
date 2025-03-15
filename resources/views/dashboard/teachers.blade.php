@@ -833,7 +833,7 @@
                                                         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
                                                             <a class="dropdown-item" href="{{route('under.construction.page')}}"><i class="ti-pencil-alt"></i> Score</a>
                                                             {{-- <a class="dropdown-item" href="{{route('score.prepare.form', ['id' => Hashids::encode($course->id)])}}"><i class="ti-pencil-alt"></i> Score</a> --}}
-                                                            <a class="dropdown-item" href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}"><i class="ti-file"></i> Results</a>
+                                                            {{-- <a class="dropdown-item" href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}"><i class="ti-file"></i> Results</a> --}}
                                                         </div>
                                                     </div>
                                                 </ul>
