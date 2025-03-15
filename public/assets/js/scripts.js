@@ -326,15 +326,15 @@
         }
     });
 
+    // Hakikisha PWA inasaidiwa
     if ('beforeinstallprompt' in window) {
         console.log('PWA inasaidiwa kwenye browser hii.');
     } else {
         console.log('PWA haisaidiiwi kwenye browser hii.');
     }
 
-
     /*================================
-    iOS Installation Prompt
+     iOS Installation Prompt
     ==================================*/
     document.addEventListener('DOMContentLoaded', () => {
         if (/iPhone|iPad/i.test(navigator.userAgent)) {
@@ -343,4 +343,27 @@
             }
         }
     });
-})(jQuery);
+
+    //allow automatic updates
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js').then((registration) => {
+            console.log('Service Worker registered:', registration);
+
+            // Angalia updates kila baada ya muda
+            setInterval(() => {
+                registration.update();
+            }, 30000); // Cheki updates kila sekunde 30
+
+            // Hakikisha standalone app pia inapata update
+            if (navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage('checkForUpdate');
+            }
+        });
+
+        // Sikiliza kama kuna service worker mpya inakua activated
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            alert('New Updates for ShuleApp is Available, please close and Re-open again');
+        });
+    }
+
+    })(jQuery);

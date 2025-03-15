@@ -1,25 +1,13 @@
-const CACHE_NAME = 'ShuleApp-cache-v1.2'; // Badilisha version kwa kila update
+const CACHE_NAME = 'ShuleApp-dynamic-cache-v1';
 
-const ASSETS_TO_CACHE = [
-    '/',
-    '/index.php',
-    '/assets/css/styles.css',
-    '/assets/js/scripts.js',
-    '/icons/icon.png',
-    '/icons/icon_2.png'
-];
-
+// Usihifadhi chochote kwa muda mrefu, kila kitu kitachukuliwa moja kwa moja kutoka server
 self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            console.log('Caching static assets...');
-            return cache.addAll(ASSETS_TO_CACHE);
-        })
-    );
-    self.skipWaiting();
+    console.log('Service Worker installing...');
+    self.skipWaiting(); // Force update immediately
 });
 
 self.addEventListener('activate', (event) => {
+    console.log('Service Worker activated');
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
@@ -32,27 +20,20 @@ self.addEventListener('activate', (event) => {
             );
         })
     );
-    self.clients.claim();
+    self.clients.claim(); // Ensure all tabs use new service worker immediately
 });
 
+// Fetch kila kitu moja kwa moja kutoka server
 self.addEventListener('fetch', (event) => {
-    const url = new URL(event.request.url);
+    event.respondWith(
+        fetch(event.request).catch(() => caches.match(event.request))
+    );
+});
 
-    if (ASSETS_TO_CACHE.includes(url.pathname)) {
-        event.respondWith(
-            caches.match(event.request).then((cachedResponse) => {
-                return cachedResponse || fetch(event.request).then((networkResponse) => {
-                    const responseClone = networkResponse.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, responseClone);
-                    });
-                    return networkResponse;
-                });
-            })
-        );
-    } else {
-        event.respondWith(
-            fetch(event.request).catch(() => caches.match(event.request))
-        );
+// Tuma ujumbe kwa watumiaji wa standalone app kuhusu update mpya
+self.addEventListener('message', (event) => {
+    if (event.data === 'checkForUpdate') {
+        self.skipWaiting();
+        console.log('Forcing service worker update...');
     }
 });
