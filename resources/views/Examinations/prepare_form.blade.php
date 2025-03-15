@@ -131,12 +131,12 @@
         }
     }
 
-    // Fungua ukurasa ukiwa na saved data
-    continueWithSavedDataButton.addEventListener('click', () => {
-        if (confirm('You have unsubmitted Results. Do you want to continue with the saved data?')) {
-            window.location.href = "{{ route('form.saved.values') }}";
-        }
-    });
+    // // Fungua ukurasa ukiwa na saved data
+    // continueWithSavedDataButton.addEventListener('click', () => {
+    //     if (confirm('You have unsubmitted Results. Do you want to continue with the saved data?')) {
+    //         window.location.href = "{{ route('form.saved.values') }}";
+    //     }
+    // });
 
     // Futa saved data zote
     clearSavedDataButton.addEventListener('click', () => {
