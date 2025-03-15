@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ShuleApp-cache-v1.1'; // Badilisha version kwa kila update
+const CACHE_NAME = 'ShuleApp-cache-v1.2'; // Badilisha version kwa kila update
 
 const ASSETS_TO_CACHE = [
     '/',
