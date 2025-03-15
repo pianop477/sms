@@ -1,6 +1,5 @@
 const CACHE_NAME = 'ShuleApp-dynamic-cache-v1';
 
-// Usihifadhi chochote kwa muda mrefu, kila kitu kitachukuliwa moja kwa moja kutoka server
 self.addEventListener('install', (event) => {
     console.log('Service Worker installing...');
     self.skipWaiting(); // Force update immediately
@@ -20,17 +19,16 @@ self.addEventListener('activate', (event) => {
             );
         })
     );
-    self.clients.claim(); // Ensure all tabs use new service worker immediately
+    self.clients.claim(); // Hakikisha kila tab inapata service worker mpya mara moja
 });
 
-// Fetch kila kitu moja kwa moja kutoka server
 self.addEventListener('fetch', (event) => {
     event.respondWith(
         fetch(event.request).catch(() => caches.match(event.request))
     );
 });
 
-// Tuma ujumbe kwa watumiaji wa standalone app kuhusu update mpya
+// Kusukuma ujumbe wa update kwa watumiaji wa standalone app
 self.addEventListener('message', (event) => {
     if (event.data === 'checkForUpdate') {
         self.skipWaiting();
