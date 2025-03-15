@@ -33,7 +33,7 @@
                                 @endif
                             @endif
                             <h4 class="user-name text-capitalize dropdown-toggle" data-toggle="dropdown" style="margin-left: 10px;">
-                                Hello, {{ Auth::user()->first_name }}! <i class="fa fa-angle-down"></i>
+                                Hi, {{ Auth::user()->first_name }}! <i class="fa fa-angle-down"></i>
                             </h4>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" href="{{route('show.profile')}}"><i class="ti-user"></i> Profile</a>
