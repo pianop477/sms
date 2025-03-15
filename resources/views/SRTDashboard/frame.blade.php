@@ -25,8 +25,6 @@
            </div>
         <!-- header area start -->
 
-        <button id="install-button" style="display: none;">Install ShuleApp</button>
-
 
         <div class="header-area header-bottom no-print">
 
@@ -59,6 +57,7 @@
 
     <!-- jquery latest version -->
     @include('SRTDashboard.script')
+
 
     @include('sweetalert::alert')
 </body>

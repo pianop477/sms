@@ -1,113 +1,121 @@
-
-(function($) {
+(function ($) {
     "use strict";
 
     /*================================
     Preloader
     ==================================*/
-
-    var preloader = $('#preloader');
-    $(window).on('load', function() {
-        setTimeout(function() {
-            preloader.fadeOut('slow', function() { $(this).remove(); });
-        }, 300)
-    });
-
-    /*================================
-    sidebar collapsing
-    ==================================*/
-    if (window.innerWidth <= 1364) {
-        $('.page-container').addClass('sbar_collapsed');
-    }
-    $('.nav-btn').on('click', function() {
-        $('.page-container').toggleClass('sbar_collapsed');
-    });
-
-    /*================================
-    Start Footer resizer
-    ==================================*/
-    var e = function() {
-        var e = (window.innerHeight > 0 ? window.innerHeight : this.screen.height) - 5;
-        (e -= 67) < 1 && (e = 1), e > 67 && $(".main-content").css("min-height", e + "px")
-    };
-    $(window).ready(e), $(window).on("resize", e);
-
-    /*================================
-    sidebar menu
-    ==================================*/
-    $("#menu").metisMenu();
-
-    /*================================
-    slimscroll activation
-    ==================================*/
-    $('.menu-inner').slimScroll({
-        height: 'auto'
-    });
-    $('.nofity-list').slimScroll({
-        height: '435px'
-    });
-    $('.timeline-area').slimScroll({
-        height: '500px'
-    });
-    $('.recent-activity').slimScroll({
-        height: 'calc(100vh - 114px)'
-    });
-    $('.settings-list').slimScroll({
-        height: 'calc(100vh - 158px)'
-    });
-
-    /*==================================
-    script for service worker
-    ===================================*/
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js')
-        .then(() => console.log('Service Worker Registered'));
-    }
-
-
-    /*=========================================
-    show loader
-    ==========================================*/
-    // function showLoading() {
-    //     document.getElementById("loading-bar").style.display = "block";
-    // }
-    // function hideLoading() {
-    //     document.getElementById("loading-bar").style.display = "none";
-    // }
-
-    // document.addEventListener("click", function() {
-    //     showLoading();
-    //     setTimeout(hideLoading, 2000); // Simulate loading time
-    // });
-
-    /*================================
-    stickey Header
-    ==================================*/
-    $(window).on('scroll', function() {
-        var scroll = $(window).scrollTop(),
-            mainHeader = $('#sticky-header'),
-            mainHeaderHeight = mainHeader.innerHeight();
-
-        // console.log(mainHeader.innerHeight());
-        if (scroll > 1) {
-            $("#sticky-header").addClass("sticky-menu");
-        } else {
-            $("#sticky-header").removeClass("sticky-menu");
+    document.addEventListener('DOMContentLoaded', () => {
+        const preloader = document.getElementById('preloader');
+        if (preloader) {
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 300);
         }
     });
 
     /*================================
-    form bootstrap validation
+    Sidebar collapsing
     ==================================*/
-    $('[data-toggle="popover"]').popover()
+    document.addEventListener('DOMContentLoaded', () => {
+        const pageContainer = document.querySelector('.page-container');
+        const navBtn = document.querySelector('.nav-btn');
 
-    /*------------- Start form Validation -------------*/
-    window.addEventListener('load', function() {
-        // Fetch all the forms we want to apply custom Bootstrap validation styles to
-        var forms = document.getElementsByClassName('needs-validation');
-        // Loop over them and prevent submission
-        var validation = Array.prototype.filter.call(forms, function(form) {
-            form.addEventListener('submit', function(event) {
+        if (window.innerWidth <= 1364 && pageContainer) {
+            pageContainer.classList.add('sbar_collapsed');
+        }
+
+        if (navBtn && pageContainer) {
+            navBtn.addEventListener('click', () => {
+                pageContainer.classList.toggle('sbar_collapsed');
+            });
+        }
+    });
+
+    /*================================
+    Footer resizer
+    ==================================*/
+    document.addEventListener('DOMContentLoaded', () => {
+        const resizeFooter = () => {
+            const windowHeight = window.innerHeight > 0 ? window.innerHeight : screen.height;
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent) {
+                const height = windowHeight - 67;
+                mainContent.style.minHeight = (height > 67 ? height : 67) + 'px';
+            }
+        };
+
+        resizeFooter();
+        window.addEventListener('resize', resizeFooter);
+    });
+
+    /*================================
+    Sidebar menu (MetisMenu)
+    ==================================*/
+    document.addEventListener('DOMContentLoaded', () => {
+        const menu = document.getElementById('menu');
+        if (menu) {
+            $('#menu').metisMenu();
+        }
+    });
+
+    /*================================
+    Slimscroll activation
+    ==================================*/
+    document.addEventListener('DOMContentLoaded', () => {
+        const slimScrollElements = [
+            { selector: '.menu-inner', height: 'auto' },
+            { selector: '.nofity-list', height: '435px' },
+            { selector: '.timeline-area', height: '500px' },
+            { selector: '.recent-activity', height: 'calc(100vh - 114px)' },
+            { selector: '.settings-list', height: 'calc(100vh - 158px)' }
+        ];
+
+        slimScrollElements.forEach((element) => {
+            const el = document.querySelector(element.selector);
+            if (el) {
+                $(element.selector).slimScroll({
+                    height: element.height
+                });
+            }
+        });
+    });
+
+    /*================================
+    Service Worker Registration
+    ==================================*/
+    document.addEventListener('DOMContentLoaded', () => {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker
+                .register('/service-worker.js')
+                .then(() => console.log('Service Worker Registered'))
+                .catch((error) => console.error('Service Worker Registration Failed:', error));
+        }
+    });
+
+    /*================================
+    Sticky Header
+    ==================================*/
+    document.addEventListener('DOMContentLoaded', () => {
+        const stickyHeader = document.getElementById('sticky-header');
+        if (stickyHeader) {
+            window.addEventListener('scroll', () => {
+                const scroll = window.scrollY;
+                if (scroll > 1) {
+                    stickyHeader.classList.add('sticky-menu');
+                } else {
+                    stickyHeader.classList.remove('sticky-menu');
+                }
+            });
+        }
+    });
+
+    /*================================
+    Bootstrap Form Validation
+    ==================================*/
+    document.addEventListener('DOMContentLoaded', () => {
+        const forms = document.getElementsByClassName('needs-validation');
+        Array.prototype.filter.call(forms, (form) => {
+            form.addEventListener('submit', (event) => {
                 if (form.checkValidity() === false) {
                     event.preventDefault();
                     event.stopPropagation();
@@ -115,244 +123,224 @@
                 form.classList.add('was-validated');
             }, false);
         });
-    }, false);
-
-    /*================================
-    datatable active
-    ==================================*/
-    if ($('#dataTable').length) {
-        $('#dataTable').DataTable({
-            responsive: true
-        });
-    }
-    if ($('#dataTable2').length) {
-        $('#dataTable2').DataTable({
-            responsive: true
-        });
-    }
-    if ($('#dataTable3').length) {
-        $('#dataTable3').DataTable({
-            responsive: true
-        });
-    }
-
-
-    /*================================
-    Slicknav mobile menu
-    ==================================*/
-    $('ul#nav_menu').slicknav({
-        prependTo: "#mobile_menu"
     });
 
     /*================================
-    login form
+    DataTable Initialization
     ==================================*/
-    $('.form-gp input').on('focus', function() {
-        $(this).parent('.form-gp').addClass('focused');
+    document.addEventListener('DOMContentLoaded', () => {
+        const dataTables = ['#dataTable', '#dataTable2', '#dataTable3'];
+        dataTables.forEach((table) => {
+            const el = document.querySelector(table);
+            if (el) {
+                $(table).DataTable({
+                    responsive: true
+                });
+            }
+        });
     });
-    $('.form-gp input').on('focusout', function() {
-        if ($(this).val().length === 0) {
-            $(this).parent('.form-gp').removeClass('focused');
+
+    /*================================
+    Slicknav Mobile Menu
+    ==================================*/
+    document.addEventListener('DOMContentLoaded', () => {
+        const navMenu = document.querySelector('ul#nav_menu');
+        if (navMenu) {
+            $('ul#nav_menu').slicknav({
+                prependTo: '#mobile_menu'
+            });
         }
     });
 
     /*================================
-    slider-area background setting
+    Login Form Focus
     ==================================*/
-    $('.settings-btn, .offset-close').on('click', function() {
-        $('.offset-area').toggleClass('show_hide');
-        $('.settings-btn').toggleClass('active');
+    document.addEventListener('DOMContentLoaded', () => {
+        const formInputs = document.querySelectorAll('.form-gp input');
+        formInputs.forEach((input) => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('focused');
+            });
+            input.addEventListener('focusout', () => {
+                if (input.value.length === 0) {
+                    input.parentElement.classList.remove('focused');
+                }
+            });
+        });
     });
 
     /*================================
-    Owl Carousel
+    Slider Area Background Setting
     ==================================*/
-    function slider_area() {
-        var owl = $('.testimonial-carousel').owlCarousel({
-            margin: 50,
-            loop: true,
-            autoplay: false,
-            nav: false,
-            dots: true,
-            responsive: {
-                0: {
-                    items: 1
-                },
-                450: {
-                    items: 1
-                },
-                768: {
-                    items: 2
-                },
-                1000: {
-                    items: 2
-                },
-                1360: {
-                    items: 1
-                },
-                1600: {
-                    items: 2
+    document.addEventListener('DOMContentLoaded', () => {
+        const settingsBtn = document.querySelector('.settings-btn');
+        const offsetClose = document.querySelector('.offset-close');
+        const offsetArea = document.querySelector('.offset-area');
+
+        if (settingsBtn && offsetArea) {
+            settingsBtn.addEventListener('click', () => {
+                offsetArea.classList.toggle('show_hide');
+                settingsBtn.classList.toggle('active');
+            });
+        }
+
+        if (offsetClose && offsetArea) {
+            offsetClose.addEventListener('click', () => {
+                offsetArea.classList.toggle('show_hide');
+                settingsBtn.classList.toggle('active');
+            });
+        }
+    });
+
+    /*================================
+    Owl Carousel Initialization
+    ==================================*/
+    document.addEventListener('DOMContentLoaded', () => {
+        const testimonialCarousel = document.querySelector('.testimonial-carousel');
+        if (testimonialCarousel) {
+            $('.testimonial-carousel').owlCarousel({
+                margin: 50,
+                loop: true,
+                autoplay: false,
+                nav: false,
+                dots: true,
+                responsive: {
+                    0: { items: 1 },
+                    450: { items: 1 },
+                    768: { items: 2 },
+                    1000: { items: 2 },
+                    1360: { items: 1 },
+                    1600: { items: 2 }
                 }
-            }
-        });
-    }
-    slider_area();
+            });
+        }
+    });
 
     /*================================
     Fullscreen Page
     ==================================*/
+    document.addEventListener('DOMContentLoaded', () => {
+        const fullViewBtn = document.getElementById('full-view');
+        const fullViewExitBtn = document.getElementById('full-view-exit');
 
-    if ($('#full-view').length) {
-
-        var requestFullscreen = function(ele) {
-            if (ele.requestFullscreen) {
-                ele.requestFullscreen();
-            } else if (ele.webkitRequestFullscreen) {
-                ele.webkitRequestFullscreen();
-            } else if (ele.mozRequestFullScreen) {
-                ele.mozRequestFullScreen();
-            } else if (ele.msRequestFullscreen) {
-                ele.msRequestFullscreen();
-            } else {
-                console.log('Fullscreen API is not supported.');
-            }
-        };
-
-        var exitFullscreen = function() {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            } else if (document.mozCancelFullScreen) {
-                document.mozCancelFullScreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
-            } else {
-                console.log('Fullscreen API is not supported.');
-            }
-        };
-
-        var fsDocButton = document.getElementById('full-view');
-        var fsExitDocButton = document.getElementById('full-view-exit');
-
-        fsDocButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            requestFullscreen(document.documentElement);
-            $('body').addClass('expanded');
-        });
-
-        fsExitDocButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            exitFullscreen();
-            $('body').removeClass('expanded');
-        });
-    }
-
-    // show loader
-    document.addEventListener("DOMContentLoaded", () => {
-        const loader = document.getElementById("loading-overlay");
-
-        // Onyesha loader wakati wowote user anapobofya link
-        document.querySelectorAll("a").forEach(link => {
-            link.addEventListener("click", () => {
-                loader.style.display = "flex";
-            });
-        });
-
-        // Ondoa loader baada ya kurender
-        window.addEventListener("load", () => {
-            setTimeout(() => {
-                loader.style.display = "none";
-            }, 1000);
-        });
-    });
-
-
-    // prompt to android users to install the app
-    let deferredPrompt;
-
-    // Hifadhi event ya installation
-    window.addEventListener("beforeinstallprompt", (event) => {
-        event.preventDefault();
-        deferredPrompt = event;
-        checkInstallation();
-    });
-
-    // Fungua notification kila user akifungua app ikiwa hajainstall
-    function checkInstallation() {
-        if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone) {
-            console.log("PWA already installed.");
-            return;
-        }
-
-        // Toa notification kila baada ya sekunde 30
-        setTimeout(() => {
-            showInstallNotification();
-        }, 30000);
-
-        // Onyesha button ya install ikiwa user anataka manual installation
-        document.getElementById("install-button").style.display = "block";
-    }
-
-    // Notification ya kusakinisha
-    function showInstallNotification() {
-        if ("Notification" in window && Notification.permission === "granted") {
-            new Notification("Install ShuleApp", {
-                body: "For a better experience, install ShuleApp on your device.",
-                icon: "/icons/icon.png",
-                actions: [{ action: "install", title: "Install Now" }]
-            });
-        } else if ("Notification" in window && Notification.permission !== "denied") {
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    showInstallNotification();
+        if (fullViewBtn && fullViewExitBtn) {
+            fullViewBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
                 }
+                document.body.classList.add('expanded');
+            });
+
+            fullViewExitBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+                document.body.classList.remove('expanded');
             });
         }
-    }
+    });
 
-    // Ikiwa user anabofya "Install Now" kwenye notification
-    self.addEventListener("notificationclick", (event) => {
-        if (event.action === "install") {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === "accepted") {
-                        console.log("User installed the app.");
-                    } else {
-                        console.log("User dismissed the installation.");
-                    }
-                    deferredPrompt = null;
+    /*================================
+    Loader
+    ==================================*/
+    document.addEventListener('DOMContentLoaded', () => {
+        const loader = document.getElementById('loading-overlay');
+        if (loader) {
+            document.querySelectorAll('a').forEach((link) => {
+                link.addEventListener('click', () => {
+                    loader.style.display = 'flex';
                 });
-            }
-        }
-    });
+            });
 
-    // Button ya Manual Installation
-    document.getElementById("install-button").addEventListener("click", () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === "accepted") {
-                    console.log("User installed the app.");
-                } else {
-                    console.log("User dismissed the installation.");
-                }
-                deferredPrompt = null;
+            window.addEventListener('load', () => {
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 1000);
             });
         }
     });
 
+    /*================================
+    PWA Installation Prompt
+    ==================================*/
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOMContentLoaded event triggered'); // Debugging
 
-    // prompt IOS users to install the app
-    // Angalia kama ni iPhone/iPad
-    if (/iPhone|iPad/i.test(navigator.userAgent)) {
-        if (!window.matchMedia('(display-mode: standalone)').matches) {
-            alert("For a better experience, install ShuleApp: Click 'Share' → 'Add to Home Screen'.");
+        let deferredPrompt;
+
+        // Unda kitufe cha kufunga programu kwa kutumia JavaScript
+        const installButton = document.createElement('button');
+        installButton.id = 'install-button';
+        installButton.textContent = 'Install App';
+        installButton.style.display = 'none'; // Ficha kitufe mwanzoni
+        installButton.style.position = 'fixed'; // Weka kitufe kwenye eneo maalum
+        installButton.style.bottom = '50px'; // Chini ya ukurasa
+        installButton.style.right = '20px'; // Upande wa kulia
+        installButton.style.padding = '10px 20px'; // Padding ya kitufe
+        installButton.style.backgroundColor = '#007bff'; // Rangi ya kitufe
+        installButton.style.color = '#fff'; // Rangi ya maandishi
+        installButton.style.border = 'none'; // Ondoa mpaka
+        installButton.style.borderRadius = '5px'; // Pinda pembe za kitufe
+        installButton.style.cursor = 'pointer'; // Badilisha mwonekano wa kielelezo
+        installButton.style.zIndex = '1000'; // Hakikisha kitufe kiko juu ya vitu vingine
+
+        // Ongeza kitufe kwenye DOM
+        document.body.appendChild(installButton);
+        console.log('Install button created and added to DOM:', installButton); // Debugging
+
+        // Kumbukumbu ya beforeinstallprompt event
+        window.addEventListener('beforeinstallprompt', (event) => {
+            console.log('beforeinstallprompt event triggered'); // Debugging
+            event.preventDefault();
+            deferredPrompt = event;
+            installButton.style.display = 'block'; // Onyesha kitufe
+            console.log('Install button displayed'); // Debugging
+
+            // Ongeza event listener kwa kitufe
+            installButton.addEventListener('click', async () => {
+                console.log('Install button clicked'); // Debugging
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const choiceResult = await deferredPrompt.userChoice;
+                    console.log('User choice:', choiceResult); // Debugging
+
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('Mtumiaji alikubali kufunga programu.');
+                    } else {
+                        console.log('Mtumiaji alikataa kufunga programu.');
+                    }
+
+                    deferredPrompt = null;
+                    installButton.style.display = 'none'; // Ficha kitufe baada ya matumizi
+                    console.log('Install button hidden after use'); // Debugging
+                }
+            }, { once: true }); // Tumia { once: true } ili kuzuia matumizi ya mara kwa mara
+        });
+
+        // Ficha kitufe ikiwa programu tayari imefungwa
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+            console.log('Already installed: hiding button');
+            installButton.style.display = 'none'; // Ikiwa tayari ni app, ficha kitufe
         }
+    });
+
+    if ('beforeinstallprompt' in window) {
+        console.log('PWA inasaidiwa kwenye browser hii.');
+    } else {
+        console.log('PWA haisaidiiwi kwenye browser hii.');
     }
 
-//prompt message kwa users wa laptop
 
-
+    /*================================
+    iOS Installation Prompt
+    ==================================*/
+    document.addEventListener('DOMContentLoaded', () => {
+        if (/iPhone|iPad/i.test(navigator.userAgent)) {
+            if (!window.matchMedia('(display-mode: standalone)').matches) {
+                alert("For a better experience, install ShuleApp: Click 'Share' → 'Add to Home Screen'.");
+            }
+        }
+    });
 })(jQuery);

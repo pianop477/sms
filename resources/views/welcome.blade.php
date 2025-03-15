@@ -150,12 +150,6 @@
 <body>
   @include('SRTDashboard.preloader')
 
-  <div id="loading-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); display: flex; align-items: center; justify-content: center; font-size: 18px; display: none;">
-    <p>Loading...</p>
-</div>
-
-  <button id="install-button" style="display: none;">Install ShuleApp</button>
-
   <nav class="navbar navbar-expand-lg navbar-custom navbar-dark">
     <div class="container">
       <img src="{{ asset('assets/img/logo/logo.png') }}" alt="" class="rounded-circle" style="width:50px; object-fit:cover; border-radius:50px;">
