@@ -362,7 +362,7 @@
 
         // Sikiliza kama kuna service worker mpya inakua activated
         navigator.serviceWorker.addEventListener('controllerchange', () => {
-            alert('New Updates for ShuleApp is Available, please close and Re-open again');
+            alert('New Updates for ShuleApp is Available');
         });
     }
 
