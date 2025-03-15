@@ -266,11 +266,9 @@
     PWA Installation Prompt
     ==================================*/
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('DOMContentLoaded event triggered'); // Debugging
+        console.log('DOMContentLoaded event triggered');
 
         let deferredPrompt;
-
-        // Unda kitufe cha kufunga programu kwa kutumia JavaScript
         const installButton = document.createElement('button');
         installButton.id = 'install-button';
         installButton.textContent = 'Install App';
@@ -290,7 +288,7 @@
         document.body.appendChild(installButton);
         console.log('Install button created and added to DOM:', installButton); // Debugging
 
-        // Kumbukumbu ya beforeinstallprompt event
+        // Sikiliza kabla ya install prompt
         window.addEventListener('beforeinstallprompt', (event) => {
             console.log('beforeinstallprompt event triggered'); // Debugging
             event.preventDefault();
@@ -323,25 +321,27 @@
         if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
             console.log('Already installed: hiding button');
             installButton.style.display = 'none'; // Ikiwa tayari ni app, ficha kitufe
+        } else {
+            console.log('App haijafungwa bado');
         }
-    });
 
-    // Hakikisha PWA inasaidiwa
-    if ('beforeinstallprompt' in window) {
-        console.log('PWA inasaidiwa kwenye browser hii.');
-    } else {
-        console.log('PWA haisaidiiwi kwenye browser hii.');
-    }
+        // Angalia kama PWA inasaidiwa
+        if ('beforeinstallprompt' in window) {
+            console.log('PWA inasaidiwa kwenye browser hii.');
+        } else {
+            console.log('PWA haisaidiiwi kwenye browser hii.');
+        }
 
-    /*================================
-     iOS Installation Prompt
-    ==================================*/
-    document.addEventListener('DOMContentLoaded', () => {
-        if (/iPhone|iPad/i.test(navigator.userAgent)) {
-            if (!window.matchMedia('(display-mode: standalone)').matches) {
-                alert("For a better experience, install ShuleApp: Click 'Share' → 'Add to Home Screen'.");
+        /*================================
+         iOS Installation Prompt
+        ==================================*/
+        document.addEventListener('DOMContentLoaded', () => {
+            if (/iPhone|iPad/i.test(navigator.userAgent)) {
+                if (!window.matchMedia('(display-mode: standalone)').matches) {
+                    alert("For a better experience, install ShuleApp: Click 'Share' → 'Add to Home Screen'.");
+                }
             }
-        }
+        });
     });
 
     //allow automatic updates
@@ -349,10 +349,10 @@
         navigator.serviceWorker.register('/service-worker.js').then((registration) => {
             console.log('Service Worker registered:', registration);
 
-            // Angalia updates kila baada ya muda
+            // Cheki updates kila baada ya sekunde 30
             setInterval(() => {
                 registration.update();
-            }, 30000); // Cheki updates kila sekunde 30
+            }, 30000);
 
             // Hakikisha standalone app pia inapata update
             if (navigator.serviceWorker.controller) {
@@ -362,7 +362,10 @@
 
         // Sikiliza kama kuna service worker mpya inakua activated
         navigator.serviceWorker.addEventListener('controllerchange', () => {
-            alert('New Updates for ShuleApp is Available');
+            setTimeout(() => {
+                alert('New Updates for ShuleApp is Available');
+                location.reload(); // Refresh page automatically
+            }, 1000);
         });
     }
 
