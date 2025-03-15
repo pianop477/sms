@@ -94,7 +94,7 @@
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                            <button type="submit" id="saveButton" class="btn btn-success" onclick="return confirm('Are you sure you want to promote this class?')">Upgrade</button>
+                                            <button type="submit" id="upGradeButton" class="btn btn-success" onclick="return confirm('Are you sure you want to promote this class?')">Upgrade</button>
                                         </div>
                                     </form>
                                 </div>

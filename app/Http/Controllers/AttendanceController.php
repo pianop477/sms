@@ -23,37 +23,54 @@ use Vinkla\Hashids\Facades\Hashids;
 class AttendanceController extends Controller
 {
 
-    public function index($class)
-    {
-        $id = Hashids::decode($class);
-        $user = Auth::user();
-        $teacherLoggedIn = Teacher::where('user_id', '=', $user->id)->firstOrFail();
+    public function index($class, Request $request)
+{
+    $id = Hashids::decode($class);
+    $user = Auth::user();
+    $teacherLoggedIn = Teacher::where('user_id', '=', $user->id)->firstOrFail();
 
-        $myClass = Class_teacher::findOrFail($id[0]);
-        // return $myClass->teacher_id;
-        $teacher = Teacher::findOrFail($myClass->teacher_id);
+    $myClass = Class_teacher::findOrFail($id[0]);
+    $teacher = Teacher::findOrFail($myClass->teacher_id);
 
-        //reject if not class teacher
-        if($teacherLoggedIn->id != $teacher->id) {
-            // Alert::error('Error', 'You are not the class teacher for this class.');
-            Alert()->toast('You are not the class teacher for this class', 'error');
-            return back();
-        }
-
-        // return $teacher->id;
-        $student_class = Grade::findOrFail($myClass->class_id);
-        // return $student_class->id;
-        $studentList = Student::where('class_id', '=', $student_class->id)
-                                ->where('group','=', $myClass->group)
-                                ->where('status', '=', 1)
-                                ->where('school_id', '=', $user->school_id)
-                                ->where('graduated', 0)
-                                // ->orderBy('first_name', 'ASC')
-                                ->orderBy('gender', 'ASC')
-                                ->orderBy('first_name', 'ASC')
-                                ->get();
-        return view('Attendance.index', ['myClass' => $myClass, 'teacher' => $teacher, 'student_class' => $student_class, 'studentList' => $studentList, 'class' => $class]);
+    // Hakikisha mwalimu aliyeingia ndiye class teacher
+    if ($teacherLoggedIn->id != $teacher->id) {
+        Alert()->toast('You are not the class teacher for this class', 'error');
+        return back();
     }
+
+    $student_class = Grade::findOrFail($myClass->class_id);
+
+    // Chagua tarehe kutoka kwa request, default iwe leo
+    $selectedDate = $request->input('attendance_date', Carbon::now()->format('Y-m-d'));
+
+    // Angalia kama attendance ipo tayari kwa hiyo tarehe
+    $attendanceExists = Attendance::where('class_id', $student_class->id)
+        ->where('class_group', $myClass->group)
+        ->where('attendance_date', $selectedDate)
+        ->where('school_id', $user->school_id)
+        ->exists();
+
+    // Pata wanafunzi lakini usiwafiche kabisa hata kama attendance ipo
+    $studentList = Student::where('class_id', '=', $student_class->id)
+        ->where('group', '=', $myClass->group)
+        ->where('status', '=', 1)
+        ->where('school_id', '=', $user->school_id)
+        ->where('graduated', 0)
+        ->orderBy('gender', 'ASC')
+        ->orderBy('first_name', 'ASC')
+        ->get();
+
+    return view('Attendance.index', [
+        'myClass' => $myClass,
+        'teacher' => $teacher,
+        'student_class' => $student_class,
+        'studentList' => $studentList,
+        'class' => $class,
+        'attendanceExists' => $attendanceExists,
+        'selectedDate' => $selectedDate,
+    ]);
+}
+
     /**
      * Show the form for creating the resource.
      */
@@ -154,7 +171,8 @@ class AttendanceController extends Controller
 
         // Alert::success('Success', 'Attendance Submitted and Saved successfully');
         Alert()->toast('Attendance Submitted and Saved successfully', 'success');
-        return redirect()->route('home');
+        // return redirect()->route('home');
+        return redirect()->back();
     }
 
     public function show($student, $year)

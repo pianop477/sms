@@ -77,7 +77,12 @@
                 </div>
                 <button class="btn btn-primary float-right" id="saveButton" type="submit">Next Step<i class="ti-arrow-right"></i></button>
             </form>
-            <button id="continueWithSavedData" class="btn btn-warning mt-3" style="display:none;">Saved Scores</button>
+            <button id="continueWithSavedData" class="btn btn-warning mt-3" style="display:none;">
+                <i class="fas fa-save"></i> Saved Scores
+            </button>
+            <button id="clearSavedData" class="btn btn-danger mt-3" style="display:none;">
+                <i class="fas fa-trash"></i> Clear Scores
+            </button>
         </div>
     </div>
 </div>
@@ -108,6 +113,43 @@
             }
         });
     });
+
+    //clear saved data from local storage
+    document.addEventListener('DOMContentLoaded', () => {
+    const continueWithSavedDataButton = document.getElementById('continueWithSavedData');
+    const clearSavedDataButton = document.getElementById('clearSavedData');
+    const formKey = 'studentsFormData';
+
+    function checkSavedData() {
+        const savedData = localStorage.getItem(formKey);
+        if (savedData) {
+            continueWithSavedDataButton.style.display = 'block';
+            clearSavedDataButton.style.display = 'block';
+        } else {
+            continueWithSavedDataButton.style.display = 'none';
+            clearSavedDataButton.style.display = 'none';
+        }
+    }
+
+    // Fungua ukurasa ukiwa na saved data
+    continueWithSavedDataButton.addEventListener('click', () => {
+        if (confirm('You have unsubmitted Results. Do you want to continue with the saved data?')) {
+            window.location.href = "{{ route('form.saved.values') }}";
+        }
+    });
+
+    // Futa saved data zote
+    clearSavedDataButton.addEventListener('click', () => {
+        if (confirm('Are you sure you want to delete all saved scores? This action cannot be undone.')) {
+            localStorage.removeItem(formKey);
+            alert('All saved scores have been deleted.');
+            checkSavedData(); // Refresh button visibility
+        }
+    });
+
+    checkSavedData();
+});
+
 
     //disable button after submission
     document.addEventListener("DOMContentLoaded", function () {

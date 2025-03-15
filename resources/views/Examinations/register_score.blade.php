@@ -79,7 +79,7 @@
                                     <th class="text-center">Admission No.</th>
                                     <th>Students Name</th>
                                     <th style="width: ">Score</th>
-                                    <th style="width: ">Grade</th>
+                                    <th style="width: " colspan="2">Grade</th>
                                 </thead>
                                 <tbody id="studentsTableBody">
                                     @if ($students->isEmpty())
@@ -237,8 +237,8 @@
     const studentsTableBody = document.getElementById('studentsTableBody');
     const formKey = 'studentsFormData';
 
-    // Load data from local storage or session
-    loadDataFromLocalStorageOrSession();
+    // Load data from local storage
+    loadDataFromLocalStorage();
 
     // Save data to local storage when clicking the "Save" button
     saveButton.addEventListener('click', () => {
@@ -253,9 +253,13 @@
         const gradeInputs = studentsTableBody.querySelectorAll('.grade-input');
 
         scoreInputs.forEach((input, index) => {
-            const studentId = input.closest('tr').querySelector('input[name^="students["]').value;
-            const score = input.value;
-            const grade = gradeInputs[index].value;
+            const studentRow = input.closest('tr');
+            const studentIdInput = studentRow.querySelector('input[name^="students["]');
+            if (!studentIdInput) return;
+
+            const studentId = studentIdInput.value;
+            const score = input.value.trim();
+            const grade = gradeInputs[index]?.value || '';
 
             if (studentId) {
                 scores[studentId] = { score, grade };
@@ -266,45 +270,74 @@
         alert('Data has been saved to your browser.');
     }
 
-    function loadDataFromLocalStorageOrSession() {
-        const savedData = localStorage.getItem(formKey) || ({{ isset($savedData) ? json_encode($savedData) : 'null' }});
+    function loadDataFromLocalStorage() {
+        const savedData = localStorage.getItem(formKey);
+        if (!savedData) return;
 
-        if (savedData) {
-            const formData = JSON.parse(savedData);
-
-            Object.keys(formData).forEach(studentId => {
-                const { score, grade } = formData[studentId];
-                const row = studentsTableBody.querySelector(`input[name^="students"][value="${studentId}"]`).closest('tr');
-                const scoreInput = row.querySelector('.score-input');
-                const gradeInput = row.querySelector('.grade-input');
-
-                if (scoreInput) {
-                    if (score) {
-                        scoreInput.value = score;
-                        scoreInput.disabled = true; // Disable the input if a value is present
-                    } else {
-                        scoreInput.value = ''; // Ensure the input is empty if no value is present
-                        scoreInput.disabled = false; // Allow editing if no value is present
-                    }
-                }
-
-                if (gradeInput) {
-                    gradeInput.value = grade;
-                    gradeInput.disabled = true;
-                }
-            });
+        let formData;
+        try {
+            formData = JSON.parse(savedData);
+        } catch (e) {
+            console.error('Error parsing saved data:', e);
+            return;
         }
+
+        Object.keys(formData).forEach(studentId => {
+            const { score, grade } = formData[studentId];
+            const studentRow = studentsTableBody.querySelector(`input[name^="students"][value="${studentId}"]`)?.closest('tr');
+            if (!studentRow) return;
+
+            const scoreInput = studentRow.querySelector('.score-input');
+            const gradeInput = studentRow.querySelector('.grade-input');
+
+            if (scoreInput) {
+                scoreInput.value = score || '';
+                scoreInput.disabled = true; // Disable initially
+            }
+
+            if (gradeInput) {
+                gradeInput.value = grade || '';
+                gradeInput.disabled = true; // Grade always remains disabled
+            }
+
+            // Angalia kama kitufe cha Edit tayari kipo
+            let editButton = studentRow.querySelector('.edit-button');
+            if (!editButton) {
+                // Unda kitufe cha Edit
+                editButton = document.createElement('button');
+                editButton.innerHTML = '<i class="fas fa-pencil"></i>';
+                editButton.classList.add("edit-button");
+                editButton.style.border = "none";
+                editButton.style.background = "transparent";
+                editButton.style.cursor = "pointer";
+                editButton.style.fontSize = "16px";
+                editButton.style.marginLeft = "10px";
+
+                editButton.addEventListener("click", (event) => {
+                    event.preventDefault(); // Prevent auto-submit issue
+                    scoreInput.disabled = false; // Enable score input
+                    scoreInput.focus(); // Focus on input for editing
+                });
+
+                // Ongeza kwenye row ya mwanafunzi
+                const actionCell = studentRow.insertCell(-1);
+                actionCell.appendChild(editButton);
+            }
+        });
     }
 
-        // Clear local storage when the form is submitted
-        scoreForm.addEventListener('submit', () => {
-            // Temporarily enable all score inputs
-            const scoreInputs = studentsTableBody.querySelectorAll('.score-input');
-            scoreInputs.forEach(input => input.disabled = false);
-
-            localStorage.removeItem(formKey);
+    // Clear local storage when the form is submitted
+    scoreForm.addEventListener('submit', (event) => {
+        // Hakikisha inputs hazijazimwa wakati wa submit
+        studentsTableBody.querySelectorAll('.score-input').forEach(input => {
+            input.disabled = false;
         });
+
+        localStorage.removeItem(formKey);
     });
+});
+
+
 
     //disable button after submission
     document.addEventListener("DOMContentLoaded", function () {
@@ -325,35 +358,6 @@
                 form.classList.add("was-validated");
                 submitButton.disabled = false; // Warudishe button kama kuna errors
                 submitButton.innerHTML = "Submit";
-                return;
-            }
-
-            // Chelewesha submission kidogo ili button ibadilike kwanza
-            setTimeout(() => {
-                form.submit();
-            }, 500);
-        });
-    });
-
-    //save score
-    document.addEventListener("DOMContentLoaded", function () {
-        const form = document.querySelector(".needs-validation");
-        const submitButton = document.getElementById("saveToLocal"); // Tafuta button kwa ID
-
-        if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
-
-        form.addEventListener("submit", function (event) {
-            event.preventDefault(); // Zuia submission ya haraka
-
-            // Disable button na badilisha maandishi
-            submitButton.disabled = true;
-            submitButton.innerHTML = `<span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span> Please Wait...`;
-
-            // Hakikisha form haina errors kabla ya kutuma
-            if (!form.checkValidity()) {
-                form.classList.add("was-validated");
-                submitButton.disabled = false; // Warudishe button kama kuna errors
-                submitButton.innerHTML = "Save";
                 return;
             }
 

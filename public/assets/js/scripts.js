@@ -248,4 +248,111 @@
         });
     }
 
+    // show loader
+    document.addEventListener("DOMContentLoaded", () => {
+        const loader = document.getElementById("loading-overlay");
+
+        // Onyesha loader wakati wowote user anapobofya link
+        document.querySelectorAll("a").forEach(link => {
+            link.addEventListener("click", () => {
+                loader.style.display = "flex";
+            });
+        });
+
+        // Ondoa loader baada ya kurender
+        window.addEventListener("load", () => {
+            setTimeout(() => {
+                loader.style.display = "none";
+            }, 1000);
+        });
+    });
+
+
+    // prompt to android users to install the app
+    let deferredPrompt;
+
+    // Hifadhi event ya installation
+    window.addEventListener("beforeinstallprompt", (event) => {
+        event.preventDefault();
+        deferredPrompt = event;
+        checkInstallation();
+    });
+
+    // Fungua notification kila user akifungua app ikiwa hajainstall
+    function checkInstallation() {
+        if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone) {
+            console.log("PWA already installed.");
+            return;
+        }
+
+        // Toa notification kila baada ya sekunde 30
+        setTimeout(() => {
+            showInstallNotification();
+        }, 30000);
+
+        // Onyesha button ya install ikiwa user anataka manual installation
+        document.getElementById("install-button").style.display = "block";
+    }
+
+    // Notification ya kusakinisha
+    function showInstallNotification() {
+        if ("Notification" in window && Notification.permission === "granted") {
+            new Notification("Install ShuleApp", {
+                body: "For a better experience, install ShuleApp on your device.",
+                icon: "/icons/icon.png",
+                actions: [{ action: "install", title: "Install Now" }]
+            });
+        } else if ("Notification" in window && Notification.permission !== "denied") {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    showInstallNotification();
+                }
+            });
+        }
+    }
+
+    // Ikiwa user anabofya "Install Now" kwenye notification
+    self.addEventListener("notificationclick", (event) => {
+        if (event.action === "install") {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === "accepted") {
+                        console.log("User installed the app.");
+                    } else {
+                        console.log("User dismissed the installation.");
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+    });
+
+    // Button ya Manual Installation
+    document.getElementById("install-button").addEventListener("click", () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === "accepted") {
+                    console.log("User installed the app.");
+                } else {
+                    console.log("User dismissed the installation.");
+                }
+                deferredPrompt = null;
+            });
+        }
+    });
+
+
+    // prompt IOS users to install the app
+    // Angalia kama ni iPhone/iPad
+    if (/iPhone|iPad/i.test(navigator.userAgent)) {
+        if (!window.matchMedia('(display-mode: standalone)').matches) {
+            alert("For a better experience, install ShuleApp: Click 'Share' → 'Add to Home Screen'.");
+        }
+    }
+
+//prompt message kwa users wa laptop
+
+
 })(jQuery);
