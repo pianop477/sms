@@ -1,114 +1,170 @@
 @extends('SRTDashboard.frame')
-    @section('content')
-    @if ($studentList->isEmpty())
-        <div class="alert alert-warning text-center">
-            <h6>No Students Records Available for this Class</h6>
-            <hr>
-            <p><a href="{{route('home')}}" class="btn btn-primary btn-sm">Go Back</a></p>
+@section('content')
+
+{{-- Fomu ya kuchagua tarehe ya attendance (hii itaonekana kila wakati) --}}
+<form method="GET" action="{{ route('get.student.list', ['class' => Hashids::encode($myClass->first()->id)]) }}" class="needs-validation" novalidate>
+    <div class="col-md-4 p-2 float-right">
+        <label for="attendance_date">Select Date:</label>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    <i class="fas fa-calendar-alt"></i> <!-- Font Awesome calendar icon -->
+                </span>
+            </div>
+            <input type="date" id="attendance_date" name="attendance_date"
+                value="{{ request()->input('attendance_date', \Carbon\Carbon::now()->format('Y-m-d')) }}"
+                max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}"
+                min="{{ \Carbon\Carbon::now()->subWeek()->format('Y-m-d') }}"
+                class="form-control p-2" required>
         </div>
-    @else
-    {{-- <p class="text-center text-danger">Attendance Date: {{\Carbon\Carbon::now()->format('d-m-Y')}}</p> --}}
-    <form action="{{ route('store.attendance', ['student_class' => Hashids::encode($student_class->id)]) }}" method="POST" enctype="multipart/form-data" onsubmit="showPreloader()" class="needs-validation" novalidate>
+    </div>
+</form>
+
+@if ($attendanceExists)
+    {{-- Onyesha ujumbe wa taarifa ikiwa attendance tayari imewekwa --}}
+    <div class="alert alert-success text-center mt-3">
+        <h6>Attendance for {{ \Carbon\Carbon::parse($selectedDate)->format('d-m-Y') }} has already been submitted.</h6>
+        <hr>
+        <p><a href="{{ route('home') }}" class="btn btn-primary btn-sm">Go Back</a></p>
+    </div>
+@else
+    {{-- Orodha ya wanafunzi inaoonekana tu ikiwa attendance haipo --}}
+    <form id="attendanceForm" action="{{ route('store.attendance', ['student_class' => Hashids::encode($student_class->id)]) }}" method="POST" class="needs-validation" novalidate>
         @csrf
-        <div class="col-md-3 float-right">
-            <label for="attendance_date">Date:</label>
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">
-                        <i class="fas fa-calendar-alt"></i>
-                    </span>
-                </div>
-                <input type="date" id="attendance_date" name="attendance_date"
-                    value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}"
-                    max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}"
-                    min="{{ \Carbon\Carbon::now()->subWeek()->format('Y-m-d') }}"
-                    class="form-control" required>
-            </div>
-            @error('attendance_date')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
-        <div class="single-table">
-            <div class="table-responsive-lg">
-                <table class="table">
-                    <thead class="text-capitalize bg-info">
-                        <tr class="text-white">
-                            <th scope="col" style="width: auto;">AdmNo.</th>
-                            <th scope="col">Name</th>
-                            <th scope="col" class="text-center">Sex</th>
-                            <th scope="col" colspan="3" class="text-center">Attendance Status</th>
+        <input type="hidden" name="attendance_date" value="{{ $selectedDate }}">
+        <div class="table-responsive-md">
+            <table class="table">
+                <thead class="text-capitalize bg-info">
+                    <tr class="text-white">
+                        <th>AdmNo.</th>
+                        <th>Name</th>
+                        <th class="text-center">Sex</th>
+                        <th class="text-center">Attendance Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($studentList as $student)
+                        <tr>
+                            <input type="hidden" name="student_id[]" value="{{ $student->id }}">
+                            <td>{{ ucwords(strtoupper($student->admission_number)) }}</td>
+                            <td>
+                                <a href="{{ route('Students.show', ['student' => Hashids::encode($student->id)]) }}">
+                                    {{ ucwords(strtolower($student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name)) }}
+                                </a>
+                            </td>
+                            <td class="text-uppercase text-center">{{ $student->gender[0] }}</td>
+                            <input type="hidden" name="group[{{ $student->id }}]" value="{{ $student->group }}">
+                            <td>
+                                <ul class="d-flex justify-content-center">
+                                    <li class="mr-3">
+                                        <input type="radio" name="attendance_status[{{ $student->id }}]" required value="present" {{ old('attendance_status.' . $student->id) == 'present' ? 'checked' : '' }}> Pres
+                                    </li>
+                                    <li class="mr-3">
+                                        <input type="radio" name="attendance_status[{{ $student->id }}]" value="absent" {{ old('attendance_status.' . $student->id) == 'absent' ? 'checked' : '' }}> Abs
+                                    </li>
+                                    <li class="mr-3">
+                                        <input type="radio" name="attendance_status[{{ $student->id }}]" value="permission" {{ old('attendance_status.' . $student->id) == 'permission' ? 'checked' : '' }}> Perm
+                                    </li>
+                                </ul>
+                                @error('attendance_status.' . $student->id)
+                                    <span class="text-sm text-danger">{{ $message }}</span>
+                                @enderror
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($studentList as $student)
-                            <tr>
-                                <td class="text-uppercase">
-                                    <input type="hidden" name="student_id[]" value="{{ $student->id }}">
-                                    {{ $student->admission_number }}
-                                </td>
-                                <td class="text-uppercase">
-                                    <a href="{{ route('Students.show', ['student' => Hashids::encode($student->id)]) }}">{{ $student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name }}</a>
-                                </td>
-                                <td class="text-uppercase text-center">{{ $student->gender[0] }}</td>
-                                    <input type="hidden" name="group[{{$student->id}}]" value="{{$student->group}}">
-                                <td>
-                                    <ul class="d-flex justify-content-center">
-                                        <li class="mr-3">
-                                            <input type="radio" name="attendance_status[{{ $student->id }}]" required value="present" {{ old('attendance_status.' . $student->id) == 'present' ? 'checked' : '' }}> Pres
-                                        </li>
-                                        <li class="mr-3">
-                                            <input type="radio" name="attendance_status[{{ $student->id }}]" value="absent" {{ old('attendance_status.' . $student->id) == 'absent' ? 'checked' : '' }}> Abs
-                                        </li>
-                                        <li class="mr-3">
-                                            <input type="radio" name="attendance_status[{{ $student->id }}]" value="permission" {{ old('attendance_status.' . $student->id) == 'permission' ? 'checked' : '' }}> Perm
-                                        </li>
-                                    </ul>
-                                    @error('attendance_status.' . $student->id)
-                                        <span class="text-sm text-danger">{{ $message }}</span>
-                                    @enderror
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
 
+        {{-- Submit Button --}}
         <div class="card-footer text-center">
             <ul class="d-flex justify-content-center">
-                <li class="mr-3"><button type="submit" id="saveButton" class="btn btn-primary" onclick="return confirm('Are you sure you want to submit attendance? You will not able to make any changes')">Submit</button></li>
-                <li><a href="{{route('today.attendance', ['student_class' => Hashids::encode($student_class->id)])}}" target="_blank" class="btn btn-success">Check Today Report</a></li>
+                <li class="mr-3">
+                    <button type="submit" id="saveButton" class="btn btn-primary">
+                        Submit
+                    </button>
+                </li>
+                <li class="mr-3">
+                    <a href="{{ route('today.attendance', ['student_class' => Hashids::encode($student_class->id)]) }}" class="btn btn-success">Today Report</a>
+                </li>
             </ul>
         </div>
     </form>
-    @endif
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const form = document.querySelector(".needs-validation");
-            const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
+@endif
 
-            if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const attendanceDateInput = document.getElementById("attendance_date");
 
-            form.addEventListener("submit", function (event) {
-                event.preventDefault(); // Zuia submission ya haraka
+        // Unda preloader kwa JavaScript ikiwa haipo
+        let preloader = document.createElement("div");
+        preloader.id = "preloader";
+        preloader.style.position = "fixed";
+        preloader.style.top = "0";
+        preloader.style.left = "0";
+        preloader.style.width = "100%";
+        preloader.style.height = "100%";
+        preloader.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
+        preloader.style.display = "none"; // Default hidden
+        preloader.style.justifyContent = "center";
+        preloader.style.alignItems = "center";
+        preloader.innerHTML = `<div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                            </div>`;
+        document.body.appendChild(preloader);
 
-                // Disable button na badilisha maandishi
-                submitButton.disabled = true;
-                submitButton.innerHTML = `<span class="spinner-border text-white" role="status" aria-hidden="true"></span> Please Wait...`;
-
-                // Hakikisha form haina errors kabla ya kutuma
-                if (!form.checkValidity()) {
-                    form.classList.add("was-validated");
-                    submitButton.disabled = false; // Warudishe button kama kuna errors
-                    submitButton.innerHTML = "Submit";
-                    return;
-                }
-
-                // Chelewesha submission kidogo ili button ibadilike kwanza
-                setTimeout(() => {
-                    form.submit();
-                }, 500);
-            });
+        attendanceDateInput.addEventListener("change", function () {
+            preloader.style.display = "flex"; // Onyesha preloader
+            setTimeout(() => {
+                window.location.href = "?attendance_date=" + this.value;
+            }, 500); // Chelewesha kidogo kwa UX bora
         });
-    </script>
-    @endsection
+
+        // Zima preloader baada ya page kupakia
+        window.addEventListener("load", function () {
+            preloader.style.display = "none";
+        });
+    });
+
+    // Disable button after form submission
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("attendanceForm"); // Tumia ID ya form
+        const submitButton = document.getElementById("saveButton");
+
+        if (!form || !submitButton) return;
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Zuia submission ya haraka
+
+            // Thibitisha kuwa kila mwanafunzi ana radio button iliyochaguliwa
+            let isValid = true;
+            document.querySelectorAll("tbody tr").forEach((row) => {
+                const studentId = row.querySelector("input[name^='student_id']").value;
+                const radios = row.querySelectorAll(`input[name="attendance_status[${studentId}]"]`);
+                const checked = [...radios].some(radio => radio.checked);
+
+                if (!checked) {
+                    isValid = false;
+                    row.style.backgroundColor = "#f8d7da"; // Rangi nyekundu ikiwa haijachaguliwa
+                } else {
+                    row.style.backgroundColor = ""; // Rudisha rangi ya kawaida
+                }
+            });
+
+            if (!isValid) {
+                alert("Please select attendance status for all students.");
+                return; // Acha submission ikiwa kuna errors
+            }
+
+            // Lemaza button na badilisha maandishi
+            submitButton.disabled = true;
+            submitButton.innerHTML = `<span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span> Submitting...`;
+
+            // Endelea na submission baada ya kuchelewesha kidogo
+            setTimeout(() => {
+                form.submit();
+            }, 500);
+        });
+    });
+</script>
+@endsection

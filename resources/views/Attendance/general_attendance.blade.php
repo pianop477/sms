@@ -65,23 +65,31 @@
 </div>
 
 <script>
-    // Hide preloader on page load
-    document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById('preloader').style.display = 'none';
-    });
-
-    // Show preloader when form submission is valid
     function showPreloader(event) {
-        const form = event.target; // Get the form element
+        const form = event.target; // Chukua form element
+        const submitButton = form.querySelector('button[type="submit"]');
 
         if (form.checkValidity()) {
-            // Form is valid; show the preloader
-            document.getElementById('preloader').style.display = 'block';
+            // Onyesha preloader ndani ya button na disable button
+            submitButton.innerHTML = '<i class="ti-settings"></i> Generating...';
+            submitButton.disabled = true;
+
+            // Ruhusu submission ifanyike kawaida (ili PDF ipakuliwe)
         } else {
-            // Form is invalid; prevent submission
+            // Zuia submission ikiwa form si sahihi na onyesha validation errors
             event.preventDefault();
-            form.classList.add('was-validated'); // Add Bootstrap validation styles
+            form.classList.add('was-validated');
         }
     }
+
+    // **Hakikisha button inarudi kwenye hali yake ikiwa user anarudi nyuma**
+    window.addEventListener("pageshow", function(event) {
+        const submitButton = document.querySelector('button[type="submit"]');
+        if (submitButton) {
+            submitButton.innerHTML = '<i class="ti-settings"></i> Generate';
+            submitButton.disabled = false;
+        }
+    });
 </script>
+
 @endsection

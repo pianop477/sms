@@ -7,9 +7,12 @@
 
     <!-- preloader area start -->
     @include('SRTDashboard.preloader')
-    <div id="loading-bar" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: rgb(83, 116, 224);"></div>
     <!-- preloader area end -->
 
+    <!-- Loader Overlay -->
+    <div id="loading-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); display: flex; align-items: center; justify-content: center; font-size: 18px; display: none;">
+        <p>Loading...</p>
+    </div>
 
     <!-- main wrapper start -->
     <div class="horizontal-main-wrapper">
@@ -21,6 +24,8 @@
             @include('SRTDashboard.topnavigation')
            </div>
         <!-- header area start -->
+
+        <button id="install-button" style="display: none;">Install ShuleApp</button>
 
 
         <div class="header-area header-bottom no-print">
@@ -37,7 +42,6 @@
         <div class="main-content-inner">
             <div class="container">
                 @yield('content')
-
             </div>
         </div>
         <!-- main content area end -->
