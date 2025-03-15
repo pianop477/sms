@@ -282,6 +282,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
 
     //error page routes redirection==================================
     Route::get('Error', [UsersController::class, 'errorPage'])->name('error.page');
+    Route::get('Construction-page', [UsersController::class, 'constructionPage'])->name('under.construction.page');
 
     //results viewing by parents routes redirection ==================================================================
     Route::middleware(['CheckUsertype:4'])->group(function () {

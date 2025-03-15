@@ -296,4 +296,9 @@ class UsersController extends Controller
         return back();
 
     }
+
+    public function constructionPage ()
+    {
+        return view('Error.construction');
+    }
 }
