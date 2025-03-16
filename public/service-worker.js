@@ -1,12 +1,12 @@
-const CACHE_NAME = 'ShuleApp-cache-v1.2'; // Badilisha version kwa kila update
-
+const CACHE_NAME = 'ShuleApp-cache-v1.3'; // Update cache version
 const ASSETS_TO_CACHE = [
     '/',
     '/index.php',
     '/assets/css/styles.css',
     '/assets/js/scripts.js',
     '/icons/icon.png',
-    '/icons/icon_2.png'
+    '/icons/icon_2.png',
+    '/offline.html' // Offline fallback page
 ];
 
 self.addEventListener('install', (event) => {
@@ -36,23 +36,11 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-    const url = new URL(event.request.url);
-
-    if (ASSETS_TO_CACHE.includes(url.pathname)) {
-        event.respondWith(
-            caches.match(event.request).then((cachedResponse) => {
-                return cachedResponse || fetch(event.request).then((networkResponse) => {
-                    const responseClone = networkResponse.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, responseClone);
-                    });
-                    return networkResponse;
-                });
-            })
-        );
-    } else {
-        event.respondWith(
-            fetch(event.request).catch(() => caches.match(event.request))
-        );
-    }
+    event.respondWith(
+        fetch(event.request).catch(() => {
+            return caches.match(event.request).then((cachedResponse) => {
+                return cachedResponse || caches.match('/offline.html'); // Tumia offline.html kama fallback
+            });
+        })
+    );
 });
