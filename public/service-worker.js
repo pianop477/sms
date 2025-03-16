@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ShuleApp-cache-v1.3.4'; // Update cache version
+const CACHE_NAME = 'ShuleApp-cache-v1.3.5'; // Update cache version
 const ASSETS_TO_CACHE = [
     '/',
     '/index.php',
@@ -36,11 +36,28 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        fetch(event.request).catch(() => {
-            return caches.match(event.request).then((cachedResponse) => {
-                return cachedResponse || caches.match('/offline.html'); // Tumia offline.html kama fallback
-            });
-        })
-    );
+    if (event.request.mode === 'navigate') {
+        event.respondWith(
+            fetch(event.request)
+                .then((response) => {
+                    return response;
+                })
+                .catch(() => {
+                    // Hifadhi URL ya mwisho kabla ya kwenda offline
+                    event.request.clone().text().then(() => {
+                        self.registration.showNotification('Upo offline', {
+                            body: 'Tutakurudisha mara tu mtandao ukirudi...',
+                        });
+                    });
+
+                    return caches.match('/offline.html');
+                })
+        );
+    } else {
+        event.respondWith(
+            caches.match(event.request).then((cachedResponse) => {
+                return cachedResponse || fetch(event.request);
+            })
+        );
+    }
 });

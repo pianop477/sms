@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Offline</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="assets/fontawesome-free-6.5.2-web/css/all.css">
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <style>
         body {
@@ -52,6 +53,31 @@
         <h1>You are offline</h1>
         <p>Check your internet connection and try again.</p>
     </div>
+
+    <script>
+        function checkConnection() {
+            if (navigator.onLine) {
+                let lastURL = sessionStorage.getItem('lastURL');
+                if (lastURL) {
+                    window.location.href = lastURL; // Rudi kwenye ukurasa wa awali
+                } else {
+                    location.reload(); // Kama hakuna URL iliyohifadhiwa, refresh ukurasa
+                }
+            }
+        }
+
+        // Hifadhi URL ya mwisho kabla ya kuingia offline
+        if (!navigator.onLine) {
+            sessionStorage.setItem('lastURL', document.referrer);
+        }
+
+        // Angalia kama mtandao umerudi kila baada ya sekunde 5
+        setInterval(checkConnection, 5000);
+
+        // Sikiliza event ya mtandao kurudi (real-time)
+        window.addEventListener('online', checkConnection);
+    </script>
+
 </body>
 </html>
 
