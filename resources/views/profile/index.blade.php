@@ -106,6 +106,13 @@
                     @error('phone')<span class="text-danger text-sm">{{$message}}</span>@enderror
                 </div>
                 <div class="">
+                    <label class="form-label">Email</label>
+                    <div class="input-group input-group-outline mb-3">
+                        <input type="email" name="email" class="form-control" value="{{$user->email}}">
+                    </div>
+                    @error('email')<span class="text-danger text-sm">{{$message}}</span>@enderror
+                </div>
+                <div class="">
                     <label class="form-label">Gender</label>
                     <div class="input-group input-group-outline mb-3">
                         <select name="gender" id="" class="form-control text-capitalize">

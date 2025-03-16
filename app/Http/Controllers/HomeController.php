@@ -361,6 +361,7 @@ class HomeController extends Controller
                 'fname' => 'required|string|max:255',
                 'lname' => 'required|string|max:255',
                 'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,' . $userData->id,
+                'email' => 'nullable|unique:users,email,' . $userData->id,
                 'gender' => 'required|In:female,male',
                 'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
             ]);
@@ -368,6 +369,7 @@ class HomeController extends Controller
             $userData->first_name = $request->fname;
             $userData->last_name = $request->lname;
             $userData->phone = $request->phone;
+            $userData->email = $request->email;
             $userData->gender = $request->gender;
 
             if ($request->hasFile('image')) {
