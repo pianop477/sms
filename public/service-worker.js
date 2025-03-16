@@ -1,12 +1,25 @@
-const CACHE_NAME = 'ShuleApp-dynamic-cache-v1';
+const CACHE_NAME = 'ShuleApp-cache-v1.2'; // Badilisha version kwa kila update
+
+const ASSETS_TO_CACHE = [
+    '/',
+    '/index.php',
+    '/assets/css/styles.css',
+    '/assets/js/scripts.js',
+    '/icons/icon.png',
+    '/icons/icon_2.png'
+];
 
 self.addEventListener('install', (event) => {
-    console.log('Service Worker installing...');
-    self.skipWaiting(); // Force update immediately
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => {
+            console.log('Caching static assets...');
+            return cache.addAll(ASSETS_TO_CACHE);
+        })
+    );
+    self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-    console.log('Service Worker activated');
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
@@ -19,19 +32,27 @@ self.addEventListener('activate', (event) => {
             );
         })
     );
-    self.clients.claim(); // Hakikisha kila tab inapata service worker mpya mara moja
+    self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        fetch(event.request).catch(() => caches.match(event.request))
-    );
-});
+    const url = new URL(event.request.url);
 
-// Kusukuma ujumbe wa update kwa watumiaji wa standalone app
-self.addEventListener('message', (event) => {
-    if (event.data === 'checkForUpdate') {
-        self.skipWaiting();
-        console.log('Forcing service worker update...');
+    if (ASSETS_TO_CACHE.includes(url.pathname)) {
+        event.respondWith(
+            caches.match(event.request).then((cachedResponse) => {
+                return cachedResponse || fetch(event.request).then((networkResponse) => {
+                    const responseClone = networkResponse.clone();
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, responseClone);
+                    });
+                    return networkResponse;
+                });
+            })
+        );
+    } else {
+        event.respondWith(
+            fetch(event.request).catch(() => caches.match(event.request))
+        );
     }
 });
