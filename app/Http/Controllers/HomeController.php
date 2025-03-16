@@ -340,7 +340,16 @@ class HomeController extends Controller
         public function showProfile()
         {
             $user = Auth::user();
-            return view('profile.index', compact('user'));
+
+            if($user->usertype == 3) {
+                $teacher = Teacher::query()
+                                    ->join('roles', 'roles.id', '=', 'teachers.role_id')
+                                    ->select('teachers.*', 'roles.role_name')
+                                    ->where('teachers.user_id', $user->id)
+                                    ->first();
+            }
+
+            return view('profile.index', compact('user', 'teacher'));
         }
 
 

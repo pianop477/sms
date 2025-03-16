@@ -21,17 +21,30 @@
           <h5 class="mb-1">
             <span class="text-capitalize">{{$user->first_name. ' '. $user->last_name}}</span>
           </h5>
-          <span class="mb-0 font-weight-normal text-sm text-white text badge bg-primary">
             @if ($user->usertype == 1)
-                {{_('System Administrator')}}
-                @elseif ($user->usertype == 2)
-                {{_('School Manager')}}
-                @elseif ($user->usertype == 3)
-                {{_('Teacher') }}
+              <span class="badge bg-success text-white">{{_('System Administrator')}}</span>
+
+            @elseif ($user->usertype == 2)
+
+              <span class="badge bg-primary text-white">{{_('School Manager')}}</span>
+
+            @elseif ($user->usertype == 3)
+                @if ($teacher->role_id == 1)
+                    <p class="">ID No: <span class="text-uppercase"><strong>{{$teacher->member_id}}</strong></span></p>
+                    <span class="badge bg-secondary text-white text-capitalize">{{$teacher->role_name}}</span>
+                @elseif ($teacher->role_id == 2)
+                    <p class="">ID No: <span class="text-uppercase"><strong>{{$teacher->member_id}}</strong></span></p>
+                    <span class="badge bg-success text-white text-capitalize">{{$teacher->role_name}}</span>
+                @elseif ($teacher->role_id == 3)
+                    <p class="">ID No: <span class="text-uppercase"><strong>{{$teacher->member_id}}</strong></span></p>
+                    <span class="badge bg-primary text-white text-capitalize">{{$teacher->role_name}}</span>
                 @else
-                {{_('Parent')}}
+                    <p class="">ID No: <span class="text-uppercase"><strong>{{$teacher->member_id}}</strong></span></p>
+                    <span class="badge bg-info text-white text-capitalize">{{$teacher->role_name}}</span>
+                @endif
+            @else
+                <span class="text-white badge bg-primary">{{_('Parent')}}</span>
             @endif
-          </span>
         </div>
       </div>
     </div>

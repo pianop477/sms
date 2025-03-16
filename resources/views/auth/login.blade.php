@@ -130,9 +130,8 @@
                             }
                 });
             });
-            @include('SRTDashboard.script')
         </script>
-
+        @include('SRTDashboard.script')
         @include('sweetalert::alert')
     </body>
 </html>
