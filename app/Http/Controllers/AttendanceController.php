@@ -45,10 +45,10 @@ class AttendanceController extends Controller
 
     // Angalia kama attendance ipo tayari kwa hiyo tarehe
     $attendanceExists = Attendance::where('class_id', $student_class->id)
-        ->where('class_group', $myClass->group)
-        ->where('attendance_date', $selectedDate)
-        ->where('school_id', $user->school_id)
-        ->exists();
+                    ->where('class_group', $myClass->group)
+                    ->where('attendance_date', $selectedDate)
+                    ->where('school_id', $user->school_id)
+                    ->exists();
 
     // Pata wanafunzi lakini usiwafiche kabisa hata kama attendance ipo
     $studentList = Student::where('class_id', '=', $student_class->id)
@@ -103,7 +103,7 @@ class AttendanceController extends Controller
         }
 
         // Get the students in the class
-        $students = Student::where('class_id', '=', $class_id)->where('school_id', $user->school_id)->get();
+        $students = Student::where('class_id', '=', $class_id)->where('school_id', $user->school_id)->where('graduated', 0)->where('status', 1)->get();
         if ($students->isEmpty()) {
             // Alert::error('Error', 'No students found in this class.');
             Alert()->toast('No students found in this class', 'error');
@@ -194,13 +194,14 @@ class AttendanceController extends Controller
                         'users.phone as teacher_phone',
                         'students.first_name as student_firstname', 'students.parent_id',
                         'students.middle_name as student_middlename',
-                        'students.last_name as student_lastname', 'students.status',
+                        'students.last_name as student_lastname', 'students.status', 'students.graduated'
                     )
                     ->whereYear('attendances.attendance_date', $year)
                     ->where('attendances.student_id', '=', $students->id)
                     ->where('attendances.school_id', $user->school_id)
                     ->where('students.parent_id', $parent->id)
                     ->where('students.status', 1)
+                    ->where('students.graduated', 0)
                     ->orderBy('attendances.attendance_date', 'DESC');
 
                 // Paginate the raw data

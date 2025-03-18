@@ -266,107 +266,112 @@
     PWA Installation Prompt
     ==================================*/
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('DOMContentLoaded event triggered');
-
+        const installButton = createInstallButton();
         let deferredPrompt;
-        const installButton = document.createElement('button');
-        installButton.id = 'install-button';
-        installButton.textContent = 'Install App';
-        installButton.style.display = 'none'; // Ficha kitufe mwanzoni
-        installButton.style.position = 'fixed'; // Weka kitufe kwenye eneo maalum
-        installButton.style.bottom = '50px'; // Chini ya ukurasa
-        installButton.style.right = '20px'; // Upande wa kulia
-        installButton.style.padding = '10px 20px'; // Padding ya kitufe
-        installButton.style.backgroundColor = '#007bff'; // Rangi ya kitufe
-        installButton.style.color = '#fff'; // Rangi ya maandishi
-        installButton.style.border = 'none'; // Ondoa mpaka
-        installButton.style.borderRadius = '5px'; // Pinda pembe za kitufe
-        installButton.style.cursor = 'pointer'; // Badilisha mwonekano wa kielelezo
-        installButton.style.zIndex = '1000'; // Hakikisha kitufe kiko juu ya vitu vingine
 
-        // Ongeza kitufe kwenye DOM
-        document.body.appendChild(installButton);
-        console.log('Install button created and added to DOM:', installButton); // Debugging
-
-        // Sikiliza kabla ya install prompt
-        window.addEventListener('beforeinstallprompt', (event) => {
-            console.log('beforeinstallprompt event triggered'); // Debugging
-            event.preventDefault();
-            deferredPrompt = event;
-            installButton.style.display = 'block'; // Onyesha kitufe
-            console.log('Install button displayed'); // Debugging
-
-            // Ongeza event listener kwa kitufe
-            installButton.addEventListener('click', async () => {
-                console.log('Install button clicked'); // Debugging
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    const choiceResult = await deferredPrompt.userChoice;
-                    console.log('User choice:', choiceResult); // Debugging
-
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('Mtumiaji alikubali kufunga programu.');
-                    } else {
-                        console.log('Mtumiaji alikataa kufunga programu.');
-                    }
-
-                    deferredPrompt = null;
-                    installButton.style.display = 'none'; // Ficha kitufe baada ya matumizi
-                    console.log('Install button hidden after use'); // Debugging
-                }
-            }, { once: true }); // Tumia { once: true } ili kuzuia matumizi ya mara kwa mara
-        });
-
-        // Ficha kitufe ikiwa programu tayari imefungwa
-        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-            console.log('Already installed: hiding button');
-            installButton.style.display = 'none'; // Ikiwa tayari ni app, ficha kitufe
-        } else {
-            console.log('App haijafungwa bado');
-        }
-
-        // Angalia kama PWA inasaidiwa
+        // PWA Installation Prompt
         if ('beforeinstallprompt' in window) {
-            console.log('PWA inasaidiwa kwenye browser hii.');
-        } else {
-            console.log('PWA haisaidiiwi kwenye browser hii.');
+            window.addEventListener('beforeinstallprompt', (event) => {
+                event.preventDefault(); // Prevent the default browser prompt
+                deferredPrompt = event;
+                showInstallButton(installButton);
+
+                installButton.addEventListener('click', handleInstallButtonClick(deferredPrompt, installButton), { once: true });
+            });
         }
 
-        /*================================
-         iOS Installation Prompt
-        ==================================*/
-        document.addEventListener('DOMContentLoaded', () => {
-            if (/iPhone|iPad/i.test(navigator.userAgent)) {
-                if (!window.matchMedia('(display-mode: standalone)').matches) {
-                    alert("For a better experience, install ShuleApp: Click 'Share' → 'Add to Home Screen'.");
-                }
-            }
-        });
+        // iOS Installation Prompt
+        if (isIosDevice() && !isAppStandalone()) {
+            alert("For a better experience, install ShuleApp: Click 'Share' → 'Add to Home Screen'.");
+        }
+
+        // Check if the app is already installed
+        if (isAppStandalone()) {
+            installButton.style.display = 'none'; // Hide install button if app is already installed
+        }
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            registerServiceWorker();
+        }
     });
 
-    //allow automatic updates
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js').then((registration) => {
-            console.log('Service Worker registered:', registration);
+    // Function to create the install button
+    function createInstallButton() {
+        const button = document.createElement('button');
+        button.id = 'install-button';
+        button.textContent = 'Install App';
+        button.style.display = 'none';
+        button.style.position = 'fixed';
+        button.style.bottom = '50px';
+        button.style.right = '20px';
+        button.style.padding = '10px 20px';
+        button.style.backgroundColor = '#007bff';
+        button.style.color = '#fff';
+        button.style.border = 'none';
+        button.style.borderRadius = '5px';
+        button.style.cursor = 'pointer';
+        button.style.zIndex = '1000';
+        document.body.appendChild(button);
 
-            // Cheki updates kila baada ya sekunde 30
+        return button;
+    }
+
+    // Function to show the install button
+    function showInstallButton(installButton) {
+        installButton.style.display = 'block';
+    }
+
+    // Handler for the install button click event
+    function handleInstallButtonClick(deferredPrompt, installButton) {
+        return async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const choiceResult = await deferredPrompt.userChoice;
+                console.log('User choice:', choiceResult.outcome === 'accepted' ? 'User accepted the install prompt.' : 'User dismissed the install prompt.');
+
+                deferredPrompt = null;
+                installButton.style.display = 'none'; // Hide the button after usage
+            }
+        };
+    }
+
+    // Check if the device is iOS
+    function isIosDevice() {
+        return /iPhone|iPad/i.test(navigator.userAgent);
+    }
+
+    // Check if the app is running in standalone mode (installed)
+    function isAppStandalone() {
+        return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+    }
+
+    // Service Worker registration and updates
+    function registerServiceWorker() {
+        navigator.serviceWorker.register('/service-worker.js').then((registration) => {
+            console.log('Service Worker registered successfully:', registration);
+
+            // Check for updates every 30 seconds
             setInterval(() => {
                 registration.update();
             }, 30000);
 
-            // Hakikisha standalone app pia inapata update
+            // Ensure updates are checked for standalone apps
             if (navigator.serviceWorker.controller) {
                 navigator.serviceWorker.controller.postMessage('checkForUpdate');
             }
+        }).catch((err) => {
+            console.error('Error during service worker registration:', err);
         });
 
-        // Sikiliza kama kuna service worker mpya inakua activated
+        // Listen for new service worker activation
         navigator.serviceWorker.addEventListener('controllerchange', () => {
             setTimeout(() => {
-                alert('New Updates for ShuleApp is Available');
-                location.reload(); // Refresh page automatically
+                alert('New updates are available for ShuleApp!');
+                location.reload(); // Refresh the page automatically to activate the new service worker
             }, 1000);
         });
     }
+
 
     })(jQuery);

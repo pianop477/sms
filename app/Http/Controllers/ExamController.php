@@ -9,6 +9,7 @@ use App\Models\Grade;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Teacher;
+use App\Models\temporary_results;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -37,46 +38,11 @@ class ExamController extends Controller
         // abort(404)
         $decoded = Hashids::decode($id);
         $class_course = class_learning_courses::find($decoded[0]);
+        $savedResults = temporary_results::where('course_id', $decoded[0])->get();
 
         $exams = Examination::where('school_id', Auth::user()->school_id)->where('status', 1)->get();
-        return view('Examinations.prepare_form', ['exams' => $exams, 'class_course' => $class_course]);
+        return view('Examinations.prepare_form', ['exams' => $exams, 'class_course' => $class_course, 'saved_results' => $savedResults]);
     }
-
-    //navigate to the next page if there are saved data in the browser
-    public function savedDataForm()
-    {
-        // Retrieve all necessary data from the session
-        $courseId = session()->get('course_id');
-        $classId = session()->get('class_id');
-        $teacherId = session()->get('teacher_id');
-        $schoolId = session()->get('school_id');
-        $examTypeId = session()->get('exam_type_id');
-        $examDate = session()->get('exam_date');
-        $term = session()->get('term');
-        $markingStyle = session()->get('marking_style');
-
-        $students = Student::where('class_id', $classId)->where('status', 1)->where('graduated', 0)->orderBy('first_name', 'ASC')->get();
-        $className = Grade::find($classId)->class_code;
-        $courseName = Subject::find($courseId)->course_code;
-        $examName = Examination::find($examTypeId)->exam_type;
-
-        return view('Examinations.register_score', [
-            'courseId' => $courseId,
-            'classId' => $classId,
-            'teacherId' => $teacherId,
-            'schoolId' => $schoolId,
-            'examTypeId' => $examTypeId,
-            'examDate' => $examDate,
-            'term' => $term,
-            'students' => $students,
-            'className' => $className,
-            'courseName' => $courseName,
-            'examName' => $examName,
-            'marking_style' => $markingStyle,
-            'savedData' => session()->get('saved_data') // Add this to pass saved data
-        ]);
-    }
-
 
     //capture values and send it to the next step===========================
     public function captureValues(Request $request)
@@ -98,21 +64,52 @@ class ExamController extends Controller
         $term = $request->term;
         $markingStyle = $request->marking_style;
 
-        $students = Student::where('class_id', $classId)->where('status', 1)->orderBy('first_name', 'ASC')->get();
+        // Pata wanafunzi wa darasa husika
+        $students = Student::where('class_id', $classId)
+                            ->where('status', 1)
+                            ->where('graduated', 0)
+                            ->orderBy('first_name', 'ASC')
+                            ->get();
+
+        // Pata majina ya darasa, somo, na mtihani
         $className = Grade::find($classId)->class_code;
         $courseName = Subject::find($courseId)->course_code;
         $examName = Examination::find($examTypeId)->exam_type;
 
-        // Store the captured values into session
-        $request->session()->put('course_id', $courseId);
-        $request->session()->put('class_id', $classId);
-        $request->session()->put('teacher_id', $teacherId);
-        $request->session()->put('school_id', $schoolId);
-        $request->session()->put('exam_type_id', $examTypeId);
-        $request->session()->put('exam_date', $examDate);
-        $request->session()->put('term', $term);
-        $request->session()->put('marking_style', $markingStyle);
+        // Angalia kama mwalimu huyu bado ana matokeo ya muda kwenye database
+        $existingSavedResults = temporary_results::where('course_id', $courseId)
+                                                ->where('teacher_id', $teacherId)
+                                                ->where('school_id', $schoolId)
+                                                ->where('exam_type_id', $examTypeId)
+                                                ->exists();
 
+        if ($existingSavedResults) {
+            // Ikiwa tayari kuna matokeo ambayo hayajahakikiwa, rudisha mtumiaji kwenye ukurasa wa uthibitisho
+            $results = temporary_results::where('course_id', $courseId)
+                                    ->where('teacher_id', $teacherId)
+                                    ->where('exam_type_id', $examTypeId)
+                                    ->get();
+            // dd($results->first()->exam_date);
+            return view('Examinations.confirm_results', [
+                'saved_results' => [
+                    'courseId' => $courseId,
+                    'classId' => $classId,
+                    'teacherId' => $teacherId,
+                    'schoolId' => $schoolId,
+                    'examTypeId' => $examTypeId,
+                    'examDate' => Carbon::parse($results->first()->exam_date)->format('Y-m-d'),
+                    'term' => $term,
+                    'students' => $students,
+                    'className' => $className,
+                    'courseName' => $courseName,
+                    'examName' => $examName,
+                    'marking_style' => $markingStyle,
+                    'results' => $results
+                ]
+            ]);
+        }
+
+        // Hakuna matokeo ya muda, waruhusu waingize matokeo mapya
         return view('Examinations.register_score', [
             'courseId' => $courseId,
             'classId' => $classId,
@@ -129,74 +126,107 @@ class ExamController extends Controller
         ]);
     }
 
-    //store examination scores ==================================
+
     public function storeScore(Request $request)
     {
-        $requestData = $request->all();
-        $examTypeId = $request->session()->get('exam_type_id');
-        $examDate = $request->session()->get('exam_date');
-        $courseId = $request->session()->get('course_id');
-        $teacherId = $request->session()->get('teacher_id');
-        $classId = $request->session()->get('class_id');
-        $schoolId = $request->session()->get('school_id');
-        $term = $request->session()->get('term');
-        $markingStyle = $request->session()->get('marking_style');
-        $class_course = class_learning_courses::where('course_id', $courseId)->first();
+        $validated = $request->validate([
+            'course_id' => 'required|integer|exists:subjects,id',
+            'class_id' => 'required|integer|exists:grades,id',
+            'teacher_id' => 'required|integer|exists:teachers,id',
+            'school_id' => 'required|integer|exists:schools,id',
+            'exam_id' => 'required|integer|exists:examinations,id',
+            'exam_date' => 'required|date|date_format:Y-m-d',
+            'term' => 'required|in:i,ii',
+            'marking_style' => 'required|in:1,2',
+        ]);
 
         // Define validation rules conditionally based on marking style
-        $scoreValidation = $markingStyle == 1 ? 'required|numeric|min:0|max:50' : 'required|numeric|min:0|max:100';
+        $scoreValidation = $request->marking_style == 1 ? 'required|numeric|min:0|max:50' : 'required|numeric|min:0|max:100';
 
         $rules = [
             'students.*.student_id' => 'required|exists:students,id',
             'students.*.score' => $scoreValidation,  // Dynamic validation for score
         ];
 
-        $validator = Validator::make($requestData, $rules);
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            $errorMessages = $validator->errors()->all();
-            $errorMessage = implode(' ', $errorMessages);
-            Alert::error('Validation Error!', $errorMessage);
+            $errorMessages = implode(' ', $validator->errors()->all());
+            Alert::error('Validation Error!', $errorMessages);
             return redirect()->back()->withInput();
         }
 
         $students = $request->input('students');
+        $action = $request->input('action'); // Save or Submit action
+        // dd($action);
 
-        foreach ($students as $studentData) {
-            $studentId = $studentData['student_id'];
-            $score = $studentData['score'];
+        if ($action === 'save') {
+            // Save temporary results (draft)
+            foreach ($students as $studentData) {
+                $studentId = $studentData['student_id'];
+                $score = $studentData['score'];
 
-            // Check for duplicate records
-            $existingRecord = Examination_result::where('student_id', $studentId)
-                                            ->where('course_id', $courseId)
-                                            ->whereDate('exam_date', Carbon::parse($examDate)->format('Y-m-d'))
-                                            ->exists();
-
-            if ($existingRecord) {
-                // Alert::error('Error!', 'Examination Results already submitted for this Course');
-                Alert::toast('Examination Results already submitted for this Course', 'error');
-                return redirect()->route('score.prepare.form', Hashids::encode($courseId));
-            } else {
-                // Create a new examination result entry
-                Examination_result::create([
-                    'student_id' => $studentId,
-                    'course_id' => $courseId,
-                    'class_id' => $classId,
-                    'teacher_id' => $teacherId,
-                    'exam_type_id' => $examTypeId,
-                    'school_id' => $schoolId,
-                    'exam_date' => $examDate,
-                    'score' => $score,
-                    'Exam_term' => $term,
-                    'marking_style' => $markingStyle
-                ]);
+                // Insert or update the temporary results table
+                temporary_results::updateOrCreate(
+                    [
+                        'student_id' => $studentId,
+                        'course_id' => $request->course_id,
+                        'class_id' => $request->class_id,
+                        'teacher_id' => $request->teacher_id,
+                        'exam_type_id' => $request->exam_id,
+                        'school_id' => $request->school_id,
+                        'exam_date' => $request->exam_date,
+                        'exam_term' => $request->term,
+                        'marking_style' => $request->marking_style,
+                        'expiry_date' => now()->addHours(72)
+                    ],
+                    ['score' => $score]
+                );
             }
+
+            Alert::toast('Examination results have been saved temporarily', 'success');
+            return redirect()->route('score.prepare.form', Hashids::encode($request->course_id));
         }
 
-        // Alert::success('Success!', 'Examination results have been submitted successfully');
-        Alert::toast('Examination results have been submitted successfully', 'success');
-        return redirect()->route('score.prepare.form', Hashids::encode($courseId));
-        // return redirect()->route('home');
+        if ($action === 'submit') {
+            // Check for existing results in examination_results table
+            foreach ($students as $studentData) {
+                $studentId = $studentData['student_id'];
+                $score = $studentData['score'];
+
+                // Check if the result already exists in the examination_results table
+                $existingRecord = Examination_result::where('student_id', $studentId)
+                                                    ->where('course_id', $request->course_id)
+                                                    ->whereDate('exam_date', Carbon::parse($request->exam_date)->format('Y-m-d'))
+                                                    ->exists();
+
+                if ($existingRecord) {
+                    Alert::toast('Examination results already submitted for this Course', 'error');
+                    return redirect()->route('score.prepare.form', Hashids::encode($request->course_id));
+                }
+
+                // Insert the result into the examination_results table
+                Examination_result::create([
+                    'student_id' => $studentId,
+                    'course_id' => $request->course_id,
+                    'class_id' => $request->class_id,
+                    'teacher_id' => $request->teacher_id,
+                    'exam_type_id' => $request->exam_id,
+                    'school_id' => $request->school_id,
+                    'exam_date' => $request->exam_date,
+                    'Exam_term' => $request->term,
+                    'score' => $score,
+                    'marking_style' => $request->marking_style
+                ]);
+            }
+
+            Alert::toast('Examination results have been submitted successfully', 'success');
+            return redirect()->route('score.prepare.form', Hashids::encode($request->course_id));
+        }
+
+        // If action is not 'save' or 'submit'
+        Alert::error('Invalid action', 'error');
+        return redirect()->route('score.prepare.form', Hashids::encode($request->course_id));
     }
 
 
@@ -561,4 +591,177 @@ class ExamController extends Controller
             }
         }
     }
+
+    public function editDraft(Request $request)
+    {
+        // Pata data zote kutoka request
+        $courseId = $request->course_id;
+        $classId = $request->class_id;
+        $teacherId = $request->teacher_id;
+        $schoolId = $request->school_id;
+        $examTypeId = $request->exam_type_id;
+        $examDate = $request->exam_date;
+        $term = $request->term;
+        $markingStyle = $request->marking_style;
+
+        // Pata matokeo yaliyohifadhiwa kwenye draft
+        $draftResults = temporary_results::where('course_id', $courseId)
+                                       ->where('teacher_id', $teacherId)
+                                       ->where('exam_type_id', $examTypeId)
+                                       ->get();
+
+        // Pata wanafunzi wa darasa hili
+        $students = Student::where('class_id', $classId)
+                            ->where('status', 1)
+                            ->where('graduated', 0)
+                            ->orderBy('first_name', 'ASC')
+                            ->get();
+
+        // Pata majina ya darasa, somo, na mtihani
+        $className = Grade::find($classId)->class_code;
+        $courseName = Subject::find($courseId)->course_code;
+        $examName = Examination::find($examTypeId)->exam_type;
+
+        // Load view ya ku-edit matokeo
+        return view('Examinations.edit_score', [
+            'courseId' => $courseId,
+            'classId' => $classId,
+            'teacherId' => $teacherId,
+            'schoolId' => $schoolId,
+            'examTypeId' => $examTypeId,
+            'examDate' => $examDate,
+            'term' => $term,
+            'students' => $students,
+            'className' => $className,
+            'courseName' => $courseName,
+            'examName' => $examName,
+            'marking_style' => $markingStyle,
+            'draftResults' => $draftResults
+        ]);
+    }
+
+    public function updateDraftResults(Request $request)
+    {
+        $courseId = $request->course_id;
+        $classId = $request->class_id;
+        $teacherId = $request->teacher_id;
+        $schoolId = $request->school_id;
+        $examTypeId = $request->exam_type_id;
+        $examDate = $request->exam_date;
+        $term = $request->term;
+        $markingStyle = $request->marking_style;
+        $scores = $request->scores;
+        $action = $request->input('action');
+
+        if ($action === 'save') {
+            // SAVE TO DRAFT
+            foreach ($scores as $studentId => $score) {
+                temporary_results::updateOrCreate(
+                    [
+                        'student_id' => $studentId,
+                        'course_id' => $courseId,
+                        'teacher_id' => $teacherId,
+                        'exam_type_id' => $examTypeId
+                    ],
+                    [
+                        'class_id' => $classId,
+                        'school_id' => $schoolId,
+                        'exam_date' => $examDate,
+                        'term' => $term,
+                        'score' => $score,
+                        'marking_style' => $markingStyle
+                    ]
+                );
+            }
+            Alert()->toast('Results saved successfully, remember to submit before the end date.', 'success');
+            return redirect()->route('score.prepare.form', Hashids::encode($courseId));
+
+        } elseif ($action === 'submit') {
+            // CHECK IF RESULTS ALREADY EXIST IN EXAMINATION_RESULT TABLE
+            foreach ($scores as $studentId => $score) {
+                $existingResult = Examination_result::where('student_id', $studentId)
+                                ->where('course_id', $courseId)
+                                ->where('teacher_id', $teacherId)
+                                ->where('exam_type_id', $examTypeId)
+                                ->where('exam_date', $examDate)
+                                ->first();
+
+                if ($existingResult) {
+                    // If result already exists, reject this submission
+                    Alert()->toast('Results already exist. Please check before submitting.', 'error');
+                    return redirect()->back();
+                }
+            }
+
+            // SUBMIT FINAL RESULTS & DELETE FROM DRAFT
+            DB::transaction(function () use ($scores, $courseId, $classId, $teacherId, $examTypeId, $examDate, $term, $schoolId, $markingStyle) {
+                foreach ($scores as $studentId => $score) {
+                    Examination_result::create([
+                        'student_id' => $studentId,
+                        'course_id' => $courseId,
+                        'teacher_id' => $teacherId,
+                        'exam_type_id' => $examTypeId,
+                        'class_id' => $classId,
+                        'school_id' => $schoolId,
+                        'exam_date' => $examDate,
+                        'Exam_term' => $term,
+                        'score' => $score,
+                        'marking_style' => $markingStyle
+                    ]);
+                }
+
+                // DELETE TEMPORARY RESULTS AFTER FINAL SUBMISSION
+                temporary_results::where('course_id', $courseId)
+                    ->where('teacher_id', $teacherId)
+                    ->where('exam_type_id', $examTypeId)
+                    ->delete();
+            });
+
+            Alert()->toast('Results submitted successfully. Editing is no longer allowed.', 'success');
+            return redirect()->route('score.prepare.form', Hashids::encode($courseId));
+        }
+
+        Alert()->toast('Invalid action.', 'error');
+        return redirect()->back();
+    }
+
+    //pending results outside button
+    public function continuePendingResults ($course, $teacher, $school, $class,$style,$term, $type,   $date)
+    {
+        // Decode the Hashids and get the first element of the returned array
+        $courseId = Hashids::decode($course)[0];  // Get the first element
+        $classId = Hashids::decode($class)[0];  // Get the first element
+        $teacherId = Hashids::decode($teacher)[0];  // Get the first element
+        $schoolId = Hashids::decode($school)[0];  // Get the first element
+        $examTypeId = $type;
+        $marking_style = $style;
+        $examDate = Carbon::parse($date)->format('Y-m-d');
+
+
+        // Pata wanafunzi wa darasa husika
+        $students = Student::where('class_id', $classId)
+                            ->where('status', 1)
+                            ->where('graduated', 0)
+                            ->orderBy('first_name', 'ASC')
+                            ->get();
+
+        // Pata majina ya darasa, somo, na mtihani
+        $className = Grade::find($classId)->class_code;
+        $courseName = Subject::find($courseId)->course_code;
+        $examName = Examination::find($examTypeId)->exam_type;
+
+        // Ikiwa tayari kuna matokeo ambayo hayajahakikiwa, rudisha mtumiaji kwenye ukurasa wa uthibitisho
+        $saved_results = temporary_results::where('course_id', $courseId)
+                                    ->where('teacher_id', $teacherId)
+                                    ->where('class_id', $classId)
+                                    ->get();
+
+        // Return the view with decoded IDs
+        return view('Examinations.confirm_results',
+                    compact('courseId', 'examTypeId', 'examDate', 'term', 'marking_style', 'examName',
+                    'classId', 'teacherId', 'schoolId', 'courseName', 'className', 'students', 'saved_results'));
+    }
+
+
+
 }

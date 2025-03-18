@@ -123,7 +123,7 @@ class ClassesController extends Controller
 
         try {
             //delete students not active to the class id
-            $notActiveStudents = Student::where('class_id', $class->id)->where('status', '!=', 1)->get();
+            $notActiveStudents = Student::where('class_id', $class->id)->where('graduated', 0)->where('status', '!=', 1)->get();
 
             if($notActiveStudents->isEmpty()) {
                 //delete class
