@@ -230,7 +230,13 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
             Route::get('{id}/Prepare', [ExamController::class, 'prepare'])->name('score.prepare.form');
             Route::post('Examination-result-create', [ExamController::class, 'captureValues'])->name('score.captured.values');
             Route::post('Upload/results', [ExamController::class, 'storeScore'])->name('exams.store.score');
-            Route::get('/Results-saved', [ExamController::class, 'savedDataForm'])->name('form.saved.values');
+            Route::get('/Results-saved/course/{course}/teacher/{teacher}/school/{school}/class/{class}/style/{style}/term/{term}/type/{type}/date/{date}', [ExamController::class, 'continuePendingResults'])->name('form.saved.values');
+            Route::get('Results/confirmation', function() {
+                return view('Examinations.confirm_results');
+            })->name('results.confirm');
+            Route::post('/results/edit-draft', [ExamController::class, 'editDraft'])->name('results.edit.draft');
+            Route::post('/results/update-draft', [ExamController::class, 'updateDraftResults'])->name('results.update.draft');
+
             //teachers  examination results =============================
             Route::get('course/{id}/Results', [ExamController::class, 'courseResults'])->name('results_byCourse');
             Route::get('/Results/course/{course}/&year/{year}', [ExamController::class, 'resultByYear'])->name('results.byYear');

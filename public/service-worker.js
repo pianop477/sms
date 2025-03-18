@@ -1,63 +1,84 @@
-const CACHE_NAME = 'ShuleApp-cache-v1.3.5'; // Update cache version
+const CACHE_NAME = 'ShuleApp-cache-v1.4'; // Cache versioning
 const ASSETS_TO_CACHE = [
-    '/',
-    '/index.php',
-    '/assets/css/styles.css',
-    '/assets/js/scripts.js',
-    '/icons/icon.png',
-    '/icons/icon_2.png',
-    '/offline.html' // Offline fallback page
+  '/',
+  '/index.php',
+  '/assets/css/styles.css',
+  '/assets/js/scripts.js',
+  '/icons/icon.png',
+  '/icons/icon_2.png',
+  '/offline.html' // Fallback page for offline use
 ];
 
+// Install event: Cache static assets
 self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            console.log('Caching static assets...');
-            return cache.addAll(ASSETS_TO_CACHE);
-        })
-    );
-    self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('Caching essential assets...');
+      return cache.addAll(ASSETS_TO_CACHE);
+    }).catch((err) => {
+      console.error('Error caching assets during install:', err);
+    })
+  );
+  self.skipWaiting(); // Immediately activate the new service worker
 });
 
+// Activate event: Clear outdated caches
 self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cache) => {
-                    if (cache !== CACHE_NAME) {
-                        console.log('Deleting old cache:', cache);
-                        return caches.delete(cache);
-                    }
-                })
-            );
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            console.log(`Deleting old cache: ${cache}`);
+            return caches.delete(cache);
+          }
         })
-    );
-    self.clients.claim();
+      );
+    }).catch((err) => {
+      console.error('Error during cache cleanup:', err);
+    })
+  );
+  self.clients.claim(); // Take control of all clients immediately
 });
 
+// Fetch event: Handle both network requests and offline scenarios
 self.addEventListener('fetch', (event) => {
-    if (event.request.mode === 'navigate') {
-        event.respondWith(
-            fetch(event.request)
-                .then((response) => {
-                    return response;
-                })
-                .catch(() => {
-                    // Hifadhi URL ya mwisho kabla ya kwenda offline
-                    event.request.clone().text().then(() => {
-                        self.registration.showNotification('Upo offline', {
-                            body: 'Tutakurudisha mara tu mtandao ukirudi...',
-                        });
-                    });
-
-                    return caches.match('/offline.html');
-                })
-        );
-    } else {
-        event.respondWith(
-            caches.match(event.request).then((cachedResponse) => {
-                return cachedResponse || fetch(event.request);
-            })
-        );
-    }
+  // For navigation requests (page load)
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => response)
+        .catch(() => {
+          // Notify the user when offline
+          self.registration.showNotification('You are offline', {
+            body: 'We will bring you back online shortly...',
+            icon: '/icons/icon_2.png',
+            badge: '/icons/icon.png'
+          });
+          return caches.match('/offline.html'); // Serve offline fallback page
+        })
+    );
+  } else {
+    // For other assets (images, CSS, JS, etc.), try fetching from cache first
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          console.log(`Cache hit: ${event.request.url}`);
+          return cachedResponse; // Return cached version if exists
+        }
+        return fetch(event.request).then((networkResponse) => {
+          // Cache non-cached responses for future use
+          if (networkResponse && networkResponse.status === 200) {
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, networkResponse.clone());
+            });
+          }
+          return networkResponse;
+        }).catch((err) => {
+          console.error(`Error fetching resource: ${event.request.url}`, err);
+          throw err; // Propagate the error if unable to fetch
+        });
+      })
+    );
+  }
 });

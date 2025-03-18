@@ -1,17 +1,15 @@
 @extends('SRTDashboard.frame')
-
 @section('content')
 <div class="row">
     <div class="col-12 mt-5">
         <div class="card">
             <div class="card-body">
-                <!-- Header and form code remains the same -->
                 <div class="row">
                     <div class="col-10">
                         <h3 class="header-title text-uppercase text-center">Students Result Form</h3>
                     </div>
-                    <div class="col-2">
-                        <a href="{{ route('score.prepare.form', ['id' => Hashids::encode($courseId)]) }}" class="float-right">
+                    <div class="col-2 text-right">
+                        <a href="{{ route('score.prepare.form', ['id' => Hashids::encode($courseId)]) }}">
                             <i class="fas fa-arrow-circle-left text-secondary" style="font-size: 1.7rem;"></i>
                         </a>
                     </div>
@@ -20,45 +18,21 @@
                 <div class="row">
                     <div class="col-6">
                         <ul>
-                            <li>
-                                <p>
-                                    Class Code: <span class="text-uppercase fw-bold"><strong>{{ $className }}</strong></span>
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    Course Code: <span class="text-uppercase fw-bold"><strong>{{ $courseName }}</strong></span>
-                                </p>
-                            </li>
+                            <li><p>Class Code: <strong class="text-uppercase">{{ $className }}</strong></p></li>
+                            <li><p>Course Code: <strong class="text-uppercase">{{ $courseName }}</strong></p></li>
                         </ul>
                     </div>
                     <div class="col-6">
                         <ul>
-                            <li>
-                                <p>
-                                    Exam Type: <span class="text-uppercase fw-bold"><strong>{{ $examName }}</strong></span>
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    Exam Date: <span class="text-uppercase"><strong>{{ \Carbon\Carbon::parse($examDate)->format('d-M-Y') }}</strong></span>
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    Term: <span class="text-uppercase"><strong>{{ $term }}</strong></span>
-                                </p>
-                            </li>
+                            <li><p>Exam Type: <strong class="text-uppercase">{{ $examName }}</strong></p></li>
+                            <li><p>Exam Date: <strong class="text-uppercase">{{ \Carbon\Carbon::parse($examDate)->format('d-M-Y') }}</strong></p></li>
+                            <li><p>Term: <strong class="text-uppercase">{{ $term }}</strong></p></li>
                         </ul>
                     </div>
                 </div>
                 <hr>
                 <h5 class="text-center">Examination Scores</h5>
-                @if ($marking_style == 1)
-                    <p class="text-center text-danger"><i>(Enter score from 0 to 50 correctly)</i></p>
-                @else
-                    <p class="text-center text-danger"><i>(Enter score from 0 to 100 correctly)</i></p>
-                @endif
+                <p class="text-center text-danger"><i>(Enter score from 0 to {{ $marking_style == 1 ? '50' : '100' }} correctly)</i></p>
                 <hr>
                 @if ($errors->any())
                     <div class="alert alert-danger">
@@ -73,50 +47,50 @@
                     <div class="col-12">
                         <form id="scoreForm" action="{{ route('exams.store.score') }}" method="POST" class="needs-validation" novalidate>
                             @csrf
-                            <table class="table table-responsive-md table-hover table-bordered" style="width: 100%;">
+                            <input type="hidden" name="course_id" value="{{$courseId}}">
+                            <input type="hidden" name="class_id" value="{{$classId}}">
+                            <input type="hidden" name="teacher_id" value="{{$teacherId}}">
+                            <input type="hidden" name="school_id" value="{{$schoolId}}">
+                            <input type="hidden" name="exam_id" value="{{$examTypeId}}">
+                            <input type="hidden" name="exam_date" value="{{$examDate}}">
+                            <input type="hidden" name="term" value="{{$term}}">
+                            <input type="hidden" name="marking_style" value="{{$marking_style}}">
+
+                            <table class="table table-responsive-md table-hover table-bordered w-100">
                                 <thead class="table-primary">
-                                    <th style="width: 5px">S/N</th>
-                                    <th class="text-center">Admission No.</th>
-                                    <th>Students Name</th>
-                                    <th style="width: ">Score</th>
-                                    <th style="width: " colspan="2">Grade</th>
+                                    <th>#</th>
+                                    <th>Student Name</th>
+                                    <th>Score</th>
+                                    <th>Grade</th>
                                 </thead>
                                 <tbody id="studentsTableBody">
-                                    @if ($students->isEmpty())
+                                    @forelse ($students as $student)
                                         <tr>
-                                            <td colspan="5" class="alert alert-warning text-center">No students records found!</td>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <input type="hidden" name="students[{{ $loop->index }}][student_id]" value="{{ $student->id }}">
+                                            <td class="text-capitalize">{{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}</td>
+                                            <td><input type="number" required class="form-control score-input" name="students[{{ $loop->index }}][score]" placeholder="Score" value="{{ old('score') }}"></td>
+                                            <td><input type="text" disabled name="students[{{ $loop->index }}][grade]" class="form-control grade-input"></td>
                                         </tr>
-                                    @else
-                                        @foreach ($students as $student)
-                                            <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td class="text-center text-uppercase">
-                                                    {{ $student->admission_number }}
-                                                    <input type="hidden" name="students[{{ $loop->index }}][student_id]" value="{{ $student->id }}">
-                                                </td>
-                                                <td class="text-capitalize">
-                                                    {{ $student->first_name }} {{ $student->middle_name }} {{ $student->last_name }}
-                                                </td>
-                                                <td>
-                                                    <input type="number" required class="form-control score-input" name="students[{{ $loop->index }}][score]" placeholder="Score", value="{{old('score')}}">
-                                                </td>
-                                                <td>
-                                                    <input type="text" disabled name="students[{{ $loop->index }}][grade]" class="form-control grade-input">
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    @endif
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="alert alert-warning text-center">No student records found!</td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                             <hr>
-                            <ul class="d-flex justify-content-center my-3">
-                                <li class="mr-3">
-                                    <button type="button" class="btn btn-danger" id="saveToLocalStorage">Save</button>
-                                </li>
-                                <li>
-                                    <button type="submit" class="btn btn-primary" id="saveButton" onclick="return confirm('Are you sure you want to submit the results? You will not be able to make any changes after submission')">Submit</button>
-                                </li>
-                            </ul>
+                            <div class="d-flex justify-content-center my-3">
+                                <!-- Save Button -->
+                                <button type="submit" class="btn btn-warning mr-3" name="action" value="save" id="saveButton" onclick="return confirm('Are you sure you want to save results temporarily?')">
+                                    <i class="fas fa-save"></i> Save as Draft
+                                </button>
+
+                                <!-- Submit Button -->
+                                <button type="submit" class="btn btn-success" name="action" value="submit" id="submitButton" onclick="return confirm('Are you sure you want to submit the results?')">
+                                    <i class="fas fa-check"></i> Submit Final Results
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -126,27 +100,11 @@
 </div>
 
 <style>
-    .score-input {
-        width: 80px;
-    }
-
-    @media (max-width: 576px) {
-        .score-input {
-            width: 70px;
-        }
-    }
-    .grade-input {
-        width: 70px;
-    }
-
-    @media(max-width:576px) {
-        .grade-input {
-            width: 80px;
-        }
-    }
+    .score-input, .grade-input { width: 80px; }
+    @media (max-width: 576px) { .score-input, .grade-input { width: 70px; } }
 </style>
 
-@if ($marking_style == 1)
+    @if ($marking_style == 1)
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const scoreInputs = document.querySelectorAll('.score-input');
@@ -229,144 +187,4 @@
         });
     </script>
 @endif
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-    const scoreForm = document.getElementById('scoreForm');
-    const saveButton = document.getElementById('saveToLocalStorage');
-    const studentsTableBody = document.getElementById('studentsTableBody');
-    const formKey = 'studentsFormData';
-
-    // Load data from local storage
-    loadDataFromLocalStorage();
-
-    // Save data to local storage when clicking the "Save" button
-    saveButton.addEventListener('click', () => {
-        if (confirm('Are you sure you want to save these results? Remember to submit the results after you complete the process')) {
-            saveDataToLocalStorage();
-        }
-    });
-
-    function saveDataToLocalStorage() {
-        const scores = {};
-        const scoreInputs = studentsTableBody.querySelectorAll('.score-input');
-        const gradeInputs = studentsTableBody.querySelectorAll('.grade-input');
-
-        scoreInputs.forEach((input, index) => {
-            const studentRow = input.closest('tr');
-            const studentIdInput = studentRow.querySelector('input[name^="students["]');
-            if (!studentIdInput) return;
-
-            const studentId = studentIdInput.value;
-            const score = input.value.trim();
-            const grade = gradeInputs[index]?.value || '';
-
-            if (studentId) {
-                scores[studentId] = { score, grade };
-            }
-        });
-
-        localStorage.setItem(formKey, JSON.stringify(scores));
-        alert('Data has been saved to your browser.');
-    }
-
-    function loadDataFromLocalStorage() {
-        const savedData = localStorage.getItem(formKey);
-        if (!savedData) return;
-
-        let formData;
-        try {
-            formData = JSON.parse(savedData);
-        } catch (e) {
-            console.error('Error parsing saved data:', e);
-            return;
-        }
-
-        Object.keys(formData).forEach(studentId => {
-            const { score, grade } = formData[studentId];
-            const studentRow = studentsTableBody.querySelector(`input[name^="students"][value="${studentId}"]`)?.closest('tr');
-            if (!studentRow) return;
-
-            const scoreInput = studentRow.querySelector('.score-input');
-            const gradeInput = studentRow.querySelector('.grade-input');
-
-            if (scoreInput) {
-                scoreInput.value = score || '';
-                scoreInput.disabled = true; // Disable initially
-            }
-
-            if (gradeInput) {
-                gradeInput.value = grade || '';
-                gradeInput.disabled = true; // Grade always remains disabled
-            }
-
-            // Angalia kama kitufe cha Edit tayari kipo
-            let editButton = studentRow.querySelector('.edit-button');
-            if (!editButton) {
-                // Unda kitufe cha Edit
-                editButton = document.createElement('button');
-                editButton.innerHTML = '<i class="fas fa-pencil"></i>';
-                editButton.classList.add("edit-button");
-                editButton.style.border = "none";
-                editButton.style.background = "transparent";
-                editButton.style.cursor = "pointer";
-                editButton.style.fontSize = "16px";
-                editButton.style.marginLeft = "10px";
-
-                editButton.addEventListener("click", (event) => {
-                    event.preventDefault(); // Prevent auto-submit issue
-                    scoreInput.disabled = false; // Enable score input
-                    scoreInput.focus(); // Focus on input for editing
-                });
-
-                // Ongeza kwenye row ya mwanafunzi
-                const actionCell = studentRow.insertCell(-1);
-                actionCell.appendChild(editButton);
-            }
-        });
-    }
-
-    // Clear local storage when the form is submitted
-    scoreForm.addEventListener('submit', (event) => {
-        // Hakikisha inputs hazijazimwa wakati wa submit
-        studentsTableBody.querySelectorAll('.score-input').forEach(input => {
-            input.disabled = false;
-        });
-
-        localStorage.removeItem(formKey);
-    });
-});
-
-
-
-    //disable button after submission
-    document.addEventListener("DOMContentLoaded", function () {
-        const form = document.querySelector(".needs-validation");
-        const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
-
-        if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
-
-        form.addEventListener("submit", function (event) {
-            event.preventDefault(); // Zuia submission ya haraka
-
-            // Disable button na badilisha maandishi
-            submitButton.disabled = true;
-            submitButton.innerHTML = `<span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span> Please Wait...`;
-
-            // Hakikisha form haina errors kabla ya kutuma
-            if (!form.checkValidity()) {
-                form.classList.add("was-validated");
-                submitButton.disabled = false; // Warudishe button kama kuna errors
-                submitButton.innerHTML = "Submit";
-                return;
-            }
-
-            // Chelewesha submission kidogo ili button ibadilike kwanza
-            setTimeout(() => {
-                form.submit();
-            }, 500);
-        });
-    });
-
-</script>
 @endsection

@@ -1,20 +1,35 @@
 {
     "name": "ShuleApp",
     "short_name": "ShuleApp",
+    "description": "ShuleApp is a modern platform for managing school results, students, and teachers efficiently.",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#007bff",
+    "orientation": "portrait",
+    "scope": "/",
+    "lang": "en",
     "icons": [
       {
-        "src": "/icons/icon.png",
+        "src": "/icons/icon-192x192.png",
         "sizes": "192x192",
-        "type": "image/png"
+        "type": "image/png",
+        "purpose": "any maskable"
       },
       {
-        "src": "/icons/icon_2.png",
+        "src": "/icons/icon-512x512.png",
         "sizes": "512x512",
-        "type": "image/png"
+        "type": "image/png",
+        "purpose": "any maskable"
+      },
+      {
+        "src": "/icons/icon-256x256.png",
+        "sizes": "256x256",
+        "type": "image/png",
+        "purpose": "any"
       }
-    ]
+    ],
+    "prefer_related_applications": false,
+    "related_applications": [],
+    "use_native_ui": true
   }

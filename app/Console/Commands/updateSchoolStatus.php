@@ -14,7 +14,7 @@ class updateSchoolStatus extends Command
      *
      * @var string
      */
-    protected $signature = 'app:update-school-status';
+    protected $signature = 'school:update-school-status';
 
     /**
      * The console command description.

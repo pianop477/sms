@@ -9,6 +9,8 @@ use App\Models\Grade;
 use App\Models\Parents;
 use App\Models\school;
 use App\Models\Student;
+use App\Models\Subject;
+use App\Models\temporary_results;
 use App\Models\User;
 use App\Services\BeemSmsService;
 use App\Services\NextSmsService;
@@ -1346,4 +1348,8 @@ class ResultsController extends Controller
 
         return response()->json(['success' => false]);
     }
+
+    //edit saved results
+
+
 }
