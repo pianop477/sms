@@ -762,6 +762,40 @@ class ExamController extends Controller
                     'classId', 'teacherId', 'schoolId', 'courseName', 'className', 'students', 'saved_results'));
     }
 
+    public function deleteDraftResults($course, $teacher, $type)
+    {
+        $course_id = Hashids::decode($course);
+        $teacher_id = Hashids::decode($teacher);
+        $examType = $type;
+        $teacherInfo = Teacher::find($teacher_id[0]);
+        $user = Auth::user();
 
+        if ($user->id != $teacherInfo->user_id) {
+            Alert()->toast('Unauthorized request', 'error');
+            return redirect()->route('score.prepare.form', Hashids::encode($course_id[0]));
+        }
+
+        // Check if there are any records that match the given parameters
+        $results = temporary_results::where('course_id', $course_id[0])
+            ->where('teacher_id', $teacher_id[0])
+            ->where('exam_type_id', $examType)
+            ->where('school_id', $teacherInfo->school_id)
+            ->get(); // Get all matching results
+
+        if ($results->isEmpty()) {
+            Alert()->toast('No results found in draft box', 'info');
+            return redirect()->route('score.prepare.form', Hashids::encode($course_id[0]));
+        }
+
+        // Delete all the matching records
+        temporary_results::where('course_id', $course_id[0])
+            ->where('teacher_id', $teacher_id[0])
+            ->where('exam_type_id', $examType)
+            ->where('school_id', $teacherInfo->school_id)
+            ->delete();
+
+        Alert()->toast('All results deleted successfully from the draft box', 'success');
+        return redirect()->route('score.prepare.form', Hashids::encode($course_id[0]));
+    }
 
 }

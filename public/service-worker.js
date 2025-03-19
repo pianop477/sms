@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ShuleApp-cache-v1.4'; // Cache versioning
+const CACHE_NAME = 'ShuleApp-cache-v1.5'; // Cache versioning
 const ASSETS_TO_CACHE = [
   '/',
   '/index.php',
@@ -6,6 +6,7 @@ const ASSETS_TO_CACHE = [
   '/assets/js/scripts.js',
   '/icons/icon.png',
   '/icons/icon_2.png',
+  '/icons/icon_3.png',
   '/offline.html' // Fallback page for offline use
 ];
 
@@ -67,10 +68,12 @@ self.addEventListener('fetch', (event) => {
           return cachedResponse; // Return cached version if exists
         }
         return fetch(event.request).then((networkResponse) => {
+          // Clone the response before consuming it
+          const clonedResponse = networkResponse.clone();
           // Cache non-cached responses for future use
           if (networkResponse && networkResponse.status === 200) {
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, networkResponse.clone());
+              cache.put(event.request, clonedResponse); // Use the cloned response
             });
           }
           return networkResponse;

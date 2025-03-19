@@ -18,31 +18,31 @@ class checkSessionTimeout
      */
 
      public function handle(Request $request, Closure $next)
-	{
-	    if (Auth::check()) {
-	        $lastActivity = Session::get('last_activity', time());
-	        $sessionLifeTime = 60 * 60; // 1 hour
+    {
+        if (Auth::check()) {
+            $lastActivity = Session::get('last_activity', time());
+            $sessionLifeTime = 60 * 60; // 1 hour
+            $warningTime = 60 * 55; // 5 minutes before session expires
 
-	       /* dd([
-	            'last_activity' => $lastActivity,
-	            'time_now' => time(),
-	            'time_difference' => time() - $lastActivity,
-	            'sessionLifeTime' => $sessionLifeTime
-	        ]); */
+            if (time() - $lastActivity > $sessionLifeTime) {
+                Auth::logout();
+                session()->invalidate();
+                session()->regenerateToken();
+                return redirect()->route('login')->with('error', 'Session Expired, Please login');
+            }
 
-	        if (time() - $lastActivity > $sessionLifeTime) {
-	            Auth::logout();
-	            session()->invalidate();
-	            session()->regenerateToken();
-	            return redirect()->route('login')->with('error', 'Session Expired, Please login');
-	        }
+            // Check if the session will expire within the warning time
+            if (time() - $lastActivity > $warningTime && !Session::has('session_warning_shown')) {
+                Session::put('session_warning_shown', true); // Set flag to avoid repeated warnings
+                Session::put('session_remaining_time', $sessionLifeTime - (time() - $lastActivity)); // Remaining session time
+            }
 
-	        if (!Session::has('last_activity')) {
-		        Session::put('last_activity', time());
-		    }
-	    }
+            if (!Session::has('last_activity')) {
+                Session::put('last_activity', time());
+            }
+        }
 
-	    return $next($request);
-	}
+        return $next($request);
+    }
 
 }

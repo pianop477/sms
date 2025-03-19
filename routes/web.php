@@ -27,6 +27,7 @@ use App\Models\Student;
 use App\Models\Transport;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpParser\Builder\ClassConst;
 use PHPUnit\Runner\ResultCache\ResultCache;
@@ -65,6 +66,22 @@ Auth::routes();
 //end of condition =================================================
 
 Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')->group(function () {
+
+    // Route to check session expiry status
+    Route::middleware('auth')->get('/check-session-expiry', function () {
+        $lastActivity = Session::get('last_activity', time());
+        $sessionLifeTime = 60 * 60; // 1 hour
+        $warningTime = 60 * 55; // 5 minutes before session expires
+
+        $remainingTime = $sessionLifeTime - (time() - $lastActivity);
+
+        if ($remainingTime <= $warningTime && $remainingTime > 0) {
+            return response()->json(['session_expiring_soon' => true, 'remaining_time' => $remainingTime]);
+        }
+
+        return response()->json(['session_expiring_soon' => false]);
+    });
+
 
     Route::middleware('CheckUsertype:1,2,3,4')->group(function () {
         // Home controller redirection ==============================================================================
@@ -236,6 +253,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
             })->name('results.confirm');
             Route::post('/results/edit-draft', [ExamController::class, 'editDraft'])->name('results.edit.draft');
             Route::post('/results/update-draft', [ExamController::class, 'updateDraftResults'])->name('results.update.draft');
+            Route::get('/Delete/draft-results/course/{course}/teacher/{teacher}/type/{type}', [ExamController::class, 'deleteDraftResults'])->name('results.draft.delete');
 
             //teachers  examination results =============================
             Route::get('course/{id}/Results', [ExamController::class, 'courseResults'])->name('results_byCourse');
