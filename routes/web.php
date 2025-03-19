@@ -67,8 +67,7 @@ Auth::routes();
 
 Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')->group(function () {
 
-    // Route to check session expiry status
-    Route::middleware('auth')->get('/check-session-expiry', function () {
+    Route::get('/check-session-expiry', function () {
         $lastActivity = Session::get('last_activity', time());
         $sessionLifeTime = 60 * 60; // 1 hour
         $warningTime = 60 * 55; // 5 minutes before session expires
@@ -76,11 +75,22 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         $remainingTime = $sessionLifeTime - (time() - $lastActivity);
 
         if ($remainingTime <= $warningTime && $remainingTime > 0) {
-            return response()->json(['session_expiring_soon' => true, 'remaining_time' => $remainingTime]);
+            return response()->json([
+                'session_expiring_soon' => true,
+                'remaining_time' => $remainingTime
+            ]);
         }
 
         return response()->json(['session_expiring_soon' => false]);
     });
+
+    //session timeout control
+    Route::post('/extend-session', function () {
+        Session::put('last_activity', time()); // Extend session
+        Session::forget('session_warning_shown'); // Reset warning flag
+        return response()->json(['success' => true]);
+    });
+
 
 
     Route::middleware('CheckUsertype:1,2,3,4')->group(function () {
