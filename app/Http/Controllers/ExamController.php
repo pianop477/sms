@@ -141,7 +141,7 @@ class ExamController extends Controller
         ]);
 
         // Define validation rules conditionally based on marking style
-        $scoreValidation = $request->marking_style == 1 ? 'required|numeric|min:0|max:50' : 'required|numeric|min:0|max:100';
+        $scoreValidation = $request->marking_style == 1 ? 'nullable|numeric|min:0|max:50' : 'required|numeric|min:0|max:100';
 
         $rules = [
             'students.*.student_id' => 'required|exists:students,id',
