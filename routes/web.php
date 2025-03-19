@@ -67,31 +67,33 @@ Auth::routes();
 
 Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')->group(function () {
 
-    Route::get('/check-session-expiry', function () {
-        $lastActivity = Session::get('last_activity', time());
-        $sessionLifeTime = 60 * 60; // 1 hour
-        $warningTime = 60 * 55; // 5 minutes before session expires
+        Route::get('/check-session-expiry', function () {
+            $lastActivity = Session::get('last_activity');
+            $sessionLifeTime = 60 * 60; // 1 hour
+            $warningTime = 60 * 55; // 5 minutes before session expires
 
-        $remainingTime = $sessionLifeTime - (time() - $lastActivity);
+            if (!$lastActivity) {
+                Session::put('last_activity', time());
+                $lastActivity = time();
+            }
 
-        if ($remainingTime <= $warningTime && $remainingTime > 0) {
-            return response()->json([
-                'session_expiring_soon' => true,
-                'remaining_time' => $remainingTime
-            ]);
-        }
+            $remainingTime = $sessionLifeTime - (time() - $lastActivity);
 
-        return response()->json(['session_expiring_soon' => false]);
-    });
+            if ($remainingTime <= $warningTime && $remainingTime > 0) {
+                return response()->json([
+                    'session_expiring_soon' => true,
+                    'remaining_time' => $remainingTime
+                ]);
+            }
 
-    //session timeout control
-    Route::post('/extend-session', function () {
-        Session::put('last_activity', time()); // Extend session
-        Session::forget('session_warning_shown'); // Reset warning flag
-        return response()->json(['success' => true]);
-    });
+            return response()->json(['session_expiring_soon' => false]);
+        });
 
-
+        Route::post('/extend-session', function () {
+            Session::put('last_activity', time());
+            Session::forget('session_warning_shown');
+            return response()->json(['success' => true]);
+        });
 
     Route::middleware('CheckUsertype:1,2,3,4')->group(function () {
         // Home controller redirection ==============================================================================

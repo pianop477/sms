@@ -20,7 +20,13 @@ class checkSessionTimeout
      public function handle(Request $request, Closure $next)
     {
         if (Auth::check()) {
-            $lastActivity = Session::get('last_activity', time());
+            $lastActivity = Session::get('last_activity');
+
+            if (!$lastActivity) {
+                Session::put('last_activity', time());
+                $lastActivity = time();
+            }
+
             $sessionLifeTime = 60 * 60; // 1 hour
             $warningTime = 60 * 55; // 5 minutes before session expires
 
@@ -31,18 +37,20 @@ class checkSessionTimeout
                 return response()->json(['session_expired' => true], 401);
             }
 
-            // Set session warning
             if (time() - $lastActivity > $warningTime && !Session::has('session_warning_shown')) {
                 Session::put('session_warning_shown', true);
                 Session::put('session_remaining_time', $sessionLifeTime - (time() - $lastActivity));
+
+                return response()->json([
+                    'session_expiring_soon' => true,
+                    'remaining_time' => Session::get('session_remaining_time')
+                ]);
             }
 
-            // Update last activity on each request
             Session::put('last_activity', time());
         }
 
         return $next($request);
     }
-
 
 }
