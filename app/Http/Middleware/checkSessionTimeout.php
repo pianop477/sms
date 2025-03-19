@@ -28,21 +28,21 @@ class checkSessionTimeout
                 Auth::logout();
                 session()->invalidate();
                 session()->regenerateToken();
-                return redirect()->route('login')->with('error', 'Session Expired, Please login');
+                return response()->json(['session_expired' => true], 401);
             }
 
-            // Check if the session will expire within the warning time
+            // Set session warning
             if (time() - $lastActivity > $warningTime && !Session::has('session_warning_shown')) {
-                Session::put('session_warning_shown', true); // Set flag to avoid repeated warnings
-                Session::put('session_remaining_time', $sessionLifeTime - (time() - $lastActivity)); // Remaining session time
+                Session::put('session_warning_shown', true);
+                Session::put('session_remaining_time', $sessionLifeTime - (time() - $lastActivity));
             }
 
-            if (!Session::has('last_activity')) {
-                Session::put('last_activity', time());
-            }
+            // Update last activity on each request
+            Session::put('last_activity', time());
         }
 
         return $next($request);
     }
+
 
 }
