@@ -59,7 +59,7 @@
                 <div class="form-row">
                     <div class="col-md-4 mb-3">
                         <label for="validationCustom02">Sender Name</label>
-                        <input type="text" name="sender_name" class="form-control" id="validationCustom02" placeholder="Last name" value="{{old('logo', $schools->sender_id)}}">
+                        <input type="text" name="sender_name" class="form-control" id="validationCustom02" placeholder="Sender ID" value="{{old('logo', $schools->sender_id)}}">
                         @error('sender_name')
                         <div class="text-danger">{{$message}}</div>
                         @enderror
