@@ -1,13 +1,14 @@
-const CACHE_NAME = 'ShuleApp-cache-v2.0';
+const CACHE_NAME = 'ShuleApp-cache-v2.1'; // Change version when updating
 const ASSETS_TO_CACHE = [
     '/',
     '/index.php',
+    '/manifest.json', // Ensure manifest.json is also cached
     '/assets/css/styles.css',
     '/assets/js/scripts.js',
     '/icons/icon.png',
     '/icons/icon_2.png',
     '/icons/icon_3.png',
-    '/offline.html' // Fallback page for offline use
+    '/offline.html'
 ];
 
 // Install event: Cache static assets
@@ -20,10 +21,10 @@ self.addEventListener('install', (event) => {
             console.error('Error caching assets during install:', err);
         })
     );
-    self.skipWaiting(); // Immediately activate the new service worker
+    self.skipWaiting(); // Ensure the new Service Worker takes over immediately
 });
 
-// Activate event: Clear outdated caches
+// Activate event: Clear outdated caches and update clients
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
@@ -39,70 +40,38 @@ self.addEventListener('activate', (event) => {
             console.error('Error during cache cleanup:', err);
         })
     );
-    self.clients.claim(); // Take control of all clients immediately
+
+    // Force refresh on all active clients (PWA update immediately)
+    self.clients.claim().then(() => {
+        self.clients.matchAll().then(clients => {
+            clients.forEach(client => client.navigate(client.url));
+        });
+    });
 });
 
-// Fetch event: Handle both network requests and offline scenarios
+// Fetch event: Smart caching strategy
 self.addEventListener('fetch', (event) => {
     const requestUrl = new URL(event.request.url);
 
-    // Bypass caching for session-related requests
+    // Avoid caching session-related requests
     if (requestUrl.pathname === '/check-session') {
-        event.respondWith(
-            fetch(event.request) // Always fetch from the network
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response; // Return the response as-is
-                })
-                .catch((err) => {
-                    console.error('Error fetching session status:', err);
-                    throw err; // Propagate the error
-                })
-        );
-        return; // Exit early to avoid caching
+        event.respondWith(fetch(event.request));
+        return;
     }
 
-
-    // For navigation requests (page load)
-    if (event.request.mode === 'navigate') {
-        event.respondWith(
-            fetch(event.request)
-                .then((response) => response)
-                .catch(() => {
-                    // Notify the user when offline
-                    self.registration.showNotification('You are offline', {
-                        body: 'We will bring you back online shortly...',
-                        icon: '/icons/icon_2.png',
-                        badge: '/icons/icon.png'
+    // Use cache but update assets in the background
+    event.respondWith(
+        caches.match(event.request).then((cachedResponse) => {
+            const fetchPromise = fetch(event.request).then((networkResponse) => {
+                if (networkResponse && networkResponse.status === 200) {
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, networkResponse.clone()); // Update cache with latest file
                     });
-                    // return caches.match('/offline.html'); // Serve offline fallback page
-                })
-        );
-    } else {
-        // For other assets (images, CSS, JS, etc.), try fetching from cache first
-        event.respondWith(
-            caches.match(event.request).then((cachedResponse) => {
-                if (cachedResponse) {
-                    console.log(`Cache hit: ${event.request.url}`);
-                    return cachedResponse; // Return cached version if exists
                 }
-                return fetch(event.request).then((networkResponse) => {
-                    // Clone the response before consuming it
-                    const clonedResponse = networkResponse.clone();
-                    // Cache non-cached responses for future use
-                    if (networkResponse && networkResponse.status === 200) {
-                        caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(event.request, clonedResponse); // Use the cloned response
-                        });
-                    }
-                    return networkResponse;
-                }).catch((err) => {
-                    console.error(`Error fetching resource: ${event.request.url}`, err);
-                    throw err; // Propagate the error if unable to fetch
-                });
-            })
-        );
-    }
+                return networkResponse;
+            }).catch(() => cachedResponse || caches.match('/offline.html'));
+
+            return cachedResponse || fetchPromise; // Return cache first, then update
+        })
+    );
 });
