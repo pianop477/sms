@@ -88,18 +88,12 @@
                         </div>
                         <hr>
                         <div class="row">
-                            <div class="col-4">
+                            <div class="col-6">
                                 <h5>NMB Bank</h5>
                                 <p>Account Number: <strong>50510028891</strong></p>
                                 <p>Account Name: <strong>Frank Mathias Masaka</strong></p>
                             </div>
-                            <div class="col-4">
-                                <h5>Mobile Money Networks</h5>
-                                <p>Tigo Pesa</p>
-                                <p>Phone Number: <strong>{{Auth::user()->phone}}</strong></p>
-                                <p>Account Name: <strong>Frank Mathias Masaka</strong></p>
-                            </div>
-                            <div class="col-4">
+                            <div class="col-6">
                                 <h5>Lipa Namba | Lipa kwa Simu</h5>
                                 <p><strong>Tigo Lipa Number</strong></p>
                                 <p>Merchant Acc. Number: <strong>15966786</strong></p>
