@@ -347,9 +347,11 @@ class HomeController extends Controller
                                     ->select('teachers.*', 'roles.role_name')
                                     ->where('teachers.user_id', $user->id)
                                     ->first();
+                return view('profile.index', compact('user', 'teacher'));
             }
-
-            return view('profile.index', compact('user', 'teacher'));
+            else {
+                return view('profile.index', compact('user'));
+            }
         }
 
 
