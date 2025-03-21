@@ -6,6 +6,7 @@
   <title>Shule | App</title>
   <link rel="manifest" href="{{asset('manifest.json')}}">
   <link rel="icon" type="image/png" href="{{ asset('assets/img/favicon/favicon.png') }}">
+  <link rel="stylesheet" href="{{asset('assets/fontawesome-free-6.5.2-web/css/all.css')}}">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -261,7 +262,11 @@
           <h4>ShuleApp - Admin</h4>
           <p>Address: Dodoma, Tanzania</p>
           <p>Email: pianop477@gmail.com</p>
-          <p>Phone: +255 678 669 000</p>
+          <p><i class="fas fa-phone"></i> Call:
+            <a href="tel:0678669000">
+                +255 678 669 000
+            </a>
+          </p>
           <p>&copy; <a href="#"> ShuleApp</a> - {{date('Y')}}  </p>
         </div>
         <div class="col-md-6">
