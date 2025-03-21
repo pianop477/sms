@@ -4,13 +4,14 @@
 <div class="col-md-12 mt-5">
     <div class="card">
         <div class="card-body">
-            <h4 class="header-title text-uppercase text-center">Students List</h4>
+            <h4 class="header-title text-uppercase text-center">Students by Classes</h4>
             @if ($classes->isEmpty())
             <div class="alert alert-warning text-center">
                 <p>No classes records found. Please register classes first!</p>
             </div>
 
             @else
+            <p class="text-danger p-2">choose class to view students</p>
             <ul class="list-group">
                 @foreach ($classes as $class)
                 <a href="{{route('create.selected.class', ['class' => Hashids::encode($class->id)])}}">

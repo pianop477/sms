@@ -30,8 +30,12 @@
           </p>
         </div>
       </div>
-      <div class="col-lg-2 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
-        <a href="{{ route('home') }}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+      <div class="col-lg-2 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3 float-right">
+        @if(Auth::check() && Auth::user()->can('create.selected.class'))
+        <a href="{{ route('create.selected.class', Hashids::encode($data->class_id)) }}" class=""><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+        @else
+            <a href="{{ route('home') }}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+        @endif
       </div>
     </div>
     <hr class="dark horizontal my-0">

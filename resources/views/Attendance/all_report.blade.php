@@ -7,13 +7,34 @@
     <title>General Class Attendance Report</title>
     <link rel="stylesheet" href="{{public_path('assets/css/print_layout.css')}}">
     <style>
-        .footer {
+       .footer {
+            width: 100%;
+            padding: 10px 20px;
             position: fixed;
-            bottom: -30px;
-            align-content: space-around;
+            bottom: 0;
+            left: 0;
+            background-color: #f8f9fa;
             font-size: 12px;
-            /* border-top: 1px solid black; */
+            border-top: 1px solid #ddd;
         }
+
+        .footer-content {
+            display: flex;
+            flex-direction: row; /* Ensure horizontal layout */
+            justify-content: space-between; /* Push items to both ends */
+            align-items: center;
+            width: 100%;
+        }
+
+        .page-number {
+            flex: 1; /* Push printed-on to the far right */
+            text-align: left;
+        }
+
+        .printed-on {
+            text-align: right;
+        }
+
         .page-number:before {
             content: "Page " counter(page);
         }
@@ -188,7 +209,10 @@
     </div>
     <div class="footer">
         <footer>
-            <div class="page-number"></div>
+            <div class="footer-content">
+                <div class="page-number"></div>
+                <span class="printed-on">Printed on: {{ \Carbon\Carbon::now()->format('d-m-Y H:i') }}</span>
+            </div>
         </footer>
     </div>
 </body>

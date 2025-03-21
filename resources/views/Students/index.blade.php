@@ -167,7 +167,7 @@
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom02">Date of Birth</label>
-                                                    <input type="date" required id="customDatePicker" name="dob" class="form-control" id="validationCustom02" placeholder="Enter your birth date" required="" value="{{old('dob')}}" min="{{\Carbon\Carbon::now()->subYears(14)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(3)->format('Y-m-d')}}">
+                                                    <input type="date" required id="customDatePicker" name="dob" class="form-control" id="validationCustom02" placeholder="Enter your birth date" required="" value="{{old('dob')}}" min="{{\Carbon\Carbon::now()->subYears(17)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(3)->format('Y-m-d')}}">
                                                     @error('dob')
                                                     <div class="invalid-feedback">
                                                        {{$message}}
@@ -183,7 +183,7 @@
                                                             @else
                                                                 @foreach ($parents as $parent)
                                                                     <option value="{{$parent->id}}">
-                                                                        {{$parent->first_name . ' ' . $parent->last_name}}
+                                                                        {{ucwords(strtoupper($parent->first_name . ' ' . $parent->last_name))}}
                                                                     </option>
                                                                 @endforeach
                                                             @endif

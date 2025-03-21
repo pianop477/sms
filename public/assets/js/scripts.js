@@ -266,37 +266,48 @@
     PWA Installation Prompt
     ==================================*/
     document.addEventListener('DOMContentLoaded', () => {
-        const installButton = createInstallButton();
         let deferredPrompt;
+        const existingButton = document.getElementById('install-button');
+        if (existingButton) existingButton.remove();
 
-        // PWA Installation Prompt
+        const installButton = createInstallButton();
+
+        // Angalia kama ni iOS na haijawekwa kama PWA
+        if (isIosDevice() && !isAppStandalone()) {
+            showIosInstallMessage();
+        }
+
+        // PWA Installation Prompt kwa Android/Chrome
         if ('beforeinstallprompt' in window) {
             window.addEventListener('beforeinstallprompt', (event) => {
-                event.preventDefault(); // Prevent the default browser prompt
+                event.preventDefault();
                 deferredPrompt = event;
                 showInstallButton(installButton);
 
-                installButton.addEventListener('click', handleInstallButtonClick(deferredPrompt, installButton), { once: true });
+                installButton.addEventListener('click', async () => {
+                    deferredPrompt.prompt();
+                    const choiceResult = await deferredPrompt.userChoice;
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User installed the app');
+                        installButton.style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                }, { once: true });
             });
         }
 
-        // iOS Installation Prompt
-        if (isIosDevice() && !isAppStandalone()) {
-            alert("For a better experience, install ShuleApp: Click 'Share' → 'Add to Home Screen'.");
-        }
-
-        // Check if the app is already installed
+        // Kama tayari app imewekwa, ficha button
         if (isAppStandalone()) {
-            installButton.style.display = 'none'; // Hide install button if app is already installed
+            installButton.style.display = 'none';
         }
 
-        // Service Worker Registration
+        // Sajili Service Worker
         if ('serviceWorker' in navigator) {
             registerServiceWorker();
         }
     });
 
-    // Function to create the install button
+    // Fungua button ya Install
     function createInstallButton() {
         const button = document.createElement('button');
         button.id = 'install-button';
@@ -306,69 +317,61 @@
         button.style.bottom = '50px';
         button.style.right = '20px';
         button.style.padding = '10px 20px';
-        button.style.backgroundColor = '#007bff';
+        button.style.backgroundColor = '#4CAF50';
         button.style.color = '#fff';
         button.style.border = 'none';
         button.style.borderRadius = '5px';
         button.style.cursor = 'pointer';
         button.style.zIndex = '1000';
+        button.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
         document.body.appendChild(button);
-
         return button;
     }
 
-    // Function to show the install button
-    function showInstallButton(installButton) {
-        installButton.style.display = 'block';
+    // Onyesha button ya install
+    function showInstallButton(button) {
+        button.style.display = 'block';
     }
 
-    // Handler for the install button click event
-    function handleInstallButtonClick(deferredPrompt, installButton) {
-        return async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const choiceResult = await deferredPrompt.userChoice;
-                console.log('User choice:', choiceResult.outcome === 'accepted' ? 'User accepted the install prompt.' : 'User dismissed the install prompt.');
-
-                deferredPrompt = null;
-                installButton.style.display = 'none'; // Hide the button after usage
-            }
-        };
+    // Onyesha ujumbe kwa iOS
+    function showIosInstallMessage() {
+        const message = document.createElement('div');
+        message.textContent = "For a better experience, install ShuleApp: Click 'Share' → 'Add to Home Screen'.";
+        message.style.position = 'fixed';
+        message.style.bottom = '50px';
+        message.style.left = '50%';
+        message.style.transform = 'translateX(-50%)';
+        message.style.backgroundColor = '#ffc107';
+        message.style.color = '#000';
+        message.style.padding = '10px';
+        message.style.borderRadius = '5px';
+        message.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+        message.style.zIndex = '1000';
+        document.body.appendChild(message);
     }
 
-    // Check if the device is iOS
+    // Angalia kama ni iOS
     function isIosDevice() {
         return /iPhone|iPad/i.test(navigator.userAgent);
     }
 
-    // Check if the app is running in standalone mode (installed)
+    // Angalia kama app imefunguliwa kama PWA
     function isAppStandalone() {
         return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
     }
 
-    // Service Worker registration and updates
+    // Sajili Service Worker
     function registerServiceWorker() {
         navigator.serviceWorker.register('/service-worker.js').then((registration) => {
             console.log('Service Worker registered successfully:', registration);
-
-            // Check for updates every 30 seconds
-            setInterval(() => {
-                registration.update();
-            }, 30000);
-
-            // Ensure updates are checked for standalone apps
-            if (navigator.serviceWorker.controller) {
-                navigator.serviceWorker.controller.postMessage('checkForUpdate');
-            }
         }).catch((err) => {
             console.error('Error during service worker registration:', err);
         });
 
-        // Listen for new service worker activation
         navigator.serviceWorker.addEventListener('controllerchange', () => {
             setTimeout(() => {
                 alert('New updates are available for ShuleApp!');
-                location.reload(); // Refresh the page automatically to activate the new service worker
+                location.reload();
             }, 1000);
         });
     }
