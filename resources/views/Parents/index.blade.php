@@ -87,21 +87,21 @@
                                             <hr class="dark horizontal py-0">
                                             <div class="form-row">
                                                 <div class="col-md-4 mb-3">
-                                                    <label for="validationCustomerUsername">Student First name</label>
+                                                    <label for="validationCustomerUsername">First name</label>
                                                     <input type="text" name="student_first_name" class="form-control" id="validationCustomer02" value="{{old('student_first_name')}}" placeholder="" required="">
                                                     @error('student_first_name')
                                                     <div class="text-danger">{{$message}}</div>
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-4 mb-3">
-                                                    <label for="validationCustomerUsername">Student Middle name</label>
+                                                    <label for="validationCustomerUsername">Middle name</label>
                                                     <input type="text" name="student_middle_name" class="form-control" id="validationCustomer02" value="{{old('student_middle_name')}}" placeholder="" required="">
                                                     @error('student_middle_name')
                                                     <div class="text-danger">{{$message}}</div>
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-4 mb-3">
-                                                    <label for="validationCustomerUsername">Student Last name</label>
+                                                    <label for="validationCustomerUsername">Last name</label>
                                                     <input type="text" name="student_last_name" class="form-control" id="validationCustomer02" value="{{old('student_last_name')}}" placeholder="" required="">
                                                     @error('student_last_name')
                                                     <div class="text-danger">{{$message}}</div>
@@ -112,7 +112,7 @@
                                                 <div class="col-md-3 mb-3">
                                                     <label for="validationCustom01">Student Gender</label>
                                                     <select name="student_gender" id="validationCustom01" class="form-control text-capitalize" required>
-                                                        <option value="">-- select Student gender --</option>
+                                                        <option value="">-- select gender --</option>
                                                         <option value="male">male</option>
                                                         <option value="female">female</option>
                                                     </select>
@@ -121,8 +121,8 @@
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-3 mb-3">
-                                                    <label for="validationCustomerUsername">Student Date of Birth</label>
-                                                    <input type="date" name="dob" class="form-control" id="validationCustomer02" value="{{old('dob')}}" required="" min="{{\Carbon\Carbon::now()->subYears(14)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(3)->format('Y-m-d')}}">
+                                                    <label for="validationCustomerUsername">Date of Birth</label>
+                                                    <input type="date" name="dob" class="form-control" id="validationCustomer02" value="{{old('dob')}}" required="" min="{{\Carbon\Carbon::now()->subYears(17)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(3)->format('Y-m-d')}}">
                                                     @error('dob')
                                                     <div class="text-danger">{{$message}}</div>
                                                     @enderror
@@ -177,7 +177,7 @@
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-6 mb-3">
-                                                    <label for="validationCustomerUsername">Photo <span class="text-sm text-danger">Maximum 512KB - Blue background</span></label>
+                                                    <label for="validationCustomerUsername">Photo <span class="text-sm text-danger">Maximum 1MB - Blue background</span></label>
                                                     <input type="file" name="passport" class="form-control" id="validationCustomer02" value="{{old('dob')}}" placeholder="Student Photo">
                                                     @error('passport')
                                                     <div class="text-danger">{{$message}}</div>

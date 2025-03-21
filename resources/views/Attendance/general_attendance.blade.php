@@ -11,36 +11,50 @@
               onsubmit="showPreloader(event)">
             @csrf
             <div class="form-row">
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <label for="validationCustom01">Class</label>
                     <select name="class" id="validationCustom01" class="form-control text-uppercase" required>
-                        <option value="">-- Select Class --</option>
+                        <option value="">--Select Classes--</option>
                         @foreach ($classes as $class)
                             <option value="{{$class->id}}">{{$class->class_name}}</option>
                         @endforeach
                     </select>
                     @error('class')
-                    <div class="invalid-feedback">
+                    <div class="text-danger text-sm">
                         {{$message}}
                     </div>
                     @enderror
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label for="validationCustom02">From Month</label>
-                    <input type="month" name="start" class="form-control" id="validationCustom02" required value="{{old('start_date')}}" max="{{\Carbon\Carbon::now()->format('Y-m')}}">
-                    @error('start_date')
-                    <div class="invalid-feedback">
+                <div class="col-md-3 mb-3">
+                    <label for="validationCustom02">Stand Date</label>
+                    <input type="date" name="start" class="form-control" id="validationCustom02" required value="{{old('start')}}" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+                    @error('start')
+                    <div class="text-danger text-sm">
                         {{$message}}
                     </div>
                     @enderror
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label for="validationCustom02">To Month</label>
-                    <input type="month" name="end" class="form-control" id="validationCustom02" required value="{{old('end_date')}}" max="{{\Carbon\Carbon::now()->format('Y-m')}}">
-                    @error('end_date')
-                    <div class="invalid-feedback">
+                <div class="col-md-3 mb-3">
+                    <label for="validationCustom02">End Date</label>
+                    <input type="date" name="end" class="form-control" id="validationCustom02" required value="{{old('end')}}" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+                    @error('end')
+                    <div class="text-danger text-sm">
                         {{$message}}
                     </div>
+                    @enderror
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="validationCustom02">Stream</label>
+                    <select name="stream" class="text-uppercase form-control" id="validationCustom02">
+                        <option value="all" selected>All</option>
+                        <option value="a">a</option>
+                        <option value="b">b</option>
+                        <option value="c">c</option>
+                    </select>
+                    @error('stream')
+                        <div class="text-danger text-sm">
+                            {{$message}}
+                        </div>
                     @enderror
                 </div>
             </div>
@@ -49,7 +63,6 @@
                     <button class="btn btn-primary float-right" type="submit"><i class="ti-settings"></i> Generate</button>
                 </div>
             </div>
-
             <div id="preloader" style="display:none;">
                 <div class="error-area ptb--100 text-center">
                     <div class="container">

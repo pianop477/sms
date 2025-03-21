@@ -14,6 +14,7 @@ use App\Services\NextSmsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use RealRashid\SweetAlert\Facades\Alert;
 use Vinkla\Hashids\Facades\Hashids;
 
@@ -436,6 +437,18 @@ class RolesController extends Controller
 
         Alert()->toast('Role has been assigned successfully', 'success');
         return redirect()->route('roles.updateRole');
+    }
+
+    public function extendSession(Request $request)
+    {
+        if (!auth()->check()) {
+            return response()->json(['session_expired' => true], 401);
+        }
+
+        Session::put('last_activity', time());
+        Session::forget('session_warning_shown'); // Reset warning flag
+
+        return response()->json(['success' => true]);
     }
 
 

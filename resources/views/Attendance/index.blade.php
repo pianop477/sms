@@ -1,34 +1,36 @@
 @extends('SRTDashboard.frame')
 @section('content')
 
-{{-- Fomu ya kuchagua tarehe ya attendance (hii itaonekana kila wakati) --}}
-<form method="GET" action="{{ route('get.student.list', ['class' => Hashids::encode($myClass->first()->id)]) }}" class="needs-validation" novalidate>
-    <div class="col-md-4 p-2 float-right">
-        <label for="attendance_date">Select Date:</label>
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text">
-                    <i class="fas fa-calendar-alt"></i> <!-- Font Awesome calendar icon -->
-                </span>
+{{-- **Hakikisha hii fomu ya tarehe inabaki bila kujali attendance** --}}
+<div class="row">
+    <div class="col-md-4 p-2">
+        <form method="GET" action="{{ route('get.student.list', ['class' => Hashids::encode($myClass->first()->id)]) }}" class="needs-validation" novalidate>
+            <label for="attendance_date">Select Date:</label>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">
+                        <i class="fas fa-calendar-alt"></i>
+                    </span>
+                </div>
+                <input type="date" id="attendance_date" name="attendance_date"
+                    value="{{ request()->input('attendance_date', \Carbon\Carbon::now()->format('Y-m-d')) }}"
+                    max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}"
+                    min="{{ \Carbon\Carbon::now()->subWeek()->format('Y-m-d') }}"
+                    class="form-control p-2" required>
             </div>
-            <input type="date" id="attendance_date" name="attendance_date"
-                value="{{ request()->input('attendance_date', \Carbon\Carbon::now()->format('Y-m-d')) }}"
-                max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}"
-                min="{{ \Carbon\Carbon::now()->subWeek()->format('Y-m-d') }}"
-                class="form-control p-2" required>
-        </div>
+        </form>
     </div>
-</form>
+</div>
 
+{{-- **Hapa ndipo ujumbe wa attendance utaonekana, lakini fomu ya tarehe inabaki juu** --}}
 @if ($attendanceExists)
-    {{-- Onyesha ujumbe wa taarifa ikiwa attendance tayari imewekwa --}}
     <div class="alert alert-success text-center mt-3">
         <h6>Attendance for {{ \Carbon\Carbon::parse($selectedDate)->format('d-m-Y') }} has already been submitted.</h6>
         <hr>
         <p><a href="{{ route('home') }}" class="btn btn-primary btn-sm">Go Back</a></p>
     </div>
 @else
-    {{-- Orodha ya wanafunzi inaoonekana tu ikiwa attendance haipo --}}
+    {{-- Ikiwa attendance haipo, onyesha fomu ya attendance --}}
     <form id="attendanceForm" action="{{ route('store.attendance', ['student_class' => Hashids::encode($student_class->id)]) }}" method="POST" class="needs-validation" novalidate>
         @csrf
         <input type="hidden" name="attendance_date" value="{{ $selectedDate }}">
@@ -36,7 +38,6 @@
             <table class="table">
                 <thead class="text-capitalize bg-info">
                     <tr class="text-white">
-                        <th>AdmNo.</th>
                         <th>Name</th>
                         <th class="text-center">Sex</th>
                         <th class="text-center">Attendance Status</th>
@@ -46,7 +47,6 @@
                     @foreach ($studentList as $student)
                         <tr>
                             <input type="hidden" name="student_id[]" value="{{ $student->id }}">
-                            <td>{{ ucwords(strtoupper($student->admission_number)) }}</td>
                             <td>
                                 <a href="{{ route('Students.show', ['student' => Hashids::encode($student->id)]) }}">
                                     {{ ucwords(strtolower($student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name)) }}
@@ -91,7 +91,6 @@
         </div>
     </form>
 @endif
-
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const attendanceDateInput = document.getElementById("attendance_date");

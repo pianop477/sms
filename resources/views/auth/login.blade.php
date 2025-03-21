@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
         @include('SRTDashboard.header')
-    </head>
     <body>
         @include('SRTDashboard.preloader')
         <!-- preloader area end -->

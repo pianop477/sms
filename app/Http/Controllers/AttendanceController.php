@@ -285,8 +285,8 @@ class AttendanceController extends Controller
         $id = Hashids::decode($classTeacher);
         // Validate the request
         $request->validate([
-            'start' => 'required|date_format:Y-m',
-            'end' => 'required|date_format:Y-m'
+            'start' => 'required|date_format:Y-m-d',
+            'end' => 'required|date_format:Y-m-d'
         ]);
 
         // Retrieve the class teacher's details
@@ -298,8 +298,8 @@ class AttendanceController extends Controller
         $userId = Auth::user()->id;
 
         // Define the date range for the report
-        $startOfMonth = Carbon::parse($request->input('start'))->startOfMonth();
-        $endOfMonth = Carbon::parse($request->input('end'))->endOfMonth();
+        $startDate = Carbon::parse($request->input('start'))->startOfDay();
+        $endDate = Carbon::parse($request->input('end'))->endOfDay();
 
         // Query the attendance data
         $attendances = Attendance::join('students', 'students.id', '=', 'attendances.student_id')
@@ -325,7 +325,7 @@ class AttendanceController extends Controller
             )
             ->where('attendances.class_id', $classId)
             ->where('students.group', $group) // Compare 'group' directly
-            ->whereBetween('attendances.attendance_date', [$startOfMonth, $endOfMonth])
+            ->whereBetween('attendances.attendance_date', [$startDate, $endDate])
             ->where('attendances.school_id', Auth::user()->school_id)
             ->orderBy('attendances.attendance_date', 'ASC')
             ->where('students.status', 1)
@@ -464,12 +464,15 @@ class AttendanceController extends Controller
     {
         $request->validate([
             'class' => 'required|exists:grades,id',
-            'start' => 'required|date_format:Y-m',
-            'end' => 'required|date_format:Y-m'
+            'start' => 'required|date_format:Y-m-d',
+            'end' => 'required|date_format:Y-m-d',
+            'stream' => 'nullable|in:a,b,c,all',
         ]);
 
-        $startOfMonth = Carbon::parse($request->input('start'))->startOfMonth();
-        $endOfMonth = Carbon::parse($request->input('end'))->endOfMonth();
+        $startDate = Carbon::parse($request->input('start'))->startOfDay();
+        $endDate = Carbon::parse($request->input('end'))->endOfDay();
+        $stream = strtolower($request->input('stream'));
+        $arrayStream = ['a', 'b', 'c']; // Safu ya thamani za stream
 
         $attendances = Attendance::query()
                     ->join('students', 'students.id', '=', 'attendances.student_id')
@@ -486,7 +489,15 @@ class AttendanceController extends Controller
                         'users.gender as teacher_gender', 'users.phone as teacher_phone', 'schools.school_reg_no',
                     )
                     ->where('attendances.class_id', $request->class)
-                    ->whereBetween('attendances.attendance_date', [$startOfMonth, $endOfMonth])
+                    ->whereBetween('attendances.attendance_date', [$startDate, $endDate])
+                    // ->where('students.group', $stream)
+                    ->where(function ($query) use ($stream, $arrayStream) {
+                        if ($stream == 'all') {
+                            $query->whereIn('students.group', $arrayStream); // Tumia whereIn kwa safu
+                        } else {
+                            $query->where('students.group', $stream); // Tumia where kwa thamani moja
+                        }
+                    })
                     ->where('attendances.school_id', Auth::user()->school_id)
                     ->where('students.status', 1)
                     ->orderBy('attendances.attendance_date', 'ASC')
@@ -533,7 +544,7 @@ class AttendanceController extends Controller
                     return Carbon::parse($item->attendance_date)->format('Y-m-d');
                 });
 
-                $pdf = \PDF::loadView('Attendance.all_report', compact('datas', 'maleSummary', 'femaleSummary', 'attendances', 'startOfMonth', 'endOfMonth'));
+                $pdf = \PDF::loadView('Attendance.all_report', compact('datas', 'maleSummary', 'femaleSummary', 'attendances', 'startDate', 'endDate'));
 
                 $className = $attendances->first()->class_name;
                 $attendanceDate = Carbon::parse($attendances->first()->attendance_date)->format('F');

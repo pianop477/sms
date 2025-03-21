@@ -37,6 +37,7 @@
         <div class="main-content-inner">
             <div class="container">
                 @yield('content')
+                <button id="install-button" style="display: none;">Install App</button>
             </div>
         </div>
         <!-- main content area end -->

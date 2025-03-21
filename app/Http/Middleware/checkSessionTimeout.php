@@ -18,39 +18,42 @@ class checkSessionTimeout
      */
 
      public function handle(Request $request, Closure $next)
-    {
-        if (Auth::check()) {
-            $lastActivity = Session::get('last_activity');
+     {
+         if (Auth::check()) {
+             $lastActivity = Session::get('last_activity', time());
+             $sessionLifeTime = 60 * 60; // 1 hour
+             $warningTime = 60 * 55; // 5 minutes before expiration
 
-            if (!$lastActivity) {
-                Session::put('last_activity', time());
-                $lastActivity = time();
-            }
+             $remainingTime = $sessionLifeTime - (time() - $lastActivity);
 
-            $sessionLifeTime = 60 * 60; // 1 hour
-            $warningTime = 60 * 55; // 5 minutes before session expires
+             // **Ikiwa muda umeisha, toa mtumiaji nje**
+             if ($remainingTime <= 0) {
+                 Auth::logout();
+                 session()->invalidate();
+                 session()->regenerateToken();
 
-            if (time() - $lastActivity > $sessionLifeTime) {
-                Auth::logout();
-                session()->invalidate();
-                session()->regenerateToken();
-                return response()->json(['session_expired' => true], 401);
-            }
+                 if ($request->expectsJson() || $request->ajax()) {
+                     return response()->json(['session_expired' => true], 401);
+                 } else {
+                     return redirect()->route('login')->with('error', 'Session expired. Please login again.');
+                 }
+             }
 
-            if (time() - $lastActivity > $warningTime && !Session::has('session_warning_shown')) {
-                Session::put('session_warning_shown', true);
-                Session::put('session_remaining_time', $sessionLifeTime - (time() - $lastActivity));
+             // **Onyo la Session Expiring**
+             if ($remainingTime <= 300) { // 5 minutes before expiration
+                 if ($request->expectsJson() || $request->ajax()) {
+                     return response()->json([
+                         'session_expiring_soon' => true,
+                         'remaining_time' => $remainingTime
+                     ]);
+                 }
+             }
 
-                return response()->json([
-                    'session_expiring_soon' => true,
-                    'remaining_time' => Session::get('session_remaining_time')
-                ]);
-            }
+             // **Sasisha last activity**
+             Session::put('last_activity', time());
+         }
 
-            Session::put('last_activity', time());
-        }
-
-        return $next($request);
-    }
+         return $next($request);
+     }
 
 }

@@ -7,7 +7,11 @@
                 <h4 class="header-title">Edit Students Information</h4>
             </div>
             <div class="col-2">
-                <a href="{{url()->previous()}}" class=""><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                @if (Auth::check() && Auth::user()->can('create.selected.class'))
+                    <a href="{{route('create.selected.class', ['class' => Hashids::encode($students->grade_class_id)])}}" class=""><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                @else
+                    <a href="{{route('home')}}" class=""><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                @endif
             </div>
         </div>
         <form class="needs-validation" novalidate="" action="{{route('students.update.records', ['students' => Hashids::encode($students->id)])}}" method="POST" enctype="multipart/form-data">

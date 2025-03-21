@@ -8,6 +8,7 @@ use App\Models\school;
 use App\Models\Student;
 use App\Models\Transport;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -86,6 +87,7 @@ class StudentsController extends Controller
                 'school_id' => 'exists:schools,id'
             ]);
 
+            DB::beginTransaction();
             try {
                 // Check for existing student records
                             $existingStudent = Student::whereRaw('LOWER(first_name) = ?', [strtolower($request->fname)])
@@ -137,11 +139,13 @@ class StudentsController extends Controller
                 // Save the new student record
                 $student =  $new_student->save();
 
+                DB::commit();
                 if($student) {
-                Alert()->toast('Student records saved successfully', 'success');
-                return redirect()->route('create.selected.class', Hashids::encode($class->id));
+                    Alert()->toast('Student records saved successfully', 'success');
+                    return redirect()->route('create.selected.class', Hashids::encode($class->id));
                 }
             } catch (\Exception $e) {
+                DB::rollBack();
                 Alert()->toast($e->getMessage(), 'error');
                 return back();
             }
@@ -153,18 +157,17 @@ class StudentsController extends Controller
         $user = Auth::user();
         $schoolData = School::findOrFail($user->school_id);
 
-        // Count existing unique admission numbers
-        if (Student::count() >= 9000) { // Keeping some buffer
-            throw new \Exception("All admission numbers are taken. Please use a larger range.");
-        }
+        // Pata ID ya mwisho ya mwanafunzi na uongeze 1
+        $lastStudent = Student::where('school_id', $user->school_id)
+                            ->orderBy('id', 'desc')
+                            ->first();
 
-        do {
-            $admissionNumber = str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
-        } while (Student::where('admission_number', $admissionNumber)
-                        ->where('status', 1)
-                        ->where('school_id', $user->school_id)
-                        ->exists());
+        $lastId = $lastStudent ? $lastStudent->id + 1 : 1;
 
+        // Hakikisha kuwa ID ni ya kipekee
+        $admissionNumber = str_pad($lastId, 4, '0', STR_PAD_LEFT);
+
+        // Rudisha nambari ya kujiunga kwa kutumia kifupi cha shule na ID
         return $schoolData->abbriv_code . '-' . $admissionNumber;
     }
 
@@ -491,7 +494,9 @@ class StudentsController extends Controller
                     return back();
             }
 
-            $students = new Student();
+            DB::beginTransaction();
+            try {
+                $students = new Student();
             $students->admission_number = $this->getAdmissionNumber();
             $students->first_name = $request->fname;
             $students->middle_name = $request->middle;
@@ -525,10 +530,17 @@ class StudentsController extends Controller
 
             // Save the new student record
             $students->save();
+            DB::commit();
 
             // Return success message
             Alert()->toast('Student records saved successfully', 'success');
             return redirect()->route('home');
+            }
+            catch(Exception $e) {
+                DB::rollBack();
+                Alert()->toast($e->getMessage(), 'error');
+                return back();
+            }
     }
 
     // show student profile *****************************************************************************
@@ -558,6 +570,7 @@ class StudentsController extends Controller
                             'users.gender as user_gender',
                             'grades.class_name as grade_class_name',
                             'grades.class_code as grade_class_code',
+                            'grades.id as class_id',
                             'transports.driver_name as driver', 'transports.gender as driver_gender', 'transports.phone as driver_phone', 'transports.bus_no as bus_number',
                             'transports.routine as bus_routine',
                             'grades.id as grade_class_id',
@@ -602,7 +615,9 @@ class StudentsController extends Controller
                                     ->join('users', 'users.id', '=', 'parents.user_id')
                                     ->join('grades', 'grades.id', '=', 'students.class_id')
                                     ->leftJoin('transports', 'transports.id', '=', 'students.transport_id')
-                                    ->select('students.*', 'grades.class_name', 'grades.class_code', 'transports.driver_name', 'transports.bus_no')
+                                    ->select('students.*', 'grades.class_name',
+                                    'grades.id as grade_class_id',
+                                    'grades.class_code', 'transports.driver_name', 'transports.bus_no')
                                     ->findOrFail($decoded[0]);
 
         $buses = Transport::where('status', '=', 1)->where('school_id', $user->school_id)->orderBy('bus_no', 'ASC')->get();

@@ -37,7 +37,7 @@ class ParentsController extends Controller
     public function showAllParents() {
         $user = Auth::user();
         $classes = Grade::where('school_id', '=', $user->school_id, 'AND', 'status', '=', 1)->orderBy('class_code')->get();
-        $buses = Transport::where('school_id', '=', $user->school_id, 'AND', 'status', '=', 1)->orderBy('driver_name', 'ASC')->get();
+        $buses = Transport::where('school_id', '=', $user->school_id, 'AND', 'status', '=', 1)->orderBy('bus_no', 'ASC')->get();
         $parents = Parents::query()
                             ->join('users', 'users.id', '=', 'parents.user_id')
                             ->join('schools', 'schools.id', '=', 'parents.school_id')
@@ -89,6 +89,7 @@ class ParentsController extends Controller
             'passport' => 'nullable|image|mimes:jpg,png,jpeg|max:512',
         ]);
 
+        DB::beginTransaction();
         try {
             // Check if user (parent) exists
             $userExists = User::where('phone', $request->phone)
@@ -160,6 +161,8 @@ class ParentsController extends Controller
                 'school_id' => $parents->school_id
             ]);
 
+            DB::commit();
+
                 $url = "https://shuleapp.tech";
 
                 $nextSmsService = new NextSmsService();
@@ -196,6 +199,7 @@ class ParentsController extends Controller
                 return redirect()->route('Parents.index');
 
         } catch (\Exception $e) {
+            DB::rollBack();
             Alert()->toast($e->getMessage(), 'error');
             return back();
         }
@@ -223,18 +227,17 @@ class ParentsController extends Controller
         $user = Auth::user();
         $schoolData = School::findOrFail($user->school_id);
 
-        // Count existing unique admission numbers
-        if (Student::count() >= 9000) { // Keeping some buffer
-            throw new \Exception("All admission numbers are taken. Please use a larger range.");
-        }
+        // Pata ID ya mwisho ya mwanafunzi na uongeze 1
+        $lastStudent = Student::where('school_id', $user->school_id)
+                            ->orderBy('id', 'desc')
+                            ->first();
 
-        do {
-            $admissionNumber = str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
-        } while (Student::where('admission_number', $admissionNumber)
-                        ->where('status', 1)
-                        ->where('school_id', $user->school_id)
-                        ->exists());
+        $lastId = $lastStudent ? $lastStudent->id + 1 : 1;
 
+        // Hakikisha kuwa ID ni ya kipekee
+        $admissionNumber = str_pad($lastId, 4, '0', STR_PAD_LEFT);
+
+        // Rudisha nambari ya kujiunga kwa kutumia kifupi cha shule na ID
         return $schoolData->abbriv_code . '-' . $admissionNumber;
     }
 
