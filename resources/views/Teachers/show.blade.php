@@ -77,7 +77,7 @@
             <div class="form-row">
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom01">Date of Birth</label>
-                    <input type="date" name="dob" class="form-control text-capitalize" value="{{$teachers->dob}}" required min="{{\Carbon\Carbon::now()->subYears(50)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(18)->format('Y-m-d')}}">
+                    <input type="date" name="dob" class="form-control text-capitalize" value="{{$teachers->dob}}" required min="{{\Carbon\Carbon::now()->subYears(60)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(18)->format('Y-m-d')}}">
                     @error('dob')
                     <div class="text-danger">{{$message}}</div>
                     @enderror
