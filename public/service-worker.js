@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ShuleApp-cache-v2.1'; // Change version when updating
+const CACHE_NAME = 'ShuleApp-cache-v2.2'; // Change version when updating
 const ASSETS_TO_CACHE = [
     '/',
     '/index.php',

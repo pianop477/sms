@@ -260,9 +260,9 @@
       <div class="row">
         <div class="col-md-6">
           <h4>ShuleApp - Admin</h4>
-          <p>Address: Dodoma, Tanzania</p>
-          <p>Email: pianop477@gmail.com</p>
-          <p><i class="fas fa-phone"></i> Call:
+          <p> <i class=" fas fa-location-pin"></i> Address: Dodoma, Tanzania</p>
+          <p><i class="fas fa-envelope"></i> pianop477@gmail.com</p>
+          <p><i class="fas fa-phone"></i>
             <a href="tel:0678669000">
                 +255 678 669 000
             </a>
