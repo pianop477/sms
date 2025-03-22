@@ -1,8 +1,8 @@
-const CACHE_NAME = 'ShuleApp-cache-v3.0'; // Change version when updating
+const CACHE_NAME = 'ShuleApp-cache-v3.1'; // Sasisha toleo
 const ASSETS_TO_CACHE = [
     '/',
     '/index.php',
-    '/manifest.json?v=3.0', // Ensure manifest.json is always updated
+    '/manifest.json?v=3.1', // Sasisha ili kuhakikisha inaboreshwa
     '/assets/css/styles.css',
     '/assets/js/scripts.js',
     '/icons/icon.png',
@@ -21,10 +21,10 @@ self.addEventListener('install', (event) => {
             console.error('Error caching assets during install:', err);
         })
     );
-    self.skipWaiting(); // Force immediate activation
+    self.skipWaiting();
 });
 
-// Activate event: Clear outdated caches and force refresh
+// Activate event: Clear outdated caches and notify clients
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
@@ -41,46 +41,31 @@ self.addEventListener('activate', (event) => {
         })
     );
 
-    // Force update on all active clients
+    // Notify clients about the update
     self.clients.claim().then(() => {
         self.clients.matchAll({ type: 'window' }).then(clients => {
-            clients.forEach(client => client.navigate(client.url));
+            clients.forEach(client => client.postMessage({ type: 'SW_UPDATED' }));
         });
     });
-
-    // Fetch new manifest.json to update theme color immediately
-    event.waitUntil(
-        fetch('/manifest.json?v=3.0').then(response => response.json()).then(updatedManifest => {
-            console.log('Manifest updated:', updatedManifest);
-        }).catch(err => {
-            console.error('Manifest update failed:', err);
-        })
-    );
 });
 
 // Fetch event: Smart caching strategy
 self.addEventListener('fetch', (event) => {
     const requestUrl = new URL(event.request.url);
 
-    // Avoid caching session-related requests
     if (requestUrl.pathname === '/check-session') {
         event.respondWith(fetch(event.request));
         return;
     }
 
-    // Use cache but update assets in the background
     event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
-            const fetchPromise = fetch(event.request).then((networkResponse) => {
-                if (networkResponse && networkResponse.status === 200) {
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, networkResponse.clone()); // Update cache
-                    });
-                }
-                return networkResponse;
-            }).catch(() => cachedResponse || caches.match('/offline.html'));
-
-            return cachedResponse || fetchPromise; // Return cache first, then update
+            return cachedResponse || fetch(event.request).then((networkResponse) => {
+                return caches.open(CACHE_NAME).then((cache) => {
+                    cache.put(event.request, networkResponse.clone());
+                    return networkResponse;
+                });
+            }).catch(() => caches.match('/offline.html'));
         })
     );
 });
