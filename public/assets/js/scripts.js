@@ -267,9 +267,6 @@
     ==================================*/
     document.addEventListener('DOMContentLoaded', () => {
         let deferredPrompt;
-        const existingButton = document.getElementById('install-button');
-        if (existingButton) existingButton.remove();
-
         const installButton = createInstallButton();
 
         // Angalia kama ni iOS na haijawekwa kama PWA
@@ -278,23 +275,23 @@
         }
 
         // PWA Installation Prompt kwa Android/Chrome
-        if ('beforeinstallprompt' in window) {
-            window.addEventListener('beforeinstallprompt', (event) => {
-                event.preventDefault();
-                deferredPrompt = event;
-                showInstallButton(installButton);
+        window.addEventListener('beforeinstallprompt', (event) => {
+            event.preventDefault();
+            deferredPrompt = event;
+            showInstallButton(installButton);
+        });
 
-                installButton.addEventListener('click', async () => {
-                    deferredPrompt.prompt();
-                    const choiceResult = await deferredPrompt.userChoice;
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User installed the app');
-                        installButton.style.display = 'none';
-                    }
-                    deferredPrompt = null;
-                }, { once: true });
-            });
-        }
+        installButton.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const choiceResult = await deferredPrompt.userChoice;
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User installed the app');
+                    installButton.style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        });
 
         // Kama tayari app imewekwa, ficha button
         if (isAppStandalone()) {
@@ -309,7 +306,12 @@
 
     // Fungua button ya Install
     function createInstallButton() {
-        const button = document.createElement('button');
+        let button = document.getElementById('install-button');
+        if (button) {
+            button.remove();
+        }
+
+        button = document.createElement('button');
         button.id = 'install-button';
         button.textContent = 'Install App';
         button.style.display = 'none';
@@ -348,6 +350,11 @@
         message.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
         message.style.zIndex = '1000';
         document.body.appendChild(message);
+
+        // Ujumbe ujifiche baada ya sekunde 10
+        setTimeout(() => {
+            message.remove();
+        }, 10000);
     }
 
     // Angalia kama ni iOS
@@ -375,6 +382,5 @@
             }, 1000);
         });
     }
-
 
     })(jQuery);
