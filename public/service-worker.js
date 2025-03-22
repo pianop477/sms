@@ -1,8 +1,8 @@
-const CACHE_NAME = 'ShuleApp-cache-v2.2'; // Change version when updating
+const CACHE_NAME = 'ShuleApp-cache-v3.0'; // Change version when updating
 const ASSETS_TO_CACHE = [
     '/',
     '/index.php',
-    '/manifest.json', // Ensure manifest.json is also cached
+    '/manifest.json?v=3.0', // Ensure manifest.json is always updated
     '/assets/css/styles.css',
     '/assets/js/scripts.js',
     '/icons/icon.png',
@@ -21,10 +21,10 @@ self.addEventListener('install', (event) => {
             console.error('Error caching assets during install:', err);
         })
     );
-    self.skipWaiting(); // Ensure the new Service Worker takes over immediately
+    self.skipWaiting(); // Force immediate activation
 });
 
-// Activate event: Clear outdated caches and update clients
+// Activate event: Clear outdated caches and force refresh
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
@@ -41,12 +41,21 @@ self.addEventListener('activate', (event) => {
         })
     );
 
-    // Force refresh on all active clients (PWA update immediately)
+    // Force update on all active clients
     self.clients.claim().then(() => {
-        self.clients.matchAll().then(clients => {
+        self.clients.matchAll({ type: 'window' }).then(clients => {
             clients.forEach(client => client.navigate(client.url));
         });
     });
+
+    // Fetch new manifest.json to update theme color immediately
+    event.waitUntil(
+        fetch('/manifest.json?v=3.0').then(response => response.json()).then(updatedManifest => {
+            console.log('Manifest updated:', updatedManifest);
+        }).catch(err => {
+            console.error('Manifest update failed:', err);
+        })
+    );
 });
 
 // Fetch event: Smart caching strategy
@@ -65,7 +74,7 @@ self.addEventListener('fetch', (event) => {
             const fetchPromise = fetch(event.request).then((networkResponse) => {
                 if (networkResponse && networkResponse.status === 200) {
                     caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, networkResponse.clone()); // Update cache with latest file
+                        cache.put(event.request, networkResponse.clone()); // Update cache
                     });
                 }
                 return networkResponse;
