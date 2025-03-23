@@ -38,7 +38,7 @@
             <table class="table">
                 <thead class="text-capitalize bg-info">
                     <tr class="text-white">
-                        <th>Name</th>
+                        <th>Student Name</th>
                         <th class="text-center">Sex</th>
                         <th class="text-center">Attendance Status</th>
                     </tr>
