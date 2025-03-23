@@ -167,17 +167,72 @@ class StudentsController extends Controller
         // Hakikisha kuwa ID ni ya kipekee
         $admissionNumber = str_pad($lastId, 4, '0', STR_PAD_LEFT);
 
+        // Hakikisha admission number ni ya kipekee
+        while (Student::where('admission_number', $schoolData->abbriv_code . '-' . $admissionNumber)->exists()) {
+            $lastId++;
+            $admissionNumber = str_pad($lastId, 4, '0', STR_PAD_LEFT);
+        }
+
         // Rudisha nambari ya kujiunga kwa kutumia kifupi cha shule na ID
         return $schoolData->abbriv_code . '-' . $admissionNumber;
     }
 
-
     /**
      * Display the resource.
      */
-    public function show()
+    public function showMyChildren($student)
     {
         //
+        $decoded = Hashids::decode($student);
+        // return $decoded;
+        $user = Auth::user();
+        // return $user;
+        $parent = Parents::where('user_id', $user->id)->first();
+        // return $parent;
+        $data = Student::query()
+                        ->join('parents', 'parents.id', '=', 'students.parent_id')
+                        ->join('grades', 'grades.id', '=', 'students.class_id')
+                        ->join('users', 'users.id', '=', 'parents.user_id')
+                        ->join('schools', 'schools.id', '=', 'students.school_id')
+                        ->leftJoin('transports', 'transports.id', '=', 'students.transport_id')
+                        ->select(
+                            'students.*',
+                            'parents.user_id as parent_user_id',
+                            'parents.address as parent_address',
+                            'users.first_name as user_first_name',
+                            'users.last_name as user_last_name',
+                            'users.id as user_id',
+                            'parents.id as parent_id',
+                            'users.phone',
+                            'users.gender as user_gender',
+                            'grades.class_name as grade_class_name',
+                            'grades.class_code as grade_class_code',
+                            'grades.id as class_id',
+                            'transports.driver_name as driver', 'transports.gender as driver_gender', 'transports.phone as driver_phone', 'transports.bus_no as bus_number',
+                            'transports.routine as bus_routine',
+                            'grades.id as grade_class_id',
+                            'schools.school_reg_no', 'schools.abbriv_code'
+                        )
+                        ->where('students.id', '=', $decoded[0])
+                        // ->where('students.parent_id', $parent->id)
+                        ->where('students.school_id', $user->school_id)
+                        ->where('students.status', 1)
+                        ->first();
+
+        // Check if the data is found
+        if (!$data) {
+            // Handle the case where no data is found, e.g., return a 404 response
+            Alert()->toast('No student found', 'error');
+            return back();
+        }
+
+        // The student gender can be accessed directly from $data
+        $studentGender = $data->gender;
+
+        return view('Students.parent_show_student', [
+            'data' => $data,
+            'studentGender' => $studentGender
+        ]);
     }
 
     /**
@@ -258,6 +313,73 @@ class StudentsController extends Controller
             Alert()->toast('Student records updated successfully', 'success');
             return redirect()->route('Students.show', Hashids::encode($student->id));
 
+    }
+
+    //parent update student information
+    public function updateMyChildren(Request $request, $students)
+    {
+        $decoded = Hashids::decode($students);
+        // return $decoded;
+        if(empty($decoded)) {
+            Alert()->toast('No such student was found', 'error');
+            return back();
+        }
+        $studentId = $decoded[0];
+
+        $student = Student::find($studentId);
+
+            $request->merge(['group' => strtoupper($request->input('group'))]);
+
+            $request->validate([
+                'fname' => 'required|string|max:255',
+                'middle' => 'required|string|max:255',
+                'lname' => 'required|string|max:255',
+                'class' => 'required|integer|exists:grades,id',
+                'group' => 'required|in:A,B,C,D',
+                'gender' => 'required|max:255',
+                'dob' => 'required|date|date_format:Y-m-d',
+                'driver' => 'integer|nullable|exists:transports,id',
+                'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
+            ]);
+
+            // return $student->first_name . ' '. $student->school_id. ' '. $student->parent_id;
+            $student->first_name = $request->fname;
+            $student->middle_name = $request->middle;
+            $student->last_name = $request->lname;
+            $student->class_id = $request->class;
+            $student->group = $request->group;
+            $student->gender = $request->gender;
+            $student->dob = $request->dob;
+            $student->transport_id = $request->driver;
+
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $imageFile = time() . '.' . $image->getClientOriginalExtension();
+                $imagePath = public_path('assets/img/students');
+
+                // Ensure the directory exists
+                if (!file_exists($imagePath)) {
+                    mkdir($imagePath, 0775, true);
+                }
+
+                // Check if the existing file exists and delete it
+                if (!empty($student->image)) {
+                    $existingFile = $imagePath . '/' . $student->image;
+                    if (file_exists($existingFile) && is_file($existingFile)) {
+                        unlink($existingFile);
+                    }
+                }
+
+                // Move the new file
+                $image->move($imagePath, $imageFile);
+
+                // Save the file name to the database
+                $student->image = $imageFile;
+            }
+
+            $student->save();
+            Alert()->toast('Student records updated successfully', 'success');
+            return redirect()->route('parent.show.student', Hashids::encode($student->id));
     }
 
 
@@ -639,6 +761,33 @@ class StudentsController extends Controller
                             ->where('students.school_id', $user->school_id)
                             ->get();
         return view('Students.trash', compact('students'));
+    }
+
+    //parent edit file blade view *************************************************************************
+    public function editMyStudent($student)
+    {
+        $user = Auth::user();
+        $parent = Parents::where('user_id', $user->id)->first();
+
+        $decoded = Hashids::decode($student);
+
+        if(empty($decoded)) {
+            Alert()->toast('No such student was found', 'error');
+            return back();
+        }
+        // return $user;
+        $students = Student::query()->join('parents', 'parents.id', '=', 'students.parent_id')
+                                    ->join('users', 'users.id', '=', 'parents.user_id')
+                                    ->join('grades', 'grades.id', '=', 'students.class_id')
+                                    ->leftJoin('transports', 'transports.id', '=', 'students.transport_id')
+                                    ->select('students.*', 'grades.class_name',
+                                    'grades.id as grade_class_id',
+                                    'grades.class_code', 'transports.driver_name', 'transports.bus_no')
+                                    ->findOrFail($decoded[0]);
+
+        $buses = Transport::where('status', '=', 1)->where('school_id', $user->school_id)->orderBy('bus_no', 'ASC')->get();
+        $classes = Grade::where('status', '=', 1)->where('school_id', $user->school_id)->orderBy('class_code')->get();
+        return view('Students.parent_edit_student', ['buses' => $buses, 'students' => $students, 'classes' => $classes ]);
     }
 
     // restore student in the trash *************************************************************************

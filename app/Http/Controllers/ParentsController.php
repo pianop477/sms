@@ -237,6 +237,12 @@ class ParentsController extends Controller
         // Hakikisha kuwa ID ni ya kipekee
         $admissionNumber = str_pad($lastId, 4, '0', STR_PAD_LEFT);
 
+        // Hakikisha admission number ni ya kipekee
+        while (Student::where('admission_number', $schoolData->abbriv_code . '-' . $admissionNumber)->exists()) {
+            $lastId++;
+            $admissionNumber = str_pad($lastId, 4, '0', STR_PAD_LEFT);
+        }
+
         // Rudisha nambari ya kujiunga kwa kutumia kifupi cha shule na ID
         return $schoolData->abbriv_code . '-' . $admissionNumber;
     }
