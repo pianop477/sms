@@ -212,13 +212,17 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         Route::post('Register-students', [StudentsController::class, 'registerStudent'])->name('register.student');
     });
 
-    //free role routes for edit students
-    Route::get('Edit-student/{students}', [StudentsController::class, 'modify'])->name('students.modify');
-    Route::put('{students}/Update-student', [StudentsController::class, 'updateRecords'])->name('students.update.records');
-
     //access students information ===========================================================================
-    Route::middleware(['CheckUsertype:2,3,4'])->group(function () {
+    Route::middleware(['CheckUsertype:2,3'])->group(function () {
         Route::get('{student}/Show-Students', [StudentsController::class, 'showRecords'])->name('Students.show');
+        Route::get('Edit-student/{students}', [StudentsController::class, 'modify'])->name('students.modify');
+        Route::put('{students}/Update-student', [StudentsController::class, 'updateRecords'])->name('students.update.records');
+    });
+
+    ROute::middleware(['CheckUsertype:4'])->group(function () {
+        Route::get('{student}/My-children', [StudentsController::class, 'showMyChildren'])->name('parent.show.student');
+        Route::get('Edit-my-children/{students}', [StudentsController::class, 'editMyStudent'])->name('parent.edit.student');
+        Route::put('{students}/Update-my-children', [StudentsController::class, 'updateMyChildren'])->name('parent.update.student');
     });
 
     //assign class teachers======================================================================================
