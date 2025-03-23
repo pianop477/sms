@@ -201,4 +201,9 @@
         </div>
     </div>
 </div>
+<script>
+    if (Auth::user()->usertype != 1) {
+        window.location.href = '/error-page'; // Redirect to an error page if user is not authorized
+    }
+</script>
 @endsection
