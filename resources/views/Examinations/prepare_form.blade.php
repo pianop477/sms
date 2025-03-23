@@ -84,10 +84,10 @@
                         <div class="col-6">
                            <div class="row">
                             <div class="col-sm-12">
-                                <span class="text-sm text-danger">Result will expire on: {{\Carbon\Carbon::parse($saved_results->first()->expiry_date)->format('d-m-Y')}}</span>
+                                <span class="text-sm fs-1 fst-italic text-danger">Result will expire on: {{\Carbon\Carbon::parse($saved_results->first()->expiry_date)->format('d-m-Y  H:i:s')}}</span>
                             </div>
                             <div class="row">
-                                <div class="col-sm-10">
+                                <div class="col-sm-8">
                                     <a href="{{route('form.saved.values', ['course' => Hashids::encode($class_course->course_id),
                                         'teacher' => Hashids::encode($class_course->teacher_id),
                                         'school' => Hashids::encode($class_course->school_id),
@@ -98,7 +98,7 @@
                                         'style' => $saved_results->first()->marking_style])}}"
                                         class="btn btn-warning" onclick="">Saved Scores</a>
                                 </div>
-                                <div class="col-2 mt-3">
+                                <div class="col-4 mt-3">
                                     <a href="{{route('results.draft.delete', ['course' => Hashids::encode($class_course->course_id),
                                                 'teacher' => Hashids::encode($class_course->teacher_id),
                                                 'type' => $saved_results->first()->exam_type_id])}}" onclick="return confirm('Are you sure you want to delete this results? you will not able to recover it')">

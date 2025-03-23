@@ -7,10 +7,10 @@
             <div class="card">
                 <div class="card-header bg-primary text-white">
                     <div class="row">
-                        <div class="col-6">
+                        <div class="col-10">
                             <h4 class="text-center text-capitalize">Edit Saved Results - {{ ucwords(strtoupper($courseName)) }} ({{ ucwords(strtoupper($className)) }})</h4>
                         </div>
-                        <div class="col-6">
+                        <div class="col-2">
                             <a href="{{route('score.prepare.form', ['id' => Hashids::encode($courseId)])}}" class="text-white float-right"><i class="fas fa-arrow-alt-circle-left"></i> Back</a>
                         </div>
                     </div>
