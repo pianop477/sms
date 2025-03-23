@@ -97,8 +97,6 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         return response()->json(['session_active' => true]);
     })->name('session.check');
 
-
-
     Route::middleware('CheckUsertype:1,2,3,4')->group(function () {
         // Home controller redirection ==============================================================================
         Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

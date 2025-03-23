@@ -35,7 +35,7 @@ class checkSessionTimeout
                  if ($request->expectsJson() || $request->ajax()) {
                      return response()->json(['session_expired' => true], 401);
                  } else {
-                     return redirect()->route('login')->with('error', 'Session expired. Please login again.');
+                     return redirect()->route('login')->with('error', 'Session has expired. Please login.');
                  }
              }
 
