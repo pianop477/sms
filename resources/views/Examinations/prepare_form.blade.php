@@ -84,7 +84,7 @@
                         <div class="col-6">
                            <div class="row">
                             <div class="col-sm-12">
-                                <span class="text-sm fs-1 fst-italic text-danger">Result will expire on: {{\Carbon\Carbon::parse($saved_results->first()->expiry_date)->format('d-m-Y  H:i:s')}}</span>
+                                <span class="text-danger" style="font-size: 10px; font-style:italic">Expiry Date: {{\Carbon\Carbon::parse($saved_results->first()->expiry_date)->format('d-m-Y  H:i:s')}}</span>
                             </div>
                             <div class="row">
                                 <div class="col-sm-8">
