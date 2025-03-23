@@ -35,31 +35,59 @@ class UpdateExpiredContract extends Command
         parent::__construct();
      }
 
-    public function handle()
-    {
-        //
-        $now = Carbon::now();
-        $expiredContract = Contract::where('status', 'approved')
-                                    ->where('end_date', '<', $now)
-                                    ->update(['status', 'expired']);
-            if($expiredContract) {
-                $teacher = Teacher::find($expiredContract->teacher_id);
-                $user = User::where('id', $teacher->user_id)->first();
-                $school = school::where('id', $user->school_id)->first();
-                $nextSmsService = new NextSmsService();
+     public function handle()
+     {
+         try {
+             $now = Carbon::now();
 
-                $payload = [
-                    'from' => $school->sender_id ?? "SHULE APP",
-                    'to' => $this->formatPhoneNumber($user->phone),
-                    'text' => "Hello ". ucwords(strtoupper($user->first_name)). ", your contract has been expired, kindly apply for contract renewal through system. Visit https://shuleapp.tech to apply",
-                    'reference' => uniqid(),
-                    ];
+             // Pata mikataba yote iliyoisha muda
+             $expiredContracts = Contract::where('status', 'approved')
+                                         ->where('end_date', '<', $now)
+                                         ->get();
 
-                $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+             if ($expiredContracts->isEmpty()) {
+                 $this->info('No expired contracts found.');
+                 return;
+             }
 
-            }
-        $this->info("Expired contract Updated: {$expiredContract}");
-    }
+             foreach ($expiredContracts as $contract) {
+                 // Badilisha status ya contract kuwa 'expired'
+                 $contract->update(['status' => 'expired']);
+
+                 $teacher = Teacher::find($contract->teacher_id);
+                 if (!$teacher) continue;
+
+                 $user = User::find($teacher->user_id);
+                 if (!$user) continue;
+
+                 $school = School::find($user->school_id);
+                 if (!$school) continue;
+
+                 // Tuma SMS notification
+                 $nextSmsService = new NextSmsService();
+                 $payload = [
+                     'from' => $school->sender_id ?? "SHULE APP",
+                     'to' => $this->formatPhoneNumber($user->phone),
+                     'text' => "Hello " . ucwords(strtolower($user->first_name)) . ", your contract has expired. Kindly apply for renewal via the system. Visit https://shuleapp.tech to apply.",
+                     'reference' => uniqid(),
+                 ];
+
+                 $response = $nextSmsService->sendSmsByNext(
+                     $payload['from'],
+                     $payload['to'],
+                     $payload['text'],
+                     $payload['reference']
+                 );
+
+                //  Log::info("Contract expired for Teacher ID: {$teacher->id}, User: {$user->first_name}");
+             }
+
+             $this->info(count($expiredContracts) . ' contracts updated to expired status.');
+         } catch (\Exception $e) {
+            //  Log::error('Error in contracts:expire command: ' . $e->getMessage());
+             $this->error('An error occurred while expiring contracts.');
+         }
+     }
 
     private function formatPhoneNumber($phone)
     {

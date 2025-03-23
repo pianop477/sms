@@ -33,46 +33,48 @@ class DeleteExpiredResults extends Command
      */
     public function handle()
     {
-        //
-        $now = Carbon::now();
+        try {
+            $now = Carbon::now();
+            $sixHoursLater = $now->clone()->addHours(6);
 
-        $expiredResults = temporary_results::where('expiry_date', '<=', $now)->get();
+            // **1. Tafuta na Futa Matokeo Yaliyo-Expire**
+            $expiredResults = temporary_results::where('expiry_date', '<=', $now)->get();
+            foreach ($expiredResults as $result) {
+                $result->delete();
+            }
+            $this->info(count($expiredResults) . ' expired results deleted.');
 
-        // Check for results expiring in the next 6 hours and send notification
-        $soonExpiringResults = temporary_results::where('expiry_date', '>=', $now)
-                                              ->where('expiry_date', '<=', $now->addHours(6))
-                                              ->get();
+            // **2. Tafuta Matokeo Yatakayo-Expire Karibuni (ndani ya masaa 6)**
+            $soonExpiringResults = temporary_results::whereBetween('expiry_date', [$now, $sixHoursLater])->get();
 
-        foreach($soonExpiringResults as $result) {
-            $expiryDate = Carbon::parse($result->expiry_date);
-
-            if($expiryDate->diffInHours($now) <= 6) {
+            foreach ($soonExpiringResults as $result) {
                 $teacher = Teacher::find($result->teacher_id);
-                $user = User::where('id', $teacher->user_id)->first();
+                $user = User::find($teacher?->user_id);
 
-                if($user) {
+                if ($user) {
+                    // **Tuma Email Notification**
                     Mail::to($user->email)->send(new ResultExpiryNotification($result));
 
-                    //notify using SMS
+                    // **Tuma SMS Notification**
                     $nextSmsService = new NextSmsService();
-                    $school = school::where('id', $user->school_id)->first();
+                    $school = school::find($user->school_id);
 
                     $payload = [
                         'from' => $school->sender_id ?? "SHULE APP",
                         'to' => $this->formatPhoneNumber($user->phone),
-                        'text' => 'Your results will expire in 6 hours later, please make sure you submit it as soon as possible to avoid data loss. Regards, ' . $school->school_name,
+                        'text' => 'Your results will expire in 6 hours. Please submit them to avoid data loss. Regards, ' . strtoupper($school->school_name),
                         'reference' => uniqid(),
                     ];
 
-                    $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+                    $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
                 }
             }
 
-            $result->delete();
+            $this->info(count($soonExpiringResults) . ' teachers notified about expiring results.');
+        } catch (\Exception $e) {
+            // \Log::error('Error in results:cleanup command: ' . $e->getMessage());
+            $this->error('An error occurred while processing expired results.');
         }
-
-        $this->info('Expired results have been deleted and teachers have been notified.');
-
     }
 
     private function formatPhoneNumber($phone)

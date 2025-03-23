@@ -28,34 +28,37 @@ class DeleteGraduatedStudents extends Command
      */
     public function handle()
     {
-        $oneYearAgo = Carbon::now()->subYear(1);
+        try {
+            $oneYearAgo = Carbon::now()->subYear();
+            $deletedCount = 0;
 
-        // Tafuta wanafunzi waliomaliza zaidi ya mwaka 1 uliyopita na hawana status hai
-        $students = Student::where('graduated', 1)
-                    ->where('status', 0)
-                    ->whereDate('updated_at', '<=', $oneYearAgo)
-                    ->get();
+            // Pata wanafunzi waliomaliza zaidi ya mwaka mmoja uliopita
+            Student::where('graduated', 1)
+                ->where('status', 0)
+                ->whereDate('updated_at', '<=', $oneYearAgo)
+                ->chunk(50, function ($students) use (&$deletedCount) {
+                    foreach ($students as $student) {
+                        // Angalia kama mwanafunzi ana picha na ifute
+                        if (!empty($student->image)) {
+                            $imagePath = public_path("assets/img/students/{$student->image}");
 
-        $deletedCount = 0;
+                            if (File::exists($imagePath)) {
+                                File::delete($imagePath);
+                                // Log::info("Student photo deleted: ID {$student->id}, Image: {$student->image}");
+                            }
+                        }
 
-        foreach ($students as $student) {
-            // Hakikisha kuna jina la picha kwenye database
-            if (!empty($student->image)) {
-                $imagePath = public_path("assets/img/students/{$student->image}");
+                        // Futa mwanafunzi kutoka kwenye database
+                        $student->delete();
+                        $deletedCount++;
+                    }
+                });
 
-                // Angalia kama picha ipo na ifute
-                if (File::exists($imagePath)) {
-                    File::delete($imagePath);
-                    $this->info("student photo {$student->id} ({$student->image}) deleted.");
-                }
-            }
-
-            // Futa mwanafunzi kwenye database
-            $student->delete();
-            $deletedCount++;
+            // Ujumbe wa mwisho
+            $this->info("Deleted $deletedCount students who graduated a year ago with their photos.");
+        } catch (\Exception $e) {
+            // Log::error("Error deleting old graduates: " . $e->getMessage());
+            $this->error("An error occurred while deleting old students.");
         }
-
-        // Output ujumbe wa jumla
-        $this->info("Students $deletedCount who graduated 1 year ago was deleted with their photos.");
     }
 }
