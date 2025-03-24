@@ -79,7 +79,14 @@
                 .then(response => response.json())
                 .then(data => {
                     if (!data.active) {
-                        alert("Session Expired! Please login.");
+                        Swal.fire({
+                            position: 'top-end',
+                            icon: 'info',
+                            title: 'Session Expired! Please login.',
+                            showConfirmButton: false,
+                            timer: 5000,
+                            toast: true
+                        });
                         window.location.reload(); // Refresh page ili kupata CSRF token mpya
                     }
                 });
