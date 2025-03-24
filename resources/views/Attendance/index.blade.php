@@ -26,6 +26,7 @@
 @if ($attendanceExists)
     <div class="alert alert-success text-center mt-3">
         <h6>Attendance for {{ \Carbon\Carbon::parse($selectedDate)->format('d-m-Y') }} has already been submitted.</h6>
+        <p> GoodBye <span style="font-size: 2rem;">👋</span></p>
         <hr>
         <p><a href="{{ route('home') }}" class="btn btn-primary btn-sm">Go Back</a></p>
     </div>
@@ -163,6 +164,19 @@
             setTimeout(() => {
                 form.submit();
             }, 500);
+        });
+    });
+
+    //exclude weekends days;
+    document.addEventListener("DOMContentLoaded", function () {
+        const attendanceDateInput = document.getElementById("attendance_date");
+        attendanceDateInput.addEventListener("change", function () {
+            const selectedDate = new Date(this.value);
+            const day = selectedDate.getDay();
+            if (day === 0 || day === 6) {
+                alert("Weekends are not allowed");
+                this.value = new Date().toISOString().split("T")[0];
+            }
         });
     });
 </script>
