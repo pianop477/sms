@@ -10,7 +10,15 @@ function checkSessionStatus() {
     .then(response => response.json())
     .then(data => {
         if (data.session_expired) {
-            alert('Session has expired, please login');
+            // alert('Session has expired, please login');
+            Swal.fire({
+                position: 'top-end',
+                icon: 'info',
+                title: 'Session has expired, please login',
+                showConfirmButton: false,
+                timer: 5000,
+                toast: true
+            });
             window.location.href = '/login';
         }
         if (data.session_expiring_soon) {
@@ -36,9 +44,25 @@ function extendSession() {
     .then(response => response.json())
     .then(data => {
         if (data.session_extended) {
-            alert('Session Extended!');
+            // alert('Session Extended!');
+            Swal.fire({
+                position: 'top-end',
+                icon: 'success',
+                title: 'Session has been Extended!',
+                showConfirmButton: false,
+                timer: 5000,
+                toast: true
+            });
         } else {
-            alert('Session has expired, please login');
+            // alert('Session has expired, please login');
+            Swal.fire({
+                position: 'top-end',
+                icon: 'info',
+                title: 'Session has expired, please login',
+                showConfirmButton: false,
+                timer: 5000,
+                toast: true
+            });
             window.location.href = '/login';
         }
     })
