@@ -153,6 +153,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         //generate general attendance report =============================================================
         Route::get('Attendance-report', [AttendanceController::class, 'getField'])->name('attendance.fill.form');
         Route::post('Attendances', [AttendanceController::class, 'genaralAttendance'])->name('manage.attendance');
+        Route::post('Generate-attendance-report', [AttendanceController::class, 'generateClassReport'])->name('class.attendance.report');
 
         //manage student registration forms and list ===========================================================
         Route::get('Class-lists', [StudentsController::class, 'index'])->name('classes.list');
@@ -195,6 +196,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
 
         //send sms results to parents
         Route::post('Send-results-sms/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/student/{student}/date/{date}', [ResultsController::class, 'sendResultSms'])->name('sms.results');
+        Route::get('Delete-student-result/school/{school}/year/{year}/class/{class}/examType/{examTyoe}/month/{month}/student/{student}/date/{date}', [ResultsController::class, 'deleteStudentResult'])->name('delete.student.result');
     });
 
     Route::middleware(['CheckUsertype:1,2,3,4'])->group(function () {
@@ -249,7 +251,6 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
             Route::get('{class}/Class-attendance', [AttendanceController::class, 'teacherAttendance'])->name('teachers.show.attendance');
             Route::get('{class}/Download-Attendance-PDF', [AttendanceController::class, 'downloadAttendancePDF'])->name('download.attendance.pdf');
             Route::get('{class}/Generate-attendance-report', [AttendanceController::class, 'getFormReport'])->name('attendance.get.form');
-            Route::get('{student_class}/Today-summary-report', [AttendanceController::class, 'todayAttendance'])->name('today.attendance');
             Route::post('{classTeacher}/Generate-attendance-report', [AttendanceController::class, 'generateReport'])->name('attendance.generate.report');
         });
     });

@@ -42,6 +42,7 @@
                 border: 1px solid black;
                 border-collapse: collapse;
                 width: 100%;
+                font-size: 12px;
             }
             .table th,
             .table td {

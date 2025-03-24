@@ -133,6 +133,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px; /* Reduced margin */
+            font-size: 12px;
         }
 
         .table th,

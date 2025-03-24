@@ -448,15 +448,13 @@ class ExamController extends Controller
 
     public function resultByMonth($course, $year, $examType, $month, $date)
     {
-        // return ['data' => $course];
         $course_id = Hashids::decode($course);
         $exam_id = Hashids::decode($examType);
 
         $user = Auth::user();
         $subjectCourse = Subject::find($course_id[0]);
-        // return $subjectCourse;
         $class_course = class_learning_courses::where('course_id', $course_id[0])->first();
-        // return ['kozi' => $class_course];
+
         $monthMap = [
             'January' => 1, 'February' => 2, 'March' => 3,
             'April' => 4, 'May' => 5, 'June' => 6,
@@ -468,33 +466,30 @@ class ExamController extends Controller
         $resultDate = Carbon::parse($date)->format('Y-m-d');
 
         $results = Examination_result::query()
-                        ->join('students', 'students.id', '=', 'examination_results.student_id')
-                        ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                        ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                        ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                        ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
-                        ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-                        ->leftJoin('schools', 'schools.id', '=', 'students.school_id')
-                        ->select(
-                            'examination_results.*', 'grades.class_name', 'grades.class_code', 'examinations.exam_type',
-                            'students.first_name', 'students.id as studentId', 'students.middle_name', 'students.last_name', 'students.gender', 'students.group', 'students.class_id', 'students.admission_number',
-                            'subjects.course_name', 'subjects.course_code', 'users.first_name as teacher_firstname', 'students.status',
-                            'users.last_name as teacher_lastname', 'users.gender as teacher_gender', 'users.phone as teacher_phone', 'schools.school_reg_no'
-                        )
-                        ->where('examination_results.course_id', $class_course->course_id)
-                        ->where('examination_results.class_id', $class_course->class_id)
-                        ->where('examination_results.teacher_id', $class_course->teacher_id)
-                        ->where('students.status', 1)
-                        // ->whereYear('examination_results.exam_date', $year)
-                        ->where('examination_results.exam_type_id', $exam_id)
-                        // ->whereMonth('examination_results.exam_date', $monthNumber)
-                        ->where('examination_results.school_id', $user->school_id)
-                        ->whereDate('examination_results.exam_date', $resultDate)
-                        ->distinct()  // Ensure distinct results
-                        ->orderBy('examination_results.score', 'desc')
-                        ->get();
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
+            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+            ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
+            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+            ->leftJoin('schools', 'schools.id', '=', 'students.school_id')
+            ->select(
+                'examination_results.*', 'grades.class_name', 'grades.class_code', 'examinations.exam_type',
+                'students.first_name', 'students.id as studentId', 'students.middle_name', 'students.last_name', 'students.gender', 'students.group', 'students.class_id', 'students.admission_number',
+                'subjects.course_name', 'subjects.course_code', 'users.first_name as teacher_firstname', 'students.status',
+                'users.last_name as teacher_lastname', 'users.gender as teacher_gender', 'users.phone as teacher_phone', 'schools.school_reg_no'
+            )
+            ->where('examination_results.course_id', $class_course->course_id)
+            ->where('examination_results.class_id', $class_course->class_id)
+            ->where('examination_results.teacher_id', $class_course->teacher_id)
+            ->where('students.status', 1)
+            ->where('examination_results.exam_type_id', $exam_id)
+            ->where('examination_results.school_id', $user->school_id)
+            ->whereDate('examination_results.exam_date', $resultDate)
+            ->distinct()
+            ->orderBy('examination_results.score', 'desc')
+            ->get();
 
-            // return ['data' => $results];
         // Initialize grade counts
         $gradeCounts = [
             'A' => 0,
@@ -556,12 +551,37 @@ class ExamController extends Controller
         $maleStudents = $results->where('gender', 'male')->count();
         $femaleStudents = $results->where('gender', 'female')->count();
 
+        // Generate the PDF and store it in the 'exam_results' folder within 'public' directory
         $pdf = \PDF::loadView('Examinations.teacher_results_by_type', compact(
             'results', 'year', 'examType', 'month', 'course', 'subjectCourse', 'class_course', 'maleStudents', 'femaleStudents', 'averageScore', 'averageGrade', 'gradeCounts'
         ));
 
-        return $pdf->stream('results_'.$subjectCourse->course_code.'_'.$month.'_'.$year.'.pdf');
+        // Generate a timestamp-based filename for the PDF
+        $timestamp = now()->timestamp; // Current timestamp in seconds
+        $pdfFileName = 'results_'.$timestamp.'.pdf'; // Using timestamp as the filename
+
+        // Define the folder path where you want to store the PDF
+        $folderPath = public_path('exam_results');
+
+        // Create the 'exam_results' folder if it doesn't exist
+        if (!file_exists($folderPath)) {
+            mkdir($folderPath, 0755, true); // Creates the folder if it doesn't exist
+        }
+
+        // Store the generated PDF in the 'exam_results' folder
+        $pdfPath = $folderPath.'/'.$pdfFileName;
+        $pdf->save($pdfPath);
+
+        // Return the URL of the generated PDF to be embedded in the iframe
+        $pdfUrl = url('exam_results/'.$pdfFileName);
+
+        // Optionally: You can schedule a task to delete the file after a certain time (e.g., after 30 days).
+        // For example, you can schedule a cron job to delete old reports or use Laravel's task scheduling for automatic deletion.
+
+        return view('Examinations.results_pdf_report', compact('pdfUrl', 'year', 'course_id', 'month', 'class_course', 'date', 'exam_id',));  // Pass the URL to the view
     }
+
+
 
     protected function determineGrade($score, $marking_style)
     {

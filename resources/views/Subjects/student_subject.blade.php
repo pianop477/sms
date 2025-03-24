@@ -57,7 +57,7 @@
                                                  <span class="text-capitalize ms-2" style="margin-left: 5px">{{ $course->first_name }} {{ $course->last_name }}</span>
                                             </td>
                                             <td class="">
-                                                <i class="fas fa-phone"></i> Call:
+                                                <i class="fas fa-phone"></i>
                                                 <a href="tel:{{ $course->teacher_phone }}" class="text-decoration-none text-dark">
                                                     {{ $course->teacher_phone }}
                                                 </a>

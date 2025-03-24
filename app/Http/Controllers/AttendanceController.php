@@ -18,58 +18,59 @@ use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\File;
 use Vinkla\Hashids\Facades\Hashids;
 
 class AttendanceController extends Controller
 {
 
     public function index($class, Request $request)
-{
-    $id = Hashids::decode($class);
-    $user = Auth::user();
-    $teacherLoggedIn = Teacher::where('user_id', '=', $user->id)->firstOrFail();
+    {
+        $id = Hashids::decode($class);
+        $user = Auth::user();
+        $teacherLoggedIn = Teacher::where('user_id', '=', $user->id)->firstOrFail();
 
-    $myClass = Class_teacher::findOrFail($id[0]);
-    $teacher = Teacher::findOrFail($myClass->teacher_id);
+        $myClass = Class_teacher::findOrFail($id[0]);
+        $teacher = Teacher::findOrFail($myClass->teacher_id);
 
-    // Hakikisha mwalimu aliyeingia ndiye class teacher
-    if ($teacherLoggedIn->id != $teacher->id) {
-        Alert()->toast('You are not the class teacher for this class', 'error');
-        return back();
+        // Hakikisha mwalimu aliyeingia ndiye class teacher
+        if ($teacherLoggedIn->id != $teacher->id) {
+            Alert()->toast('You are not the class teacher for this class', 'error');
+            return back();
+        }
+
+        $student_class = Grade::findOrFail($myClass->class_id);
+
+        // Chagua tarehe kutoka kwa request, default iwe leo
+        $selectedDate = $request->input('attendance_date', Carbon::now()->format('Y-m-d'));
+
+        // Angalia kama attendance ipo tayari kwa hiyo tarehe
+        $attendanceExists = Attendance::where('class_id', $student_class->id)
+                        ->where('class_group', $myClass->group)
+                        ->where('attendance_date', $selectedDate)
+                        ->where('school_id', $user->school_id)
+                        ->exists();
+
+        // Pata wanafunzi lakini usiwafiche kabisa hata kama attendance ipo
+        $studentList = Student::where('class_id', '=', $student_class->id)
+            ->where('group', '=', $myClass->group)
+            ->where('status', '=', 1)
+            ->where('school_id', '=', $user->school_id)
+            ->where('graduated', 0)
+            ->orderBy('gender', 'ASC')
+            ->orderBy('first_name', 'ASC')
+            ->get();
+
+        return view('Attendance.index', [
+            'myClass' => $myClass,
+            'teacher' => $teacher,
+            'student_class' => $student_class,
+            'studentList' => $studentList,
+            'class' => $class,
+            'attendanceExists' => $attendanceExists,
+            'selectedDate' => $selectedDate,
+        ]);
     }
-
-    $student_class = Grade::findOrFail($myClass->class_id);
-
-    // Chagua tarehe kutoka kwa request, default iwe leo
-    $selectedDate = $request->input('attendance_date', Carbon::now()->format('Y-m-d'));
-
-    // Angalia kama attendance ipo tayari kwa hiyo tarehe
-    $attendanceExists = Attendance::where('class_id', $student_class->id)
-                    ->where('class_group', $myClass->group)
-                    ->where('attendance_date', $selectedDate)
-                    ->where('school_id', $user->school_id)
-                    ->exists();
-
-    // Pata wanafunzi lakini usiwafiche kabisa hata kama attendance ipo
-    $studentList = Student::where('class_id', '=', $student_class->id)
-        ->where('group', '=', $myClass->group)
-        ->where('status', '=', 1)
-        ->where('school_id', '=', $user->school_id)
-        ->where('graduated', 0)
-        ->orderBy('gender', 'ASC')
-        ->orderBy('first_name', 'ASC')
-        ->get();
-
-    return view('Attendance.index', [
-        'myClass' => $myClass,
-        'teacher' => $teacher,
-        'student_class' => $student_class,
-        'studentList' => $studentList,
-        'class' => $class,
-        'attendanceExists' => $attendanceExists,
-        'selectedDate' => $selectedDate,
-    ]);
-}
 
     /**
      * Show the form for creating the resource.
@@ -368,99 +369,43 @@ class AttendanceController extends Controller
         }
 
         // Group the data by month
-        $datas = $attendances->groupBy(function($item) {
+        $datas = $attendances->groupBy(function ($item) {
             return Carbon::parse($item->attendance_date)->format('Y-m');
         });
         $message = "There is no attendance record for the selected time duration! thank you";
-        if($datas->isEmpty()) {
+
+        if ($datas->isEmpty()) {
             return view('Attendance.teacher', compact('message', 'classId'));
         }
+
+        // Generate PDF
         $pdf = \PDF::loadView('Attendance.teacher_report', compact('datas', 'maleSummary', 'femaleSummary'));
-       return $pdf->stream('class_teacher_attendance.pdf');
+
+        // Generate a filename with a timestamp
+        $timestamp = Carbon::now()->timestamp;
+        $fileName = "class_teacher_attendance_{$timestamp}.pdf";
+        $folderPath = public_path('attendances');
+
+        // Make sure the directory exists
+        if (!File::exists($folderPath)) {
+            File::makeDirectory($folderPath, 0755, true);
+        }
+
+        // Save the PDF file to the 'attendances' folder
+        $pdf->save($folderPath . '/' . $fileName);
+
+        // URL to the file for embedding in iframe
+        $fileUrl = url('attendances/' . $fileName);
+
+        return view('Attendance.teacher_pdf_generated_report', compact('fileUrl', 'id'));
     }
-
-    public function todayAttendance($student_class)
-    {
-        $id = Hashids::decode($student_class);
-        $user = Auth::user()->id;
-        $teacher = Teacher::where('user_id', '=', $user)->firstOrFail();
-        $class = Grade::findOrFail($id[0]);
-        // return $class;
-        $classTeacher = Class_teacher::where('class_id', '=', $class->id)->firstOrFail();
-        $teacher_id = $classTeacher->teacher_id;
-        $teacherGroup = $classTeacher->group;
-        $today = date('Y-m-d');
-
-        $attendanceRecords = Attendance::query()->join('students', 'students.id', '=', 'attendances.student_id')
-            ->join('grades', 'grades.id', '=', 'attendances.class_id')
-            ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
-            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-            ->leftJoin('schools', 'schools.id', '=', 'students.school_id')
-            ->select(
-                'attendances.*',
-                'students.id as studentId', 'students.first_name', 'students.middle_name',
-                'students.last_name', 'students.admission_number', 'students.group', 'students.class_id', 'students.gender', 'schools.school_reg_no',
-                'grades.class_name', 'grades.class_code', 'grades.id as class_id', 'students.status',
-                'users.first_name as teacher_firstname', 'users.last_name as teacher_lastname',
-                'users.phone as teacher_phone', 'users.gender as teacher_gender'
-            )
-            ->where('attendances.attendance_date', '=', $today)
-            ->where('attendances.teacher_id', '=', $teacher->id)
-            ->where('attendances.school_id', '=', Auth::user()->school_id)
-            ->where('students.status', 1)
-            ->orderBy('students.gender', 'DESC')
-            ->orderBy('students.first_name', 'ASC')
-            ->get();
-
-        // Initialize counters
-        $malePresent = 0;
-        $maleAbsent = 0;
-        $malePermission = 0;
-        $femalePresent = 0;
-        $femaleAbsent = 0;
-        $femalePermission = 0;
-
-        // Count the attendance based on gender and status
-        foreach ($attendanceRecords as $record) {
-            if ($record->gender == 'male') {
-                if ($record->attendance_status == 'present') {
-                    $malePresent++;
-                } elseif ($record->attendance_status == 'absent') {
-                    $maleAbsent++;
-                } elseif ($record->attendance_status == 'permission') {
-                    $malePermission++;
-                }
-            } elseif ($record->gender == 'female') {
-                if ($record->attendance_status == 'present') {
-                    $femalePresent++;
-                } elseif ($record->attendance_status == 'absent') {
-                    $femaleAbsent++;
-                } elseif ($record->attendance_status == 'permission') {
-                    $femalePermission++;
-                }
-            }
-        }
-        $message = 'You have not submitted daily attendance report, please do it right now!';
-
-        if($attendanceRecords->isEmpty()) {
-            return view('Attendance.todayAttendance', compact('message', 'class'));
-        }
-        else {
-            $pdf = \PDF::loadView('Attendance.pdfreport', compact('attendanceRecords', 'malePresent', 'maleAbsent',
-            'malePermission', 'femalePresent', 'femaleAbsent', 'femalePermission'));
-
-            return $pdf->stream($today.' Attendance.pdf');
-        }
-    }
-
 
     public function getField() {
         $classes = Grade::where('school_id', Auth::user()->school_id)->where('status', 1)->orderBy('class_code')->get();
         return view('Attendance.general_attendance', ['classes' => $classes]);
     }
 
-
-    public function genaralAttendance(Request $request)
+    public function generateClassReport(Request $request)
     {
         $request->validate([
             'class' => 'required|exists:grades,id',
@@ -472,51 +417,51 @@ class AttendanceController extends Controller
         $startDate = Carbon::parse($request->input('start'))->startOfDay();
         $endDate = Carbon::parse($request->input('end'))->endOfDay();
         $stream = strtolower($request->input('stream'));
-        $arrayStream = ['a', 'b', 'c']; // Safu ya thamani za stream
+        $arrayStream = ['a', 'b', 'c']; // Stream values
 
+        // Query to retrieve attendance records
         $attendances = Attendance::query()
-                    ->join('students', 'students.id', '=', 'attendances.student_id')
-                    ->join('grades', 'grades.id', '=', 'attendances.class_id')
-                    ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
-                    ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-                    ->leftJoin('schools', 'schools.id', '=', 'students.school_id')
-                    ->select(
-                        'attendances.*',
-                        'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.gender',
-                        'students.group', 'students.class_id as student_class', 'students.admission_number', 'students.status',
-                        'grades.id as class_id', 'grades.class_name', 'grades.class_code',
-                        'users.first_name as teacher_firstname', 'users.last_name as teacher_lastname',
-                        'users.gender as teacher_gender', 'users.phone as teacher_phone', 'schools.school_reg_no',
-                    )
-                    ->where('attendances.class_id', $request->class)
-                    ->whereBetween('attendances.attendance_date', [$startDate, $endDate])
-                    // ->where('students.group', $stream)
-                    ->where(function ($query) use ($stream, $arrayStream) {
-                        if ($stream == 'all') {
-                            $query->whereIn('students.group', $arrayStream); // Tumia whereIn kwa safu
-                        } else {
-                            $query->where('students.group', $stream); // Tumia where kwa thamani moja
-                        }
-                    })
-                    ->where('attendances.school_id', Auth::user()->school_id)
-                    ->where('students.status', 1)
-                    ->orderBy('attendances.attendance_date', 'ASC')
-                    ->orderBy('students.gender', 'DESC')
-                    ->orderBy('students.first_name', 'ASC')
-                    ->get();
+            ->join('students', 'students.id', '=', 'attendances.student_id')
+            ->join('grades', 'grades.id', '=', 'attendances.class_id')
+            ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
+            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+            ->leftJoin('schools', 'schools.id', '=', 'students.school_id')
+            ->select(
+                'attendances.*',
+                'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.gender',
+                'students.group', 'students.class_id as student_class', 'students.admission_number', 'students.status',
+                'grades.id as class_id', 'grades.class_name', 'grades.class_code',
+                'users.first_name as teacher_firstname', 'users.last_name as teacher_lastname',
+                'users.gender as teacher_gender', 'users.phone as teacher_phone', 'schools.school_reg_no',
+            )
+            ->where('attendances.class_id', $request->class)
+            ->whereBetween('attendances.attendance_date', [$startDate, $endDate])
+            ->where(function ($query) use ($stream, $arrayStream) {
+                if ($stream == 'all') {
+                    $query->whereIn('students.group', $arrayStream);
+                } else {
+                    $query->where('students.group', $stream);
+                }
+            })
+            ->where('attendances.school_id', Auth::user()->school_id)
+            ->where('students.status', 1)
+            ->orderBy('attendances.attendance_date', 'ASC')
+            ->orderBy('students.gender', 'DESC')
+            ->orderBy('students.first_name', 'ASC')
+            ->get();
 
-        if($attendances->isEmpty()) {
+        if ($attendances->isEmpty()) {
             $message = 'No attendance records found for selected time duration, thank you!';
             return view('Attendance.attendance_records', compact('message'));
-        }
-        else {
+        } else {
             $maleSummary = [];
             $femaleSummary = [];
 
-            foreach($attendances as $attendance) {
+            // Summarize attendance by date and gender
+            foreach ($attendances as $attendance) {
                 $date = Carbon::parse($attendance->attendance_date)->format('Y-m-d');
 
-                if(!isset($maleSummary[$date])) {
+                if (!isset($maleSummary[$date])) {
                     $maleSummary[$date] = [
                         'present' => 0,
                         'absent' => 0,
@@ -532,26 +477,41 @@ class AttendanceController extends Controller
                 }
                 $gender = $attendance->gender;
                 $status = $attendance->attendance_status;
-                if($gender === 'male') {
+                if ($gender === 'male') {
                     $maleSummary[$date][$status]++;
                 } else {
                     $femaleSummary[$date][$status]++;
                 }
             }
 
-                // Group by attendance date
-                $datas = $attendances->groupBy(function($item) {
-                    return Carbon::parse($item->attendance_date)->format('Y-m-d');
-                });
+            // Group by attendance date
+            $datas = $attendances->groupBy(function ($item) {
+                return Carbon::parse($item->attendance_date)->format('Y-m-d');
+            });
 
-                $pdf = \PDF::loadView('Attendance.all_report', compact('datas', 'maleSummary', 'femaleSummary', 'attendances', 'startDate', 'endDate'));
+            // Generate the PDF
+            $pdf = \PDF::loadView('Attendance.all_report', compact('datas', 'maleSummary', 'femaleSummary', 'attendances', 'startDate', 'endDate'));
 
-                $className = $attendances->first()->class_name;
-                $attendanceDate = Carbon::parse($attendances->first()->attendance_date)->format('F');
-                $fileName = "{$className} {$attendanceDate} Attendance Report.pdf";
+            // Generate filename using timestamp
+            $timestamp = Carbon::now()->timestamp;
+            $fileName = "class_attendance_report_{$timestamp}.pdf"; // Filename format: class_teacher_attendance_<timestamp>.pdf
+            $folderPath = public_path('attendances'); // Folder path in public directory
 
-                return $pdf->stream($fileName);
+            // Make sure the directory exists
+            if (!File::exists($folderPath)) {
+                File::makeDirectory($folderPath, 0755, true);
+            }
+
+            // Save the PDF to the 'attendances' folder
+            $pdf->save($folderPath . '/' . $fileName);
+
+            // Generate the URL for accessing the saved PDF
+            $fileUrl = asset('attendances/' . $fileName);
+
+            // Return the view with the file URL to embed in the iframe
+            return view('Attendance.general_pdf_report', compact('fileUrl', 'fileName'));
         }
     }
+
 
 }

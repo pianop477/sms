@@ -29,7 +29,7 @@
                             <div id="{{ Str::slug($month) }}" class="date-list mt-2" style="display: none; padding-left: 20px;">
                                 <p class="text-danger">Choose Date to get result</p>
                                 @foreach ($dates as $date => $results)
-                                    <a href="{{ route('results.student.get', ['student' => Hashids::encode($students->id), 'year' => $year, 'exam_id' => Hashids::encode($exam_id), 'month' => $month, 'date' => $date]) }}" target="_blank">
+                                    <a href="{{ route('results.student.get', ['student' => Hashids::encode($students->id), 'year' => $year, 'exam_id' => Hashids::encode($exam_id), 'month' => $month, 'date' => $date]) }}" target="">
                                         <button type="button" class="list-group-item list-group-item-action">
                                             <i class="fas fa-calendar-alt"></i> {{ $date }}
                                         </button>
