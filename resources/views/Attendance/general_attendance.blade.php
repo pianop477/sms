@@ -5,7 +5,7 @@
     <div class="card-body">
         <h4 class="header-title text-uppercase text-center">Generate Attendance Report</h4>
         <form class="needs-validation" novalidate
-              action="{{route('manage.attendance')}}"
+              action="{{route('class.attendance.report')}}"
               method="POST"
               enctype="multipart/form-data"
               onsubmit="showPreloader(event)">
@@ -61,16 +61,6 @@
             <div class="form-row">
                 <div class="col-12 justify-content-center">
                     <button class="btn btn-primary float-right" type="submit"><i class="ti-settings"></i> Generate</button>
-                </div>
-            </div>
-            <div id="preloader" style="display:none;">
-                <div class="error-area ptb--100 text-center">
-                    <div class="container">
-                        <div class="error-content">
-                            <h5>Loading....</h5>
-                            <p>Retrieving Data, please wait.....</p>
-                        </div>
-                    </div>
                 </div>
             </div>
         </form>

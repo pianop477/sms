@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,42 +19,28 @@ class checkSessionTimeout
      */
 
      public function handle(Request $request, Closure $next)
-     {
-         if (Auth::check()) {
-             $lastActivity = Session::get('last_activity', time());
-             $sessionLifeTime = 60 * 60; // 1 hour
-             $warningTime = 60 * 55; // 5 minutes before expiration
+    {
+        // Retrieve the user's last login time from the session
+        $lastLoginTime = Session::get('last_login_time');
 
-             $remainingTime = $sessionLifeTime - (time() - $lastActivity);
+        // If there's no last login time in the session, it means the user hasn't logged in yet
+        if (!$lastLoginTime) {
+            return $next($request); // Let the request pass, if not logged in
+        }
 
-             // **Ikiwa muda umeisha, toa mtumiaji nje**
-             if ($remainingTime <= 0) {
-                 Auth::logout();
-                 session()->invalidate();
-                 session()->regenerateToken();
+        // Define session timeout duration (1 hour)
+        $timeoutDuration = 60; // 60 minutes (1 hour)
 
-                 if ($request->expectsJson() || $request->ajax()) {
-                     return response()->json(['session_expired' => true], 401);
-                 } else {
-                     return redirect()->route('login')->with('error', 'Session has expired. Please login.');
-                 }
-             }
+        // Check if the session has expired
+        if (Carbon::parse($lastLoginTime)->addMinutes($timeoutDuration)->isPast()) {
+            // If the session has expired, clear the session and redirect to login
+            session()->flush();
+            // Redirect to login page
+            return redirect()->route('login')->with('error', 'Your session has expired. Please login.');
+        }
 
-             // **Onyo la Session Expiring**
-             if ($remainingTime <= 300) { // 5 minutes before expiration
-                 if ($request->expectsJson() || $request->ajax()) {
-                     return response()->json([
-                         'session_expiring_soon' => true,
-                         'remaining_time' => $remainingTime
-                     ]);
-                 }
-             }
-
-             // **Sasisha last activity**
-             Session::put('last_activity', time());
-         }
-
-         return $next($request);
-     }
+        // Continue to the next request (middleware stack)
+        return $next($request);
+    }
 
 }

@@ -17,6 +17,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('school:update-status')->daily();
         $schedule->command('results:delete-expired')->everyMinute();
         $schedule->command('students:delete-graduated-students')->daily();
+        $schedule->command('delete:old-exam-results')->everyMinute();
+        $schedule->command('delete:old-attendance-reports')->daily();
+        $schedule->command('delete:student-old-reports')->daily();
+        $schedule->command('contracts:delete-old')->daily();
     }
 
     /**

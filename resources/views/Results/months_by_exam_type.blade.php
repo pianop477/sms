@@ -23,7 +23,7 @@
                         <p class="text-danger">Select Date to get PDF Result</p>
                         @foreach ($dates as $date => $data)
                             <div class="d-flex justify-content-between align-items-center list-group-item">
-                                <a href="{{ route('results.resultsByMonth', ['school' => Hashids::encode($schools->id), 'year' => $year, 'class' => Hashids::encode($class_id), 'examType' => Hashids::encode($exam_id), 'month' => $month, 'date' => $date]) }}" target="_blank">
+                                <a href="{{ route('results.resultsByMonth', ['school' => Hashids::encode($schools->id), 'year' => $year, 'class' => Hashids::encode($class_id), 'examType' => Hashids::encode($exam_id), 'month' => $month, 'date' => $date]) }}" target="">
                                     <p class=""><i class="fas fa-calendar-alt"></i> {{ $date }}</p>
                                 </a>
                                 <a href="{{ route('individual.student.reports', ['school' => Hashids::encode($schools->id), 'year' => $year, 'examType' => Hashids::encode($exam_id), 'class' => Hashids::encode($class_id), 'month' => $month, 'date' => $date]) }}" class="btn btn-primary btn-xs">

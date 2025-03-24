@@ -184,7 +184,7 @@
                         <p style="text-transform:capitalize; font-weight:bold; text-align:center">A. Student Information</p>
                         <p><strong>Student Full Name:</strong> <span style="text-decoration:underline">{{ ucwords(strtoupper($studentId->first_name. ' '.$studentId->middle_name . ' '. $studentId->last_name )) }}</span></p>
                         <p><strong>Gender:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $studentId->gender}}</span></p>
-                        <p><strong>Class:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $results->first()->class_name }} - ({{$studentId->group}})</span></p>
+                        <p><strong>Class:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $results->first()->class_name }}</span></p>
                         <p><strong>Stream:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $studentId->group }}</span></p>
                     </div>
                     <p style="border-bottom: 2px solid gray;"></p>

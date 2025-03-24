@@ -79,16 +79,9 @@
 
         {{-- Submit Button --}}
         <div class="card-footer text-center">
-            <ul class="d-flex justify-content-center">
-                <li class="mr-3">
-                    <button type="submit" id="saveButton" class="btn btn-primary">
-                        Submit
-                    </button>
-                </li>
-                <li class="mr-3">
-                    <a href="{{ route('today.attendance', ['student_class' => Hashids::encode($student_class->id)]) }}" class="btn btn-success">Today Report</a>
-                </li>
-            </ul>
+            <button type="submit" id="saveButton" class="btn btn-success">
+                Submit Attendance
+            </button>
         </div>
     </form>
 @endif

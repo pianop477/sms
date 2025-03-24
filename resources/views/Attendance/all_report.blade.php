@@ -86,6 +86,7 @@
             width: 100%;
             border: 1px solid black;
             border-collapse: collapse;
+            font-size: 12px;
         }
 
         .table th, .table td {

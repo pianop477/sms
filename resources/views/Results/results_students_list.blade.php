@@ -68,8 +68,12 @@
                                                 <li class="mr-3">
                                                     <form action="{{route('sms.results', ['school' => Hashids::encode($schools->id), 'year' => $year, 'class' => Hashids::encode($classId->id), 'examType' => Hashids::encode($exam_id), 'month' => $month, 'student' => Hashids::encode($student_id), 'date' => $date])}}" method="POST" role="form">
                                                         @csrf
-                                                        <button class="btn btn-danger btn-xs" onclick="return confirm('Are you sure you want to Re-send SMS?')">SMS</button>
+                                                        <button class="btn btn-warning btn-xs" onclick="return confirm('Are you sure you want to Re-send SMS?')">SMS</button>
                                                     </form>
+                                                </li>
+                                                <li class="mr-3">
+                                                    <a href="{{route('delete.student.result', ['school' => Hashids::encode($schools->id), 'year' => $year, 'class' => Hashids::encode($classId->id), 'examTyoe' => Hashids::encode($exam_id), 'month' => $month, 'student' => Hashids::encode($student_id), 'date' => $date])}}" class="btn btn-danger btn-xs"
+                                                     onclick="return confirm('Are you sure you want to delete results for this student?')">Delete</a>
                                                 </li>
                                             </ul>
                                         </td>

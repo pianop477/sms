@@ -14,7 +14,7 @@
                     </a>
                 </div>
             </div>
-            <p class="text-danger">Select Month to view Results</p>
+            <p class="text-danger">Select Month</p>
             <div class="list-group">
                 @foreach ($months as $month => $dates)
                     <button type="button" class="list-group-item list-group-item-action month-toggle" data-month="{{ Str::slug($month) }}">
@@ -23,7 +23,7 @@
                     <div id="{{ Str::slug($month) }}" class="date-list mt-2" style="display: none; padding-left: 20px;">
                         <p class="text-danger">Select Date to get result</p>
                         @foreach ($dates as $date => $results)
-                            <a href="{{ route('results.byMonth', ['course' => Hashids::encode($class_course->course_id), 'year' => $year, 'examType' => Hashids::encode($exam_id), 'month' => $month, 'date' => $date]) }}" target="_blank">
+                            <a href="{{ route('results.byMonth', ['course' => Hashids::encode($class_course->course_id), 'year' => $year, 'examType' => Hashids::encode($exam_id), 'month' => $month, 'date' => $date]) }}" target="">
                                 <button type="button" class="list-group-item list-group-item-action">
                                     <i class="fas fa-calendar-alt"></i> {{ $date }}
                                 </button>
