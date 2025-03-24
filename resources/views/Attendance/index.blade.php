@@ -167,14 +167,26 @@
         });
     });
 
-    //exclude weekends days;
     document.addEventListener("DOMContentLoaded", function () {
         const attendanceDateInput = document.getElementById("attendance_date");
+
         attendanceDateInput.addEventListener("change", function () {
             const selectedDate = new Date(this.value);
             const day = selectedDate.getDay();
+
+            // Check if it's Saturday (6) or Sunday (0)
             if (day === 0 || day === 6) {
-                alert("Weekends are not allowed");
+                // Use SweetAlert toast notification
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'error',
+                    title: 'Weekends are not allowed',
+                    showConfirmButton: false,
+                    timer: 5000,
+                    toast: true
+                });
+
+                // Reset the input value to today
                 this.value = new Date().toISOString().split("T")[0];
             }
         });
