@@ -66,37 +66,6 @@ Auth::routes();
 
 Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')->group(function () {
 
-    Route::post('/session/extend', function () {
-        if (Auth::check()) {
-            Session::put('last_activity', time()); // Sasisha muda wa mwisho wa activity
-            return response()->json(['session_extended' => true]);
-        }
-        return response()->json(['session_expired' => true], 401);
-    })->name('session.extend');
-
-
-    Route::get('/session/check', function () {
-        if (Auth::check()) {
-            $lastActivity = Session::get('last_activity', time());
-            $sessionLifeTime = 60 * 60; // 1 hour
-            $remainingTime = $sessionLifeTime - (time() - $lastActivity);
-
-            if ($remainingTime <= 0) {
-                Auth::logout();
-                session()->invalidate();
-                return response()->json(['session_expired' => true], 401);
-            }
-
-            if ($remainingTime <= 300) {
-                return response()->json([
-                    'session_expiring_soon' => true,
-                    'remaining_time' => $remainingTime
-                ]);
-            }
-        }
-        return response()->json(['session_active' => true]);
-    })->name('session.check');
-
     Route::middleware('CheckUsertype:1,2,3,4')->group(function () {
         // Home controller redirection ==============================================================================
         Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
