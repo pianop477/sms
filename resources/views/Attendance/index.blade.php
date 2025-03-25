@@ -79,7 +79,7 @@
 
         {{-- Submit Button --}}
         <div class="card-footer text-center">
-            <button type="submit" id="saveButton" class="btn btn-success">
+            <button type="submit" id="saveButton" class="btn btn-success" onclick="return confirm('Are you sure you want to submit attendance? No any changes will be allowed after submission')">
                 Submit Attendance
             </button>
         </div>
