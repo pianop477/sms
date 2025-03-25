@@ -14,8 +14,8 @@ class BeemSmsService
 
     public function __construct()
     {
-       $this->apiKey = env('BEEM_API_KEY');
-       $this->secretKey = env('BEEM_SECRET_KEY');
+       $this->apiKey = '947863ca54be8767';
+       $this->secretKey = 'YjJhZjcyYmIxNzllNDlmMDhiOTFkNzRlMTUyN2IwNDdiN2NhYWEyNGNiYWE5MjhhYmViMjRhZGQwMzc4MjRjOA==';
        $this->baseUrl = "https://apisms.beem.africa/v1/send";
     }
 
