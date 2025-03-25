@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use RealRashid\SweetAlert\Facades\Alert;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,26 +21,32 @@ class checkSessionTimeout
 
      public function handle(Request $request, Closure $next)
     {
-        // Retrieve the user's last login time from the session
-        $lastLoginTime = Session::get('last_login_time');
-
-        // If there's no last login time in the session, it means the user hasn't logged in yet
-        if (!$lastLoginTime) {
-            return $next($request); // Let the request pass, if not logged in
+        // Hakikisha mtumiaji ame-authenticate
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Please login first.');
         }
 
-        // Define session timeout duration (1 hour)
-        $timeoutDuration = 60; // 60 minutes (1 hour)
+        // Pata session ya mtumiaji kutoka kwenye database
+        $sessionId = Session::getId();
+        $session = DB::table('sessions')->where('id', $sessionId)->first();
 
-        // Check if the session has expired
-        if (Carbon::parse($lastLoginTime)->addMinutes($timeoutDuration)->isPast()) {
-            // If the session has expired, clear the session and redirect to login
-            session()->flush();
-            // Redirect to login page
-            return redirect()->route('login')->with('error', 'Your session has expired. Please login.');
+        // Ikiwa hakuna session kwenye database, acha user aendelee
+        if (!$session) {
+            return $next($request);
         }
 
-        // Continue to the next request (middleware stack)
+        // Pata muda wa mwisho wa activity ya session
+        $lastActivity = Carbon::parse($session->last_activity);
+
+        // Angalia kama muda wa session umepita
+        $timeoutDuration = 60; // Dakika 60
+        if ($lastActivity->addMinutes($timeoutDuration)->isPast()) {
+            // Futa session na force user kuingia tena
+            Auth::logout();
+            Session::flush();
+            return redirect()->route('login')->with('error', 'Your session has expired. Please login again.');
+        }
+
         return $next($request);
     }
 
