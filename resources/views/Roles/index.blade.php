@@ -19,7 +19,6 @@
                                     <th scope="col">Teacher's Name</th>
                                     <th scope="col" class="text-center">Gender</th>
                                     <th scope="col">Phone</th>
-                                    <th scope="col">Email</th>
                                     <th scope="col">Role</th>
                                     <th scope="col" class="text-center">Action</th>
                                 </tr>
@@ -31,16 +30,15 @@
                                         <td class="text-capitalize">{{$user->first_name}} {{$user->last_name}}</td>
                                         <td class="text-capitalize text-center">{{$user->gender[0]}}</td>
                                         <td class="text-capitalize">{{$user->phone}}</td>
-                                        <td class="">{{$user->email}}</td>
                                         <td class="text-capitalize">
                                             @if ($user->role_id == 3)
-                                                <span class="alert alert-primary">{{$user->role_name}}</span>
+                                                <span class="badge bg-primary">{{$user->role_name}}</span>
                                             @elseif ($user->role_id == 2)
-                                                <span class="alert alert-success">{{$user->role_name}}</span>
+                                                <span class="badge bg-success">{{$user->role_name}}</span>
                                             @elseif ($user->role_id == 4)
-                                                <span class="alert alert-warning">{{$user->role_name}}</span>
+                                                <span class="badge bg-warning">{{$user->role_name}}</span>
                                             @else
-                                                <span class="alert alert-secondary">{{$user->role_name}}</span>
+                                                <span class="badge bg-secondary">{{$user->role_name}}</span>
                                             @endif
                                         </td>
                                         <td>

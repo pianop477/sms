@@ -21,30 +21,26 @@ class checkSessionTimeout
 
      public function handle(Request $request, Closure $next)
     {
-        // Hakikisha mtumiaji ame-authenticate
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please login first.');
-        }
+        if (Auth::check()) {
+            $sessionId = $request->session()->getId(); // Pata session ID ya mtumiaji
+            $session = DB::table('sessions')->where('id', $sessionId)->first();
 
-        // Pata session ya mtumiaji kutoka kwenye database
-        $sessionId = Session::getId();
-        $session = DB::table('sessions')->where('id', $sessionId)->first();
+            if ($session) {
+                $lastActivity = Carbon::parse($session->last_activity);
+                $now = Carbon::now();
 
-        // Ikiwa hakuna session kwenye database, acha user aendelee
-        if (!$session) {
-            return $next($request);
-        }
+                // Angalia kama muda umepita zaidi ya saa 1 (3600 sekunde)
+                if ($lastActivity->diffInMinutes($now) >= 60) {
+                    Auth::logout(); // Logout mtumiaji
+                    $request->session()->invalidate(); // Futa session
+                    return redirect()->route('login')->with('error', 'Session expired. Please login again.');
+                }
 
-        // Pata muda wa mwisho wa activity ya session
-        $lastActivity = Carbon::parse($session->last_activity);
-
-        // Angalia kama muda wa session umepita
-        $timeoutDuration = 60; // Dakika 60
-        if ($lastActivity->addMinutes($timeoutDuration)->isPast()) {
-            // Futa session na force user kuingia tena
-            Auth::logout();
-            Session::flush();
-            return redirect()->route('login')->with('error', 'Your session has expired. Please login again.');
+                // 🔥 Kuhuisha last_activity kwa kila request
+                DB::table('sessions')->where('id', $sessionId)->update([
+                    'last_activity' => $now->timestamp
+                ]);
+            }
         }
 
         return $next($request);
