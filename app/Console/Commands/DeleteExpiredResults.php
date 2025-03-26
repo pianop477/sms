@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\NextSmsService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class DeleteExpiredResults extends Command
@@ -32,50 +33,54 @@ class DeleteExpiredResults extends Command
      * Execute the console command.
      */
     public function handle()
-    {
-        try {
-            $now = Carbon::now();
-            $sixHoursLater = $now->clone()->addHours(6);
+{
+    try {
+        $now = Carbon::now();
+        $sixHoursLater = $now->clone()->addHours(6);
 
-            // **1. Tafuta na Futa Matokeo Yaliyo-Expire**
-            $expiredResults = temporary_results::where('expiry_date', '<=', $now)->get();
-            foreach ($expiredResults as $result) {
-                $result->delete();
-            }
-            $this->info(count($expiredResults) . ' expired results deleted.');
+        // **1. Futa Matokeo Yaliyo-Expire kwa Ufanisi**
+        $deletedCount = temporary_results::where('expiry_date', '<=', $now)->delete();
+        $this->info($deletedCount . ' expired results deleted.');
 
-            // **2. Tafuta Matokeo Yatakayo-Expire Karibuni (ndani ya masaa 6)**
-            $soonExpiringResults = temporary_results::whereBetween('expiry_date', [$now, $sixHoursLater])->get();
+        // **2. Pata Matokeo Yatakayo-Expire Ndani ya Masaa 6 Kabla ya Kufutwa**
+        $notificationStart = $sixHoursLater->clone()->subHours(6); // Sasa hivi hadi masaa 6 kabla ya kufutwa
+        $soonExpiringResults = temporary_results::with('teacher.user.school')
+            ->whereBetween('expiry_date', [$notificationStart, $sixHoursLater])
+            ->get();
 
-            foreach ($soonExpiringResults as $result) {
-                $teacher = Teacher::find($result->teacher_id);
-                $user = User::find($teacher?->user_id);
+        foreach ($soonExpiringResults as $result) {
+            $user = $result->teacher?->user;
+            $school = $user?->school;
 
-                if ($user) {
-                    // **Tuma Email Notification**
-                    Mail::to($user->email)->send(new ResultExpiryNotification($result));
-
-                    // **Tuma SMS Notification**
-                    $nextSmsService = new NextSmsService();
-                    $school = school::find($user->school_id);
-
-                    $payload = [
-                        'from' => $school->sender_id ?? "SHULE APP",
-                        'to' => $this->formatPhoneNumber($user->phone),
-                        'text' => 'Your results will expire in 6 hours. Please submit them to avoid data loss. Regards, ' . strtoupper($school->school_name),
-                        'reference' => uniqid(),
-                    ];
-
-                    $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
-                }
+            if (!$user || !$school || empty($user->phone)) {
+                continue; // Ruka ikiwa user, school, au phone number haipo
             }
 
-            $this->info(count($soonExpiringResults) . ' teachers notified about expiring results.');
-        } catch (\Exception $e) {
-            // \Log::error('Error in results:cleanup command: ' . $e->getMessage());
-            $this->error('An error occurred while processing expired results.');
+            // **Tuma Email Notification**
+            Mail::to($user->email)->send(new ResultExpiryNotification($result));
+
+            // **Tuma SMS Notification**
+            $nextSmsService = new NextSmsService();
+            $payload = [
+                'from' => $school->sender_id ?? "SHULE APP",
+                'to' => $this->formatPhoneNumber($user->phone),
+                'text' => 'Your results will expire in 6 hours. Please submit them to avoid data loss. Regards, ' . strtoupper($school->school_name),
+                'reference' => uniqid(),
+            ];
+
+            $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
         }
+
+        $this->info(count($soonExpiringResults) . ' teachers notified about expiring results.');
+    } catch (\Exception $e) {
+        Log::error('Error in results:cleanup command', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        $this->error('An error occurred while processing expired results. Check logs for details.');
     }
+}
+
 
     private function formatPhoneNumber($phone)
     {
