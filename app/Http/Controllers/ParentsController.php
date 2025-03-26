@@ -116,6 +116,7 @@ class ParentsController extends Controller
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'gender' => $request->gender,
+                'bus_no' => $request->bus_no,
                 'usertype' => $request->input('usertype', 4),
                 'password' => Hash::make($request->input('password', 'shule2025')),
                 'school_id' => $user->school_id,
