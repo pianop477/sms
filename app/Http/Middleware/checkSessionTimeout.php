@@ -33,9 +33,6 @@ class checkSessionTimeout
 
                  return redirect()->route('login')->with('error', 'Session expired. Please login again.');
              }
-         } else {
-             // Weka muda wa kuanza session mara ya kwanza
-             session()->put('session_start_time', now());
          }
 
          return $next($request);

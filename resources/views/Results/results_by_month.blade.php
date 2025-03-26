@@ -111,15 +111,15 @@
         }
         thead {
                 display: table-header-group;
-                background-color: gray; /* Adds a gray background to thead */
+                /* background-color: gray; Adds a gray background to thead */
             }
             tbody {
                 display: table-row-group;
             }
 
             .table th {
-                background-color: #343a40;
-                color: #fff;
+                /* background-color: #343a40; */
+                /* color: #fff; */
                 text-align: center;
             }
             .table th,
@@ -206,6 +206,9 @@
                 </div>
                 <div class="total-summary results">
                     <table class="table" style="text-align:center; width:60%">
+                        <tr style="background: rgb(187, 163, 56); color:black">
+                            <th colspan="6">OVERALL GRADE SUMMARY</th>
+                        </tr>
                         <tr>
                             <td>Gender</td>
                             <td>A</td>
@@ -215,7 +218,7 @@
                             <td>E</td>
                         </tr>
                         <tr>
-                            <td>GIRLS</td>
+                            <td>Girls</td>
                             <td>{{$totalFemaleGrades['A']}}</td>
                             <td>{{$totalFemaleGrades['B']}}</td>
                             <td>{{$totalFemaleGrades['C']}}</td>
@@ -223,7 +226,7 @@
                             <td>{{$totalFemaleGrades['E']}}</td>
                         </tr>
                         <tr>
-                            <td>BOYS</td>
+                            <td>Boys</td>
                             <td>{{$totalMaleGrades['A']}}</td>
                             <td>{{$totalMaleGrades['B']}}</td>
                             <td>{{$totalMaleGrades['C']}}</td>
@@ -231,7 +234,7 @@
                             <td>{{$totalMaleGrades['E']}}</td>
                         </tr>
                         <tr>
-                            <td>TOTAL</td>
+                            <td>Total</td>
                             <td>{{$totalFemaleGrades['A'] + $totalMaleGrades['A']}}</td>
                             <td>{{$totalFemaleGrades['B'] +$totalMaleGrades['B']}}</td>
                             <td>{{$totalFemaleGrades['C'] +$totalMaleGrades['C']}}</td>
@@ -240,19 +243,24 @@
                         </tr>
                     </table>
                 </div>
+                .<div style="background: rgb(187, 163, 56);">
+                    <p style="text-align:center; font-size:14px; font-weight:bold" colspan="">STUDENTS WISE PERFORMANCE</p>
+                </div>
                 <table class="table results">
                     <thead>
+
+                        </tr>
                         <tr>
-                            <th>Reg No.</th>
+                            <th>Adm.No.</th>
                             <th style="" class="">sex</th>
                             <th style="">Student Name</th>
                             @foreach ($results->groupBy('course_id')->keys() as $courseId)
                                 <th style="text-transform: uppercase">{{ $results->firstWhere('course_id', $courseId)->course_code }}</th>
                             @endforeach
                             <th style="text-align:center;">Total</th>
-                            <th style="text-align:center;">Average</th>
+                            <th style="text-align:center;">Avg</th>
                             <th style="text-align:center;">Grade</th>
-                            <th style="text-align:center;">Position</th>
+                            <th style="text-align:center;">Rank</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -272,10 +280,11 @@
                         @endforeach
                     </tbody>
                 </table>
+                <hr>
                 <div class="final-summary">
                     <table class="table results" style="width:100%">
-                        <tr>
-                            <th colspan="5">SUBJECTWISE PERFORMANCE</th>
+                        <tr style="background: rgb(187, 163, 56); color:black">
+                            <th colspan="5">SUBJECTWISE RANKINGS</th>
                         </tr>
                         <tr style="">
                             <th style="text-transform: capitalize">Subject Name</th>
@@ -297,12 +306,80 @@
                                     @elseif ($course['grade']=='C')
                                         <td style="background:rgb(237, 220, 113); padding:2px 10px ">grade {{ $course['grade']}} (PASS)</td>
                                     @elseif ($course['grade']=='D')
-                                        <td style="background:rgb(235, 75, 75); padding:2px 10px ">grade {{ $course['grade']}} (POOR)</td>
+                                        <td style="background:rgb(182, 176, 176); padding:2px 10px ">grade {{ $course['grade']}} (POOR)</td>
                                     @else
-                                        <td style="background:rgb(182, 176, 176); padding:2px 10px ">grade {{ $course['grade']}} (FAIL)</td>
+                                        <td style="background:rgb(235, 75, 75); padding:2px 10px ">grade {{ $course['grade']}} (FAIL)</td>
                                     @endif
                             </tr>
                         @endforeach
+                    </table>
+                    <hr>
+                </div>
+                <div class="final-summary">
+                    <table class="table table-bordered" style="font-size: 12px; text-align:center;">
+                        <thead>
+                            <tr style="background: rgb(187, 163, 56); color:black">
+                                <th style="align-text:center" colspan="16">SUBJECTWISE PERFORMANCE SUMMARY</th>
+                            </tr>
+                            <tr style="">
+                                <th rowspan="2" style="background: gray;">SUBJECTS</th>
+                                <th colspan="3" style="background:rgb(117, 244, 48);">A</th>
+                                <th colspan="3" style="background:rgb(12, 211, 184);">B</th>
+                                <th colspan="3" style="background:rgb(237, 220, 113);">C</th>
+                                <th colspan="3" style="background:rgb(182, 176, 176);">D</th>
+                                <th colspan="3" style="background:rgb(235, 75, 75);">E</th>
+                            </tr>
+                            <tr style="">
+                                <th style="background:rgb(117, 244, 48);">Boys</th>
+                                <th style="background:rgb(117, 244, 48);">Girls</th>
+                                <th style="background:rgb(117, 244, 48);">Total</th>
+                                <th style="background:rgb(12, 211, 184);">Boys</th>
+                                <th style="background:rgb(12, 211, 184);">Girls</th>
+                                <th style="background:rgb(12, 211, 184);">Total</th>
+                                <th style="background:rgb(237, 220, 113);">Boys</th>
+                                <th style="background:rgb(237, 220, 113);">Girls</th>
+                                <th style="background:rgb(237, 220, 113);">Total</th>
+                                <th style="background:rgb(182, 176, 176);">Boys</th>
+                                <th style="background:rgb(182, 176, 176);">Girls</th>
+                                <th style="background:rgb(182, 176, 176);">Total</th>
+                                <th style="background: rgb(235, 75, 75);">Boys</th>
+                                <th style="background: rgb(235, 75, 75);">Girls</th>
+                                <th style="background: rgb(235, 75, 75);">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($subjectGradesByGender as $courseId => $grades)
+                                <tr style="">
+                                    <!-- Get the course name for this course_id -->
+                                    <td style="text-transform: uppercase">{{ $courses->find($courseId)->course_code }}</td>
+
+                                    <!-- Grade A Counts -->
+                                    <td style="background:rgb(117, 244, 48);">{{ $grades['A']['male'] }}</td>
+                                    <td style="background:rgb(117, 244, 48);">{{ $grades['A']['female'] }}</td>
+                                    <td style="background:rgb(117, 244, 48);">{{ $grades['A']['male'] + $grades['A']['female'] }}</td>
+
+                                    <!-- Grade B Counts -->
+                                    <td style="background:rgb(12, 211, 184);">{{ $grades['B']['male'] }}</td>
+                                    <td style="background:rgb(12, 211, 184);">{{ $grades['B']['female'] }}</td>
+                                    <td style="background:rgb(12, 211, 184);">{{ $grades['B']['male'] + $grades['B']['female'] }}</td>
+
+                                    <!-- Grade C Counts -->
+                                    <td style="background:rgb(237, 220, 113);">{{ $grades['C']['male'] }}</td>
+                                    <td style="background:rgb(237, 220, 113);">{{ $grades['C']['female'] }}</td>
+                                    <td style="background:rgb(237, 220, 113);">{{ $grades['C']['male'] + $grades['C']['female'] }}</td>
+
+                                    <!-- Grade D Counts -->
+                                    <td style="background:rgb(182, 176, 176);">{{ $grades['D']['male'] }}</td>
+                                    <td style="background:rgb(182, 176, 176);">{{ $grades['D']['female'] }}</td>
+                                    <td style="background:rgb(182, 176, 176);">{{ $grades['D']['male'] + $grades['D']['female'] }}</td>
+
+                                    <!-- Grade E Counts -->
+                                    <td style="background: rgb(235, 75, 75);">{{ $grades['E']['male'] }}</td>
+                                    <td style="background: rgb(235, 75, 75);">{{ $grades['E']['female'] }}</td>
+                                    <td style="background: rgb(235, 75, 75);">{{ $grades['E']['male'] + $grades['E']['female'] }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
                     </table>
                 </div>
             </div>

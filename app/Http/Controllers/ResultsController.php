@@ -685,6 +685,7 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
         return $grades;
     });
 
+    $courses = Subject::all(); // Assuming 'Subject' is your model for courses
     // Total average of all courses
     $totalAverageScore = $results->avg('score');
 
@@ -737,11 +738,36 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
     // Count unique students
     $totalUniqueStudents = $results->pluck('student_id')->unique()->count();
 
+    // Count grades by subject and gender (A, B, C, D, E)
+    $subjectGradesByGender = $results->groupBy('course_id')->map(function ($courseResults) {
+        $grades = [
+            'A' => ['male' => 0, 'female' => 0],
+            'B' => ['male' => 0, 'female' => 0],
+            'C' => ['male' => 0, 'female' => 0],
+            'D' => ['male' => 0, 'female' => 0],
+            'E' => ['male' => 0, 'female' => 0],
+        ];
+
+        foreach ($courseResults as $result) {
+            $grade = $this->calculateGrade($result->score, $result->marking_style);
+
+            // Increment the count for the respective grade and gender
+            if ($result->gender == 'male') {
+                $grades[$grade]['male']++;
+            } else {
+                $grades[$grade]['female']++;
+            }
+        }
+
+        return $grades;
+    });
+
+
     // Generate the PDF
     $pdf = \PDF::loadView('Results.results_by_month', compact(
         'school', 'year', 'class', 'examType', 'month', 'results', 'totalMaleStudents', 'totalFemaleStudents', 'totalMaleGrades', 'totalFemaleGrades',
         'averageScoresByCourse', 'evaluationScores', 'totalAverageScore', 'date', 'sortedStudentsResults', 'sumOfCourseAverages', 'sortedCourses',
-        'totalUniqueStudents',
+        'totalUniqueStudents', 'subjectGradesByGender', 'courses'
     ));
     $pdf->setOption('isHtml5ParserEnabled', true);
     $pdf->setOption('isPhpEnabled', true);
