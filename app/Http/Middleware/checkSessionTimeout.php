@@ -35,11 +35,6 @@ class checkSessionTimeout
                     $request->session()->invalidate(); // Futa session
                     return redirect()->route('login')->with('error', 'Session expired. Please login again.');
                 }
-
-                // 🔥 Kuhuisha last_activity kwa kila request
-                DB::table('sessions')->where('id', $sessionId)->update([
-                    'last_activity' => $now->timestamp
-                ]);
             }
         }
 
