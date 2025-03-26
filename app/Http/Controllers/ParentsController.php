@@ -116,7 +116,6 @@ class ParentsController extends Controller
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'gender' => $request->gender,
-                'bus_no' => $request->bus_no,
                 'usertype' => $request->input('usertype', 4),
                 'password' => Hash::make($request->input('password', 'shule2025')),
                 'school_id' => $user->school_id,
@@ -157,6 +156,7 @@ class ParentsController extends Controller
                 'gender' => $request->student_gender,
                 'dob' => $request->dob,
                 'class_id' => $request->class,
+                'transport_id' => $request->bus_no,
                 'group' => $request->group,
                 'image' => $studentImage,
                 'school_id' => $parents->school_id
