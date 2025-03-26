@@ -20,25 +20,25 @@ class checkSessionTimeout
      */
 
      public function handle(Request $request, Closure $next)
-    {
-        if (Auth::check()) {
-            $sessionId = $request->session()->getId(); // Pata session ID ya mtumiaji
-            $session = DB::table('sessions')->where('id', $sessionId)->first();
+     {
+         if (Auth::check()) {
+             $sessionStartTime = session()->get('session_start_time', now()); // Pata muda wa kuanza wa session
+             $sessionDuration = now()->diffInMinutes($sessionStartTime);
 
-            if ($session) {
-                $lastActivity = Carbon::parse($session->last_activity);
-                $now = Carbon::now();
+             // Angalia kama muda wa session umefikia saa 1 (60 dakika)
+             if ($sessionDuration >= 60) {
+                 Auth::logout(); // Logout mtumiaji
+                 $request->session()->invalidate(); // Futa session
+                 $request->session()->regenerateToken(); // Zuia CSRF attacks
 
-                // Angalia kama muda umepita zaidi ya saa 1 (3600 sekunde)
-                if ($lastActivity->diffInMinutes($now) >= 60) {
-                    Auth::logout(); // Logout mtumiaji
-                    $request->session()->invalidate(); // Futa session
-                    return redirect()->route('login')->with('error', 'Session expired. Please login again.');
-                }
-            }
-        }
+                 return redirect()->route('login')->with('error', 'Session expired. Please login again.');
+             }
+         } else {
+             // Weka muda wa kuanza session mara ya kwanza
+             session()->put('session_start_time', now());
+         }
 
-        return $next($request);
-    }
+         return $next($request);
+     }
 
 }
