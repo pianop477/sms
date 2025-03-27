@@ -261,12 +261,13 @@
                             <thead class="text-uppercase">
                                 <tr>
                                     <th scope="col">#</th>
-                                    <th scope="col" class="text-center">Admission No.</th>
+                                    <th scope="col" class="text-center">Adm No.</th>
                                     <th scope="col">First Name</th>
                                     <th scope="col">Middle Name</th>
                                     <th scope="col">Last Name</th>
                                     <th scope="col" class="text-center">Gender</th>
-                                    <th scope="col">Date of Birth</th>
+                                    <th scope="col" class="text-center">Stream</th>
+                                    <th scope="col">DoB</th>
                                     <th scope="col" class="text-center">Action</th>
                                 </tr>
                             </thead>
@@ -279,6 +280,7 @@
                                         <td class="text-uppercase">{{$student->middle_name}}</td>
                                         <td class="text-uppercase">{{$student->last_name}}</td>
                                         <td class="text-center text-uppercase">{{$student->gender[0]}}</td>
+                                        <td class="text-center text-uppercase">{{$student->group}}</td>
                                         <td>
                                             {{ \Carbon\Carbon::parse($student->dob)->format('M d, Y') }}
                                         </td>
