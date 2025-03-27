@@ -173,7 +173,7 @@
                         // Chart options
                         var option = {
                             title: {
-                                text: 'Student Registration by Gender',
+                                text: 'Student Registration',
                                 left: 'center'
                             },
                             tooltip: {
