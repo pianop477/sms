@@ -258,7 +258,7 @@
                         // Add chart title
                         chart.children.unshift(
                             am5.Label.new(root, {
-                                text: "Teachers by Qualifications",
+                                text: "Qualifications",
                                 fontSize: 20,
                                 fontWeight: "bold",
                                 textAlign: "center",
@@ -365,7 +365,7 @@
         <div class="col-md-4 mt-2 mb-3">
             <div class="card">
                 <div class="card-title mt-2">
-                    <h6 class="text-center">Total Students</h6>
+                    <h6 class="text-center">Students Registration</h6>
                 </div>
                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
@@ -380,9 +380,9 @@
                     const genderChart = new Chart(ctx, {
                         type: 'doughnut',
                         data: {
-                            labels: ['Male Students', 'Female Students'],
+                            labels: ['Boys', 'Girls'],
                             datasets: [{
-                                label: 'Student Gender Distribution',
+                                label: 'Student Registration',
                                 data: [totalMaleStudents, totalFemaleStudents],
                                 backgroundColor: [
                                     'rgba(54, 162, 235, 0.7)', // Blue
