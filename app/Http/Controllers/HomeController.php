@@ -218,8 +218,8 @@ class HomeController extends Controller
                                                     'students.gender', 'students.id as student_id',
                                                 )
                                                 ->where('attendances.school_id', $user->school_id)
-                                                ->where('attendances.class_id', $classTeacher->class_id)
-                                                ->where('attendances.class_group', $classTeacher->group)
+                                                ->where('attendances.class_id', $classTeacher->class_id ?? '')
+                                                ->where('attendances.class_group', $classTeacher->group ?? '')
                                                 ->where('attendances.teacher_id', $teacher->id)
                                                 ->whereDate('attendances.attendance_date', $today)
                                                 ->get();
