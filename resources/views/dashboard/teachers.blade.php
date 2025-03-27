@@ -204,7 +204,7 @@
                                 // Chart options
                                 var option = {
                                     title: {
-                                        text: 'Student Registration by Gender',
+                                        text: 'Student Registration',
                                         left: 'center'
                                     },
                                     tooltip: {
@@ -286,7 +286,7 @@
                                 // Add chart title
                                 chart.children.unshift(
                                     am5.Label.new(root, {
-                                        text: "Teachers by Qualifications",
+                                        text: "Qualifications",
                                         fontSize: 20,
                                         fontWeight: "bold",
                                         textAlign: "center",
@@ -393,7 +393,7 @@
                 <div class="col-md-4 mt-2 mb-3">
                     <div class="card">
                         <div class="card-title mt-2">
-                            <h6 class="text-center">Total Students</h6>
+                            <h6 class="text-center">Students Registration</h6>
                         </div>
                         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                         <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
@@ -408,9 +408,9 @@
                             const genderChart = new Chart(ctxGender, {
                                 type: 'doughnut',
                                 data: {
-                                    labels: ['Male Students', 'Female Students'],
+                                    labels: ['Boys', 'Girls'],
                                     datasets: [{
-                                        label: 'Student Gender Distribution',
+                                        label: 'Students Enrollment',
                                         data: [totalMaleStudents, totalFemaleStudents],
                                         backgroundColor: [
                                             'rgba(54, 162, 235, 0.7)', // Blue
@@ -733,7 +733,7 @@
                             // Chart options
                             var option = {
                                 title: {
-                                    text: 'Student Registration by Gender',
+                                    text: 'Student Registration',
                                     left: 'center'
                                 },
                                 tooltip: {
@@ -922,7 +922,7 @@
                 <div class="col-md-4 mt-2 mb-3">
                     <div class="card">
                         <div class="card-title mt-2">
-                            <h6 class="text-center">Total Students</h6>
+                            <h6 class="text-center">Students Enrollment</h6>
                         </div>
                         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                         <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
@@ -937,9 +937,9 @@
                             const genderChart = new Chart(ctxGender, {
                                 type: 'doughnut',
                                 data: {
-                                    labels: ['Male Students', 'Female Students'],
+                                    labels: ['Boys', 'Girls'],
                                     datasets: [{
-                                        label: 'Student Gender Distribution',
+                                        label: 'Student Enrollment',
                                         data: [totalMaleStudents, totalFemaleStudents],
                                         backgroundColor: [
                                             'rgba(54, 162, 235, 0.7)', // Blue
@@ -1246,7 +1246,7 @@
             <div class="col-lg-6 mt-1">
                 <div class="card">
                     <div class="card-title mt-1">
-                        <h6 class="text-center">Class Gender Distribution</h6>
+                        <h6 class="text-center">Students Enrollment</h6>
                     </div>
                     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
@@ -1262,9 +1262,9 @@
                         const genderDistributionChart = new Chart(ctxGender, {
                             type: 'doughnut',
                             data: {
-                                labels: ['Male Students', 'Female Students'],
+                                labels: ['Boys', 'Girls'],
                                 datasets: [{
-                                    label: 'Gender Distribution',
+                                    label: 'Students Enrollment',
                                     data: [maleCount, femaleCount], // Use the passed data
                                     backgroundColor: [
                                         'rgba(54, 162, 235, 0.7)', // Blue
@@ -1308,6 +1308,71 @@
                                 }
                             },
                             plugins: [ChartDataLabels] // Register the plugin
+                        });
+                    </script>
+                </div>
+            </div>
+            <div class="col-lg-6 mt-1">
+                <div class="card">
+                    <div class="card-title mt-1">
+                        <h6 class="text-center">Today's Attendance Summary</h6>
+                        <p class="text-center font-style-italic">Today is: {{\Carbon\Carbon::today()->format('d-m-Y')}}</p>
+                    </div>
+                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+                    <div style="width: 280px; height: 260px; margin: 0 auto;">
+                        @if (is_array($attendanceCount) && $attendanceCount > 0)
+                            <canvas id="attendanceChart"></canvas>
+                        @else
+                            <p class="text-center mt-5 text-danger">No Attendance records available.</p>
+                        @endif
+                    </div>
+                    <script>
+                        const attendanceData = @json($attendanceCount); // Pass the PHP array to JavaScript
+
+                        const ctx = document.getElementById('attendanceChart').getContext('2d');
+                        const attendanceChart = new Chart(ctx, {
+                            type: 'bar', // Bar chart for better visualization of actual numbers
+                            data: {
+                                labels: ['Present', 'Absent', 'Permission'],
+                                datasets: [
+                                    {
+                                        label: 'Boys',
+                                        data: [
+                                            attendanceData.male.present,
+                                            attendanceData.male.absent,
+                                            attendanceData.male.permission
+                                        ],
+                                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                        borderColor: 'rgba(54, 162, 235, 1)',
+                                        borderWidth: 1
+                                    },
+                                    {
+                                        label: 'Girls',
+                                        data: [
+                                            attendanceData.female.present,
+                                            attendanceData.female.absent,
+                                            attendanceData.female.permission
+                                        ],
+                                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                        borderWidth: 1
+                                    }
+                                ]
+                            },
+                            options: {
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                },
+                                responsive: true,
+                                plugins: {
+                                    legend: {
+                                        position: 'top',
+                                    }
+                                }
+                            }
                         });
                     </script>
                 </div>

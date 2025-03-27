@@ -115,7 +115,7 @@
                             </button>
 
                             <!-- Submit Final Results -->
-                            <button type="submit" class="btn btn-success" name="action" value="submit" id="submitButton" onclick="return confirm('Are you sure you want to submit results permanently?')">
+                            <button type="submit" class="btn btn-success" name="action" value="submit" id="submitButton" onclick="return confirm('Are you sure you want to submit final results? No editing will be allowed')">
                                 <i class="fas fa-check"></i> Submit Final Results
                             </button>
                         </div>

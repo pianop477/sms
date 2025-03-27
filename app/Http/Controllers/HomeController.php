@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attendance;
 use App\Models\class_learning_courses;
 use App\Models\Class_teacher;
 use App\Models\Contract;
@@ -204,6 +205,56 @@ class HomeController extends Controller
                             ->where('class_teachers.school_id', '=', $teachers->school_id)
                             ->get();
 
+                //class teacher attendance daily report chart ************************
+                    $today = Carbon::today()->format('Y-m-d'); // Get today's date
+                    $teacher = Teacher::where('user_id', $user->id)->first();
+                    $classTeacher = Class_teacher::where('teacher_id', $teacher->id)->first();
+                    // Query to get the attendance counts
+                    $attendanceStats = Attendance::query()
+                                                ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
+                                                ->join('students', 'students.id', '=', 'attendances.student_id')
+                                                ->select(
+                                                    'attendances.*', 'teachers.id as teachers_id',
+                                                    'students.gender', 'students.id as student_id',
+                                                )
+                                                ->where('attendances.school_id', $user->school_id)
+                                                ->where('attendances.class_id', $classTeacher->class_id)
+                                                ->where('attendances.class_group', $classTeacher->group)
+                                                ->where('attendances.teacher_id', $teacher->id)
+                                                ->whereDate('attendances.attendance_date', $today)
+                                                ->get();
+
+                    // return $attendanceStats;
+                    // Initialize an array to hold the attendance counts for each gender and status
+                    $attendanceCount = [
+                        'male' => [
+                            'present' => 0,
+                            'absent' => 0,
+                            'permission' => 0,
+                        ],
+                        'female' => [
+                            'present' => 0,
+                            'absent' => 0,
+                            'permission' => 0,
+                        ]
+                    ];
+
+                    // Loop through the results and count the statuses based on gender
+                    foreach ($attendanceStats as $attendance) {
+                        $gender = $attendance->gender;
+                        $status = $attendance->attendance_status;
+
+                        if ($gender == 'male') {
+                            $attendanceCount['male'][$status]++;
+                        } elseif ($gender == 'female') {
+                            $attendanceCount['female'][$status]++;
+                        }
+                    }
+
+                    // Now we have the count of male and female students based on status (present, absent, permission)
+                    // return $attendanceCount;
+
+
                 $teacherByGender = Teacher::query()
                             ->join('users', 'users.id', '=', 'teachers.user_id')
                             ->select(
@@ -260,7 +311,7 @@ class HomeController extends Controller
                                     ->get();
                 $teacherQualifications = Teacher::where('school_id', '=', $user->school_id)
                                 ->where('status', '=', 1)
-                                ->select('qualification', \DB::raw('COUNT(*) as count'))
+                                ->select('qualification', DB::raw('COUNT(*) as count'))
                                 ->groupBy('qualification')
                                 ->get();
 
@@ -292,7 +343,7 @@ class HomeController extends Controller
                         ];
                 }
                 //end of summary -----------------
-                return view('home', compact('courses', 'contract', 'attendanceCounts', 'today', 'myClass', 'teacherByGender', 'classes', 'teachers', 'students', 'classes', 'subjects', 'studentsByClass',
+                return view('home', compact('courses', 'contract', 'attendanceCounts', 'attendanceCount', 'today', 'myClass', 'teacherByGender', 'classes', 'teachers', 'students', 'classes', 'subjects', 'studentsByClass',
                             'parents', 'buses', 'totalMaleStudents', 'chartData', 'totalFemaleStudents', 'classData', 'qualificationData'));
             }
 
