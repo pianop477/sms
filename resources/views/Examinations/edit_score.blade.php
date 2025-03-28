@@ -98,7 +98,7 @@
                                         <td>{{ $index + 1 }}</td>
                                         <td class="text-capitalize">{{ ucwords(strtolower($student->first_name. ' '. $student->middle_name.' '. $student->last_name)) }}</td>
                                         <td>
-                                            <input type="number" style="width: auto;" name="scores[{{ $student->id }}]" class="form-control score-input" value="{{ $score }}" min="0" max="100" required>
+                                            <input type="number" style="width: auto;" name="scores[{{ $student->id }}]" class="form-control score-input" value="{{ $score }}" min="0" max="100">
                                         </td>
                                         <td>
                                             <input type="text" style="width: 50px;" class="form-control grade-input" value="{{ $grade }}" disabled style="background-color: {{ $bgColor }}">
