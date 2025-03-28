@@ -141,7 +141,7 @@ class ExamController extends Controller
         ]);
 
         // Define validation rules conditionally based on marking style
-        $scoreValidation = $request->marking_style == 1 ? 'nullable|numeric|min:0|max:50' : 'required|numeric|min:0|max:100';
+        $scoreValidation = $request->marking_style == 1 ? 'nullable|numeric|min:0|max:50' : 'nullable|numeric|min:0|max:100';
 
         $rules = [
             'students.*.student_id' => 'required|exists:students,id',
@@ -184,7 +184,7 @@ class ExamController extends Controller
                 );
             }
 
-            Alert::toast('Examination results have been saved temporarily', 'success');
+            Alert::toast('Examination results have been saved to the draft', 'success');
             return redirect()->route('score.prepare.form', Hashids::encode($request->course_id));
         }
 
@@ -506,38 +506,44 @@ class ExamController extends Controller
 
         foreach ($results as $result) {
             if ($result->marking_style == 1) {
-                if ($result->score >= 41) {
+                if ($result->score >= 40.5) {
                     $result->grade = 'A';
                     $gradeCounts['A']++;
-                } elseif ($result->score >= 31) {
+                } elseif ($result->score >= 30.5) {
                     $result->grade = 'B';
                     $gradeCounts['B']++;
-                } elseif ($result->score >= 21) {
+                } elseif ($result->score >= 20.5) {
                     $result->grade = 'C';
                     $gradeCounts['C']++;
-                } elseif ($result->score >= 11) {
+                } elseif ($result->score >= 10.5) {
                     $result->grade = 'D';
                     $gradeCounts['D']++;
-                } else {
+                } elseif($result->score >= 0.1) {
                     $result->grade = 'E';
                     $gradeCounts['E']++;
+                } else {
+                    $result->grade = 'ABS';
+                    // $gradeCounts['E']++;
                 }
             } else {
-                if ($result->score >= 81) {
+                if ($result->score >= 80.5) {
                     $result->grade = 'A';
                     $gradeCounts['A']++;
-                } elseif ($result->score >= 61) {
+                } elseif ($result->score >= 60.5) {
                     $result->grade = 'B';
                     $gradeCounts['B']++;
-                } elseif ($result->score >= 41) {
+                } elseif ($result->score >= 40.5) {
                     $result->grade = 'C';
                     $gradeCounts['C']++;
-                } elseif ($result->score >= 21) {
+                } elseif ($result->score >= 20.5) {
                     $result->grade = 'D';
                     $gradeCounts['D']++;
-                } else {
+                } elseif($result->score >= 0.5) {
                     $result->grade = 'E';
                     $gradeCounts['E']++;
+                } else {
+                    $result->grade = 'ABS';
+                    // $gradeCounts['E']++;
                 }
             }
             $totalScore += $result->score;
@@ -586,28 +592,32 @@ class ExamController extends Controller
     protected function determineGrade($score, $marking_style)
     {
         if ($marking_style == 1) {
-            if ($score >= 41) {
+            if ($score >= 40.5) {
                 return 'A';
-            } elseif ($score >= 31) {
+            } elseif ($score >= 30.5) {
                 return 'B';
-            } elseif ($score >= 21) {
+            } elseif ($score >= 20.5) {
                 return 'C';
-            } elseif ($score >= 11) {
+            } elseif ($score >= 10.5) {
                 return 'D';
-            } else {
+            } elseif($score >= 0.5) {
                 return 'E';
+            } else {
+                return 'ABS';
             }
         } else {
-            if ($score >= 81) {
+            if ($score >= 80.5) {
                 return 'A';
-            } elseif ($score >= 61) {
+            } elseif ($score >= 60.5) {
                 return 'B';
-            } elseif ($score >= 41) {
+            } elseif ($score >= 40.5) {
                 return 'C';
-            } elseif ($score >= 21) {
+            } elseif ($score >= 20.5) {
                 return 'D';
-            } else {
+            } elseif($score >= 0.5) {
                 return 'E';
+            } else {
+                return 'ABS';
             }
         }
     }
