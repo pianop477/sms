@@ -187,7 +187,7 @@
                     </div>
                 </div>
                 <div class="details">
-                    <h4>{{$results->first()->class_name}} {{$results->first()->exam_type}} Results - {{\Carbon\Carbon::parse($date)->format('d-M-Y')}}</h4>
+                    <h4>{{$results->first()->class_name}} {{$results->first()->exam_type}} Results - {{\Carbon\Carbon::parse($date)->format('d.m.Y')}}</h4>
                     <h5 style="font-weight:normal">TERM: {{$results->first()->Exam_term}}</h5>
                     <h5 style="font-weight:normal">NUMBER OF CANDIDATES: {{$totalUniqueStudents}}</h5>
                     <h5 style="font-weight:normal">CLASS AVERAGE: <strong>{{number_format($sumOfCourseAverages, 4)}}</strong>
@@ -265,18 +265,20 @@
                     </thead>
                     <tbody>
                         @foreach ($sortedStudentsResults as $index => $studentResult)
-                            <tr>
-                                <td style="text-align: center; text-transform:uppercase">{{$studentResult['admission_number']}}</td>
-                                <td style="text-align: center">{{ $studentResult['gender'][0] }}</td>
-                                <td style="text-transform:capitalize">{{ ucwords(strtolower($studentResult['student_name'])) }}</td>
-                                @foreach ($studentResult['courses'] as $course)
-                                    <td style="text-align:center;">{{ $course['score'] }}</td>
-                                @endforeach
-                                <td style="text-align:center">{{ $studentResult['total_marks'] }}</td>
-                                <td style="text-align:center">{{ number_format($studentResult['average'], 2) }}</td>
-                                <td style="text-align:center; text-transform:uppercase">{{ $studentResult['grade'] }}</td>
-                                <td style="text-align:center">{{ $studentResult['position'] }}</td>
-                            </tr>
+                        <tr>
+                            <td style="text-align: center; text-transform:uppercase">{{ $studentResult['admission_number'] }}</td>
+                            <td style="text-align: center">{{ $studentResult['gender'][0] }}</td>
+                            <td style="text-transform:capitalize">{{ ucwords(strtolower($studentResult['student_name'])) }}</td>
+                            @foreach ($studentResult['courses'] as $course)
+                                <td style="text-align:center;">{{ $course['score'] }}</td>
+                            @endforeach
+                            <td style="text-align:center">{{ $studentResult['total_marks'] }}</td>
+                            <td style="text-align:center">{{ number_format($studentResult['average'], 2) }}</td>
+                            <td style="text-align:center; text-transform:uppercase">
+                                {{ $studentResult['grade'] === 'ABS' ? 'ABS' : $studentResult['grade'] }}
+                            </td>
+                            <td style="text-align:center">{{ $studentResult['position'] }}</td>
+                        </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -300,15 +302,15 @@
                                 <td style="text-align:center">{{ number_format($course['average_score'], 2) }}</td>
                                 <td style="text-align:center">{{ $course['position'] }}</td>
                                     @if ($course['grade']=='A')
-                                        <td style="background:rgb(117, 244, 48); padding:2px 10px ">grade {{ $course['grade']}} (EXCELLENT)</td>
+                                        <td style="background:rgb(117, 244, 48); padding:2px 10px ">grade {{ $course['grade']}} - <i>EXCELLENT</i></td>
                                     @elseif ($course['grade']=='B')
-                                        <td style="background:rgb(12, 211, 184); padding:2px 10px ">grade {{ $course['grade']}} (VERY GOOD)</td>
+                                        <td style="background:rgb(12, 211, 184); padding:2px 10px ">grade {{ $course['grade']}} - <i>VERY GOOD</i></td>
                                     @elseif ($course['grade']=='C')
-                                        <td style="background:rgb(237, 220, 113); padding:2px 10px ">grade {{ $course['grade']}} (PASS)</td>
+                                        <td style="background:rgb(237, 220, 113); padding:2px 10px ">grade {{ $course['grade']}} - <i>PASS</i></td>
                                     @elseif ($course['grade']=='D')
-                                        <td style="background:rgb(182, 176, 176); padding:2px 10px ">grade {{ $course['grade']}} (POOR)</td>
+                                        <td style="background:rgb(182, 176, 176); padding:2px 10px ">grade {{ $course['grade']}} - <i>POOR</i></td>
                                     @else
-                                        <td style="background:rgb(235, 75, 75); padding:2px 10px ">grade {{ $course['grade']}} (FAIL)</td>
+                                        <td style="background:rgb(235, 75, 75); padding:2px 10px ">grade {{ $course['grade']}} - <i>FAIL</i></td>
                                     @endif
                             </tr>
                         @endforeach

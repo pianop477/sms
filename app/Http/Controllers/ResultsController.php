@@ -675,6 +675,7 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
             'C' => 0,
             'D' => 0,
             'E' => 0,
+            'ABS' => 0,
         ];
 
         foreach ($courseResults as $result) {
@@ -691,9 +692,11 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
 
     // Student results with total marks, average, grade, and position
     $studentsResults = $results->groupBy('student_id')->map(function ($studentResults) {
-                        $totalMarks = $studentResults->sum('score');
-                        $average = $studentResults->avg('score');
-                        $grade = $this->calculateGrade($average, $studentResults->first()->marking_style);
+        $totalMarks = $studentResults->sum('score');
+        $average = $studentResults->avg('score');
+
+        // Check if average score is 0 and set grade to ABS if true
+        $grade = $average == 0 ? 'ABS' : $this->calculateGrade($average, $studentResults->first()->marking_style);
 
         return [
             'student_id' => $studentResults->first()->student_id,
@@ -705,7 +708,7 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
                 return [
                     'course_name' => $result->course_name,
                     'score' => $result->score,
-                    'grade' => $this->calculateGrade($result->score, $result->marking_style)
+                    'grade' => $this->calculateGrade($result->score, $result->marking_style),
                 ];
             }),
             'total_marks' => $totalMarks,
@@ -724,7 +727,7 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
 
     // Count grades by gender based on overall student performance
     $gradesByGender = $studentsResults->groupBy('gender')->map(function ($group) {
-        $grades = ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0];
+        $grades = ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0, 'ABS' => 0, 'ABS' => 0];
         foreach ($group as $student) {
             $grades[$student['grade']]++; // Count the grade calculated for the student
         }
@@ -732,8 +735,8 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
     });
 
     // Separate counts for male and female grades
-    $totalMaleGrades = $gradesByGender->get('male', ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0]);
-    $totalFemaleGrades = $gradesByGender->get('female', ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0]);
+    $totalMaleGrades = $gradesByGender->get('male', ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0, 'ABS' => 0]);
+    $totalFemaleGrades = $gradesByGender->get('female', ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0, 'ABS' => 0]);
 
     // Count unique students
     $totalUniqueStudents = $results->pluck('student_id')->unique()->count();
@@ -746,6 +749,7 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
             'C' => ['male' => 0, 'female' => 0],
             'D' => ['male' => 0, 'female' => 0],
             'E' => ['male' => 0, 'female' => 0],
+            'ABS' => ['male' => 0, 'female' => 0],
         ];
 
         foreach ($courseResults as $result) {
@@ -796,29 +800,30 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
     private function calculateGrade($score, $marking_style)
     {
         if ($marking_style == 1) {
-            if ($score >= 41) {
+            if ($score >= 40.5) {
                 return 'A';
-            } elseif ($score >= 31) {
+            } elseif ($score >= 30.5) {
                 return 'B';
-            } elseif ($score >= 21) {
+            } elseif ($score >= 20.5) {
                 return 'C';
-            } elseif ($score >= 11) {
+            } elseif ($score >= 10.5) {
                 return 'D';
-            } else {
+            } elseif($score >= 0.5) {
                 return 'E';
-            }
+            } else { return 'ABS'; }
+
         } else {
-            if ($score >= 81) {
+            if ($score >= 80.5) {
                 return 'A';
-            } elseif ($score >= 61) {
+            } elseif ($score >= 60.5) {
                 return 'B';
-            } elseif ($score >= 41) {
+            } elseif ($score >= 40.5) {
                 return 'C';
-            } elseif ($score >= 21) {
+            } elseif ($score >= 20.5) {
                 return 'D';
-            } else {
+            } elseif($score >= 0.5) {
                 return 'E';
-            }
+            } else { return 'ABS'; }
         }
     }
     //end of results in general ==============================================
