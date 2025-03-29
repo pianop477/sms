@@ -88,14 +88,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-sm-8">
-                                    <a href="{{route('form.saved.values', ['course' => Hashids::encode($class_course->course_id),
-                                        'teacher' => Hashids::encode($class_course->teacher_id),
-                                        'school' => Hashids::encode($class_course->school_id),
-                                        'class' => Hashids::encode($class_course->class_id),
-                                        'type' => $saved_results->first()->exam_type_id,
-                                        'date' => $saved_results->first()->exam_date,
-                                        'term' => $saved_results->first()->exam_term,
-                                        'style' => $saved_results->first()->marking_style])}}"
+                                    <a href=""
                                         class="btn btn-warning" onclick="">Saved Scores</a>
                                 </div>
                                 {{-- <div class="col-4 mt-3">
