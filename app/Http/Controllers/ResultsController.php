@@ -192,7 +192,7 @@ class ResultsController extends Controller
                     $result->remarks = 'Excellent';
                 } elseif ($result->score >= 31) {
                     $result->grade = 'B';
-                    $result->remarks = 'Very Good';
+                    $result->remarks = 'Good';
                 } elseif ($result->score >= 21) {
                     $result->grade = 'C';
                     $result->remarks = 'Pass';
@@ -209,7 +209,7 @@ class ResultsController extends Controller
                     $result->remarks = 'Excellent';
                 } elseif ($result->score >= 61) {
                     $result->grade = 'B';
-                    $result->remarks = 'Very Good';
+                    $result->remarks = 'Good';
                 } elseif ($result->score >= 41) {
                     $result->grade = 'C';
                     $result->remarks = 'Pass';
@@ -1216,7 +1216,7 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
                     $result->remarks = 'Excellent';
                 } elseif ($result->score >= 31) {
                     $result->grade = 'B';
-                    $result->remarks = 'Very Good';
+                    $result->remarks = 'Good';
                 } elseif ($result->score >= 21) {
                     $result->grade = 'C';
                     $result->remarks = 'Pass';
@@ -1233,7 +1233,7 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
                     $result->remarks = 'Excellent';
                 } elseif ($result->score >= 61) {
                     $result->grade = 'B';
-                    $result->remarks = 'Very Good';
+                    $result->remarks = 'Good';
                 } elseif ($result->score >= 41) {
                     $result->grade = 'C';
                     $result->remarks = 'Pass';
