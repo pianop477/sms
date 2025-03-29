@@ -80,35 +80,33 @@
                 });
 
                 //disable button
-                <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const form = document.querySelector(".needs-validation");
-            const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
+                document.addEventListener("DOMContentLoaded", function () {
+                    const form = document.querySelector(".needs-validation");
+                    const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
 
-            if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
+                    if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
 
-            form.addEventListener("submit", function (event) {
-                event.preventDefault(); // Zuia submission ya haraka
+                    form.addEventListener("submit", function (event) {
+                        event.preventDefault(); // Zuia submission ya haraka
 
-                // Disable button na badilisha maandishi
-                submitButton.disabled = true;
-                submitButton.innerHTML = `<span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span> Please Wait...`;
+                        // Disable button na badilisha maandishi
+                        submitButton.disabled = true;
+                        submitButton.innerHTML = `<span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span> Please Wait...`;
 
-                // Hakikisha form haina errors kabla ya kutuma
-                if (!form.checkValidity()) {
-                    form.classList.add("was-validated");
-                    submitButton.disabled = false; // Warudishe button kama kuna errors
-                    submitButton.innerHTML = "Send SMS";
-                    return;
-                }
+                        // Hakikisha form haina errors kabla ya kutuma
+                        if (!form.checkValidity()) {
+                            form.classList.add("was-validated");
+                            submitButton.disabled = false; // Warudishe button kama kuna errors
+                            submitButton.innerHTML = "Send SMS";
+                            return;
+                        }
 
-                // Chelewesha submission kidogo ili button ibadilike kwanza
-                setTimeout(() => {
-                    form.submit();
-                }, 500);
-            });
-        });
-    </script>
-            </script>
+                        // Chelewesha submission kidogo ili button ibadilike kwanza
+                        setTimeout(() => {
+                            form.submit();
+                        }, 500);
+                    });
+                });
+        </script>
 
 @endsection
