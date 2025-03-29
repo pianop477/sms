@@ -186,6 +186,7 @@ class HomeController extends Controller
                                                 ->where('class_learning_courses.teacher_id', $teachers->id)
                                                 ->where('class_learning_courses.school_id', $user->school_id)
                                                 ->get();
+                // return $courses;
                 //return myclass assigned as class teachers ------------------------
                 $myClass = Class_teacher::query()
                             ->join('grades', 'grades.id', 'class_teachers.class_id')

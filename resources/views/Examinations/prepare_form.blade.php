@@ -88,16 +88,25 @@
                             </div>
                             <div class="row">
                                 <div class="col-sm-8">
-                                    <a href=""
-                                        class="btn btn-warning" onclick="">Saved Scores</a>
+                                    <a href="{{route('form.saved.values', ['course' => Hashids::encode($class_course->course_id),
+                                        'teacher' => Hashids::encode($class_course->teacher_id),
+                                        'school' => Hashids::encode($class_course->school_id),
+                                        'class' => Hashids::encode($class_course->class_id),
+                                        'type' => $saved_results->first()->exam_type_id,
+                                        'date' => $saved_results->first()->exam_date,
+                                        'term' => $saved_results->first()->exam_term,
+                                        'style' => $saved_results->first()->marking_style])}}"
+                                        class="btn btn-warning" onclick="">Pending Results</a>
                                 </div>
-                                {{-- <div class="col-4 mt-3">
+                                <div class="col-4 mt-3">
                                     <a href="{{route('results.draft.delete', ['course' => Hashids::encode($class_course->course_id),
                                                 'teacher' => Hashids::encode($class_course->teacher_id),
-                                                'type' => $saved_results->first()->exam_type_id])}}" onclick="return confirm('Are you sure you want to delete this results? you will not able to recover it')">
+                                                'type' => $saved_results->first()->exam_type_id,
+                                                'class' => Hashids::encode($class_course->class_id),
+                                                'date' => $saved_results->first()->exam_date])}}" onclick="return confirm('Are you sure you want to delete this results? you will not able to recover it')">
                                         <i class="fas fa-trash text-danger" style="font-size: 1.2rem;"></i>
                                     </a>
-                                </div> --}}
+                                </div>
                             </div>
                            </div>
                         </div>

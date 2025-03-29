@@ -37,9 +37,10 @@ class ExamController extends Controller
     {
         // abort(404)
         $decoded = Hashids::decode($id);
+        // return $decoded;
         $class_course = class_learning_courses::find($decoded[0]);
-        $savedResults = temporary_results::where('course_id', $decoded[0])->get();
-
+        $savedResults = temporary_results::where('course_id', $class_course->course_id)->get();
+        // return $savedResults;
         $exams = Examination::where('school_id', Auth::user()->school_id)->where('status', 1)->orderBy('exam_type')->get();
         return view('Examinations.prepare_form', ['exams' => $exams, 'class_course' => $class_course, 'saved_results' => $savedResults]);
     }
@@ -742,9 +743,12 @@ class ExamController extends Controller
 
                 // DELETE TEMPORARY RESULTS AFTER FINAL SUBMISSION
                 temporary_results::where('course_id', $courseId)
-                    ->where('teacher_id', $teacherId)
-                    ->where('exam_type_id', $examTypeId)
-                    ->delete();
+                        ->where('teacher_id', $teacherId)
+                        ->where('exam_type_id', $examTypeId)
+                        ->where('class_id', $classId)
+                        ->where('exam_date', $examDate)
+                        ->where('school_id', $schoolId)
+                        ->delete();
             });
 
             Alert()->toast('Results submitted successfully. Editing is no longer allowed.', 'success');
@@ -792,10 +796,12 @@ class ExamController extends Controller
                     'classId', 'teacherId', 'schoolId', 'courseName', 'className', 'students', 'saved_results'));
     }
 
-    public function deleteDraftResults($course, $teacher, $type)
+    public function deleteDraftResults($course, $teacher, $type, $class, $date)
     {
         $course_id = Hashids::decode($course);
         $teacher_id = Hashids::decode($teacher);
+        $class_id = Hashids::decode($class);
+        $examDate = Carbon::parse($date)->format('Y-m-d');
         $examType = $type;
         $teacherInfo = Teacher::find($teacher_id[0]);
         $user = Auth::user();
@@ -810,6 +816,8 @@ class ExamController extends Controller
             ->where('teacher_id', $teacher_id[0])
             ->where('exam_type_id', $examType)
             ->where('school_id', $teacherInfo->school_id)
+            ->where('class_id', $class_id[0])
+            ->where('exam_date', $examDate)
             ->get(); // Get all matching results
 
         if ($results->isEmpty()) {
