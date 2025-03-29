@@ -40,7 +40,7 @@ class ExamController extends Controller
         $class_course = class_learning_courses::find($decoded[0]);
         $savedResults = temporary_results::where('course_id', $decoded[0])->get();
 
-        $exams = Examination::where('school_id', Auth::user()->school_id)->where('status', 1)->get();
+        $exams = Examination::where('school_id', Auth::user()->school_id)->where('status', 1)->orderBy('exam_type')->get();
         return view('Examinations.prepare_form', ['exams' => $exams, 'class_course' => $class_course, 'saved_results' => $savedResults]);
     }
 
