@@ -914,9 +914,9 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
                 }
 
                 $messageContent = "Matokeo ya: " . strtoupper("{$student->first_name} {$student->last_name}"). ", ";
-                $messageContent .= "Mtihani: " . strtoupper($student->exam_type) ." => wa " . Carbon::parse($date)->format('d/m/Y'). "ni:- ";
+                $messageContent .= "Mtihani: " . strtoupper($student->exam_type) ." => " . Carbon::parse($date)->format('d/m/Y'). "ni:- ";
                 $messageContent .= strtoupper("{$student->courses}") . ". ";
-                $messageContent .= "Jumla: {$student->total_marks}, Wastani: " . number_format($student->average_marks,1) . ", Nafasi: {$student->rank} kati ya: {$totalStudents}. ";
+                $messageContent .= "Jumla: {$student->total_marks}, Wastani: " . number_format($student->average_marks) . ", Nafasi: {$student->rank} kati ya: {$totalStudents}. ";
                 $messageContent .= "Zaidi tembelea: $url.";
 
                 // Prepare the recipients array
@@ -1384,8 +1384,8 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
             $nextSmsService = new NextSmsService();
             $sender = $school->sender_id ?? "SHULE APP";
             $destination = $this->formatPhoneNumber($users->phone);
-            $messageContent = "Habari! Matokeo ya ". strtoupper($fullName ).", Mtihani: ". strtoupper($examination)." => ". strtoupper($month). ", Muhula ". strtoupper($term). " - ". $year." ni:" . implode(', ', array_map('strtoupper', $courseScores));
-            $messageContent .= ". Jumla: $totalScore, Wastani: ". number_format($averageScore, 1) .", Nafasi: $studentRank kati ya: $totalStudents. Zaidi tembelea: $url";
+            $messageContent = "Matokeo ya ". strtoupper($fullName ).", Mtihani wa: ". strtoupper($examination)." => ". Carbon::parse($date)->format('d/m/Y'). ", ni:- ". implode(', ', array_map('strtoupper', $courseScores));
+            $messageContent .= ". Jumla: $totalScore, Wastani: ". number_format($averageScore) .", Nafasi: $studentRank kati ya: $totalStudents. Zaidi tembelea: $url";
             $reference = uniqid();
 
             $payload = [
