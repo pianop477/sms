@@ -241,7 +241,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
             })->name('results.confirm');
             Route::post('/results/edit-draft', [ExamController::class, 'editDraft'])->name('results.edit.draft');
             Route::post('/results/update-draft', [ExamController::class, 'updateDraftResults'])->name('results.update.draft');
-            Route::get('/Delete/draft-results/course/{course}/teacher/{teacher}/type/{type}', [ExamController::class, 'deleteDraftResults'])->name('results.draft.delete');
+            Route::get('/Delete/draft-results/course/{course}/teacher/{teacher}/type/{type}/class/{class}/date/{date}', [ExamController::class, 'deleteDraftResults'])->name('results.draft.delete');
 
             //teachers  examination results =============================
             Route::get('course/{id}/Results', [ExamController::class, 'courseResults'])->name('results_byCourse');
