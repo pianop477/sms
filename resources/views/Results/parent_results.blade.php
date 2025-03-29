@@ -234,17 +234,17 @@
                             $grade = "'A' - EXCELLENT";
                             $gradeColor = 'rgb(117, 244, 48)';
                         } elseif ($averageScore >= 31 || $averageScore >= 61) {
-                            $grade = "'B' - VERY GOOD";
+                            $grade = "'B' - GOOD";
                             $gradeColor = 'rgb(12, 211, 184)';
                         } elseif ($averageScore >= 21 || $averageScore >= 41) {
-                            $grade = "'C' - AVERAGE";
+                            $grade = "'C' - PASS";
                             $gradeColor = 'rgb(237, 220, 113)';
                         } elseif ($averageScore >= 11 || $averageScore >= 21) {
                             $grade = "'D' - POOR";
-                            $gradeColor = 'rgb(235, 75, 75)';
+                            $gradeColor = 'rgb(182, 176, 176)';
                         } elseif ($averageScore <= 10 || $averageScore <= 20) {
                             $grade = "'E' - FAIL";
-                            $gradeColor = 'rgb(182, 176, 176)';
+                            $gradeColor = ' rgb(235, 75, 75)';
                         }
                     @endphp
                     <p>Grade Level: <strong><span style="background: {{$gradeColor}}; padding:1px 4px">{{$grade}}</span></strong></p>
