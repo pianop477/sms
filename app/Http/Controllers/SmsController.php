@@ -184,7 +184,7 @@ class SmsController extends Controller
 
         //prepare payload
         $nextSmsService = new NextSmsService();
-        $sender = 'SHULE APP';
+        $sender = $school->sender_id ?? 'SHULE APP';
         $dest = [];
         $reference = uniqid();
 
