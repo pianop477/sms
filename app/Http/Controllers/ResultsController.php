@@ -914,7 +914,7 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
                 }
 
                 $messageContent = "Matokeo ya: " . strtoupper("{$student->first_name} {$student->last_name}"). ", ";
-                $messageContent .= "Mtihani: " . strtoupper($student->exam_type) ." => " . Carbon::parse($date)->format('d/m/Y'). "ni:- ";
+                $messageContent .= "Mtihani: " . strtoupper($student->exam_type) ." => " . Carbon::parse($date)->format('d/m/Y'). " ni:- ";
                 $messageContent .= strtoupper("{$student->courses}") . ". ";
                 $messageContent .= "Jumla: {$student->total_marks}, Wastani: " . number_format($student->average_marks) . ", Nafasi: {$student->rank} kati ya: {$totalStudents}. ";
                 $messageContent .= "Zaidi tembelea: $url.";
@@ -1353,7 +1353,7 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
             $totalStudents = $rankings->count();
             $url = 'https://shuleapp.tech';
             $beemSmsService = new BeemSmsService();
-            $messageContent = "Matokeo ya ". strtoupper($fullName ).", Mtihani: ". strtoupper($examination)." => wa ". Carbon::parse($date)->format('d/m/Y'). ", ni:- ". implode(', ', array_map('strtoupper', $courseScores));
+            $messageContent = "Matokeo ya ". strtoupper($fullName ).", Mtihani: ". strtoupper($examination)." => ". Carbon::parse($date)->format('d/m/Y'). " ni:- ". implode(', ', array_map('strtoupper', $courseScores));
             $messageContent .= ". Jumla: $totalScore, Wastani: ". number_format($averageScore, 1) .", Nafasi: $studentRank kati ya: $totalStudents. Zaidi tembelea: $url";
 
             // Output the message content (or send it via SMS)
