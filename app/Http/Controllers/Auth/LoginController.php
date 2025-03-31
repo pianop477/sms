@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class LoginController extends Controller
 {
@@ -67,7 +68,7 @@ class LoginController extends Controller
             $request->session()->put('last_activity', time());
 
             $this->clearLoginAttempts($request);
-
+            Alert()->toast('Hello 🤩 Welcome back to ShuleApp', 'success');
             return redirect()->intended($this->redirectPath());
         }
 

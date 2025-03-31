@@ -939,12 +939,12 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
                     'text' => $messageContent,
                     'reference' => $student->student_id
                 ];
-                $response = $nextSmsService->sendSmsByNext(
-                    $payload['from'],
-                    $payload['to'],
-                    $payload['text'],
-                    $payload['reference']
-                );
+                    $response = $nextSmsService->sendSmsByNext(
+                        $payload['from'],
+                        $payload['to'],
+                        $payload['text'],
+                        $payload['reference']
+                    );
                 }
 
                 Alert()->toast('Results published successfully', 'success');
