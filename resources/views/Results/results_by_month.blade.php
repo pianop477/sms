@@ -304,7 +304,7 @@
                                     @if ($course['grade']=='A')
                                         <td style="background:rgb(117, 244, 48); padding:2px 10px ">grade {{ $course['grade']}} - <i>EXCELLENT</i></td>
                                     @elseif ($course['grade']=='B')
-                                        <td style="background:rgb(12, 211, 184); padding:2px 10px ">grade {{ $course['grade']}} - <i>VERY GOOD</i></td>
+                                        <td style="background:rgb(12, 211, 184); padding:2px 10px ">grade {{ $course['grade']}} - <i>GOOD</i></td>
                                     @elseif ($course['grade']=='C')
                                         <td style="background:rgb(237, 220, 113); padding:2px 10px ">grade {{ $course['grade']}} - <i>PASS</i></td>
                                     @elseif ($course['grade']=='D')
