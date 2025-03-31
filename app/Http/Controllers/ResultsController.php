@@ -181,12 +181,14 @@ class ResultsController extends Controller
 
         // Calculate rankings
         $rankings = Examination_result::query()
-            ->where('class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
-            ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
-            ->select('student_id', DB::raw('SUM(score) as total_score'))
-            ->groupBy('student_id')
-            ->orderBy('total_score', 'desc')
-            ->get();
+                ->where('class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
+                ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
+                ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na jedwali la wanafunzi
+                ->select('student_id', DB::raw('SUM(score) as total_score'), 'students.first_name')
+                ->groupBy('student_id', 'students.first_name')
+                ->orderByDesc('total_score') // Pangilia kwa score kwanza
+                ->orderBy('students.first_name') // Ikiwa score zinafanana, panga kwa jina
+                ->get();
 
         $studentRank = $rankings->pluck('student_id')->search($studentId->id) + 1;
 
@@ -233,12 +235,15 @@ class ResultsController extends Controller
                 ->where('course_id', $result->course_id)
                 ->where('class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
                 ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
-                ->select('student_id', DB::raw('SUM(score) as total_score'))
-                ->groupBy('student_id')
-                ->orderBy('total_score', 'desc')
+                ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
+                ->select('student_id', DB::raw('SUM(score) as total_score'), 'students.first_name')
+                ->groupBy('student_id', 'students.first_name')
+                ->orderByDesc('total_score') // Pangilia kwa score kwanza
+                ->orderBy('students.first_name') // Ikiwa score zinafanana, panga kwa jina
                 ->get();
 
             $result->courseRank = $courseRankings->pluck('student_id')->search($studentId->id) + 1;
+
 
         }
 
@@ -1209,12 +1214,14 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
 
         // Determine the student's overall rank based on their total score
         $rankings = Examination_result::query()
-            ->where('class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
-            ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
-            ->select('student_id', DB::raw('SUM(score) as total_score'))
-            ->groupBy('student_id')
-            ->orderBy('total_score', 'desc')
-            ->get();
+                ->where('class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
+                ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
+                ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na jedwali la wanafunzi
+                ->select('student_id', DB::raw('SUM(score) as total_score'), 'students.first_name')
+                ->groupBy('student_id', 'students.first_name')
+                ->orderByDesc('total_score') // Pangilia kwa score kwanza
+                ->orderBy('students.first_name') // Ikiwa score zinafanana, panga kwa jina
+                ->get();
 
         $studentRank = $rankings->pluck('student_id')->search($studentId->id) + 1;
 
@@ -1258,17 +1265,19 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
                 }
             }
 
-            // Determine the rank for the student in each course
             $courseRankings = Examination_result::query()
                 ->where('course_id', $result->course_id)
                 ->where('class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
                 ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
-                ->select('student_id', DB::raw('SUM(score) as total_score'))
-                ->groupBy('student_id')
-                ->orderBy('total_score', 'desc')
+                ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
+                ->select('student_id', DB::raw('SUM(score) as total_score'), 'students.first_name')
+                ->groupBy('student_id', 'students.first_name')
+                ->orderByDesc('total_score') // Pangilia kwa score kwanza
+                ->orderBy('students.first_name') // Ikiwa score zinafanana, panga kwa jina
                 ->get();
 
             $result->courseRank = $courseRankings->pluck('student_id')->search($studentId->id) + 1;
+
 
         }
 
@@ -1345,12 +1354,14 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
 
             // Determine the student's overall rank
             $rankings = Examination_result::query()
-                        ->where('class_id', $studentInfo->class_id) // Angalia wanafunzi wa darasa hili pekee
-                        ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
-                        ->select('student_id', DB::raw('SUM(score) as total_score'))
-                        ->groupBy('student_id')
-                        ->orderBy('total_score', 'desc')
-                        ->get();
+                ->where('class_id', $studentInfo->class_id) // Angalia wanafunzi wa darasa hili pekee
+                ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
+                ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na jedwali la wanafunzi
+                ->select('student_id', DB::raw('SUM(score) as total_score'), 'students.first_name')
+                ->groupBy('student_id', 'students.first_name')
+                ->orderByDesc('total_score') // Pangilia kwa score kwanza
+                ->orderBy('students.first_name') // Ikiwa score zinafanana, panga kwa jina
+                ->get();
 
             $studentRank = $rankings->search(function ($item) use ($studentInfo) {
                 return $item->student_id === $studentInfo->id;

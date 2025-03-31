@@ -489,6 +489,7 @@ class ExamController extends Controller
             ->whereDate('examination_results.exam_date', $resultDate)
             ->distinct()
             ->orderBy('examination_results.score', 'desc')
+            ->orderBy('students.first_name', 'asc')
             ->get();
 
         // Initialize grade counts
