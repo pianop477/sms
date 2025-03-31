@@ -54,6 +54,7 @@ class ResultsController extends Controller
                                     ->where('student_id', $students->id)
                                     ->where('students.parent_id', $parent->id)
                                     ->where('examination_results.school_id', $user->school_id)
+                                    ->where('examination_results.class_id', $students->class_id)
                                     ->orderBy('examination_results.exam_date', 'DESC')
                                     ->get();
 
@@ -92,6 +93,7 @@ class ResultsController extends Controller
                     ->where('student_id', $students->id)
                     ->where('examination_results.school_id', $user->school_id)
                     ->where('students.parent_id', $parent->id)
+                    ->where('examination_results.class_id', $students->class_id)
                     ->orderBy('examinations.exam_type', 'asc')
                     ->paginate(10);
 
@@ -117,6 +119,7 @@ class ResultsController extends Controller
             ->where('examination_results.school_id', $user->school_id)
             ->where('students.parent_id', $parent->id)
             ->where('examination_results.student_id', $students->id)
+            ->where('examination_results.class_id', $students->class_id)
             ->orderBy('exam_date') // Sorting ya moja kwa moja kabla ya grouping
             ->get();
 
@@ -166,6 +169,7 @@ class ResultsController extends Controller
                     )
                     ->where('examination_results.student_id', $studentId->id)
                     ->where('examination_results.exam_type_id', $exam_id[0])
+                    ->where('examination_results.class_id', $studentId->class_id)
                     ->whereDate('exam_date', Carbon::parse($date)) // Filtering by date
                     ->where('examination_results.school_id', $user->school_id)
                     ->where('students.parent_id', $parent->id)
@@ -177,12 +181,15 @@ class ResultsController extends Controller
 
         // Calculate rankings
         $rankings = Examination_result::query()
+            ->where('class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
+            ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
             ->select('student_id', DB::raw('SUM(score) as total_score'))
             ->groupBy('student_id')
             ->orderBy('total_score', 'desc')
             ->get();
 
         $studentRank = $rankings->pluck('student_id')->search($studentId->id) + 1;
+
 
         // Add grades, remarks, and individual ranks to each result
         foreach ($results as $result) {
@@ -222,15 +229,17 @@ class ResultsController extends Controller
                 }
             }
 
-            // Determine the rank for the student in each course
             $courseRankings = Examination_result::query()
                 ->where('course_id', $result->course_id)
+                ->where('class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
+                ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
                 ->select('student_id', DB::raw('SUM(score) as total_score'))
                 ->groupBy('student_id')
                 ->orderBy('total_score', 'desc')
                 ->get();
 
             $result->courseRank = $courseRankings->pluck('student_id')->search($studentId->id) + 1;
+
         }
 
         // Generate the PDF
@@ -643,9 +652,11 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
                 ->whereDate('examination_results.exam_date', $date)
                 ->get();
 
-    // Total number of students by gender
-    $totalMaleStudents = $results->where('gender', 'male')->groupBy('student_id')->count();
-    $totalFemaleStudents = $results->where('gender', 'female')->groupBy('student_id')->count();
+    // Filter students by class_id
+    $studentsByClass = $results->where('class_id', $class_id[0])->groupBy('student_id');
+
+    $totalMaleStudents = $studentsByClass->filter(fn($student) => $student->first()->gender === 'male')->count();
+    $totalFemaleStudents = $studentsByClass->filter(fn($student) => $student->first()->gender === 'female')->count();
 
     // Average score per course with grade and course name
     $averageScoresByCourse = $results->groupBy('course_id')->map(function ($courseResults) {
@@ -694,8 +705,6 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
     $studentsResults = $results->groupBy('student_id')->map(function ($studentResults) {
         $totalMarks = $studentResults->sum('score');
         $average = $studentResults->avg('score');
-
-        // Check if average score is 0 and set grade to ABS if true
         $grade = $average == 0 ? 'ABS' : $this->calculateGrade($average, $studentResults->first()->marking_style);
 
         return [
@@ -703,7 +712,6 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
             'admission_number' => $studentResults->first()->admission_number,
             'student_name' => $studentResults->first()->first_name . ' ' . $studentResults->first()->middle_name . ' ' . $studentResults->first()->last_name,
             'gender' => $studentResults->first()->gender,
-            'group' => $studentResults->first()->group,
             'courses' => $studentResults->map(function ($result) {
                 return [
                     'course_name' => $result->course_name,
@@ -711,6 +719,7 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
                     'grade' => $this->calculateGrade($result->score, $result->marking_style),
                 ];
             }),
+            'group' => $studentResults->first()->group,
             'total_marks' => $totalMarks,
             'average' => $average,
             'grade' => $grade,
@@ -719,11 +728,11 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
 
     // Sort students by total marks to determine position
     $sortedStudentsResults = $studentsResults->sortByDesc('total_marks')->values()->all();
-
-    // Add position to each student result
     foreach ($sortedStudentsResults as $index => &$studentResult) {
         $studentResult['position'] = $index + 1;
     }
+
+    $totalUniqueStudents = $studentsByClass->count();
 
     // Count grades by gender based on overall student performance
     $gradesByGender = $studentsResults->groupBy('gender')->map(function ($group) {
@@ -1200,12 +1209,15 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
 
         // Determine the student's overall rank based on their total score
         $rankings = Examination_result::query()
-                        ->select('student_id', DB::raw('SUM(score) as total_score'))
-                        ->groupBy('student_id')
-                        ->orderBy('total_score', 'desc')
-                        ->get();
+            ->where('class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
+            ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
+            ->select('student_id', DB::raw('SUM(score) as total_score'))
+            ->groupBy('student_id')
+            ->orderBy('total_score', 'desc')
+            ->get();
 
         $studentRank = $rankings->pluck('student_id')->search($studentId->id) + 1;
+
 
         // Add grades, remarks, and individual ranks to each result
         foreach ($results as $result) {
@@ -1249,12 +1261,15 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
             // Determine the rank for the student in each course
             $courseRankings = Examination_result::query()
                 ->where('course_id', $result->course_id)
+                ->where('class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
+                ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
                 ->select('student_id', DB::raw('SUM(score) as total_score'))
                 ->groupBy('student_id')
                 ->orderBy('total_score', 'desc')
                 ->get();
 
             $result->courseRank = $courseRankings->pluck('student_id')->search($studentId->id) + 1;
+
         }
 
         // Pass the calculated data to the view
@@ -1330,10 +1345,12 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
 
             // Determine the student's overall rank
             $rankings = Examination_result::query()
-                ->select('student_id', DB::raw('SUM(score) as total_score'))
-                ->groupBy('student_id')
-                ->orderBy('total_score', 'desc')
-                ->get();
+                        ->where('class_id', $studentInfo->class_id) // Angalia wanafunzi wa darasa hili pekee
+                        ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
+                        ->select('student_id', DB::raw('SUM(score) as total_score'))
+                        ->groupBy('student_id')
+                        ->orderBy('total_score', 'desc')
+                        ->get();
 
             $studentRank = $rankings->search(function ($item) use ($studentInfo) {
                 return $item->student_id === $studentInfo->id;
