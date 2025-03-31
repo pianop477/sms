@@ -386,7 +386,6 @@ class SchoolsController extends Controller
                 $sender_id = $request->sender_id;
             }
 
-            return $sender_id;
             $nextSmsService = new NextSmsService();
             $payload = [
                 'from' => $sender_id,
