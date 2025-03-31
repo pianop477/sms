@@ -88,8 +88,8 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         Route::get('{school}/Delete-school', [SchoolsController::class, 'destroy'])->name('schools.destroy');
         Route::get('Feedback', [SchoolsController::class, 'showFeedback'])->name('feedback');
         Route::get('{sms}/Delete-feedback', [SchoolsController::class, 'deletePost'])->name('delete.post');
-        Route::get('{sms}/Reply', [SchoolsController::class, 'replyFeedback'])->name('reply.post');
         Route::post('Send-reply-message', [SchoolsController::class, 'sendFeebackReply'])->name('send.reply.message');
+        Route::get('{sms}/Reply', [SchoolsController::class, 'replyFeedback'])->name('reply.post');
 
         //upprove or reject school registration ====================================================================
         Route::get('Approve-school/{school}', [SchoolsController::class, 'approveSchool'])->name('approve.school');
