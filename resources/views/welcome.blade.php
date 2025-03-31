@@ -256,7 +256,7 @@
 
   <section class="section" id="contact" style="background:rgb(159, 240, 214)">
     <div class="container">
-      <h2 class="text-center mb-4">CONTACT US</h2>
+      <h2 class="text-center mb-4">CONTACT SUPPORT</h2>
       <div class="row">
         <div class="col-md-6">
           <h4>ShuleApp - Admin</h4>
