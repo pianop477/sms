@@ -28,6 +28,9 @@
                                         <li>
                                             <a href="{{route('delete.post', ['sms' => Hashids::encode($sms->id)])}}" onclick="return confirm('Are you sure you want to delete this post?')"><i class="ti-trash text-danger"></i></a>
                                         </li>
+                                        <li>
+                                            <a href="{{route('reply.post', ['sms' => Hashids::encode($sms->id)])}}" onclick="return confirm('Are you sure you want to reply this post?')"><i class="ti-share text-success"></i></a>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>

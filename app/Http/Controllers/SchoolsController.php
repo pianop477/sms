@@ -362,4 +362,53 @@ class SchoolsController extends Controller
 
     }
 
+    public function replyFeedback($sms)
+    {
+        $id = Hashids::decode($sms);
+        $sender = message::find($id[0]);
+        $schools = school::orderBy('school_name')->get();
+        return view('Schools.reply_box', compact('sender', 'schools'));
+    }
+
+    public function sendFeebackReply (Request $request)
+    {
+        // dd($request->all());
+        try {
+            $this->validate($request, [
+                'message_content' => 'required|string|max:160',
+            ]);
+
+            $sender_id = '';
+            if($request->sender_id == NULL) {
+                $sender_id = 'SHULE APP';
+            }
+            else {
+                $sender_id = $request->sender_id;
+            }
+
+            $nextSmsService = new NextSmsService();
+            $payload = [
+                'from' => $sender_id,
+                'to' => $this->formatPhoneNumber($request->phone),
+                'text' => $request->message_content,
+                'reference' => uniqid()
+            ];
+
+            $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+
+            //delete feedback after reply;
+            $textId = $request->text_id;
+            // return $textId;
+            $sms = message::where('id', $textId)->delete();
+
+            Alert()->toast('Message sent', 'success');
+            return redirect()->route('feedback');
+
+        }
+        catch(\Exception $e) {
+            Alert()->toast($e->getMessage(), 'error');
+            return back();
+        }
+    }
+
 }
