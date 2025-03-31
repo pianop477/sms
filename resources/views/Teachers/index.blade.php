@@ -15,7 +15,7 @@
                                 <i class="fas fa-cloud-arrow-down"></i> Export
                             </button>
                             <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                <a class="dropdown-item" href="{{route('teachers.excel.export')}}" target="_blank"><i class="fas fa-file-excel"></i> Excel</a>
+                                <a class="dropdown-item" href="{{route('teachers.excel.export')}}" target=""><i class="fas fa-file-excel"></i> Excel</a>
                                 <a class="dropdown-item" href="{{route('teachers.pdf.export')}}" target="_blank"><i class="fas fa-file-pdf"></i> pdf</a>
                             </div>
                         </div>
