@@ -18,8 +18,8 @@
                 @csrf
                 <div class="form-row">
                     <div class="col-md-6 mb-3">
-                        <p class="text-capitalize">Customer Name: {{$sender->name}}</p>
-                        <p class="">{{$sender->email}}</p>
+                        <p class="text-capitalize">Sender Name: <strong>{{$sender->name}}</strong></p>
+                        <p class="">Phone: <strong>{{$sender->email}}</strong></p>
                     </div>
                     <div class="col-md-6 mb-3">
                         <input type="hidden" name="text_id" value="{{$sender->id}}">
