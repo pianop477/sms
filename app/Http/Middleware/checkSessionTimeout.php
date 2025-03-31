@@ -39,7 +39,8 @@ class checkSessionTimeout
                 $request->session()->invalidate(); // Invalidate session
                 $request->session()->regenerateToken(); // Prevent CSRF attacks
 
-                return redirect()->route('login')->with('error', 'Session expired. Please login again.');
+                Alert()->toast('Session expired. Please login again 🚫', 'error');
+                return redirect()->route('login');
             }
         }
 

@@ -39,6 +39,8 @@
                 @yield('content')
                 <button id="install-button" style="display: none;">Install App</button>
             </div>
+
+            @include('SRTDashboard.spinner')
         </div>
         <!-- main content area end -->
         <!-- footer area start-->

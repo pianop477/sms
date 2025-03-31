@@ -409,4 +409,11 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         Route::get('year/{year}/Contracts-group', [ContractController::class, 'contractByMonths'])->name('contract.by.months');
         Route::get('year/{year}/month/{month}/All-approved-contract', [ContractController::class, 'getAllApprovedContract'])->name('contract.approved.all');
     });
+
+    //logout routes
+    Route::post('Logout', function () {
+        Auth::logout();
+        Alert()->toast('Goodbyee see you back later 👋', 'success');
+        return redirect()->route('login');
+    })->name('logout');
 });
