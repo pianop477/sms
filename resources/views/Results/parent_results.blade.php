@@ -190,9 +190,9 @@
                     <p style="border-bottom: 2px solid gray;"></p>
                     <p style="text-transform:capitalize; font-weight:bold; text-align:center">B. Examination Details</p>
                     <div class="info-container exam-info">
-                        <p><strong>Examination Type:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $results->first()->exam_type }}</span></p>
+                        <p><strong>Examination Type:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ ucwords(strtoupper($results->first()->exam_type)) }}</span></p>
                         <p><strong>Exam Date:</strong> <span style="text-decoration:underline">{{ \Carbon\Carbon::parse($date)->format('d-F-Y') }}</span></p>
-                        <p><strong>Term:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{$results->first()->Exam_term}}</span></p>
+                        <p><strong>Term:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ucwords(strtoupper($results->first()->Exam_term))}}</span></p>
                     </div>
                 </div>
                 <p style="text-transform:capitalize; font-weight:bold; text-align:center">C. Student overall performance </p>
@@ -213,7 +213,7 @@
                         @foreach ($results as $index => $result)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
-                                <td style="text-align: left; text-transform: capitalize">{{ $result->course_name }}</td>
+                                <td style="text-align: left; text-transform: capitalize">{{ ucwords(strtolower($result->course_name)) }}</td>
                                 <td style="text-transform: capitalize">{{ ucwords(strtolower($result->teacher_first_name. '. ' $result->teacher_last_name[0])) }}</td>
                                 <td style="text-transform: uppercase">{{ $result->course_code }}</td>
                                 <td>{{ $result->score }}</td>
