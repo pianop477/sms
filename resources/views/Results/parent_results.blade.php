@@ -214,7 +214,7 @@
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td style="text-align: left; text-transform: capitalize">{{ ucwords(strtolower($result->course_name)) }}</td>
-                                <td style="text-transform: capitalize">{{ ucwords(strtolower($result->teacher_first_name. '. '.$result->teacher_last_name[0])) }}</td>
+                                <td style="text-transform: capitalize; text-align:left">{{ ucwords(strtolower($result->teacher_first_name. '. '.$result->teacher_last_name[0])) }}</td>
                                 <td style="text-transform: uppercase">{{ $result->course_code }}</td>
                                 <td>{{ $result->score }}</td>
                                 <td>{{ $result->grade }}</td>
