@@ -191,7 +191,7 @@
                     <p style="text-transform:capitalize; font-weight:bold; text-align:center">B. Examination Details</p>
                     <div class="info-container exam-info">
                         <p><strong>Examination Type:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $results->first()->exam_type }}</span></p>
-                        <p><strong>Exam Date:</strong> <span style="text-decoration:underline">{{ \Carbon\Carbon::parse($date)->format('d-M-Y') }}</span></p>
+                        <p><strong>Exam Date:</strong> <span style="text-decoration:underline">{{ \Carbon\Carbon::parse($date)->format('d-F-Y') }}</span></p>
                         <p><strong>Term:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{$results->first()->Exam_term}}</span></p>
                     </div>
                 </div>
@@ -214,7 +214,7 @@
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td style="text-align: left; text-transform: capitalize">{{ $result->course_name }}</td>
-                                <td style="text-transform: capitalize">{{ $result->teacher_first_name[0] }}.{{ $result->teacher_last_name }}</td>
+                                <td style="text-transform: capitalize">{{ $result->teacher_first_name }}.{{ $result->teacher_last_name[0] }}</td>
                                 <td style="text-transform: uppercase">{{ $result->course_code }}</td>
                                 <td>{{ $result->score }}</td>
                                 <td>{{ $result->grade }}</td>
