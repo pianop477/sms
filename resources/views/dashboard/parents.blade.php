@@ -166,7 +166,7 @@
                                     @foreach ($students as $student )
                                         <tr>
                                             <td class="text-uppercase">
-                                                <a href="{{route('Students.show', ['student' => Hashids::encode($student->id)])}}">{{$student->first_name. ' '.$student->middle_name.' ' .$student->last_name}}</a>
+                                                <a href="{{route('parent.show.student', ['student' => Hashids::encode($student->id)])}}">{{$student->first_name. ' '.$student->middle_name.' ' .$student->last_name}}</a>
                                             </td>
                                             <td class="text-uppercase">{{$student->class_code}} {{$student->group}}</td>
                                             <td>
