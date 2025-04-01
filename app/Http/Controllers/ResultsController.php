@@ -181,18 +181,31 @@ class ResultsController extends Controller
 
         // Calculate rankings
         $rankings = Examination_result::query()
-                ->where('examination_results.class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
-                ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
-                ->where('examination_results.exam_type_id', $exam_id[0]) // Angalia aina ya mtihani
-                ->where('examination_results.school_id', $user->school_id)
-                ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na jedwali la wanafunzi
-                ->select('student_id', DB::raw('SUM(score) as total_score'), 'students.first_name')
-                ->groupBy('student_id', 'students.first_name')
-                ->orderByDesc('total_score') // Pangilia kwa score kwanza
-                ->orderBy('students.first_name') // Ikiwa score zinafanana, panga kwa jina
-                ->get();
+                    ->where('examination_results.class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
+                    ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
+                    ->where('examination_results.exam_type_id', $exam_id[0]) // Angalia aina ya mtihani
+                    ->where('examination_results.school_id', $user->school_id)
+                    ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
+                    ->select('student_id', DB::raw('SUM(score) as total_score'))
+                    ->groupBy('student_id')
+                    ->orderByDesc('total_score') // Pangilia kwa score kwanza
+                    ->get();
 
-        $studentRank = $rankings->pluck('student_id')->search($studentId->id) + 1;
+                // Kutengeneza mfumo wa tie ranking
+                $rank = 1;
+                $previousScore = null;
+                $ranks = [];
+
+                foreach ($rankings as $key => $ranking) {
+                    if ($previousScore !== null && $ranking->total_score < $previousScore) {
+                        $rank = $key + 1;
+                    }
+                    $ranks[$ranking->student_id] = $rank;
+                    $previousScore = $ranking->total_score;
+                }
+
+                // Kupata rank ya mwanafunzi husika
+                $studentRank = $ranks[$studentId->id] ?? null;
 
 
         // Add grades, remarks, and individual ranks to each result
@@ -234,20 +247,32 @@ class ResultsController extends Controller
             }
 
             $courseRankings = Examination_result::query()
-                ->where('course_id', $result->course_id)
-                ->where('examination_results.class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
-                ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
-                ->where('examination_results.exam_type_id', $exam_id[0]) // Angalia aina ya mtihani
-                ->where('examination_results.school_id', $user->school_id)
-                ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
-                ->select('student_id', DB::raw('SUM(score) as total_score'), 'students.first_name')
-                ->groupBy('student_id', 'students.first_name')
-                ->orderByDesc('total_score') // Pangilia kwa score kwanza
-                ->orderBy('students.first_name') // Ikiwa score zinafanana, panga kwa jina
-                ->get();
+                            ->where('course_id', $result->course_id)
+                            ->where('examination_results.class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
+                            ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
+                            ->where('examination_results.exam_type_id', $exam_id[0]) // Angalia aina ya mtihani
+                            ->where('examination_results.school_id', $user->school_id)
+                            ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
+                            ->select('student_id', DB::raw('SUM(score) as total_score'))
+                            ->groupBy('student_id')
+                            ->orderByDesc('total_score') // Pangilia kwa score kwanza
+                            ->get();
 
-            $result->courseRank = $courseRankings->pluck('student_id')->search($studentId->id) + 1;
+                    // Hakikisha wanafunzi wenye score sawa wanashirikiana rank
+                $rank = 1;
+                $previousScore = null;
+                $ranks = [];
 
+                foreach ($courseRankings as $key => $ranking) {
+                    if ($previousScore !== null && $ranking->total_score < $previousScore) {
+                        $rank = $key + 1;
+                    }
+                    $ranks[$ranking->student_id] = $rank;
+                    $previousScore = $ranking->total_score;
+                }
+
+                // Kupata rank ya mwanafunzi husika
+                $result->courseRank = $ranks[$studentId->id] ?? null;
 
         }
 
@@ -910,32 +935,47 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
                 });
 
                 // Sort students by total marks in descending order
-                $studentsData = $studentsData->sortByDesc('total_marks')->values();
-                $term = $studentResults->first()->Exam_term;
+            $studentsData = $studentsData->sortByDesc('total_marks')->values();
+            $term = $studentResults->first()->Exam_term;
 
-                // Assign ranks
-                $studentsData = $studentsData->map(fn($student, $index) => tap($student, fn($s) => $s->rank = $index + 1));
+            // Assign tie ranking
+            $rank = 1;
+            $previousScore = null;
+            $studentsData = $studentsData->map(function ($student, $index) use (&$rank, &$previousScore) {
+                if ($previousScore !== null && $student->total_marks < $previousScore) {
+                    $rank = $index + 1; // Ranka inabadilika tu ikiwa total marks zinapungua
+                }
+                $student->rank = $rank; // Mwanafunzi anapewa rank yake sahihi
+                $previousScore = $student->total_marks;
+                return $student;
+            });
 
-                // School URL
-                $url = "https://shuleapp.tech";
-                $beemSmsService = new BeemSmsService();
+            // School URL
+            $url = "https://shuleapp.tech";
+            $beemSmsService = new BeemSmsService();
 
-                // Find total number of students
-                $totalStudents = $studentsData->count();
+            // Find total number of students
+            $totalStudents = $studentsData->count();
 
-                // Loop through each student and prepare the payload for each parent
-                foreach ($studentsData as $student) {
+            // Loop through each student and prepare the payload for each parent
+            foreach ($studentsData as $student) {
                 $phoneNumber = $this->formatPhoneNumber($student->phone);
                 if (!$phoneNumber) {
                     // Log::error("Invalid phone number for {$student->first_name}: {$student->phone}");
-                    return response()->json(['success' => false, 'message' => "Invalid phone number for {$student->first_name}", 'type' => 'error']);
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Invalid phone number for {$student->first_name}",
+                        'type' => 'error'
+                    ]);
                 }
 
-                $messageContent = "Matokeo ya: " . strtoupper("{$student->first_name} {$student->last_name}"). ", ";
-                $messageContent .= "Mtihani: " . strtoupper($student->exam_type) ." => " . Carbon::parse($date)->format('d/m/Y'). " ni:- ";
+                // Construct the SMS message
+                $messageContent = "Matokeo ya: " . strtoupper("{$student->first_name} {$student->last_name}") . ", ";
+                $messageContent .= "Mtihani wa: " . strtoupper($student->exam_type) . " wa Tarehe " . Carbon::parse($date)->format('d/m/Y') . " ni: ";
                 $messageContent .= strtoupper("{$student->courses}") . ". ";
-                $messageContent .= "Jumla: {$student->total_marks}, Wastani: " . number_format($student->average_marks) . ", Nafasi: {$student->rank} kati ya: {$totalStudents}. ";
-                $messageContent .= "Zaidi tembelea: $url.";
+                $messageContent .= "Jumla ya Alama: {$student->total_marks}, Wastani: " . number_format($student->average_marks) . ", Nafasi ya: {$student->rank} kati ya: {$totalStudents}. ";
+                $messageContent .= "Kuona ripoti tembelea: $url.";
+                $messageContent .= " Asante kwa kuchagua: " . strtoupper($schools->school_name);
 
                 // Prepare the recipients array
                 $recipients = [
@@ -1213,23 +1253,32 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
 
         // Fixed ranking query
         $rankings = Examination_result::query()
-                ->join('students', 'students.id', '=', 'examination_results.student_id')
-                // Explicitly specify which class_id to use (assuming you want examination_results.class_id)
-                ->where('examination_results.class_id', $class_id[0]) // Using the decoded class_id from URL
-                ->whereDate('examination_results.exam_date', Carbon::parse($date))
-                ->where('examination_results.exam_type_id', $exam_id[0])
-                ->where('examination_results.school_id', $schools->id)
-                ->select(
-                    'examination_results.student_id',
-                    DB::raw('SUM(examination_results.score) as total_score'),
-                    'students.first_name'
-                )
-                ->groupBy('examination_results.student_id', 'students.first_name')
-                ->orderByDesc('total_score')
-                ->orderBy('students.first_name')
-                ->get();
+                    ->where('examination_results.class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
+                    ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
+                    ->where('examination_results.exam_type_id', $exam_id[0]) // Angalia aina ya mtihani
+                    ->where('examination_results.school_id', $user->school_id)
+                    ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
+                    ->select('student_id', DB::raw('SUM(score) as total_score'))
+                    ->groupBy('student_id')
+                    ->orderByDesc('total_score') // Pangilia kwa score kwanza
+                    ->get();
 
-        $studentRank = $rankings->pluck('student_id')->search($studentId->id) + 1;
+        // Kutengeneza mfumo wa tie ranking
+        $rank = 1;
+        $previousScore = null;
+        $ranks = [];
+
+        foreach ($rankings as $key => $ranking) {
+            if ($previousScore !== null && $ranking->total_score < $previousScore) {
+                $rank = $key + 1;
+            }
+            $ranks[$ranking->student_id] = $rank;
+            $previousScore = $ranking->total_score;
+        }
+
+        // Kupata rank ya mwanafunzi husika
+        $studentRank = $ranks[$studentId->id] ?? null;
+
 
         // Add grades, remarks, and individual ranks to each result
         foreach ($results as $result) {
@@ -1271,20 +1320,32 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
             }
 
             $courseRankings = Examination_result::query()
-                ->where('course_id', $result->course_id)
-                ->where('examination_results.class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
-                ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
-                ->where('examination_results.exam_type_id', $exam_id[0])
-                ->where('examination_results.school_id', $schools->id)
-                ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
-                ->select('student_id', DB::raw('SUM(score) as total_score'), 'students.first_name')
-                ->groupBy('student_id', 'students.first_name')
-                ->orderByDesc('total_score') // Pangilia kwa score kwanza
-                ->orderBy('students.first_name') // Ikiwa score zinafanana, panga kwa jina
-                ->get();
+                            ->where('course_id', $result->course_id)
+                            ->where('examination_results.class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
+                            ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
+                            ->where('examination_results.exam_type_id', $exam_id[0]) // Angalia aina ya mtihani
+                            ->where('examination_results.school_id', $user->school_id)
+                            ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
+                            ->select('student_id', DB::raw('SUM(score) as total_score'))
+                            ->groupBy('student_id')
+                            ->orderByDesc('total_score') // Pangilia kwa score kwanza
+                            ->get();
 
-            $result->courseRank = $courseRankings->pluck('student_id')->search($studentId->id) + 1;
+            // Hakikisha wanafunzi wenye score sawa wanashirikiana rank
+            $rank = 1;
+            $previousScore = null;
+            $ranks = [];
 
+            foreach ($courseRankings as $key => $ranking) {
+                if ($previousScore !== null && $ranking->total_score < $previousScore) {
+                    $rank = $key + 1;
+                }
+                $ranks[$ranking->student_id] = $rank;
+                $previousScore = $ranking->total_score;
+            }
+
+            // Kupata rank ya mwanafunzi husika
+            $result->courseRank = $ranks[$studentId->id] ?? null;
 
         }
 
@@ -1361,20 +1422,31 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
 
             // Determine the student's overall rank
             $rankings = Examination_result::query()
-                ->where('examination_results.class_id', $studentInfo->class_id) // Angalia wanafunzi wa darasa hili pekee
-                ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
-                ->where('examination_results.exam_type_id', $exam_id[0])
-                ->where('examination_results.school_id', $schools->id)
-                ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na jedwali la wanafunzi
-                ->select('student_id', DB::raw('SUM(score) as total_score'), 'students.first_name')
-                ->groupBy('student_id', 'students.first_name')
-                ->orderByDesc('total_score') // Pangilia kwa score kwanza
-                ->orderBy('students.first_name') // Ikiwa score zinafanana, panga kwa jina
-                ->get();
+                            ->where('examination_results.class_id', $studentInfo->class_id) // Angalia wanafunzi wa darasa hili pekee
+                            ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
+                            ->where('examination_results.exam_type_id', $exam_id[0])
+                            ->where('examination_results.school_id', $schools->id)
+                            ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
+                            ->select('student_id', DB::raw('SUM(score) as total_score'))
+                            ->groupBy('student_id')
+                            ->orderByDesc('total_score') // Pangilia kwa score kwanza
+                            ->get();
 
-            $studentRank = $rankings->search(function ($item) use ($studentInfo) {
-                return $item->student_id === $studentInfo->id;
-            }) + 1;
+            // Kutengeneza mfumo wa tie ranking
+            $rank = 1;
+            $previousScore = null;
+            $ranks = [];
+
+            foreach ($rankings as $key => $ranking) {
+                if ($previousScore !== null && $ranking->total_score < $previousScore) {
+                    $rank = $key + 1;
+                }
+                $ranks[$ranking->student_id] = $rank;
+                $previousScore = $ranking->total_score;
+            }
+
+            // Kupata rank ya mwanafunzi husika
+            $studentRank = $ranks[$studentInfo->id] ?? null;
 
             // Prepare the message content
             $fullName = $studentInfo->first_name. ' '. $studentInfo->last_name;
@@ -1390,8 +1462,10 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
             $totalStudents = $rankings->count();
             $url = 'https://shuleapp.tech';
             $beemSmsService = new BeemSmsService();
-            $messageContent = "Matokeo ya ". strtoupper($fullName ).", Mtihani: ". strtoupper($examination)." => ". Carbon::parse($date)->format('d/m/Y'). " ni:- ". implode(', ', array_map('strtoupper', $courseScores));
-            $messageContent .= ". Jumla: $totalScore, Wastani: ". number_format($averageScore, 1) .", Nafasi: $studentRank kati ya: $totalStudents. Zaidi tembelea: $url";
+            $messageContent = "Matokeo ya ". strtoupper($fullName ).", Mtihani wa: ". strtoupper($examination)." wa Tarehe ". Carbon::parse($date)->format('d/m/Y'). " ni: ". implode(', ', array_map('strtoupper', $courseScores));
+            $messageContent .= ". Jumla ya Alama: $totalScore, Wastani: ". number_format($averageScore, 1) .", Nafasi ya: $studentRank kati ya: $totalStudents. ";
+            $messageContent .= "Kuona ripoti tembelea: $url.";
+            $messageContent .= " Asante kwa kuchagua: " . strtoupper($schools->school_name);
 
             // Output the message content (or send it via SMS)
             // return $messageContent;
