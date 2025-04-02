@@ -11,7 +11,7 @@
                     </div>
                     <div class="col-md-2">
                         <div class="col-4">
-                            <button type="button" class="btn btn-xs btn-warning" data-toggle="modal" data-target=".bd-example-modal-md"><i class="fas fa-file-import"></i> Import
+                            <button type="button" class="btn btn-xs btn-warning text-white" data-toggle="modal" data-target=".bd-example-modal-md"><i class="fas fa-file-import"></i> Import File
                             </button>
                             <div class="modal fade bd-example-modal-md">
                                 <div class="modal-dialog modal-md">
@@ -48,7 +48,7 @@
                     </div>
                     <div class="col-md-2">
                         <button type="button" class="btn btn-xs btn-info" data-toggle="modal" data-target=".bd-example-modal-lg">
-                            <i class="fas fa-user-plus"></i> New Parent
+                            <i class="fas fa-user-plus"></i> Parent Form
                         </button>
                         <div class="modal fade bd-example-modal-lg">
                             <div class="modal-dialog modal-lg">
