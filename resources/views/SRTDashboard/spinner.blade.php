@@ -6,13 +6,19 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-         // Add preloader logic
-         document.querySelectorAll("form").forEach(form => {
-             form.addEventListener("submit", function (event) {
-                 // Onyesha preloader
-                 let preloader = document.getElementById("mypreloader");
-                 preloader.style.display = "flex";
-             });
-         });
-     });
- </script>
+        document.querySelectorAll("form").forEach(form => {
+            form.addEventListener("submit", function (event) {
+                // Angalia kama form imepita validation
+                if (!form.checkValidity()) {
+                    event.preventDefault(); // Acha submission ikiwa validation haijakamilika
+                    form.reportValidity(); // Onyesha errors za validation
+                    return;
+                }
+
+                // Onyesha preloader kama validation imekamilika
+                let preloader = document.getElementById("mypreloader");
+                preloader.style.display = "flex";
+            });
+        });
+    });
+</script>
