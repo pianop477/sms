@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\PasswordResetEvent;
+use App\Imports\ParentStudentImport;
 use App\Models\Grade;
 use App\Models\Parents;
 use App\Models\school;
@@ -467,6 +468,74 @@ class ParentsController extends Controller
             // Log::error('Failed to update user information');
             Alert()->toast('Failed to update parent records', 'error');
             return back();
+        }
+    }
+
+    //import file
+    public function import(Request $request)
+    {
+        // Validate the uploaded file
+        $validated = $request->validate([
+            'file' => 'required|mimes:xlsx,csv,',
+        ]);
+
+        // Get the authenticated user (admin)
+        $user = Auth::user();
+
+        // Import the data from the file
+        $import = new ParentStudentImport();
+        $import->import($request->file('file'));
+
+        if ($import->failures()->isNotEmpty()) {
+            // Handle validation failures if any
+            return back()->withErrors($import->failures());
+        }
+
+        // Send SMS to all parents
+        $this->sendSmsToParents($user->school_id);
+
+        Alert()->toast('Import completed successfully!', 'success');
+        return redirect()->back();
+    }
+
+    private function sendSmsToParents($schoolId)
+    {
+        $parents = Parents::where('school_id', $schoolId)->get();
+        $school = $user = Auth::user();
+        $url = "https://shuleapp.tech";
+
+        foreach ($parents as $parent) {
+            // Fetch user linked to the parent
+            $users = User::find($parent->user_id);
+
+            $nextSmsService = new NextSmsService();
+            $senderId = $school->sender_id ?? "SHULE APP";
+            $message = "Welcome to ShuleApp, Your Login details are: ";
+            $message .= " Username: {$users->phone}";
+            $message .= " Password: shule2025."; // Default password
+            $message .= " Visit {$url} to Login";
+
+            $reference = uniqid();
+            $formattedPhone = $this->formatPhoneNumber($users->phone);
+
+            $payload = [
+                'from' => $senderId,
+                'to' => $formattedPhone,
+                'text' => $message,
+                'reference' => $reference
+            ];
+
+            // Send SMS
+            $beemSmsService = new BeemSmsService();
+            $Code_id = 1;
+            $recipients = [
+                [
+                    'recipient_id' => 1,
+                    'dest_addr' => $formattedPhone, // Use validated phone number
+                ],
+            ];
+
+            $response = $beemSmsService->sendSms($senderId, $message, $recipients);
         }
     }
 }
