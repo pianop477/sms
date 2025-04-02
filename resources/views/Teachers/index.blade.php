@@ -148,7 +148,7 @@
                                     <th scope="col">Gender</th>
                                     <th scope="col">role</th>
                                     <th scope="col">Phone</th>
-                                    <th scope="col">Email</th>
+                                    <th scope="col">Qualification</th>
                                     <th scope="col">Joined</th>
                                     <th scope="col">status</th>
                                     <th scope="col">Action</th>
@@ -170,7 +170,17 @@
                                             @endif
                                         </td>
                                         <td>{{$teacher->phone}}</td>
-                                        <td>{{$teacher->email}}</td>
+                                        <td>
+                                            @if ($teacher->qualification == 1)
+                                                <span class="badge bg-success text-white">Masters</span>
+                                            @elseif ($teacher->qualification == 2)
+                                                <span class="badge bg-info text-white">Degree</span>
+                                            @elseif ($teacher->qualification == 3)
+                                                <span class="badge bg-warning text-white">Diploma</span>
+                                            @elseif ($teacher->qualification == 4)
+                                                <span class="badge bg-danger text-white">Certificate</span>
+                                            @endif
+                                        </td>
                                         <td>{{$teacher->joined}}</td>
                                         <td>
                                             @if ($teacher->status ==1)
