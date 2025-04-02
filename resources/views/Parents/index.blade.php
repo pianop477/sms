@@ -6,10 +6,47 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-10">
+                    <div class="col-md-8">
                         <h4 class="header-title text-uppercase text-center">Parents list</h4>
                     </div>
-                    <div class="col-2">
+                    <div class="col-md-2">
+                        <div class="col-4">
+                            <button type="button" class="btn btn-xs btn-warning" data-toggle="modal" data-target=".bd-example-modal-md"><i class="fas fa-file-import"></i> Import
+                            </button>
+                            <div class="modal fade bd-example-modal-md">
+                                <div class="modal-dialog modal-md">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Register Parent File</h5>
+                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form class="needs-validation" novalidate="" action="{{route('import.parents.students')}}" method="POST" enctype="multipart/form-data">
+                                                @csrf
+                                                <div class="form-row">
+                                                    <div class="col-md-12 mb-3">
+                                                        <label for="validationCustom01">Upload File</label>
+                                                        <span class="text-danger">Only excel file allowed</span>
+                                                        <input type="file" required name="file" class="form-control" accept="excel" id="validationCustom01" placeholder="" value="" required="">
+                                                        @error('file')
+                                                        <div class="text-danger">
+                                                            {{$message}}
+                                                        </div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                            <button type="submit" id="saveButton" class="btn btn-success">Upload</button>
+                                        </div>
+                                    </div>
+                                </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
                         <button type="button" class="btn btn-xs btn-info" data-toggle="modal" data-target=".bd-example-modal-lg">
                             <i class="fas fa-user-plus"></i> New Parent
                         </button>

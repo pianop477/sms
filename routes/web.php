@@ -159,6 +159,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         Route::put('{parent}/Delete-permanent', [ParentsController::class, 'deleteParent'])->name('Parents.remove');
         Route::get('{parent}/Edit-parents', [ParentsController::class, 'editParent'])->name('Parents.edit');
         Route::put('{parents}/Update-parents', [ParentsController::class, 'updateParent'])->name('Parents.update');
+        Route::post('/import-parents-students', [ParentsController::class, 'import'])->name('import.parents.students');
 
         //send sms to specific class
         Route::get('Send-messages-by-class', [SmsController::class, 'smsForm'])->name('sms.form');
