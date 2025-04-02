@@ -172,13 +172,13 @@
                                         <td>{{$teacher->phone}}</td>
                                         <td>
                                             @if ($teacher->qualification == 1)
-                                                <span class="badge bg-success text-white">Masters</span>
+                                                <span class="">Masters</span>
                                             @elseif ($teacher->qualification == 2)
-                                                <span class="badge bg-info text-white">Degree</span>
+                                                <span class="">Degree</span>
                                             @elseif ($teacher->qualification == 3)
-                                                <span class="badge bg-warning text-white">Diploma</span>
+                                                <span class="">Diploma</span>
                                             @elseif ($teacher->qualification == 4)
-                                                <span class="badge bg-danger text-white">Certificate</span>
+                                                <span class="">Certificate</span>
                                             @endif
                                         </td>
                                         <td>{{$teacher->joined}}</td>
