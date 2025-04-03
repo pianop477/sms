@@ -11,13 +11,13 @@
                     </div>
                     <div class="col-md-2">
                         <div class="col-4">
-                            <button type="button" class="btn btn-xs btn-warning text-white" data-toggle="modal" data-target=".bd-example-modal-md"><i class="fas fa-file-import"></i> Import File
+                            <button type="button" class="btn btn-xs btn-secondary text-white" data-toggle="modal" data-target=".bd-example-modal-md"><i class="fas fa-file-import"></i> Import File
                             </button>
                             <div class="modal fade bd-example-modal-md">
                                 <div class="modal-dialog modal-md">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title">Register Parent File</h5>
+                                            <h5 class="modal-title">Import Parents File</h5>
                                             <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                         </div>
                                         <div class="modal-body">
@@ -29,12 +29,13 @@
                                                         <span class="text-danger">Only excel file allowed</span>
                                                         <input type="file" required name="file" class="form-control" accept="excel" id="validationCustom01" placeholder="" value="" required="">
                                                         @error('file')
-                                                        <div class="text-danger">
-                                                            {{$message}}
-                                                        </div>
+                                                            <div class="text-danger">
+                                                                {{$message}}
+                                                            </div>
                                                         @enderror
                                                     </div>
                                                 </div>
+                                                <p>Download template file here 👉 <a href="{{route('template.export')}}">Template</a></p>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
