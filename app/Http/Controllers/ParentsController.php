@@ -20,6 +20,7 @@ use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 use Vinkla\Hashids\Facades\Hashids;
 
 class ParentsController extends Controller
@@ -471,33 +472,6 @@ class ParentsController extends Controller
         }
     }
 
-    //import file
-    public function import(Request $request)
-    {
-        // Validate the uploaded file
-        $validated = $request->validate([
-            'file' => 'required|mimes:xlsx,csv,',
-        ]);
-
-        // Get the authenticated user (admin)
-        $user = Auth::user();
-
-        // Import the data from the file
-        $import = new ParentStudentImport();
-        $import->import($request->file('file'));
-
-        if ($import->failures()->isNotEmpty()) {
-            // Handle validation failures if any
-            return back()->withErrors($import->failures());
-        }
-
-        // Send SMS to all parents
-        $this->sendSmsToParents($user->school_id);
-
-        Alert()->toast('Import completed successfully!', 'success');
-        return redirect()->back();
-    }
-
     private function sendSmsToParents($schoolId)
     {
         $parents = Parents::where('school_id', $schoolId)->get();
@@ -537,5 +511,29 @@ class ParentsController extends Controller
 
             $response = $beemSmsService->sendSms($senderId, $message, $recipients);
         }
+    }
+
+    //import file
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,csv|max:2048',
+        ],
+        [
+            'file.mimes' => 'The file must be a file of type: xlsx, csv.',
+            'file.max' => 'The file may not be greater than 2MB.',
+            'file.required' => 'The field must be filled.',
+            'file.file' => 'The file must be a file.',
+        ]
+    );
+
+        Excel::import(new ParentStudentImport, $request->file('file'));
+        Alert()->toast('Records has been imported successfully', 'success');
+        return back();
+    }
+
+    public function exportFile()
+    {
+        return response()->download(storage_path('app/templates/parent_student_template.xlsx'));
     }
 }

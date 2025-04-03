@@ -160,6 +160,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         Route::get('{parent}/Edit-parents', [ParentsController::class, 'editParent'])->name('Parents.edit');
         Route::put('{parents}/Update-parents', [ParentsController::class, 'updateParent'])->name('Parents.update');
         Route::post('/import-parents-students', [ParentsController::class, 'import'])->name('import.parents.students');
+        Route::get('Export-templates', [ParentsController::class, 'exportFile'])->name('template.export');
 
         //send sms to specific class
         Route::get('Send-messages-by-class', [SmsController::class, 'smsForm'])->name('sms.form');
