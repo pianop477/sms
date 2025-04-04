@@ -57,20 +57,25 @@ class ParentStudentImport implements ToModel, WithHeadingRow
             // return back(); // Or handle error
         }
 
+        $email = !empty($row['parent_email']) ? strtolower(trim($row['parent_email'])) : null;
 
-        // Hakikisha mzazi yupo, kama hayupo, muunde
-        $user = User::firstOrCreate(
-            ['phone' => trim($row['parent_phone'])], // Simu ni unique
-            [
-                'first_name' => htmlspecialchars(ucwords(strtolower($row['parent_first_name']))),
-                'last_name' => htmlspecialchars(ucwords(strtolower($row['parent_last_name']))),
-                'email' => htmlspecialchars(strtolower(trim($row['parent_email'] ?? ''))),
-                'gender' => htmlspecialchars(strtolower($row['parent_gender'])),
-                'usertype' => 4, // Mzazi
-                'password' => Hash::make('shule2025'),
-                'school_id' => $school->id,
-            ]
-        );
+        if ($email && User::where('email', $email)->exists()) {
+            // Email ipo tayari, chukua huyo user badala ya ku-create
+            $user = User::where('email', $email)->first();
+        } else {
+            $user = User::firstOrCreate(
+                ['phone' => trim($row['parent_phone'])],
+                [
+                    'first_name' => htmlspecialchars(ucwords(strtolower($row['parent_first_name']))),
+                    'last_name' => htmlspecialchars(ucwords(strtolower($row['parent_last_name']))),
+                    'email' => $email,
+                    'gender' => htmlspecialchars(strtolower($row['parent_gender'])),
+                    'usertype' => 4,
+                    'password' => Hash::make('shule2025'),
+                    'school_id' => $school->id,
+                ]
+            );
+        }
 
         // Unda mzazi kwenye table ya parents
         $parent = Parents::firstOrCreate(
