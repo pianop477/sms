@@ -118,7 +118,7 @@ class ParentStudentImport implements ToModel, WithHeadingRow
                 'reference' => $user->id,
             ];
 
-            // $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+            $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
         }
 
         return $student;
