@@ -53,8 +53,8 @@ class ParentStudentImport implements ToModel, WithHeadingRow
         if (array_diff($excelColumns, $allowedColumns)) {
             // Log error or notify user
             Log::error('Columns mismatch detected!', ['columns' => $excelColumns]);
-            Alert()->toast('Columns mismatch detected!', 'error');
-            return back(); // Or handle error
+            // Alert()->toast('Columns mismatch detected!', 'error');
+            // return back(); // Or handle error
         }
 
 
@@ -102,18 +102,23 @@ class ParentStudentImport implements ToModel, WithHeadingRow
 
         // Tuma SMS kwa mzazi kuhusu akaunti yake
         if ($user->wasRecentlyCreated) {
+
+            $uniquePhone = $user->pluck('phone')->map(function ($phone) {
+                return $this->formatPhoneNumber($phone); // Hakikisha namba zina format sahihi
+            })->unique()->values()->all(); // Hakikisha ni array safi
+
             $phone = $this->formatPhoneNumber($row['parent_phone']);
 
             $nextSmsService = new NextSmsService();
             $link = "https://shuleapp.tech";
             $payload = [
                 'from' => $school->sender_id ?? "SHULE APP",
-                'to' => $phone,
-                'text' => "Welcome to ShuleApp, Your login credentials are: \nUsername: $phone \nPassword: shule2025 \nLogin link: $link",
+                'to' => $uniquePhone,
+                'text' => "Welcome to ShuleApp!\n\nYour login credentials are:\nUsername: $phone\nPassword: shule2025\n\nLogin here: $link",
                 'reference' => $user->id,
             ];
 
-            $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+            // $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
         }
 
         return $student;
