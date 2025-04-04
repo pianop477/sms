@@ -185,7 +185,7 @@ class RolesController extends Controller
         ];
         // dd($payload);
 
-        $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+        // $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
         Alert()->toast('Password reset successfully', 'success');
         return back();
