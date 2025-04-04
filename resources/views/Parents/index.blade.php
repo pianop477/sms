@@ -35,7 +35,7 @@
                                                         @enderror
                                                     </div>
                                                 </div>
-                                                <p>Download template file here 👉 <a href="{{route('template.export')}}">Template</a></p>
+                                                <p>Download template here 👉 <a href="{{route('template.export')}}">Template</a></p>
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>

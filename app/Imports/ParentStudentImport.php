@@ -58,23 +58,26 @@ class ParentStudentImport implements ToModel, WithHeadingRow
         }
 
         $email = !empty($row['parent_email']) ? strtolower(trim($row['parent_email'])) : null;
+        $phone = trim($row['parent_phone']);
 
         if ($email && User::where('email', $email)->exists()) {
-            // Email ipo tayari, chukua huyo user badala ya ku-create
+            // Kama email ipo, chukua user wa email hiyo
             $user = User::where('email', $email)->first();
+        } elseif (User::where('phone', $phone)->exists()) {
+            // Kama simu ipo, chukua user wa simu hiyo
+            $user = User::where('phone', $phone)->first();
         } else {
-            $user = User::firstOrCreate(
-                ['phone' => trim($row['parent_phone'])],
-                [
-                    'first_name' => htmlspecialchars(ucwords(strtolower($row['parent_first_name']))),
-                    'last_name' => htmlspecialchars(ucwords(strtolower($row['parent_last_name']))),
-                    'email' => $email,
-                    'gender' => htmlspecialchars(strtolower($row['parent_gender'])),
-                    'usertype' => 4,
-                    'password' => Hash::make('shule2025'),
-                    'school_id' => $school->id,
-                ]
-            );
+            // Hakuna email wala phone waliokuwepo, muunde mzazi mpya
+            $user = User::create([
+                'first_name' => htmlspecialchars(ucwords(strtolower($row['parent_first_name']))),
+                'last_name' => htmlspecialchars(ucwords(strtolower($row['parent_last_name']))),
+                'email' => $email,
+                'phone' => $phone,
+                'gender' => htmlspecialchars(strtolower($row['parent_gender'])),
+                'usertype' => 4, // Mzazi
+                'password' => Hash::make('shule2025'),
+                'school_id' => $school->id,
+            ]);
         }
 
         // Unda mzazi kwenye table ya parents
@@ -105,25 +108,25 @@ class ParentStudentImport implements ToModel, WithHeadingRow
             ]
         );
 
-        // Tuma SMS kwa mzazi kuhusu akaunti yake
+                // Tuma SMS kwa mzazi kuhusu akaunti yake mpya tu
         if ($user->wasRecentlyCreated) {
-
-            $uniquePhone = $user->pluck('phone')->map(function ($phone) {
-                return $this->formatPhoneNumber($phone); // Hakikisha namba zina format sahihi
-            })->unique()->values()->all(); // Hakikisha ni array safi
-
-            $phone = $this->formatPhoneNumber($row['parent_phone']);
+            $formattedPhone = $this->formatPhoneNumber($user->phone); // tumia namba halisi iliyosajiliwa
 
             $nextSmsService = new NextSmsService();
             $link = "https://shuleapp.tech";
             $payload = [
                 'from' => $school->sender_id ?? "SHULE APP",
-                'to' => $uniquePhone,
-                'text' => "Welcome to ShuleApp!\n\nYour login credentials are:\nUsername: $phone\nPassword: shule2025\n\nLogin here: $link",
+                'to' => [$formattedPhone], // iwe array
+                'text' => "Welcome to ShuleApp!\n\nYour login credentials are:\nUsername: {$user->phone}\nPassword: shule2025\n\nLogin here: $link",
                 'reference' => $user->id,
             ];
 
-            $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+            $response = $nextSmsService->sendSmsByNext(
+                $payload['from'],
+                $payload['to'],
+                $payload['text'],
+                $payload['reference']
+            );
         }
 
         return $student;
