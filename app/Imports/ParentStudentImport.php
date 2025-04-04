@@ -7,7 +7,7 @@ use App\Models\Parents;
 use App\Models\Student;
 use App\Models\Grade;
 use App\Models\Transport;
-use App\Models\School;
+use App\Models\school;
 use App\Services\NextSmsService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
@@ -23,7 +23,7 @@ class ParentStudentImport implements ToModel, WithHeadingRow
     public function model(array $row)
     {
         $user = Auth::user();
-        $school = School::findOrFail($user->school_id);
+        $school = school::findOrFail($user->school_id);
 
         // Tafuta Class ID kwa kutumia Class Name
         $class = Grade::where('class_name', $row['class_name'])
@@ -141,7 +141,7 @@ class ParentStudentImport implements ToModel, WithHeadingRow
 
     protected function getAdmissionNumber($school_id)
     {
-        $schoolData = School::findOrFail($school_id);
+        $schoolData = school::findOrFail($school_id);
         $lastStudent = Student::where('school_id', $school_id)
                             ->orderBy('id', 'desc')
                             ->first();
