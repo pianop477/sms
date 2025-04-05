@@ -40,7 +40,10 @@
                 <button id="install-button" style="display: none;">Install App</button>
             </div>
 
-            @include('SRTDashboard.spinner')
+            @if (!View::hasSection('hidePreloader'))
+                @include('SRTDashboard.spinner');
+            @endif
+
         </div>
         <!-- main content area end -->
         <!-- footer area start-->
