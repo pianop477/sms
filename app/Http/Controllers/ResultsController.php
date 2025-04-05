@@ -79,7 +79,7 @@ class ResultsController extends Controller
         $students = Student::find($decoded[0]);
 
         if(! $students ) {
-            Alert()->toast('No such student was found in the attendance', 'error');
+            Alert()->toast('No such student was found', 'error');
             return back();
         }
         $user = Auth::user();
