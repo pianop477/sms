@@ -18,6 +18,7 @@ use App\Http\Controllers\SmsController;
 use App\Http\Controllers\StudentsController;
 use App\Http\Controllers\SubjectsController;
 use App\Http\Controllers\TeachersController;
+use App\Http\Controllers\TimetableController;
 use App\Http\Controllers\TransportController;
 use App\Http\Controllers\UsersController;
 use App\Models\Attendance;
@@ -206,6 +207,14 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
             Route::get('{teacher}/Edit', [RolesController::class, 'edit'])->name('roles.edit');
             Route::put('{classTeacher}/Update-class-teacher', [RolesController::class, 'update'])->name('roles.update.class.teacher');
             Route::get('{teacher}/Delete', [RolesController::class, 'destroy'])->name('roles.destroy');
+
+            //timetable settings ********************************
+            Route::get('/timetable/settings', [TimetableController::class, 'showSettingsForm'])->name('timetable.settings');
+            Route::post('/timetable/settings', [TimetableController::class, 'storeSettings'])->name('timetable.settings.store');
+
+            Route::get('/timetable/generate', [TimetableController::class, 'showGenerator'])->name('timetable.generator');
+            Route::post('/timetable/generate', [TimetableController::class, 'generateTimetable'])->name('timetable.generate');
+            Route::get('{timetable}/timtable/delete/settings', [TimetableController::class, 'deleteTimetable'])->name('timetable.delete.settings');
         });
     });
 

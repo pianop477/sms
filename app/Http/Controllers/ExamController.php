@@ -380,17 +380,18 @@ class ExamController extends Controller
         $user = Auth::user();
         $courses = Subject::find($id[0]);
         $loggedTeacher = Teacher::where('user_id', $user->id)->first();
+
         if(! $courses) {
             Alert()->toast('No such course was found', 'error');
             return back();
         }
         // return ['data' => $courses];
         $class_course = class_learning_courses::where('course_id', $courses->id)->first();
-
-        if($class_course->teacher_id != $loggedTeacher->id) {
-            Alert()->toast('You are not authorized to view this page', 'error');
-            return back();
-        }
+        // return  ['data' => $class_course];
+        // if($class_course->teacher_id != $loggedTeacher->id) {
+        //     Alert()->toast('You are not authorized to view this page', 'error');
+        //     return back();
+        // }
         // return ['data' => $class_course];
         $results = Examination_result::query()
                     ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
