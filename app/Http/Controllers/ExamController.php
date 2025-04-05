@@ -353,15 +353,10 @@ class ExamController extends Controller
             return back();
         }
 
-        if($class_course->teacher_id != $loggedTeacher->id) {
-            Alert()->toast('You are not authorized to view this page', 'error');
-            return back();
-        }
-
         $results = Examination_result::where('course_id', $class_course->course_id)
                                         ->where('class_id', $class_course->class_id)
-                                        ->where('teacher_id', $loggedTeacher->id)
-                                        ->where('school_id', $user->school_id)
+                                        ->where('teacher_id', $class_course->teacher_id)
+                                        ->where('school_id', $class_course->school_id)
                                         ->orderBy('exam_date', 'DESC')
                                         ->get();
 
@@ -392,9 +387,9 @@ class ExamController extends Controller
                     ->select('examination_results.*', 'examinations.exam_type')
                     ->where('course_id', $class_course->course_id)
                     ->where('class_id', $class_course->class_id)
-                    ->where('teacher_id', $loggedTeacher->id)
+                    ->where('teacher_id', $class_course->teacher_id)
                     ->whereYear('exam_date', $year)
-                    ->where('examination_results.school_id', $user->school_id)
+                    ->where('examination_results.school_id', $class_course->school_id)
                     ->orderBy('examination_results.exam_date', 'DESC')
                     ->distinct()  // Ensure distinct exam types
                     ->get();
@@ -420,10 +415,10 @@ class ExamController extends Controller
         // return ['data' => $class_course];
         $results = Examination_result::where('course_id', $class_course->course_id)
                                 ->where('class_id', $class_course->class_id)
-                                ->where('teacher_id', $loggedTeacher->id)
+                                ->where('teacher_id', $class_course->teacher_id)
                                 ->whereYear('exam_date', $year)
                                 ->where('exam_type_id', $exam_id[0])
-                                ->where('school_id', $user->school_id)
+                                ->where('school_id', $class_course->school_id)
                                 ->distinct()  // Ensure distinct months
                                 ->get();
 
