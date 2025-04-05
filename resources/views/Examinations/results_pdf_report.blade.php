@@ -9,7 +9,7 @@
                     <h4 class="header-title">Examination Results for ({{ $date }})</h4>
                 </div>
                 <div class="col-2">
-                    <a href="{{ route('results.byExamType', ['course' => Hashids::encode($course_id[0]), 'year' => $year, 'examType' => Hashids::encode($exam_id[0])])}}" class="float-right">
+                    <a href="{{ route('results.byExamType', ['course' => Hashids::encode($id[0]), 'year' => $year, 'examType' => Hashids::encode($exam_id[0])])}}" class="float-right">
                         <i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i>
                     </a>
                 </div>
