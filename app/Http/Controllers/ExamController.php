@@ -387,12 +387,6 @@ class ExamController extends Controller
         }
         // return ['data' => $courses];
         $class_course = class_learning_courses::where('course_id', $courses->id)->first();
-        // return  ['data' => $class_course];
-        // if($class_course->teacher_id != $loggedTeacher->id) {
-        //     Alert()->toast('You are not authorized to view this page', 'error');
-        //     return back();
-        // }
-        // return ['data' => $class_course];
         $results = Examination_result::query()
                     ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
                     ->select('examination_results.*', 'examinations.exam_type')
@@ -423,10 +417,6 @@ class ExamController extends Controller
 
         $loggedTeacher = Teacher::where('user_id', $user->id)->first();
 
-        if($class_course->teacher_id != $loggedTeacher->id) {
-            Alert()->toast('You are not authorized to view this page', 'error');
-            return back();
-        }
         // return ['data' => $class_course];
         $results = Examination_result::where('course_id', $class_course->course_id)
                                 ->where('class_id', $class_course->class_id)
