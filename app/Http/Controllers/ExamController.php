@@ -36,10 +36,23 @@ class ExamController extends Controller
     public function prepare($id)
     {
         // abort(404)
+        $user = Auth::user();
+        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
         $decoded = Hashids::decode($id);
         // return $decoded;
-        $class_course = class_learning_courses::find($decoded[0]);
-        $savedResults = temporary_results::where('course_id', $class_course->course_id)->get();
+        $class_course = class_learning_courses::findOrFail($decoded[0]);
+
+        if($class_course->teacher_id != $loggedTeacher->id) {
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return back();
+        }
+
+        $savedResults = temporary_results::where('course_id', $class_course->course_id)
+                                        ->where('teacher_id', $class_course->teacher_id)
+                                        ->where('class_id', $class_course->class_id)
+                                        ->where('school_id', $user->school_id)
+                                        ->where('status', 'draft')
+                                        ->get();
         // return $savedResults;
         $exams = Examination::where('school_id', Auth::user()->school_id)->where('status', 1)->orderBy('exam_type')->get();
         return view('Examinations.prepare_form', ['exams' => $exams, 'class_course' => $class_course, 'saved_results' => $savedResults]);
@@ -708,7 +721,7 @@ class ExamController extends Controller
                     ]
                 );
             }
-            Alert()->toast('Results saved successfully, remember to submit before the end date.', 'success');
+            Alert()->toast('Results saved successfully, remember to submit before expiry date.', 'success');
             // return redirect()->route('score.prepare.form', Hashids::encode($courseId));
             return redirect()->route('home');
 

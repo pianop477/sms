@@ -8,9 +8,10 @@
     <style>
         .student-image {
             position: absolute;
-            top: 20%;
+            top: 1%;
             /* right: 0px; */
-            left: 80%;
+            /* left: 82%; */
+            right: 0;
             color: inherit;
         }
 
@@ -32,13 +33,6 @@
             .print-only {
                 display: block;
             }
-            .footer {
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-                border-top: 1px solid #ddd;
-                padding-top: 10px;
-            }
             thead {
                 display: table-header-group;
                 background-color: rgb(194, 191, 191); /* Adds a gray background to thead */
@@ -55,15 +49,15 @@
 
         .container {
             display: flex;
-            padding: 10px;
-            flex-direction: row;
-            flex-wrap: wrap;
+            /* padding: 10px; */
+            flex-direction: column;
+            flex-wrap: nowrap;
             /* border-bottom: 2px solid gray; */
         }
         .logo {
             position: absolute;
-            left: 0px;
-            top: 5px;
+            left: 2px;
+            top: 3%;
             color: inherit;
         }
         .header {
@@ -124,7 +118,7 @@
             width: 100%;
             border-collapse: collapse;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
     .table th {
@@ -162,8 +156,8 @@
                         <h3>united republic of tanzania</h3>
                         <h4>president office - TAMISEMI</h4>
                         <h4>{{$results->first()->school_name}}</h4>
-                        <h6>{{$results->first()->postal_address}} - {{$results->first()->postal_name}}, {{$results->first()->country}}</h6>
-                        <h6>academic progressive report</h6>
+                        <h5>{{$results->first()->postal_address}} - {{$results->first()->postal_name}}, {{$results->first()->country}}</h5>
+                        <h5>academic progress report</h5>
                     </div>
                     <div class="student-image">
                         @php
@@ -172,11 +166,11 @@
                         @endphp
 
                         @if(file_exists($imagePath) && !is_dir($imagePath))
-                            <img src="{{ $imagePath }}" alt="Student Image" style="max-width: 100px; height:100px; border-radius:50px;">
+                            <img src="{{ $imagePath }}" alt="Student Image" style="max-width: 100px; height:100px; border-radius:8px;">
                         @else
-                            <img src="{{ $defaultImagePath }}" alt="" style="max-width: 100px; border-radius:50px;">
+                            <img src="{{ $defaultImagePath }}" alt="" style="max-width: 100px; border-radius:8px;">
                         @endif
-                        <p style="font-size:10px;">Admission No: <span style="text-decoration: underline;">{{ucwords(strtoupper($results->first()->admission_number))}}</span></p>
+                        <p style="font-size:12px; text-align:center; font-style:italic;">Adm.No: <span style="text-decoration: underline;">{{ucwords(strtoupper($results->first()->admission_number))}}</span></p>
                     </div>
                 </div>
                 <div class="" style="border-bottom: 2px solid gray">
