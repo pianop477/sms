@@ -15,7 +15,7 @@
             <p class="text-danger">Click to select Examination type</p>
             <div class="list-group">
                 @foreach ($examTypes as $examType)
-                    <a href="{{ route('results.byExamType', ['course' => Hashids::encode($class_course->course_id), 'year' => $year, 'examType' => Hashids::encode($examType->first()->exam_type_id)]) }}">
+                    <a href="{{ route('results.byExamType', ['course' => Hashids::encode($class_course->id), 'year' => $year, 'examType' => Hashids::encode($examType->first()->exam_type_id)]) }}">
                         <button type="button" class="list-group-item list-group-item-action">
                             <h6 class="text-primary text-capitalize"><i class="fas fa-chevron-right"></i> {{ $examType->first()->exam_type }}</h6>
                         </button>

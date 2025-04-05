@@ -353,10 +353,15 @@ class ExamController extends Controller
             return back();
         }
 
+        if($class_course->teacher_id != $loggedTeacher->id) {
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return back();
+        }
+
         $results = Examination_result::where('course_id', $class_course->course_id)
                                         ->where('class_id', $class_course->class_id)
-                                        ->where('teacher_id', $class_course->teacher_id)
-                                        ->where('school_id', $class_course->school_id)
+                                        ->where('teacher_id', $loggedTeacher->id)
+                                        ->where('school_id', $user->school_id)
                                         ->orderBy('exam_date', 'DESC')
                                         ->get();
 
@@ -372,24 +377,31 @@ class ExamController extends Controller
     public function resultByYear($course, $year)
     {
         $id = Hashids::decode($course);
+        // return $id;
         $user = Auth::user();
-        $courses = Subject::find($id[0]);
+        $class_course = class_learning_courses::findOrFail($id[0]);
         $loggedTeacher = Teacher::where('user_id', $user->id)->first();
 
-        if(! $courses) {
+        if(! $class_course) {
             Alert()->toast('No such course was found', 'error');
             return back();
         }
-        // return ['data' => $courses];
-        $class_course = class_learning_courses::where('course_id', $courses->id)->first();
+        // return ['data' => $class_course];
+
+
+        if($class_course->teacher_id != $loggedTeacher->id) {
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return back();
+        }
+        // return ['data' => $class_course];
         $results = Examination_result::query()
                     ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
                     ->select('examination_results.*', 'examinations.exam_type')
                     ->where('course_id', $class_course->course_id)
                     ->where('class_id', $class_course->class_id)
-                    ->where('teacher_id', $class_course->teacher_id)
+                    ->where('teacher_id', $loggedTeacher->id)
                     ->whereYear('exam_date', $year)
-                    ->where('examination_results.school_id', $class_course->school_id)
+                    ->where('examination_results.school_id', $user->school_id)
                     ->orderBy('examination_results.exam_date', 'DESC')
                     ->distinct()  // Ensure distinct exam types
                     ->get();
@@ -399,26 +411,30 @@ class ExamController extends Controller
         // Group by exam type ID
         $examTypes = $results->groupBy('exam_type_id');
 
-        return view('Examinations.teacher_results_by_exam_type', compact('examTypes', 'year', 'class_course', 'course'));
+        return view('Examinations.teacher_results_by_exam_type', compact('examTypes', 'year', 'class_course'));
     }
 
 
     public function resultByExamType($course, $year, $examType)
     {
-        $course_id = Hashids::decode($course);
+        $id = Hashids::decode($course);
         $exam_id = Hashids::decode($examType);
         $user = Auth::user();
-        $class_course = class_learning_courses::where('course_id', $course_id[0])->first();
+        $class_course = class_learning_courses::findOrFail($id[0]);
 
         $loggedTeacher = Teacher::where('user_id', $user->id)->first();
 
+        if($class_course->teacher_id != $loggedTeacher->id) {
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return back();
+        }
         // return ['data' => $class_course];
         $results = Examination_result::where('course_id', $class_course->course_id)
                                 ->where('class_id', $class_course->class_id)
-                                ->where('teacher_id', $class_course->teacher_id)
+                                ->where('teacher_id', $loggedTeacher->id)
                                 ->whereYear('exam_date', $year)
                                 ->where('exam_type_id', $exam_id[0])
-                                ->where('school_id', $class_course->school_id)
+                                ->where('school_id', $user->school_id)
                                 ->distinct()  // Ensure distinct months
                                 ->get();
 
@@ -437,12 +453,11 @@ class ExamController extends Controller
 
     public function resultByMonth($course, $year, $examType, $month, $date)
     {
-        $course_id = Hashids::decode($course);
+        $id = Hashids::decode($course);
         $exam_id = Hashids::decode($examType);
-
         $user = Auth::user();
-        $subjectCourse = Subject::find($course_id[0]);
-        $class_course = class_learning_courses::where('course_id', $course_id[0])->first();
+        $class_course = class_learning_courses::findOrFail($id[0]);
+        $subjectCourse = Subject::findOrFail($class_course->course_id);
 
         $monthMap = [
             'January' => 1, 'February' => 2, 'March' => 3,
