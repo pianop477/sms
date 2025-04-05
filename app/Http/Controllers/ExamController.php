@@ -589,7 +589,7 @@ class ExamController extends Controller
         // Optionally: You can schedule a task to delete the file after a certain time (e.g., after 30 days).
         // For example, you can schedule a cron job to delete old reports or use Laravel's task scheduling for automatic deletion.
 
-        return view('Examinations.results_pdf_report', compact('pdfUrl', 'year', 'course_id', 'month', 'class_course', 'date', 'exam_id',));  // Pass the URL to the view
+        return view('Examinations.results_pdf_report', compact('pdfUrl', 'year', 'id', 'month', 'class_course', 'date', 'exam_id',));  // Pass the URL to the view
     }
 
 
