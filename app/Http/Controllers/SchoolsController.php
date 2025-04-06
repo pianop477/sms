@@ -411,4 +411,47 @@ class SchoolsController extends Controller
         }
     }
 
+    //send invoice bill through sms
+    public function sendInvoice($school)
+    {
+        $decoded = Hashids::decode($school);
+        $schools = school::find($decoded[0]);
+        $managers = User::where('school_id', $schools->id)->where('usertype', 2)->first();
+        // return $schools;
+        $students = Student::where('school_id', $schools->id)->where('status', 1)->count();
+        return view('invoice.send', compact('schools', 'managers', 'students'));
+    }
+
+    public function sendSmsInvoce (Request $request, $school, $manager)
+    {
+        try {
+            $nextSmsService = new NextSmsService();
+            $studentCount = $request->students;
+            $cost = $request->unit_cost;
+            $school_id = Hashids::decode($school);
+            $manager_id = Hashids::decode($manager);
+
+            $schoolInfo = school::findOrFail($school_id[0]);
+            $managerInfo = User::findOrFail($manager_id[0]);
+
+            $payload = [
+                'from' => 'SHULE APP',
+                'to' => $this->formatPhoneNumber($managerInfo->phone),
+                'text' => "Habari, Pokea Ankara ya malipo ya matumizi ya mfumo kuanzia ". Carbon::parse($schoolInfo->service_start_date)->format('d/m/Y'). " mpaka " .
+                            Carbon::parse($schoolInfo->service_start_date)->format('d/m/Y') . " Kiasi cha Tzs. ". number_format($studentCount * $cost) . ", Asante kwa kuchagua ShuleApp",
+                'reference' => uniqid()
+            ];
+            // return $payload['text'];
+
+            $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+
+            Alert()->toast('Invoice Bill sent successfully', 'success');
+            return redirect()->route('admin.generate.invoice', ['school' => Hashids::encode($school_id[0])]);
+        }
+        catch(\Exception $e) {
+            Alert()->toast($e->getMessage(), 'error');
+            return back();
+        }
+    }
+
 }

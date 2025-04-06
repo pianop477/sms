@@ -9,7 +9,7 @@
                             <div class="row">
                                 <div class="iv-left col-2">
                                     <h2>INVOICE</h2>
-                                    <img src="{{asset('assets/img/logo/logo.png')}}" alt="" class="profile-img border-radius-lg shadow-sm" style="width: 70px; object-fit:cover; border-radius:50px;">
+                                    <img src="{{asset('assets/img/logo/logo.png')}}" alt="" class="profile-img border-radius-lg shadow-sm" style="width: 80px; object-fit:cover; border-radius:50px;">
                                     {{-- <p class="text-center font-weight-bold">ShuleApp</p> --}}
                                 </div>
                                 <div class="iv-right col-10 text-right">
@@ -103,8 +103,8 @@
                         <hr>
                     </div>
                     <div class="text-right">
-                        <a href="#" class="btn btn-primary no-print" onclick="scrollToTopAndPrint(); return false;">Print Invoice</a>
-                        <a href="" class="btn btn-success no-print">Send Invoice</a>
+                        <a href="#" class="btn btn-primary no-print" onclick="scrollToTopAndPrint(); return false;">Print Bill</a>
+                        <a href="{{route('admin.send.invoice', ['school' => Hashids::encode($schools->id)])}}" class="btn btn-success no-print">Send Bill</a>
                     </div>
                 </div>
             </div>
