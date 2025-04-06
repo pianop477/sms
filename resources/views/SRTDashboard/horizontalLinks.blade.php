@@ -59,7 +59,7 @@
                                     <li>
                                         <a href="{{route('attendance.fill.form')}}"><i class="fas fa-calendar-check"></i><span> Attendance</span></a>
                                     </li>
-                                    <li><a href="{{route('timetable.settings')}}"><i class="fas fa-file-circle-check"></i> Timetable</a></li>
+                                    <li><a href="{{route('under.construction.page')}}"><i class="fas fa-file-circle-check"></i> Timetable</a></li>
                                     <li><a href="{{route('graduate.students')}}"><i class="fas fa-graduation-cap"></i> Graduate Students</a></li>
                                 </ul>
                             </li>

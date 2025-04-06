@@ -254,7 +254,7 @@ class ExamController extends Controller
         // abort(404);
         $request->validate([
             'name' => 'required|string|max:255',
-            'abbreviation' => 'required|string|max:4'
+            'abbreviation' => 'required|string|max:8'
         ]);
 
         $existingRecords = Examination::where('exam_type', '=', $request->name)->where('symbolic_abbr', $request->abbreviation)->where('school_id', '='. Auth::user()->school_id)->exists();

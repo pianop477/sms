@@ -42,7 +42,7 @@ class TimetableController extends Controller
             ])
         );
 
-        Alert()->toast('settings saved!', 'success');
+        Alert()->toast('Configuration settings saved successfully!', 'success');
         return back();
     }
 
