@@ -214,7 +214,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
 
             Route::get('/timetable/generate', [TimetableController::class, 'showGenerator'])->name('timetable.generator');
             Route::post('/timetable/generate', [TimetableController::class, 'generateTimetable'])->name('timetable.generate');
-            Route::get('{timetable}/timtable/delete/settings', [TimetableController::class, 'deleteTimetable'])->name('timetable.delete.settings');
+            Route::delete('{timetable}/timtable/delete/settings', [TimetableController::class, 'deleteTimetable'])->name('timetable.delete.settings');
         });
     });
 

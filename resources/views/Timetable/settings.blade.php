@@ -1,5 +1,4 @@
 @extends('SRTDashboard.frame')
-
 @section('content')
 <div class="row">
    <!-- table primary start -->
@@ -142,7 +141,7 @@
                             @foreach ($timetableSettings as $row )
                                 <tr>
                                     <td>{{$row->period_duration}} Minutes</td>
-                                    <td class="text-capitalize">Every day {{\Carbon\Carbon::parse($row->day_start_time)->format('H:i')}}</td>
+                                    <td class="text-capitalize">Daily {{\Carbon\Carbon::parse($row->day_start_time)->format('H:i')}}</td>
                                     <td class="text-capitalize">{{\Carbon\Carbon::parse($row->first_break_start)->format('H:i')}}</td>
                                     <td class="text-capitalize">{{\Carbon\Carbon::parse($row->first_break_end)->format('H:i')}}</td>
                                     <td class="text-capitalize">{{\Carbon\Carbon::parse($row->second_break_start)->format('H:i')}}</td>
@@ -150,9 +149,6 @@
                                     <td class="text-capitalize">{{\Carbon\Carbon::parse($row->day_end_time)->format('H:i')}}</td>
                                     <td>
                                         <ul class="d-flex justify-content-center">
-                                            <li class="mr-3">
-                                                <a href=""><i class="ti-pencil text-secondary"></i></a>
-                                            </li>
                                             <li>
                                                 <form action="{{route('timetable.delete.settings', ['timetable' => Hashids::encode($row->id)])}}" method="POST">
                                                     @csrf
@@ -171,6 +167,10 @@
                     </table>
                 </div>
             </div>
+
+        </div>
+        <div class="col-md-12 p-4">
+            <a href="{{route('timetable.generator')}}" class="btn btn-success">Generate Timetable</a>
         </div>
     </div>
 </div>
