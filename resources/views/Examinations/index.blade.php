@@ -28,16 +28,16 @@
                                                     <label for="validationCustom01">Examination Name</label>
                                                     <input type="text" name="name" class="form-control text-uppercase" id="validationCustom01" placeholder="Enter Exam name or test" value="" required="">
                                                     @error('name')
-                                                    <div class="invalid-feedback">
+                                                    <div class="text-danger">
                                                         {{$message}}
                                                     </div>
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-6 mb-3">
-                                                    <label for="validationCustom01">Symbolic Abbreviation</label>
+                                                    <label for="validationCustom01">Symbolic code</label>
                                                     <input type="text" name="abbreviation" class="form-control text-uppercase" id="validationCustom01" placeholder="Examination Abbreviation" value="{{old('abbreviation')}}" required="">
                                                     @error('abbreviation')
-                                                    <div class="invalid-feedback">
+                                                    <div class="text-danger">
                                                         {{$message}}
                                                     </div>
                                                     @enderror
