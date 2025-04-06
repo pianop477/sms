@@ -56,7 +56,10 @@ class TimetableController extends Controller
         $schoolId = Auth::user()->school_id;
 
         $settings = school_timetable_settings::where('school_id', $schoolId)->first();
-        if (!$settings) return back()->with('error', 'Please set up timetable settings first.');
+        if (!$settings) {
+            Alert()->toast('Please set up timetable settings first!', 'error');
+            return back();
+        }
 
         $assignmentsGrouped = class_learning_courses::where('school_id', $schoolId)->get()->groupBy('class_id');
 
@@ -138,13 +141,12 @@ class TimetableController extends Controller
 
         if ($timetable) {
             $timetable->delete();
-            Alert()->toast('Timetable deleted successfully!', 'success');
+            Alert()->toast('Timetable settings deleted successfully!', 'success');
             return back();
         } else {
-            Alert()->toast('Timetable not found!', 'error');
+            Alert()->toast('Timetable settings not found!', 'error');
+            return back();
         }
-
-        return back();
     }
 }
 

@@ -41,7 +41,7 @@
             </div>
 
             @if (!View::hasSection('hidePreloader'))
-                @include('SRTDashboard.spinner');
+                @include('SRTDashboard.spinner')
             @endif
 
         </div>
