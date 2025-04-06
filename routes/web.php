@@ -83,6 +83,8 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         Route::put('{user}/Update', [ManagerController::class, 'resetPassword'])->name('admin.update.password');
         Route::get('{school}/About-school', [SchoolsController::class, 'show'])->name('schools.show');
         Route::get('{school}/Invoice', [SchoolsController::class, 'invoceCreate'])->name('admin.generate.invoice');
+        Route::get('{school}/Invoice/send', [SchoolsController::class, 'sendInvoice'])->name('admin.send.invoice');
+        Route::post('school/{school}/manager/{manager}/Invoice/send', [SchoolsController::class, 'sendSmsInvoce'])->name('send.sms.invoice');
         //edit school information ===================================================================================
         Route::get('{school}/Edit-school', [SchoolsController::class, 'edit'])->name('schools.edit');
         Route::put('{school}/Update-school', [SchoolsController::class, 'updateSchool'])->name('schools.update.school');
