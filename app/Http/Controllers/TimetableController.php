@@ -48,7 +48,7 @@ class TimetableController extends Controller
 
     public function showGenerator()
     {
-        return view('timetable.generate');
+        return view('Timetable.generate');
     }
 
     public function generateTimetable()
@@ -131,7 +131,7 @@ class TimetableController extends Controller
             ->get()
             ->groupBy('class_id');
 
-        return view('timetable.generated', compact('classTimetables', 'settings'));
+        return view('Timetable.generated', compact('classTimetables', 'settings'));
     }
 
     public function deleteTimetable ($id)
