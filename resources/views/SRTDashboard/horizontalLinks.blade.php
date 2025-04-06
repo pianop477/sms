@@ -129,6 +129,9 @@
                                     <li>
                                         <a href="{{route('Transportation.index')}}"><i class="fa fa-bus-alt"></i><span> School Bus</span></a>
                                     </li>
+                                    <li>
+                                        <a href="{{route('sms.form')}}"><i class="ti-announcement"></i><span> Announcements</span></a>
+                                    </li>
                                 </ul>
                             </li>
 
