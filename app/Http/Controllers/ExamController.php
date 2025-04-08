@@ -303,7 +303,7 @@ class ExamController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'abbreviation' => 'required|string|max:4'
+            'abbreviation' => 'required|string|max:8'
         ]);
 
         $exam = Examination::findOrFail($exams);
