@@ -613,6 +613,6 @@ class ParentsController extends Controller
 
     public function exportFile()
     {
-        return response()->download(storage_path('app/templates/parent_student_template.xlsx'));
+        return response()->download(public_path('assets/templates/parent_student_template.xlsx'));
     }
 }
