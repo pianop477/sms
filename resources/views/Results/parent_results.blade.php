@@ -20,7 +20,7 @@
             /* line-height: 2px; */
             margin: 0; /* Remove default margin */
             padding: 0; /* Remove default padding */
-            background-color: #f8f9fa;
+            background-color: #eee;
         }
         @media print {
             .no-print {

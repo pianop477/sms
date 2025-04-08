@@ -19,7 +19,7 @@
                         <input type="text" name="name" class="form-control text-uppercase" id="validationCustom01" placeholder="Enter Examination Eest" value="{{$exam->exam_type}}" required="">
                         @error('name')
                         <div class="invalid-feedback">
-                            {{$message}}
+                            <span class="text-danger">{{$message}}</span>
                         </div>
                         @enderror
                     </div>
@@ -28,7 +28,7 @@
                         <input type="text" name="abbreviation" class="form-control text-uppercase" id="validationCustom01" placeholder="Examination Abbreviation" value="{{ $exam->symbolic_abbr}}" required="">
                         @error('abbreviation')
                         <div class="invalid-feedback">
-                            {{$message}}
+                            <span class="text-danger">{{$message}}</span>
                         </div>
                         @enderror
                     </div>
