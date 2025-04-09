@@ -35,7 +35,7 @@
                             <p class="text-success">All available courses</p>
                         </div>
                         <div class="col-4">
-                            <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus"></i> New Subject
+                            <button type="button" class="btn btn-primary float-right btn-xs" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus"></i> New Subject
                             </button>
                             <div class="modal fade bd-example-modal-lg">
                                 <div class="modal-dialog modal-lg">
