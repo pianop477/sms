@@ -51,7 +51,7 @@
                                                     <div class="col-md-6 mb-3">
                                                         <input type="hidden" name="school_id" value="{{Auth::user()->school_id}}">
                                                         <label for="validationCustom01">Subject Name</label>
-                                                        <input type="text" required name="sname" class="form-control text-uppercase" id="validationCustom01" placeholder="Class Name" value="{{old('name')}}" required="">
+                                                        <input type="text" required name="sname" class="form-control text-capitalize" id="validationCustom01" placeholder="Course Name" value="{{old('name')}}" required="">
                                                         @error('sname')
                                                         <div class="text-danger">
                                                             {{$message}}
@@ -60,7 +60,7 @@
                                                     </div>
                                                     <div class="col-md-6 mb-3">
                                                         <label for="validationCustom02">Code</label>
-                                                        <input type="text" required name="scode" class="form-control text-uppercase" id="validationCustom02" placeholder="Class Code" required="" value="{{old('code')}}" required>
+                                                        <input type="text" required name="scode" class="form-control text-uppercase" id="validationCustom02" placeholder="course Code" required="" value="{{old('code')}}" required>
                                                         @error('scode')
                                                         <div class="text-danger">
                                                            {{$message}}
