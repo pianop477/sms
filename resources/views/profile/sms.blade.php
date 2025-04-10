@@ -52,7 +52,7 @@
 
                 </div>
                 <div class="col-md-12 mb-3">
-                    <button class="btn btn-success float-right" id="saveButton" type="submit">Send SMS</button>
+                    <button class="btn btn-success float-right" id="saveButton" type="submit" onclick="return confirm('Are you sure you want to send SMS?')">Send SMS</button>
                 </div>
             </form>
             <script>
