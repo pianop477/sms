@@ -20,7 +20,7 @@
             /* line-height: 2px; */
             margin: 0; /* Remove default margin */
             padding: 0; /* Remove default padding */
-            background-color: #eee;
+            background-color: white;
         }
         @media print {
             .no-print {
@@ -128,7 +128,7 @@
             }
 
     .table td {
-            background-color: #fff;
+            background-color: white;
         }
         .footer {
             position: fixed;
