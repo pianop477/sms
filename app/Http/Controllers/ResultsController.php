@@ -1412,7 +1412,7 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
             // Hakikisha kuwa kuna data kwenye $results
             if ($results->isEmpty()) {
                 // Log::error("Hakuna matokeo yaliyopatikana kwa mwanafunzi: {$studentInfo->id}");
-                Alert()->toast('No results found for the selected student or Selected results are blocked', 'error');
+                Alert()->toast('Results data set is locked 🔐', 'info');
                 return redirect()->back();
             }
 
