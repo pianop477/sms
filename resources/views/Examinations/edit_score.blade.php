@@ -108,9 +108,9 @@
                             </tbody>
                         </table>
 
-                        <div class="text-center">
+                        <div class="d-flex justify-content-center my-3">
                             <!-- Save to Draft -->
-                            <button type="submit" class="btn btn-warning" name="action" value="save" onclick="return confirm('Are you sure you want to save results to draft?')">
+                            <button type="submit" class="btn btn-warning mr-3" name="action" value="save" onclick="return confirm('Are you sure you want to save results to draft?')">
                                 <i class="fas fa-save"></i> Save as Draft
                             </button>
 
