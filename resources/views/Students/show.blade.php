@@ -123,7 +123,9 @@
                             Parent's gender: <span class="text-uppercase font-weight-bold">{{$data->user_gender[0]}}</span>
                         </button>
                         <button type="button" class="list-group-item list-group-item-action">
-                            Parent's Phone: <span class="text-uppercase font-weight-bold">{{$data->phone}}</span>
+                            Parent's Phone: <i class="fas fa-phone"></i> <span class="text-uppercase font-weight-bold">
+                                <a href="tel: {{$data->phone}}">{{$data->phone}}</a>
+                            </span>
                         </button>
                         <button type="button" class="list-group-item list-group-item-action" disabled="">
                             Street Address/Location: <span class="text-uppercase font-weight-bold">{{$data->parent_address}}</span>
