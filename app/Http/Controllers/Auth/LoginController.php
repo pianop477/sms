@@ -72,6 +72,6 @@ class LoginController extends Controller
             return redirect()->intended($this->redirectPath());
         }
 
-        return back()->with('error', 'Invalid credentials');
+        return redirect()->back()->with('error', 'Invalid credentials');
     }
 }
