@@ -110,7 +110,6 @@
                             </div>
                            </div>
                         </div>
-                        <p>{{$saved_results->first()->exam_term}}</p>
                         <div class="col-6">
                             <button class="btn btn-primary float-right" id="saveButton" type="submit">
                                 Next Step <i class="ti-arrow-right"></i>
