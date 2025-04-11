@@ -278,7 +278,7 @@
                             <td style="text-align:center; text-transform:uppercase">
                                 {{ $studentResult['grade'] === 'ABS' ? 'ABS' : $studentResult['grade'] }}
                             </td>
-                            <td style="text-align:center">{{ $studentResult->position }}</td>
+                            <td style="text-align:center">{{ $studentResult['position'] }}</td>
                         </tr>
                         @endforeach
                     </tbody>
