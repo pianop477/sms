@@ -761,7 +761,7 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
     });
 
     // Sort students by total marks to determine position
-    $sortedStudentsResults = $studentsResults->sortByDesc('total_marks')->values();
+    $sortedStudentsResults = $studentsResults->sortByDesc('total_marks')->values()->all();
 
     $lastTotal = null;
     $position = 0;
