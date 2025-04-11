@@ -34,7 +34,7 @@ class checkSessionTimeout
             $sessionDuration = now()->diffInMinutes($sessionStartTime);
 
             // If session duration exceeds 2 minutes, log out user and invalidate session
-            if ($sessionDuration >= 60) {
+            if ($sessionDuration >= 120) {
                 Auth::logout(); // Logout user
                 $request->session()->invalidate(); // Invalidate session
                 $request->session()->regenerateToken(); // Prevent CSRF attacks
