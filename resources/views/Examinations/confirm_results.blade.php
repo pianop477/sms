@@ -12,14 +12,14 @@
                 @if(isset($saved_results))
                 <form action="{{ route('results.edit.draft') }}" method="POST" class="needs-validation" novalidate>
                     @csrf
-                    <input type="hidden" name="course_id" value="{{ $saved_results['courseId'] ?? $courseId }}">
-                    <input type="hidden" name="class_id" value="{{ $saved_results['classId'] ?? $classId }}">
-                    <input type="hidden" name="teacher_id" value="{{ $saved_results['teacherId'] ?? $teacherId }}">
-                    <input type="hidden" name="school_id" value="{{ $saved_results['schoolId'] ?? $schoolId }}">
-                    <input type="hidden" name="exam_type_id" value="{{ $saved_results['examTypeId'] ?? $examTypeId }}">
-                    <input type="hidden" name="exam_date" value="{{ $saved_results['examDate'] ?? $examDate }}">
-                    <input type="hidden" name="term" value="{{ $saved_results['term'] ?? $term }}">
-                    <input type="hidden" name="marking_style" value="{{ $saved_results['marking_style'] ?? $marking_style }}">
+                    <input type="hidden" name="course_id" value="{{ $saved_results['courseId']}}">
+                    <input type="hidden" name="class_id" value="{{ $saved_results['classId']}}">
+                    <input type="hidden" name="teacher_id" value="{{ $saved_results['teacherId'] }}">
+                    <input type="hidden" name="school_id" value="{{ $saved_results['schoolId'] }}">
+                    <input type="hidden" name="exam_type_id" value="{{ $saved_results['examTypeId'] }}">
+                    <input type="hidden" name="exam_date" value="{{ $saved_results['examDate'] }}">
+                    <input type="text" name="term" value="{{ $saved_results['term']}}">
+                    <input type="hidden" name="marking_style" value="{{ $saved_results['marking_style'] }}">
 
                     <button type="submit" class="btn btn-success" id="saveButton">Yes, Proceed</button>
                     <a href="{{route('score.prepare.form', ['id' => Hashids::encode($saved_results['courseId'] ?? $courseId)])}}" class="btn btn-danger">No, Cancel</a>

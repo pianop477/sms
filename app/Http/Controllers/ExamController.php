@@ -819,7 +819,7 @@ class ExamController extends Controller
 
         // Return the view with decoded IDs
         return view('Examinations.confirm_results',
-                    compact('courseId', 'examTypeId', 'examDate', 'term', 'marking_style', 'examName',
+                    compact('courseId', 'examTypeId', 'examDate', 'marking_style', 'examName',
                     'classId', 'teacherId', 'schoolId', 'courseName', 'className', 'students', 'saved_results'));
     }
 
