@@ -93,34 +93,13 @@ class ExamController extends Controller
         // Angalia kama mwalimu huyu bado ana matokeo ya muda kwenye database
         $existingSavedResults = temporary_results::where('course_id', $courseId)
                                                 ->where('teacher_id', $teacherId)
+                                                ->where('class_id', $classId)
                                                 ->where('school_id', $schoolId)
-                                                ->where('exam_type_id', $examTypeId)
                                                 ->exists();
 
         if ($existingSavedResults) {
-            // Ikiwa tayari kuna matokeo ambayo hayajahakikiwa, rudisha mtumiaji kwenye ukurasa wa uthibitisho
-            $results = temporary_results::where('course_id', $courseId)
-                                    ->where('teacher_id', $teacherId)
-                                    ->where('exam_type_id', $examTypeId)
-                                    ->get();
-            // dd($results->first()->exam_date);
-            return view('Examinations.confirm_results', [
-                'saved_results' => [
-                    'courseId' => $courseId,
-                    'classId' => $classId,
-                    'teacherId' => $teacherId,
-                    'schoolId' => $schoolId,
-                    'examTypeId' => $examTypeId,
-                    'examDate' => Carbon::parse($results->first()->exam_date)->format('Y-m-d'),
-                    'term' => $term,
-                    'students' => $students,
-                    'className' => $className,
-                    'courseName' => $courseName,
-                    'examName' => $examName,
-                    'marking_style' => $markingStyle,
-                    'results' => $results
-                ]
-            ]);
+            Alert()->toast('You have pending results, please submit or delete first', 'error');
+            return to_route('score.prepare.form', Hashids::encode($courseId));
         }
 
         // Hakuna matokeo ya muda, waruhusu waingize matokeo mapya
@@ -199,7 +178,7 @@ class ExamController extends Controller
             }
 
             Alert::toast('Examination results have been saved to the draft', 'success');
-            return redirect()->route('home');
+            return to_route('score.prepare.form', Hashids::encode($request->course_id));
             // return redirect()->route('score.prepare.form', Hashids::encode($request->course_id));
         }
 
@@ -730,7 +709,7 @@ class ExamController extends Controller
             }
             Alert()->toast('Results saved successfully, remember to submit before expiry date.', 'success');
             // return redirect()->route('score.prepare.form', Hashids::encode($courseId));
-            return redirect()->route('home');
+            return to_route('score.prepare.form', Hashids::encode($courseId));
 
         } elseif ($action === 'submit') {
             // CHECK IF RESULTS ALREADY EXIST IN EXAMINATION_RESULT TABLE
