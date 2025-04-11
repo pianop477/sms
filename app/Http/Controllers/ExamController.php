@@ -499,9 +499,23 @@ class ExamController extends Controller
         // Calculate grades, positions, and average score
         $totalScore = 0;
         $totalRecords = $results->count();
-        $position = 1;
+
+        // Sort results by score descending
+        $results = $results->sortByDesc('score')->values();
+
+        $lastScore = null;
+        $position = 0;
+        $counter = 0;
 
         foreach ($results as $result) {
+            $counter++;
+
+            // Determine position with tie logic
+            if ($result->score !== $lastScore) {
+                $position = $counter;
+                $lastScore = $result->score;
+            }
+
             if ($result->marking_style == 1) {
                 if ($result->score >= 40.5) {
                     $result->grade = 'A';
@@ -543,8 +557,11 @@ class ExamController extends Controller
                     // $gradeCounts['E']++;
                 }
             }
+
+            // Assign position
+            $result->position = $position;
+            // Sum total score
             $totalScore += $result->score;
-            $result->position = $position++;
         }
 
         $averageScore = $totalRecords > 0 ? $totalScore / $totalRecords : 0;
