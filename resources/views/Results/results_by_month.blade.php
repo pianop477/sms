@@ -191,15 +191,15 @@
                     <h5 style="font-weight:normal">TERM: {{$results->first()->Exam_term}}</h5>
                     <h5 style="font-weight:normal">NUMBER OF CANDIDATES: {{$totalUniqueStudents}}</h5>
                     <h5 style="font-weight:normal">CLASS AVERAGE: <strong>{{number_format($sumOfCourseAverages, 4)}}</strong>
-                            @if ($generalClassAvg >= 41 && $generalClassAvg <=  50 || $generalClassAvg >= 81 && $generalClassAvg <= 100)
+                            @if ($generalClassAvg >= 40.5 || $generalClassAvg >= 80.5)
                                     <span style="background:rgb(117, 244, 48); padding:2px 10px ">GRADE A (EXCELLENT)</span>
-                                @elseif ($generalClassAvg >= 31 && $generalClassAvg <=  40 || $generalClassAvg >= 61 && $generalClassAvg <= 80)
+                                @elseif ($generalClassAvg >= 30.5 || $generalClassAvg >= 60.5)
                                     <span style="background:rgb(12, 211, 184); padding:2px 10px ">GRADE B (GOOD)</span>
-                                @elseif ($generalClassAvg >= 21 && $generalClassAvg <=  30 || $generalClassAvg >= 41 && $generalClassAvg <= 60)
+                                @elseif ($generalClassAvg >= 20.5 || $generalClassAvg >= 40.5)
                                     <span style="background:rgb(237, 220, 113); padding:2px 10px ">GRADE C (PASS)</span>
-                                @elseif ($generalClassAvg >= 11 && $generalClassAvg <=  20 || $generalClassAvg >= 21 && $generalClassAvg <= 40)
+                                @elseif ($generalClassAvg >= 10.5 || $generalClassAvg >= 20.5)
                                     <span style="background:rgb(182, 176, 176); padding:2px 10px "> GRADE D (POOR)</span>
-                                @else
+                                @elseif($generalClassAvg <= 10.4 || $generalClassAvg <= 20.4)
                                     <span style="background:rgb(235, 75, 75); padding:2px 10px ">GRADE E (FAIL)</span>
                             @endif
                     </h5>
@@ -278,7 +278,7 @@
                             <td style="text-align:center; text-transform:uppercase">
                                 {{ $studentResult['grade'] === 'ABS' ? 'ABS' : $studentResult['grade'] }}
                             </td>
-                            <td style="text-align:center">{{ $studentResult['position'] }}</td>
+                            <td style="text-align:center">{{ $studentResult->position }}</td>
                         </tr>
                         @endforeach
                     </tbody>
