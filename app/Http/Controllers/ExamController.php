@@ -707,7 +707,7 @@ class ExamController extends Controller
         $markingStyle = $request->marking_style;
         $scores = $request->scores;
         $action = $request->input('action');
-        return $examTerm;
+        // return $examTerm;
         if ($action === 'save') {
             // SAVE TO DRAFT
             foreach ($scores as $studentId => $score) {
@@ -722,7 +722,7 @@ class ExamController extends Controller
                         'class_id' => $classId,
                         'school_id' => $schoolId,
                         'exam_date' => $examDate,
-                        'term' => $examTerm,
+                        'exam_term' => $examTerm,
                         'score' => $score,
                         'marking_style' => $markingStyle
                     ]
