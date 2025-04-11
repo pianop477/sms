@@ -193,11 +193,11 @@
                     <h5 style="font-weight:normal">CLASS AVERAGE: <strong>{{number_format($sumOfCourseAverages, 4)}}</strong>
                             @if ($generalClassAvg >= 41 && $generalClassAvg <=  50 || $generalClassAvg >= 81 && $generalClassAvg <= 100)
                                     <span style="background:rgb(117, 244, 48); padding:2px 10px ">GRADE A (EXCELLENT)</span>
-                                @elseif ($generalClassAvg >= 31 && $generalClassAvg >=  40 || $generalClassAvg >= 61 && $generalClassAvg <= 80)
+                                @elseif ($generalClassAvg >= 31 && $generalClassAvg <=  40 || $generalClassAvg >= 61 && $generalClassAvg <= 80)
                                     <span style="background:rgb(12, 211, 184); padding:2px 10px ">GRADE B (GOOD)</span>
-                                @elseif ($generalClassAvg >= 21 && $generalClassAvg >=  30 || $generalClassAvg >= 41 && $generalClassAvg <= 60)
+                                @elseif ($generalClassAvg >= 21 && $generalClassAvg <=  30 || $generalClassAvg >= 41 && $generalClassAvg <= 60)
                                     <span style="background:rgb(237, 220, 113); padding:2px 10px ">GRADE C (PASS)</span>
-                                @elseif ($generalClassAvg >= 11 && $generalClassAvg >=  20 || $generalClassAvg >= 21 && $generalClassAvg <= 40)
+                                @elseif ($generalClassAvg >= 11 && $generalClassAvg <=  20 || $generalClassAvg >= 21 && $generalClassAvg <= 40)
                                     <span style="background:rgb(182, 176, 176); padding:2px 10px "> GRADE D (POOR)</span>
                                 @else
                                     <span style="background:rgb(235, 75, 75); padding:2px 10px ">GRADE E (FAIL)</span>
