@@ -96,7 +96,7 @@
                                     @endphp
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
-                                        <td class="text-capitalize">{{ ucwords(strtolower($student->first_name. ' '. $student->middle_name.' '. $student->last_name)) }}</td>
+                                        <td class="text-capitalize">{{ ucwords(strtolower($student->first_name))}} {{ucwords(strtolower($student->middle_name))}}{{ucwords(strtolower($student->last_name)) }}</td>
                                         <td>
                                             <input type="number" style="width: auto;" name="scores[{{ $student->id }}]" class="form-control score-input" value="{{ $score }}" min="0" max="100">
                                         </td>
