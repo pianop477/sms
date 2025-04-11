@@ -649,14 +649,21 @@ class ExamController extends Controller
         $schoolId = $request->school_id;
         $examTypeId = $request->exam_type_id;
         $examDate = $request->exam_date;
-        $term = $request->term;
+        $examTerm = $request->term;
+
         $markingStyle = $request->marking_style;
 
         // Pata matokeo yaliyohifadhiwa kwenye draft
         $draftResults = temporary_results::where('course_id', $courseId)
                                        ->where('teacher_id', $teacherId)
                                        ->where('exam_type_id', $examTypeId)
+                                       ->where('class_id', $classId)
+                                        ->where('exam_date', $examDate)
+                                        ->where('school_id', $schoolId)
+                                        ->where('marking_style', $markingStyle)
+                                        // ->where('exam_term', $examTerm)
                                        ->get();
+        // return $draftResults;
 
         // Pata wanafunzi wa darasa hili
         $students = Student::where('class_id', $classId)
@@ -678,7 +685,7 @@ class ExamController extends Controller
             'schoolId' => $schoolId,
             'examTypeId' => $examTypeId,
             'examDate' => $examDate,
-            'term' => $term,
+            'term' => $examTerm,
             'students' => $students,
             'className' => $className,
             'courseName' => $courseName,
@@ -696,7 +703,7 @@ class ExamController extends Controller
         $schoolId = $request->school_id;
         $examTypeId = $request->exam_type_id;
         $examDate = $request->exam_date;
-        $term = $request->term;
+        $examTerm = $request->term;
         $markingStyle = $request->marking_style;
         $scores = $request->scores;
         $action = $request->input('action');
@@ -715,7 +722,7 @@ class ExamController extends Controller
                         'class_id' => $classId,
                         'school_id' => $schoolId,
                         'exam_date' => $examDate,
-                        'term' => $term,
+                        'term' => $examTerm,
                         'score' => $score,
                         'marking_style' => $markingStyle
                     ]
@@ -743,7 +750,7 @@ class ExamController extends Controller
             }
 
             // SUBMIT FINAL RESULTS & DELETE FROM DRAFT
-            DB::transaction(function () use ($scores, $courseId, $classId, $teacherId, $examTypeId, $examDate, $term, $schoolId, $markingStyle) {
+            DB::transaction(function () use ($scores, $courseId, $classId, $teacherId, $examTypeId, $examDate, $examTerm, $schoolId, $markingStyle) {
                 foreach ($scores as $studentId => $score) {
                     Examination_result::create([
                         'student_id' => $studentId,
@@ -753,7 +760,7 @@ class ExamController extends Controller
                         'class_id' => $classId,
                         'school_id' => $schoolId,
                         'exam_date' => $examDate,
-                        'Exam_term' => $term,
+                        'Exam_term' => $examTerm,
                         'score' => $score,
                         'marking_style' => $markingStyle
                     ]);

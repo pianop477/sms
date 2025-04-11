@@ -28,7 +28,7 @@
                         <input type="hidden" name="school_id" value="{{ $schoolId }}">
                         <input type="hidden" name="exam_type_id" value="{{ $examTypeId }}">
                         <input type="hidden" name="exam_date" value="{{ \Carbon\Carbon::parse($examDate)->format('Y-m-d') }}">
-                        <input type="hidden" name="term" value="{{ $term }}">
+                        <input type="hidden" name="term" value="{{ $draftResults->first()->exam_term }}">
                         <input type="hidden" name="marking_style" value="{{ $marking_style }}">
                         <p class="text-center text-danger"><i>(Enter score from 0 to {{ $marking_style == 1 ? '50' : '100' }} correctly)</i></p>
 
