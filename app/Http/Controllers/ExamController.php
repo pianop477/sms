@@ -779,7 +779,7 @@ class ExamController extends Controller
     }
 
     //pending results outside button
-    public function continuePendingResults ($course, $teacher, $school, $class,$style,$term, $type,   $date)
+    public function continuePendingResults ($course, $teacher, $school, $class, $style, $term, $type,   $date)
     {
         // Decode the Hashids and get the first element of the returned array
         $courseId = Hashids::decode($course)[0];  // Get the first element
@@ -788,6 +788,9 @@ class ExamController extends Controller
         $schoolId = Hashids::decode($school)[0];  // Get the first element
         $examTypeId = $type;
         $marking_style = $style;
+        $exam_term = $term;
+        $exam_date = Carbon::parse($date)->format('Y-m-d');
+        // return $exam_date;
         $examDate = Carbon::parse($date)->format('Y-m-d');
 
 
@@ -807,6 +810,11 @@ class ExamController extends Controller
         $saved_results = temporary_results::where('course_id', $courseId)
                                     ->where('teacher_id', $teacherId)
                                     ->where('class_id', $classId)
+                                    ->where('exam_term', $exam_term)
+                                    ->where('school_id', $schoolId)
+                                    ->where('exam_type_id', $examTypeId)
+                                    ->where('exam_date', $examDate)
+                                    ->where('marking_style', $marking_style)
                                     ->get();
 
         // Return the view with decoded IDs
