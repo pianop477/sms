@@ -18,7 +18,7 @@
                     <input type="hidden" name="school_id" value="{{ $saved_results->first()->school_id}}">
                     <input type="hidden" name="exam_type_id" value="{{ $saved_results->first()->exam_type_id}}">
                     <input type="hidden" name="exam_date" value="{{ $saved_results->first()->exam_date}}">
-                    <input type="text" name="term" value="{{ $saved_results->first()->exam_term}}">
+                    <input type="hidden" name="term" value="{{ $saved_results->first()->exam_term}}">
                     <input type="hidden" name="marking_style" value="{{ $saved_results->first()->marking_style}}">
 
                     <button type="submit" class="btn btn-success" id="saveButton">Yes, Proceed</button>
