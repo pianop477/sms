@@ -784,6 +784,11 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
     // Count unique students
     $totalUniqueStudents = $results->pluck('student_id')->unique()->count();
 
+    //total subjects added in the results
+    $totalSubjects = $results->pluck('course_id')->unique()->count();
+
+    //class total average
+    $generalClassAvg = $sumOfCourseAverages / $totalSubjects;
     // Count grades by subject and gender (A, B, C, D, E)
     $subjectGradesByGender = $results->groupBy('course_id')->map(function ($courseResults) {
         $grades = [
@@ -814,7 +819,7 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
     $pdf = \PDF::loadView('Results.results_by_month', compact(
         'school', 'year', 'class', 'examType', 'month', 'results', 'totalMaleStudents', 'totalFemaleStudents', 'totalMaleGrades', 'totalFemaleGrades',
         'averageScoresByCourse', 'evaluationScores', 'totalAverageScore', 'date', 'sortedStudentsResults', 'sumOfCourseAverages', 'sortedCourses',
-        'totalUniqueStudents', 'subjectGradesByGender', 'courses'
+        'totalUniqueStudents', 'subjectGradesByGender', 'courses', 'generalClassAvg',
     ));
     $pdf->setOption('isHtml5ParserEnabled', true);
     $pdf->setOption('isPhpEnabled', true);
