@@ -124,7 +124,7 @@
                                 </ul>
                             </li>
                             <li>
-                                <a href="javascript:void(0)"><i class="fas fa-handshake-alt"></i><span>School Services</span></a>
+                                <a href="javascript:void(0)"><i class="fas fa-handshake-alt"></i><span>Services</span></a>
                                 <ul class="submenu">
                                     <li>
                                         <a href="{{route('Transportation.index')}}"><i class="fa fa-bus-alt"></i><span> School Bus</span></a>

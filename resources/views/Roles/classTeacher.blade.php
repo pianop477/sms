@@ -1,22 +1,60 @@
 @extends('SRTDashboard.frame')
-
 @section('content')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<!-- Pakia Select2 CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<!-- Pakia Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<style>
+    /* Override Select2 default styles to match Bootstrap form-control */
+    .select2-container .select2-selection--single {
+        height: 38px !important;  /* Ensure same height as form-control */
+        border: 1px solid #ccc !important; /* Border to match Bootstrap */
+        border-radius: 4px !important; /* Rounded corners to match Bootstrap */
+        padding: 6px 12px !important; /* Padding to match form-control */
+    }
+    .select2-container {
+    width: 100% !important; /* Ensure Select2 takes full width of the parent */
+    }
+
+    .select2-container {
+        width: 100% !important; /* Set full width for Select2 container */
+        max-width: 100% !important; /* Ensure it does not exceed container */
+    }
+
+    .select2-selection--single {
+        width: 100% !important; /* Set width of the selection box */
+    }
+    .select2-selection--single {
+        width: 100% !important; /* Ensure selection box inside Select2 also takes full width */
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #495057; /* Match the default text color */
+        line-height: 26px; /* Align text */
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 30px; /* Arrow should be aligned */
+    }
+
+</style>
 <div class="row">
     <div class="col-12 mt-5">
         <div class="card">
             <div class="card-body">
                 <div class="row">
                     <div class="col-8">
-                        <h4 class="header-title text-uppercase">Class Teacher For {{ $classes->class_name}}</h4>
+                        <h4 class="header-title text-uppercase">assigned Class Teachers: <span style="text-decoration: underline"><strong>{{ $classes->class_name}}</strong></span></h4>
                     </div>
                     <div class="col-2">
-                        <a href="{{route('Classes.index', ['class' => Hashids::encode($classes->id)])}}" class=""><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                        <a href="{{route('Classes.index', ['class' => Hashids::encode($classes->id)])}}" class="btn btn-xs btn-info float-right"><i class="fas fa-arrow-circle-left"></i> Back</a>
                     </div>
                     <div class="col-2">
-                        <button type="button" class="btn btn-link p-0" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-user-plus text-secondary" style="font-size: 2rem;"></i>
+                        <button type="button" class="btn btn-primary btn-xs p-1 float-right" data-toggle="modal" data-target=".bd-example-modal-md"><i class="fas fa-user-plus"></i> Assign
                         </button>
-                        <div class="modal fade bd-example-modal-lg">
-                            <div class="modal-dialog modal-lg">
+                        <div class="modal fade bd-example-modal-md">
+                            <div class="modal-dialog modal-md">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Assign Class Teacher</h5>
@@ -26,15 +64,15 @@
                                         <form class="needs-validation" novalidate="" action="{{route('Class.teacher.assign', ['classes' => Hashids::encode($classes->id)])}}" method="POST" enctype="multipart/form-data">
                                             @csrf
                                             <div class="form-row">
-                                                <div class="col-md-4 mb-3">
+                                                <div class="col-md-6 mb-3">
                                                     <label for="validationCustom01">Teacher's Name</label>
-                                                    <select name="teacher" id="" class="form-control text-capitalize">
+                                                    <select name="teacher" id="parentSelect" class="form-control select2 text-capitalize" required>
                                                         <option value="">-- Select Class Teacher --</option>
                                                         @if ($teachers->isEmpty())
                                                             <option value="" class="text-danger">No teachers found</option>
                                                         @else
                                                             @foreach ($teachers as $teacher)
-                                                                <option value="{{$teacher->id}}">{{$teacher->teacher_first_name. ' '. $teacher->teacher_last_name}}</option>
+                                                                <option value="{{$teacher->id}}">{{ucwords(strtolower($teacher->teacher_first_name))}} {{ucwords(strtolower($teacher->teacher_last_name))}}</option>
                                                             @endforeach
                                                         @endif
                                                     </select>
@@ -44,13 +82,13 @@
                                                     </div>
                                                     @enderror
                                                 </div>
-                                                <div class="col-md-4 mb-3">
+                                                <div class="col-md-6 mb-3">
                                                     <label for="validationCustom02">Class Group</label>
-                                                    <select name="group" id="" class="form-control text-uppercase">
+                                                    <select name="group" id="" class="form-control text-capitalize" required>
                                                         <option value="">-- Select Class Group --</option>
-                                                        <option value="A">A</option>
-                                                        <option value="B">B</option>
-                                                        <option value="C">C</option>
+                                                        <option value="A">Stream A</option>
+                                                        <option value="B">stream B</option>
+                                                        <option value="C">stream C</option>
                                                     </select>
                                                     @error('group')
                                                     <div class="text-danger">
@@ -112,6 +150,22 @@
     </div>
 </div>
 <script>
+    window.onload = function() {
+        // Hakikisha jQuery na Select2 inapatikana
+        if (typeof $.fn.select2 !== 'undefined') {
+            // Fanya initialization ya Select2
+            $('#parentSelect').select2({
+                placeholder: "Search...",
+                allowClear: true
+            }).on('select2:open', function () {
+                $('.select2-results__option').css('text-transform', 'capitalize');  // Capitalize option text
+            });
+        } else {
+            console.error("Select2 haijapakiwa!");
+        }
+    };
+
+
     document.addEventListener("DOMContentLoaded", function () {
         const form = document.querySelector(".needs-validation");
         const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
