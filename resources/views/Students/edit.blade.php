@@ -1,5 +1,44 @@
 @extends('SRTDashboard.frame')
 @section('content')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<!-- Pakia Select2 CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<!-- Pakia Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<style>
+    /* Override Select2 default styles to match Bootstrap form-control */
+.select2-container .select2-selection--single {
+        height: 38px !important;  /* Ensure same height as form-control */
+        border: 1px solid #ccc !important; /* Border to match Bootstrap */
+        border-radius: 4px !important; /* Rounded corners to match Bootstrap */
+        padding: 6px 12px !important; /* Padding to match form-control */
+    }
+    .select2-container {
+    width: 100% !important; /* Ensure Select2 takes full width of the parent */
+    }
+
+    .select2-container {
+        width: 100% !important; /* Set full width for Select2 container */
+        max-width: 100% !important; /* Ensure it does not exceed container */
+    }
+
+    .select2-selection--single {
+        width: 100% !important; /* Set width of the selection box */
+    }
+    .select2-selection--single {
+        width: 100% !important; /* Ensure selection box inside Select2 also takes full width */
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #495057; /* Match the default text color */
+        line-height: 26px; /* Align text */
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 30px; /* Arrow should be aligned */
+    }
+
+</style>
 <div class="card mt-5">
     <div class="card-body">
         <div class="row">
@@ -96,7 +135,23 @@
                 </div>
             </div>
             <div class="form-row">
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
+                    <label for="validationCustomUsername">Parent/Guardian Name</label>
+                        <select name="parent" id="parentSelect" class="form-control select2 text-capitalize" required>
+                            <option value="{{$parents->parent_id}}" selected>{{ucwords(strtolower($parents->first_name))}} {{ucwords(strtolower($parents->last_name))}}</option>
+                            @foreach ($allParents as $parent)
+                                <option value="{{$parent->parent_id}}">
+                                    {{ucwords(strtolower($parent->first_name))}} {{ucwords(strtolower($parent->last_name))}}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('parent')
+                        <div class="invalid-feedback">
+                            {{$message}}
+                        </div>
+                        @enderror
+                </div>
+                <div class="col-md-3 mb-3">
                     <label for="validationCustom01">Class</label>
                     <select name="class" id="validationCustom01" class="form-control text-uppercase" required>
                         <option value="{{$students->class_id}}">{{$students->class_name}}</option>
@@ -112,7 +167,7 @@
                     <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <label for="validationCustom01">Stream</label>
                     {{-- <input type="text" name="group" class="form-control text-capitalize" id="validationCustom01" value="{{$students->group}}"> --}}
                     <select name="group" id="validationCustom02" required class="form-control">
@@ -125,7 +180,7 @@
                     <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <label for="validationCustom01">Photo <span class="text-sm text-danger">Maximum 1MB - Blue background</span></label>
                     <input type="file" name="image" class="form-control text-capitalize" id="validationCustom01" value="{{old('image')}}">
                     @error('image')
@@ -138,6 +193,22 @@
             </div>
 
             <script>
+                window.onload = function() {
+                    // Hakikisha jQuery na Select2 inapatikana
+                    if (typeof $.fn.select2 !== 'undefined') {
+                        // Fanya initialization ya Select2
+                        $('#parentSelect').select2({
+                            placeholder: "Search Parent...",
+                            allowClear: true
+                        }).on('select2:open', function () {
+                            $('.select2-results__option').css('text-transform', 'capitalize');  // Capitalize option text
+                        });
+                    } else {
+                        console.error("Select2 haijapakiwa!");
+                    }
+                };
+
+
                 document.addEventListener("DOMContentLoaded", function () {
                     const form = document.querySelector(".needs-validation");
                     const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID

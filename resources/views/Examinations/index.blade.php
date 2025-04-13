@@ -11,10 +11,10 @@
                     </div>
                     @if (Route::has('exams.store'))
                     <div class="col-2">
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-circle-plus text-secondary" style="font-size: 2rem"></i>
+                        <button type="button" class="btn btn-primary btn-xs p-1 float-right" data-toggle="modal" data-target=".bd-example-modal-md"><i class="fas fa-circle-plus"></i> Add New
                         </button>
-                        <div class="modal fade bd-example-modal-lg">
-                            <div class="modal-dialog modal-lg">
+                        <div class="modal fade bd-example-modal-md">
+                            <div class="modal-dialog modal-md">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Register Examination or Test</h5>
@@ -26,7 +26,7 @@
                                             <div class="form-row">
                                                 <div class="col-md-6 mb-3">
                                                     <label for="validationCustom01">Examination Name</label>
-                                                    <input type="text" name="name" class="form-control text-uppercase" id="validationCustom01" placeholder="Enter Exam name or test" value="" required="">
+                                                    <input type="text" name="name" class="form-control text-capitalize" id="validationCustom01" placeholder="Exam name or test" value="" required="">
                                                     @error('name')
                                                     <div class="text-danger">
                                                         {{$message}}
@@ -34,8 +34,8 @@
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-6 mb-3">
-                                                    <label for="validationCustom01">Symbolic code</label>
-                                                    <input type="text" name="abbreviation" class="form-control text-uppercase" id="validationCustom01" placeholder="Examination Abbreviation" value="{{old('abbreviation')}}" required="">
+                                                    <label for="validationCustom01">Exam code</label>
+                                                    <input type="text" name="abbreviation" class="form-control text-capitalize" id="validationCustom01" placeholder="Exam code" value="{{old('abbreviation')}}" required="">
                                                     @error('abbreviation')
                                                     <div class="text-danger">
                                                         {{$message}}

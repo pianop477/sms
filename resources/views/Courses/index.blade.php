@@ -1,5 +1,44 @@
 @extends('SRTDashboard.frame')
 @section('content')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<!-- Pakia Select2 CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<!-- Pakia Select2 JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<style>
+    /* Override Select2 default styles to match Bootstrap form-control */
+    .select2-container .select2-selection--single {
+        height: 38px !important;  /* Ensure same height as form-control */
+        border: 1px solid #ccc !important; /* Border to match Bootstrap */
+        border-radius: 4px !important; /* Rounded corners to match Bootstrap */
+        padding: 6px 12px !important; /* Padding to match form-control */
+    }
+    .select2-container {
+    width: 100% !important; /* Ensure Select2 takes full width of the parent */
+    }
+
+    .select2-container {
+        width: 100% !important; /* Set full width for Select2 container */
+        max-width: 100% !important; /* Ensure it does not exceed container */
+    }
+
+    .select2-selection--single {
+        width: 100% !important; /* Set width of the selection box */
+    }
+    .select2-selection--single {
+        width: 100% !important; /* Ensure selection box inside Select2 also takes full width */
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #495057; /* Match the default text color */
+        line-height: 26px; /* Align text */
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 30px; /* Arrow should be aligned */
+    }
+
+</style>
 <div class="row">
     <!-- table primary start -->
     <div class="col-lg-12 mt-5">
@@ -10,7 +49,7 @@
                         @if (isset($message))
                             <h4 class="header-title">{{ $message }}</h4>
                         @else
-                            <h4 class="header-title">Courses List for <span class="text-uppercase"><strong>{{$class->class_name}}</strong></span></h4>
+                            <h4 class="header-title text-uppercase">Courses List: <span class="" style="text-decoration: underline"><strong>{{$class->class_name}}</strong></span></h4>
                         @endif
                     </div>
                     <div class="col-2">
@@ -33,13 +72,13 @@
                                                 <div class="col-md-4 mb-3">
                                                     <input type="hidden" name="school_id" value="{{Auth::user()->school_id}}">
                                                     <label for="validationCustom01">Select Subject</label>
-                                                        <select name="course_id" id="validationCustom01" class="form-control text-capitalize" required>
+                                                        <select name="course_id" id="parentSelect" class="form-control select2 select2-enhanced text-capitalize" required>
                                                             <option value="">--Select Course--</option>
                                                             @if ($courses->isEmpty())
                                                                 <option value="" class="text-danger">{{_('No courses found')}}</option>
                                                             @else
                                                                 @foreach ($courses as $course)
-                                                                    <option value="{{$course->id}}">{{$course->course_name}}</option>
+                                                                    <option value="{{$course->id}}">{{ucwords(strtolower($course->course_name))}}</option>
                                                                 @endforeach
                                                             @endif
                                                         </select>
@@ -63,7 +102,7 @@
                                                 </div>
                                                 <div class="col-md-4 mb-3">
                                                     <label for="validationCustom01">Select Teacher</label>
-                                                        <select name="teacher_id" id="validationCustom01" class="form-control text-capitalize" required>
+                                                        <select name="teacher_id" id="selectTeacher" class="form-control select2 select2-enhanced text-capitalize" required>
                                                             <option value="">--Select Teacher--</option>
                                                             @if ($teachers->isEmpty())
                                                                 <option value="" class="text-danger">{{_('No teachers found')}}</option>
@@ -171,6 +210,20 @@
     </div>
     <!-- table primary end -->
     <script>
+        window.onload = function() {
+            if (typeof $.fn.select2 !== 'undefined') {
+                // Apply Select2 to all elements with class 'select2-enhanced'
+                $('.select2-enhanced').select2({
+                    placeholder: "Search...",
+                    allowClear: true
+                }).on('select2:open', function () {
+                    $('.select2-results__option').css('text-transform', 'capitalize');
+                });
+            } else {
+                console.error("Select2 haijapakiwa!");
+            }
+        };
+
         document.addEventListener("DOMContentLoaded", function () {
             const form = document.querySelector(".needs-validation");
             const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID

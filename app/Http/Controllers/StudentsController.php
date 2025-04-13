@@ -178,7 +178,7 @@ class StudentsController extends Controller
     }
 
     /**
-     * Display the resource.
+     * Display students belongs to a certain parent.
      */
     public function showMyChildren($student)
     {
@@ -266,6 +266,7 @@ class StudentsController extends Controller
                 'fname' => 'required|string|max:255',
                 'middle' => 'required|string|max:255',
                 'lname' => 'required|string|max:255',
+                'parent' => 'integer|exists:parents,id',
                 'class' => 'required|integer|exists:grades,id',
                 'group' => 'required|in:A,B,C,D',
                 'gender' => 'required|max:255',
@@ -279,6 +280,7 @@ class StudentsController extends Controller
             $student->middle_name = $request->middle;
             $student->last_name = $request->lname;
             $student->class_id = $request->class;
+            $student->parent_id = $request->parent;
             $student->group = $request->group;
             $student->gender = $request->gender;
             $student->dob = $request->dob;
@@ -724,7 +726,6 @@ class StudentsController extends Controller
     public function modify($student)
     {
         $user = Auth::user();
-        $parent = Parents::where('user_id', $user->id)->first();
 
         $decoded = Hashids::decode($student);
 
@@ -742,9 +743,22 @@ class StudentsController extends Controller
                                     'grades.class_code', 'transports.driver_name', 'transports.bus_no')
                                     ->findOrFail($decoded[0]);
 
+        $parent = Parents::query()
+                        ->join('users', 'users.id', '=', 'parents.user_id')
+                        ->select('users.first_name', 'users.last_name', 'parents.id as parent_id')
+                        ->findOrFail($students->parent_id);
+
+        $allParents = Parents::query()
+                            ->join('users', 'users.id', '=', 'parents.user_id')
+                            ->select('users.first_name', 'users.status', 'users.last_name', 'parents.id as parent_id')
+                            ->where('users.status', 1)
+                            ->where('users.school_id', $user->school_id)
+                            ->orderBy('users.first_name')
+                            ->get();
+
         $buses = Transport::where('status', '=', 1)->where('school_id', $user->school_id)->orderBy('bus_no', 'ASC')->get();
         $classes = Grade::where('status', '=', 1)->where('school_id', $user->school_id)->orderBy('class_code')->get();
-        return view('Students.edit', ['buses' => $buses, 'students' => $students, 'classes' => $classes ]);
+        return view('Students.edit', ['buses' => $buses, 'students' => $students, 'classes' => $classes, 'parents' => $parent, 'allParents' => $allParents ]);
     }
 
     // show student list in the trash *****************************************************************
@@ -843,6 +857,26 @@ class StudentsController extends Controller
         $student->delete();
         Alert()->toast('Student has been deleted permanently', 'success');
         return back();
+    }
+
+    public function batchUpdateStream (Request $request)
+    {
+       try {
+            $request->validate([
+                'student' => 'required|array',
+                'new_stream' => 'required|string|max:10',
+            ]);
+
+            Student::whereIn('id', $request->student)
+                    ->update(['group' => $request->new_stream]);
+
+            Alert()->toast('Students stream updated successfully', 'success');
+            return back();
+       }
+       catch(Exception $e) {
+            Alert()->toast($e->getMessage(), 'error');
+            return back();
+       }
     }
 
 }

@@ -138,7 +138,7 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         Route::get('Graduate-student', [StudentsController::class, 'callGraduateStudents'])->name('graduate.students');
         Route::get('Graduate-students/year/{year}', [StudentsController::class, 'graduatedStudentByYear'])->name('graduate.student.by.year');
         Route::get('Export-graduate-students/year/{year}', [StudentsController::class, 'exportGraduateStudents'])->name('graduate.students.export');
-        Route::put('{student}/Delete-student', [StudentsController::class, 'destroy'])->name('Students.destroy');
+        Route::post('{student}/Delete-student', [StudentsController::class, 'destroy'])->name('Students.destroy');
         Route::get('Student-trash', [StudentsController::class, 'studentTrashList'])->name('students.trash');
         Route::put('{student}/Restore-trashed-students', [StudentsController::class, 'restoreTrashList'])->name('student.restored.trash');
         Route::get('{student}/Delete-student-permanent', [StudentsController::class, 'deletePerStudent'])->name('student.delete.permanent');
@@ -292,6 +292,9 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
             Route::put('{exam}/Examination-type/Unblock', [ExamController::class, 'unblockExams'])->name('exams.unblock');
             Route::get('{exam}/Examination-type/Edit', [ExamController::class, 'edit'])->name('exams.type.edit');
             Route::put('{exams}/Examination-type/Update', [ExamController::class, 'update'])->name('exams.update');
+
+            //move class stream
+            Route::post('/students/batch-update-stream', [StudentsController::class, 'batchUpdateStream'])->name('students.batchUpdateStream');
         });
     });
     //manage examination results in general schools ========================================================

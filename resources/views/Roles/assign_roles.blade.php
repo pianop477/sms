@@ -9,7 +9,7 @@
                                 <h4 class="header-title">Assign Roles</h4>
                             </div>
                             <div class="col-2">
-                                <a href="{{route('roles.updateRole')}}"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem"></i></a>
+                                <a href="{{route('roles.updateRole')}}" class="btn btn-info btn-xs float-right"><i class="fas fa-arrow-circle-left"></i> Back</a>
                             </div>
                         </div>
                         <form action="{{route('roles.assign.new', ['user' => Hashids::encode($teachers->id)])}}" class="needs-validation" novalidate="" method="POST" enctype="multipart/form-data">

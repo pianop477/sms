@@ -32,13 +32,13 @@
                                         <td class="text-capitalize">{{$user->phone}}</td>
                                         <td class="text-capitalize">
                                             @if ($user->role_id == 3)
-                                                <span class="badge bg-primary">{{$user->role_name}}</span>
+                                                <span class="badge bg-primary text-white">{{$user->role_name}}</span>
                                             @elseif ($user->role_id == 2)
-                                                <span class="badge bg-success">{{$user->role_name}}</span>
+                                                <span class="badge bg-success text-white">{{$user->role_name}}</span>
                                             @elseif ($user->role_id == 4)
                                                 <span class="badge bg-warning">{{$user->role_name}}</span>
                                             @else
-                                                <span class="badge bg-secondary">{{$user->role_name}}</span>
+                                                <span class="badge bg-secondary text-white">{{$user->role_name}}</span>
                                             @endif
                                         </td>
                                         <td>
