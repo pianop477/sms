@@ -292,9 +292,6 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
             Route::put('{exam}/Examination-type/Unblock', [ExamController::class, 'unblockExams'])->name('exams.unblock');
             Route::get('{exam}/Examination-type/Edit', [ExamController::class, 'edit'])->name('exams.type.edit');
             Route::put('{exams}/Examination-type/Update', [ExamController::class, 'update'])->name('exams.update');
-
-            //move class stream
-            Route::post('/students/batch-update-stream', [StudentsController::class, 'batchUpdateStream'])->name('students.batchUpdateStream');
         });
     });
     //manage examination results in general schools ========================================================
@@ -376,6 +373,8 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         Route::get('Delete-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/date/{date}', [ResultsController::class, 'deleteResults'])->name('delete.results');
         //export students records to PDF
         Route::get('{class}/Export-students', [StudentsController::class, 'exportPdf'])->name('export.student.pdf');
+         //move class stream
+         Route::post('/students/batch-update-stream', [StudentsController::class, 'batchUpdateStream'])->name('students.batchUpdateStream');
 
         //post compiled results to the database table
         Route::post('Submit-compiled-results/school/{school}/year/{year}/class/{class}', [ResultsController::class, 'saveCompiledResults'])->name('submit.compiled.results');
