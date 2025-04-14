@@ -67,8 +67,8 @@
                         <label for="marking_style">Marking System</label>
                         <select name="marking_style" id="marking_style" class="form-control" required>
                             <option value="">-- Select Marking System --</option>
-                            <option value="2">Percentage</option>
-                            <option value="1" selected>From 0 to 50</option>
+                            <option value="2">0 - 100</option>
+                            <option value="1" selected>0 - 50</option>
                         </select>
                         @error('marking_style')
                         <div class="invalid-feedback">{{ $message }}</div>
