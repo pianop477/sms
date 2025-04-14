@@ -317,7 +317,7 @@
                                                         <li>
                                                             <form action="{{route('Students.destroy', ['student' => Hashids::encode($student->id)])}}" method="POST">
                                                                 @csrf
-                                                                <button class="btn btn-link p-0" onclick="return confirm('Are you sure you want to delete {{strtoupper($student->first_name)}} {{strtoupper($student->middle_name)}} {{strtoupper($student->last_name)}} Permanently?')">
+                                                                <button class="btn btn-link p-0" onclick="return confirm('Are you sure you want to block {{strtoupper($student->first_name)}} {{strtoupper($student->middle_name)}} {{strtoupper($student->last_name)}}?')">
                                                                     <i class="ti-trash text-danger"></i>
                                                                 </button>
                                                             </form>
