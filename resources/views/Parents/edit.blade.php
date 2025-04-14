@@ -38,8 +38,19 @@
                 @foreach ($students as $student)
                 <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
                     <div class="p-3 border rounded shadow-sm">
-                        <p><strong>Name:</strong> <span class="text-capitalize">{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}} - {{$student->gender}}</span></p>
+                        <p><strong>Admission Number: </strong><span class="text-uppercase">{{$student->admission_number}}</span></p>
+                        <p><strong>Name:</strong>
+                            <span class="text-uppercase" style="text-decoration: underline">
+                                <a href="{{route('Students.show', ['student' => Hashids::encode($student->id)])}}">{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}} - {{$student->gender}}</a>
+                            </span>
+                        </p>
                         <p><strong>Class:</strong> <span class="text-uppercase">{{$student->class_name}} - {{$student->class_code}}</span></p>
+                        <form action="{{route('Students.destroy', ['student' => Hashids::encode($student->id)])}}" method="POST">
+                            @csrf
+                            <button class="btn btn-danger btn-xs p-1" onclick="return confirm('Are you sure you want to block {{strtoupper($student->first_name)}} {{strtoupper($student->middle_name)}} {{strtoupper($student->last_name)}}?')">
+                                <i class="ti-trash"></i> Delete
+                            </button>
+                        </form>
                     </div>
                 </div>
                 @endforeach

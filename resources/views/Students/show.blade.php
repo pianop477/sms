@@ -117,7 +117,9 @@
                     <h4 class="header-title">Parents Information</h4>
                     <div class="list-group">
                         <button type="button" class="list-group-item list-group-item-action">
-                            Parent's full name: <span class="text-uppercase font-weight-bold">{{$data->user_first_name}} {{$data->user_last_name}}</span>
+                            Parent's full name: <span class="text-uppercase font-weight-bold" style="text-decoration: underline">
+                                <a href="{{route('Parents.edit', ['parent' => Hashids::encode($data->parent_id)])}}"> {{$data->user_first_name}} {{$data->user_last_name}}</a>
+                            </span>
                         </button>
                         <button type="button" class="list-group-item list-group-item-action">
                             Parent's gender: <span class="text-uppercase font-weight-bold">{{$data->user_gender[0]}}</span>

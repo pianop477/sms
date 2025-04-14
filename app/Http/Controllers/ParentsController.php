@@ -278,8 +278,10 @@ class ParentsController extends Controller
         }
         $students = Student::query()
                         ->join('grades', 'grades.id', '=', 'students.class_id')
-                        ->select('students.*', 'grades.class_name', 'grades.class_code')
-                        ->where('students.parent_id', $parents->id)->get();
+                        ->select('students.*', 'grades.class_name', 'grades.class_code' )
+                        ->where('students.parent_id', $parents->id)
+                        ->where('students.status', 1)
+                        ->get();
 
         return view('Parents.edit', ['parents' => $parents, 'students' => $students]);
     }

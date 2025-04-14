@@ -773,6 +773,7 @@ class StudentsController extends Controller
                             )
                             ->where('students.status', 2)
                             ->where('students.school_id', $user->school_id)
+                            ->orderBy('students.first_name', 'ASC')
                             ->get();
         return view('Students.trash', compact('students'));
     }
