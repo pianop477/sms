@@ -620,7 +620,7 @@ class ResultsController extends Controller
         ->whereYear('examination_results.exam_date', $year)
         ->where('examination_results.class_id', $class_id[0])
         ->where('examination_results.exam_type_id', $exam_id[0])
-        ->orderBy('examination_results.exam_date') // Panga kwa tarehe
+        ->orderBy('examination_results.exam_date', 'desc') // Panga kwa tarehe
         ->get();
 
     // Group by Month, then by Date
