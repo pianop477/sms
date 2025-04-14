@@ -286,7 +286,13 @@
                             <td style="text-align: center">{{ $studentResult['gender'][0] }}</td>
                             <td style="text-transform:capitalize">{{ ucwords(strtolower($studentResult['student_name'])) }}</td>
                             @foreach ($studentResult['courses'] as $course)
-                                <td style="text-align:center;">{{ $course['score'] }}</td>
+                                <td style="text-align:center;">
+                                    @if ( $course['score'] === null)
+                                        <span style="background:rgb(235, 75, 75); padding:2px 10px ">X</span>
+                                    @else
+                                    {{ $course['score'] }}
+                                    @endif
+                                </td>
                             @endforeach
                             <td style="text-align:center">{{ $studentResult['total_marks'] }}</td>
                             <td style="text-align:center">{{ number_format($studentResult['average'], 2) }}</td>
