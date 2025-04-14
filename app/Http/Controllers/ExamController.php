@@ -428,7 +428,6 @@ class ExamController extends Controller
                                 ->where('exam_type_id', $exam_id[0])
                                 ->where('school_id', $user->school_id)
                                 ->distinct()  // Ensure distinct months
-                                ->orderBy('exam_date', 'DESC')
                                 ->get();
 
         $months = $results->sortBy('exam_date') // Panga kwa tarehe
