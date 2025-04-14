@@ -288,7 +288,7 @@
                             @foreach ($studentResult['courses'] as $course)
                                 <td style="text-align:center;">
                                     @if ( $course['score'] === null)
-                                        <span style="background:rgb(235, 75, 75); padding:2px 10px ">X</span>
+                                        <span style="background:rgb(235, 75, 75); padding:2px 10px ">XX</span>
                                     @else
                                     {{ $course['score'] }}
                                     @endif
@@ -299,7 +299,13 @@
                             <td style="text-align:center; text-transform:uppercase">
                                 {{ $studentResult['grade'] === 'ABS' ? 'ABS' : $studentResult['grade'] }}
                             </td>
-                            <td style="text-align:center">{{ $studentResult['position'] }}</td>
+                            <td style="text-align:center">
+                                @if ($studentResult['grade'] === 'ABS')
+                                    <span style="background: rgb(235, 75, 75); padding: 2px; 10px">XX</span>
+                                @else
+                                    {{ $studentResult['position'] }}
+                                @endif
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>
