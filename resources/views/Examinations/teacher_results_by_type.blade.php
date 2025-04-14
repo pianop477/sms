@@ -216,7 +216,13 @@
                     <td>{{ucwords(strtolower($result->first_name. ' '. $result->middle_name. ' '.$result->last_name  ))}}</td>
                     <td style="text-align:center">{{$result->gender[0]}}</td>
                     <td style="text-align:center">{{$result->group}}</td>
-                    <td style="text-align:center">{{$result->score}}</td>
+                    <td style="text-align:center">
+                        @if ( $result->score === null)
+                            <span style="background:rgb(235, 75, 75); padding:2px 10px ">XX</span>
+                        @else
+                            {{ $result->score }}
+                        @endif
+                    </td>
                     <td style="text-align:center">{{$result->grade}}</td>
                     <td style="text-align:center">{{$result->position}}</td>
                 </tr>
