@@ -120,7 +120,7 @@ class ResultsController extends Controller
             ->where('students.parent_id', $parent->id)
             ->where('examination_results.student_id', $students->id)
             ->where('examination_results.class_id', $students->class_id)
-            ->orderBy('exam_date') // Sorting ya moja kwa moja kabla ya grouping
+            ->orderBy('examination_results.exam_date', 'desc') // Sorting ya moja kwa moja kabla ya grouping
             ->get();
 
         // Grouping kwa mwezi, halafu grouping kwa tarehe ndani ya mwezi

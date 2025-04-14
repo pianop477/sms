@@ -25,7 +25,7 @@
                         @foreach ($dates as $date => $results)
                             <a href="{{ route('results.byMonth', ['course' => Hashids::encode($class_course->id), 'year' => $year, 'examType' => Hashids::encode($exam_id), 'month' => $month, 'date' => $date]) }}" target="">
                                 <button type="button" class="list-group-item list-group-item-action">
-                                    <p class="text-primary text-decoration-underline"><i class="fas fa-calendar-alt"></i> {{ \Carbon\Carbon::parse($date)->format('d-m-Y') }}</p>
+                                    <p class="text-primary" style="text-decoration: underline;"><i class="fas fa-calendar-alt"></i> {{ \Carbon\Carbon::parse($date)->format('d-m-Y') }}</p>
                                 </button>
                             </a>
                         @endforeach
