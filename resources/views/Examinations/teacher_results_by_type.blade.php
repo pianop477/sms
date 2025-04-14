@@ -218,13 +218,19 @@
                     <td style="text-align:center">{{$result->group}}</td>
                     <td style="text-align:center">
                         @if ( $result->score === null)
-                            <span style="background:rgb(235, 75, 75); padding:2px 10px ">XX</span>
+                            <span style="background:rgb(235, 75, 75); padding:2px 10px ">X</span>
                         @else
                             {{ $result->score }}
                         @endif
                     </td>
                     <td style="text-align:center">{{$result->grade}}</td>
-                    <td style="text-align:center">{{$result->position}}</td>
+                    <td style="text-align:center">
+                        @if ($result->score === null)
+                            <span style="background:rgb(235, 75, 75); padding:2px 10px ">X</span>
+                        @else
+                            {{$result->position}}
+                        @endif
+                    </td>
                 </tr>
             @endforeach
         </tbody>

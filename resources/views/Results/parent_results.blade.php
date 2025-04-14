@@ -212,28 +212,28 @@
                                 <td style="text-transform: uppercase">{{ $result->course_code }}</td>
                                 <td>
                                     @if ( $result->score === null)
-                                        <span style="background:rgb(235, 75, 75); padding:2px 10px ">XX</span>
+                                        <span style="">X</span>
                                     @else
                                         {{ $result->score }}
                                     @endif
                                 </td>
                                 <td>
                                     @if ($result->score === null)
-                                        <span style="background:rgb(235, 75, 75); padding:2px 10px ">XX</span>
+                                        <span style="">X</span>
                                     @else
                                     {{ $result->grade }}
                                     @endif
                                 </td>
                                 <td>
                                     @if ($result->score === null)
-                                        <span style="background:rgb(235, 75, 75); padding:2px 10px ">XX</span>
+                                        <span style="">X</span>
                                     @else
                                     {{ $result->remarks }}
                                     @endif
                                 </td>
                                 <td>
                                     @if ($result->score === null)
-                                        <span style="background:rgb(235, 75, 75); padding:2px 10px ">XX</span>
+                                        <span style="">X</span>
                                     @else
                                         {{ $result->courseRank }}
                                     @endif
