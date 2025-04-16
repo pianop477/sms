@@ -939,7 +939,7 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
                 // Calculate ranks based on total marks
                 $studentsData = $studentsData->map(function ($student) use ($studentResults) {
                 $courses = $studentResults->where('student_id', $student->student_id)
-                    ->map(fn($result) => "{$result->course_code} - {$result->score}")
+                    ->map(fn($result) => "{$result->course_code}={$result->score}")
                     ->implode(', ');
 
                 $totalMarks = $studentResults->where('student_id', $student->student_id)->sum('score');
@@ -988,12 +988,11 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
                 }
 
                 // Construct the SMS message
-                $messageContent = "Matokeo ya: " . strtoupper("{$student->first_name} {$student->last_name}") . ", ";
-                $messageContent .= "Mtihani wa: " . strtoupper($student->exam_type) . " wa Tarehe " . Carbon::parse($date)->format('d/m/Y') . " ni: ";
+                $messageContent = "Matokeo ya " . strtoupper("{$student->first_name} {$student->last_name}");
+                $messageContent .= "Mtihani wa " . strtoupper($student->exam_type) . " wa Tarehe " . Carbon::parse($date)->format('d/m/Y') . " ni: ";
                 $messageContent .= strtoupper("{$student->courses}") . ". ";
-                $messageContent .= "Jumla ya Alama: {$student->total_marks}, Wastani: " . number_format($student->average_marks) . ", Nafasi ya: {$student->rank} kati ya: {$totalStudents}. ";
-                $messageContent .= "Kuona ripoti tembelea: $url.";
-                $messageContent .= " Asante kwa kuchagua: " . strtoupper($schools->school_name);
+                $messageContent .= "Jumla ya Alama {$student->total_marks}, Wastani " . number_format($student->average_marks) . ", Nafasi ya {$student->rank} kati ya {$totalStudents}. ";
+                $messageContent .= "Tembelea {$url} kupakua ripoti";
 
                 // Prepare the recipients array
                 $recipients = [
@@ -1474,16 +1473,15 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
 
             $courseScores = [];
             foreach ($results as $result) {
-                $courseScores[] = "{$result->course_code} - {$result->score}";
+                $courseScores[] = "{$result->course_code}={$result->score}";
             }
 
             $totalStudents = $rankings->count();
             $url = 'https://shuleapp.tech';
             $beemSmsService = new BeemSmsService();
-            $messageContent = "Matokeo ya ". strtoupper($fullName ).", Mtihani wa: ". strtoupper($examination)." wa Tarehe ". Carbon::parse($date)->format('d/m/Y'). " ni: ". implode(', ', array_map('strtoupper', $courseScores));
-            $messageContent .= ". Jumla ya Alama: $totalScore, Wastani: ". number_format($averageScore, 1) .", Nafasi ya: $studentRank kati ya: $totalStudents. ";
-            $messageContent .= "Kuona ripoti tembelea: $url.";
-            $messageContent .= " Asante kwa kuchagua: " . strtoupper($schools->school_name);
+            $messageContent = "Matokeo ya ". strtoupper($fullName )." Mtihani wa ". strtoupper($examination)." wa Tarehe ". Carbon::parse($date)->format('d/m/Y'). " ni: ". implode(', ', array_map('strtoupper', $courseScores));
+            $messageContent .= ". Jumla ya Alama $totalScore, Wastani ". number_format($averageScore, 1) .", Nafasi ya $studentRank kati ya $totalStudents. ";
+            $messageContent .= "Tembelea {$url} kupakua ripoti.";
 
             // Output the message content (or send it via SMS)
             // return $messageContent;
@@ -1513,8 +1511,8 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
             $nextSmsService = new NextSmsService();
             $sender = $school->sender_id ?? "SHULE APP";
             $destination = $this->formatPhoneNumber($users->phone);
-            $messageContent = "Matokeo ya ". strtoupper($fullName ).", Mtihani wa: ". strtoupper($examination)." => ". Carbon::parse($date)->format('d/m/Y'). ", ni:- ". implode(', ', array_map('strtoupper', $courseScores));
-            $messageContent .= ". Jumla: $totalScore, Wastani: ". number_format($averageScore) .", Nafasi: $studentRank kati ya: $totalStudents. Zaidi tembelea: $url";
+            $messageContent = "Matokeo ya ". strtoupper($fullName )." Mtihani wa ". strtoupper($examination)." wa Tarehe ". Carbon::parse($date)->format('d/m/Y'). " ni:- ". implode(', ', array_map('strtoupper', $courseScores));
+            $messageContent .= ". Jumla $totalScore, Wastani ". number_format($averageScore) .", Nafasi $studentRank kati ya $totalStudents. Tembelea {$url} kupakua ripoti.";
             $reference = uniqid();
 
             $payload = [
