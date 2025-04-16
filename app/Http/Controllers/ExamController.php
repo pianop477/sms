@@ -178,7 +178,7 @@ class ExamController extends Controller
             }
 
             Alert::toast('Examination results have been saved to the draft', 'success');
-            return to_route('score.prepare.form', Hashids::encode($request->course_id));
+            return to_route('home');
             // return redirect()->route('score.prepare.form', Hashids::encode($request->course_id));
         }
 
@@ -726,7 +726,7 @@ class ExamController extends Controller
             }
             Alert()->toast('Results saved successfully, remember to submit before expiry date.', 'success');
             // return redirect()->route('score.prepare.form', Hashids::encode($courseId));
-            return to_route('score.prepare.form', Hashids::encode($courseId));
+            return to_route('home');
 
         } elseif ($action === 'submit') {
             // CHECK IF RESULTS ALREADY EXIST IN EXAMINATION_RESULT TABLE
