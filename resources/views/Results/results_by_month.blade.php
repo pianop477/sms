@@ -259,7 +259,7 @@
                         </tr>
                     </table>
                 </div>
-                .<div style="background: rgb(187, 163, 56);">
+                <div style="background: rgb(187, 163, 56);">
                     <p style="text-align:center; font-size:14px; font-weight:bold" colspan="">STUDENTS WISE PERFORMANCE</p>
                 </div>
                 <table class="table results">
