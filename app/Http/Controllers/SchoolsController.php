@@ -322,12 +322,17 @@ class SchoolsController extends Controller
 
     public function deletePost ($sms)
     {
-        $decoded = Hashids::decode($sms);
-
-        $message = message::findOrFail($decoded[0]);
-        $message->delete();
-        Alert()->toast('Post has been moved to trash', 'success');
-        return back();
+        try {
+            $decoded = Hashids::decode($sms);
+            $message = message::findOrFail($decoded[0]);
+            $message->delete();
+            Alert()->toast('Post has been moved to trash', 'success');
+            return back();
+        }
+        catch(Exception $e) {
+            Alert()->toast($e->getMessage(), 'error');
+            return back();
+        }
     }
 
     public function addActiveTime(Request $request, $school)
