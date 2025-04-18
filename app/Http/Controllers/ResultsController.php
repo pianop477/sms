@@ -1480,7 +1480,7 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
             $url = 'https://shuleapp.tech';
             $beemSmsService = new BeemSmsService();
             $messageContent = "Matokeo ya ". strtoupper($fullName )." Mtihani wa ". strtoupper($examination)." wa Tarehe ". Carbon::parse($date)->format('d/m/Y'). " ni: ". implode(', ', array_map('strtoupper', $courseScores));
-            $messageContent .= ". Jumla ya Alama $totalScore, Wastani ". number_format($averageScore, 1) .", Nafasi ya $studentRank kati ya $totalStudents. ";
+            $messageContent .= ". Jumla ya Alama $totalScore, Wastani ". number_format($averageScore) .", Nafasi ya $studentRank kati ya $totalStudents. ";
             $messageContent .= "Tembelea {$url} kupakua ripoti.";
 
             // Output the message content (or send it via SMS)
@@ -1494,7 +1494,7 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
             // return $users->phone;
 
             //prepare send sms payload to send via Beem API *************************************
-            $sourceAddr = $school->sender_id ?? 'shuleApp';
+            $sourceAddr = $schools->sender_id ?? 'shuleApp';
             $recipient_id = 1;
             $phone = $this->formatPhoneNumber($users->phone);
             $recipients = [
@@ -1509,7 +1509,7 @@ public function resultsByMonth($school, $year, $class, $examType, $month, $date)
 
             // send sms via NextSMS API ************************************************************
             $nextSmsService = new NextSmsService();
-            $sender = $school->sender_id ?? "SHULE APP";
+            $sender = $schools->sender_id ?? "SHULE APP";
             $destination = $this->formatPhoneNumber($users->phone);
             $messageContent = "Matokeo ya ". strtoupper($fullName )." Mtihani wa ". strtoupper($examination)." wa Tarehe ". Carbon::parse($date)->format('d/m/Y'). " ni:- ". implode(', ', array_map('strtoupper', $courseScores));
             $messageContent .= ". Jumla $totalScore, Wastani ". number_format($averageScore) .", Nafasi $studentRank kati ya $totalStudents. Tembelea {$url} kupakua ripoti.";
