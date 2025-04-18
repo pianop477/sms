@@ -25,8 +25,8 @@
                                 <div class="invoice-address">
                                     <h4>Billed To</h4>
                                     <h5 class="text-uppercase">{{$schools->school_name}}</h5>
-                                    <p class="text-capitalize">{{$managers->first()->first_name}} {{$managers->first()->last_name}} - Manager</p>
-                                    <p class="text-capitalize">P.O Box {{$schools->postal_address}} - {{$schools->postal_name}}</p>
+                                    <p class="text-capitalize">{{$managers->first()->first_name}} {{$managers->first()->last_name}}</p>
+                                    <p class="text-capitalize">{{$schools->postal_address}} - {{$schools->postal_name}}</p>
                                     <p class="text-capitalize">{{$schools->country}}</p>
                                     <p>{{$managers->first()->email}}</p>
                                 </div>
@@ -45,7 +45,7 @@
                             <table class="table table-bordered table-hover text-right">
                                 <thead>
                                     <tr class="text-capitalize">
-                                        <th class="text-center" style="width: 5%;">id</th>
+                                        <th class="text-center" style="width: 5%;">#</th>
                                         <th class="text-left" style="">description</th>
                                         <th class="text-left">Service Time Duration</th>
                                         <th style="">No.Students</th>
