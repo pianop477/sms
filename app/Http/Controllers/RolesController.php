@@ -169,7 +169,7 @@ class RolesController extends Controller
             $users->password = Hash::make($request->input('password', 'shule2025'));
             $users->save();
             //dispatch event to logout user after password reset
-            event(new PasswordResetEvent($user));
+            // event(new PasswordResetEvent($user));
 
             //notify via SMS after password reset
             $nextSmsService = new NextSmsService();
