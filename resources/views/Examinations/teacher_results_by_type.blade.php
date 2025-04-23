@@ -174,7 +174,7 @@
                 $comment = 'Excellent';
             }
             if($averageGrade == 'B') {
-                $bgColor = 'rgb(12, 211, 184)';
+                $bgColor = 'rgb(153, 250, 237)';
                 $comment = 'Good';
             }
             if($averageGrade == 'C') {

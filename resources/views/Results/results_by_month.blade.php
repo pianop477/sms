@@ -193,27 +193,27 @@
                     <h5 style="font-weight:normal">CLASS AVERAGE: <strong>{{number_format($sumOfCourseAverages, 4)}}</strong>
                         @if($results->first()->marking_style == 1)
                             @if ($generalClassAvg >= 40.5)
-                                    <span style="background:rgb(117, 244, 48); padding:2px 10px ">GRADE A (EXCELLENT)</span>
+                                    <span style="background:rgb(117, 244, 48); padding:2px 10px; ">GRADE A (EXCELLENT)</span>
                                 @elseif ($generalClassAvg >= 30.5)
-                                    <span style="background:rgb(12, 211, 184); padding:2px 10px ">GRADE B (GOOD)</span>
+                                    <span style="background:rgb(153, 250, 237); padding:2px 10px;">GRADE B (GOOD)</span>
                                 @elseif ($generalClassAvg >= 20.5)
-                                    <span style="background:rgb(237, 220, 113); padding:2px 10px ">GRADE C (PASS)</span>
+                                    <span style="background:rgb(237, 220, 113); padding:2px 10px;">GRADE C (PASS)</span>
                                 @elseif ($generalClassAvg >= 10.5)
-                                    <span style="background:rgb(182, 176, 176); padding:2px 10px "> GRADE D (POOR)</span>
+                                    <span style="background:rgb(182, 176, 176); padding:2px 10px;"> GRADE D (POOR)</span>
                                 @elseif($generalClassAvg <= 10.4)
-                                    <span style="background:rgb(235, 75, 75); padding:2px 10px ">GRADE E (FAIL)</span>
+                                    <span style="background:rgb(235, 75, 75); padding:2px 10px;">GRADE E (FAIL)</span>
                             @endif
                         @else
                             @if ($generalClassAvg >= 80.5)
-                                <span style="background:rgb(117, 244, 48); padding:2px 10px ">GRADE A (EXCELLENT)</span>
+                                <span style="background:rgb(117, 244, 48); padding:2px 10px;">GRADE A (EXCELLENT)</span>
                             @elseif ($generalClassAvg >= 60.5)
-                                <span style="background:rgb(12, 211, 184); padding:2px 10px ">GRADE B (GOOD)</span>
+                                <span style="background:rgb(153, 250, 237); padding:2px 10px;">GRADE B (GOOD)</span>
                             @elseif ($generalClassAvg >= 40.5)
-                                <span style="background:rgb(237, 220, 113); padding:2px 10px ">GRADE C (PASS)</span>
+                                <span style="background:rgb(237, 220, 113); padding:2px 10px">GRADE C (PASS)</span>
                             @elseif ($generalClassAvg >= 20.5)
-                                <span style="background:rgb(182, 176, 176); padding:2px 10px "> GRADE D (POOR)</span>
+                                <span style="background:rgb(182, 176, 176); padding:2px 10px;"> GRADE D (POOR)</span>
                             @elseif($generalClassAvg <= 20.4)
-                                <span style="background:rgb(235, 75, 75); padding:2px 10px ">GRADE E (FAIL)</span>
+                                <span style="background:rgb(235, 75, 75); padding:2px 10px;">GRADE E (FAIL)</span>
                             @endif
                         @endif
 
@@ -332,7 +332,7 @@
                                     @if ($course['grade']=='A')
                                         <td style="background:rgb(117, 244, 48); padding:2px 10px ">grade {{ $course['grade']}} - <i>EXCELLENT</i></td>
                                     @elseif ($course['grade']=='B')
-                                        <td style="background:rgb(12, 211, 184); padding:2px 10px ">grade {{ $course['grade']}} - <i>GOOD</i></td>
+                                        <td style="background:rgb(153, 250, 237); padding:2px 10px ">grade {{ $course['grade']}} - <i>GOOD</i></td>
                                     @elseif ($course['grade']=='C')
                                         <td style="background:rgb(237, 220, 113); padding:2px 10px ">grade {{ $course['grade']}} - <i>PASS</i></td>
                                     @elseif ($course['grade']=='D')
@@ -354,7 +354,7 @@
                             <tr style="">
                                 <th rowspan="2" style="background: gray;">SUBJECTS</th>
                                 <th colspan="3" style="background:rgb(117, 244, 48);">A</th>
-                                <th colspan="3" style="background:rgb(12, 211, 184);">B</th>
+                                <th colspan="3" style="background:rgb(153, 250, 237);">B</th>
                                 <th colspan="3" style="background:rgb(237, 220, 113);">C</th>
                                 <th colspan="3" style="background:rgb(182, 176, 176);">D</th>
                                 <th colspan="3" style="background:rgb(235, 75, 75);">E</th>
@@ -363,9 +363,9 @@
                                 <th style="background:rgb(117, 244, 48);">Boys</th>
                                 <th style="background:rgb(117, 244, 48);">Girls</th>
                                 <th style="background:rgb(117, 244, 48);">Total</th>
-                                <th style="background:rgb(12, 211, 184);">Boys</th>
-                                <th style="background:rgb(12, 211, 184);">Girls</th>
-                                <th style="background:rgb(12, 211, 184);">Total</th>
+                                <th style="background:rgb(153, 250, 237);">Boys</th>
+                                <th style="background:rgb(153, 250, 237);">Girls</th>
+                                <th style="background:rgb(153, 250, 237);">Total</th>
                                 <th style="background:rgb(237, 220, 113);">Boys</th>
                                 <th style="background:rgb(237, 220, 113);">Girls</th>
                                 <th style="background:rgb(237, 220, 113);">Total</th>
@@ -389,9 +389,9 @@
                                     <td style="background:rgb(117, 244, 48);">{{ $grades['A']['male'] + $grades['A']['female'] }}</td>
 
                                     <!-- Grade B Counts -->
-                                    <td style="background:rgb(12, 211, 184);">{{ $grades['B']['male'] }}</td>
-                                    <td style="background:rgb(12, 211, 184);">{{ $grades['B']['female'] }}</td>
-                                    <td style="background:rgb(12, 211, 184);">{{ $grades['B']['male'] + $grades['B']['female'] }}</td>
+                                    <td style="background:rgb(153, 250, 237);">{{ $grades['B']['male'] }}</td>
+                                    <td style="background:rgb(153, 250, 237);">{{ $grades['B']['female'] }}</td>
+                                    <td style="background:rgb(153, 250, 237);">{{ $grades['B']['male'] + $grades['B']['female'] }}</td>
 
                                     <!-- Grade C Counts -->
                                     <td style="background:rgb(237, 220, 113);">{{ $grades['C']['male'] }}</td>

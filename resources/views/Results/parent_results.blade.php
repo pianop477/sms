@@ -253,7 +253,7 @@
                             $gradeColor = 'rgb(117, 244, 48)';
                         } elseif ($averageScore >= 31 || $averageScore >= 61) {
                             $grade = "'B' - GOOD";
-                            $gradeColor = 'rgb(12, 211, 184)';
+                            $gradeColor = 'rgb(153, 250, 237)';
                         } elseif ($averageScore >= 21 || $averageScore >= 41) {
                             $grade = "'C' - PASS";
                             $gradeColor = 'rgb(237, 220, 113)';
