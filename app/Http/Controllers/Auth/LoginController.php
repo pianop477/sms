@@ -60,7 +60,7 @@ class LoginController extends Controller
         $ip = $request->ip();
         $key = 'login:attempts:' . $ip;
         $maxAttempts = 3;
-        $decayMinutes = 10;
+        $decayMinutes = 15;
 
         // Check if IP is blocked
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {

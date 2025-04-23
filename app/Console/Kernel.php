@@ -21,6 +21,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('delete:old-attendance-reports')->daily();
         $schedule->command('delete:student-old-reports')->daily();
         $schedule->command('contracts:delete-old')->daily();
+        $schedule->command('logins:clean-old')->daily();
     }
 
     /**

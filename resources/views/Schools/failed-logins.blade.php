@@ -15,14 +15,13 @@
                                     <th scope="col">IP Address</th>
                                     <th scope="col">Username</th>
                                     <th scope="col">User Agent</th>
-                                    <th scope="col">Failed_at</th>
-                                    <th scope="col">Action</th>
+                                    <th scope="col">Attempted_at</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @if ($attempts->isEmpty())
                                     <tr>
-                                        <td class="text-danger text-center" colspan="6">No any failed login attempts</td>
+                                        <td class="text-danger text-center" colspan="5">No any failed login attempts</td>
                                     </tr>
                                 @else
                                 @foreach ($attempts as $row )
@@ -31,19 +30,13 @@
                                         <td class="text-uppercase">
                                             {{$row->ip}}
                                         </td>
-                                        <td class="text-uppercase">
+                                        <td class="text-capitalize">
                                             {{$row->username}}
                                         </td>
                                         <td class="">
                                             {{$row->user_agent}}
                                         </td>
                                         <td class="">{{$row->attempted_at}}</td>
-                                        <td>
-                                            <a href="" class="btn btn-danger btn-xs" onclick="return confrim('Are you sure you want to delete this record?')">
-                                                <i class="fas fa-trash"></i>
-                                                Delete
-                                            </a>
-                                        </td>
                                     </tr>
                                 @endforeach
                                 @endif
