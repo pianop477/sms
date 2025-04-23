@@ -16,6 +16,7 @@ use App\Services\NextSmsService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -457,6 +458,13 @@ class SchoolsController extends Controller
             Alert()->toast($e->getMessage(), 'error');
             return back();
         }
+
+    }
+
+    public function faileLoginAttempts()
+    {
+        $attempts = DB::table('failed_logins')->orderByDesc('attempted_at')->paginate(20);
+        return view('Schools.failed-logins', compact('attempts'));
     }
 
 }

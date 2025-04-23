@@ -7,6 +7,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class LoginController extends Controller
@@ -54,24 +57,47 @@ class LoginController extends Controller
             'password' => 'required|string',
         ]);
 
-        $loginType = $this->username();
+        $ip = $request->ip();
+        $key = 'login:attempts:' . $ip;
+        $maxAttempts = 3;
+        $decayMinutes = 10;
 
+        // Check if IP is blocked
+        if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
+            $seconds = RateLimiter::availableIn($key);
+            // return back()->with('error', "Too many login attempts. Try again in " . ceil($seconds / 60) . " minutes.");
+            Alert()->toast('Too many login attempts. Try again in ' . ceil($seconds / 60) . ' minutes.', 'error');
+            return redirect()->back();
+        }
+
+        $loginType = $this->username();
         $credentials = [
             $loginType => $request->username,
             'password' => $request->password,
         ];
 
-        if(Auth::attempt($credentials, $request->remember)) {
+        if (Auth::attempt($credentials, $request->remember)) {
             $request->session()->regenerate();
 
-            //set active session
+            // Clear failed attempts on success
+            RateLimiter::clear($key);
             $request->session()->put('last_activity', time());
 
-            $this->clearLoginAttempts($request);
             Alert()->toast('Hello 🤩 Welcome back to ShuleApp', 'success');
             return redirect()->intended($this->redirectPath());
         }
 
+        // Increment failed attempts
+        RateLimiter::hit($key, $decayMinutes * 60);
+
+        DB::table('failed_logins')->insert([
+            'ip' => $ip,
+            'username' => $request->username,
+            'user_agent' => $request->userAgent(),
+            'attempted_at' => now()
+        ]);
+
         return back()->with('error', 'Invalid credentials');
     }
+
 }
