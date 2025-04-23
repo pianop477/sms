@@ -74,5 +74,6 @@ class Kernel extends HttpKernel
         'GeneralMiddleware' => \App\Http\Middleware\GeneralMiddleware::class,
         'ManagerOrTeacher' => \App\Http\Middleware\ManagerOrTeacher::class,
         'activeUser' => \App\Http\Middleware\ActiveUserMiddleware::class,
+        'block.ip' => \App\Http\Middleware\BlockSuspiciousIP::class,
     ];
 }

@@ -2,6 +2,7 @@
 use App\Exports\StudentsExport;
 use App\Exports\TeachersExport;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ClassesController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\CoursesController;
@@ -52,6 +53,10 @@ Route::get('/check-session', function () {
     return response()->json(['active' => auth()->check()]);
 });
 
+// Throttle login route - max 5 attempts per 1 minute
+Route::post('login', [LoginController::class, 'login'])
+            ->middleware('throttle:3,1')
+            ->name('login');
 
 Auth::routes();
 
@@ -65,7 +70,7 @@ Auth::routes();
     Route::post('/Feedback', [SendMessageController::class, 'store'])->name('send.feedback.message');
 //end of condition =================================================
 
-Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')->group(function () {
+Route::middleware('auth', 'activeUser', 'throttle:10,1', 'checkSessionTimeout', 'block.ip')->group(function () {
 
     Route::middleware('CheckUsertype:1,2,3,4')->group(function () {
         // Home controller redirection ==============================================================================
@@ -93,6 +98,9 @@ Route::middleware('auth', 'activeUser', 'throttle:60,1', 'checkSessionTimeout')-
         Route::get('{sms}/Delete-feedback', [SchoolsController::class, 'deletePost'])->name('delete.post');
         Route::post('Send-reply-message', [SchoolsController::class, 'sendFeebackReply'])->name('send.reply.message');
         Route::get('{sms}/Reply', [SchoolsController::class, 'replyFeedback'])->name('reply.post');
+
+        //check for failed login attempts
+        Route::get('/failed-logins', [SchoolsController::class, 'faileLoginAttempts'])->name('failed.login.attempts');
 
         //upprove or reject school registration ====================================================================
         Route::get('Approve-school/{school}', [SchoolsController::class, 'approveSchool'])->name('approve.school');

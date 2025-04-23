@@ -17,13 +17,16 @@
                                 <a href="{{route('Schools.index')}}"><i class="fas fa-building"></i> <span>Schools</span></a>
                             </li>
                             <li>
-                                <a href="{{route('admin.reset.password')}}"><i class="ti-unlock"></i><span>User Password Reset</span></a>
+                                <a href="{{route('admin.reset.password')}}"><i class="ti-key"></i><span>User Password Reset</span></a>
                             </li>
                             <li>
                                 <a href="{{route('admin.accounts')}}"><i class="fas fa-user-lock"></i><span>Admin Accounts</span></a>
                             </li>
                             <li>
                                 <a href="{{route('feedback')}}"><i class="ti-email"></i><span>Messages</span></a>
+                            </li>
+                            <li>
+                                <a href="{{route('failed.login.attempts')}}"><i class="ti-lock"></i><span>System Security</span></a>
                             </li>
                         @endif
 
