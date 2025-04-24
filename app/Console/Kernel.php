@@ -19,9 +19,11 @@ class Kernel extends ConsoleKernel
         $schedule->command('students:delete-graduated-students')->daily();
         $schedule->command('delete:old-exam-results')->everyMinute();
         $schedule->command('delete:old-attendance-reports')->daily();
-        $schedule->command('delete:student-old-reports')->daily();
+        $schedule->command('delete:student-old-reports')->everyMinute();
         $schedule->command('contracts:delete-old')->daily();
-        $schedule->command('logins:clean-old')->daily();
+        $schedule->command('logins:clean-old')->everyMinute();
+        $schedule->command('security:blocked-user-agents')->everyMinute();
+        $schedule->command('cleanup:old-reports')->everyMinute();
     }
 
     /**
