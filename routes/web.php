@@ -55,7 +55,7 @@ Route::get('/check-session', function () {
 
 // Throttle login route - max 5 attempts per 1 minute
 Route::post('login', [LoginController::class, 'login'])
-            ->middleware('throttle:5,1')
+            ->middleware('throttle:3,1')
             ->name('login');
 
 Auth::routes();
