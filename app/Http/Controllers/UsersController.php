@@ -37,16 +37,16 @@ class UsersController extends Controller
     // register parents out of the system, in the sign up page *****************************************
     public function create(Request $req) {
         $this->validate($req, [
-            'fname' => 'required|string|max:255',
-            'lname' => 'required|string|max:255',
-            'email' => 'nullable|string|unique:users,email',
-            'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone',
-            'gender' => 'required|string|max:255',
-            'school' => 'required|integer|exists:schools,id',
-            'password' => 'required|min:8|regex:/[a-zA-Z]/|regex:/[0-9]/',
-            'password_confirmation' => 'same:password',
-            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
-            'street' => 'required|string|max:255',
+            'fname' => ['required', 'string', 'max:255'],
+            'lname' => ['required','string', 'max:255'],
+            'email' => ['nullable', 'string', 'unique:users,email'],
+            'phone' => ['required', 'regex:/^[0-9]{10}$/', 'unique:users,phone'],
+            'gender' => ['required', 'string', 'max:255'],
+            'school' => ['required', 'integer', 'exists:schools,id'],
+            'password' => ['required', 'min:8', 'regex:/[a-z]/', 'regex:/[A-Z]/', 'regex:/[0-9]/'],
+            'password_confirmation' => ['same:password'],
+            'image' => ['nullable', 'image', 'mimes:jpg,png,jpeg', 'max:1024'],
+            'street' => ['required', 'string', 'max:255'],
         ]);
 
         $parentExists = User::where('phone', $req->phone)->where('school_id', $req->school)->exists();

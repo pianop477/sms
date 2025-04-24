@@ -356,9 +356,9 @@ class HomeController extends Controller
 
     public function storePassword(Request $request) {
         $request->validate([
-            'current_password' => 'required|string',
-            'new_password' => 'required|min:8|regex:/[a-z]/|regex:/[A-Z]/|regex:/[0-9]/',
-            'confirm_password' => 'required|same:new_password'
+            'current_password' => ['required', 'string'],
+            'new_password' => ['required', 'string', 'min:8', 'regex:/[a-z]/','regex:/[A-Z]/', 'regex:/[0-9]/'],
+            'confirm_password' => ['required', 'same:new_password']
         ]);
 
         try {
@@ -380,7 +380,7 @@ class HomeController extends Controller
                 if($new_password) {
                     Alert()->toast('Password Updated successfully', 'success');
                     Auth::logout();
-                    return redirect()->route('login');
+                    return to_route('login');
                 }
         } catch (\Exception $e) {
             Alert::error('Errors', $e->getMessage());
