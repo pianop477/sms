@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\Rules\Unique;
 use PhpOffice\PhpSpreadsheet\Calculation\Engine\FormattedNumber;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -43,7 +44,11 @@ class UsersController extends Controller
             'phone' => ['required', 'regex:/^[0-9]{10}$/', 'unique:users,phone'],
             'gender' => ['required', 'string', 'max:255'],
             'school' => ['required', 'integer', 'exists:schools,id'],
-            'password' => ['required', 'min:8', 'regex:/[a-z]/', 'regex:/[A-Z]/', 'regex:/[0-9]/'],
+            'password' => ['required', 'string', Password::min(8)
+                ->letters()
+                ->mixedCase()
+                ->numbers()
+            ],
             'password_confirmation' => ['same:password'],
             'image' => ['nullable', 'image', 'mimes:jpg,png,jpeg', 'max:1024'],
             'street' => ['required', 'string', 'max:255'],

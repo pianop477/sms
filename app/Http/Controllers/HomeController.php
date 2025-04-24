@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Hash;
 use Laravel\Ui\Presets\React;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rules\Password;
 
 class HomeController extends Controller
 {
@@ -357,9 +358,9 @@ class HomeController extends Controller
     public function storePassword(Request $request) {
 
         $this->validate($request, [
-            'current_password' => 'required|string',
-            'new_password' => 'required|string|min:8|regex:/[a-z]/|regex:/[A-Z]/|regex:/[0-9]/',
-            'confirm_password' => 'required|same:new_password'
+            'current_password' => ['required', 'string'],
+            'new_password' => ['required', 'string', Password::min(8)->mixedCase()->letters()->numbers()],
+            'confirm_password' => ['required', 'same:new_password'],
         ]);
 
         try {
