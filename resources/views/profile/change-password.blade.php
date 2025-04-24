@@ -24,9 +24,7 @@
                             </div>
                         </div>
                         @error('current_password')
-                        <div class="invalid-feedback">
-                            <span class="text-danger">{{$message}}</span>
-                        </div>
+                            <div class="text-danger text-sm">{{$message}}</div>
                         @enderror
                     </div>
                     <!-- New Password -->
@@ -41,9 +39,7 @@
                             </div>
                         </div>
                         @error('new_password')
-                        <div class="invalid-feedback">
-                            <span class="text-danger">{{$message}}</span>
-                        </div>
+                            <div class="text-danger text-sm">{{$message}}</div>
                         @enderror
                     </div>
 
@@ -59,9 +55,7 @@
                             </div>
                         </div>
                         @error('confirm_password')
-                        <div class="invalid-feedback">
-                            <span class="text-danger">{{$message}}</span>
-                        </div>
+                            <div class="text-danger text-sm">{{$message}}</div>
                         @enderror
                     </div>
                 </div>
