@@ -59,14 +59,14 @@ class LoginController extends Controller
 
         $ip = $request->ip();
         $key = 'login:attempts:' . $ip;
-        $maxAttempts = 5;
+        $maxAttempts = 3;
         $decayMinutes = 15;
 
         // Check if IP is blocked
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             $seconds = RateLimiter::availableIn($key);
             // return back()->with('error', "Too many login attempts. Try again in " . ceil($seconds / 60) . " minutes.");
-            Alert()->toast('Account locked. Try again in ' . ceil($seconds / 60) . ' minutes.', 'error');
+            Alert()->toast('Account is blocked. Try again in ' . ceil($seconds / 60) . ' minutes.', 'error');
             return redirect()->back();
         }
 
