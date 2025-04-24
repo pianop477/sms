@@ -355,7 +355,8 @@ class HomeController extends Controller
         }
 
     public function storePassword(Request $request) {
-        $request->validate([
+
+        $this->validate($request, [
             'current_password' => ['required', 'string'],
             'new_password' => ['required', 'string', 'min:8', 'regex:/[a-z]/','regex:/[A-Z]/', 'regex:/[0-9]/'],
             'confirm_password' => ['required', 'same:new_password']

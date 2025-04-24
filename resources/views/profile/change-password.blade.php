@@ -4,11 +4,11 @@
     <div class="card mt-5">
         <div class="card-body">
             <h4 class="header-title">Change Password Form</h4>
-            @if (Session::has('errors'))
+            {{-- @if (Session::has('errors'))
                 <div class="alert alert-danger" role="alert">
                     {{Session::get('errors')}}
                 </div>
-            @endif
+            @endif --}}
             <form class="needs-validation" novalidate="" action="{{route('change.new.password')}}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="form-row">
