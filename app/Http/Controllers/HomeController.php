@@ -355,13 +355,13 @@ class HomeController extends Controller
         }
 
     public function storePassword(Request $request) {
-        try {
-            $request->validate([
-                'current_password' => 'required|string',
-                'new_password' => 'required|min:8|regex:/[a-zA-Z]/|regex:/[0-9]/',
-                'confirm_password' => 'required|same:new_password'
-            ]);
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|min:8|regex:/[a-zA-Z]/|regex:/[0-9]/',
+            'confirm_password' => 'required|same:new_password'
+        ]);
 
+        try {
                 if(!(Hash::check($request->get('current_password'), Auth::user()->password))) {
                     // return back()->with('error', 'Current password does not match');
                     Alert()->toast('Current password does not match', 'error');
