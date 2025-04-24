@@ -29,7 +29,7 @@ class CleanOldFailedLogins extends Command
     {
         //
         $deleted = DB::table('failed_logins')
-            ->where('attempted_at', '<', Carbon::now()->subMonth())
+            ->where('attempted_at', '<', Carbon::now()->subWeek())
             ->delete();
 
         $this->info("Deleted $deleted old failed login attempt(s).");
