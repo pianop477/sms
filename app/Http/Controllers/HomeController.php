@@ -358,7 +358,7 @@ class HomeController extends Controller
         try {
             $request->validate([
                 'current_password' => 'required|string',
-                'new_password' => 'required|string|min:8',
+                'new_password' => 'required|min:8|regex:/[a-zA-Z]/|regex:/[0-9]/',
                 'confirm_password' => 'required|same:new_password'
             ]);
 
