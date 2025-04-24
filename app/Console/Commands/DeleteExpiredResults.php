@@ -44,13 +44,14 @@ class DeleteExpiredResults extends Command
 
         // **2. Pata Matokeo Yatakayo-Expire Ndani ya Masaa 6 Kabla ya Kufutwa**
         $notificationStart = $sixHoursLater->clone()->subHours(6); // Sasa hivi hadi masaa 6 kabla ya kufutwa
-        $soonExpiringResults = temporary_results::with('teacher.user.school')
-            ->whereBetween('expiry_date', [$notificationStart, $sixHoursLater])
-            ->get();
+        $soonExpiringResults = temporary_results::whereBetween('expiry_date', [$notificationStart, $sixHoursLater])->get();
 
         foreach ($soonExpiringResults as $result) {
-            $user = $result->teacher?->user;
-            $school = $user?->school;
+            $teacherId = $result->teacher_id;
+            $schoolId = $result->school_id;
+            $teacher = Teacher::findOrFail($teacherId);
+            $school = school::findOrFail($schoolId);
+            $user = User::where('id', $teacher->user_id)->first();
 
             if (!$user || !$school || empty($user->phone)) {
                 continue; // Ruka ikiwa user, school, au phone number haipo
@@ -64,7 +65,7 @@ class DeleteExpiredResults extends Command
             $payload = [
                 'from' => $school->sender_id ?? "SHULE APP",
                 'to' => $this->formatPhoneNumber($user->phone),
-                'text' => 'Your results will expire in 6 hours. Please submit them to avoid data loss. Regards, ' . strtoupper($school->school_name),
+                'text' => 'Your Pending results will expire in 6 hours. Please submit to avoid data loss. Regards, ' . strtoupper($school->school_name),
                 'reference' => uniqid(),
             ];
 
