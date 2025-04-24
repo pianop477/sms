@@ -20,7 +20,7 @@ class BlockSuspiciousIP
         $blockedIps = Cache::get('blocked_ips', []);
 
         if (in_array($ip, $blockedIps)) {
-            abort(403, 'Access Denied from your IP address');
+            abort(403, 'Access Denied, Suspecious activity detected');
         }
 
         return $next($request);

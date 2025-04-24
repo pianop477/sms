@@ -43,7 +43,7 @@ class UsersController extends Controller
             'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone',
             'gender' => 'required|string|max:255',
             'school' => 'required|integer|exists:schools,id',
-            'password' => 'required|min:8',
+            'password' => 'required|min:8|regex:/[a-zA-Z]/|regex:/[0-9]/',
             'password_confirmation' => 'same:password',
             'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
             'street' => 'required|string|max:255',
