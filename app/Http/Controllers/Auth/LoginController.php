@@ -62,15 +62,17 @@ class LoginController extends Controller
         $maxAttempts = 3;
         $decayMinutes = 15;
 
-        // Check if IP is blocked
+        // Record the attempt first
+        RateLimiter::hit($key, $decayMinutes * 60);
+
+        // Check if IP is now blocked
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             $seconds = RateLimiter::availableIn($key);
-            // return back()->with('error', "Too many login attempts. Try again in " . ceil($seconds / 60) . " minutes.");
             Alert()->toast('Account locked. Try again in ' . ceil($seconds / 60) . ' minutes.', 'error');
             return redirect()->back();
         }
 
-        $loginType = $this->username();
+        $loginType = $this->username(); // could be 'email' or 'username' depending on your logic
         $credentials = [
             $loginType => $request->username,
             'password' => $request->password,
@@ -79,7 +81,7 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $request->remember)) {
             $request->session()->regenerate();
 
-            // Clear failed attempts on success
+            // Clear rate limit on successful login
             RateLimiter::clear($key);
             $request->session()->put('last_activity', time());
 
@@ -87,9 +89,7 @@ class LoginController extends Controller
             return redirect()->intended($this->redirectPath());
         }
 
-        // Increment failed attempts
-        RateLimiter::hit($key, $decayMinutes * 60);
-
+        // Log failed login details in database
         DB::table('failed_logins')->insert([
             'ip' => $ip,
             'username' => $request->username,
@@ -99,5 +99,6 @@ class LoginController extends Controller
 
         return back()->with('error', 'Invalid credentials');
     }
+
 
 }
