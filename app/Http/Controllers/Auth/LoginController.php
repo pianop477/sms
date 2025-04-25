@@ -66,7 +66,7 @@ class LoginController extends Controller
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             $seconds = RateLimiter::availableIn($key);
             // return back()->with('error', "Too many login attempts. Try again in " . ceil($seconds / 60) . " minutes.");
-            Alert()->toast('Account is blocked. Try again in ' . ceil($seconds / 60) . ' minutes.', 'error');
+            Alert()->toast('Account locked. Try again in ' . ceil($seconds / 60) . ' minutes.', 'error');
             return redirect()->back();
         }
 
