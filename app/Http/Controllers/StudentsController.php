@@ -750,7 +750,7 @@ class StudentsController extends Controller
 
         $allParents = Parents::query()
                             ->join('users', 'users.id', '=', 'parents.user_id')
-                            ->select('users.first_name', 'users.status', 'users.last_name', 'parents.id as parent_id')
+                            ->select('users.first_name', 'users.status', 'users.last_name', 'parents.id as parent_id', 'users.phone')
                             ->where('users.status', 1)
                             ->where('users.school_id', $user->school_id)
                             ->orderBy('users.first_name')
