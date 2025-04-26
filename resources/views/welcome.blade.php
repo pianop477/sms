@@ -41,9 +41,9 @@
   </header>
 
   <!-- Hero Section -->
-  <section id="home" class="h-screen bg-cover bg-center relative" style="background-image: url('{{ asset('assets/img/cards/paper 1.jpeg') }}');">
+  <section id="home" class="h-screen bg-cover bg-center relative" style="background-image: url('{{ asset('assets/img/bg/bg-2.jpeg') }}');">
     <div class="absolute inset-0 bg-opacity-50"></div>
-    <div class="container mx-auto h-full flex flex-col justify-center items-center text-center relative z-10 text-white pt-20">
+    <div class="container mx-auto h-full flex flex-col justify-center items-center text-center relative z-10 text-white pt-60">
       <h1 class="text-4xl md:text-6xl font-bold mb-6">Karibu ShuleApp</h1>
       <p class="text-xl md:text-2xl mb-8">Suluhisho lako Bora la Usimamizi wa Elimu</p>
       <a href="{{route('login')}}" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full text-lg font-semibold transition">Anza Sasa</a>
@@ -53,7 +53,7 @@
   <!-- Features Section -->
   <section id="features" class="py-20 bg-white">
     <div class="container mx-auto px-6 text-center">
-      <h2 class="text-3xl md:text-4xl font-bold mb-12 text-gray-800">Vipengele vya Mfumo wa ShuleApp</h2>
+      <h2 class="text-3xl md:text-4xl font-bold mb-12 text-gray-800">Huduma Zinazopatikana ShuleApp</h2>
       <div class="grid md:grid-cols-3 gap-12">
 
         <!-- Attendance -->
