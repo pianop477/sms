@@ -1,307 +1,180 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sw">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shule | App</title>
-  <link rel="manifest" href="{{asset('manifest.json')}}">
-  <link rel="icon" type="image/png" href="{{ asset('assets/img/favicon/favicon.png') }}">
-  <link rel="stylesheet" href="{{asset('assets/fontawesome-free-6.5.2-web/css/all.css')}}">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShuleApp</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/scrollreveal"></script>
   <style>
-    /* Navbar customization */
-    html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-    }
-
-    .navbar-custom {
-      background-color: #ccdfee;
-      color: rgb(39, 75, 109);
-      border-bottom: 3px solid orange;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-
-    .navbar-custom .navbar-brand {
-      color: rgb(35, 66, 112);
-      font-weight: bold;
-      font-size: 1.5rem;
-    }
-
-    .navbar-custom .navbar-nav .nav-link {
-      color: rgb(49, 75, 118);
-    }
-
-    /* Hero section styling */
-    .hero {
-      position: relative;
-      width: 100%;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    .carousel-item {
-      height: 100vh;
-      background-size: cover;
-      background-position: center;
-      transition: opacity 1s ease-in-out;
-    }
-
-    .carousel-item-next, .carousel-item-prev, .carousel-item.active {
-      transition: opacity 1s ease-in-out;
-    }
-
-    .carousel-caption {
-      position: absolute;
-      top: 60%;
-      transform: translateY(-50%);
-      text-align: center;
-      color: white;
-    }
-
-    .carousel-caption h1 {
-      font-size: 3rem;
-      font-weight: bold;
-    }
-
-    .carousel-caption p {
-      font-size: 1.3rem;
-      color: #07db78;
-      font-weight: bold;
-    }
-
-    /* Blur effect */
-    .carousel-item-next, .carousel-item-prev {
-      filter: blur(8px);
-      opacity: 0;
-    }
-
-    .carousel-item.active {
-      filter: none;
-      opacity: 1;
-    }
-
-    .section {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        padding: 20px; /* Epuka mambo ya margin kuathiri urefu */
-        box-sizing: border-box;
-    }
-
-
-    .bg-light {
-      background-color: #f8f9fa;
-    }
-
-    /* Media queries for responsiveness */
-    @media (max-width: 768px) {
-      .hero {
-        height: 60vh;
-      }
-
-      .carousel-caption {
-        top: 50%;
-        font-size: 1rem;
-      }
-
-      .carousel-caption h1 {
-        font-size: 1.5rem;
-      }
-
-      .carousel-caption p {
-        font-size: 1rem;
-      }
-
-      .section {
-        height: auto;
-        padding: 20px 0;
-      }
-
-      .card {
-        width: 100%;
-        margin-bottom: 20px;
-      }
-    }
-
-    @media (max-width: 576px) {
-      .carousel-caption h1 {
-        font-size: 1.2rem;
-      }
-
-      .carousel-caption p {
-        font-size: 0.8rem;
-      }
-
-      .card img {
-        height: auto;
-        width: 100%;
-      }
+    body {
+      scroll-behavior: smooth;
     }
   </style>
 </head>
-<body>
-  @include('SRTDashboard.preloader')
+<body class="bg-gray-50">
 
-  <nav class="navbar navbar-expand-lg navbar-custom navbar-dark">
-    <div class="container">
-      <img src="{{ asset('assets/img/logo/logo.png') }}" alt="" class="rounded-circle" style="width:50px; object-fit:cover; border-radius:50px;">
-       <a class="navbar-brand" href="{{route('welcome')}}">  ShuleApp</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav ml-auto">
-          @if (Route::has('users.form'))
-          <li class="nav-item">
-            <a class="nav-link btn btn-outline-primary btn-sm" href="{{ route('users.form') }}">Sign Up</a>
-          </li>
-          @endif
-        </ul>
+  <!-- Header -->
+  <header class="fixed top-0 w-full bg-white shadow-md z-50">
+    <div class="container mx-auto flex justify-between items-center p-4">
+      <div class="text-2xl font-bold text-blue-600">ShuleApp</div>
+      <nav class="hidden md:flex space-x-8">
+        <a href="#home" class="hover:text-blue-600 font-semibold">Home</a>
+        <a href="#features" class="hover:text-blue-600 font-semibold">Features</a>
+        <a href="#contact" class="hover:text-blue-600 font-semibold">Contact</a>
+      </nav>
+      <!-- Mobile Menu Button -->
+      <div class="md:hidden">
+        <button id="menu-toggle" class="focus:outline-none">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
+          </svg>
+        </button>
       </div>
     </div>
-  </nav>
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white p-4 space-y-4">
+      <a href="#home" class="block text-gray-700">Home</a>
+      <a href="#features" class="block text-gray-700">Features</a>
+      <a href="#contact" class="block text-gray-700">Contact</a>
+    </div>
+  </header>
 
-  <section class="hero">
-    <div id="heroCarousel" class="carousel slide carousel-fade" data-ride="carousel">
-      <ol class="carousel-indicators">
-        <li data-target="#heroCarousel" data-slide-to="0" class="active"></li>
-        <li data-target="#heroCarousel" data-slide-to="1"></li>
-        <li data-target="#heroCarousel" data-slide-to="2"></li>
-        <li data-target="#heroCarousel" data-slide-to="3"></li>
-      </ol>
-      <div class="carousel-inner">
-        <div class="carousel-item active" style="background-image: url('{{ asset('assets/img/cards/paper 1.jpeg') }}');">
-          <div class="carousel-caption">
-            <h1>Welcome to ShuleApp</h1>
-            <p>Your Ultimate Education Management Solution</p>
-            <a href="{{route('login')}}" class="btn btn-primary btn-lg">Get Started</a>
-          </div>
-        </div>
-        <div class="carousel-item" style="background-image: url('{{ asset('assets/img/cards/paper 2.jpg') }}');">
-          <div class="carousel-caption">
-            <h1>Efficient Data Management</h1>
-            <p>Streamline your educational processes</p>
-            <a href="{{route('login')}}" class="btn btn-primary btn-lg">Get Started</a>
-          </div>
-        </div>
-        <div class="carousel-item" style="background-image: url('{{ asset('assets/img/cards/paper 3.jpg') }}');">
-          <div class="carousel-caption">
-            <h1>Innovative Solutions</h1>
-            <p>Enhance learning with technology</p>
-            <a href="{{route('login')}}" class="btn btn-primary btn-lg">Get Started</a>
-          </div>
-        </div>
-        <div class="carousel-item" style="background-image: url('{{ asset('assets/img/cards/paper 4.jpg') }}');">
-          <div class="carousel-caption">
-            <h1>Join to Our Community</h1>
-            <p>Be part of the future of education</p>
-            <a href="{{route('login')}}" class="btn btn-primary btn-lg">Get Started</a>
-          </div>
-        </div>
-      </div>
-      <a class="carousel-control-prev" href="#heroCarousel" role="button" data-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-      </a>
-      <a class="carousel-control-next" href="#heroCarousel" role="button" data-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-      </a>
+  <!-- Hero Section -->
+  <section id="home" class="h-screen bg-cover bg-center relative" style="background-image: url('{{ asset('assets/img/cards/paper 1.jpeg') }}');">
+    <div class="absolute inset-0 bg-opacity-50"></div>
+    <div class="container mx-auto h-full flex flex-col justify-center items-center text-center relative z-10 text-white pt-20">
+      <h1 class="text-4xl md:text-6xl font-bold mb-6">Karibu ShuleApp</h1>
+      <p class="text-xl md:text-2xl mb-8">Suluhisho lako Bora la Usimamizi wa Elimu</p>
+      <a href="{{route('login')}}" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full text-lg font-semibold transition">Anza Sasa</a>
     </div>
   </section>
 
-  <section class="section" id="features" style="background: rgb(232, 167, 221)">
-    <div class="container">
-      <h2 class="text-center mb-4">MAIN FEATURES</h2>
-      <div class="row features">
-        <div class="col-md-4">
-            <div class="card">
-                <img src="{{asset('assets/img/features/feature 1.png')}}" class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title">Reports Management</h5>
-                  <p class="card-text">The reporting capabilities of ShuleApp systems are flexible enough to get reports from attendance, grades/scores, and student Reports</p>
-                </div>
-              </div>
+  <!-- Features Section -->
+  <section id="features" class="py-20 bg-white">
+    <div class="container mx-auto px-6 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold mb-12 text-gray-800">Vipengele vya Kipekee vya ShuleApp</h2>
+      <div class="grid md:grid-cols-3 gap-12">
+
+        <!-- Attendance -->
+        <div class="p-8 shadow-lg rounded-xl hover:scale-105 transition transform bg-gray-50">
+          <div class="text-blue-600 mb-4">
+            <svg class="mx-auto w-14 h-14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-semibold mb-2">Mahudhurio ya Wanafunzi</h3>
+          <p class="text-gray-600">Fuatilia mahudhurio ya kila mwanafunzi kwa haraka, kwa usahihi wa hali ya juu kila siku.</p>
         </div>
-        <div class="col-md-4">
-            <div class="card">
-                <img src="{{asset('assets/img/features/feature 2.png')}}" class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title">Parents Portal</h5>
-                  <p class="card-text">The ShuleApp gives parents a level of control over their child's performance at school than ever seen before. Don't plan to miss using this Amazing Application</p>
-                </div>
-              </div>
+
+        <!-- Matokeo -->
+        <div class="p-8 shadow-lg rounded-xl hover:scale-105 transition transform bg-gray-50">
+          <div class="text-green-600 mb-4">
+            <svg class="mx-auto w-14 h-14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M9 17v-2a4 4 0 014-4h6"></path>
+              <path d="M13 7h6"></path>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-semibold mb-2">Matokeo ya Mitihani</h3>
+          <p class="text-gray-600">Rekodi, changanua na sambaza matokeo ya wanafunzi kwa urahisi bila usumbufu.</p>
         </div>
-        <div class="col-md-4">
-            <div class="card">
-                <img src="{{asset('assets/img/features/feature 3.jpeg')}}" class="card-img-top" alt="...">
-                <div class="card-body">
-                  <h5 class="card-title">Centralized Data Management</h5>
-                  <p class="card-text">Our system provides a centralized platform for managing all staff data, ensuring that information is organized, accessible, and secure.</p>
-                </div>
-              </div>
+
+        <!-- Records -->
+        <div class="p-8 shadow-lg rounded-xl hover:scale-105 transition transform bg-gray-50">
+          <div class="text-purple-600 mb-4">
+            <svg class="mx-auto w-14 h-14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M4 4h16v16H4z"></path>
+              <path d="M8 2v4"></path>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-semibold mb-2">Usimamizi wa Taarifa</h3>
+          <p class="text-gray-600">Hifadhi taarifa muhimu za shule kama kumbukumbu za wanafunzi, walimu na wazazi kwa usalama wa hali ya juu.</p>
         </div>
+
+        <!-- Bulk SMS -->
+        <div class="p-8 shadow-lg rounded-xl hover:scale-105 transition transform bg-gray-50">
+          <div class="text-yellow-500 mb-4">
+            <svg class="mx-auto w-14 h-14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
+              <path d="M7 10l5 5 5-5"></path>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-semibold mb-2">Bulk SMS</h3>
+          <p class="text-gray-600">Tuma ujumbe wa pamoja kwa wazazi kwa sekunde chache tu, bila bughudha.</p>
+        </div>
+
+        <!-- Security -->
+        <div class="p-8 shadow-lg rounded-xl hover:scale-105 transition transform bg-gray-50">
+          <div class="text-red-500 mb-4">
+            <svg class="mx-auto w-14 h-14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-semibold mb-2">Usalama wa Data</h3>
+          <p class="text-gray-600">Data yako inalindwa kwa viwango vya juu vya usalama kuhakikisha faragha na uhakika wa taarifa zako.</p>
+        </div>
+
+        <!-- Parent Portal -->
+        <div class="p-8 shadow-lg rounded-xl hover:scale-105 transition transform bg-gray-50">
+          <div class="text-indigo-600 mb-4">
+            <svg class="mx-auto w-14 h-14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M16 12a4 4 0 01-8 0m8 0a4 4 0 00-8 0m8 0H8"></path>
+              <path d="M12 14v6"></path>
+              <path d="M8 18h8"></path>
+            </svg>
+          </div>
+          <h3 class="text-2xl font-semibold mb-2">Portal ya Wazazi</h3>
+          <p class="text-gray-600">Wazazi hupata taarifa za mahudhurio, matokeo, na matukio moja kwa moja kwa urahisi mtandaoni.</p>
+        </div>
+
       </div>
     </div>
   </section>
 
-  <section class="section" id="contact" style="background:rgb(159, 240, 214)">
-    <div class="container">
-      <h2 class="text-center mb-4">CONTACT SUPPORT</h2>
-      <div class="row">
-        <div class="col-md-6">
-          <h4>ShuleApp - Admin</h4>
-          <p> <i class=" fas fa-location-pin"></i> Address: Dodoma, Tanzania</p>
-          <p><i class="fas fa-envelope"></i> pianop477@gmail.com</p>
-          <p><i class="fas fa-phone"></i>
-            <a href="tel:0678669000">
-                +255 678 669 000
-            </a>
-          </p>
-          <p>&copy; <a href="#"> ShuleApp</a> - {{date('Y')}}  </p>
-        </div>
-        <div class="col-md-6">
-          <form method="POST" action="{{route('send.feedback.message') . ('#contact')}}" class="needs-validation" novalidate>
-            @csrf
-            <div class="form-group">
-              <label for="name">Name:</label>
-              <input type="text" class="form-control" id="name" name="name" placeholder="Enter your Name" value="{{old('name')}}">
-              @error('name')
-                  <div class="text-danger">{{$message}}</div>
-              @enderror
-            </div>
-            <div class="form-group">
-              <label for="email">Phone:</label>
-              <input type="text" class="form-control" id="" placeholder="Enter your Phone" name="phone" value="{{old('phone')}}">
-              @error('phone')
-                  <div class="text-danger">{{$message}}</div>
-              @enderror
-            </div>
-            <div class="form-group">
-              <label for="message">Message:</label>
-              <textarea class="form-control" id="message" rows="3" placeholder="Enter your Message here" name="message">{{old('message')}}</textarea>
-              @error('message')
-                  <div class="text-danger">{{$message}}</div>
-              @enderror
-            </div>
-            <button type="submit" id="saveButton" class="btn btn-primary">Send Message</button>
-          </form>
-        </div>
-      </div>
+  <!-- Testimonials Section -->
+
+  <!-- Contact Section -->
+  <section id="contact" class="py-20 bg-gray-100">
+    <div class="container mx-auto px-6 text-center">
+      <h2 class="text-3xl font-bold mb-12 text-gray-800">Wasiliana Nasi</h2>
+      <p>Kwa Msaada: <a href="tel:+255678669000">0678 669 000</a></p>
+      <form class="max-w-2xl mx-auto space-y-6 needs-validation" novalidate action="{{route('send.feedback.message') . ('#contact')}}" method="POST">
+        @csrf
+        <input type="text" name="name" placeholder="Jina lako" value="{{old('name')}}" class="w-full border border-gray-300 p-4 rounded-lg">
+        @error('name')
+            <span class="" style="color: red;">{{$message}}</span>
+        @enderror
+        <input type="text" name="phone" placeholder="Namba ya simu" value="{{old('phone')}}" class="w-full border border-gray-300 p-4 rounded-lg">
+        @error('phone')
+            <span class="" style="color: red;">{{$message}}</span>
+        @enderror
+        <textarea placeholder="Ujumbe wako" name="message" class="w-full border border-gray-300 p-4 rounded-lg" rows="5" required>{{old('message')}}</textarea>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-full transition" id="saveButton">Tuma Ujumbe</button>
+      </form>
     </div>
   </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-gray-400 py-8 text-center">
+    <p>©{{date('Y')}} ShuleApp. Haki Zote Zimehifadhiwa.</p>
+  </footer>
+
   @include('sweetalert::alert')
-
   <script>
+    // Mobile menu toggle
+    document.getElementById('menu-toggle').addEventListener('click', function() {
+      document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+
+    // Scroll animations
+    ScrollReveal().reveal('section', {
+      delay: 200,
+      distance: '50px',
+      duration: 1000,
+      easing: 'ease-in-out',
+      origin: 'bottom'
+    });
+
     document.addEventListener("DOMContentLoaded", function () {
         const form = document.querySelector(".needs-validation");
         const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
@@ -313,13 +186,13 @@
 
             // Disable button na badilisha maandishi
             submitButton.disabled = true;
-            submitButton.innerHTML = `<span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span> Please Wait...`;
+            submitButton.innerHTML = `<span class="inline-block w-5 h-5 border-4 border-t-4 border-white rounded-full animate-spin"></span> Please Wait...`;
 
             // Hakikisha form haina errors kabla ya kutuma
             if (!form.checkValidity()) {
                 form.classList.add("was-validated");
                 submitButton.disabled = false; // Warudishe button kama kuna errors
-                submitButton.innerHTML = "Send Message";
+                submitButton.innerHTML = "Tuma Ujumbe";
                 return;
             }
 
@@ -329,6 +202,7 @@
             }, 500);
         });
     });
-</script>
+  </script>
+
 </body>
 </html>
