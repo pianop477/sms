@@ -184,7 +184,7 @@
                                                                 @else
                                                                     @foreach ($parents as $parent)
                                                                         <option value="{{$parent->id}}">
-                                                                            {{ucwords(strtoupper($parent->first_name . ' ' . $parent->last_name))}}
+                                                                            {{ucwords(strtoupper($parent->first_name . ' ' . $parent->last_name))}} - {{$parent->phone}}
                                                                         </option>
                                                                     @endforeach
                                                                 @endif
@@ -201,9 +201,9 @@
                                                         <label for="validationCustom01">Class Group</label>
                                                         <select name="group" id="validationCustom02" required class="form-control">
                                                             <option value="">--Select Stream--</option>
-                                                            <option value="a">A</option>
-                                                            <option value="b">B</option>
-                                                            <option value="c">C</option>
+                                                            <option value="a">Stream A</option>
+                                                            <option value="b">Stream B</option>
+                                                            <option value="c">Stream C</option>
                                                         </select>
                                                         {{-- <input type="text" name="group" required id="validationCustomUsername" class="form-control text-uppercase" placeholder="Enter Group A, B or C" id="validationCustom02" value="{{old('dob')}}" required> --}}
                                                         @error('group')

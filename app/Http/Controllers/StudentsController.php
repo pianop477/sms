@@ -423,7 +423,7 @@ class StudentsController extends Controller
         $parents = Parents::query()
                             ->join('users', 'users.id', '=', 'parents.user_id')
                             ->join('schools', 'schools.id', '=', 'parents.school_id')
-                            ->select('parents.id', 'users.first_name', 'users.last_name')
+                            ->select('parents.id', 'users.first_name', 'users.last_name', 'users.phone')
                             ->where('parents.school_id', '=', $user->school_id)
                             ->where('parents.status', '=', 1)
                             ->orderBy('users.first_name', 'ASC')
@@ -735,17 +735,17 @@ class StudentsController extends Controller
         }
         // return $user;
         $students = Student::query()->join('parents', 'parents.id', '=', 'students.parent_id')
-                                    ->join('users', 'users.id', '=', 'parents.user_id')
+                                    ->leftJoin('users', 'users.id', '=', 'parents.user_id')
                                     ->join('grades', 'grades.id', '=', 'students.class_id')
                                     ->leftJoin('transports', 'transports.id', '=', 'students.transport_id')
                                     ->select('students.*', 'grades.class_name',
-                                    'grades.id as grade_class_id',
+                                    'grades.id as grade_class_id', 'users.phone',
                                     'grades.class_code', 'transports.driver_name', 'transports.bus_no')
                                     ->findOrFail($decoded[0]);
 
         $parent = Parents::query()
                         ->join('users', 'users.id', '=', 'parents.user_id')
-                        ->select('users.first_name', 'users.last_name', 'parents.id as parent_id')
+                        ->select('users.first_name', 'users.last_name', 'parents.id as parent_id', 'users.phone')
                         ->findOrFail($students->parent_id);
 
         $allParents = Parents::query()
