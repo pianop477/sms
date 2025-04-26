@@ -104,9 +104,9 @@
                                                         {{-- <input type="text" name="group" id="validationCustomUsername" class="form-control" placeholder="Enter A, B or C" id="validationCustom02" value="{{old('group')}}" required> --}}
                                                         <select name="group" id="validationCustom02" required class="form-control">
                                                             <option value="">--Select Stream--</option>
-                                                            <option value="a">A</option>
-                                                            <option value="b">B</option>
-                                                            <option value="c">C</option>
+                                                            <option value="a">Stream A</option>
+                                                            <option value="b">Stream B</option>
+                                                            <option value="c">Stream C</option>
                                                         </select>
                                                         @error('group')
                                                         <div class="text-danger">{{$message}}</div>

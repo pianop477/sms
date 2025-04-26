@@ -138,10 +138,10 @@
                 <div class="col-md-3 mb-3">
                     <label for="validationCustomUsername">Parent/Guardian Name</label>
                         <select name="parent" id="parentSelect" class="form-control select2 text-capitalize" required>
-                            <option value="{{$parents->parent_id}}" selected>{{ucwords(strtolower($parents->first_name))}} {{ucwords(strtolower($parents->last_name))}}</option>
+                            <option value="{{$parents->parent_id}}" selected>{{ucwords(strtolower($parents->first_name))}} {{ucwords(strtolower($parents->last_name))}} - {{$parents->phone}}</option>
                             @foreach ($allParents as $parent)
                                 <option value="{{$parent->parent_id}}">
-                                    {{ucwords(strtolower($parent->first_name))}} {{ucwords(strtolower($parent->last_name))}}
+                                    {{ucwords(strtolower($parent->first_name))}} {{ucwords(strtolower($parent->last_name))}} - {{$parent->phone}}
                                 </option>
                             @endforeach
                         </select>
@@ -171,10 +171,10 @@
                     <label for="validationCustom01">Stream</label>
                     {{-- <input type="text" name="group" class="form-control text-capitalize" id="validationCustom01" value="{{$students->group}}"> --}}
                     <select name="group" id="validationCustom02" required class="form-control">
-                        <option value="{{$students->group}}" selected>{{$students->group}}</option>
-                        <option value="a">A</option>
-                        <option value="b">B</option>
-                        <option value="c">C</option>
+                        <option value="{{$students->group}}" selected>Stream {{$students->group}}</option>
+                        <option value="a">Stream A</option>
+                        <option value="b">Stream B</option>
+                        <option value="c">Stream C</option>
                     </select>
                     @error('group')
                     <div class="text-danger">{{$message}}</div>

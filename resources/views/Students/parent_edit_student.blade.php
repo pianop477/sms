@@ -116,10 +116,10 @@
                     <label for="validationCustom01">Stream</label>
                     {{-- <input type="text" name="group" class="form-control text-capitalize" id="validationCustom01" value="{{$students->group}}"> --}}
                     <select name="group" id="validationCustom02" required class="form-control">
-                        <option value="{{$students->group}}" selected>{{$students->group}}</option>
-                        <option value="a">A</option>
-                        <option value="b">B</option>
-                        <option value="c">C</option>
+                        <option value="{{$students->group}}" selected>Stream {{$students->group}}</option>
+                        <option value="a">Stream A</option>
+                        <option value="b">Stream B</option>
+                        <option value="c">Stream C</option>
                     </select>
                     @error('group')
                     <div class="text-danger">{{$message}}</div>
