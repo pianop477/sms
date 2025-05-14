@@ -1706,7 +1706,7 @@ class ResultsController extends Controller
         }
 
         $student = $results->first();
-        $schoolInfo = $results->first();
+        $schoolInfo = school::findOrFail($schoolId);
         return $schoolInfo;
 
         // =================== EXAM HEADERS WITH DATES ===================
@@ -2070,8 +2070,7 @@ class ResultsController extends Controller
         }
 
         $students = $results->first();
-        $schoolInfo = $results->first();
-        return $schoolInfo;
+        $schoolInfo = school::findOrFail($schoolId);
 
         // =================== EXAM HEADERS WITH DATES ===================
         $examHeadersWithDates = $results
