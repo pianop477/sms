@@ -84,7 +84,7 @@
                             icon: 'info',
                             title: 'Session Expired! Please login.',
                             showConfirmButton: false,
-                            timer: 5000,
+                            timer: 10000,
                             toast: true
                         });
                         window.location.reload(); // Refresh page ili kupata CSRF token mpya

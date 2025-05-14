@@ -19,7 +19,7 @@
                 <div class="form-row">
                     <div class="col-md-6 mb-3">
                         <label for="validationCustom01">Select Class</label>
-                        <select name="class" id="validationCustom01" class="form-control text-capitalize">
+                        <select name="class" id="validationCustom01" class="form-control text-uppercase">
                             <option value="">--Select class--</option>
                             @if ($classes->isEmpty())
                                 <option value="" disabled class="text-danger">No classes found</option>
@@ -36,13 +36,22 @@
                         @enderror
                         <hr>
                         <label>
-                            <input type="checkbox" name="send_to_all" value="1" class=""> Send to all Classes?
+                            <input type="checkbox" name="send_to_all" value="1" class=""> Send to all Parents with students registered in all classes?
+                        </label> <br>
+                        <label for="">
+                            <input type="checkbox" name="send_with_transport" value="1" class=""> Send to all Parents with students registered in transport?
                         </label>
+                        <label for="">
+                            <input type="checkbox" name="send_without_transport" value="1" class=""> Send to all Parents with students registered without transport?
+                        </label><br>
+                        <label for="">
+                            <input type="checkbox" name="send_to_teachers" value="1" class=""> Send to all Teachers?
+                        </label><br>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="validationCustom02">Your Message</label>
-                        <textarea name="message_content" id="message_content" cols="30" rows="5" class="form-control" required maxlength="160">{{ old('message_content') }}</textarea>
-                        <small id="charCount" class="text-muted">160 characters remaining</small>
+                        <textarea name="message_content" id="message_content" cols="30" rows="7" class="form-control" required maxlength="160">{{ old('message_content') }}</textarea>
+                        <small id="charCount" class="text-muted">306 characters remaining</small>
                         @error('message_content')
                         <div class="text-danger">
                             <span>{{ $message }}</span>
@@ -59,7 +68,7 @@
                 document.addEventListener("DOMContentLoaded", function () {
                     const textarea = document.getElementById("message_content");
                     const charCount = document.getElementById("charCount");
-                    const maxChars = 160;
+                    const maxChars = 306;
 
                     textarea.addEventListener("input", function () {
                         let remaining = maxChars - textarea.value.length;

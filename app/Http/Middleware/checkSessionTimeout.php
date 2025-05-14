@@ -22,22 +22,19 @@ class checkSessionTimeout
      public function handle(Request $request, Closure $next)
     {
         if (Auth::check()) {
-            // Check if the session start time is set, if not, set it to now
+            // Ikiwa session_start_time haipo, weka sasa hivi (user ka-login tu)
             if (!session()->has('session_start_time')) {
-                session()->put('session_start_time', now());
+                session(['session_start_time' => now()]);
             }
 
-            // Get the session start time
-            $sessionStartTime = session()->get('session_start_time');
+            // Linganisha muda wa sasa na ule aliowekewa mwanzo
+            $sessionDuration = now()->diffInMinutes(session('session_start_time'));
 
-            // Calculate session duration in minutes
-            $sessionDuration = now()->diffInMinutes($sessionStartTime);
-
-            // If session duration exceeds 2 minutes, log out user and invalidate session
+            // Kama muda umepita zaidi ya masaa 2 (dakika 120), fanya logout
             if ($sessionDuration >= 120) {
-                Auth::logout(); // Logout user
-                $request->session()->invalidate(); // Invalidate session
-                $request->session()->regenerateToken(); // Prevent CSRF attacks
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
 
                 return redirect()->route('login')->with('error', 'Session expired. Please login again');
             }
@@ -45,5 +42,6 @@ class checkSessionTimeout
 
         return $next($request);
     }
+
 
 }

@@ -5,7 +5,7 @@
         <div class="col-md-4 mt-5">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="header-title text-center text-capitalize">Approved Contract Groups</h4>
+                    <h4 class="header-title text-center text-capitalize">Approved Contract Group</h4>
                     <p class="text-danger">Select Year</p>
                     @if ($contractsByYear->isEmpty())
                     <div class="alert alert-danger" role="alert">
@@ -26,7 +26,7 @@
         <div class="col-md-8 mt-5">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="header-title text-center text-capitalize">all Contracts Requests</h4>
+                    <h4 class="header-title text-center text-capitalize">New Contracts Requests</h4>
                     @if ($contractRequests->isEmpty())
                         <div class="alert alert-warning text-center">
                             <p class="text-danger">There is no new contract request!</p>

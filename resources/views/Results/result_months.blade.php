@@ -9,8 +9,8 @@
                     <h4 class="header-title text-center text-uppercase">Select Month - for {{$year}}</h4>
                 </div>
                 <div class="col-2">
-                    <a href="{{ route('result.byType', ['student' => Hashids::encode($students->id), 'year' => $year]) }}" class="float-right">
-                        <i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i>
+                    <a href="{{ route('result.byType', ['student' => Hashids::encode($students->id), 'year' => $year]) }}" class="float-right btn btn-info btn-xs">
+                        <i class="fas fa-arrow-circle-left" style=""></i> Back
                     </a>
                 </div>
             </div>

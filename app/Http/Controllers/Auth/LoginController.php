@@ -58,20 +58,18 @@ class LoginController extends Controller
         ]);
 
         $ip = $request->ip();
-        $key = 'login:attempts:' . $ip;
+        $key = 'login:attempts:' . strtolower($request->username) . ':' . $ip;
         $maxAttempts = 3;
         $decayMinutes = 15;
 
         // Record the attempt first
-        RateLimiter::hit($key, $decayMinutes * 60);
-
-        // Check if IP is now blocked
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             $seconds = RateLimiter::availableIn($key);
             Alert()->toast('Account locked. Try again in ' . ceil($seconds / 60) . ' minutes.', 'error');
             return redirect()->back();
         }
 
+        RateLimiter::hit($key, $decayMinutes * 60);
         $loginType = $this->username(); // could be 'email' or 'username' depending on your logic
         $credentials = [
             $loginType => $request->username,
@@ -99,6 +97,4 @@ class LoginController extends Controller
 
         return back()->with('error', 'Invalid credentials');
     }
-
-
 }

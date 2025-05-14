@@ -31,19 +31,31 @@
                         </div>
                         <div class="form-gp">
                             <label for="exampleInputPassword1">Password</label>
-                            <input type="password" id="exampleInputPassword1" name="password" value="{{old('password')}}">
-                            <i class="ti-lock"></i>
-                            @error('password')
+                                <div class="input-group">
+                                    <input type="password" id="exampleInputPassword1" name="password" value="{{old('password')}}" placeholder="Password" class="form-control">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text toggle-password" data-target="exampleInputPassword1">
+                                            <i class="ti-eye"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                @error('password')
                                 <div class="text-danger">{{$message}}</div>
                             @enderror
                         </div>
                         <div class="form-gp">
-                            <label for="exampleInputPassword1">Confirm Password</label>
-                            <input type="password" id="exampleInputPassword1" name="password_confirmation" value="{{old('password')}}">
-                            <i class="ti-lock"></i>
-                            @error('password_confirmation')
+                            <label for="exampleInputPassword1">Password</label>
+                                <div class="input-group">
+                                    <input type="password" id="exampleInputPassword1" name="password_confirmation" value="{{old('password')}}" placeholder="Password" class="form-control">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text toggle-password" data-target="exampleInputPassword1">
+                                            <i class="ti-eye"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                @error('password')
                                 <div class="text-danger">{{$message}}</div>
-                            @enderror
+                                @enderror
                         </div>
 
                         <div class="submit-btn-area">
@@ -86,6 +98,20 @@
                 }, 500);
             });
         });
+
+        //show and hide password field
+            document.querySelectorAll(".toggle-password").forEach(item => {
+                item.addEventListener("click", function() {
+                    let input = document.getElementById(this.getAttribute("data-target"));
+                        if (input.type === "password") {
+                            input.type = "text";
+                                this.innerHTML = '<i class="fa fa-eye-slash"></i>';
+                            } else {
+                                input.type = "password";
+                                this.innerHTML = '<i class="ti-eye"></i>';
+                            }
+                });
+            });
     </script>
 </body>
 

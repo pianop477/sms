@@ -141,7 +141,7 @@
                 <div class="single-table">
                     <div class="table-responsive">
                         <table class="table table-hover progress-table" id="myTable">
-                            <thead class="text-uppercase">
+                            <thead class="text-capitalize">
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Teacher's Name</th>

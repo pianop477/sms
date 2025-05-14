@@ -682,7 +682,7 @@
                     <div class="card" style="background: #b14fbe">
                         <div class="">
                             <div class="p-4 d-flex justify-content-between align-items-center">
-                                <div class="seofct-icon"><i class="ti-book"></i> My Course</div>
+                                <div class="seofct-icon"><i class="ti-book"></i> My Courses</div>
                                 <h2 class="text-white">
                                     @if ( $courses->where('status', 1)->count() > 2)
                                         3+
@@ -796,7 +796,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-10"><h4 class="header-title text-uppercase text-center"> My Courses</h4></div>
+                            <div class="col-10"><h4 class="header-title text-capitalize text-center">my teaching subjects</h4></div>
                         </div>
                         <div class="table-responsive-md">
                             <table class="table table-hover text-center" id="">
@@ -819,7 +819,7 @@
                                         @else
                                         @foreach ($courses as $course )
                                         <tr>
-                                            <td class="text-uppercase">
+                                            <td class="text-capitalize">
                                                 {{$course->course_name}}
                                             </td>
                                             <td class="text-uppercase">{{$course->class_code}}</td>
@@ -1105,7 +1105,7 @@
                         <div class="card" style="background:#098ddf">
                             <div class="">
                                 <div class="p-4 d-flex justify-content-between align-items-center">
-                                    <div class="seofct-icon"><i class="ti-blackboard"></i> My Class</div>
+                                    <div class="seofct-icon"><i class="fas fa-person-circle-check"></i> My Attendance</div>
                                     <h2 class="text-white">{{ $myClass->count() }}</h2>
                                 </div>
                                 <canvas id="" height="50"></canvas>
@@ -1119,7 +1119,7 @@
                     <div class="card" style="background:#c84fe0">
                         <div class="">
                             <div class="p-4 d-flex justify-content-between align-items-center">
-                                <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Student</div>
+                                <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Students</div>
                                 @foreach ($classData as $data )
                                 <h2 class="text-white">{{$data['maleCount'] + $data['femaleCount']}}</h2>
                                 @endforeach
@@ -1132,7 +1132,7 @@
                     <div class="card" style="background: #bf950a">
                         <div class="">
                             <div class="p-4 d-flex justify-content-between align-items-center">
-                                <div class="seofct-icon"><i class="ti-book"></i> My Course</div>
+                                <div class="seofct-icon"><i class="ti-book"></i> My Courses</div>
                                 <h2 class="text-white">
                                     @if ($courses->where('status', 1)->count() > 2)
                                         3+
@@ -1150,7 +1150,7 @@
                 <div class="col-lg-6 mt-0">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="header-title text-center text-uppercase"> My Attendance Class</h4>
+                            <h4 class="header-title text-center text-capitalize"> My Attendance Class</h4>
                             <div class="table-responsive-md">
                                 <table class="table table-hover text-center">
                                     <thead>
@@ -1189,7 +1189,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-10"><h4 class="header-title text-center text-uppercase"> My Courses</h4></div>
+                            <div class="col-10"><h4 class="header-title text-center text-capitalize">my teaching subjects</h4></div>
                         </div>
                         <div class="table-responsive-md">
                             <table class="table table-hover text-center" id="">
@@ -1212,7 +1212,7 @@
                                         @else
                                         @foreach ($courses as $course )
                                         <tr>
-                                            <td class="text-uppercase">
+                                            <td class="text-capitalize">
                                                 {{$course->course_name}}
                                             </td>
                                             <td class="text-uppercase">{{$course->class_code}}</td>
@@ -1315,66 +1315,82 @@
             <div class="col-lg-6 mt-1">
                 <div class="card">
                     <div class="card-title mt-1">
-                        <h6 class="text-center">Today's Attendance Summary</h6>
-                        <p class="text-center font-style-italic">Today is: {{\Carbon\Carbon::today()->format('d-m-Y')}}</p>
+                        <h6 class="text-center">Today's Attendance: {{\Carbon\Carbon::today()->format('d-m-Y')}}</h6>
+                        {{-- <p class="text-center font-style-italic">Today is: {{\Carbon\Carbon::today()->format('d-m-Y')}}</p> --}}
                     </div>
-                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-                    <div style="width: 280px; height: 260px; margin: 0 auto;">
-                        @if (is_array($attendanceCount) && $attendanceCount > 0)
-                            <canvas id="attendanceChart"></canvas>
+                       @if (!empty($attendanceCount) && is_array($attendanceCount))
+                            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                            <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+                            <div style="width: 300px; height: 260px; margin: 0 auto;">
+                                <canvas id="attendanceChart"></canvas>
+                            </div>
+                            <script>
+                                const attendanceData = @json($attendanceCount);
+
+                                if (attendanceData && attendanceData.male && attendanceData.female) {
+                                    const ctx = document.getElementById('attendanceChart').getContext('2d');
+
+                                    const malePresent = attendanceData.male.present || 0;
+                                    const femalePresent = attendanceData.female.present || 0;
+                                    const maleAbsent = attendanceData.male.absent || 0;
+                                    const femaleAbsent = attendanceData.female.absent || 0;
+                                    const malePermission = attendanceData.male.permission || 0;
+                                    const femalePermission = attendanceData.female.permission || 0;
+
+                                    const totalPresent = malePresent + femalePresent;
+                                    const totalAbsent = maleAbsent + femaleAbsent;
+                                    const totalPermission = malePermission + femalePermission;
+
+                                    const attendanceChart = new Chart(ctx, {
+                                        type: 'doughnut',
+                                        data: {
+                                            labels: [
+                                                `Pres (B: ${malePresent}, G: ${femalePresent})`,
+                                                `Abs (B: ${maleAbsent}, G: ${femaleAbsent})`,
+                                                `Perm (B: ${malePermission}, G: ${femalePermission})`
+                                            ],
+                                            datasets: [{
+                                                label: 'Total Attendance',
+                                                data: [totalPresent, totalAbsent, totalPermission],
+                                                backgroundColor: [
+                                                    'rgba(75, 192, 192, 0.6)',
+                                                    'rgba(255, 159, 64, 0.6)',
+                                                    'rgba(255, 99, 132, 0.7)'
+                                                ],
+                                                borderColor: [
+                                                    'rgba(75, 192, 192, 1)',
+                                                    'rgba(255, 159, 64, 1)',
+                                                    'rgba(255, 99, 132, 0.7)'
+                                                ],
+                                                borderWidth: 1
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            plugins: {
+                                                legend: {
+                                                    position: 'top'
+                                                },
+                                                datalabels: {
+                                                    color: '#000',
+                                                    font: {
+                                                        weight: 'bold',
+                                                        size: 12
+                                                    },
+                                                    formatter: function(value, context) {
+                                                        return `${context.chart.data.labels[context.dataIndex]} = ${value}`;
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        plugins: [ChartDataLabels]
+                                    });
+                                }
+                            </script>
                         @else
-                            <p class="text-center mt-5 text-danger">No Attendance records available.</p>
+                            <p class="text-center mt-5 text-danger">No attendance records available.</p>
                         @endif
                     </div>
-                    <script>
-                        const attendanceData = @json($attendanceCount); // Pass the PHP array to JavaScript
-
-                        const ctx = document.getElementById('attendanceChart').getContext('2d');
-                        const attendanceChart = new Chart(ctx, {
-                            type: 'bar', // Bar chart for better visualization of actual numbers
-                            data: {
-                                labels: ['Present', 'Absent', 'Permission'],
-                                datasets: [
-                                    {
-                                        label: 'Boys',
-                                        data: [
-                                            attendanceData.male.present,
-                                            attendanceData.male.absent,
-                                            attendanceData.male.permission
-                                        ],
-                                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                        borderColor: 'rgba(54, 162, 235, 1)',
-                                        borderWidth: 1
-                                    },
-                                    {
-                                        label: 'Girls',
-                                        data: [
-                                            attendanceData.female.present,
-                                            attendanceData.female.absent,
-                                            attendanceData.female.permission
-                                        ],
-                                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                        borderColor: 'rgba(255, 99, 132, 1)',
-                                        borderWidth: 1
-                                    }
-                                ]
-                            },
-                            options: {
-                                scales: {
-                                    y: {
-                                        beginAtZero: true
-                                    }
-                                },
-                                responsive: true,
-                                plugins: {
-                                    legend: {
-                                        position: 'top',
-                                    }
-                                }
-                            }
-                        });
-                    </script>
                 </div>
             </div>
         </div>
@@ -1406,7 +1422,7 @@
                 <div class="card" style="background: #bf950a">
                     <div class="">
                         <div class="p-4 d-flex justify-content-between align-items-center">
-                            <div class="seofct-icon"><i class="ti-book"></i> My Course</div>
+                            <div class="seofct-icon"><i class="ti-book"></i> My Courses</div>
                             <h2 class="text-white">
                                 @if ($courses->where('status', 1)->count() > 2)
                                     3+
@@ -1423,7 +1439,7 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-10"><h4 class="header-title text-center text-uppercase"> My Courses</h4></div>
+                            <div class="col-10"><h4 class="header-title text-center text-capitalize">my teaching subjects</h4></div>
                         </div>
                         <div class="table-responsive-md">
                             <table class="table table-hover text-center" id="">
@@ -1446,7 +1462,7 @@
                                         @else
                                         @foreach ($courses as $course )
                                         <tr>
-                                            <td class="text-uppercase">
+                                            <td class="text-capitalize">
                                                 {{$course->course_name}}
                                             </td>
                                             <td class="text-uppercase">{{$course->class_code}}</td>

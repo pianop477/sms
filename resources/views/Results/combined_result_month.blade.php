@@ -1,141 +1,96 @@
 @extends('SRTDashboard.frame')
 @section('content')
-    <div class="col-md-12 mt-5">
+    <div class="col-md-12 mt-3">
         <div class="card">
             <div class="card-body">
                 <div class="row">
                     <div class="col-10">
-                        <h4 class="header-title text-center text-uppercase">{{$exam}} combined reports</h4>
+                        <h4 class="header-title text-center text-uppercase">students generated report - {{$reports->title}} ({{$classes->class_code}})</h4>
                     </div>
                     <div class="col-2">
-                        <a href="" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                        <a href="{{route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
                     </div>
                 </div>
-                <p class="text-danger">Combine Result Months for {{$exam}} - {{$year}}</p>
-                <div class="list-group">
-                    @if ($groupedByMonth->isEmpty())
-                        <div class="alert alert-warning text-center" role="alert">
-                            <h6>No Result Records found</h6>
-                        </div>
-                    @else
-                    <table class="table table-responsive-md table-hover">
-                        <tbody>
-                            @foreach ($groupedByMonth as $month => $results)
-                                @php
-                                    $firstResult = $results->first();
-                                @endphp
+                <table class="table table-responsive-md table-hover table-striped" id="myTable">
+                    <thead>
+                        <tr class="text-uppercase">
+                            <th class="text-center">Adm No</th>
+                            <th>Student Name</th>
+                            <th>Phone</th>
+                            <th>Score</th>
+                            <th>Total</th>
+                            <th>Average</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if ($myReportData->isEmpty())
+                            <tr>
+                                <td colspan="7" class="text-center text-danger">No Students records found</td>
+                            </tr>
+                        @else
+                            @foreach ($myReportData as $student)
                                 <tr>
+                                    <td class="text-center text-uppercase">{{ $student->admission_number }}</td>
+                                    <td class="text-capitalize">{{ ucwords(strtolower($student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name)) }}</td>
+                                    <td>{{ $student->phone }}</td>
                                     <td>
-                                        <a href="" target="_blank">
-                                            <h6 class="text-primary text-capitalize"><i class="fas fa-chevron-right"></i> {{ $month }} Combined Results Link</h6>
-                                        </a>
+                                        @php
+                                            $total = 0;
+                                            $count = 0;
+                                        @endphp
+
+                                        @foreach ($reports->exam_dates as $exam_date)
+                                            <div class="mb-2">
+                                                <strong>{{ \Carbon\Carbon::parse($exam_date)->format('d M, Y') }}</strong>
+                                                <div class="d-flex flex-wrap gap-1 mt-1">
+                                                    @foreach ($allScores[$student->student_id] ?? [] as $course_id => $dates)
+                                                        @if (isset($dates[$exam_date]))
+                                                            @php
+                                                                $score = $dates[$exam_date][0]->score;
+                                                                $course = $dates[$exam_date][0]->course_code ?? 'Course';
+                                                                $total += $score;
+                                                                $count++;
+                                                            @endphp
+                                                            <div class="me-1 mb-1">
+                                                                <small>{{ $course }}</small><br>
+                                                                <input type="number" value="{{ $score }}" class="form-control form-control-sm" style="width: 60px;" readonly>
+                                                            </div>
+                                                        @else
+                                                            <div class="me-1 mb-1">
+                                                                <small>{{ $course }}</small><br>
+                                                                <input type="text" value="ABS" class="form-control form-control-sm text-danger" style="width: 60px;" readonly>
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endforeach
                                     </td>
+
+                                    <td>{{ $total }}</td>
+                                    <td>{{ $count > 0 ? round($total / $count, 2) : '-' }}</td>
                                     <td>
-                                        <a href="" class="float-right btn btn-primary btn-xs">
-                                            Students
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <label class="switch float-right">
-                                            <input type="checkbox" class="toggle-status" data-school="{{ $school->id }}" data-year="{{ $year }}" data-class="{{ $class}}" data-exam-type="{{ $exam }}" data-month="{{ $month }}" {{ $firstResult->status == 2 ? 'checked' : '' }}>
-                                            <span class="slider round"></span>
-                                        </label>
-                                    </td>
-                                    <td>
-                                        <a href="{{route('delete.combinedResults', ['class' => $class, 'year' => $year, 'school' => $school, 'exam' => $exam, 'month' => $month])}}" class="float-right btn btn-danger btn-xs" onclick="return confirm('Are you sure you want to delete this results?')">
-                                            Delete
-                                        </a>
+                                        <ul class="d-flex justify-content-center list-unstyled mb-0">
+                                            <li class="mr-2">
+                                                <a href="{{route('students.report', ['school' => $school, 'year' => $year, 'class' => Hashids::encode($classes->id), 'report' => $report, 'student' => Hashids::encode($student->studentId)])}}" title="Preview Report" class="btn btn-success btn-xs" onclick="return confirm('Are you sure you want to preview report?')">Preview</a>
+                                            </li>
+                                            <li>
+                                                <form action="{{route('send.sms.combine.report', ['school'=> $school, 'year'=> $year, 'class'=>Hashids::encode($classes->id), 'report'=>$report, 'student'=>Hashids::encode($student->studentId)])}}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" title="Send SMS" class="btn btn-warning btn-xs"  onclick="return confirm('Are you sure you want to Re-send SMS?')">SMS</button>
+                                                </form>
+                                            </li>
+                                        </ul>
                                     </td>
                                 </tr>
                             @endforeach
-                        </tbody>
-                    </table>
-                    @endif
-                </div>
-
+                        @endif
+                    </tbody>
+                </table>
                 <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        const toggleButtons = document.querySelectorAll('.toggle-status');
 
-                        toggleButtons.forEach(button => {
-                            button.addEventListener('change', function () {
-                                const isChecked = this.checked;
-                                const schoolId = this.getAttribute('data-school');
-                                const year = this.getAttribute('data-year');
-                                const classId = this.getAttribute('data-class');
-                                const examType = this.getAttribute('data-exam-type');
-                                const month = this.getAttribute('data-month');
-                                const url = isChecked ? '{{ route('publish.results', ['school' => ':school', 'year' => ':year', 'class' => ':class', 'examType' => ':examType', 'month' => ':month']) }}' : '{{ route('unpublish.results', ['school' => ':school', 'year' => ':year', 'class' => ':class', 'examType' => ':examType', 'month' => ':month']) }}';
-
-                                const form = document.createElement('form');
-                                form.method = 'POST';
-                                form.action = url.replace(':school', schoolId).replace(':year', year).replace(':class', classId).replace(':examType', examType).replace(':month', month);
-
-                                const csrfField = document.createElement('input');
-                                csrfField.type = 'hidden';
-                                csrfField.name = '_token';
-                                csrfField.value = '{{ csrf_token() }}';
-                                form.appendChild(csrfField);
-
-                                const methodField = document.createElement('input');
-                                methodField.type = 'hidden';
-                                methodField.name = '_method';
-                                methodField.value = 'PUT';
-                                form.appendChild(methodField);
-
-                                document.body.appendChild(form);
-                                form.submit();
-                            });
-                        });
-                    });
                 </script>
-
-                <style>
-                    .switch {
-                        position: relative;
-                        display: inline-block;
-                        width: 50px;
-                        height: 24px;
-                    }
-
-                    .switch input {
-                        opacity: 0;
-                        width: 0;
-                        height: 0;
-                    }
-
-                    .slider {
-                        position: absolute;
-                        cursor: pointer;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        bottom: 0;
-                        background-color: #ccc;
-                        transition: .4s;
-                        border-radius: 34px;
-                    }
-
-                    .slider:before {
-                        position: absolute;
-                        content: "";
-                        height: 16px;
-                        width: 16px;
-                        left: 2px;
-                        bottom: 4px;
-                        background-color: white;
-                        transition: .4s;
-                        border-radius: 50%;
-                    }
-
-                    input:checked + .slider {
-                        background-color: #2196F3;
-                    }
-
-                    input:checked + .slider:before {
-                        transform: translateX(26px);
-                    }
-                </style>
             </div>
         </div>
     </div>

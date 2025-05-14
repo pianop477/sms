@@ -14,15 +14,15 @@
     </style>
         <div class="col-md-12 mt-5">
             <div class="row">
-                <div class="col-md-6 mt-2">
+                <div class="col-md-5 mt-2">
                     <div class="card">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-10">
-                                    <h4 class="header-title">Single Month results</h4>
+                                <div class="col-8">
+                                    <h4 class="header-title">Single results reports</h4>
                                 </div>
-                                <div class="col-2">
-                                    <a href="{{route('results.classesByYear', ['school' => Hashids::encode($schools->id), 'year'=>$year])}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                                <div class="col-4">
+                                    <a href="{{route('results.classesByYear', ['school' => Hashids::encode($schools->id), 'year'=>$year])}}" class="float-right btn btn-warning btn-xs"><i class="fas fa-arrow-circle-left"></i> Back</a>
                                 </div>
                             </div>
                             <p class="text-danger">Select Examination type to view results</p>
@@ -44,12 +44,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6 mt-2">
+                <div class="col-md-7 mt-2">
                     <div class="card">
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-8">
-                                    <h4 class="header-title">Combined Results</h4>
+                                    <h4 class="header-title">Compiled Results Reports</h4>
                                 </div>
                                 <div class="col-4">
                                     <button type="button" class="btn btn-xs btn-info float-right" data-toggle="modal" data-target=".bd-example-modal-lg">
@@ -59,23 +59,13 @@
                                         <div class="modal-dialog modal-lg">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title">Combine Results for Different Months</h5>
+                                                    <h5 class="modal-title">Combine Results Data Set</h5>
                                                     <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                                 </div>
                                                 <div class="modal-body">
                                                     <form class="needs-validation" novalidate="" action="{{route('submit.compiled.results', ['school' => Hashids::encode($schools->id), 'year' => $year, 'class' => Hashids::encode($classes->id)])}}" method="POST" enctype="multipart/form-data">
                                                         @csrf
-                                                        {{-- <div class="form-row">
-                                                            <div class="col-md-4 mb-3">
-                                                                <label for="validationCustom01">Class</label>
-                                                                <input type="hidden" name="class_id" value="{{$class}}">
-                                                                <input type="text" readonly name="class" class="form-control text-uppercase" value="{{$grades->class_name}}">
-                                                                @error('class')
-                                                                <div class="invalid-feedback">
-                                                                    {{$message}}
-                                                                </div>
-                                                                @enderror
-                                                            </div>
+                                                        <div class="form-row">
                                                             <div class="col-md-4">
                                                                 <label for="validationCustom02">Report Type:</label>
                                                                 <select name="exam_type" id="report-type" class="form-control text-capitalize" required>
@@ -91,62 +81,61 @@
                                                                 <label for="custom-report-type">Custom Report Type</label>
                                                                 <input type="text" name="custom_exam_type" id="custom-report-type" class="form-control" placeholder="Enter Report Type Name">
                                                             </div>
-                                                        </div>
-                                                        <div class="form-row">
-                                                            <div class="col-md-6 mb-3">
-                                                                <label for="validationCustom01">Report Date</label>
-                                                                <input type="date" name="report_date" class="form-control" value=""
-                                                                    min="{{ \Carbon\Carbon::create($year)->startOfYear()->format('Y-m-d') }}"
-                                                                    max="{{ \Carbon\Carbon::create($year)->endOfYear()->format('Y-m-d') }}">
-                                                                @error('report_date')
+
+                                                            <div class="col-md-4 mb-3">
+                                                                <label for="validationCustom01">Class</label>
+                                                                <select name="class_id" id="" class="form-control text-uppercase">
+                                                                    <option value="{{$classes->id}}" selected>{{$classes->class_name}}</option>
+                                                                </select>
+                                                                @error('class_id')
                                                                 <div class="invalid-feedback">
                                                                     {{$message}}
                                                                 </div>
                                                                 @enderror
                                                             </div>
-                                                            <div class="col-md-6">
-                                                                <label for="validationCustom02">Report Term</label>
+                                                            <div class="col-md-4 mb-3">
+                                                                <label for="validationCustom01">Term</label>
                                                                 <select name="term" id="" class="form-control text-capitalize" required>
-                                                                    <option value="">--Select Term--</option>
-                                                                    <option value="i">term 1</option>
+                                                                    <option value="" selected>--select term--</option>
+                                                                    <option value="i">Term 1</option>
                                                                     <option value="ii">Term 2</option>
                                                                 </select>
+                                                                @error('class_id')
+                                                                <div class="invalid-feedback">
+                                                                    {{$message}}
+                                                                </div>
+                                                                @enderror
                                                             </div>
                                                         </div>
+                                                        <hr>
                                                         <div class="form-row">
                                                             <div class="col-md-12 mb-3">
                                                                 <div class="row">
-                                                                    <div class="col-md-5">
-                                                                        <label for="available-options">Available Results Months</label>
-                                                                        <select id="available-options" class="form-control" size="10" multiple>
-                                                                            @if ($groupedByMonth->isEmpty())
-                                                                                <option value="" disabled class="text-danger">{{ _('No results record found') }}</option>
-                                                                            @else
-                                                                                @foreach ($groupedByMonth as $month => $monthsResult)
-                                                                                    <option value="{{ $month }}">{{ strtoupper($month) }} - {{strtoupper($monthsResult->first()->symbolic_abbr)}} ({{strtoupper('term '.$monthsResult->first()->Exam_term)}})</option>
-                                                                                @endforeach
-                                                                            @endif
-                                                                        </select>
+                                                                    <div class="col-6">
+                                                                        <p class="text-danger" style="font-weight: bold">Select Examination Results Dates</p>
+                                                                        <hr>
+                                                                        @if ($groupedByMonth->isEmpty())
+                                                                            <p class="text-danger">No exam results records found</p>
+                                                                        @else
+                                                                        @foreach ($groupedByMonth as $date => $resultDate )
+                                                                            <label for=""><input type="checkbox" style="font-size: 16px;" name="exam_dates[]" value="{{$date}}" required> {{\Carbon\Carbon::parse($date)->format('d-m-Y')}} => {{ucwords(strtolower($resultDate->first()->exam_type))}} ({{ucwords(strtolower('term '.$resultDate->first()->Exam_term))}})</label>
+                                                                        @endforeach
+                                                                        @endif
                                                                     </div>
-                                                                    <div class="col-md-2 text-center">
-                                                                        <div style="margin-top: 40px;">
-                                                                            <button type="button" id="btn-add" class="btn btn-primary btn-sm mb-2">>></button><br />
-                                                                            <button type="button" id="btn-remove" class="btn btn-secondary btn-sm"><<</button>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-md-5">
-                                                                        <label for="selected-options">Selected Months</label>
-                                                                        <select id="selected-options" name="months[]" class="form-control" size="10" multiple required></select>
+                                                                    <div class="col-6">
+                                                                        <p class="text-danger" style="font-weight: bold">Report display format</p>
+                                                                        <input type="radio" name="combine_option" value="sum" required> Calculate and show total only <br>
+                                                                        <input type="radio" name="combine_option" value="average" required> Calculate and show average only <br>
+                                                                        <input type="radio" name="combine_option" value="individual" required> Calculate and show individual score separately
                                                                     </div>
                                                                 </div>
 
                                                             </div>
-                                                        </div> --}}
-                                                        <p class="text-danger">Under Construction</p>
+                                                        </div>
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="clear" class="btn btn-danger" data-dismiss="modal">Clear</button>
-                                                    {{-- <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to generate compiled results?')">Generate</button> --}}
+                                                    <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to generate compiled results?')">Generate</button>
                                                 </div>
                                             </div>
                                         </form>
@@ -154,77 +143,74 @@
                                     </div>
                                 </div>
                             </div>
-                            <p class="text-danger text-center">Fetch Combined Results</p>
                             <hr>
-                            <!-- Loader GIF -->
-                            <div id="preloader" style="
-                            position: fixed;
-                            top: 0;
-                            left: 0;
-                            width: 100%;
-                            height: 100%;
-                            background: rgba(255, 255, 255, 0.8); /* Optional: semi-transparent background */
-                            display: none; /* Ensure it is hidden by default */
-                            justify-content: center;
-                            align-items: center;
-                            z-index: 9999; /* Ensures it stays on top */
-                        ">
-                            <img src="{{ asset('assets/img/loader/loader.gif') }}" alt="Loading..." width="100">
-                        </div>
-
-
-                            <form action="{{ route('fetch.report', ['class' => Hashids::encode($classes->id), 'year' => $year, 'school' => Hashids::encode($schools->id)]) }}" method="POST" role="form" class="needs-validation" novalidate id="" onsubmit="showPreloader(event)">
-                                @csrf
-                                <!-- Loader GIF -->
-                                <div id="loaderContainer" style="display: none; text-align: center; margin-top: 10px;">
-                                    <img src="{{ asset('assets/img/loader/loader.gif') }}" alt="Loading..." width="50">
-                                </div>
-                                <div class="form-row">
-                                    <div class="col-md-6">
-                                        <label for="">Class</label>
-                                        <select name="class" id="class-id" class="form-control text-capitalize" required>
-                                            <option value="{{$classes->id}}" selected>{{$classes->class_name}}</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="">Report Type</label>
-                                        <select name="exam_type" id="" class="form-control" required>
-                                            <option value="">--Select--</option>
-                                            @if ($compiledGroupByExam->isEmpty())
-                                                <option value="" disabled class="text-danger">{{ _('No results record found') }}</option>
-                                            @else
-                                                @foreach ($compiledGroupByExam as $report_type => $compiled_results )
-                                                    <option value="{{$report_type}}">{{$report_type}}</option>
-                                                @endforeach
-                                            @endif
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <div class="col-md-6">
-                                        <label for="">Report Date</label>
-                                        <input type="date" name="report_date" class="form-control" required
-                                            min="{{ \Carbon\Carbon::create($year)->startOfYear()->format('Y-m-d') }}"
-                                            max="{{ \Carbon\Carbon::create($year)->endOfYear()->format('Y-m-d') }}">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="">Term</label>
-                                        <select name="term" id="term" class="form-control">
-                                            <option value="">--Select--</option>
-                                            <option value="i">Term 1</option>
-                                            <option value="ii">Term 2</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <hr class="">
-                                <div class="form-row">
-                                    <div class="col-md-12 d-flex justify-content-center">
-                                        <button type="submit" class="btn btn-success" id="searchBtn">
-                                            <i class="fas fa-search"></i> Search
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
+                            <table class="table table-bordered table-responsive-md table-striped table-hover" id="myTable">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Created On</th>
+                                        <th>Generated By</th>
+                                        <th>Combine Style</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @if ($reports->isEmpty())
+                                        <tr>
+                                            <td colspan="4" class="text-center">No compiled results found</td>
+                                        </tr>
+                                    @else
+                                        @foreach ($reports as $report)
+                                            <tr>
+                                                <td class="text-capitalize">{{ $report->title }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($report->created_at)->format('d-m-Y') }}</td>
+                                                <td>{{ ucwords(strtolower($report->first_name. '. '.  $report->last_name[0])) }}</td>
+                                                <td class="text-capitalize">{{$report->combine_option}}</td>
+                                                <td>
+                                                    <ul class="d-flex justify-content-center">
+                                                        <li class="mr-3">
+                                                            <a href="{{route('students.combined.report', [
+                                                            'school' => Hashids::encode($report->school_id), 'year' => $year,
+                                                            'class' => Hashids::encode($report->class_id), 'report' => Hashids::encode($report->id)])}}" class="" title="Student Report"><i class="fas fa-eye"></i></a>
+                                                        </li>
+                                                        <li class="mr-3">
+                                                            <a href="{{route('download.general.combined', ['school' => Hashids::encode($report->school_id), 'year' => $year, 'class' => Hashids::encode($report->class_id), 'report' => Hashids::encode($report->id)])}}" onclick="return confirm('Are you sure you want to download this report?')" class="" title="Download Report"><i class="fas fa-download text-info"></i></a>
+                                                        </li>
+                                                        <li class="mr-3">
+                                                            @if ($report->status === 0)
+                                                                <form action="{{route('publish.combined.report', ['school' => Hashids::encode($report->school_id), 'year' => $year, 'class' => Hashids::encode($report->class_id), 'report' => Hashids::encode($report->id)])}}" method="POST">
+                                                                    @csrf
+                                                                    @method('PUT')
+                                                                    <button class="btn btn-link p-0" type="submit" title="Publish report" onclick="return confirm('Are you sure you want to Publish this report?')">
+                                                                        <i class="fas fa-toggle-off text-secondary" style="font-size: 20px;"></i>
+                                                                    </button>
+                                                                </form>
+                                                            @else
+                                                                <form action="">
+                                                                    @csrf
+                                                                    <button class="btn btn-link p-0" type="submit" title="Publish report" onclick="return confirm('Are you sure you want to Publish this report?')">
+                                                                        <i class="fas fa-toggle-on text-success" style="font-size: 20px;"></i>
+                                                                    </button>
+                                                                </form>
+                                                            @endif
+                                                        </li>
+                                                        <li class="mr-3">
+                                                            <a href="{{route('generated.report.delete',
+                                                                        ['school' => Hashids::encode($report->school_id),
+                                                                        'year' =>$year , 'class' => Hashids::encode($report->class_id),
+                                                                        'report' => Hashids::encode($report->id)])}}"
+                                                                        onclick="return confirm('Are you sure you want to delete this report?')" title="Delete Report">
+                                                                        <i class="fas fa-trash text-danger"></i>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @endif
+                                </tbody>
+                            </table>
+                            {{ $reports->links() }}
                         </div>
                     </div>
                 </div>

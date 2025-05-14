@@ -5,7 +5,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-8">
-                    <h4 class="header-title">Fill the Result Form</h4>
+                    <h4 class="header-title text-capitalize">results form - preliminary information</h4>
                 </div>
                 <div class="col-4">
                     <a href="{{ route('home') }}" class="float-right">
@@ -17,61 +17,60 @@
             <form class="needs-validation" novalidate action="{{ route('score.captured.values') }}" method="POST">
                 @csrf
                 <!-- Hidden Fields -->
-                <input type="hidden" name="course_id" value="{{ $class_course->course_id ?? '' }}">
-                <input type="hidden" name="class_id" value="{{ $class_course->class_id ?? '' }}">
-                <input type="hidden" name="teacher_id" value="{{ $class_course->teacher_id ?? '' }}">
-                <input type="hidden" name="school_id" value="{{ $class_course->school_id ?? '' }}">
-
+                <input type="hidden" name="course_id" value="{{ $class_course->course_id }}">
+                <input type="hidden" name="class_id" value="{{ $class_course->class_id }}">
+                <input type="hidden" name="teacher_id" value="{{ $class_course->teacher_id }}">
+                <input type="hidden" name="school_id" value="{{ $class_course->school_id }}">
                 <div class="form-row">
                     <!-- Examination -->
                     <div class="col-md-3 mb-3">
-                        <label for="exam_type">Examination</label>
-                        <select name="exam_type" id="exam_type" class="form-control text-uppercase" required>
-                            <option value="">-- Select Exam --</option>
+                        <label for="exam_type">Exam Type</label>
+                        <select name="exam_type" id="exam_type" class="form-control text-capitalize" required>
+                            <option value="">-- Select Exam type --</option>
                             @foreach ($exams as $exam)
                                 <option value="{{ $exam->id }}">{{ $exam->exam_type }}</option>
                             @endforeach
                         </select>
                         @error('exam_type')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="text-danger text-sm">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <!-- Exam Date -->
                     <div class="col-md-3 mb-3">
-                        <label for="exam_date">Examination Date</label>
+                        <label for="exam_date">Uploading Date</label>
                         <input type="date" name="exam_date" class="form-control" id="exam_date" required
                                value="{{ old('exam_date') }}"
                                min="{{ \Carbon\Carbon::now()->subYears(1)->format('Y-m-d') }}"
                                max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
                         @error('exam_date')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="text-danger text-sm">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <!-- Exam Term -->
                     <div class="col-md-3 mb-3">
-                        <label for="term">Examination Term</label>
-                        <select name="term" id="term" class="form-control text-uppercase" required>
+                        <label for="term">Term</label>
+                        <select name="term" id="term" class="form-control text-capitalize" required>
                             <option value="">-- Select Term --</option>
-                            <option value="i">Term I</option>
-                            <option value="ii">Term II</option>
+                            <option value="i">Term 1</option>
+                            <option value="ii">Term 2</option>
                         </select>
                         @error('term')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="text-danger text-sm">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <!-- Marking System -->
                     <div class="col-md-3 mb-3">
-                        <label for="marking_style">Marking System</label>
+                        <label for="marking_style">Grading System</label>
                         <select name="marking_style" id="marking_style" class="form-control" required>
-                            <option value="">-- Select Marking System --</option>
-                            <option value="2">0 - 100</option>
-                            <option value="1" selected>0 - 50</option>
+                            <option value="">-- Select Grading System --</option>
+                            <option value="2">Percentage (0-100%)</option>
+                            <option value="1" selected>Points (0-50)</option>
                         </select>
                         @error('marking_style')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="text-danger text-sm">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
@@ -96,15 +95,16 @@
                                         'date' => $saved_results->first()->exam_date,
                                         'term' => $saved_results->first()->exam_term,
                                         'style' => $saved_results->first()->marking_style])}}"
-                                        class="btn btn-warning" onclick="">Pending Results</a>
+                                        class="btn btn-warning" onclick="" title="Pending score">Pending Results</a>
                                 </div>
                                 <div class="col-4 mt-3">
                                     <a href="{{route('results.draft.delete', ['course' => Hashids::encode($class_course->course_id),
                                                 'teacher' => Hashids::encode($class_course->teacher_id),
                                                 'type' => $saved_results->first()->exam_type_id,
                                                 'class' => Hashids::encode($class_course->class_id),
-                                                'date' => $saved_results->first()->exam_date])}}" onclick="return confirm('Are you sure you want to delete this results? you will not able to recover it')">
-                                        <i class="fas fa-trash text-danger" style="font-size: 1.2rem;"></i>
+                                                'date' => $saved_results->first()->exam_date])}}" onclick="return confirm('Are you sure you want to delete this results? you cant recover it later')"
+                                                title="Delete pending results">
+                                        <i class="fas fa-trash text-danger" style="font-size: 1rem;"></i>
                                     </a>
                                 </div>
                             </div>

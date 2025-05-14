@@ -22,12 +22,38 @@
                     <hr class="horizontal p-0">
                     <form action="{{ route('results.update.draft') }}" method="POST" id="resultsForm">
                         @csrf
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="">Exam Type</label>
+                                <select name="exam_type_id" id="exam_type" class="form-control text-capitalize" required>
+                                    <option value="">-- Select Exam type --</option>
+                                    @foreach ($exams as $exam)
+                                        <option value="{{ $exam->id }}" {{ $exam->id == $examTypeId ? 'selected' : '' }}>{{ $exam->exam_type }}</option>
+                                    @endforeach
+                                </select>
+                                @error('exam_type')
+                                    <div class="text-danger text-sm">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-2"></div>
+                            <div class="col-md-4">
+                                <label for="">Uploading Date</label>
+                                <input type="date" name="exam_date" class="form-control" id="exam_date" required
+                                       value="{{ \Carbon\Carbon::parse($examDate)->format('Y-m-d') }}"
+                                       min="{{ \Carbon\Carbon::now()->subYears(1)->format('Y-m-d') }}"
+                                       max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                                @error('exam_date')
+                                <div class="text-danger text-sm">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <hr>
                         <input type="hidden" name="course_id" value="{{ $courseId }}">
                         <input type="hidden" name="class_id" value="{{ $classId }}">
                         <input type="hidden" name="teacher_id" value="{{ $teacherId }}">
                         <input type="hidden" name="school_id" value="{{ $schoolId }}">
-                        <input type="hidden" name="exam_type_id" value="{{ $examTypeId }}">
-                        <input type="hidden" name="exam_date" value="{{ \Carbon\Carbon::parse($examDate)->format('Y-m-d') }}">
+                        {{-- <input type="hidden" name="exam_type_id" value="{{ $examTypeId }}"> --}}
+                        {{-- <input type="hidden" name="exam_date" value="{{ \Carbon\Carbon::parse($examDate)->format('Y-m-d') }}"> --}}
                         <input type="hidden" name="term" value="{{ $draftResults->first()->exam_term }}">
                         <input type="hidden" name="marking_style" value="{{ $marking_style }}">
                         <p class="text-center text-danger"><i>(Enter score from 0 to {{ $marking_style == 1 ? '50' : '100' }} correctly)</i></p>

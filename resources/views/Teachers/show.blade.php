@@ -19,6 +19,9 @@
             <p class="mb-2">
                 Member ID: <span class="text-uppercase">{{$teachers->member_id}}</span>
             </p>
+            <p class="mb-2">
+                Email: <span class="">{{$teachers->email}}</span>
+            </p>
           </h5>
           <p class="mb-0 font-weight-normal text-sm"> Qualification:
             @if ($teachers->qualification == 1)
@@ -132,6 +135,15 @@
                     <div class="text-danger">{{$message}}</div>
                     @enderror
                 </div>
+                <div class="col-md-4 mb-3">
+                    <label for="validationCustom01">Email</label>
+                    <input type="email" name="email" class="form-control" value="{{old('email', $teachers->email)}}" required>
+                    @error('email')
+                    <div class="text-danger">{{$message}}</div>
+                    @enderror
+                </div>
+            </div>
+            <div class="form-row">
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom01">Passport Size <span class="text-danger text-sm">Maximum 1MB</span></label>
                     <input type="file" name="image" class="form-control text-capitalize" value="{{old('image')}}">
