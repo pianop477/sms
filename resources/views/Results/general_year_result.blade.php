@@ -8,7 +8,7 @@
                             <h4 class="header-title text-center"><span class="text-uppercase text-primary">{{$schools->school_name}}</span> Examination Results</h4>
                         </div>
                         <div class="col-2">
-                            <a href="{{route('home')}}" class="float-right btn btn-info btn-xs"><i class="fas fa-arrow-circle-left" style=""></i></a> Back
+                            <a href="{{route('home')}}" class="float-right btn btn-info btn-xs"><i class="fas fa-arrow-circle-left" style=""></i> Back</a>
                         </div>
                     </div>
                     <p class="text-danger">Select year of study</p>

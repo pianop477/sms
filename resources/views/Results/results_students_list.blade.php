@@ -19,7 +19,7 @@
                         <h4 class="header-title text-uppercase">Candidates Exam Report for {{$classId->class_name ?? ''}}</h4>
                     </div>
                     <div class="col-4">
-                        <a href="{{route('results.monthsByExamType', ['school' => Hashids::encode($schools->id), 'year' => $year, 'class' => Hashids::encode($classId->id), 'examType' => Hashids::encode($exam_id), 'months' => $month])}}" class="float-right">
+                        <a href="{{route('results.monthsByExamType', ['school' => Hashids::encode($schools->id), 'year' => $year, 'class' => Hashids::encode($classId->id), 'examType' => Hashids::encode($exam_id), 'months' => $month])}}" class="float-right btn btn-info btn-xs">
                             <i class="fas fa-arrow-circle-left"></i> Back
                         </a>
                     </div>
