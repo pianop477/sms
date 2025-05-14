@@ -18,7 +18,7 @@
                 @csrf
                 <div class="form-row">
                     <div class="col-md-6 mb-3">
-                        <label for="validationCustom01">Select Class</label>
+                        <label for="validationCustom01">Send to Specific Class</label>
                         <select name="class" id="validationCustom01" class="form-control text-uppercase">
                             <option value="">--Select class--</option>
                             @if ($classes->isEmpty())
