@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreign('class_id')->references('id')->on('grades')->onDelete('cascade');
             $table->unsignedBigInteger('school_id');
             $table->foreign('school_id')->references('id')->on('schools')->onDelete('cascade');
-            $table->array('exam_dates');
+            $table->json('exam_dates');
             $table->enum('combine_option', ['sum', 'average', 'individual'])->default('sum');
             $table->unsignedBigInteger('created_by');
             $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
