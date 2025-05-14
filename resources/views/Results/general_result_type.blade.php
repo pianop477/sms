@@ -157,7 +157,7 @@
                                 <tbody>
                                     @if ($reports->isEmpty())
                                         <tr>
-                                            <td colspan="4" class="text-center">No compiled results found</td>
+                                            <td colspan="5" class="text-center text-danger">No compiled results found</td>
                                         </tr>
                                     @else
                                         @foreach ($reports as $report)
