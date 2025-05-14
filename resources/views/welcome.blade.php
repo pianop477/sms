@@ -55,7 +55,7 @@
   <!-- Features Section -->
   <section id="features" class="py-20 bg-white">
     <div class="container mx-auto px-6 text-center">
-      <h2 class="text-3xl md:text-4xl font-bold mb-12 text-gray-800">Huduma Zinazopatikana ShuleApp</h2>
+      <h2 class="text-3xl md:text-4xl font-bold mb-12 text-gray-800">Huduma Zetu</h2>
       <div class="grid md:grid-cols-3 gap-12">
 
         <!-- Attendance -->

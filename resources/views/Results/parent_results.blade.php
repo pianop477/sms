@@ -2,278 +2,263 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Student Academic Report</title>
     <style>
-        .student-image {
-            position: absolute;
-            top: 1%;
-            /* right: 0px; */
-            /* left: 82%; */
-            right: 0;
-            color: inherit;
-        }
-
         body {
             font-family: Arial, sans-serif;
-            /* line-height: 2px; */
-            margin: 0; /* Remove default margin */
-            padding: 0; /* Remove default padding */
-            background-color: white;
+            font-size: 12px;
+            line-height: 1.4;
+            margin: 0;
+            padding: 0;
         }
-        @media print {
-            .no-print {
-                display: none;
-            }
-            h1, h2, h4, h5, h6 {
-                text-transform: uppercase;
-                text-align: center
-            }
-            .print-only {
-                display: block;
-            }
-            thead {
-                display: table-header-group;
-                background-color: rgb(194, 191, 191); /* Adds a gray background to thead */
-            }
-            tbody {
-                display: table-row-group;
-            }
-
-            .table th,
-            .table td {
-                border: 1px solid black;
-            }
-        }
-
-        .container {
-            display: flex;
-            /* padding: 10px; */
-            flex-direction: column;
-            flex-wrap: nowrap;
-            /* border-bottom: 2px solid gray; */
+        .header {
+            width: 100%;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+            position: relative;
         }
         .logo {
             position: absolute;
-            left: 2px;
-            top: 3%;
-            color: inherit;
-        }
-        .header {
-            text-align: center;
-            position: relative;
+            left: 0;
             top: 0;
-            left: 0px;
-            text-transform: uppercase;
-            line-height: 1px;
         }
-        .summary-header {
-            margin-top: 3px;
+        .school-info {
             text-align: center;
-            text-transform: capitalize;
-            font-size: 20px;
+            padding-top: 5px;
+            text-transform: uppercase;
+            font-size: 18px;
         }
-        .summary-content {
-            display: flex;
-            flex-direction: row;
-            text-transform: capitalize
-        }
-
-        .course-details {
-            position: relative;
-            left: 5px;
-            width: 50%;
-            line-height: 5px;
-        }
-        .grade-summary {
+        .student-image {
             position: absolute;
-            width: 50%;
-            left: 50%;
-            top: 17%
+            right: 0;
+            top: 0;
+            text-align: center;
         }
-        th, td {
-            border: 1px solid black;
+        .student-image img {
+            width: 70px;
+            height: 70px;
+            /* border-radius: 5px; */
+            /* border: 1px solid #ddd; */
         }
-        thead {
-                display: table-header-group;
-                background-color: rgb(202, 199, 199); /* Adds a gray background to thead */
-            }
-            tbody {
-                display: table-row-group;
-            }
-            .table th,
-            .table td {
-                /* border: 1px solid black; */
-                text-transform: capitalize;
-            }
-            th.vertical {
-            writing-mode: vertical-rl; /* or vertical-lr */
-            text-orientation: upright;
-            transform: rotate(180deg);
-            white-space: nowrap;
+        .student-details {
+            width: 100%;
+            margin: 10px 0;
+            font-size: 12px;
         }
-
-        table {
+        .student-details td {
+            vertical-align: top;
+            padding: 2px 5px;
+        }
+        .section-title {
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0 5px 0;
+            text-transform: uppercase;
+            border-bottom: 1px solid #333;
+            padding-bottom: 3px;
+        }
+        .report-table {
             width: 100%;
             border-collapse: collapse;
-            text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            font-size: 11px;
         }
-
-    .table th {
-            background-color: #343a40;
-            color: #fff;
+        .report-table th, .report-table td {
+            border: 1px solid #ddd;
+            padding: 5px;
             text-align: center;
-            }
-
-    .table td {
-            background-color: white;
+        }
+        .report-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .subject-name {
+            text-align: left;
+        }
+        .teacher-name {
+            text-align: left;
+        }
+        .summary-row {
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
+        .excellent {
+            background-color: #75f430;
+            padding: 2px 5px;
+        }
+        .good {
+            background-color: #99faed;
+            padding: 2px 5px;
+        }
+        .pass {
+            background-color: #eddc71;
+            padding: 2px 5px;
+        }
+        .poor {
+            background-color: #b6b0b0;
+            padding: 2px 5px;
+        }
+        .fail {
+            background-color: #eb4b4b;
+            padding: 2px 5px;
         }
         .footer {
             position: fixed;
             bottom: 0;
-            left: 0;
             width: 100%;
-            background-color: #333; /* Rangi ya background (Dark Gray) */
-            color: white; /* Rangi ya maandishi */
-            font-size: 12px;
             text-align: center;
-            padding: 5px 0; /* Padding juu na chini */
-            box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.2); /* Kuongeza kivuli juu ya footer */
+            border-top: 1px solid #ddd;
+            font-size: 10px;
+            color: #666;
+        }
+        .performance-summary {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+        }
+        .performance-item {
+            margin: 5px 0;
+        }
+        @media print {
+            .header, .footer {
+                position: fixed;
+                left: 0;
+                right: 0;
+            }
+            .header {
+                top: 0;
+            }
+            .footer {
+                bottom: 0;
+            }
+            body {
+                padding-top: 120px;
+                padding-bottom: 30px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="col-md-12">
-        <div class="card mt-2">
-            <div class="card-body">
-                <div class="container">
-                    <div class="logo">
-                        <img src="{{public_path('assets/img/logo/'.$results->first()->logo)}}" alt="" style="max-width: 70px;">
-                    </div>
-                    <div class="header" style="">
-                        <h3>united republic of tanzania</h3>
-                        <h4>president office - TAMISEMI</h4>
-                        <h4>{{$results->first()->school_name}}</h4>
-                        <h5>{{$results->first()->postal_address}} - {{$results->first()->postal_name}}, {{$results->first()->country}}</h5>
-                        <h5>academic progress report</h5>
-                    </div>
-                    <div class="student-image">
-                        @php
-                            $imagePath = public_path('assets/img/students/' . $studentId->image);
-                            $defaultImagePath = public_path('assets/img/students/student.jpg');
-                        @endphp
 
-                        @if(file_exists($imagePath) && !is_dir($imagePath))
-                            <img src="{{ $imagePath }}" alt="Student Image" style="max-width: 100px; height:100px; border-radius:8px;">
-                        @else
-                            <img src="{{ $defaultImagePath }}" alt="" style="max-width: 100px; border-radius:8px;">
-                        @endif
-                        <p style="font-size:12px; text-align:center; font-style:italic;">Adm.No: <span style="text-decoration: underline;">{{ucwords(strtoupper($results->first()->admission_number))}}</span></p>
-                    </div>
-                </div>
-                <div class="" style="border-bottom: 2px solid gray">
-                    <div class="info-container student-info">
-                        <p style="text-transform:capitalize; font-weight:bold; text-align:center">A. Student Information</p>
-                        <p><strong>Student Full Name:</strong> <span style="text-decoration:underline">{{ ucwords(strtoupper($studentId->first_name)) }} {{ucwords(strtoupper($studentId->middle_name))}} {{ucwords(strtoupper($studentId->last_name))}}</span></p>
-                        <p><strong>Gender:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $studentId->gender}}</span></p>
-                        <p><strong>Class:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $results->first()->class_name }}</span></p>
-                        <p><strong>Stream:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ $studentId->group }}</span></p>
-                    </div>
-                    <p style="border-bottom: 2px solid gray;"></p>
-                    <p style="text-transform:capitalize; font-weight:bold; text-align:center">B. Examination Details</p>
-                    <div class="info-container exam-info">
-                        <p><strong>Examination Type:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ ucwords(strtoupper($results->first()->exam_type)) }}</span></p>
-                        <p><strong>Exam Date:</strong> <span style="text-decoration:underline">{{ \Carbon\Carbon::parse($date)->format('d-F-Y') }}</span></p>
-                        <p><strong>Term:</strong> <span style="text-transform: uppercase; text-decoration:underline">{{ucwords(strtoupper($results->first()->Exam_term))}}</span></p>
-                    </div>
-                </div>
-                <p style="text-transform:capitalize; font-weight:bold; text-align:center">C. Student overall performance </p>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Subject</th>
-                            <th>Teacher</th>
-                            <th>Code</th>
-                            <th>Score</th>
-                            <th>Grade</th>
-                            <th>Remarks</th>
-                            <th>Position</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($results as $index => $result)
-                            <tr>
-                                <td>{{ $index + 1 }}</td>
-                                <td style="text-align: left; text-transform: capitalize">{{ ucwords(strtolower($result->course_name)) }}</td>
-                                <td style="text-transform: capitalize; text-align:left">{{ ucwords(strtolower($result->teacher_first_name. '. '.$result->teacher_last_name[0])) }}</td>
-                                <td style="text-transform: uppercase">{{ $result->course_code }}</td>
-                                <td>
-                                    @if ( $result->score === null)
-                                        <span style="">X</span>
-                                    @else
-                                        {{ $result->score }}
-                                    @endif
-                                </td>
-                                <td>
-                                    @if ($result->score === null)
-                                        <span style="">X</span>
-                                    @else
-                                    {{ $result->grade }}
-                                    @endif
-                                </td>
-                                <td>
-                                    @if ($result->score === null)
-                                        <span style="">X</span>
-                                    @else
-                                    {{ $result->remarks }}
-                                    @endif
-                                </td>
-                                <td>
-                                    @if ($result->score === null)
-                                        <span style="">X</span>
-                                    @else
-                                        {{ $result->courseRank }}
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                <div class="cut" style="border-bottom: 2px dashed gray;">
-                    <p>Total Marks: <strong>{{ $totalScore }}</strong></p>
-                    <p>Overall Average: <strong>{{ number_format($averageScore, 2) }}</strong></p>
-                    @php
-                        $grade = '';
-                        $gradeColor = '';
-                        if ($averageScore >= 41 || $averageScore >= 81) {
-                            $grade = "'A' - EXCELLENT";
-                            $gradeColor = 'rgb(117, 244, 48)';
-                        } elseif ($averageScore >= 31 || $averageScore >= 61) {
-                            $grade = "'B' - GOOD";
-                            $gradeColor = 'rgb(153, 250, 237)';
-                        } elseif ($averageScore >= 21 || $averageScore >= 41) {
-                            $grade = "'C' - PASS";
-                            $gradeColor = 'rgb(237, 220, 113)';
-                        } elseif ($averageScore >= 11 || $averageScore >= 21) {
-                            $grade = "'D' - POOR";
-                            $gradeColor = 'rgb(182, 176, 176)';
-                        } elseif ($averageScore <= 10 || $averageScore <= 20) {
-                            $grade = "'E' - FAIL";
-                            $gradeColor = ' rgb(235, 75, 75)';
-                        }
-                    @endphp
-                    <p>Grade Level: <strong><span style="background: {{$gradeColor}}; padding:1px 4px">{{$grade}}</span></strong></p>
-                    <p>Ranked: <strong><span style="text-decoration: underline;">{{ $studentRank }}</span></strong> out of <strong><span style="text-decoration: underline">{{ $rankings->count() }}</span></strong> students</p>
-                </div>
-                <div class="footer" style="">
-                    <p style="line-height: 1px;">
-                        <i>&copy; Copyright {{ucwords(strtolower($results->first()->school_name))}} - {{\Carbon\Carbon::now()->format('Y')}}</i>
-                    </p>
-                </div>
-        </div>
+<div class="header">
+    <div class="logo">
+        <img src="{{ public_path('assets/img/logo/'.$results->first()->logo) }}" alt="Logo" width="70">
     </div>
+    <div class="school-info">
+        <h3 style="margin:0; padding:0;">THE UNITED REPUBLIC OF TANZANIA</h3>
+        <h4 style="margin:0; padding:0;">PRESIDENT OFFICE - TAMISEMI</h4>
+        <h4 style="margin:0; padding:0;">{{ $results->first()->school_name }}</h4>
+        <h5 style="margin:0; padding:0;">{{ $results->first()->postal_address }} - {{ $results->first()->postal_name }}, {{ $results->first()->country }}</h5>
+        <h5 style="margin:5px 0; padding:0;">STUDENT'S PROGRESS REPORT</h5>
+    </div>
+    <div class="student-image">
+        @php
+            $imagePath = public_path('assets/img/students/' . $studentId->image);
+            $defaultImagePath = public_path('assets/img/students/student.jpg');
+        @endphp
+
+        @if(file_exists($imagePath) && !is_dir($imagePath))
+            <img src="{{ $imagePath }}" alt="Student Image">
+        @else
+            <img src="{{ $defaultImagePath }}" alt="Student Image">
+        @endif
+        <p style="margin:2px 0; font-size:10px;">Adm.No: {{ strtoupper($results->first()->admission_number) }}</p>
+    </div>
+</div>
+
+<div class="section-title">A. Student Information</div>
+
+<table class="student-details">
+    <tr>
+        <td width="50%">
+            <strong>Student Full Name:</strong> {{ strtoupper($studentId->first_name) }} {{ strtoupper($studentId->middle_name) }} {{ strtoupper($studentId->last_name) }}<br>
+            <strong>Gender:</strong> {{ ucfirst($studentId->gender) }}
+        </td>
+        <td width="50%">
+            <strong>Class:</strong> {{ strtoupper($results->first()->class_name) }}<br>
+            <strong>Stream:</strong> {{ strtoupper($studentId->group) }}
+        </td>
+    </tr>
+</table>
+
+<div class="section-title">B. Examination Details</div>
+
+<table class="student-details">
+    <tr>
+        <td width="50%">
+            <strong>Examination Type:</strong> {{ strtoupper($results->first()->exam_type) }}<br>
+            <strong>Term:</strong> {{ strtoupper($results->first()->Exam_term) }}
+        </td>
+        <td width="50%">
+            <strong>Exam Date:</strong> {{ \Carbon\Carbon::parse($date)->format('d-F-Y') }}
+        </td>
+    </tr>
+</table>
+
+<div class="section-title">C. Student Overall Performance</div>
+
+<table class="report-table" style="font-size: 12px;">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th class="subject-name">Subject</th>
+            <th class="teacher-name">Teacher</th>
+            <th>Code</th>
+            <th>Score</th>
+            <th>Grade</th>
+            <th>Remarks</th>
+            <th>Position</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach ($results as $index => $result)
+            <tr>
+                <td>{{ $index + 1 }}</td>
+                <td class="subject-name">{{ ucwords(strtolower($result->course_name)) }}</td>
+                <td class="teacher-name">{{ ucwords(strtolower($result->teacher_first_name. '. '.$result->teacher_last_name[0])) }}</td>
+                <td style="text-transform: uppercase">{{ $result->course_code }}</td>
+                <td>{{ $result->score ?? 'X' }}</td>
+                <td>{{ $result->score ? $result->grade : 'X' }}</td>
+                <td>{{ $result->score ? $result->remarks : 'X' }}</td>
+                <td>{{ $result->score ? $result->courseRank : 'X' }}</td>
+            </tr>
+        @endforeach
+    </tbody>
+</table>
+
+<div class="performance-summary">
+    <div class="performance-item"><strong>Total Marks:</strong> {{ $totalScore }}</div>
+    <div class="performance-item"><strong>Overall Average:</strong> {{ number_format($averageScore, 2) }}</div>
+    @php
+        $grade = '';
+        $gradeClass = '';
+        if ($averageScore >= 81) {
+            $grade = "'A' - EXCELLENT";
+            $gradeClass = 'excellent';
+        } elseif ($averageScore >= 61) {
+            $grade = "'B' - GOOD";
+            $gradeClass = 'good';
+        } elseif ($averageScore >= 41) {
+            $grade = "'C' - PASS";
+            $gradeClass = 'pass';
+        } elseif ($averageScore >= 21) {
+            $grade = "'D' - POOR";
+            $gradeClass = 'poor';
+        } else {
+            $grade = "'E' - FAIL";
+            $gradeClass = 'fail';
+        }
+    @endphp
+    <div class="performance-item"><strong>Grade Level:</strong> <span class="{{ $gradeClass }}">{{ $grade }}</span></div>
+    <div class="performance-item"><strong>Position:</strong> {{ $studentRank }} out of {{ $rankings->count() }} students</div>
+</div>
+
+<div class="footer">
+    &copy; Copyright {{ $results->first()->school_name }} - {{ date('Y') }}
+</div>
+
 </body>
 </html>

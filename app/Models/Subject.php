@@ -17,4 +17,9 @@ class Subject extends Model
     ];
 
     protected $guarded = ['id', 'created_at', 'updated_at'];
+
+    public function examination_results()
+    {
+        return $this->hasMany(Examination_result::class, 'course_id', 'id');
+    }
 }

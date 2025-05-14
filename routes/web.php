@@ -7,6 +7,7 @@ use App\Http\Controllers\ClassesController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\GeneratedReportController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\ParentsController;
@@ -271,6 +272,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
             Route::get('/Results/course/{course}/&year/{year}', [ExamController::class, 'resultByYear'])->name('results.byYear');
             Route::get('/Results/course/{course}/&year/{year}/&examination/{examType}', [ExamController::class, 'resultByExamType'])->name('results.byExamType');
             Route::get('/Results/course/{course}/&year/{year}/&examination/{examType}/&month/{month}/&date/{date}', [ExamController::class, 'resultByMonth'])->name('results.byMonth');
+            Route::get('/Results/delete/course/{course}/&year/{year}/&examination/{examType}/&month/{month}/&date/{date}', [ExamController::class, 'TeacherDeleteResults'])->name('results.delete.byTeacher');
         });
     });
 
@@ -327,6 +329,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('Result-months/Student/{student}/Year/{year}/Type/{exam_type}', [ResultsController::class, 'resultByMonth'])->name('result.byMonth');
         Route::get('Result/student/{student}/year/{year}/exam-type/{exam_id}/month/{month}/date/{date}', [ResultsController::class, 'viewStudentResult'])->name('results.student.get');
         Route::get('student/{student}/Courses-list', [CoursesController::class, 'viewStudentCourses'])->name('student.courses.list');
+        Route::get('/Student-report/school/{school}/year/{year}/class/{class}/report/{report}/student/{student}', [ResultsController::class, 'parentDownloadStudentCombinedReport'])->name('student.combined.report');
 
     });
     //End of condition ==============================================================================================
@@ -389,6 +392,15 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('Individual-student-reports/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/date/{date}', [ResultsController::class, 'individualStudentReports'])->name('individual.student.reports');
         Route::get('Download-individual-report/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/student/{student}/date/{date}/', [ResultsController::class, 'downloadIndividualReport'])->name('download.individual.report');
         Route::post('/update-score', [ResultsController::class, 'updateScore'])->name('update.score');
+
+        //generate report card for students
+        Route::get('Delete/generated-report/school/{school}/year/{year}/class/{class}/report/{report}', [ResultsController::class, 'destroyReport'])->name('generated.report.delete');
+        Route::get('/Students/generated-report/school/{school}/year/{year}/class/{class}/report/{report}', [ResultsController::class, 'studentGeneratedCombinedReport'])->name('students.combined.report');
+        Route::get('/student/generated-report/school/{school}/year/{year}/class/{class}/report/{report}/student/{student}', [ResultsController::class, 'showStudentCompiledReport'])->name('students.report');
+        Route::post('/send/sms/combine/report/school/{school}/year/{year}/class/{class}/report/{report}/student/{student}', [ResultsController::class, 'sendSmsForCombinedReport'])->name('send.sms.combine.report');
+        Route::get('Download-combined-report/school/{school}/year/{year}/class/{class}/report/{report}/student/{student}', [ResultsController::class, 'downloadCombinedReport'])->name('download.combined.report');
+        Route::put('Publish-combine-report/school/{school}/year/{year}/class/{class}/report/{report}', [ResultsController::class, 'publishCombinedReport'])->name('publish.combined.report');
+        Route::get('/General-combined-report/school/{school}/year/{year}/class/{class}/report/{report}', [ResultsController::class, 'downloadGeneralCombinedReport'])->name('download.general.combined');
 
         //fetch report combined************************************
         Route::post('Fetch-report/class/{class}/year/{year}/school/{school}', [ResultsController::class, 'fetchReport'])->name('fetch.report');

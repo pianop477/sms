@@ -51,11 +51,37 @@
                             <input type="hidden" name="class_id" value="{{$classId}}">
                             <input type="hidden" name="teacher_id" value="{{$teacherId}}">
                             <input type="hidden" name="school_id" value="{{$schoolId}}">
-                            <input type="hidden" name="exam_id" value="{{$examTypeId}}">
-                            <input type="hidden" name="exam_date" value="{{$examDate}}">
+                            {{-- <input type="hidden" name="exam_id" value="{{$examTypeId}}"> --}}
+                            {{-- <input type="hidden" name="exam_date" value="{{$examDate}}"> --}}
                             <input type="hidden" name="term" value="{{$term}}">
                             <input type="hidden" name="marking_style" value="{{$marking_style}}">
-
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="">Exam Type</label>
+                                    <select name="exam_id" id="exam_type" class="form-control text-capitalize" required>
+                                        <option value="">-- Select Exam type --</option>
+                                        @foreach ($exams as $exam)
+                                            <option value="{{ $exam->id }}" {{ $exam->id == $examTypeId ? 'selected' : '' }}>{{ $exam->exam_type }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('exam_type')
+                                        <div class="text-danger text-sm">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-2"></div>
+                                <div class="col-md-4">
+                                    <label for="">Uploading Date</label>
+                                    <input type="date" name="exam_date" class="form-control" id="exam_date" required
+                                        value="{{ \Carbon\Carbon::parse($examDate)->format('Y-m-d') }}"
+                                        min="{{ \Carbon\Carbon::now()->subYears(1)->format('Y-m-d') }}"
+                                        max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                                    @error('exam_date')
+                                    <div class="text-danger text-sm">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <hr>
                             <table class="table table-responsive-md table-hover table-bordered w-100">
                                 <thead class="table-primary">
                                     <th>#</th>

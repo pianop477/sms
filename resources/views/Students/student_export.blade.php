@@ -42,7 +42,6 @@
                 border: 1px solid black;
                 border-collapse: collapse;
                 width: 100%;
-                font-size: 12px;
             }
             .table th,
             .table td {
@@ -81,7 +80,6 @@
 
         .table th, .table td {
             border: 1px solid #dee2e6;
-            padding: 2px;
             text-align: left;
             text-transform: capitalize
         }
@@ -145,7 +143,8 @@
                             <th>#</th>
                             <th style="text-align: center">Admission No</th>
                             <th>Gender</th>
-                            <th>Full Name</th>
+                            <th>Stream</th>
+                            <th>Student Name</th>
                             <th>Dob</th>
                             <th>Street</th>
                             <th>Parent Phone</th>
@@ -157,6 +156,7 @@
                                 <td>{{ $loop->iteration }}</td>
                                 <td style="text-transform: uppercase; text-align:center">{{ $student->admission_number }}</td>
                                 <td style="text-transform: uppercase; text-align:center;">{{ $student->gender[0] }}</td>
+                                <td style="text-transform: uppercase; text-align:center">{{ $student->group }}</td>
                                 <td style="text-transform: capitalize">{{ ucwords(strtolower($student->first_name. ' '. $student->middle_name. ' '. $student->last_name)) }}</td>
                                 <td>{{ \Carbon\Carbon::parse($student->dob)->format('d/m/Y') }}</td>
                                 <td class="" style="text-transform: capitalize">{{ $student->address }}</td>

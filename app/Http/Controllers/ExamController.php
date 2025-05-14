@@ -40,9 +40,10 @@ class ExamController extends Controller
         $loggedTeacher = Teacher::where('user_id', $user->id)->first();
         $decoded = Hashids::decode($id);
         // return $decoded;
-        $class_course = class_learning_courses::findOrFail($decoded[0]);
+        $class_course = class_learning_courses::where('course_id', $decoded[0])->where('teacher_id', $loggedTeacher->id)->first();
+        // return $class_course;
 
-        if($class_course->teacher_id != $loggedTeacher->id) {
+        if(! $class_course) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
@@ -78,6 +79,15 @@ class ExamController extends Controller
         $term = $request->term;
         $markingStyle = $request->marking_style;
 
+        $user = Auth::user();
+        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
+        $class_course = class_learning_courses::where('course_id', $courseId)->where('teacher_id', $loggedTeacher->id)->first();
+
+        if($class_course->teacher_id != $teacherId && $class_course->course_id != $courseId && $class_course->class_id != $classId) {
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return to_route('score.prepare.form', Hashids::encode($courseId));
+        }
+
         // Pata wanafunzi wa darasa husika
         $students = Student::where('class_id', $classId)
                             ->where('status', 1)
@@ -102,6 +112,8 @@ class ExamController extends Controller
             return to_route('score.prepare.form', Hashids::encode($courseId));
         }
 
+        $exams = Examination::where('school_id', Auth::user()->school_id)->where('status', 1)->orderBy('exam_type')->get();
+
         // Hakuna matokeo ya muda, waruhusu waingize matokeo mapya
         return view('Examinations.register_score', [
             'courseId' => $courseId,
@@ -116,6 +128,7 @@ class ExamController extends Controller
             'courseName' => $courseName,
             'examName' => $examName,
             'marking_style' => $markingStyle,
+            'exams' => $exams
         ]);
     }
 
@@ -146,7 +159,7 @@ class ExamController extends Controller
         if ($validator->fails()) {
             $errorMessages = implode(' ', $validator->errors()->all());
             Alert::error('Validation Error!', $errorMessages);
-            return redirect()->back()->withInput();
+            return to_route('score.prepare.form', Hashids::encode($request->course_id));
         }
 
         $students = $request->input('students');
@@ -178,8 +191,8 @@ class ExamController extends Controller
             }
 
             Alert::toast('Examination results have been saved to the draft', 'success');
-            return to_route('home');
-            // return redirect()->route('score.prepare.form', Hashids::encode($request->course_id));
+            // return to_route('home');
+            return to_route('score.prepare.form', Hashids::encode($request->course_id));
         }
 
         if ($action === 'submit') {
@@ -191,6 +204,7 @@ class ExamController extends Controller
                 // Check if the result already exists in the examination_results table
                 $existingRecord = Examination_result::where('student_id', $studentId)
                                                     ->where('course_id', $request->course_id)
+                                                    ->where('exam_type_id', $request->exam_id)
                                                     ->whereDate('exam_date', Carbon::parse($request->exam_date)->format('Y-m-d'))
                                                     ->exists();
 
@@ -319,9 +333,11 @@ class ExamController extends Controller
             return back();
        }
 
-       $hasResults = Examination_result::where('exam_type_id', $examination)->exists();
-       if($hasResults) {
-            Alert()->toast('Cannot delete this examination because has results payload for this school', 'info');
+       $hasTempResults = temporary_results::where('exam_type_id', $examination)->exists();
+       $hasPermResults = Examination_result::where('exam_type_id', $examination)->exists();
+
+       if($hasTempResults || $hasPermResults) {
+            Alert()->toast('Cannot delete this examination because has results payload', 'info');
             return back();
        }
 
@@ -337,22 +353,17 @@ class ExamController extends Controller
         // return $decoded;
         $user = Auth::user();
         $loggedTeacher = Teacher::where('user_id', $user->id)->first(); //get teacher id from the logged in user
-        $class_course = class_learning_courses::find($decoded[0]);
+        $class_course = class_learning_courses::where('course_id', $decoded[0])->where('teacher_id', $loggedTeacher->id)->first();
         // return $class_course;
 
         if(! $class_course) {
-            Alert()->toast('No such course was found', 'error');
-            return back();
-        }
-
-        if($class_course->teacher_id != $loggedTeacher->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
 
         $results = Examination_result::where('course_id', $class_course->course_id)
                                         ->where('class_id', $class_course->class_id)
-                                        ->where('teacher_id', $loggedTeacher->id)
+                                        // ->where('teacher_id', $loggedTeacher->id)
                                         ->where('school_id', $user->school_id)
                                         ->orderBy('exam_date', 'DESC')
                                         ->get();
@@ -371,17 +382,11 @@ class ExamController extends Controller
         $id = Hashids::decode($course);
         // return $id;
         $user = Auth::user();
-        $class_course = class_learning_courses::findOrFail($id[0]);
         $loggedTeacher = Teacher::where('user_id', $user->id)->first();
+        $class_course = class_learning_courses::where('course_id', $id[0])->where('teacher_id', $loggedTeacher->id)->first();
+
 
         if(! $class_course) {
-            Alert()->toast('No such course was found', 'error');
-            return back();
-        }
-        // return ['data' => $class_course];
-
-
-        if($class_course->teacher_id != $loggedTeacher->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
@@ -391,7 +396,7 @@ class ExamController extends Controller
                     ->select('examination_results.*', 'examinations.exam_type')
                     ->where('course_id', $class_course->course_id)
                     ->where('class_id', $class_course->class_id)
-                    ->where('teacher_id', $loggedTeacher->id)
+                    // ->where('teacher_id', $loggedTeacher->id)
                     ->whereYear('exam_date', $year)
                     ->where('examination_results.school_id', $user->school_id)
                     ->orderBy('examination_results.exam_date', 'DESC')
@@ -412,18 +417,18 @@ class ExamController extends Controller
         $id = Hashids::decode($course);
         $exam_id = Hashids::decode($examType);
         $user = Auth::user();
-        $class_course = class_learning_courses::findOrFail($id[0]);
 
         $loggedTeacher = Teacher::where('user_id', $user->id)->first();
+        $class_course = class_learning_courses::where('course_id', $id[0])->where('teacher_id', $loggedTeacher->id)->first();
 
-        if($class_course->teacher_id != $loggedTeacher->id) {
+        if(! $class_course) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
         // return ['data' => $class_course];
         $results = Examination_result::where('course_id', $class_course->course_id)
                                 ->where('class_id', $class_course->class_id)
-                                ->where('teacher_id', $loggedTeacher->id)
+                                // ->where('teacher_id', $loggedTeacher->id)
                                 ->whereYear('exam_date', $year)
                                 ->where('exam_type_id', $exam_id[0])
                                 ->where('school_id', $user->school_id)
@@ -448,7 +453,14 @@ class ExamController extends Controller
         $id = Hashids::decode($course);
         $exam_id = Hashids::decode($examType);
         $user = Auth::user();
-        $class_course = class_learning_courses::findOrFail($id[0]);
+        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
+        $class_course = class_learning_courses::where('course_id', $id[0])->where('teacher_id', $loggedTeacher->id)->first();
+
+        if(! $class_course) {
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return back();
+        }
+
         $subjectCourse = Subject::findOrFail($class_course->course_id);
 
         $monthMap = [
@@ -477,7 +489,7 @@ class ExamController extends Controller
             )
             ->where('examination_results.course_id', $class_course->course_id)
             ->where('examination_results.class_id', $class_course->class_id)
-            ->where('examination_results.teacher_id', $class_course->teacher_id)
+            // ->where('examination_results.teacher_id', $class_course->teacher_id)
             ->where('students.status', 1)
             ->where('examination_results.exam_type_id', $exam_id)
             ->where('examination_results.school_id', $user->school_id)
@@ -649,6 +661,15 @@ class ExamController extends Controller
 
         $markingStyle = $request->marking_style;
 
+        $user = Auth::user();
+        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
+        $class_course = class_learning_courses::where('course_id', $courseId)->where('class_id', $classId)->where('teacher_id', $loggedTeacher->id)->first();
+
+        if($class_course->teacher_id != $teacherId && $class_course->course_id != $courseId && $class_course->class_id != $classId) {
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return to_route('score.prepare.form', Hashids::encode($courseId));
+        }
+
         // Pata matokeo yaliyohifadhiwa kwenye draft
         $draftResults = temporary_results::where('course_id', $courseId)
                                        ->where('teacher_id', $teacherId)
@@ -672,6 +693,7 @@ class ExamController extends Controller
         $className = Grade::find($classId)->class_code;
         $courseName = Subject::find($courseId)->course_code;
         $examName = Examination::find($examTypeId)->exam_type;
+        $exams = Examination::where('school_id', Auth::user()->school_id)->where('status', 1)->orderBy('exam_type')->get();
 
         // Load view ya ku-edit matokeo
         return view('Examinations.edit_score', [
@@ -687,7 +709,8 @@ class ExamController extends Controller
             'courseName' => $courseName,
             'examName' => $examName,
             'marking_style' => $markingStyle,
-            'draftResults' => $draftResults
+            'draftResults' => $draftResults,
+            'exams' => $exams
         ]);
     }
 
@@ -704,6 +727,16 @@ class ExamController extends Controller
         $scores = $request->scores;
         $action = $request->input('action');
         // return $examTerm;
+
+        $user = Auth::user();
+        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
+        $class_course = class_learning_courses::where('course_id', $courseId)->where('teacher_id', $loggedTeacher->id)->first();
+
+        if($class_course->teacher_id != $teacherId && $class_course->course_id != $courseId && $class_course->class_id != $classId) {
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return to_route('score.prepare.form', Hashids::encode($courseId));
+        }
+
         if ($action === 'save') {
             // SAVE TO DRAFT
             foreach ($scores as $studentId => $score) {
@@ -712,21 +745,21 @@ class ExamController extends Controller
                         'student_id' => $studentId,
                         'course_id' => $courseId,
                         'teacher_id' => $teacherId,
-                        'exam_type_id' => $examTypeId
                     ],
                     [
                         'class_id' => $classId,
+                        'exam_type_id' => $examTypeId,
                         'school_id' => $schoolId,
                         'exam_date' => $examDate,
                         'exam_term' => $examTerm,
                         'score' => $score,
-                        'marking_style' => $markingStyle
+                        'marking_style' => $markingStyle,
                     ]
                 );
             }
             Alert()->toast('Results saved successfully, remember to submit before expiry date.', 'success');
-            // return redirect()->route('score.prepare.form', Hashids::encode($courseId));
-            return to_route('home');
+            return redirect()->route('score.prepare.form', Hashids::encode($courseId));
+            // return to_route('home');
 
         } elseif ($action === 'submit') {
             // CHECK IF RESULTS ALREADY EXIST IN EXAMINATION_RESULT TABLE
@@ -796,6 +829,14 @@ class ExamController extends Controller
         // return $exam_date;
         $examDate = Carbon::parse($date)->format('Y-m-d');
 
+        $user = Auth::user();
+        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
+        $class_course = class_learning_courses::where('course_id', $courseId)->where('teacher_id', $loggedTeacher->id)->first();
+
+        if($class_course->teacher_id != $teacherId && $class_course->course_id != $courseId && $class_course->class_id != $classId) {
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return to_route('score.prepare.form', Hashids::encode($courseId));
+        }
 
         // Pata wanafunzi wa darasa husika
         $students = Student::where('class_id', $classId)
@@ -835,12 +876,13 @@ class ExamController extends Controller
         $examType = $type;
         $teacherInfo = Teacher::find($teacher_id[0]);
         $user = Auth::user();
+        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
+        $class_course = class_learning_courses::where('course_id', $course_id)->where('teacher_id', $loggedTeacher->id)->first();
 
-        if ($user->id != $teacherInfo->user_id) {
-            Alert()->toast('Unauthorized request', 'error');
-            return redirect()->route('score.prepare.form', Hashids::encode($course_id[0]));
+        if($class_course->teacher_id != $teacher_id && $class_course->course_id != $course_id && $class_course->class_id != $class_id) {
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return to_route('score.prepare.form', Hashids::encode($course_id));
         }
-
         // Check if there are any records that match the given parameters
         $results = temporary_results::where('course_id', $course_id[0])
             ->where('teacher_id', $teacher_id[0])
@@ -852,7 +894,7 @@ class ExamController extends Controller
 
         if ($results->isEmpty()) {
             Alert()->toast('No results found in draft box', 'info');
-            return redirect()->route('score.prepare.form', Hashids::encode($course_id[0]));
+            return redirect()->route('score.prepare.form', ['id' => $course]);
         }
 
         // Delete all the matching records
@@ -863,7 +905,38 @@ class ExamController extends Controller
             ->delete();
 
         Alert()->toast('All results deleted successfully from the draft box', 'success');
-        return redirect()->route('score.prepare.form', Hashids::encode($course_id[0]));
+        return redirect()->route('score.prepare.form', ['id' => $course]);
+    }
+
+    public function TeacherDeleteResults($course, $year, $examType, $month, $date)
+    {
+        $couurse_id = Hashids::decode($course);
+        $exam_id = Hashids::decode($examType);
+        $user = Auth::user();
+        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
+        $class_course = class_learning_courses::where('course_id', $couurse_id[0])->where('teacher_id', $loggedTeacher->id)->first();
+
+        if(! $class_course) {
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return back();
+        }
+        $examDate = Carbon::parse($date)->format('Y-m-d');
+
+        try {
+            // Delete the results for the specified course, year, and exam type
+            Examination_result::where('course_id', $class_course->course_id)
+                ->where('class_id', $class_course->class_id)
+                ->where('teacher_id', $loggedTeacher->id)
+                ->where('exam_type_id', $exam_id[0])
+                ->whereDate('exam_date', $examDate)
+                ->delete();
+
+            Alert()->toast('Results deleted successfully', 'success');
+            return to_route('results.byExamType', ['course' => $course, 'year' => $year, 'examType' => $examType]);
+        } catch (\Exception $e) {
+            Alert()->toast('Error deleting results: ' . $e->getMessage(), 'error');
+            return to_route('results.byExamType', ['course' => $course, 'year' => $year, 'examType' => $examType]);
+        }
     }
 
 }

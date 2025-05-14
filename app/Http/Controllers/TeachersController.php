@@ -243,7 +243,7 @@ class TeachersController extends Controller
                 ->join('roles', 'roles.id', '=', 'teachers.role_id')
                 ->select(
                     'teachers.*', 'users.first_name', 'users.last_name', 'users.gender',
-                    'users.phone', 'users.usertype', 'users.image', 'schools.school_reg_no',
+                    'users.phone', 'users.usertype', 'users.image', 'schools.school_reg_no', 'users.email',
                     'schools.school_name', 'roles.role_name')
                 ->where('teachers.id', '=', $teacherId->id)
                 ->where('teachers.school_id', '=', Auth::user()->school_id)
@@ -290,6 +290,7 @@ class TeachersController extends Controller
             'gender' => 'required|max:20',
             'joined_at' => 'required|date_format:Y',
             'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
+            'email' => 'nullable|string|email|unique:users,email,'.$user->id,
         ]);
 
 
@@ -299,6 +300,7 @@ class TeachersController extends Controller
             $user->last_name = $request->lname;
             $user->phone = $request->phone;
             $user->gender = $request->gender;
+            $user->email = $request->email;
 
             // Handle image upload
             if ($request->hasFile('image')) {

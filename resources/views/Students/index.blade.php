@@ -275,10 +275,9 @@
                             </div>
                             <div class="table-responsive">
                                 <table class="table table-hover progress-table" id="myTable">
-                                    <thead class="text-uppercase">
+                                    <thead class="text-capitalize">
                                         <tr>
-                                            <th scope="col"><input type="checkbox" id="selectAll"></th>
-                                            <th scope="col">#</th>
+                                            <th scope="col" class="text-center"><input type="checkbox" id="selectAll"> All</th>
                                             <th scope="col" class="text-center">Adm No.</th>
                                             <th scope="col">First Name</th>
                                             <th scope="col">Middle Name</th>
@@ -292,16 +291,16 @@
                                     <tbody>
                                         @foreach ($students as $student )
                                             <tr>
-                                                <td><input type="checkbox" name="student[]" value="{{$student->id}}"></td>
-                                                <td>
+                                                <td class="text-center">
+                                                    <input type="checkbox" name="student[]" value="{{$student->id}}">
                                                     {{$loop->iteration}}
                                                 </td>
                                                 <td class="text-uppercase text-center">{{$student->admission_number}}</td>
-                                                <td class="text-uppercase">{{$student->first_name}}</td>
-                                                <td class="text-uppercase">{{$student->middle_name}}</td>
-                                                <td class="text-uppercase">{{$student->last_name}}</td>
-                                                <td class="text-center text-uppercase">{{$student->gender[0]}}</td>
-                                                <td class="text-center text-uppercase">{{$student->group}}</td>
+                                                <td class="text-capitalize">{{ucwords(strtolower($student->first_name))}}</td>
+                                                <td class="text-capitalize">{{ucwords(strtolower($student->middle_name))}}</td>
+                                                <td class="text-capitalize">{{ucwords(strtolower($student->last_name))}}</td>
+                                                <td class="text-center text-capitalize">{{$student->gender[0]}}</td>
+                                                <td class="text-center text-capitalize">{{$student->group}}</td>
                                                 <td>
                                                     {{ \Carbon\Carbon::parse($student->dob)->format('M d, Y') }}
                                                 </td>

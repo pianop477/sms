@@ -7,7 +7,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-8">
-                        <h4 class="header-title text-uppercase text-center">Student Lists - {{$transport->driver_name}}</h4>
+                        <h4 class="header-title text-uppercase text-center">Student Lists - Driver Name: {{$transport->driver_name}}</h4>
                     </div>
                     <div class="col-2">
                         @if ($students->isNotEmpty())
@@ -38,12 +38,12 @@
                                 @foreach ($students as $student )
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
-                                        <td class="text-capitalize">{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}</td>
+                                        <td class="text-capitalize">{{ucwords(strtolower($student->first_name . ' ' .$student->middle_name . ' '. $student->last_name))}}</td>
                                         <td class="text-uppercase">{{$student->gender[0]}}</td>
                                         <td class="text-uppercase">{{$student->class_code}}</td>
                                         <td class="text-uppercase">{{$student->group}}</td>
                                         <td>{{$student->parent_phone}}</td>
-                                        <td class="text-capitalize">{{$student->address}}</td>
+                                        <td class="text-capitalize">{{ucwords(strtolower($student->address))}}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

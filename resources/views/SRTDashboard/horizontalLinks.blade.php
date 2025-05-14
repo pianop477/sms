@@ -53,6 +53,7 @@
                                     <li><a href="{{route('courses.index')}}"><i class="fas fa-book-open"></i><span> Courses</span></a></li>
                                     <li><a href="{{route('exams.index')}}"><i class="fas fa-clipboard-list"></i>Examination</a></li>
                                     <li><a href="{{route('results.general', ['school' => Hashids::encode(Auth::user()->school_id)])}}"><i class="fas fa-chart-bar"></i>Results</a></li>
+                                    <li><a href="{{route('under.construction.page')}}"><i class="fas fa-file-circle-check"></i> Timetable</a></li>
                                 </ul>
                             </li>
 
@@ -62,12 +63,11 @@
                                     <li>
                                         <a href="{{route('attendance.fill.form')}}"><i class="fas fa-calendar-check"></i><span> Attendance</span></a>
                                     </li>
-                                    <li><a href="{{route('under.construction.page')}}"><i class="fas fa-file-circle-check"></i> Timetable</a></li>
                                     <li><a href="{{route('graduate.students')}}"><i class="fas fa-graduation-cap"></i> Graduate Students</a></li>
                                 </ul>
                             </li>
                             <li>
-                                <a href="javascript:void(0)"><i class="fa fa-file-archive"></i><span>Contracts & Legal</span></a>
+                                <a href="javascript:void(0)"><i class="fa fa-file-archive"></i><span>Contracts & Legals</span></a>
                                 <ul class="submenu">
                                     <li><a href="{{route('contract.index')}}"><i class="fa fa-exchange-alt"></i> Contract Manager</a></li>
                                 </ul>
@@ -101,6 +101,7 @@
                                     <li><a href="{{route('courses.index')}}"><i class="fas fa-book-open"></i><span> Courses</span></a></li>
                                     <li><a href="{{route('exams.index')}}"><i class="fas fa-clipboard-list"></i>Examination</a></li>
                                     <li><a href="{{route('results.general', ['school' => Hashids::encode(Auth::user()->school_id)])}}"><i class="fas fa-chart-bar"></i>Results</a></li>
+                                    <li><a href="{{route('under.construction.page')}}"><i class="fas fa-file-circle-check"></i> Timetable</a></li>
                                 </ul>
                             </li>
                             <li>
@@ -121,7 +122,7 @@
                                 </ul>
                             </li>
                             <li>
-                                <a href="javascript:void(0)"><i class="fa fa-file-archive"></i><span>Contracts & Legal</span></a>
+                                <a href="javascript:void(0)"><i class="fa fa-file-archive"></i><span>Contracts & Legals</span></a>
                                 <ul class="submenu">
                                     <li><a href="{{route('contract.management')}}"><i class="fa fa-exchange-alt"></i> Contracts Requests</a></li>
                                 </ul>

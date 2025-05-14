@@ -21,6 +21,9 @@
                         @error('current_password')
                             <div class="text-danger text-sm">{{$message}}</div>
                         @enderror
+                        @if (Session::has('error'))
+                            <div class="text-danger text-sm">{{Session::get('error')}}</div>
+                        @endif
                     </div>
                     <!-- New Password -->
                     <div class="col-md-4 mb-3">

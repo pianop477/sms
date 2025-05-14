@@ -50,14 +50,27 @@
     </script>
     <script>
         $(document).ready(function() {
-            $('#myTable').DataTable();
+            var table = $('#myTable').DataTable({
+                stateSave: true,
+                columnDefs: [{
+                    orderable: false,
+                    targets: 0
+                }]
+            });
+
+            // Handle select all checkbox
+            $('#selectAll').on('click', function() {
+                var rows = table.rows({ 'search': 'applied' }).nodes();
+                $('input[type="checkbox"]', rows).prop('checked', this.checked);
+            });
+
+            // Handle individual checkboxes
+            $('#myTable tbody').on('change', 'input[type="checkbox"]', function() {
+                if (!this.checked) {
+                    $('#selectAll').prop('checked', false);
+                }
+            });
         });
-
-          function  printPage() {
-                window.print();
-            }
-
-
     </script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Grade;
 use App\Models\school;
 use App\Models\Student;
+use App\Models\Teacher;
 use App\Services\BeemSmsService;
 use App\Services\NextSmsService;
 use Exception;
@@ -13,6 +14,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use RealRashid\SweetAlert\Facades\Alert;
 
 use function Laravel\Prompts\text;
@@ -145,16 +148,29 @@ class SmsController extends Controller
         //fetch school details
         $school = school::findOrFail($user->school_id);
 
+        $validator = Validator::make($request->all(), [
+            'class' => 'nullable|integer|exists:grades,id',
+                        Rule::requiredIf(function () use ($request) {
+                            return $request->send_to_all == 0 &&
+                                $request->send_with_transport == 0 &&
+                                $request->send_without_transport == 0 &&
+                                $request->send_to_teachers == 0;
+                        }),
+            'message_content' => 'required|string',
+        ]);
         $this->validate($request, [
             'class' => 'nullable|required_if:send_to_all,0|integer|exists:grades,id',
             'message_content' => 'required|string',
         ]);
 
-        $sendToAll = $request->has('send_to_all');
+        $sendToAllClasses = $request->has('send_to_all');
+        $sendwithTransport = $request->has('send_with_transport');
+        $sendWithoutTransport = $request->has('send_without_transport');
+        $sendToTeachers = $request->has('send_to_teachers');
 
-        if ($sendToAll) {
+        if ($sendToAllClasses) {
             // Fetch students and parents for all classes
-            $students = Student::query()
+            $data = Student::query()
                 ->join('parents', 'parents.id', '=', 'students.parent_id')
                 ->leftJoin('users', 'users.id', '=', 'parents.user_id')
                 ->select('students.*', 'users.phone')
@@ -162,9 +178,40 @@ class SmsController extends Controller
                 ->where('students.school_id', $user->school_id)
                 ->where('students.graduated', 0)
                 ->get();
-        } else {
+        }
+        elseif ($sendwithTransport) {
+            $data = Student::query()
+                ->join('parents', 'parents.id', '=', 'students.parent_id')
+                ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+                ->select('users.phone', 'students.*')
+                ->where('students.graduated', 0)
+                ->where('students.status', 1)
+                ->where('students.transport_id', '!=', null)
+                ->where('students.school_id', $user->school_id)
+                ->get();
+        }
+        elseif ($sendWithoutTransport) {
+            $data = Student::query()
+                ->join('parents', 'parents.id', '=', 'students.parent_id')
+                ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+                ->select('users.phone', 'students.*')
+                ->where('students.graduated', 0)
+                ->where('students.status', 1)
+                ->where('students.transport_id', null)
+                ->where('students.school_id', $user->school_id)
+                ->get();
+        }
+        elseif ($sendToTeachers) {
+            $data = Teacher::query()
+                ->join('users', 'users.id', '=', 'teachers.user_id')
+                ->select('users.phone', 'teachers.*')
+                ->where('teachers.status', 1)
+                ->where('teachers.school_id', $user->school_id)
+                ->get();
+        }
+         else {
             // Fetch students and parents for the selected class
-            $students = Student::query()
+            $data = Student::query()
                 ->join('parents', 'parents.id', '=', 'students.parent_id')
                 ->leftJoin('users', 'users.id', '=', 'parents.user_id')
                 ->select('users.phone', 'students.*')
@@ -176,7 +223,7 @@ class SmsController extends Controller
         }
 
         // Check if any students were found
-        if ($students->isEmpty()) {
+        if ($data->isEmpty()) {
             // return response()->json(['error' => 'No phone numbers found for this class'], 400);
             Alert()->toast('No phone numbers found for this class', 'error');
             return back();
@@ -189,7 +236,7 @@ class SmsController extends Controller
         $reference = uniqid();
 
         // Ondoa namba zinazojirudia kwa kutumia unique()
-        $uniquePhones = $students->pluck('phone')->map(function ($phone) {
+        $uniquePhones = $data->pluck('phone')->map(function ($phone) {
             return $this->formatPhoneNumber($phone); // Hakikisha namba zina format sahihi
         })->unique()->values()->all(); // Hakikisha ni array safi
 
@@ -205,7 +252,7 @@ class SmsController extends Controller
 
            // Tuma SMS
             $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
-
+            // Log::info('Payload:', $payload);
             Alert()->toast('Message Sent Successfully', 'success');
             return redirect()->back();
         }
@@ -213,7 +260,6 @@ class SmsController extends Controller
             Alert()->toast($e->getMessage(), 'error');
             return back();
         }
-
 
     }
 
