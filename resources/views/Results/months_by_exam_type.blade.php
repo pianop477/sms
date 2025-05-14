@@ -8,8 +8,9 @@
                     <h4 class="header-title text-center text-uppercase">Select Month</h4>
                 </div>
                 <div class="col-2">
-                    <a href="{{ route('results.examTypesByClass', ['school' => Hashids::encode($schools->id), 'year' => $year, 'class' => Hashids::encode($class_id)]) }}" class="float-right">
-                        <i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i>
+                    <a href="{{ route('results.examTypesByClass', ['school' => Hashids::encode($schools->id), 'year' => $year, 'class' => Hashids::encode($class_id)]) }}" class="float-right btn btn-info btn-xs">
+                        <i class="fas fa-arrow-circle-left" style=""></i>
+                        Back
                     </a>
                 </div>
             </div>

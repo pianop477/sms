@@ -8,8 +8,9 @@
                         <h4 class="header-title text-center text-uppercase">Select Combined Report - For Year {{$year}}</h4>
                     </div>
                     <div class="col-2">
-                        <a href="{{route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])}}" class="float-right">
-                            <i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i>
+                        <a href="{{route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])}}" class="float-right btn btn-info btn-xs">
+                            <i class="fas fa-arrow-circle-left" style=";"></i>
+                            Back
                         </a>
                     </div>
                 </div>
