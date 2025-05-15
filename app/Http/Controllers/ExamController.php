@@ -37,13 +37,13 @@ class ExamController extends Controller
     {
         // abort(404)
         $user = Auth::user();
-        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
+        $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
         $decoded = Hashids::decode($id);
         // return $decoded;
         $class_course = class_learning_courses::findOrFail($decoded[0]);
         // return $class_course;
 
-        if($class_course->teacher_id != $loggedTeacher->id && $class_course->course_id != $decoded[0]) {
+        if($class_course->teacher_id != $loggedTeacher->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
@@ -80,10 +80,14 @@ class ExamController extends Controller
         $markingStyle = $request->marking_style;
 
         $user = Auth::user();
-        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
-        $class_course = class_learning_courses::where('course_id', $courseId)->where('teacher_id', $loggedTeacher->id)->first();
+        $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
 
-        if($class_course->teacher_id != $teacherId && $class_course->course_id != $courseId && $class_course->class_id != $classId) {
+        $exists = class_learning_courses::where('course_id', $courseId)
+                                        ->where('class_id', $classId)
+                                        ->where('teacher_id', $loggedTeacher->id)
+                                        ->exists();
+
+        if (!$exists) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return to_route('score.prepare.form', Hashids::encode($courseId));
         }
@@ -352,11 +356,11 @@ class ExamController extends Controller
         $decoded = Hashids::decode($id);
         // return $decoded;
         $user = Auth::user();
-        $loggedTeacher = Teacher::where('user_id', $user->id)->first(); //get teacher id from the logged in user
+        $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail(); //get teacher id from the logged in user
         $class_course = class_learning_courses::findOrFail($decoded[0]);
         // return $class_course;
 
-        if($class_course->teacher_id != $loggedTeacher->id && $class_course->course_id != $decoded[0]) {
+        if(! $class_course) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
@@ -382,13 +386,12 @@ class ExamController extends Controller
         $id = Hashids::decode($course);
         // return $id;
         $user = Auth::user();
-        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
+        $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
         $class_course = class_learning_courses::findOrFail($id[0]);
 
-
-        if($class_course->teacher_id != $loggedTeacher->id && $class_course->course_id != $id[0]) {
+        if($class_course->teacher_id != $loggedTeacher->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
-            return back();
+            return to_route('home');
         }
         // return ['data' => $class_course];
         $results = Examination_result::query()
@@ -396,7 +399,6 @@ class ExamController extends Controller
                     ->select('examination_results.*', 'examinations.exam_type')
                     ->where('course_id', $class_course->course_id)
                     ->where('class_id', $class_course->class_id)
-                    // ->where('teacher_id', $loggedTeacher->id)
                     ->whereYear('exam_date', $year)
                     ->where('examination_results.school_id', $user->school_id)
                     ->orderBy('examination_results.exam_date', 'DESC')
@@ -418,17 +420,16 @@ class ExamController extends Controller
         $exam_id = Hashids::decode($examType);
         $user = Auth::user();
 
-        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
+        $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
         $class_course = class_learning_courses::findOrFail($id[0]);
 
-        if($class_course->teacher_id != $loggedTeacher->id && $class_course->course_id != $id[0]) {
+        if($class_course->teacher_id != $loggedTeacher->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
         // return ['data' => $class_course];
         $results = Examination_result::where('course_id', $class_course->course_id)
                                 ->where('class_id', $class_course->class_id)
-                                // ->where('teacher_id', $loggedTeacher->id)
                                 ->whereYear('exam_date', $year)
                                 ->where('exam_type_id', $exam_id[0])
                                 ->where('school_id', $user->school_id)
@@ -453,10 +454,10 @@ class ExamController extends Controller
         $id = Hashids::decode($course);
         $exam_id = Hashids::decode($examType);
         $user = Auth::user();
-        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
+        $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
         $class_course = class_learning_courses::findOrFail($id[0]);
 
-        if($class_course->teacher_id != $loggedTeacher->id && $class_course->course_id != $id[0]) {
+        if($class_course->teacher_id != $loggedTeacher->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
@@ -489,7 +490,6 @@ class ExamController extends Controller
             )
             ->where('examination_results.course_id', $class_course->course_id)
             ->where('examination_results.class_id', $class_course->class_id)
-            // ->where('examination_results.teacher_id', $class_course->teacher_id)
             ->where('students.status', 1)
             ->where('examination_results.exam_type_id', $exam_id)
             ->where('examination_results.school_id', $user->school_id)
@@ -662,7 +662,7 @@ class ExamController extends Controller
         $markingStyle = $request->marking_style;
 
         $user = Auth::user();
-        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
+        $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
 
         $exists = class_learning_courses::where('course_id', $courseId)
                                         ->where('class_id', $classId)
@@ -733,10 +733,14 @@ class ExamController extends Controller
         // return $examTerm;
 
         $user = Auth::user();
-        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
-        $class_course = class_learning_courses::where('course_id', $courseId)->where('teacher_id', $loggedTeacher->id)->first();
+        $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
 
-        if($class_course->teacher_id != $teacherId && $class_course->course_id != $courseId && $class_course->class_id != $classId) {
+        $exists = class_learning_courses::where('course_id', $courseId)
+                                        ->where('class_id', $classId)
+                                        ->where('teacher_id', $loggedTeacher->id)
+                                        ->exists();
+
+        if (!$exists) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return to_route('score.prepare.form', Hashids::encode($courseId));
         }
@@ -834,10 +838,14 @@ class ExamController extends Controller
         $examDate = Carbon::parse($date)->format('Y-m-d');
 
         $user = Auth::user();
-        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
-        $class_course = class_learning_courses::findOrFail($courseId);
+        $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
 
-        if($class_course->teacher_id != $teacherId && $class_course->course_id != $courseId && $class_course->class_id != $classId) {
+        $exists = class_learning_courses::where('course_id', $courseId)
+                                        ->where('class_id', $classId)
+                                        ->where('teacher_id', $loggedTeacher->id)
+                                        ->exists();
+
+        if (!$exists) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return to_route('score.prepare.form', Hashids::encode($courseId));
         }
@@ -880,12 +888,16 @@ class ExamController extends Controller
         $examType = $type;
         $teacherInfo = Teacher::find($teacher_id[0]);
         $user = Auth::user();
-        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
-        $class_course = class_learning_courses::findOrFail($course_id[0]);
+        $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
 
-        if($class_course->teacher_id != $teacher_id && $class_course->course_id != $course_id && $class_course->class_id != $class_id) {
+        $exists = class_learning_courses::where('course_id', $course_id[0])
+                                        ->where('class_id', $class_id[0])
+                                        ->where('teacher_id', $loggedTeacher->id)
+                                        ->exists();
+
+        if (!$exists) {
             Alert()->toast('You are not authorized to view this page', 'error');
-            return to_route('score.prepare.form', Hashids::encode($course_id));
+            return to_route('score.prepare.form', Hashids::encode($course_id[0]));
         }
         // Check if there are any records that match the given parameters
         $results = temporary_results::where('course_id', $course_id[0])
@@ -917,8 +929,10 @@ class ExamController extends Controller
         $couurse_id = Hashids::decode($course);
         $exam_id = Hashids::decode($examType);
         $user = Auth::user();
-        $loggedTeacher = Teacher::where('user_id', $user->id)->first();
-        $class_course = class_learning_courses::findOrFail($couurse_id[0]);
+        $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
+        $class_course = class_learning_courses::where('course_id', $couurse_id[0])
+                                        ->where('teacher_id', $loggedTeacher->id)
+                                        ->first();
 
         if($class_course->teacher_id != $loggedTeacher->id && $class_course->course_id != $couurse_id[0]) {
             Alert()->toast('You are not authorized to view this page', 'error');
