@@ -663,9 +663,9 @@ class ExamController extends Controller
 
         $user = Auth::user();
         $loggedTeacher = Teacher::where('user_id', $user->id)->first();
-        $class_course = class_learning_courses::findOrFail($courseId);
+        $class_course = class_learning_courses::where('course_id', $courseId)->where('class_id', $classId)->where('teacher_id', $loggedTeacher->id)->first();
 
-        if($class_course->teacher_id != $teacherId && $class_course->course_id != $courseId && $class_course->class_id != $classId) {
+        if($class_course->teacher_id != $loggedTeacher->id && $class_course->course_id != $courseId && $class_course->class_id != $classId) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return to_route('score.prepare.form', Hashids::encode($courseId));
         }
