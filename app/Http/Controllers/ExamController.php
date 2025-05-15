@@ -40,7 +40,7 @@ class ExamController extends Controller
         $loggedTeacher = Teacher::where('user_id', $user->id)->first();
         $decoded = Hashids::decode($id);
         // return $decoded;
-        $class_course = class_learning_courses::where('course_id', $decoded[0])->where('teacher_id', $loggedTeacher->id)->first();
+        $class_course = class_learning_courses::findOrFail($decoded[0]);
         // return $class_course;
 
         if($class_course->teacher_id != $loggedTeacher->id && $class_course->course_id != $decoded[0]) {
