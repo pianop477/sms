@@ -155,7 +155,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (isset($reports) && $reports->isEmpty())
+                                    @if ($reports->isEmpty())
                                         <tr>
                                             <td colspan="5" class="text-center text-danger">No compiled results found</td>
                                         </tr>

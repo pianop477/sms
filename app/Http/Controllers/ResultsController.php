@@ -434,10 +434,10 @@ class ResultsController extends Controller
         $classes = Grade::find($class_id[0]);
         // return $classes;
 
-        if($user->school_id != $schools->id){
-            Alert()->toast('You are not authorized to view this page', 'error');
-            return redirect()->route('error.page');
-        }
+        // if($user->school_id != $schools->id){
+        //     Alert()->toast('You are not authorized to view this page', 'error');
+        //     return redirect()->route('error.page');
+        // }
 
         $results = Examination_result::query()
                                     ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
