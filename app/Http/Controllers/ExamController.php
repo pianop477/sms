@@ -955,11 +955,12 @@ class ExamController extends Controller
         try {
             // Delete the results for the specified course, year, and exam type
             Examination_result::where('course_id', $class_course->course_id)
-                ->where('class_id', $class_course->class_id)
-                ->where('teacher_id', $loggedTeacher->id)
-                ->where('exam_type_id', $exam_id[0])
-                ->whereDate('exam_date', $examDate)
-                ->delete();
+                            ->where('class_id', $class_course->class_id)
+                            ->where('teacher_id', $loggedTeacher->id)
+                            ->where('exam_type_id', $exam_id[0])
+                            ->whereDate('exam_date', $examDate)
+                            ->where('status', 1)
+                            ->delete();
 
             Alert()->toast('Results deleted successfully', 'success');
             return to_route('results.byExamType', ['course' => $course, 'year' => $year, 'examType' => $examType]);
