@@ -434,10 +434,10 @@ class ResultsController extends Controller
         $classes = Grade::find($class_id[0]);
         // return $classes;
 
-        // if($user->school_id != $schools->id){
-        //     Alert()->toast('You are not authorized to view this page', 'error');
-        //     return redirect()->route('error.page');
-        // }
+        if($user->school_id != $schools->id){
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return redirect()->route('error.page');
+        }
 
         $results = Examination_result::query()
                                     ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
@@ -445,7 +445,7 @@ class ResultsController extends Controller
                                         'examination_results.*',
                                         'examinations.id as exam_type_id', 'examinations.exam_type'
                                     )
-                                    ->where('examination_results.school_id', $school_id[0])
+                                    ->where('examination_results.school_id', $schools->id)
                                     ->whereYear('examination_results.exam_date', $year)
                                     ->where('examination_results.class_id', $classes->id)
                                     ->get();
@@ -466,7 +466,7 @@ class ResultsController extends Controller
                                                     ->select('examination_results.*', 'examinations.exam_type', 'examinations.symbolic_abbr')
                                                     ->where('class_id', $classes->id)
                                                     ->whereYear('examination_results.exam_date', $year)
-                                                    ->where('examination_results.school_id', $school_id[0])
+                                                    ->where('examination_results.school_id', $schools->id)
                                                     ->orderBy('examination_results.exam_date')
                                                     ->get();
 
@@ -474,18 +474,23 @@ class ResultsController extends Controller
                     return Carbon::parse($item->exam_date)->format('Y-m-d');
                 });
 
+                //get compiled results
+                $compiled_results = compiled_results::where('school_id', $schools->id)
+                                                    ->where('class_id', $classes->id)
+                                                    ->get();
 
                 $groupedByExamType = $results->groupBy('exam_type_id'); // Group by exam type using results
+                $compiledGroupByExam = $compiled_results->groupBy('report_name'); // Group by exam type using compiled results
 
                 $reports = generated_reports::query()
                                                 ->join('users', 'users.id', '=', 'generated_reports.created_by')
                                                 ->select('generated_reports.*', 'users.first_name', 'users.last_name')
-                                                ->where('generated_reports.school_id', $school_id[0])
+                                                ->where('generated_reports.school_id', $schools->id)
                                                 ->where('generated_reports.class_id', $classes->id)
                                                 ->orderBy('generated_reports.title')
                                                 ->paginate(5);
 
-                return view('Results.general_result_type', compact('schools', 'reports', 'school', 'class', 'groupedByMonth', 'year', 'exams', 'grades', 'classes', 'groupedByExamType'));
+                return view('Results.general_result_type', compact('schools', 'reports', 'groupedByMonth', 'compiledGroupByExam', 'year', 'exams', 'grades', 'classes', 'groupedByExamType'));
     }
 
 
@@ -2751,7 +2756,7 @@ class ResultsController extends Controller
         if ($report) {
             $report->delete();
             Alert()->toast('Report deleted successfully.', 'success');
-            return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
+            return to_route('results.classesByYear', ['school' => $school, 'year' => $year]);
         } else {
             Alert()->toast('Report not found.', 'error');
             return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
