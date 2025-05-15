@@ -485,7 +485,7 @@ class ResultsController extends Controller
                                                 ->orderBy('generated_reports.title')
                                                 ->paginate(5);
 
-                return view('Results.general_result_type', compact('schools', 'reports', 'groupedByMonth', 'compiledGroupByExam', 'year', 'exams', 'grades', 'classes', 'groupedByExamType'));
+                return view('Results.general_result_type', compact('schools', 'reports', 'groupedByMonth', 'year', 'exams', 'grades', 'classes', 'groupedByExamType'));
     }
 
 
