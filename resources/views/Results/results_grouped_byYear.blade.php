@@ -8,10 +8,10 @@
                         <h4 class="header-title text-center">Examination Results - <span class="text-primary">{{$year}}</span></h4>
                     </div>
                     <div class="col-2">
-                        <a href="{{route('results.general', ['school' => Hashids::encode($schools->id)])}}" class="float-right"><i class="fas fa-arrow-circle-left btn btn-info btn-xs" style=""></i> Back</a>
+                        <a href="{{route('results.general', ['school' => Hashids::encode($schools->id)])}}" class="float-right btn btn-info btn-xs"><i class="fas fa-arrow-circle-left" style=""></i> Back</a>
                     </div>
                 </div>
-                <p class="text-danger">Select Class you want to view results</p>
+                <p class="text-danger">Select class you want to view results</p>
                 <div class="list-group">
                     @if ($groupedByClass->isEmpty())
                     <div class="alert alert-warning text-center" role="alert">

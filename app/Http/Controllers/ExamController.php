@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\class_learning_courses;
 use App\Models\Examination;
 use App\Models\Examination_result;
+use App\Models\generated_reports;
 use App\Models\Grade;
 use App\Models\Student;
 use App\Models\Subject;
@@ -933,15 +934,23 @@ class ExamController extends Controller
         $exam_id = Hashids::decode($examType);
         $user = Auth::user();
         $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
-        $class_course = class_learning_courses::where('course_id', $couurse_id[0])
-                                        ->where('teacher_id', $loggedTeacher->id)
-                                        ->first();
+        $class_course = class_learning_courses::findOrFail($couurse_id[0]);
 
-        if($class_course->teacher_id != $loggedTeacher->id && $class_course->course_id != $couurse_id[0]) {
+        if($class_course->teacher_id != $loggedTeacher->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
-            return to_route('home');
+            return to_route('results.byExamType', ['course' => $course, 'year' => $year, 'examType' => $examType]);
         }
         $examDate = Carbon::parse($date)->format('Y-m-d');
+
+        $existInCompile = generated_reports::where('class_id', $class_course->class_id)
+                                    ->whereJsonContains('exam_dates', $examDate)
+                                    ->where('school_id', $class_course->school_id)
+                                    ->exists();
+
+        if ($existInCompile) {
+            Alert()->toast('Results already exist in the compiled reports. Cannot delete.', 'error');
+            return to_route('results.byExamType', ['course' => $course, 'year' => $year, 'examType' => $examType]);
+        }
 
         try {
             // Delete the results for the specified course, year, and exam type

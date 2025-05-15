@@ -25,7 +25,7 @@
                         @foreach ($dates as $date => $data)
                             <div class="d-flex justify-content-between align-items-center list-group-item">
                                 <a href="{{ route('results.resultsByMonth', ['school' => Hashids::encode($schools->id), 'year' => $year, 'class' => Hashids::encode($class_id), 'examType' => Hashids::encode($exam_id), 'month' => $month, 'date' => $date]) }}" target="">
-                                    <p class="text-primary" style="text-decoration: underline;"><i class="fas fa-calendar-alt"></i> {{ \Carbon\Carbon::parse($date)->format('d-m-Y') }}</p>
+                                    <p class="text-success" style="text-decoration: underline;"><i class="fas fa-file-pdf" style="font-size: 1.3rem;"></i> {{ \Carbon\Carbon::parse($date)->format('d-m-Y') }}</p>
                                 </a>
                                 <a href="{{ route('individual.student.reports', ['school' => Hashids::encode($schools->id), 'year' => $year, 'examType' => Hashids::encode($exam_id), 'class' => Hashids::encode($class_id), 'month' => $month, 'date' => $date]) }}" class="btn btn-primary btn-xs">
                                     Students
@@ -38,7 +38,7 @@
                                     <form action="{{ route('publish.results', ['school' => Hashids::encode($schools->id), $year, 'class' => Hashids::encode($class_id), 'examType' => Hashids::encode($exam_id), 'month' => $month, 'date' => $date]) }}" method="POST">
                                         @csrf
                                         @method('PUT')
-                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to publish this results?')">
+                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to publish this results to parents?')">
                                             <i class="fas fa-toggle-off text-secondary" style="font-size: 2rem;"></i>
                                         </button>
                                     </form>
