@@ -22,7 +22,7 @@
                                     <h4 class="header-title">Single results reports</h4>
                                 </div>
                                 <div class="col-4">
-                                    <a href="{{route('results.classesByYear', ['school' => Hashids::encode($schools->id), 'year'=>$year])}}" class="float-right btn btn-warning btn-xs"><i class="fas fa-arrow-circle-left"></i> Back</a>
+                                    <a href="{{route('results.classesByYear', ['school' => $school, 'year'=>$year])}}" class="float-right btn btn-warning btn-xs"><i class="fas fa-arrow-circle-left"></i> Back</a>
                                 </div>
                             </div>
                             <p class="text-danger">Select Examination type to view results</p>
@@ -33,7 +33,7 @@
                                 </div>
                                 @else
                                     @foreach ($groupedByExamType as $exam_type_id => $results )
-                                        <a href="{{ route('results.monthsByExamType', ['school' => Hashids::encode($schools->id), 'year' => $year, 'class' => Hashids::encode($classes->id), 'examType' => Hashids::encode($exam_type_id)]) }}">
+                                        <a href="{{ route('results.monthsByExamType', ['school' => $school, 'year' => $year, 'class' => $class, 'examType' => Hashids::encode($exam_type_id)]) }}">
                                             <button type="button" class="list-group-item list-group-item-action">
                                                 <h6 class="text-primary text-capitalize">>> {{ $results->first()->exam_type }}</h6>
                                             </button>
@@ -63,7 +63,7 @@
                                                     <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <form class="needs-validation" novalidate="" action="{{route('submit.compiled.results', ['school' => Hashids::encode($schools->id), 'year' => $year, 'class' => Hashids::encode($classes->id)])}}" method="POST" enctype="multipart/form-data">
+                                                    <form class="needs-validation" novalidate="" action="{{route('submit.compiled.results', ['school' => $school, 'year' => $year, 'class' => $class])}}" method="POST" enctype="multipart/form-data">
                                                         @csrf
                                                         <div class="form-row">
                                                             <div class="col-md-4">
@@ -123,10 +123,15 @@
                                                                         @endif
                                                                     </div>
                                                                     <div class="col-6">
-                                                                        <p class="text-danger" style="font-weight: bold">Report display format</p>
-                                                                        <input type="radio" name="combine_option" value="sum" required> Calculate and show total only <br>
-                                                                        <input type="radio" name="combine_option" value="average" required> Calculate and show average only <br>
-                                                                        <input type="radio" name="combine_option" value="individual" required> Calculate and show individual score separately
+                                                                        <p class="text-danger fw-bold">Report Aggregation Method</p>
+                                                                        <input type="radio" name="combine_option" value="sum" required>
+                                                                        <label>Display Total Marks Only</label> <br>
+
+                                                                        <input type="radio" name="combine_option" value="average" required>
+                                                                        <label>Display Average Score Only</label> <br>
+
+                                                                        <input type="radio" name="combine_option" value="individual" required>
+                                                                        <label>Display Individual Subject Scores</label>
                                                                     </div>
                                                                 </div>
 
@@ -149,7 +154,7 @@
                                     <tr>
                                         <th>Title</th>
                                         <th>Created On</th>
-                                        <th>Generated By</th>
+                                        <th>Created By</th>
                                         <th>Combine Style</th>
                                         <th>Action</th>
                                     </tr>
@@ -170,25 +175,25 @@
                                                     <ul class="d-flex justify-content-center">
                                                         <li class="mr-3">
                                                             <a href="{{route('students.combined.report', [
-                                                            'school' => Hashids::encode($report->school_id), 'year' => $year,
-                                                            'class' => Hashids::encode($report->class_id), 'report' => Hashids::encode($report->id)])}}" class="" title="Student Report"><i class="fas fa-eye"></i></a>
+                                                            'school' => $school, 'year' => $year,
+                                                            'class' => $class, 'report' => Hashids::encode($report->id)])}}" class="" title="Student Report"><i class="fas fa-eye"></i></a>
                                                         </li>
                                                         <li class="mr-3">
-                                                            <a href="{{route('download.general.combined', ['school' => Hashids::encode($report->school_id), 'year' => $year, 'class' => Hashids::encode($report->class_id), 'report' => Hashids::encode($report->id)])}}" onclick="return confirm('Are you sure you want to download this report?')" class="" title="Download Report"><i class="fas fa-download text-info"></i></a>
+                                                            <a href="{{route('download.general.combined', ['school' => $school, 'year' => $year, 'class' => $class, 'report' => Hashids::encode($report->id)])}}" onclick="return confirm('Are you sure you want to download this report?')" class="" title="Download Report"><i class="fas fa-download text-info"></i></a>
                                                         </li>
                                                         <li class="mr-3">
                                                             @if ($report->status === 0)
-                                                                <form action="{{route('publish.combined.report', ['school' => Hashids::encode($report->school_id), 'year' => $year, 'class' => Hashids::encode($report->class_id), 'report' => Hashids::encode($report->id)])}}" method="POST">
+                                                                <form action="{{route('publish.combined.report', ['school' => $school, 'year' => $year, 'class' => $class, 'report' => Hashids::encode($report->id)])}}" method="POST">
                                                                     @csrf
                                                                     @method('PUT')
-                                                                    <button class="btn btn-link p-0" type="submit" title="Publish report" onclick="return confirm('Are you sure you want to Publish this report?')">
+                                                                    <button class="btn btn-link p-0" type="submit" title="Publish report" onclick="return confirm('Are you sure you want to Publish this report to parents?')">
                                                                         <i class="fas fa-toggle-off text-secondary" style="font-size: 20px;"></i>
                                                                     </button>
                                                                 </form>
                                                             @else
                                                                 <form action="">
                                                                     @csrf
-                                                                    <button class="btn btn-link p-0" type="submit" title="Publish report" onclick="return confirm('Are you sure you want to Publish this report?')">
+                                                                    <button class="btn btn-link p-0" type="submit" title="Publish report" onclick="return confirm('Are you sure you want to Unpublish this report?')">
                                                                         <i class="fas fa-toggle-on text-success" style="font-size: 20px;"></i>
                                                                     </button>
                                                                 </form>
@@ -196,8 +201,8 @@
                                                         </li>
                                                         <li class="mr-3">
                                                             <a href="{{route('generated.report.delete',
-                                                                        ['school' => Hashids::encode($schools->id),
-                                                                        'year' =>$year , 'class' => Hashids::encode($classes->id),
+                                                                        ['school' => $school,
+                                                                        'year' =>$year , 'class' => $class,
                                                                         'report' => Hashids::encode($report->id)])}}"
                                                                         onclick="return confirm('Are you sure you want to delete this report?')" title="Delete Report">
                                                                         <i class="fas fa-trash text-danger"></i>
