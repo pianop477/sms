@@ -43,7 +43,7 @@ class ExamController extends Controller
         $class_course = class_learning_courses::where('course_id', $decoded[0])->where('teacher_id', $loggedTeacher->id)->first();
         // return $class_course;
 
-        if(! $class_course) {
+        if($class_course->teacher_id != $loggedTeacher->id && $class_course->course_id != $decoded[0]) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
@@ -356,7 +356,7 @@ class ExamController extends Controller
         $class_course = class_learning_courses::where('course_id', $decoded[0])->where('teacher_id', $loggedTeacher->id)->first();
         // return $class_course;
 
-        if(! $class_course) {
+        if($class_course->teacher_id != $loggedTeacher->id && $class_course->course_id != $decoded[0]) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
@@ -386,7 +386,7 @@ class ExamController extends Controller
         $class_course = class_learning_courses::where('course_id', $id[0])->where('teacher_id', $loggedTeacher->id)->first();
 
 
-        if(! $class_course) {
+        if($class_course->teacher_id != $loggedTeacher->id && $class_course->course_id != $id[0]) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
@@ -421,7 +421,7 @@ class ExamController extends Controller
         $loggedTeacher = Teacher::where('user_id', $user->id)->first();
         $class_course = class_learning_courses::where('course_id', $id[0])->where('teacher_id', $loggedTeacher->id)->first();
 
-        if(! $class_course) {
+        if($class_course->teacher_id != $loggedTeacher->id && $class_course->course_id != $id[0]) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
@@ -456,7 +456,7 @@ class ExamController extends Controller
         $loggedTeacher = Teacher::where('user_id', $user->id)->first();
         $class_course = class_learning_courses::where('course_id', $id[0])->where('teacher_id', $loggedTeacher->id)->first();
 
-        if(! $class_course) {
+        if($class_course->teacher_id != $loggedTeacher->id && $class_course->course_id != $id[0]) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
@@ -916,7 +916,7 @@ class ExamController extends Controller
         $loggedTeacher = Teacher::where('user_id', $user->id)->first();
         $class_course = class_learning_courses::where('course_id', $couurse_id[0])->where('teacher_id', $loggedTeacher->id)->first();
 
-        if(! $class_course) {
+        if($class_course->teacher_id != $loggedTeacher->id && $class_course->course_id != $couurse_id[0]) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
