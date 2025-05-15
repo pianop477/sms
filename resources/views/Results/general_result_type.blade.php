@@ -155,7 +155,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if ($reports->isEmpty())
+                                    @if (isset($reports) && $reports->isEmpty())
                                         <tr>
                                             <td colspan="5" class="text-center text-danger">No compiled results found</td>
                                         </tr>
@@ -196,8 +196,8 @@
                                                         </li>
                                                         <li class="mr-3">
                                                             <a href="{{route('generated.report.delete',
-                                                                        ['school' => Hashids::encode($report->school_id),
-                                                                        'year' =>$year , 'class' => Hashids::encode($report->class_id),
+                                                                        ['school' => Hashids::encode($schools->id),
+                                                                        'year' =>$year , 'class' => Hashids::encode($classes->id),
                                                                         'report' => Hashids::encode($report->id)])}}"
                                                                         onclick="return confirm('Are you sure you want to delete this report?')" title="Delete Report">
                                                                         <i class="fas fa-trash text-danger"></i>

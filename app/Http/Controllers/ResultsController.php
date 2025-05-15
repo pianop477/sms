@@ -439,8 +439,7 @@ class ResultsController extends Controller
             return redirect()->route('error.page');
         }
 
-        else {
-                $results = Examination_result::query()
+        $results = Examination_result::query()
                                     ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
                                     ->select(
                                         'examination_results.*',
@@ -492,27 +491,8 @@ class ResultsController extends Controller
                                                 ->paginate(5);
 
                 return view('Results.general_result_type', compact('schools', 'reports', 'groupedByMonth', 'compiledGroupByExam', 'year', 'exams', 'grades', 'classes', 'groupedByExamType'));
-        }
     }
 
-    // function to delete compiled results*************************************************
-    public function destroyReport($class, $year, $school, $reportId)
-    {
-        $school_id = Hashids::decode($school);
-        $class_id = Hashids::decode($class);
-        $report_id = Hashids::decode($reportId);
-
-        $report = generated_reports::find($report_id[0]);
-        // delete the report
-        if ($report) {
-            $report->delete();
-            Alert()->toast('Report deleted successfully.', 'success');
-            return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
-        } else {
-            Alert()->toast('Report not found.', 'error');
-            return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
-        }
-    }
 
     //function for displaying general results by term ***************************************
     public function monthsByExamType($school, $year, $class, $examType)
@@ -1030,6 +1010,15 @@ class ResultsController extends Controller
                 'October' => 10, 'November' => 11, 'December' => 12,
             ];
 
+            $existInCompile = generated_reports::where('class_id', $class_id[0])
+                                                ->whereJsonContains('exam_dates', $date)
+                                                ->where('school_id', $school_id[0])
+                                                ->exists();
+
+            if ($existInCompile) {
+                Alert()->toast('Results already exist in the compiled reports. Cannot delete.', 'error');
+                return to_route('results.monthsByExamType',[$school, 'year' => $year, 'class' => $class, 'examType' => $examType]);
+            }
             // return $monthsArray;
             if(array_key_exists($month, $monthsArray)){
                 $monthNumber = $monthsArray[$month];
@@ -1706,7 +1695,7 @@ class ResultsController extends Controller
         }
 
         $student = $results->first();
-        $schoolInfo = school::findOrFail($schoolId);
+        $schoolInfo = $results->first();
         return $schoolInfo;
 
         // =================== EXAM HEADERS WITH DATES ===================
@@ -2753,6 +2742,25 @@ class ResultsController extends Controller
         $fileUrl = asset('reports/' . $fileName);
 
         return view('generated_reports.student_pdf_report', compact('fileUrl', 'year', 'reports', 'class', 'school', 'report', 'students', 'studentId', 'schoolId', 'classId', 'reportId'));
+    }
+
+     // function to delete compiled results*************************************************
+    public function destroyReport($class, $year, $school, $reportId)
+    {
+        $school_id = Hashids::decode($school);
+        $class_id = Hashids::decode($class);
+        $report_id = Hashids::decode($reportId);
+
+        $report = generated_reports::find($report_id[0]);
+        // delete the report
+        if ($report) {
+            $report->delete();
+            Alert()->toast('Report deleted successfully.', 'success');
+            return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
+        } else {
+            Alert()->toast('Report not found.', 'error');
+            return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
+        }
     }
 
 }
