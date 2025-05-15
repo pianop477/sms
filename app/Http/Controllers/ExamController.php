@@ -195,8 +195,8 @@ class ExamController extends Controller
             }
 
             Alert::toast('Examination results have been saved to the draft', 'success');
-            // return to_route('home');
-            return to_route('score.prepare.form', Hashids::encode($request->course_id));
+            return to_route('home');
+            // return to_route('score.prepare.form', Hashids::encode($request->course_id));
         }
 
         if ($action === 'submit') {
@@ -671,7 +671,8 @@ class ExamController extends Controller
 
         if (!$exists) {
             Alert()->toast('You are not authorized to view this page', 'error');
-            return to_route('score.prepare.form', Hashids::encode($courseId));
+            return to_route('home');
+            // return to_route('score.prepare.form', Hashids::encode($courseId));
         }
 
         // Pata matokeo yaliyohifadhiwa kwenye draft
@@ -742,7 +743,8 @@ class ExamController extends Controller
 
         if (!$exists) {
             Alert()->toast('You are not authorized to view this page', 'error');
-            return to_route('score.prepare.form', Hashids::encode($courseId));
+            to_route('home');
+            // return to_route('score.prepare.form', Hashids::encode($courseId));
         }
 
         if ($action === 'save') {
@@ -766,8 +768,8 @@ class ExamController extends Controller
                 );
             }
             Alert()->toast('Results saved successfully, remember to submit before expiry date.', 'success');
-            return redirect()->route('score.prepare.form', Hashids::encode($courseId));
-            // return to_route('home');
+            // return redirect()->route('score.prepare.form', Hashids::encode($courseId));
+            return to_route('home');
 
         } elseif ($action === 'submit') {
             // CHECK IF RESULTS ALREADY EXIST IN EXAMINATION_RESULT TABLE
@@ -782,7 +784,7 @@ class ExamController extends Controller
                 if ($existingResult) {
                     // If result already exists, reject this submission
                     Alert()->toast('Results already exist. Please check before submitting.', 'error');
-                    return redirect()->back();
+                    return to_route('home');
                 }
             }
 
@@ -819,7 +821,7 @@ class ExamController extends Controller
         }
 
         Alert()->toast('Invalid action.', 'error');
-        return redirect()->back();
+        return to_route('home');
     }
 
     //pending results outside button
@@ -847,7 +849,8 @@ class ExamController extends Controller
 
         if (!$exists) {
             Alert()->toast('You are not authorized to view this page', 'error');
-            return to_route('score.prepare.form', Hashids::encode($courseId));
+            // return to_route('score.prepare.form', Hashids::encode($courseId));
+            return to_route('home');
         }
 
         // Pata wanafunzi wa darasa husika
@@ -936,7 +939,7 @@ class ExamController extends Controller
 
         if($class_course->teacher_id != $loggedTeacher->id && $class_course->course_id != $couurse_id[0]) {
             Alert()->toast('You are not authorized to view this page', 'error');
-            return back();
+            return to_route('home');
         }
         $examDate = Carbon::parse($date)->format('Y-m-d');
 
