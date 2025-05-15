@@ -445,7 +445,7 @@ class ResultsController extends Controller
                                         'examination_results.*',
                                         'examinations.id as exam_type_id', 'examinations.exam_type'
                                     )
-                                    ->where('examination_results.school_id', $schools->id)
+                                    ->where('examination_results.school_id', $school_id[0])
                                     ->whereYear('examination_results.exam_date', $year)
                                     ->where('examination_results.class_id', $classes->id)
                                     ->get();
@@ -466,7 +466,7 @@ class ResultsController extends Controller
                                                     ->select('examination_results.*', 'examinations.exam_type', 'examinations.symbolic_abbr')
                                                     ->where('class_id', $classes->id)
                                                     ->whereYear('examination_results.exam_date', $year)
-                                                    ->where('examination_results.school_id', $schools->id)
+                                                    ->where('examination_results.school_id', $school_id[0])
                                                     ->orderBy('examination_results.exam_date')
                                                     ->get();
 
@@ -474,18 +474,13 @@ class ResultsController extends Controller
                     return Carbon::parse($item->exam_date)->format('Y-m-d');
                 });
 
-                //get compiled results
-                $compiled_results = compiled_results::where('school_id', $schools->id)
-                                                    ->where('class_id', $classes->id)
-                                                    ->get();
 
                 $groupedByExamType = $results->groupBy('exam_type_id'); // Group by exam type using results
-                $compiledGroupByExam = $compiled_results->groupBy('report_name'); // Group by exam type using compiled results
 
                 $reports = generated_reports::query()
                                                 ->join('users', 'users.id', '=', 'generated_reports.created_by')
                                                 ->select('generated_reports.*', 'users.first_name', 'users.last_name')
-                                                ->where('generated_reports.school_id', $schools->id)
+                                                ->where('generated_reports.school_id', $school_id[0])
                                                 ->where('generated_reports.class_id', $classes->id)
                                                 ->orderBy('generated_reports.title')
                                                 ->paginate(5);
