@@ -2756,7 +2756,7 @@ class ResultsController extends Controller
         if ($report) {
             $report->delete();
             Alert()->toast('Report deleted successfully.', 'success');
-            return to_route('results.classesByYear', ['school' => $school, 'year' => $year]);
+            return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
         } else {
             Alert()->toast('Report not found.', 'error');
             return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
