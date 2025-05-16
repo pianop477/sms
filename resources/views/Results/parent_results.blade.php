@@ -209,8 +209,8 @@
             <th>Code</th>
             <th>Score</th>
             <th>Grade</th>
-            <th>Remarks</th>
             <th>Position</th>
+            <th>Remarks</th>
         </tr>
     </thead>
     <tbody>
@@ -222,8 +222,8 @@
                 <td style="text-transform: uppercase">{{ $result->course_code }}</td>
                 <td>{{ $result->score ?? 'X' }}</td>
                 <td>{{ $result->score ? $result->grade : 'X' }}</td>
-                <td>{{ $result->score ? $result->remarks : 'X' }}</td>
                 <td>{{ $result->score ? $result->courseRank : 'X' }}</td>
+                <td style="font-style: italic">{{ $result->score ? $result->remarks : 'X' }}</td>
             </tr>
         @endforeach
     </tbody>
