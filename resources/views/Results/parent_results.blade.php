@@ -277,7 +277,7 @@
 </div>
 
 <div class="footer">
-    &copy; Copyright {{ $results->first()->school_name }} - {{ date('Y') }}
+    <span style="text-transform: capitalize">&copy; Copyright {{ $results->first()->school_name }} - {{ date('Y') }}</span>
 </div>
 
 </body>
