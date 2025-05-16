@@ -48,7 +48,7 @@
                                                         @if (isset($dates[$exam_date]))
                                                             @php
                                                                 $score = $dates[$exam_date][0]->score;
-                                                                $course = $dates[$exam_date][0]->course_code ?? 'Course';
+                                                                $course = $dates[$exam_date][0]->course_code ?? 'Null';
                                                                 $total += $score;
                                                                 $count++;
                                                             @endphp
