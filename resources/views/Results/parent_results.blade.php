@@ -152,7 +152,7 @@
         <h4 style="margin:0; padding:0;">PRESIDENT OFFICE - TAMISEMI</h4>
         <h4 style="margin:0; padding:0;">{{ $results->first()->school_name }}</h4>
         <h5 style="margin:0; padding:0;">{{ $results->first()->postal_address }} - {{ $results->first()->postal_name }}, {{ $results->first()->country }}</h5>
-        <h5 style="margin:5px 0; padding:0;">STUDENT'S PROGRESS REPORT</h5>
+        <h5 style="margin:5px 0; padding:0;">STUDENT'S ACADEMIC REPORT</h5>
     </div>
     <div class="student-image">
         @php
@@ -235,21 +235,41 @@
     @php
         $grade = '';
         $gradeClass = '';
-        if ($averageScore >= 81) {
-            $grade = "'A' - EXCELLENT";
-            $gradeClass = 'excellent';
-        } elseif ($averageScore >= 61) {
-            $grade = "'B' - GOOD";
-            $gradeClass = 'good';
-        } elseif ($averageScore >= 41) {
-            $grade = "'C' - PASS";
-            $gradeClass = 'pass';
-        } elseif ($averageScore >= 21) {
-            $grade = "'D' - POOR";
-            $gradeClass = 'poor';
-        } else {
-            $grade = "'E' - FAIL";
-            $gradeClass = 'fail';
+        if($results->first()->marking_style == 1) {
+            if ($averageScore >= 40.5) {
+                $grade = "'A' - EXCELLENT";
+                $gradeClass = 'excellent';
+            } elseif ($averageScore >= 30.5) {
+                $grade = "'B' - GOOD";
+                $gradeClass = 'good';
+            } elseif ($averageScore >= 20.5) {
+                $grade = "'C' - PASS";
+                $gradeClass = 'pass';
+            } elseif ($averageScore >= 10.5) {
+                $grade = "'D' - POOR";
+                $gradeClass = 'poor';
+            } else {
+                $grade = "'E' - FAIL";
+                $gradeClass = 'fail';
+            }
+        }
+        else {
+            if ($averageScore >= 81) {
+                $grade = "'A' - EXCELLENT";
+                $gradeClass = 'excellent';
+            } elseif ($averageScore >= 61) {
+                $grade = "'B' - GOOD";
+                $gradeClass = 'good';
+            } elseif ($averageScore >= 41) {
+                $grade = "'C' - PASS";
+                $gradeClass = 'pass';
+            } elseif ($averageScore >= 21) {
+                $grade = "'D' - POOR";
+                $gradeClass = 'poor';
+            } else {
+                $grade = "'E' - FAIL";
+                $gradeClass = 'fail';
+            }
         }
     @endphp
     <div class="performance-item"><strong>Grade Level:</strong> <span class="{{ $gradeClass }}">{{ $grade }}</span></div>
