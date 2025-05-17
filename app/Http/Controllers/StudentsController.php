@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\class_learning_courses;
+use App\Models\Class_teacher;
 use App\Models\Grade;
 use App\Models\Parents;
 use App\Models\school;
@@ -313,7 +315,7 @@ class StudentsController extends Controller
 
             $student->save();
             Alert()->toast('Student records updated successfully', 'success');
-            return redirect()->route('Students.show', Hashids::encode($student->id));
+            return redirect()->route('teacher.student.profile', Hashids::encode($student->id));
 
     }
 
@@ -381,7 +383,7 @@ class StudentsController extends Controller
 
             $student->save();
             Alert()->toast('Student records updated successfully', 'success');
-            return redirect()->route('parent.show.student', Hashids::encode($student->id));
+            return redirect()->route('students.profile', Hashids::encode($student->id));
     }
 
 
@@ -685,19 +687,18 @@ class StudentsController extends Controller
                         ->select(
                             'students.*',
                             'parents.user_id as parent_user_id',
-                            'parents.address as parent_address',
-                            'users.first_name as user_first_name',
-                            'users.last_name as user_last_name',
+                            'parents.address',
+                            'users.first_name as parent_first_name',
+                            'users.last_name as parent_last_name',
                             'users.id as user_id',
                             'parents.id as parent_id',
                             'users.phone',
-                            'users.gender as user_gender',
-                            'grades.class_name as grade_class_name',
-                            'grades.class_code as grade_class_code',
+                            'users.gender as parent_gender', 'users.created_at as parent_created_at',
+                            'grades.class_name',
+                            'grades.class_code',
                             'grades.id as class_id',
-                            'transports.driver_name as driver', 'transports.gender as driver_gender', 'transports.phone as driver_phone', 'transports.bus_no as bus_number',
-                            'transports.routine as bus_routine',
-                            'grades.id as grade_class_id',
+                            'transports.driver_name', 'transports.gender as driver_gender', 'transports.phone as driver_phone', 'transports.bus_no',
+                            'transports.routine',
                             'schools.school_reg_no', 'schools.abbriv_code'
                         )
                         ->where('students.id', '=', $decoded[0])
@@ -717,7 +718,63 @@ class StudentsController extends Controller
         $studentGender = $data->gender;
 
         return view('Students.show', [
-            'data' => $data,
+            'students' => $data,
+            'studentGender' => $studentGender
+        ]);
+    }
+
+    //show student profile new version by teacher
+    public function showStudentProfileByTeacher($student)
+    {
+        $decoded = Hashids::decode($student);
+        // return $decoded;
+        $user = Auth::user();
+        // return $user;
+        $parent = Parents::where('user_id', $user->id)->first();
+        // return $parent;
+        $data = Student::query()
+                        ->join('parents', 'parents.id', '=', 'students.parent_id')
+                        ->join('grades', 'grades.id', '=', 'students.class_id')
+                        ->join('users', 'users.id', '=', 'parents.user_id')
+                        ->join('schools', 'schools.id', '=', 'students.school_id')
+                        ->leftJoin('transports', 'transports.id', '=', 'students.transport_id')
+                        ->select(
+                            'students.*',
+                            'parents.user_id as parent_user_id',
+                            'parents.address',
+                            'users.first_name as parent_first_name',
+                            'users.last_name as parent_last_name',
+                            'users.id as user_id',
+                            'users.created_at as parent_created_at',
+                            'parents.id as parent_id',
+                            'users.phone',
+                            'users.gender as parent_gender',
+                            'grades.class_name',
+                            'grades.class_code',
+                            'grades.id as class_id',
+                            'transports.driver_name', 'transports.gender as driver_gender', 'transports.phone as driver_phone', 'transports.bus_no',
+                            'transports.routine',
+                            'grades.id as grade_class_id',
+                            'schools.school_reg_no', 'schools.abbriv_code'
+                        )
+                        ->where('students.id', '=', $decoded[0])
+                        // ->where('students.parent_id', $parent->id)
+                        ->where('students.school_id', $user->school_id)
+                        ->where('students.status', 1)
+                        ->first();
+
+        // Check if the data is found
+        if (!$data) {
+            // Handle the case where no data is found, e.g., return a 404 response
+            Alert()->toast('No student found', 'error');
+            return back();
+        }
+
+        // The student gender can be accessed directly from $data
+        $studentGender = $data->gender;
+
+        return view('Students.teacher_student_profile', [
+            'students' => $data,
             'studentGender' => $studentGender
         ]);
     }
@@ -880,4 +937,59 @@ class StudentsController extends Controller
        }
     }
 
+    public function studentProfile($student)
+    {
+        $id = Hashids::decode($student);
+
+        $students = Student::query()
+                            ->join('grades', 'grades.id', '=', 'students.class_id')
+                            ->join('parents', 'parents.id', '=', 'students.parent_id')
+                            ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+                            ->leftJoin('transports', 'transports.id', '=', 'students.transport_id')
+                            ->select(
+                                'students.*',
+                                'grades.class_name', 'grades.class_code',
+                                'parents.address',
+                                'users.first_name as parent_first_name', 'users.last_name as parent_last_name',
+                                'users.phone', 'transports.driver_name', 'transports.bus_no', 'transports.routine', 'transports.gender as driver_gender',
+                                'transports.phone as driver_phone', 'users.gender as parent_gender', 'users.created_at as parent_created_at',
+                                'users.email',
+                            )
+                            ->findOrFail($id[0]);
+
+        $class = Grade::findOrFail($students->class_id);
+
+        $user = Auth::user();
+
+        if(! $class) {
+            Alert()->toast('No class details was found', 'error');
+            return back();
+        }
+        $class_course = class_learning_courses::query()
+                                            ->join('subjects', 'subjects.id', '=', 'class_learning_courses.course_id')
+                                            ->join('grades', 'grades.id', '=', 'class_learning_courses.class_id')
+                                            ->join('teachers', 'teachers.id', '=', 'class_learning_courses.teacher_id')
+                                            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+                                            ->select(
+                                                'class_learning_courses.*', 'grades.class_name', 'subjects.course_name', 'subjects.course_code',
+                                                'users.first_name', 'users.last_name', 'users.phone as teacher_phone', 'users.image'
+                                            )
+                                            ->where('class_learning_courses.class_id', $class->id)
+                                            ->where('class_learning_courses.school_id', $user->school_id)
+                                            ->get();
+        //fetch class teacher details
+
+        $myClassTeacher = Class_teacher::query()
+                                        ->join('teachers', 'teachers.id', '=', 'class_teachers.teacher_id')
+                                        ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+                                        ->join('grades', 'grades.id', '=', 'class_teachers.class_id')
+                                        ->select('users.first_name', 'users.last_name', 'users.phone', 'users.gender', 'users.image', 'class_teachers.*', 'grades.class_name')
+                                        ->where('class_teachers.class_id', $class->id)
+                                        ->where('class_teachers.group', $students->group)
+                                        ->where('class_teachers.school_id', $user->school_id)
+                                        ->orderBY('users.first_name')
+                                        ->get();
+
+        return view('profile.student_profile', compact('students', 'myClassTeacher', 'class_course', 'class'));
+    }
 }

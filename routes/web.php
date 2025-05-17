@@ -133,6 +133,9 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::put('{teacher}/Delete-teacher', [TeachersController::class, 'deleteTeacher'])->name('Teachers.remove');
         Route::get('Deleted-teachers', [TeachersController::class, 'trashedTeachers'])->name('Teachers.trashed');
 
+        // show teachers profile new version
+        Route::get('Teacher/profile/id/{teacher}', [TeachersController::class, 'teacherProfile'])->name('teacher.profile');
+
         //generate general attendance report =============================================================
         Route::get('Attendance-report', [AttendanceController::class, 'getField'])->name('attendance.fill.form');
         Route::post('Attendances', [AttendanceController::class, 'genaralAttendance'])->name('manage.attendance');
@@ -151,6 +154,9 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('Student-trash', [StudentsController::class, 'studentTrashList'])->name('students.trash');
         Route::put('{student}/Restore-trashed-students', [StudentsController::class, 'restoreTrashList'])->name('student.restored.trash');
         Route::get('{student}/Delete-student-permanent', [StudentsController::class, 'deletePerStudent'])->name('student.delete.permanent');
+
+        // show student profile new version
+        Route::get('Student/profile/id/{student}', [StudentsController::class, 'showStudentProfileByTeacher'])->name('teacher.student.profile');
 
         //manage classses ========================================================================================
         // Route::resource('Classes', ClassesController::class);
@@ -330,6 +336,9 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('Result/student/{student}/year/{year}/exam-type/{exam_id}/month/{month}/date/{date}', [ResultsController::class, 'viewStudentResult'])->name('results.student.get');
         Route::get('student/{student}/Courses-list', [CoursesController::class, 'viewStudentCourses'])->name('student.courses.list');
         Route::get('/Student-report/school/{school}/year/{year}/class/{class}/report/{report}/student/{student}', [ResultsController::class, 'parentDownloadStudentCombinedReport'])->name('student.combined.report');
+
+        // student profile management
+        Route::get('Student/view/id/{student}', [StudentsController::class, 'studentProfile'])->name('students.profile');
 
     });
     //End of condition ==============================================================================================

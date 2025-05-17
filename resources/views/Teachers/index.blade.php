@@ -192,7 +192,7 @@
                                         @if ($teacher->status == 1)
                                         <td>
                                             <ul class="d-flex justify-content-center">
-                                                <li class="mr-3"><a href="{{route('Teachers.show.profile', ['teacher' => Hashids::encode($teacher->id)])}}" class="text-primary"><i class="fa fa-eye"></i></a></li>
+                                                <li class="mr-3"><a href="{{route('teacher.profile', ['teacher' => Hashids::encode($teacher->id)])}}" class="text-primary"><i class="fa fa-eye"></i></a></li>
                                                 <li class="mr-3">
                                                     <form action="{{route('update.teacher.status', ['teacher' => Hashids::encode($teacher->id)])}}" method="POST">
                                                         @csrf

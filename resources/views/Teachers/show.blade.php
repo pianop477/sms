@@ -1,55 +1,16 @@
 @extends('SRTDashboard.frame')
 @section('content')
   <div class="card card-body mx-3 mx-md-4 mt-n6">
-    <div class="row">
-      <div class="col-auto">
-        <div class="avatar position-relative">
-            @if (!empty($teachers->image))
-                <img src="{{ asset('assets/img/profile/' . $teachers->image) }}" alt="profile_image" class="profile-img border-radius-lg shadow-sm" style="width: 150px; object-fit:cover; border-radius: 50px;">
-            @else
-                <i class="fas fa-user-tie text-secondary" style="font-size: 8rem;"></i>
-            @endif
-        </div>
-
-      </div>
-      <div class="col-auto my-auto">
-        <div class="h-100">
-          <h5 class="mb-1">
-            <span class="text-capitalize">{{$teachers->first_name. ' '. $teachers->last_name}}</span>
-            <p class="mb-2">
-                Member ID: <span class="text-uppercase">{{$teachers->member_id}}</span>
-            </p>
-            <p class="mb-2">
-                Email: <span class="">{{$teachers->email}}</span>
-            </p>
-          </h5>
-          <p class="mb-0 font-weight-normal text-sm"> Qualification:
-            @if ($teachers->qualification == 1)
-                <span class="badge bg-success text-white">{{_('Masters')}}</span>
-                @elseif($teachers->qualification == 2)
-                <span class="badge bg-primary text-white">{{_('Bachelor')}}</span>
-                @elseif ($teachers->qualification == 3)
-                <span class="badge bg-info text-white">{{_('Diploma')}}</span>
-                @else
-                <span class="badge bg-secondary text-white">{{_('Cerificate')}}</span>
-            @endif
-          </p>
-          <p class="text-sm">
-            Job Title:
-            @if ($teachers->usertype == 3)
-                <span  class="text-capitalize text-white badge bg-secondary"> Teacher - {{$teachers->role_name}}</span>
-            @endif
-          </p>
-        </div>
-      </div>
-      <div class="col-lg-2 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-2">
-        <a href="{{ route('Teachers.index')}}" class="float-right btn-link"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
-      </div>
-    </div>
-    <hr class="dark horizontal my-0">
-    <div class="card mt-5">
+    <div class="card">
         <div class="card-body">
-            <h4 class="header-title">Update Teacher's Details</h4>
+            <div class="row">
+                <div class="col-md-10">
+                    <h4 class="header-title">Update Teacher's Details</h4>
+                </div>
+                <div class="col-md-2">
+                    <a href="{{ route('teacher.profile', Hashids::encode($teachers->id))}}" class="float-right btn btn-info btn-xs"><i class="fas fa-arrow-circle-left"></i> Back</a>
+                </div>
+            </div>
         </div>
         <form action="{{route('Update.teachers', ['teachers' => Hashids::encode($teachers->id)])}}" method="POST" enctype="multipart/form-data">
             @csrf

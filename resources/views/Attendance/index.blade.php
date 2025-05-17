@@ -49,7 +49,7 @@
 @if ($attendanceExists)
     <div class="alert alert-success text-center mt-3">
         <h6>Attendance for {{ \Carbon\Carbon::parse($selectedDate)->format('d-m-Y') }} has already been submitted.</h6>
-        <p>Goodbyee <span style="font-size: 2rem;" class="waving">👋</span></p>
+        <p>See you later <span style="font-size: 2rem;" class="waving">👋</span></p>
         <hr>
         <p><a href="{{ route('home') }}" class="btn btn-primary btn-sm">Go Back</a></p>
     </div>
@@ -62,6 +62,7 @@
             <table class="table">
                 <thead class="text-capitalize bg-info">
                     <tr class="text-white">
+                        <th>#</th>
                         <th>Student Name</th>
                         <th class="text-center">Sex</th>
                         <th class="text-center">Attendance Status</th>
@@ -71,6 +72,7 @@
                     @foreach ($studentList as $student)
                         <tr>
                             <input type="hidden" name="student_id[]" value="{{ $student->id }}">
+                            <td>{{$loop->iteration}}</td>
                             <td>
                                 <a href="{{ route('Students.show', ['student' => Hashids::encode($student->id)]) }}">
                                     {{ ucwords(strtolower($student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name)) }}
