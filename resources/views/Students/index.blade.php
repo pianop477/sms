@@ -310,7 +310,7 @@
                                                             <a href="{{route('students.modify', ['students' => Hashids::encode($student->id)])}}"><i class="ti-pencil text-primary"></i></a>
                                                         </li>
                                                         <li class="mr-3">
-                                                            <a href="{{route('Students.show', ['student' => Hashids::encode($student->id)])}}"><i class="ti-eye text-secondary"></i></a>
+                                                            <a href="{{route('teacher.student.profile', ['student' => Hashids::encode($student->id)])}}"><i class="ti-eye text-secondary"></i></a>
                                                         </li>
 
                                                         <li>

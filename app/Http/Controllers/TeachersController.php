@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\PasswordResetEvent;
+use App\Models\class_learning_courses;
 use App\Models\Class_teacher;
 use App\Models\school;
 use App\Models\Teacher;
@@ -32,7 +33,8 @@ class TeachersController extends Controller
 
 
     // Display teachers list in the school ***********************************************************
-    public function showTeachersList() {
+    public function showTeachersList()
+    {
         $userLogged = Auth::user();
         $teachers = Teacher::query()
                             ->join('users', 'users.id', '=', 'teachers.user_id')
@@ -253,6 +255,47 @@ class TeachersController extends Controller
         }
 
 
+    public function teacherProfile($teacher)
+    {
+        $decoded = Hashids::decode($teacher);
+            // Find the teacher by ID
+            $teacherId = Teacher::findOrFail($decoded[0]);
+            $user = Auth::user();
+
+            if($teacherId->school_id != $user->school_id) {
+                Alert()->toast('You are not authorized to perform this action', 'error');
+                return back();
+            }
+            // Join the teacher with the users table and get the necessary fields
+            $teachers = Teacher::query()
+                ->join('users', 'users.id', '=', 'teachers.user_id')
+                ->join('schools', 'schools.id', '=', 'teachers.school_id')
+                ->join('roles', 'roles.id', '=', 'teachers.role_id')
+                ->select(
+                    'teachers.*', 'users.first_name', 'users.last_name', 'users.gender',
+                    'users.phone', 'users.usertype', 'users.image', 'schools.school_reg_no', 'users.email',
+                    'schools.school_name', 'roles.role_name',
+                    'users.created_at as teacher_created_at',
+                    )
+                ->where('teachers.id', '=', $teacherId->id)
+                ->where('teachers.school_id', '=', Auth::user()->school_id)
+                ->firstOrFail();
+
+                $teachingSubjects = class_learning_courses::query()
+                                                    ->join('grades', 'grades.id', '=', 'class_learning_courses.class_id')
+                                                    ->join('subjects', 'subjects.id', '=', 'class_learning_courses.course_id')
+                                                    ->join('teachers', 'teachers.id', '=', 'class_learning_courses.teacher_id')
+                                                    ->select(
+                                                        'class_learning_courses.*',
+                                                        'grades.class_name', 'grades.class_code',
+                                                        'subjects.course_name', 'subjects.course_code',
+                                                    )
+                                                    ->where('class_learning_courses.teacher_id', $teacherId->id)
+                                                    ->get();
+
+            return view('Teachers.teacher_profile', ['teachers' => $teachers, 'subjects' => $teachingSubjects]);
+    }
+
     /**
      * Show the form for editing the resource.
      */
@@ -334,7 +377,7 @@ class TeachersController extends Controller
                 if ($teacher->save()) {
                     // Log::info('Teacher updated successfully');
                     Alert()->toast('Teacher records updated successfully', 'success');
-                    return back();
+                    return to_route('teacher.profile', ['teacher' => Hashids::encode($teacher->id)]);
                 } else {
                     // Log::error('Failed to update teacher');
                     Alert()->toast('Failed to update teacher records', 'error');
@@ -404,7 +447,8 @@ class TeachersController extends Controller
     }
 
     // update teacher status to active in the school ***********************************************************
-    public function restoreStatus(Request $request, $teacher) {
+    public function restoreStatus(Request $request, $teacher)
+    {
         // Find the teacher record
         $decoded = Hashids::decode($teacher);
         $teachers = Teacher::findOrFail($decoded[0]);

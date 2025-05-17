@@ -8,7 +8,7 @@
                 <h4 class="text-capitalize ">student information</h4>
             </div>
             <div class="col-2">
-                <a href="{{ url()->previous() }}" class="btn btn-info float-right btn-xs"><i class="fas fa-arrow-circle-left"></i> Back</a>
+                <a href="{{route('home')}}" class="btn btn-info float-right btn-xs"><i class="fas fa-arrow-circle-left"></i> Back</a>
             </div>
         </div>
         <hr>
@@ -49,7 +49,7 @@
                                 @endif
                             </li>
                         </ul>
-                        <a href="{{route('students.modify', ['students' => Hashids::encode($students->id)])}}" class="btn btn-block btn-primary" data-toggle="tooltip" data-placement="button" title="Edit"> Edit</a>
+                        <a href="{{route('parent.edit.student', ['students' => Hashids::encode($students->id)])}}" class="btn btn-block btn-primary" data-toggle="tooltip" data-placement="button" title="Edit"> Edit</a>
                     </div>
                 </div>
             </div>
@@ -58,14 +58,23 @@
                     <div class="card-header p-1">
                         <ul class="nav nav-pills flex-column flex-sm-row">
                             <li class="flex-sm-fill text-sm-center nav-item">
-                                <a class="nav-link active" title="Profile" href="#student" data-toggle="tab"><i class="fas fa-user-graduate"></i> Student Information</a>
+                                <a class="nav-link active" title="Profile" href="#student" data-toggle="tab"><i class="fas fa-user-graduate"></i> Student</a>
                             </li>
                             <li class="flex-sm-fill text-sm-center nav-item">
-                                <a class="nav-link" href="#parents" title="Parents" data-toggle="tab"><i class="fas fa-user-shield"></i> Parents Information</a>
+                                <a class="nav-link" href="#parents" title="Parents" data-toggle="tab"><i class="fas fa-user-shield"></i> Parents</a>
+                            </li>
+                            <li class="flex-sm-fill text-sm-center nav-item">
+                                <a class="nav-link" href="#subjects" title="Subjects" data-toggle="tab"><i class="ti-book"></i> Subjects</a>
+                            </li>
+                            <li class="flex-sm-fill text-sm-center nav-item">
+                                <a class="nav-link" href="#attendance" title="Attendance" data-toggle="tab"><i class="fas fa-calendar-check"></i> Attendance</a>
+                            </li>
+                            <li class="flex-sm-fill text-sm-center nav-item">
+                                <a class="nav-link" href="#results" title="Results" data-toggle="tab"><i class="fas fa-chart-bar"></i> Results</a>
                             </li>
                             @if ($students->transport_id != Null)
                                 <li class="flex-sm-fill text-sm-center nav-item">
-                                    <a class="nav-link" href="#transport" title="Transport" data-toggle="tab"><i class="fas fa-bus"></i> Transport Information</a>
+                                    <a class="nav-link" href="#transport" title="Transport" data-toggle="tab"><i class="fas fa-bus"></i> Transport</a>
                                 </li>
                             @endif
                         </ul>
@@ -117,9 +126,7 @@
                                         </tr>
                                         <tr>
                                             <th>Father's Name</th>
-                                            <td>
-                                               {{ucwords(strtolower($students->parent_first_name. ' '. $students->parent_last_name))}}
-                                            </td>
+                                            <td>{{ucwords(strtolower($students->parent_first_name. ' '. $students->parent_last_name))}}</td>
                                         </tr>
                                         <tr>
                                             <th><i class="fas fa-phone"></i>Phone</th>
@@ -155,9 +162,7 @@
                                         </tr>
                                         <tr>
                                             <th>Mother's Name</th>
-                                            <td>
-                                                {{ucwords(strtolower($students->parent_first_name. ' '. $students->parent_last_name))}}
-                                            </td>
+                                            <td>{{ucwords(strtolower($students->parent_first_name. ' '. $students->parent_last_name))}}</td>
                                         </tr>
                                         <tr>
                                             <th><i class="fas fa-phone"></i> Phone</th>
@@ -189,6 +194,128 @@
                                         </tr>
                                     @endif
                                 </table>
+                            </div>
+
+                            {{-- subjects tab pane --}}
+                            <div class="tab-pane" id="subjects">
+                                <p>Subject Teachers for: <span class="text-uppercase"><strong>{{$class->class_name}}</strong></span></p>
+                                <table class="table table-condensed table-responsive-md">
+                                    <thead>
+                                        <th scope="col">#</th>
+                                        <th scope="col" class="">Subject</th>
+                                        <th scope="col" class="">Code</th>
+                                        <th scope="col">Teacher</th>
+                                        <th scope="col">Phone</th>
+                                    </thead>
+                                    <tbody>
+                                        @if ($class_course->isEmpty())
+                                           <tr>
+                                                <td colspan="5" class="text-danger text-center">No Available subjects assigned!</td>
+                                            </tr>
+                                        @else
+                                            @foreach ($class_course as $course)
+                                            <tr>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td class="text-capitalize">{{ $course->course_name }}</td>
+                                                <td class="text-uppercase">{{ $course->course_code }}</td>
+                                                <td class="d-flex align-items-center">
+                                                    @if (!empty($course->image) && file_exists(public_path('assets/img/profile/' . $course->image)))
+                                                        <img src="{{ asset('assets/img/profile/' . $course->image) }}"
+                                                            alt="Profile Picture"
+                                                            class="rounded-circle"
+                                                            style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px;">
+                                                    @else
+                                                        <i class="fas fa-user-tie rounded-circle bg-secondary d-flex justify-content-center align-items-center"
+                                                        style="width: 40px; height: 40px; font-size: 20px; color: white;"></i>
+                                                    @endif
+                                                    <span class="text-capitalize ms-2" style="margin-left: 5px">{{ $course->first_name }} {{ $course->last_name }}</span>
+                                                </td>
+                                                <td class="">
+                                                    <i class="fas fa-phone"></i>
+                                                    <a href="tel:{{ $course->teacher_phone }}" class="text-decoration-none text-dark">
+                                                        {{ $course->teacher_phone }}
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                        @endif
+                                    </tbody>
+                                </table>
+                                <hr>
+                                <p><b>Class Teacher Details</b></p>
+                                <ul class="list-group list-group-flush">
+                                    @if ($myClassTeacher->isEmpty())
+                                        <li class="list-group-item text-center text-danger">
+                                            No class teacher assigned!
+                                        </li>
+                                    @else
+                                        @foreach ($myClassTeacher as $classTeacher)
+                                            <div class="d-flex align-items-center">
+                                                <div class="img-container mr-5">
+                                                    @if ($classTeacher->image == NULL)
+                                                        <i class="fas fa-user-tie" style="font-size: 5rem;"></i>
+                                                    @else
+                                                        <img src="{{ asset('assets/img/profile/' . $classTeacher->image) }}"
+                                                            alt=""
+                                                            style="max-width: 80px; border-radius:50px;">
+                                                    @endif
+                                                </div>
+                                                <ul class="list-group w-100">
+                                                    <li class="list-group-item">Name:
+                                                        <span class="text-uppercase font-weight-bold float-right">
+                                                            {{ $classTeacher->first_name }} {{ $classTeacher->last_name }}
+                                                        </span>
+                                                    </li>
+                                                    <li class="list-group-item">Gender:
+                                                        <span class="text-capitalize font-weight-bold float-right">
+                                                            {{ $classTeacher->gender }}
+                                                        </span>
+                                                    </li>
+                                                    <li class="list-group-item">Phone:
+                                                        <span class="font-weight-bold float-right">
+                                                            <i class="fas fa-phone"></i>
+                                                            <a href="tel:{{ $classTeacher->phone }}" class="text-decoration-none text-dark">
+                                                                {{ $classTeacher->phone }}
+                                                            </a>
+                                                        </span>
+                                                    </li>
+                                                    <li class="list-group-item">Class:
+                                                        <span class="text-uppercase font-weight-bold float-right">
+                                                            {{ $classTeacher->class_name }} - {{ $classTeacher->group }}
+                                                        </span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            @if (!$loop->last)
+                                                <hr> {{-- Separator between teachers --}}
+                                            @endif
+                                        @endforeach
+                                    @endif
+                                </ul>
+                            </div>
+
+                            {{-- attendance tab pane --}}
+                            <div class="tab-pane" id="attendance">
+                                <p>Attendance for: <span class="text-uppercase"><strong>{{$students->first_name. ' '. $students->last_name}}</strong></span></p>
+                                <ul class="list-group">
+                                    <a href="{{route('attendance.byYear', ['student' => Hashids::encode($students->id)])}}">
+                                        <li class="list-group-item">
+                                            <h6 class="text-primary">>> Check Attendance</h6>
+                                        </li>
+                                    </a>
+                                </ul>
+                            </div>
+
+                            {{-- results tab pane --}}
+                            <div class="tab-pane" id="results">
+                                <p>Results Report for: <span class="text-uppercase"><strong>{{$students->first_name. ' '. $students->last_name}}</strong></span></p>
+                                <ul class="list-group">
+                                    <a href="{{route('results.index', ['student' => Hashids::encode($students->id)])}}">
+                                        <li class="list-group-item">
+                                            <h6 class="text-primary">>> Check Results Reports</h6>
+                                        </li>
+                                    </a>
+                                </ul>
                             </div>
 
                             {{-- transport tab-pane --}}

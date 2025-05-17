@@ -5,11 +5,11 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-10">
-                    <h6 class="header-title">Student Name:</h6>
-                    <h5 class="text-primary">{{ $firstRecord->student_firstname }} {{ $firstRecord->student_middlename }} {{ $firstRecord->student_lastname }}</h5>
+                    <b class="header-title">Student Name:</b>
+                    <span class="text-uppercase text-primary">{{ $firstRecord->student_firstname }} {{ $firstRecord->student_middlename }} {{ $firstRecord->student_lastname }}</span>
                 </div>
                 <div class="col-2">
-                    <a href="{{route('attendance.byYear', ['student' => Hashids::encode($students->id)])}}"><i class="fa-solid fa-circle-arrow-left text-secondary" style="font-size: 2rem"></i></a>
+                    <a href="{{route('attendance.byYear', ['student' => Hashids::encode($students->id)])}}" class="float-right btn btn-xs btn-info"><i class="fa-solid fa-circle-arrow-left" style=""></i> Back</a>
                 </div>
             </div>
             <div class="single-table">
@@ -26,7 +26,7 @@
                             @if ($groupedData->isNotEmpty())
                                 @foreach ($groupedData as $week => $records)
                                     <tr>
-                                        <td colspan="3" class="bg-light text-center">Week {{ $week }}</td>
+                                        <td colspan="3" class="bg-light text-center"><b>Week {{ $week }}</b></td>
                                     </tr>
                                     @foreach ($records as $item)
                                         <tr>

@@ -8,7 +8,7 @@
                 <h4 class="text-capitalize ">student information</h4>
             </div>
             <div class="col-2">
-                <a href="{{ url()->previous() }}" class="btn btn-info float-right btn-xs"><i class="fas fa-arrow-circle-left"></i> Back</a>
+                <a href="{{ route('create.selected.class', Hashids::encode($students->class_id)) }}" class="btn btn-info float-right btn-xs"><i class="fas fa-arrow-circle-left"></i> Back</a>
             </div>
         </div>
         <hr>
@@ -118,7 +118,9 @@
                                         <tr>
                                             <th>Father's Name</th>
                                             <td>
-                                               {{ucwords(strtolower($students->parent_first_name. ' '. $students->parent_last_name))}}
+                                                <a href="{{route('Parents.edit', ['parent' => Hashids::encode($students->parent_id)])}}" style="text-decoration: underline">
+                                                    {{ucwords(strtolower($students->parent_first_name. ' '. $students->parent_last_name))}}
+                                                </a>
                                             </td>
                                         </tr>
                                         <tr>
@@ -156,7 +158,9 @@
                                         <tr>
                                             <th>Mother's Name</th>
                                             <td>
-                                                {{ucwords(strtolower($students->parent_first_name. ' '. $students->parent_last_name))}}
+                                                <a href="{{route('Parents.edit', ['parent' => Hashids::encode($students->parent_id)])}}" style="text-decoration: underline">
+                                                    {{ucwords(strtolower($students->parent_first_name. ' '. $students->parent_last_name))}}
+                                                </a>
                                             </td>
                                         </tr>
                                         <tr>

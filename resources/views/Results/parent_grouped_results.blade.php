@@ -9,7 +9,7 @@
                             <span class="text-danger">Select Year of Study - To view Results</span>
                         </div>
                         <div class="col-2">
-                            <a href="{{route('home')}}" class="float-right btn btn-info btn-xs"><i class="fas fa-arrow-circle-left" style=""></i> Back</a>
+                            <a href="{{route('students.profile', ['student' => Hashids::encode($students->id)])}}" class="float-right btn btn-info btn-xs"><i class="fas fa-arrow-circle-left" style=""></i> Back</a>
                         </div>
                     </div>
                     <div class="list-group">

@@ -8,7 +8,7 @@
                             <h4 class="header-title">Select Year</h4>
                         </div>
                         <div class="col-2">
-                            <a href="{{route('home')}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                            <a href="{{route('students.profile', ['student' => Hashids::encode($students->id)])}}" class="float-right btn btn-info btn-xs"><i class="fas fa-arrow-circle-left" style=""></i> Back</a>
                         </div>
                     </div>
                     <div class="list-group">

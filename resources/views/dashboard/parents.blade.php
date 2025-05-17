@@ -166,22 +166,13 @@
                                     @foreach ($students as $student )
                                         <tr>
                                             <td class="text-uppercase">
-                                                <a href="{{route('parent.show.student', ['student' => Hashids::encode($student->id)])}}">{{$student->first_name. ' '.$student->middle_name.' ' .$student->last_name}}</a>
+                                                {{-- <a href="{{route('parent.show.student', ['student' => Hashids::encode($student->id)])}}"></a> --}}
+                                                {{$student->first_name. ' '.$student->middle_name.' ' .$student->last_name}}
                                             </td>
                                             <td class="text-uppercase">{{$student->class_code}} {{$student->group}}</td>
                                             <td>
                                                 <ul class="d-flex justify-content-center">
-                                                    <div class="btn-group" role="group">
-                                                        <button id="btnGroupDrop" type="button" class="btn btn-success btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            Manage
-                                                        </button>
-                                                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                                            <a class="dropdown-item" href="{{route('parent.show.student', ['student' => Hashids::encode($student->id)])}}"><i class="ti-user text-primary"></i> Profile</a>
-                                                            <a class="dropdown-item" href="{{route('attendance.byYear', ['student' => Hashids::encode($student->id)])}}"><i class="fa fa-list-check text-success"></i> Attendance</a>
-                                                            <a class="dropdown-item" href="{{route('results.index', ['student' => Hashids::encode($student->id)])}}"><i class="ti-file text-info"></i> Results</a>
-                                                            <a class="dropdown-item" href="{{route('student.courses.list', ['student' => Hashids::encode($student->id)])}}"><i class="ti-book text-warning"></i> Subjects</a>
-                                                        </div>
-                                                    </div>
+                                                    <a href="{{route('students.profile', ['student' => Hashids::encode($student->id)])}}" class="btn btn-xs btn-success">Manage</a>
                                                 </ul>
                                             </td>
                                         </tr>
