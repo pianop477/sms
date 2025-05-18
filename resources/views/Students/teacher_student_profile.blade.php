@@ -124,7 +124,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th><i class="fas fa-phone"></i>Phone</th>
+                                            <th><i class="fas fa-phone"></i> Phone</th>
                                             <td>
                                                 <a href="tel:{{ $students->phone }}" class="">
                                                     {{ $students->phone }}

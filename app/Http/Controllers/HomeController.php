@@ -395,69 +395,93 @@ class HomeController extends Controller
         {
             $user = Auth::user();
 
-            if($user->usertype == 3) {
-                $teacher = Teacher::query()
-                                    ->join('roles', 'roles.id', '=', 'teachers.role_id')
-                                    ->select('teachers.*', 'roles.role_name')
-                                    ->where('teachers.user_id', $user->id)
-                                    ->first();
-                return view('profile.index', compact('user', 'teacher'));
-            }
-            else {
-                return view('profile.index', compact('user'));
-            }
+           $userAccount = User::query()
+                        ->leftJoin('teachers', 'users.id', '=', 'teachers.user_id')
+                        ->leftJoin('parents', 'users.id', '=', 'parents.user_id')
+                        ->leftJoin('roles', 'roles.id', '=', 'teachers.role_id')
+                        ->select(
+                            'users.*',
+                            'teachers.user_id as teacher_id',
+                            'teachers.address as teacher_address',
+                            'teachers.member_id',
+                            'parents.address as parent_address',
+                            'roles.role_name'
+                        )
+                        ->findOrFail($user->id);
+
+            return view('profile.index', ['user' => $userAccount]);
         }
 
 
-        public function updateProfile(Request $request, $user)
-        {
-            $userData = User::findOrFail($user);
+    public function updateProfile(Request $request, $user)
+    {
+        $userData = User::findOrFail($user);
 
-            $request->validate([
-                'fname' => 'required|string|max:255',
-                'lname' => 'required|string|max:255',
-                'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,' . $userData->id,
-                'email' => 'nullable|unique:users,email,' . $userData->id,
-                'gender' => 'required|In:female,male',
-                'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
-            ]);
+        // Only get teacher/parent if the user is actually that type
+        $teacher = null;
+        $parent = null;
 
-            $userData->first_name = $request->fname;
-            $userData->last_name = $request->lname;
-            $userData->phone = $request->phone;
-            $userData->email = $request->email;
-            $userData->gender = $request->gender;
+        if($userData->usertype == 3) {
+            $teacher = Teacher::where('user_id', $userData->id)->first();
+        }
+        elseif($userData->usertype == 4) {
+            $parent = Parents::where('user_id', $userData->id)->first();
+        }
 
-            if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $imageName = time() . '.' . $image->getClientOriginalExtension();
-                $imageDestinationPath = public_path('assets/img/profile');
+        $request->validate([
+            'fname' => 'required|string|max:255',
+            'lname' => 'required|string|max:255',
+            'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,' . $userData->id,
+            'email' => 'nullable|unique:users,email,' . $userData->id,
+            'gender' => 'required|In:female,male',
+            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
+            'address' => 'nullable|string|max:255',
+        ]);
 
-                // Ensure the directory exists
-                if (!file_exists($imageDestinationPath)) {
-                    mkdir($imageDestinationPath, 0775, true);
-                }
+        // Update user data
+        $userData->first_name = $request->fname;
+        $userData->last_name = $request->lname;
+        $userData->phone = $request->phone;
+        $userData->email = $request->email;
+        $userData->gender = $request->gender;
 
-                //check for existing image file
-                if(! empty($userData->image)) {
-                    $existingFile = $imageDestinationPath . '/' . $userData->image;
-                    if(file_exists($existingFile)) {
-                        unlink($existingFile);
-                    }
-                }
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $imageDestinationPath = public_path('assets/img/profile');
 
-                // Move the file
-                $image->move($imageDestinationPath, $imageName);
-
-                // Save the file name to the database
-                $userData->image = $imageName;
+            if (!file_exists($imageDestinationPath)) {
+                mkdir($imageDestinationPath, 0775, true);
             }
 
-            // Update user data
-            $saveData = $userData->save();
-            if($saveData) {
-                Alert()->toast('Profile Updated successfully', 'success');
-                return back();
+            if(!empty($userData->image)) {
+                $existingFile = $imageDestinationPath . '/' . $userData->image;
+                if(file_exists($existingFile)) {
+                    unlink($existingFile);
+                }
+            }
+
+            $image->move($imageDestinationPath, $imageName);
+            $userData->image = $imageName;
+        }
+
+        // Save user data
+        $userData->save();
+
+        // Update address based on user type
+        if($request->address) {
+            if($userData->usertype == 3 && $teacher) {
+                $teacher->address = $request->address;
+                $teacher->save();
+            }
+            elseif($userData->usertype == 4 && $parent) {
+                $parent->address = $request->address;
+                $parent->save();
             }
         }
+
+        Alert()->toast('Profile Updated successfully', 'success');
+        return back();
+    }
 }
