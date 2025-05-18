@@ -157,9 +157,9 @@
                                             @foreach ($subjects as $subject)
                                                 <tr>
                                                     <td>{{$loop->iteration}}</td>
-                                                    <td>{{ucwords(strtolower($subject->class_name))}}</td>
+                                                    <td>{{ucwords(strtoupper($subject->class_name))}}</td>
                                                     <td>{{ucwords(strtoupper($subject->course_code))}}</td>
-                                                    <td>{{ucwords(strtolower($subject->course_name))}}</td>
+                                                    <td>{{ucwords(strtoupper($subject->course_name))}}</td>
                                                     <td>{{ucwords(strtoupper($subject->course_code))}}</td>
                                                 </tr>
                                             @endforeach

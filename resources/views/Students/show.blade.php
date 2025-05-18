@@ -49,7 +49,7 @@
                                 @endif
                             </li>
                         </ul>
-                        <a href="{{route('students.modify', ['students' => Hashids::encode($students->id)])}}" class="btn btn-block btn-primary" data-toggle="tooltip" data-placement="button" title="Edit"> Edit</a>
+                        {{-- <a href="{{route('students.modify', ['students' => Hashids::encode($students->id)])}}" class="btn btn-block btn-primary" data-toggle="tooltip" data-placement="button" title="Edit"> Edit</a> --}}
                     </div>
                 </div>
             </div>
@@ -122,7 +122,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th><i class="fas fa-phone"></i>Phone</th>
+                                            <th><i class="fas fa-phone"></i> Phone</th>
                                             <td>
                                                 <a href="tel:{{ $students->phone }}" class="">
                                                     {{ $students->phone }}
