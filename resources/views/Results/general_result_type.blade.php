@@ -118,7 +118,7 @@
                                                                             <p class="text-danger">No exam results records found</p>
                                                                         @else
                                                                         @foreach ($groupedByMonth as $date => $resultDate )
-                                                                            <label for=""><input type="checkbox" style="font-size: 16px;" name="exam_dates[]" value="{{$date}}" required> {{\Carbon\Carbon::parse($date)->format('d-m-Y')}} => {{ucwords(strtolower($resultDate->first()->exam_type))}} ({{ucwords(strtolower('term '.$resultDate->first()->Exam_term))}})</label>
+                                                                            <label for=""><input type="checkbox" style="font-size: 16px;" name="exam_dates[]" value="{{$date}}"> {{\Carbon\Carbon::parse($date)->format('d-m-Y')}} => {{ucwords(strtolower($resultDate->first()->exam_type))}} ({{ucwords(strtolower('term '.$resultDate->first()->Exam_term))}})</label>
                                                                         @endforeach
                                                                         @endif
                                                                     </div>
@@ -191,9 +191,10 @@
                                                                     </button>
                                                                 </form>
                                                             @else
-                                                                <form action="">
+                                                                <form action="{{route('Unpublish.combined.report', ['school' => Hashids::encode($report->school_id), 'year' => $year, 'class' => Hashids::encode($report->class_id), 'report' => Hashids::encode($report->id)])}}" method="POST">
                                                                     @csrf
-                                                                    <button class="btn btn-link p-0" type="submit" title="Publish report" onclick="return confirm('Are you sure you want to Publish this report?')">
+                                                                    @method('PUT')
+                                                                    <button class="btn btn-link p-0" type="submit" title="Publish report" onclick="return confirm('Are you sure you want to Unpublish this report and Lock it?')">
                                                                         <i class="fas fa-toggle-on text-success" style="font-size: 20px;"></i>
                                                                     </button>
                                                                 </form>

@@ -192,27 +192,27 @@
                     <h5 style="font-weight:normal">NUMBER OF CANDIDATES: {{$totalCandidates}}</h5>
                     <h5 style="font-weight:normal">CLASS AVERAGE: <strong>{{number_format($subjectAveragesSum, 4)}}</strong>
                         @if($results->first()->marking_style == 1)
-                            @if ($overallGrade >= 40.5)
+                            @if ($overallTotalAverage >= 40.5)
                                     <span style="background:rgb(117, 244, 48); padding:2px 10px; ">GRADE A (EXCELLENT)</span>
-                                @elseif ($overallGrade >= 30.5)
+                                @elseif ($overallTotalAverage >= 30.5)
                                     <span style="background:rgb(153, 250, 237); padding:2px 10px;">GRADE B (GOOD)</span>
-                                @elseif ($overallGrade >= 20.5)
+                                @elseif ($overallTotalAverage >= 20.5)
                                     <span style="background:rgb(237, 220, 113); padding:2px 10px;">GRADE C (PASS)</span>
-                                @elseif ($overallGrade >= 10.5)
+                                @elseif ($overallTotalAverage >= 10.5)
                                     <span style="background:rgb(182, 176, 176); padding:2px 10px;"> GRADE D (POOR)</span>
-                                @elseif($overallGrade <= 10.4)
+                                @elseif($overallTotalAverage <= 10.4)
                                     <span style="background:rgb(235, 75, 75); padding:2px 10px;">GRADE E (FAIL)</span>
                             @endif
                         @else
-                            @if ($overallGrade >= 80.5)
+                            @if ($overallTotalAverage >= 80.5)
                                 <span style="background:rgb(117, 244, 48); padding:2px 10px;">GRADE A (EXCELLENT)</span>
-                            @elseif ($overallGrade >= 60.5)
+                            @elseif ($overallTotalAverage >= 60.5)
                                 <span style="background:rgb(153, 250, 237); padding:2px 10px;">GRADE B (GOOD)</span>
-                            @elseif ($overallGrade >= 40.5)
+                            @elseif ($overallTotalAverage >= 40.5)
                                 <span style="background:rgb(237, 220, 113); padding:2px 10px">GRADE C (PASS)</span>
-                            @elseif ($overallGrade >= 20.5)
+                            @elseif ($overallTotalAverage >= 20.5)
                                 <span style="background:rgb(182, 176, 176); padding:2px 10px;"> GRADE D (POOR)</span>
-                            @elseif($overallGrade <= 20.4)
+                            @elseif($overallTotalAverage <= 20.4)
                                 <span style="background:rgb(235, 75, 75); padding:2px 10px;">GRADE E (FAIL)</span>
                             @endif
                         @endif
