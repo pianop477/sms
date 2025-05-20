@@ -1700,7 +1700,7 @@ class ResultsController extends Controller
 
         $student = $results->first();
         $schoolInfo = $results->first();
-        return $schoolInfo;
+        // return $schoolInfo;
 
         // =================== EXAM HEADERS WITH DATES ===================
         $examHeadersWithDates = $results
