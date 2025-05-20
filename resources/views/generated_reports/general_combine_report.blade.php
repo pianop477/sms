@@ -253,7 +253,7 @@
                             <th style="" class="">sex</th>
                             <th style="">Student Name</th>
                              @foreach($subjectCodes as $code)
-                                <th style="text-transform: uppercase" colspan="2">{{ $code }}</th>
+                                <th style="text-transform: uppercase">{{ $code }}</th>
                             @endforeach
                             <th style="text-align:center;">Total</th>
                             <th style="text-align:center;">Avg</th>
@@ -272,10 +272,9 @@
                                     @if(isset($student['subject_averages'][$code]['score']))
                                         {{ $student['subject_averages'][$code]['score'] }}
                                     @else
-                                        -
+                                        X
                                     @endif
                                 </td>
-                                <td style="text-align: center">{{ $student['subject_averages'][$code]['grade'] }}</td>
                             @endforeach
                             <td style="text-align:center">{{ $student['total']  }}</td>
                             <td style="text-align:center">{{ $student['average'] }}</td>
