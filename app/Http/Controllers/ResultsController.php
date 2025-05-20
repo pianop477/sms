@@ -80,7 +80,7 @@ class ResultsController extends Controller
      */
 
 
-     public function resultByType($student, $year)
+    public function resultByType($student, $year)
      {
         $decoded = Hashids::decode($student);
 
@@ -157,7 +157,7 @@ class ResultsController extends Controller
 
      }
 
-     public function resultByMonth($student, $year, $exam_type)
+    public function resultByMonth($student, $year, $exam_type)
     {
         $student_id = Hashids::decode($student);
         $exam_id = Hashids::decode($exam_type);
@@ -891,6 +891,8 @@ class ResultsController extends Controller
             // Loop through each student and prepare the payload for each parent
             foreach ($studentsData as $student) {
                 $phoneNumber = $this->formatPhoneNumber($student->phone);
+                $dateFormat = Carbon::parse($date)->format('d-m-Y');
+                $fullname = $student->first_name . ', '. $student->last_name[0];
                 if (!$phoneNumber) {
                     // Log::error("Invalid phone number for {$student->first_name}: {$student->phone}");
                     return response()->json([
@@ -901,9 +903,9 @@ class ResultsController extends Controller
                 }
 
                 // Construct the SMS message
-                $messageContent = "Matokeo ya {$student->first_name} {$student->last_name} \n";
-                $messageContent .= "Mtihani wa {$student->exam_type} ni: \n";
-                $messageContent .= "Jumla ya Alama {$student->total_marks}, Wastani " . number_format($student->average_marks) . ", Nafasi ya {$student->rank} kati ya {$totalStudents}. \n";
+                $messageContent = "Matokeo ya ". strtoupper($fullname).", \n";
+                $messageContent .= "Mtihani wa ". strtoupper($student->exam_type).", Tar. {$dateFormat} ni: \n";
+                $messageContent .= "Jumla {$student->total_marks}, Wastani " . number_format($student->average_marks) . ", Nafasi ya {$student->rank} kati ya {$totalStudents}. \n";
                 $messageContent .= "Tembelea {$url} kuona ripoti";
 
                 // Prepare the recipients array
@@ -1388,7 +1390,7 @@ class ResultsController extends Controller
             $studentRank = $ranks[$studentInfo->id] ?? null;
 
             // Prepare the message content
-            $fullName = $studentInfo->first_name. ' '. $studentInfo->last_name;
+            $fullName = $studentInfo->first_name. ', '. $studentInfo->last_name[0];
             $examination = $results->first()->exam_type;
             $term = $results->first()->Exam_term;
             $schoolName = $results->first()->school_name;
@@ -1400,6 +1402,7 @@ class ResultsController extends Controller
 
             $totalStudents = $rankings->count();
             $url = 'https://shuleapp.tech';
+            $dateFormat = Carbon::parse($date)->format('d-m-Y');
 
             // find the parent phone number
             $parent = Parents::where('id', $studentInfo->parent_id)->first();
@@ -1426,8 +1429,9 @@ class ResultsController extends Controller
             $nextSmsService = new NextSmsService();
             $sender = $schools->sender_id ?? "SHULE APP";
             $destination = $this->formatPhoneNumber($users->phone);
-            $messageContent = "Matokeo ya ". strtoupper($fullName )." Mtihani wa ". strtoupper($examination)." ni: \n";
-            $messageContent .= "Jumla ya Alama $totalScore, Wastani ". number_format($averageScore) .", Nafasi $studentRank kati ya $totalStudents. Tembelea {$url} kuona ripoti";
+            $messageContent = "Matokeo ya ". strtoupper($fullName )." Mtihani wa ". strtoupper($examination).",\n";
+            $messageContent .= "Tar. {$dateFormat} ni: \n";
+            $messageContent .= "Jumla $totalScore, Wastani ". number_format($averageScore) .", Nafasi $studentRank kati ya $totalStudents. Tembelea {$url} kuona ripoti";
             $reference = uniqid();
 
             $payload = [
@@ -1918,16 +1922,18 @@ class ResultsController extends Controller
         }
 
         // ========== BUILD SMS MESSAGE ==========
-        $studentName = $student->first_name . ' ' . $student->last_name;
+        $studentName = $student->first_name . ', ' . $student->last_name[0];
         $studentGender = strtolower($student->gender) == 'male' ? 'He' : 'She';
         $className = $student->class_name;
         $schoolName = $schoolInfo->school_name;
         $reportName = $reports->title;
+        $date = Carbon::parse($reports->created_at)->format('d-m-Y');
         $url = 'https://shuleapp.tech';
 
-        $message = "Matokeo ya {$studentName}\n";
-        $message .= "Mtihani wa {$reportName} ni:\n";
-        $message .= "Jumla ya Alama: {$studentTotal}, Wastani {$studentGeneralAverage}, Nafasi ya {$generalPosition} kati ya {$totalStudents}\n";
+        $message = "Matokeo ya ". strtoupper($studentName)."\n";
+        $message .= "Mtihani wa ". strtoupper($reportName)."\n";
+        $message .= "Tar. {$date} ni: \n";
+        $message .= "Jumla: {$studentTotal}, Wastani {$studentGeneralAverage}, Nafasi ya {$generalPosition} kati ya {$totalStudents}\n";
         $message .= "Tembelea {$url} kuona ripoti";
 
         // ========== SEND SMS ==========
@@ -2239,7 +2245,7 @@ class ResultsController extends Controller
 
                 return [
                     'parent_id' => $student['parent_id'],
-                    'student_name' => "{$student['first_name']} {$student['last_name']}",
+                    'student_name' => strtoupper($student['first_name'] . ', '. $student['last_name'][0]),
                     'position' => $positionText,
                     'total_average' => round($student['total_average'], 1),
                     'course_averages' => $student['course_averages'],
@@ -2259,8 +2265,9 @@ class ResultsController extends Controller
                 $phoneNumber = $this->formatPhoneNumber($user->phone);
                 // return $user;
                 $message = "Matokeo ya {$payload['student_name']}\n"
-                    ."Mtihani wa {$report->title} ni:\n"
-                    . "Jumla ya alama: {$payload['total_course_average']}, Wastani {$payload['total_average']}\n"
+                    ."Mtihani wa ". strtoupper($report->title)."\n"
+                    ."Tar. " .Carbon::parse($report->created_at)->format('d-m-Y'). " ni:\n"
+                    . "Jumla: {$payload['total_course_average']}, Wastani {$payload['total_average']}\n"
                     . "Nafasi ya {$payload['position']}.\n"
                     . "Tembelea {$link} kuona ripoti.";
 
@@ -2277,6 +2284,29 @@ class ResultsController extends Controller
             Alert()->toast($e->getMessage(), 'error');
             return redirect()->back();
         }
+    }
+
+    //unpublish combined report
+    public function unpublishCombinedReport($school, $year, $class, $report)
+    {
+        $school_id = Hashids::decode($school);
+        $class_id = Hashids::decode($class);
+        $report_id = Hashids::decode($report);
+        $status = 0;
+
+        $reports = generated_reports::findOrFail($report_id[0]);
+        // return $reports;
+        try {
+            $reports->update(['status' => $status]);
+
+            Alert()->toast('Results data set has been Locked successfully 🔐', 'success');
+            return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
+        }
+        catch(Exception $e) {
+            Alert()->toast($e->getMessage(), 'error');
+            return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
+        }
+
     }
 
     public function downloadGeneralCombinedReport($school, $year, $class, $report)
@@ -2493,7 +2523,7 @@ class ResultsController extends Controller
                 if (isset($student['subject_averages'][$subject->course_code]['grade'])) {
                     $grade = $student['subject_averages'][$subject->course_code]['grade'];
 
-                    if ($student['gender'] == 'Male') {
+                    if ($student['gender'] == 'male') {
                         $maleGrades[$grade]++;
                     } else {
                         $femaleGrades[$grade]++;

@@ -410,6 +410,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('Download-combined-report/school/{school}/year/{year}/class/{class}/report/{report}/student/{student}', [ResultsController::class, 'downloadCombinedReport'])->name('download.combined.report');
         Route::put('Publish-combine-report/school/{school}/year/{year}/class/{class}/report/{report}', [ResultsController::class, 'publishCombinedReport'])->name('publish.combined.report');
         Route::get('/General-combined-report/school/{school}/year/{year}/class/{class}/report/{report}', [ResultsController::class, 'downloadGeneralCombinedReport'])->name('download.general.combined');
+        Route::put('Unpublish/combined-report/school/{school}/year/{year}/class/{class}/report/{report}', [ResultsController::class, 'unpublishCombinedReport'])->name('Unpublish.combined.report');
 
         //fetch report combined************************************
         Route::post('Fetch-report/class/{class}/year/{year}/school/{school}', [ResultsController::class, 'fetchReport'])->name('fetch.report');
