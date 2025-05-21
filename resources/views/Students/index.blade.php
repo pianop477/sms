@@ -256,11 +256,12 @@
                         </div>
                 </div>
                 <div class="single-table mt-5">
-                    <form action="{{ route('students.batchUpdateStream') }}" method="POST" onsubmit="return confirm('Are you sure you want to move selected students to a new stream?')">
+                    <form action="{{ route('students.batchUpdateStream') }}" novalidate class="needs-validation" method="POST">
                         @csrf
                             <div class="col-md-12 mb-3">
                                 <div class="row">
                                     <div class="col-md-2">
+                                        <label for="">Transfer Student Stream</label>
                                         <select name="new_stream" class="form-control text-capitalize" required>
                                             <option value="">-- Select Stream --</option>
                                             <option value="A">Stream A</option>
@@ -268,8 +269,8 @@
                                             <option value="C">Stream C</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
-                                        <button type="submit" class="btn btn-warning btn-xs text-capitalize"><i class="fas fa-random"></i> Move</button>
+                                    <div class="col-md-3 mt-4">
+                                        <button type="submit" class="btn btn-warning btn-xs text-capitalize" onclick="return confirm('Are you sure you want to move selected students to a new stream?')"><i class="fas fa-random"></i> Move</button>
                                     </div>
                                 </div>
                             </div>

@@ -1568,8 +1568,8 @@ class ResultsController extends Controller
                             'grades.class_name', 'grades.class_code',
                             'users.first_name as user_first_name', 'users.last_name as user_last_name', 'users.phone',
                         )
-                        ->where('examination_results.class_id', $reports->class_id)
-                        ->where('examination_results.school_id', $reports->school_id)
+                        ->where('examination_results.class_id', $classId[0])
+                        ->where('examination_results.school_id', $schoolId[0])
                         ->whereIn(DB::raw('DATE(exam_date)'), $reports->exam_dates)
                         ->orderBy('students.first_name')
                         ->get()
@@ -1579,8 +1579,8 @@ class ResultsController extends Controller
 
         $allScores = Examination_result::query()
                             ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                            ->where('examination_results.class_id', $reports->class_id)
-                            ->where('examination_results.school_id', $reports->school_id)
+                            ->where('examination_results.class_id', $classId[0])
+                            ->where('examination_results.school_id', $schoolId[0])
                             ->whereIn(DB::raw('DATE(exam_date)'), $reports->exam_dates)
                             ->get()
                             ->groupBy([

@@ -13,7 +13,8 @@ use Vinkla\Hashids\Facades\Hashids;
 class TransportController extends Controller
 {
 
-    public function getSchoolBuses() {
+    public function getSchoolBuses()
+    {
         $user = Auth::user();
         $transport = Transport::where('school_id', $user->school_id)->get();
         return view('Transport.index', ['transport' => $transport]);
@@ -223,7 +224,8 @@ class TransportController extends Controller
                             ->where('students.school_id', $user->school_id)
                             ->orderBy('students.first_name')
                             ->get();
-        return view('Transport.students', compact('students', 'transport'));
+        $AllBuses = Transport::where('school_id', $user->school_id)->where('status', 1)->where('id', '!=', $transport->id)->get();
+        return view('Transport.students', compact('students', 'transport', 'AllBuses'));
     }
 
     public function export ($trans)
@@ -250,5 +252,25 @@ class TransportController extends Controller
                             ->get();
         $pdf = \PDF::loadView('Transport.export', compact('students', 'transport'));
         return $pdf->stream($transport->driver_name. ' students.pdf');
+    }
+
+    public function transferStudentBus (Request $request)
+    {
+        try {
+            $request->validate([
+                'student' => 'required|array',
+                'new_bus' => 'required|integer|exists:transports,id',
+            ]);
+
+            Student::whereIn('id', $request->student)
+                    ->update(['transport_id' => $request->new_bus]);
+
+            Alert()->toast('Students School bus updated successfully', 'success');
+            return back();
+       }
+       catch(\Exception $e) {
+            Alert()->toast($e->getMessage(), 'error');
+            return back();
+       }
     }
 }

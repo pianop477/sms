@@ -153,10 +153,10 @@
                                 <thead>
                                     <tr>
                                         <th>Title</th>
-                                        <th>Created On</th>
-                                        <th>Created By</th>
-                                        <th>Combine Style</th>
-                                        <th>Action</th>
+                                        <th>Created at</th>
+                                        <th>Created by</th>
+                                        <th>Display Mode</th>
+                                        <th class="text-center">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -202,11 +202,11 @@
                                                         </li>
                                                         <li class="mr-3">
                                                             <a href="{{route('generated.report.delete',
-                                                                        ['school' => Hashids::encode($report->school_id),
-                                                                        'year' =>$year , 'class' => Hashids::encode($report->class_id),
-                                                                        'report' => Hashids::encode($report->id)])}}"
-                                                                        onclick="return confirm('Are you sure you want to delete this report?')" title="Delete Report">
-                                                                        <i class="fas fa-trash text-danger"></i>
+                                                                ['school' => Hashids::encode($report->school_id),
+                                                                'year' =>$year , 'class' => Hashids::encode($report->class_id),
+                                                                'report' => Hashids::encode($report->id)])}}"
+                                                                onclick="return confirm('Are you sure you want to delete this report?')" title="Delete Report">
+                                                                <i class="fas fa-trash text-danger"></i>
                                                             </a>
                                                         </li>
                                                     </ul>

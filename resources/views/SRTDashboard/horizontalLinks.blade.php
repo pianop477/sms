@@ -78,6 +78,9 @@
                                     <li><a href="{{route('Teachers.trashed')}}"><i class="fas fa-trash"></i> Recycle bin</a></li>
                                 </ul>
                             </li>
+                            <li>
+                                <a href="{{route('sms.form')}}"><i class="ti-announcement"></i><span> Public Notice</span></a>
+                            </li>
                         @endif
                         @if (Auth::user()->usertype == 2 || Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 2)
                             <li>
@@ -134,7 +137,7 @@
                                         <a href="{{route('Transportation.index')}}"><i class="fa fa-bus-alt"></i><span> School Bus</span></a>
                                     </li>
                                     <li>
-                                        <a href="{{route('sms.form')}}"><i class="ti-announcement"></i><span> Announcements</span></a>
+                                        <a href="{{route('sms.form')}}"><i class="ti-announcement"></i><span> Public Notice</span></a>
                                     </li>
                                 </ul>
                             </li>

@@ -7,7 +7,7 @@
 
         {{-- display contract status for head teacher --}}
         <div class="row">
-            <div class="col-6">
+            <div class="col-md-12">
                 @if ($contract == null)
                     <p class="alert alert-danger text-capitalize">contract status: <strong>Not applied.</strong> | please apply <a href="{{route('contract.index')}}">here</a></p>
                 @else
@@ -24,29 +24,6 @@
                     @endif
                 @endif
             </div>
-            <div class="col-6">
-                <p>
-                    <a href="{{route('sms.form')}}" class="float-right alert alert-primary animated-colors">
-                        <i class="ti-announcement" style=""></i>
-                        Public Notice
-                    </a>
-                </p>
-            </div>
-
-            <style>
-            @keyframes colorChange {
-                0% { background-color: #007bff; } /* Primary Blue */
-                25% { background-color: #e47beb; } /* Green */
-                50% { background-color: #ffc107; } /* Yellow */
-                75% { background-color: #ef1128; } /* Red */
-                100% { background-color: #007bff; } /* Back to Blue */
-            }
-
-            .animated-colors {
-                animation: colorChange 5s infinite alternate;
-                transition: background-color 0.5s ease-in-out;
-            }
-            </style>
         </div>
             <div class="row">
                 <div class="col-md-4 mt-3 mb-3">
@@ -556,7 +533,7 @@
 
         {{-- check for academic contract  --}}
         <div class="row">
-            <div class="col-6">
+            <div class="col-12">
                 @if ($contract == null)
                     <p class="alert alert-danger text-capitalize">contract status: <strong>Not applied.</strong> | please apply <a href="{{route('contract.index')}}">here</a></p>
                 @else
@@ -573,29 +550,6 @@
                     @endif
                 @endif
             </div>
-            <div class="col-6">
-                <p>
-                    <a href="{{route('sms.form')}}" class="float-right alert alert-primary animated-colors">
-                        <i class="ti-announcement" style=""></i>
-                        Public Notice
-                    </a>
-                </p>
-            </div>
-
-            <style>
-            @keyframes colorChange {
-                0% { background-color: #007bff; } /* Primary Blue */
-                25% { background-color: #e47beb; } /* Green */
-                50% { background-color: #ffc107; } /* Yellow */
-                75% { background-color: #ef1128; } /* Red */
-                100% { background-color: #007bff; } /* Back to Blue */
-            }
-
-            .animated-colors {
-                animation: colorChange 5s infinite alternate;
-                transition: background-color 0.5s ease-in-out;
-            }
-            </style>
         </div>
             <div class="row">
                 <div class="col-md-4 mt-3 mb-3">

@@ -111,7 +111,7 @@
                 <div class="single-table">
                     <div class="table-responsive">
                         <table class="table table-hover progress-table" id="myTable">
-                            <thead class="text-uppercase">
+                            <thead class="text-capitalize text-center">
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Class Name</th>
@@ -122,10 +122,10 @@
                             </thead>
                             <tbody>
                                 @foreach ($classTeacher as $teacher )
-                                    <tr class="text-capitalize">
+                                    <tr class="text-capitalize text-center">
                                         <td>{{$loop->iteration}}</td>
                                         <td class="text-uppercase">{{$teacher->class_name}}</td>
-                                        <td class="text-uppercase text-center">{{$teacher->group}}</td>
+                                        <td class="text-capitalize text-center">Stream {{$teacher->group}}</td>
                                         <td>{{$teacher->teacher_first_name. ' '. $teacher->teacher_last_name}}</td>
                                         <td>
                                             <ul class="d-flex justify-content-center">

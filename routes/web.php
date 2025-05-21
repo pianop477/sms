@@ -362,6 +362,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('{trans}/Transport-Edit', [TransportController::class, 'Edit'])->name('transport.edit');
         Route::put('{transport}/Update', [TransportController::class, 'UpdateRecords'])->name('transport.update.records');
         Route::get('{trans}/Export-transport', [TransportController::class, 'export'])->name('transport.export');
+        Route::post('Update/transport/batch', [TransportController::class, 'transferStudentBus'])->name('update.transport.batch');
 
         //assign new roles ==========================================================================================
         Route::get('Update-roles', [RolesController::class, 'updateRoles'])->name('roles.updateRole');

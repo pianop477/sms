@@ -144,6 +144,7 @@
                             <thead class="text-capitalize">
                                 <tr>
                                     <th scope="col">#</th>
+                                    <th scope="col">Member ID</th>
                                     <th scope="col">Teacher's Name</th>
                                     <th scope="col">Gender</th>
                                     <th scope="col">role</th>
@@ -158,6 +159,7 @@
                                 @foreach ($teachers as $teacher )
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
+                                        <td class="text-uppercase">{{$teacher->member_id}}</td>
                                         <td class="text-capitalize">{{$teacher->first_name. ' '. $teacher->last_name}}</td>
                                         <td class="text-capitalize">{{$teacher->gender[0]}}</td>
                                         <td class="text-capitalize text-white">
