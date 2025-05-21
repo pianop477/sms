@@ -5,7 +5,7 @@
         <div class="col-md-4 mt-5">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="header-title text-center text-uppercase">Subjects By Class</h4>
+                    <h4 class="header-title text-center text-uppercase">Class Learning Subjects</h4>
                     <p class="text-danger">Select class to view subjects</p>
                     @if ($classes->isEmpty())
                         <div class="alert alert-warning text-center">
@@ -32,7 +32,7 @@
                     <h4 class="header-title text-center text-uppercase">All Registered Subjects</h4>
                     <div class="row">
                         <div class="col-8">
-                            <p class="text-success">All available courses</p>
+                            <p class="text-success">registered subjects</p>
                         </div>
                         <div class="col-4">
                             <button type="button" class="btn btn-primary float-right btn-xs" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus"></i> New Subject

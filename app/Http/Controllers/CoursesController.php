@@ -18,7 +18,8 @@ use Vinkla\Hashids\Facades\Hashids;
 class CoursesController extends Controller
 {
 
-    public function index() {
+    public function index()
+    {
         $user = Auth::user();
         $classes = Grade::where('school_id', '=', Auth::user()->school_id)->orderBy('id', 'ASC')->get();
 
@@ -131,7 +132,7 @@ class CoursesController extends Controller
                                                 'grades.class_name', 'subjects.course_name', 'users.first_name', 'users.last_name',
                                                 'teachers.id as teacherId'
                                             )
-                                            ->find($decode[0]);
+                                            ->findOrFail($decode[0]);
         if(! $classCourse) {
             // Alert::error('Error', 'No such course was found');
             Alert()->toast('No such course was found', 'error');
@@ -145,7 +146,7 @@ class CoursesController extends Controller
                                     ->orderBy('users.first_name')
                                     ->get();
 
-        return view('Courses.admin-edit', compact('classCourse', 'teachers'));
+        return view('Courses.admin-edit', compact('classCourse', 'teachers', 'id'));
 
     }
 
