@@ -130,6 +130,7 @@
                         </div>
                     </div>
                 </div>
+                <hr>
                 @if (isset($message))
                     <div class="alert alert-warning" role="alert">
                         <h6 class="text-center">{{ $message }}</h6>
@@ -142,7 +143,7 @@
                     <div class="single-table">
                         <div class="table-responsive">
                             <table class="table">
-                                <thead class="text-uppercase bg-info">
+                                <thead class="text-capitalize bg-info">
                                     <tr class="text-white">
                                         <th scope="col">#</th>
                                         <th scope="col">Course Name</th>

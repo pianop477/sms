@@ -8,12 +8,12 @@
                         <h4 class="header-title text-center text-uppercase">students generated report - {{$reports->title}} ({{$classes->class_code}})</h4>
                     </div>
                     <div class="col-2">
-                        <a href="{{route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])}}" class="float-right"><i class="fas fa-arrow-circle-left"></i> Back</a>
+                        <a href="{{route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])}}" class="float-right btn btn-info btn-xs"><i class="fas fa-arrow-circle-left"></i> Back</a>
                     </div>
                 </div>
                 <table class="table table-responsive-md table-hover table-striped" id="myTable">
                     <thead>
-                        <tr class="text-uppercase">
+                        <tr class="text-capitalize">
                             <th class="text-center">Adm #</th>
                             <th>Student Name</th>
                             <th>Phone</th>
@@ -58,7 +58,7 @@
                                                             </div>
                                                         @else
                                                             <div class="me-1 mb-1">
-                                                                <small>{{ $course ?? "Null" }}</small><br>
+                                                                <small>Null</small><br>
                                                                 <input type="text" value="ABS" class="form-control form-control-sm text-danger" style="width: 60px;" readonly>
                                                             </div>
                                                         @endif
