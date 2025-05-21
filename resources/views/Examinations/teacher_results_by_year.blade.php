@@ -9,7 +9,7 @@
                     <h4 class="header-title text-center">Select Academic Year of Study</h4>
                 </div>
                 <div class="col-2">
-                    <a href="{{route('home')}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                    <a href="{{route('home')}}" class="float-right btn btn-xs btn-info"><i class="fas fa-arrow-circle-left" style=""></i> Back</a>
                 </div>
             </div>
             <p class="text-danger">Click on Specific Academic Year</p>

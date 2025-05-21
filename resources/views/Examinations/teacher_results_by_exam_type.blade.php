@@ -9,7 +9,7 @@
                     <h4 class="header-title text-center">Select Examination Type for {{ $year }}</h4>
                 </div>
                 <div class="col-2">
-                    <a href="{{route('results_byCourse', ['id' => Hashids::encode($class_course->id)])}}" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                    <a href="{{route('results_byCourse', ['id' => Hashids::encode($class_course->id)])}}" class="float-right btn btn-xs btn-info"><i class="fas fa-arrow-circle-left"></i> Back</a>
                 </div>
             </div>
             <p class="text-danger">Click to select Examination type</p>

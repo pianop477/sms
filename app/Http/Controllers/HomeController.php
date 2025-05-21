@@ -359,7 +359,7 @@ class HomeController extends Controller
 
         $this->validate($request, [
             'current_password' => ['required', 'string'],
-            'new_password' => ['required', 'string', Password::min(8)->mixedCase()->letters()->numbers()],
+            'new_password' => ['required', 'string', Password::min(8)->letters()->numbers()],
             'confirm_password' => ['required', 'same:new_password'],
         ]);
 
@@ -381,8 +381,8 @@ class HomeController extends Controller
 
                 if($new_password) {
                     Alert()->toast('Password Updated successfully', 'success');
-                    Auth::logout();
-                    return to_route('login');
+                    // Auth::logout();
+                    return to_route('home');
                 }
         } catch (\Exception $e) {
             Alert::error('Errors', $e->getMessage());

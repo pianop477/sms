@@ -9,8 +9,9 @@
                     <h4 class="header-title text-center">Select Months for Academic Year {{ $year }}</h4>
                 </div>
                 <div class="col-2">
-                    <a href="{{ route('results.byYear', ['year' => $year, 'course' => Hashids::encode($class_course->course_id)]) }}" class="float-right">
-                        <i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i>
+                    <a href="{{route('results.byYear', ['course' => Hashids::encode($class_course->id), 'year' => $year])}}" class="float-right btn btn-xs btn-info">
+                        <i class="fas fa-arrow-circle-left" style=""></i>
+                        Back
                     </a>
                 </div>
             </div>

@@ -10,7 +10,8 @@
                         <h4 class="header-title text-uppercase">School Bus List</h4>
                     </div>
                     <div class="col-2">
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus-circle text-secondary" style="font-size: 2rem;"></i>
+                        <button type="button" class="btn btn-info btn-xs float-right" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus-circle" style=""></i>
+                            New Route
                         </button>
                         <div class="modal fade bd-example-modal-lg">
                             <div class="modal-dialog modal-lg">
@@ -68,7 +69,7 @@
                                                 <div class="col-md-6 mb-3">
                                                     <label for="validationCustomUsername">Bus Routine Description</label>
                                                     <div class="input-group">
-                                                        <textarea name="routine" id="" cols="60" rows="4" class="form-control text-uppercase">{{old('routine')}}</textarea>
+                                                        <textarea name="routine" id="" cols="60" rows="4" class="form-control text-capitalize">{{old('routine')}}</textarea>
                                                         @error('routine')
                                                         <div class="text-danger">
                                                             {{$message}}
