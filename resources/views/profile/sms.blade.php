@@ -50,7 +50,7 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="validationCustom02">Your Message</label>
-                        <textarea name="message_content" id="message_content" cols="30" rows="7" class="form-control" required maxlength="160">{{ old('message_content') }}</textarea>
+                        <textarea name="message_content" id="message_content" cols="30" rows="6" class="form-control" required maxlength="306">{{ old('message_content') }}</textarea>
                         <small id="charCount" class="text-muted">306 characters remaining</small>
                         @error('message_content')
                         <div class="text-danger">
