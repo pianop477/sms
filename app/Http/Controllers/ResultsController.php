@@ -1597,6 +1597,7 @@ class ResultsController extends Controller
 
     }
     // end of compiled results by month
+
     //function for showing individual student report which is already compiled
     public function showStudentCompiledReport($school, $year, $class, $report, $student)
     {
@@ -1676,25 +1677,22 @@ class ResultsController extends Controller
                 $average = $filtered->count() > 0 ? $filtered->avg() : 0;
             }
 
+            // Kubadilisha logic ya kuhesabu position kwa kutumia jumla ya score kwa kila exam_date
             $allScores = Examination_result::where('course_id', $subjectId)
                             ->where('class_id', $classId)
                             ->where('school_id', $schoolId)
                             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
                             ->get()
                             ->groupBy('student_id')
-                            ->map(function ($scores) use ($combineOption) {
-                                if ($combineOption == 'sum') {
-                                    return $scores->sum('score');
-                                } elseif ($combineOption == 'average') {
-                                    return $scores->avg('score');
-                                } else {
-                                    return $scores->sum('score');
-                                }
+                            ->map(function ($scores) {
+                                // Sasa tunatumia jumla ya score kwa kila exam_date
+                                return $scores->sum('score');
                             })
                             ->sortDesc()
                             ->values();
 
-            $position = $allScores->search($combineOption == 'average' ? $average : $total) + 1;
+            // Position itahesabiwa kwa kutumia jumla ya score bila kujali combineOption
+            $position = $allScores->search($total) + 1;
 
             $finalData[] = compact('subjectName', 'teacher', 'subjectCode', 'examScores', 'total', 'average', 'position');
         }
@@ -2042,25 +2040,22 @@ class ResultsController extends Controller
                 $average = $filtered->count() > 0 ? $filtered->avg() : 0;
             }
 
+            // Kubadilisha logic ya kuhesabu position kwa kutumia jumla ya score kwa kila exam_date
             $allScores = Examination_result::where('course_id', $subjectId)
                             ->where('class_id', $classId)
                             ->where('school_id', $schoolId)
                             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
                             ->get()
                             ->groupBy('student_id')
-                            ->map(function ($scores) use ($combineOption) {
-                                if ($combineOption == 'sum') {
-                                    return $scores->sum('score');
-                                } elseif ($combineOption == 'average') {
-                                    return $scores->avg('score');
-                                } else {
-                                    return $scores->sum('score');
-                                }
+                            ->map(function ($scores) {
+                                // Sasa tunatumia jumla ya score kwa kila exam_date
+                                return $scores->sum('score');
                             })
                             ->sortDesc()
                             ->values();
 
-            $position = $allScores->search($combineOption == 'average' ? $average : $total) + 1;
+            // Position itahesabiwa kwa kutumia jumla ya score bila kujali combineOption
+            $position = $allScores->search($total) + 1;
 
             $finalData[] = compact('subjectName', 'teacher', 'subjectCode', 'examScores', 'total', 'average', 'position');
         }
