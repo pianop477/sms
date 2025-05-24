@@ -1634,7 +1634,7 @@ class ResultsController extends Controller
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->get();
 
-        return $results;
+        // return $results;
 
         $classResultsGrouped = $results->groupBy('subjectId');
 
