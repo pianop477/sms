@@ -5,10 +5,10 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-10">
-                        <h4 class="header-title text-center text-uppercase">students generated report - {{$reports->title}} ({{$classes->class_code}})</h4>
+                        <h4 class="header-title text-center text-uppercase">students generated report - {{$reports->title}} ({{$myReportData->first()->class_code}})</h4>
                     </div>
                     <div class="col-2">
-                        <a href="{{route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])}}" class="float-right btn btn-info btn-xs"><i class="fas fa-arrow-circle-left"></i> Back</a>
+                        <a href="{{route('results.examTypesByClass', ['school' => Hashids::encode($reports->school_id), 'year' => $year, 'class' => Hashids::encode($reports->class_id)])}}" class="float-right btn btn-info btn-xs"><i class="fas fa-arrow-circle-left"></i> Back</a>
                     </div>
                 </div>
                 <table class="table table-responsive-md table-hover table-striped" id="myTable">
@@ -73,10 +73,10 @@
                                     <td>
                                         <ul class="d-flex justify-content-center list-unstyled mb-0">
                                             <li class="mr-2">
-                                                <a href="{{route('students.report', ['school' => $school, 'year' => $year, 'class' => Hashids::encode($classes->id), 'report' => $report, 'student' => Hashids::encode($student->studentId)])}}" title="Preview Report" class="btn btn-success btn-xs" onclick="return confirm('Are you sure you want to preview report?')">Preview</a>
+                                                <a href="{{route('students.report', ['school' => Hashids::encode($student->student_school_id), 'year' => $year, 'class' => Hashids::encode($student->student_class_id), 'report' => Hashids::encode($reports->id), 'student' => Hashids::encode($student->studentId)])}}" title="Preview Report" class="btn btn-success btn-xs" onclick="return confirm('Are you sure you want to preview report?')">Preview</a>
                                             </li>
                                             <li>
-                                                <form action="{{route('send.sms.combine.report', ['school'=> $school, 'year'=> $year, 'class'=>Hashids::encode($classes->id), 'report'=>$report, 'student'=>Hashids::encode($student->studentId)])}}" method="POST">
+                                                <form action="{{route('send.sms.combine.report', ['school'=> Hashids::encode($student->student_school_id), 'year'=> $year, 'class'=>Hashids::encode($student->student_class_id), 'report'=> Hashids::encode($reports->id), 'student'=>Hashids::encode($student->studentId)])}}" method="POST">
                                                     @csrf
                                                     <button type="submit" title="Send SMS" class="btn btn-warning btn-xs"  onclick="return confirm('Are you sure you want to Re-send SMS?')">SMS</button>
                                                 </form>
