@@ -1550,12 +1550,12 @@ class ResultsController extends Controller
         $classId = Hashids::decode($class);
         $schoolId = Hashids::decode($school);
 
-        $reports = generated_reports::find($reportId[0]);
-        return $reports;
+        $reports = generated_reports::findOrFail($reportId[0]);
+        // return $reports;
 
         //fetch class details
 
-        $classes = Grade::find($classId[0]);
+        $classes = Grade::findOrFail($classId[0]);
         //fetch students lists found in the report
         $studentsReport = Examination_result::query()
                         ->join('students', 'students.id', '=', 'examination_results.student_id')
@@ -1565,11 +1565,12 @@ class ResultsController extends Controller
                         ->select(
                             'examination_results.*',
                             'students.first_name', 'students.middle_name', 'students.last_name', 'students.admission_number', 'students.gender', 'students.id as studentId',
-                            'grades.class_name', 'grades.class_code',
+                            'students.class_id as student_class_id',
+                            'grades.class_name', 'grades.class_code', 'students.school_id as student_school_id',
                             'users.first_name as user_first_name', 'users.last_name as user_last_name', 'users.phone',
                         )
-                        ->where('examination_results.class_id', $classId[0])
-                        ->where('examination_results.school_id', $schoolId[0])
+                        ->where('examination_results.class_id', $reports->class_id)
+                        ->where('examination_results.school_id', $reports->school_id)
                         ->whereIn(DB::raw('DATE(exam_date)'), $reports->exam_dates)
                         ->orderBy('students.first_name')
                         ->get()
@@ -1579,8 +1580,8 @@ class ResultsController extends Controller
 
         $allScores = Examination_result::query()
                             ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                            ->where('examination_results.class_id', $classId[0])
-                            ->where('examination_results.school_id', $schoolId[0])
+                            ->where('examination_results.class_id', $reports->class_id)
+                            ->where('examination_results.school_id', $reports->school_id)
                             ->whereIn(DB::raw('DATE(exam_date)'), $reports->exam_dates)
                             ->get()
                             ->groupBy([
