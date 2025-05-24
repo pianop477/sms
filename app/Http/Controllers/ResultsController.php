@@ -1551,7 +1551,7 @@ class ResultsController extends Controller
         $schoolId = Hashids::decode($school);
 
         $reports = generated_reports::find($reportId[0]);
-        // return $report;
+        return $report;
 
         //fetch class details
 
