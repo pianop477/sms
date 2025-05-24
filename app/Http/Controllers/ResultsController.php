@@ -1609,7 +1609,7 @@ class ResultsController extends Controller
         $reports = generated_reports::find($reportId);
         $examDates = $reports->exam_dates; // array
 
-        return $reports;
+        // return $reports;
 
         $results = Examination_result::query()
             ->join('students', 'students.id', '=', 'examination_results.student_id')
@@ -1633,6 +1633,8 @@ class ResultsController extends Controller
             ->where('examination_results.school_id', $schoolId)
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->get();
+
+        return $results;
 
         $classResultsGrouped = $results->groupBy('subjectId');
 
