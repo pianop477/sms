@@ -74,8 +74,12 @@
                                 <tr>
                                     <td class="text-capitalize">{{ $subject['subjectName'] }} <span class="text-uppercase">({{ $subject['subjectCode'] }})</span></td>
                                     <td class="text-capitalize">{{$subject['teacher']}}</td>
-                                    @foreach($examHeaders as $abbr)
-                                        <td class="text-center">{{ $subject['examScores'][$abbr] ?? '-' }}</td>
+                                    @foreach($examHeadersWithDates as $abbr => $dates)
+                                        @foreach($dates as $date)
+                                            <td class="text-center">
+                                                {{ $subject['examScores'][$abbr][$date] ?? '-' }}
+                                            </td>
+                                        @endforeach
                                     @endforeach
                                     <td class="text-center">{{ $subject['total'] }}</td>
                                     <td class="text-center">{{ number_format($subject['average'], 1) }}</td>
