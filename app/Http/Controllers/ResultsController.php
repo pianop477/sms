@@ -1638,13 +1638,20 @@ class ResultsController extends Controller
 
         $classResultsGrouped = $results->groupBy('subjectId');
 
-       $examHeadersWithDates = $results
+       // Badilisha hii kabla ya kuituma kwenye view
+        $examHeadersWithDates = $results
+            ->groupBy('symbolic_abbr')
+            ->map(function ($group) {
+                return $group->pluck('exam_date')->unique()->values()->toArray();
+            })
+            ->toArray();
+
+        // Au kama unahitaji kuweka kama object:
+        $examHeadersWithDates = $results
             ->groupBy('symbolic_abbr')
             ->map(function ($group) {
                 return $group->pluck('exam_date')->unique()->values();
             });
-
-        $examHeaders = $examHeadersWithDates->keys();
 
         $finalData = [];
         $combineOption = $reports->combine_option ?? 'individual';
