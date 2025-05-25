@@ -71,75 +71,46 @@
                         </thead>
                         <tbody>
                             @foreach ($finalData as $subject)
-                                <tr>
-                                    <td class="text-capitalize">{{ $subject['subjectName'] }} <span class="text-uppercase">({{ $subject['subjectCode'] }})</span></td>
-                                    <td class="text-capitalize">{{$subject['teacher']}}</td>
-                                    @foreach($examHeadersWithDates as $abbr => $dates)
-                                        @foreach($dates as $date)
-                                            <td class="text-center">
-                                                {{ $subject['examScores'][$abbr][$date] ?? '-' }}
-                                            </td>
-                                        @endforeach
-                                    @endforeach
-                                    <td class="text-center">{{ $subject['total'] }}</td>
-                                    <td class="text-center">{{ number_format($subject['average'], 1) }}</td>
-                                    <td class="text-center">
-                                        @if ($results->first()->marking_style === 1)
-                                            @if ($subject['average'] >= 40.5)
-                                            A
-                                            @elseif ($subject['average'] >= 30.5)
-                                                B
-                                            @elseif ($subject['average'] >= 20.5)
-                                                C
-                                            @elseif ($subject['average'] >= 10.5)
-                                                D
-                                            @else
-                                                E
-                                            @endif
-                                        @else
-                                            @if ($subject['average'] >= 80.5)
-                                                A
-                                            @elseif ($subject['average'] >= 60.5)
-                                                B
-                                            @elseif ($subject['average'] >= 40.5)
-                                                C
-                                            @elseif ($subject['average'] >= 20.5)
-                                                D
-                                            @else
-                                                E
-                                            @endif
-                                        @endif
-                                    </td>
-                                    <td class="text-center">{{ $subject['position'] }}</td>
-                                    <td class="text-center" style="font-style: italic">
-                                        @if ($results->first()->marking_style === 1)
-                                            @if ($subject['average'] >= 40.5)
-                                            Excellent
-                                            @elseif ($subject['average'] >= 30.5)
-                                            Good
-                                            @elseif ($subject['average'] >= 20.5)
-                                                Pass
-                                            @elseif ($subject['average'] >= 10.5)
-                                                Poor
-                                            @else
-                                                Fail
-                                            @endif
-                                        @else
-                                            @if ($subject['average'] >= 80.5)
-                                                Excellent
-                                            @elseif ($subject['average'] >= 60.5)
-                                                Good
-                                            @elseif ($subject['average'] >= 40.5)
-                                                Pass
-                                            @elseif ($subject['average'] >= 20.5)
-                                                Poor
-                                            @else
-                                                Fail
-                                            @endif
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
+    <tr>
+        <td class="text-capitalize">{{ $subject['subjectName'] }} <span class="text-uppercase">({{ $subject['subjectCode'] }})</span></td>
+        <td class="text-capitalize">{{$subject['teacher']}}</td>
+
+        @if($combineOption == 'individual')
+            {{-- Display all exam dates for each exam type --}}
+            @foreach($examHeadersWithDates as $abbr => $dates)
+                @if(is_array($dates) || is_object($dates))
+                    @foreach($dates as $date)
+                        <td class="text-center">
+                            {{ $subject['examScores'][$abbr][$date] ?? '-' }}
+                        </td>
+                    @endforeach
+                @else
+                    <td class="text-center">
+                        {{ $subject['examScores'][$abbr] ?? '-' }}
+                    </td>
+                @endif
+            @endforeach
+        @else
+            {{-- For sum or average, just show the combined score per exam type --}}
+            @foreach($examHeaders as $abbr)
+                <td class="text-center">
+                    {{ $subject['examScores'][$abbr] ?? '-' }}
+                </td>
+            @endforeach
+        @endif
+
+        <!-- Rest of your table cells -->
+        <td class="text-center">{{ $subject['total'] }}</td>
+        <td class="text-center">{{ number_format($subject['average'], 1) }}</td>
+        <td class="text-center">
+            <!-- Your grade logic here -->
+        </td>
+        <td class="text-center">{{ $subject['position'] }}</td>
+        <td class="text-center" style="font-style: italic">
+            <!-- Your remark logic here -->
+        </td>
+    </tr>
+@endforeach
                                 <tr>
                                     <td colspan="" class="font-weight-bold">Exam Averages</td>
                                     <td></td>
