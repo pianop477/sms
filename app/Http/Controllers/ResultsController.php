@@ -1653,6 +1653,8 @@ class ResultsController extends Controller
                 return $group->pluck('exam_date')->unique()->values();
             });
 
+        $examHeaders = $examHeadersWithDates->keys();
+
         $finalData = [];
         $combineOption = $reports->combine_option ?? 'individual';
 
