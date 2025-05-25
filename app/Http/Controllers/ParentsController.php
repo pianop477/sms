@@ -37,7 +37,8 @@ class ParentsController extends Controller
     }
 
     // Display a listing of the resource *******************PARENTS ***************************************.
-    public function showAllParents() {
+    public function showAllParents()
+    {
         $user = Auth::user();
         $classes = Grade::where('school_id', '=', $user->school_id, 'AND', 'status', '=', 1)->orderBy('class_code')->get();
         $buses = Transport::where('school_id', '=', $user->school_id, 'AND', 'status', '=', 1)->orderBy('bus_no', 'ASC')->get();
@@ -89,7 +90,7 @@ class ParentsController extends Controller
             'class' => 'required|integer|exists:grades,id',
             'group' => 'required|string|in:a,b,c,d,e',
             'bus_no' => 'nullable|integer|exists:transports,id',
-            'passport' => 'nullable|image|mimes:jpg,png,jpeg|max:512',
+            'passport' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
         ]);
 
         DB::beginTransaction();
@@ -269,7 +270,7 @@ class ParentsController extends Controller
         $decoded = Hashids::decode($parent);
         $loggedUser = Auth::user();
         $parents = Parents::query()->join('users', 'users.id', '=', 'parents.user_id')
-                                    ->select('parents.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.image')
+                                    ->select('parents.*', 'users.first_name', 'users.last_name', 'users.created_at as user_created_at', 'users.email', 'users.gender', 'users.phone', 'users.image')
                                     ->where('parents.id', '=', $decoded[0])
                                     ->first();
         if($parents->school_id != $loggedUser->school_id) {
@@ -317,7 +318,8 @@ class ParentsController extends Controller
     }
 
     // update parents records set to active mode **************************************************
-    public function restoreStatus(Request $request, $parent) {
+    public function restoreStatus(Request $request, $parent)
+    {
         $decoded = Hashids::decode($parent);
         $loggedUser = Auth::user();
         $parents = Parents::findOrFail($decoded[0]);
@@ -420,14 +422,16 @@ class ParentsController extends Controller
             'lname' => 'required|max:255|string',
             'gender' => 'required|string|max:255',
             'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,'.$user->id,
+            'email' => 'nullable|unique:users,email,'.$user->id,
             'street' => 'required|string|max:255',
-            'nullable|image|mimes:jpg,png,jpeg|max:512',
+            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
         ]);
 
         $user->first_name = $request->fname;
         $user->last_name = $request->lname;
         $user->phone = $request->phone;
         $user->gender = $request->gender;
+        $user->email = $request->email;
 
         if($request->hasFile('image')) {
             // Log::info('Image upload detected');

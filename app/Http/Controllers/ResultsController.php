@@ -1638,22 +1638,10 @@ class ResultsController extends Controller
 
         $classResultsGrouped = $results->groupBy('subjectId');
 
-       // Badilisha hii kabla ya kuituma kwenye view
-        $examHeadersWithDates = $results
-            ->groupBy('symbolic_abbr')
-            ->map(function ($group) {
-                return $group->pluck('exam_date')->unique()->values()->toArray();
-            })
-            ->toArray();
-
-        // Au kama unahitaji kuweka kama object:
-        $examHeadersWithDates = $results
-            ->groupBy('symbolic_abbr')
-            ->map(function ($group) {
-                return $group->pluck('exam_date')->unique()->values();
-            });
-
-        $examHeaders = $examHeadersWithDates->keys();
+        $examHeaders = $results
+            ->pluck('symbolic_abbr', 'exam_type_id')
+            ->unique()
+            ->values();
 
         $finalData = [];
         $combineOption = $reports->combine_option ?? 'individual';
@@ -1667,51 +1655,33 @@ class ResultsController extends Controller
             $total = 0;
             $average = 0;
 
-            // Group exam headers with their dates
-            $examHeadersWithDates = $subjectResults
-                ->groupBy('symbolic_abbr')
-                ->map(function ($group) {
-                    return $group->pluck('exam_date')->unique()->values();
-                });
-
             if ($combineOption == 'individual') {
-                foreach ($examHeadersWithDates as $abbr => $dates) {
-                    foreach ($dates as $date) {
-                        $score = $subjectResults->where('symbolic_abbr', $abbr)
-                                            ->where('exam_date', $date)
-                                            ->first()->score ?? null;
-                        $examScores[$abbr][$date] = $score;
-                    }
+                foreach ($examHeaders as $examTypeId => $abbr) {
+                    $score = $subjectResults->where('symbolic_abbr', $abbr)->first()->score ?? null;
+                    $examScores[$abbr] = $score;
                 }
-                // Calculate total and average for individual option
-                $total = collect($examScores)->flatten()->filter()->sum();
-                $average = collect($examScores)->flatten()->filter()->count() > 0
-                        ? $total / collect($examScores)->flatten()->filter()->count()
-                        : 0;
+                $total = collect($examScores)->filter()->sum();
+                $average = count(array_filter($examScores)) > 0 ? $total / count(array_filter($examScores)) : 0;
 
             } elseif ($combineOption == 'sum') {
-                foreach ($examHeadersWithDates as $abbr => $dates) {
-                    $score = $subjectResults->where('symbolic_abbr', $abbr)
-                                        ->sum('score') ?? 0;
+                foreach ($examHeaders as $examTypeId => $abbr) {
+                    $score = $subjectResults->where('symbolic_abbr', $abbr)->first()->score ?? 0;
                     $examScores[$abbr] = $score;
                 }
                 $total = collect($examScores)->sum();
-                $average = collect($examScores)->filter()->count() > 0
-                        ? $total / collect($examScores)->filter()->count()
-                        : 0;
+                $average = count(array_filter($examScores)) > 0 ? $total / count(array_filter($examScores)) : 0;
 
             } elseif ($combineOption == 'average') {
-                foreach ($examHeadersWithDates as $abbr => $dates) {
-                    $avgScore = $subjectResults->where('symbolic_abbr', $abbr)
-                                            ->avg('score') ?? null;
-                    $examScores[$abbr] = $avgScore;
+                foreach ($examHeaders as $examTypeId => $abbr) {
+                    $score = $subjectResults->where('symbolic_abbr', $abbr)->first()->score ?? null;
+                    $examScores[$abbr] = $score;
                 }
                 $filtered = collect($examScores)->filter();
                 $total = 0;
                 $average = $filtered->count() > 0 ? $filtered->avg() : 0;
             }
 
-            // Calculate position for the student in this subject
+            // Calculate position
             $allScores = Examination_result::where('course_id', $subjectId)
                             ->where('class_id', $classId)
                             ->where('school_id', $schoolId)
@@ -1724,7 +1694,6 @@ class ResultsController extends Controller
                                 } elseif ($combineOption == 'average') {
                                     return $scores->avg('score');
                                 } else {
-                                    // For individual, sum all scores across all exams
                                     return $scores->sum('score');
                                 }
                             })
@@ -1789,7 +1758,7 @@ class ResultsController extends Controller
 
         return view('generated_reports.index', compact(
                 'finalData',
-                'examHeaders',
+                // 'examHeaders',
                 'studentGeneralAverage',
                 'examHeadersWithDates',
                 'results',
@@ -1801,7 +1770,6 @@ class ResultsController extends Controller
                 'student', 'studentId',
                 'reports',
                 'schoolInfo',
-                'combineOption',
                 'school', 'report', 'class', 'studentTotalScores', 'totalScoreForStudent'
         ));
     }
