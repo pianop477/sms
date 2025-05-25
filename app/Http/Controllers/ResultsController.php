@@ -1801,6 +1801,7 @@ class ResultsController extends Controller
                 'student', 'studentId',
                 'reports',
                 'schoolInfo',
+                'combineOption',
                 'school', 'report', 'class', 'studentTotalScores', 'totalScoreForStudent'
         ));
     }
