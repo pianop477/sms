@@ -25,7 +25,7 @@ return new class extends Migration
             $table->foreign('exam_type_id')->references('id')->on('examinations')->onDelete('cascade');
             $table->unsignedBigInteger('school_id');
             $table->foreign('school_id')->references('id')->on('schools')->onDelete('cascade');
-            $table->float('score');
+            $table->float('score')->nullable();
             $table->string('Exam_term');
             $table->integer('marking_style');
             $table->string('status')->default(1);

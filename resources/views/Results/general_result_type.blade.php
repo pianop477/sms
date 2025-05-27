@@ -112,7 +112,7 @@
                                                             <div class="col-md-12 mb-3">
                                                                 <div class="row">
                                                                     <div class="col-6">
-                                                                        <p class="text-danger" style="font-weight: bold">Select Examination Results Dates</p>
+                                                                        <p class="text-danger" style="font-weight: bold">Examination Results data sets</p>
                                                                         <hr>
                                                                         @if ($groupedByMonth->isEmpty())
                                                                             <p class="text-danger">No exam results records found</p>
@@ -123,7 +123,7 @@
                                                                         @endif
                                                                     </div>
                                                                     <div class="col-6">
-                                                                        <p class="text-danger fw-bold">Report Aggregation Method</p>
+                                                                        <p class="text-danger fw-bold">Aggregation Method</p>
                                                                         <input type="radio" name="combine_option" value="sum" required>
                                                                         <label>Display Total Marks Only</label> <br>
 
@@ -149,6 +149,22 @@
                                 </div>
                             </div>
                             <hr>
+                            @if (Session::has('success'))
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <strong>Success!</strong> {{ Session::get('success') }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            @endif
+                            @if (Session::has('error'))
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <strong>Success!</strong> {{ Error::get('error') }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            @endif
                             <table class="table table-bordered table-responsive-md table-striped table-hover" id="myTable">
                                 <thead>
                                     <tr>

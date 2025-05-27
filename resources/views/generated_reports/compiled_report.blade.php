@@ -69,7 +69,8 @@
         }
         .summary-row td {
             font-weight: bold;
-            background-color: #f9f9f9;
+            padding: 3px;
+            /* background-color: #f9f9f9; */
         }
         .excellent {
             background-color: #75f430;
@@ -146,6 +147,7 @@
         </td>
     </tr>
 </table>
+<p style="padding: 3px; background:rgb(187, 163, 56); text-align:center; font-size: 14px;"><strong>Student's Information</strong></p>
 <table class="student-info">
     <tr>
         <td width="50%">
@@ -175,10 +177,10 @@
                 <th rowspan="2">Remarks</th>
             </tr>
             <tr>
-                @foreach($examHeadersWithDates as $abbr => $date)
-                    <th class="compact-header">
-                        <span class="" style="text-transform: uppercase">{{ $abbr }}</span><br>
-                        <small>{{ \Carbon\Carbon::parse($date)->format('d M') }}</small>
+                @foreach($examHeaders as $exam)
+                    <th class="compact-header text-center">
+                        <span style="text-transform: uppercase;" class="text-sm">{{ $exam['abbr'] }}</span><br>
+                        <small>{{ \Carbon\Carbon::parse($exam['date'])->format('d-M') }}</small>
                     </th>
                 @endforeach
             </tr>
@@ -188,11 +190,11 @@
                 <tr>
                     <td class="subject-name" style="text-transform: capitalize">{{ $subject['subjectName'] }} <span class="" style="text-transform: uppercase">({{ $subject['subjectCode'] }})</span></td>
                     <td class="teacher-name">{{$subject['teacher']}}</td>
-                    @foreach($examHeaders as $abbr)
-                        <td class="exam-score">{{ $subject['examScores'][$abbr] ?? 'X' }}</td>
+                     @foreach($examHeaders as $exam)
+                        <td class="exam-score text-center">{{ $subject['examScores'][$exam['abbr'].'_'.$exam['date']] ?? 'X' }}</td>
                     @endforeach
                     <td>{{ $subject['total'] }}</td>
-                    <td>{{ number_format($subject['average'], 1) }}</td>
+                    <td>{{ number_format($subject['average'], 2) }}</td>
                     <td>
                         @if ($results->first()->marking_style === 1)
                             @if ($subject['average'] >= 40.5) A
@@ -230,11 +232,13 @@
             <tr class="summary-row">
                 <td>Exam Averages</td>
                 <td></td>
-                @foreach ($examHeaders as $abbr)
-                    <td>{{ number_format($examAverages[$abbr] ?? 0, 1) }}</td>
+                @foreach ($examHeaders as $exam)
+                    <td class="text-center font-weight-bold">
+                        {{ number_format($examAverages[$exam['abbr'].'_'.$exam['date']] ?? 0, 2) }}
+                    </td>
                 @endforeach
-                <td>{{ number_format($sumOfAverages, 1) }}</td>
-                <td>{{ number_format($studentGeneralAverage, 1) }}</td>
+                <td>{{ number_format($sumOfAverages, 2) }}</td>
+                <td>{{ number_format($studentGeneralAverage, 2) }}</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -243,21 +247,25 @@
             <tr class="summary-row">
                 <td>Exam Grades</td>
                 <td></td>
-                @foreach ($examHeaders as $abbr)
-                    <td>
+                @foreach ($examHeaders as $exam)
+                    @php
+                        $examKey = $exam['abbr'].'_'.$exam['date'];
+                        $averageScore = $examAverages[$examKey] ?? 0;
+                    @endphp
+                    <td class="text-center">
                         @if ($results->first()->marking_style === 1)
-                            @if ($examAverages[$abbr] >= 40.5) A
-                            @elseif ($examAverages[$abbr] >= 30.5) B
-                            @elseif ($examAverages[$abbr] >= 20.5) C
-                            @elseif ($examAverages[$abbr] >= 10.5) D
+                            @if ($averageScore >= 40.5) A
+                            @elseif ($averageScore >= 30.5) B
+                            @elseif ($averageScore >= 20.5) C
+                            @elseif ($averageScore >= 10.5) D
                             @else E @endif
                         @else
-                            @if ($examAverages[$abbr] >= 80.5) A
-                            @elseif ($examAverages[$abbr] >= 60.5) B
-                            @elseif ($examAverages[$abbr] >= 40.5) C
-                            @elseif ($examAverages[$abbr] >= 20.5) D
+                            @if ($averageScore >= 80.5) A
+                            @elseif ($averageScore >= 60.5) B
+                            @elseif ($averageScore >= 40.5) C
+                            @elseif ($averageScore >= 20.5) D
                             @else E @endif
-                        @endif
+                            @endif
                     </td>
                 @endforeach
                 <td></td>
@@ -287,9 +295,9 @@
 
             <tr class="summary-row">
                 <td colspan="2">
-                    General Average: <strong>{{ number_format($studentGeneralAverage, 2) }}</strong>
+                    General Average: <strong>{{ number_format($studentGeneralAverage, 3) }}</strong>
                 </td>
-                <td colspan="{{ count($examHeaders) }}" class="text-center">
+                <td colspan="2" class="text-center">
                     Grade: <strong>
                     @if ($results->first()->marking_style === 1)
                         @if ($studentGeneralAverage >= 40.5) "A"
@@ -309,7 +317,7 @@
                 <td colspan="3">
                     Position: <strong style="text-decoration:underline">{{ $generalPosition }}</strong> out of <strong style="text-decoration:underline">{{ $totalStudents }}</strong>
                 </td>
-                <td colspan="2" class="text-center">
+                <td colspan="{{count($examHeaders)}}" class="text-center">
                     General Remarks:
                     @if ($results->first()->marking_style === 1)
                         @if ($studentGeneralAverage >= 40.5)
@@ -340,10 +348,35 @@
             </tr>
         </tbody>
     </table>
-
+        @if(count($examSpecifications) > 0)
+        <table class="report-table" style="margin-top: 20px;">
+        <tbody>
+            <tr>
+                <td colspan="7" style="background: rgb(187, 163, 56); font-size: 12px"><strong>Specification Table</strong></td>
+            </tr>
+            <tr>
+                <th colspan="2">Examination Code</th>
+                <th colspan="3">Examination Name</th>
+                <th colspan="2">Examination Date</th>
+            </tr>
+            @foreach ($examSpecifications as $spec )
+                <tr>
+                    <td colspan="2" style="text-transform: uppercase">{{ $spec['abbr'] }}</td>
+                    <td colspan="3" style="text-transform: capitalize">{{ $spec['full_name'] }}</td>
+                    <td colspan="2">{{ \Carbon\Carbon::parse($spec['date'])->format('d F Y') }}</td>
+                </tr>
+            @endforeach
+            <tr>
+                <td colspan="7" style="text-align: center; font-style: italic;">
+                    Note: "X" indicates that the student did not take the exam.
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    @endif
 @elseif ($reports->combine_option === 'sum')
     <!-- Similar optimized table structure for 'sum' option -->
-    <table class="report-table" style="font-size: 14px;">
+    <table class="report-table" style="font-size: 13px;">
         <thead>
             <tr>
                 <th rowspan="2" class="subject-name">Subject Name (Code)</th>
@@ -364,7 +397,7 @@
                     <td class="subject-name" style="text-transform: capitalize">{{ $subject['subjectName'] }} <span class="" style="text-transform: uppercase">({{ $subject['subjectCode'] }})</span></td>
                     <td class="teacher-name">{{$subject['teacher']}}</td>
                     <td>{{ $subject['total'] }}</td>
-                    <td>{{ number_format($subject['average'], 1) }}</td>
+                    <td>{{ number_format($subject['average'], 2) }}</td>
                     <td>
                         @if ($results->first()->marking_style === 1)
                             @if ($subject['average'] >= 40.5) A
@@ -408,7 +441,7 @@
                     Total Marks: <span class="font-weight-bold">{{ $totalScoreForStudent }}</span>
                 </td>
                 <td colspan="">
-                    General Average: <strong>{{ number_format($studentGeneralAverage, 2) }}</strong>
+                    General Average: <strong>{{ number_format($studentGeneralAverage, 3) }}</strong>
                 </td>
                 <td colspan="" class="text-center">
                     Grade: <strong>
@@ -463,7 +496,7 @@
     </table>
 @else
     <!-- Similar optimized table structure for default/average option -->
-    <table class="report-table" style="font-size: 14px;">
+    <table class="report-table" style="font-size: 13px;">
         <thead>
             <tr>
                 <th rowspan="2" class="subject-name">Subject Name (Code)</th>
@@ -482,7 +515,7 @@
                 <tr>
                     <td class="subject-name" style="text-transform: capitalize">{{ $subject['subjectName'] }} <span class="" style="text-transform: uppercase">({{ $subject['subjectCode'] }})</span></td>
                     <td class="teacher-name">{{$subject['teacher']}}</td>
-                    <td>{{ number_format($subject['average'], 1) }}</td>
+                    <td>{{ number_format($subject['average'], 2) }}</td>
                     <td>
                         @if ($results->first()->marking_style === 1)
                             @if ($subject['average'] >= 40.5) A
@@ -523,7 +556,7 @@
 
             <tr class="summary-row">
                 <td colspan="">
-                    General Average: <strong>{{ number_format($studentGeneralAverage, 2) }}</strong>
+                    General Average: <strong>{{ number_format($studentGeneralAverage, 3) }}</strong>
                 </td>
                 <td colspan="" class="text-center">
                     Grade: <strong>

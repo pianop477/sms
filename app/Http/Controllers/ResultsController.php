@@ -493,7 +493,6 @@ class ResultsController extends Controller
                 return view('Results.general_result_type', compact('schools', 'reports', 'groupedByMonth', 'compiledGroupByExam', 'year', 'exams', 'grades', 'classes', 'groupedByExamType'));
     }
 
-
     //function for displaying general results by term ***************************************
     public function monthsByExamType($school, $year, $class, $examType)
     {
@@ -1638,10 +1637,16 @@ class ResultsController extends Controller
 
         $classResultsGrouped = $results->groupBy('subjectId');
 
-        $examHeaders = $results
-            ->pluck('symbolic_abbr', 'exam_type_id')
-            ->unique()
-            ->values();
+        // Badilisha uundaji wa examHeaders kuwa kwa kila mtihani tofauti
+        $examHeaders = $results->map(function($item) {
+            return [
+                'abbr' => $item->symbolic_abbr,
+                'date' => $item->exam_date,
+                'display' => $item->symbolic_abbr . ' ' . \Carbon\Carbon::parse($item->exam_date)->format('d M Y')
+            ];
+        })->unique(function($item) {
+            return $item['abbr'].$item['date']; // Unique kwa mchanganyiko wa abbreviation na tarehe
+        })->values();
 
         $finalData = [];
         $combineOption = $reports->combine_option ?? 'individual';
@@ -1656,51 +1661,51 @@ class ResultsController extends Controller
             $average = 0;
 
             if ($combineOption == 'individual') {
-                foreach ($examHeaders as $examTypeId => $abbr) {
-                    $score = $subjectResults->where('symbolic_abbr', $abbr)->first()->score ?? null;
-                    $examScores[$abbr] = $score;
+                foreach ($examHeaders as $exam) {
+                    $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
+                            ->where('exam_date', $exam['date'])
+                            ->first()->score ?? null;
+                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
                 }
+
                 $total = collect($examScores)->filter()->sum();
-                $average = count(array_filter($examScores)) > 0 ? $total / count(array_filter($examScores)) : 0;
+                $average = collect($examScores)->filter()->avg() ?? 0;
 
             } elseif ($combineOption == 'sum') {
-                foreach ($examHeaders as $examTypeId => $abbr) {
-                    $score = $subjectResults->where('symbolic_abbr', $abbr)->first()->score ?? 0;
-                    $examScores[$abbr] = $score;
+                foreach ($examHeaders as $exam) {
+                    $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
+                                            ->where('exam_date', $exam['date'])
+                                            ->first()->score ?? null;
+                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
                 }
                 $total = collect($examScores)->sum();
                 $average = count(array_filter($examScores)) > 0 ? $total / count(array_filter($examScores)) : 0;
 
             } elseif ($combineOption == 'average') {
-                foreach ($examHeaders as $examTypeId => $abbr) {
-                    $score = $subjectResults->where('symbolic_abbr', $abbr)->first()->score ?? null;
-                    $examScores[$abbr] = $score;
+                foreach ($examHeaders as $exam) {
+                    $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
+                                            ->where('exam_date', $exam['date'])
+                                            ->first()->score ?? null;
+                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
                 }
                 $filtered = collect($examScores)->filter();
                 $total = 0;
                 $average = $filtered->count() > 0 ? $filtered->avg() : 0;
             }
 
-            // Calculate position
             $allScores = Examination_result::where('course_id', $subjectId)
-                            ->where('class_id', $classId)
-                            ->where('school_id', $schoolId)
-                            ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                            ->get()
-                            ->groupBy('student_id')
-                            ->map(function ($scores) use ($combineOption) {
-                                if ($combineOption == 'sum') {
-                                    return $scores->sum('score');
-                                } elseif ($combineOption == 'average') {
-                                    return $scores->avg('score');
-                                } else {
-                                    return $scores->sum('score');
-                                }
-                            })
-                            ->sortDesc()
-                            ->values();
+                        ->where('class_id', $classId)
+                        ->where('school_id', $schoolId)
+                        ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                        ->get()
+                        ->groupBy('student_id')
+                        ->map(function ($scores) {
+                            return $scores->sum('score'); // Daima tumia jumla kwa rank
+                        })
+                        ->sortDesc()
+                        ->values();
 
-            $position = $allScores->search($combineOption == 'average' ? $average : $total) + 1;
+            $position = $allScores->search($total) + 1;
 
             $finalData[] = compact('subjectName', 'teacher', 'subjectCode', 'examScores', 'total', 'average', 'position');
         }
@@ -1715,26 +1720,28 @@ class ResultsController extends Controller
                 return [$item->symbolic_abbr => $item->exam_date];
             })->unique()->toBase(); // toBase() to allow ->values()
 
-        // =================== EXAM AVERAGE PER EXAM DATE ===================
+       // =================== EXAM AVERAGE PER EXAM DATE ===================
         $examAverages = [];
-        foreach ($examHeadersWithDates as $abbr => $date) {
+        foreach ($examHeaders as $exam) {
             $totalPerExam = 0;
             $countPerExam = 0;
+            $abbr = $exam['abbr'];
+            $date = $exam['date'];
 
             foreach ($finalData as $subject) {
-                $score = $subject['examScores'][$abbr] ?? null;
+                $score = $subject['examScores'][$abbr.'_'.$date] ?? null;
                 if (is_numeric($score)) {
                     $totalPerExam += $score;
                     $countPerExam++;
                 }
             }
 
-            $examAverages[$abbr] = $countPerExam > 0 ? round($totalPerExam / $countPerExam, 1) : 0;
+            $examAverages[$abbr.'_'.$date] = $countPerExam > 0 ? number_format($totalPerExam / $countPerExam, 2) : 0;
         }
 
         // =================== GENERAL AVERAGE ===================
         $sumOfAverages = array_sum($examAverages);
-        $studentGeneralAverage = count($examAverages) > 0 ? round($sumOfAverages / count($examAverages), 1) : 0;
+        $studentGeneralAverage = count($examAverages) > 0 ? number_format($sumOfAverages / count($examAverages), 2) : 0;
 
         // =================== GENERAL POSITION ===================
         $studentId = $results->first()->student_id ?? null;
@@ -1756,9 +1763,24 @@ class ResultsController extends Controller
         $totalStudents = count($allStudentIds);
         $totalScoreForStudent = $results->sum('score');
 
+        // =================== EXAM SPECIFICATIONS ===================
+        $examSpecifications = $results
+            ->map(function($item) {
+                return [
+                    'abbr' => $item->symbolic_abbr,
+                    'full_name' => $item->exam_type,
+                    'date' => $item->exam_date
+                ];
+            })
+            ->unique(function($item) {
+                return $item['abbr'].$item['full_name'];
+            })
+            ->values()
+            ->keyBy('abbr'); // We key by abbreviation for easy lookup
+
         return view('generated_reports.index', compact(
                 'finalData',
-                // 'examHeaders',
+                'examHeaders',
                 'studentGeneralAverage',
                 'examHeadersWithDates',
                 'results',
@@ -1768,8 +1790,8 @@ class ResultsController extends Controller
                 'generalPosition',
                 'totalStudents',
                 'student', 'studentId',
-                'reports',
-                'schoolInfo',
+                'reports', 'combineOption',
+                'schoolInfo', 'examSpecifications',
                 'school', 'report', 'class', 'studentTotalScores', 'totalScoreForStudent'
         ));
     }
@@ -1782,190 +1804,215 @@ class ResultsController extends Controller
         $reportId = Hashids::decode($report)[0];
 
         $reports = generated_reports::findOrFail($reportId);
-        $examDates = $reports->exam_dates; // array of dates
 
-        $results = Examination_result::query()
-                        ->join('students', 'students.id', '=', 'examination_results.student_id')
-                        ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                        ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                        ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                        ->join('schools', 'schools.id', '=', 'examination_results.school_id')
-                        ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
-                        ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-                        ->select(
-                            'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.group', 'students.gender', 'students.image',
-                            'students.parent_id', // for fetching parent
-                            'subjects.id as subjectId', 'subjects.course_name', 'subjects.course_code', 'students.admission_number',
-                            'grades.class_name', 'grades.class_code',
-                            'examination_results.*',
-                            'examinations.exam_type', 'examinations.symbolic_abbr',
-                            'schools.school_name', 'schools.school_reg_no', 'schools.postal_address', 'schools.postal_name', 'schools.logo', 'schools.country',
-                            'users.first_name as teacher_first_name', 'users.last_name as teacher_last_name'
-                        )
-                        ->where('examination_results.student_id', $studentId)
-                        ->where('examination_results.class_id', $classId)
-                        ->where('examination_results.school_id', $schoolId)
-                        ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                        ->get();
+        if($reports->status == 1) {
+            $examDates = $reports->exam_dates; // array of dates
+
+            $results = Examination_result::query()
+                            ->join('students', 'students.id', '=', 'examination_results.student_id')
+                            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+                            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+                            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+                            ->join('schools', 'schools.id', '=', 'examination_results.school_id')
+                            ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
+                            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+                            ->select(
+                                'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.group', 'students.gender', 'students.image',
+                                'students.parent_id', // for fetching parent
+                                'subjects.id as subjectId', 'subjects.course_name', 'subjects.course_code', 'students.admission_number',
+                                'grades.class_name', 'grades.class_code',
+                                'examination_results.*',
+                                'examinations.exam_type', 'examinations.symbolic_abbr',
+                                'schools.school_name', 'schools.school_reg_no', 'schools.postal_address', 'schools.postal_name', 'schools.logo', 'schools.country',
+                                'users.first_name as teacher_first_name', 'users.last_name as teacher_last_name'
+                            )
+                            ->where('examination_results.student_id', $studentId)
+                            ->where('examination_results.class_id', $classId)
+                            ->where('examination_results.school_id', $schoolId)
+                            ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                            ->get();
 
 
-        if ($results->isEmpty()) {
-            Alert()->toast('No results found for this student.', 'error');
-            return to_route('students.combined.report', ['school' => $school, 'year' => $year, 'class' => $class, 'report' => $report]);
-        }
-
-        $classResultsGrouped = $results->groupBy('subjectId');
-        $examHeaders = $results->pluck('symbolic_abbr', 'exam_type_id')->unique()->values();
-
-        $finalData = [];
-        $combineOption = $reports->combine_option ?? 'individual';
-
-        //find total score of a student
-        $studentTotal = $results->sum('score');
-
-        foreach ($classResultsGrouped as $subjectId => $subjectResults) {
-            $subjectName = $subjectResults->first()->course_name;
-            $subjectCode = $subjectResults->first()->course_code;
-            $teacher = $subjectResults->first()->teacher_first_name . '. ' . $subjectResults->first()->teacher_last_name[0];
-
-            $examScores = [];
-            $total = 0;
-            $average = 0;
-
-            foreach ($examHeaders as $abbr) {
-                $score = $subjectResults->where('symbolic_abbr', $abbr)->first()->score ?? null;
-                $examScores[$abbr] = $score;
+            if ($results->isEmpty()) {
+                Alert()->toast('No results found for this student.', 'error');
+                return to_route('students.combined.report', ['school' => $school, 'year' => $year, 'class' => $class, 'report' => $report]);
             }
 
-            if ($combineOption === 'sum' || $combineOption === 'individual') {
-                $total = collect($examScores)->filter()->sum();
-            }
+            $classResultsGrouped = $results->groupBy('subjectId');
+            $examHeaders = $results->map(function($item) {
+                return [
+                    'abbr' => $item->symbolic_abbr,
+                    'date' => $item->exam_date,
+                    'display' => $item->symbolic_abbr . ' ' . \Carbon\Carbon::parse($item->exam_date)->format('d M Y')
+                ];
+            })->unique(function($item) {
+                return $item['abbr'].$item['date']; // Unique kwa mchanganyiko wa abbreviation na tarehe
+            })->values();
 
-            if ($combineOption === 'average') {
-                $filtered = collect($examScores)->filter();
-                $average = $filtered->count() > 0 ? $filtered->avg() : 0;
-            } else {
-                $average = count(array_filter($examScores)) > 0 ? $total / count(array_filter($examScores)) : 0;
-            }
+            $finalData = [];
+            $combineOption = $reports->combine_option ?? 'individual';
 
-            $allScores = Examination_result::where('course_id', $subjectId)
+            //find total score of a student
+            $studentTotal = $results->sum('score');
+
+            foreach ($classResultsGrouped as $subjectId => $subjectResults) {
+                $subjectName = $subjectResults->first()->course_name;
+                $subjectCode = $subjectResults->first()->course_code;
+                $teacher = $subjectResults->first()->teacher_first_name . '. ' . $subjectResults->first()->teacher_last_name[0];
+
+                $examScores = [];
+                $total = 0;
+                $average = 0;
+
+                foreach ($examHeaders as $exam) {
+                    $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
+                                            ->where('exam_date', $exam['date'])
+                                            ->first()->score ?? null;
+                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
+                }
+
+                if ($combineOption === 'sum' || $combineOption === 'individual') {
+                    $total = collect($examScores)->filter()->sum();
+                }
+
+                if ($combineOption === 'average') {
+                    $filtered = collect($examScores)->filter();
+                    $average = $filtered->count() > 0 ? $filtered->avg() : 0;
+                } else {
+                    $average = count(array_filter($examScores)) > 0 ? $total / count(array_filter($examScores)) : 0;
+                }
+
+                $allScores = Examination_result::where('course_id', $subjectId)
                             ->where('class_id', $classId)
                             ->where('school_id', $schoolId)
                             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
                             ->get()
                             ->groupBy('student_id')
-                            ->map(fn($scores) => $combineOption === 'average' ? $scores->avg('score') : $scores->sum('score'))
+                            ->map(function ($scores) {
+                                return $scores->sum('score'); // Daima tumia jumla kwa rank
+                            })
                             ->sortDesc()
                             ->values();
 
-            $position = $allScores->search($combineOption === 'average' ? $average : $total) + 1;
+                $position = $allScores->search($total) + 1;
 
-            $finalData[] = compact('subjectName', 'teacher', 'subjectCode', 'examScores', 'total', 'average', 'position');
-        }
-
-        $student = $results->first();
-        $schoolInfo = $results->first();
-
-        // ======= GENERAL AVERAGE ==========
-        $examHeadersWithDates = $results->mapWithKeys(fn($item) => [$item->symbolic_abbr => $item->exam_date])->unique()->toBase();
-        $examAverages = [];
-        foreach ($examHeadersWithDates as $abbr => $date) {
-            $scores = array_filter(array_column($finalData, 'examScores'));
-            $subjectTotal = 0;
-            $subjectCount = 0;
-            foreach ($finalData as $subject) {
-                $score = $subject['examScores'][$abbr] ?? null;
-                if (is_numeric($score)) {
-                    $subjectTotal += $score;
-                    $subjectCount++;
-                }
+                $finalData[] = compact('subjectName', 'teacher', 'subjectCode', 'examScores', 'total', 'average', 'position');
             }
-            $examAverages[$abbr] = $subjectCount > 0 ? round($subjectTotal / $subjectCount, 1) : 0;
-        }
 
-        $sumOfAverages = array_sum($examAverages);
-        $studentGeneralAverage = count($examAverages) > 0 ? round($sumOfAverages / count($examAverages), 1) : 0;
+            $student = $results->first();
+            $schoolInfo = $results->first();
 
-        // ======= GENERAL POSITION ==========
-        $studentTotalScores = Examination_result::where('class_id', $classId)
-                                        ->where('school_id', $schoolId)
-                                        ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                                        ->get()
-                                        ->groupBy('student_id')
-                                        ->map(fn($results) => $results->sum('score'))
-                                        ->sortDesc();
+            // ======= GENERAL AVERAGE ==========
+            $examHeadersWithDates = $results
+                ->mapWithKeys(function ($item) {
+                    return [$item->symbolic_abbr => $item->exam_date];
+                })->unique()->toBase();
 
-        // 1. Panga alama za kila mwanafunzi kwa mpangilio (DESC) na uhifadhi kama array
-        $sortedScores = $studentTotalScores->values()->all();
+            $examAverages = [];
+            foreach ($examHeaders as $exam) {
+                $totalPerExam = 0;
+                $countPerExam = 0;
+                $abbr = $exam['abbr'];
+                $date = $exam['date'];
 
-        // 2. Chukua alama zisizorudiwa (unique scores) na zipange kubwa → ndogo
-        $uniqueScores = array_values(array_unique($sortedScores));
-        rsort($uniqueScores); // Sort high to low
+                foreach ($finalData as $subject) {
+                    $score = $subject['examScores'][$abbr.'_'.$date] ?? null;
+                    if (is_numeric($score)) {
+                        $totalPerExam += $score;
+                        $countPerExam++;
+                    }
+                }
 
-        // 3. Tafuta nafasi ya mwanafunzi kwa kurejelea alama yake
-        $studentScore = $studentTotalScores->get($studentId, 0);
-        $generalPosition = $studentScore ? array_search($studentScore, $uniqueScores) + 1 : '-';
+                $examAverages[$abbr.'_'.$date] = $countPerExam > 0 ? number_format($totalPerExam / $countPerExam, 2) : 0;
+            }
 
-        // 4. Jumla ya wanafunzi (totalStudents)
-        $totalStudents = $studentTotalScores->count();
+            $sumOfAverages = array_sum($examAverages);
+            $studentGeneralAverage = count($examAverages) > 0 ? number_format($sumOfAverages / count($examAverages), 2) : 0;
 
-        // ========== FETCH PHONE NUMBER ==========
-        $parentId = $student->parent_id ?? null;
-        $phoneNumber = null;
+            // ======= GENERAL POSITION ==========
+            $studentId = $results->first()->student_id ?? null;
 
-        if ($parentId) {
-            $parent = Parents::query()->join('users', 'users.id', '=', 'parents.user_id')
-                                ->where('parents.id', $parentId)
-                                ->select('parents.*', 'users.phone')
-                                ->first();
+            $sortedScores = Examination_result::where('class_id', $classId)
+                                ->where('school_id', $schoolId)
+                                ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                                ->get()
+                                ->groupBy('student_id')
+                                ->map(function ($studentResults) {
+                                    return $studentResults->sum('score');
+                                })
+                                ->sortDesc();
 
-            $phoneNumber = $this->formatPhoneNumber($parent->phone);
-        }
+            // Pata alama zisizorudiwa kwa kutumia unique() na sortDesc() za Collection
+            $uniqueScores = $sortedScores->unique()->sortDesc()->values();
 
-        if (!$phoneNumber) {
-            // return response()->json(['message' => 'Phone number not found for parent.'], 404);
-            Alert()->toast('Phone number not found for parent.', 'error');
+            // Tafuta nafasi ya mwanafunzi
+            $studentScore = $sortedScores->get($studentId, 0);
+            $generalPosition = $studentScore ? $uniqueScores->search($studentScore) + 1 : '-';
+
+            // Jumla ya wanafunzi
+            $totalStudents = $sortedScores->count();
+
+            // ========== FETCH PHONE NUMBER ==========
+            $parentId = $student->parent_id ?? null;
+            $phoneNumber = null;
+
+            if ($parentId) {
+                $parent = Parents::query()->join('users', 'users.id', '=', 'parents.user_id')
+                                    ->where('parents.id', $parentId)
+                                    ->select('parents.*', 'users.phone')
+                                    ->first();
+
+                $phoneNumber = $this->formatPhoneNumber($parent->phone);
+            }
+
+            if (!$phoneNumber) {
+                // return response()->json(['message' => 'Phone number not found for parent.'], 404);
+                Alert()->toast('Phone number not found for parent.', 'error');
+                return to_route('students.combined.report', ['school' => $school, 'year' => $year, 'class' => $class, 'report' => $report]);
+            }
+
+            // ========== BUILD SMS MESSAGE ==========
+            $studentName = $student->first_name . ', ' . $student->last_name[0];
+            $studentGender = strtolower($student->gender) == 'male' ? 'He' : 'She';
+            $className = $student->class_name;
+            $schoolName = $schoolInfo->school_name;
+            $reportName = $reports->title;
+            $date = Carbon::parse($reports->created_at)->format('d-m-Y');
+            $url = 'https://shuleapp.tech';
+
+            $message = "Matokeo ya ". strtoupper($studentName)."\n";
+            $message .= "Mtihani wa ". strtoupper($reportName)."\n";
+            $message .= "Tar. {$date} ni: \n";
+            $message .= "Jumla: {$studentTotal}, Wastani {$studentGeneralAverage}, Nafasi ya {$generalPosition} kati ya {$totalStudents}\n";
+            $message .= "Tembelea {$url} kuona ripoti";
+
+            // ========== SEND SMS ==========
+            try {
+                // Simulate SMS for now
+                $nextSmsService = new NextSmsService();
+                $payload = [
+                    'from' => $schoolInfo->sender_id ?? "SHULE APP",
+                    'to' => $phoneNumber,
+                    'text' => $message,
+                    'reference' => uniqid()
+                ];
+
+                $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+
+                // Log::info("SMS to $phoneNumber: $message");
+                // return response()->json(['message' => 'SMS sent successfully.']);
+                Alert()->toast('Results SMS has been Re-sent successfully', 'success');
+                return to_route('students.combined.report', ['school'=>$school, 'year'=>$year, 'class'=> $class, 'report'=>$report]);
+
+            } catch (\Exception $e) {
+                Log::error("Failed to send SMS: " . $e->getMessage());
+                // return response()->json(['message' => 'Failed to send SMS.'], 500);
+                Alert()->toast('Failed to send SMS', 'error');
+                return to_route('students.combined.report', ['school'=>$school, 'year'=>$year, 'class'=> $class, 'report'=>$report]);
+            }
+        } else {
+            Alert()->toast('This report data set is locked 🔐, please unlock it first', 'error');
             return to_route('students.combined.report', ['school' => $school, 'year' => $year, 'class' => $class, 'report' => $report]);
-        }
-
-        // ========== BUILD SMS MESSAGE ==========
-        $studentName = $student->first_name . ', ' . $student->last_name[0];
-        $studentGender = strtolower($student->gender) == 'male' ? 'He' : 'She';
-        $className = $student->class_name;
-        $schoolName = $schoolInfo->school_name;
-        $reportName = $reports->title;
-        $date = Carbon::parse($reports->created_at)->format('d-m-Y');
-        $url = 'https://shuleapp.tech';
-
-        $message = "Matokeo ya ". strtoupper($studentName)."\n";
-        $message .= "Mtihani wa ". strtoupper($reportName)."\n";
-        $message .= "Tar. {$date} ni: \n";
-        $message .= "Jumla: {$studentTotal}, Wastani {$studentGeneralAverage}, Nafasi ya {$generalPosition} kati ya {$totalStudents}\n";
-        $message .= "Tembelea {$url} kuona ripoti";
-
-        // ========== SEND SMS ==========
-        try {
-            // Simulate SMS for now
-            $nextSmsService = new NextSmsService();
-            $payload = [
-                'from' => $schoolInfo->sender_id ?? "SHULE APP",
-                'to' => $phoneNumber,
-                'text' => $message,
-                'reference' => uniqid()
-            ];
-
-            $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
-
-            // Log::info("SMS to $phoneNumber: $message");
-            // return response()->json(['message' => 'SMS sent successfully.']);
-            Alert()->toast('Results SMS has been Re-sent successfully', 'success');
-            return to_route('students.combined.report', ['school'=>$school, 'year'=>$year, 'class'=> $class, 'report'=>$report]);
-
-        } catch (\Exception $e) {
-            Log::error("Failed to send SMS: " . $e->getMessage());
-            // return response()->json(['message' => 'Failed to send SMS.'], 500);
-            Alert()->toast('Failed to send SMS', 'error');
-            return to_route('students.combined.report', ['school'=>$school, 'year'=>$year, 'class'=> $class, 'report'=>$report]);
         }
     }
 
@@ -2005,10 +2052,16 @@ class ResultsController extends Controller
 
         $classResultsGrouped = $results->groupBy('subjectId');
 
-        $examHeaders = $results
-            ->pluck('symbolic_abbr', 'exam_type_id')
-            ->unique()
-            ->values();
+         // Badilisha uundaji wa examHeaders kuwa kwa kila mtihani tofauti
+        $examHeaders = $results->map(function($item) {
+            return [
+                'abbr' => $item->symbolic_abbr,
+                'date' => $item->exam_date,
+                'display' => $item->symbolic_abbr . ' ' . \Carbon\Carbon::parse($item->exam_date)->format('d M Y')
+            ];
+        })->unique(function($item) {
+            return $item['abbr'].$item['date']; // Unique kwa mchanganyiko wa abbreviation na tarehe
+        })->values();
 
         $finalData = [];
         $combineOption = $reports->combine_option ?? 'individual';
@@ -2023,25 +2076,32 @@ class ResultsController extends Controller
             $average = 0;
 
             if ($combineOption == 'individual') {
-                foreach ($examHeaders as $examTypeId => $abbr) {
-                    $score = $subjectResults->where('symbolic_abbr', $abbr)->first()->score ?? null;
-                    $examScores[$abbr] = $score;
+                foreach ($examHeaders as $exam) {
+                    $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
+                            ->where('exam_date', $exam['date'])
+                            ->first()->score ?? null;
+                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
                 }
+
                 $total = collect($examScores)->filter()->sum();
-                $average = count(array_filter($examScores)) > 0 ? $total / count(array_filter($examScores)) : 0;
+                $average = collect($examScores)->filter()->avg() ?? 0;
 
             } elseif ($combineOption == 'sum') {
-                foreach ($examHeaders as $examTypeId => $abbr) {
-                    $score = $subjectResults->where('symbolic_abbr', $abbr)->first()->score ?? 0;
-                    $examScores[$abbr] = $score;
+                foreach ($examHeaders as $exam) {
+                    $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
+                                            ->where('exam_date', $exam['date'])
+                                            ->first()->score ?? null;
+                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
                 }
                 $total = collect($examScores)->sum();
                 $average = count(array_filter($examScores)) > 0 ? $total / count(array_filter($examScores)) : 0;
 
             } elseif ($combineOption == 'average') {
-                foreach ($examHeaders as $examTypeId => $abbr) {
-                    $score = $subjectResults->where('symbolic_abbr', $abbr)->first()->score ?? null;
-                    $examScores[$abbr] = $score;
+                foreach ($examHeaders as $exam) {
+                    $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
+                                            ->where('exam_date', $exam['date'])
+                                            ->first()->score ?? null;
+                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
                 }
                 $filtered = collect($examScores)->filter();
                 $total = 0;
@@ -2049,30 +2109,25 @@ class ResultsController extends Controller
             }
 
             $allScores = Examination_result::where('course_id', $subjectId)
-                            ->where('class_id', $classId)
-                            ->where('school_id', $schoolId)
-                            ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                            ->get()
-                            ->groupBy('student_id')
-                            ->map(function ($scores) use ($combineOption) {
-                                if ($combineOption == 'sum') {
-                                    return $scores->sum('score');
-                                } elseif ($combineOption == 'average') {
-                                    return $scores->avg('score');
-                                } else {
-                                    return $scores->sum('score');
-                                }
-                            })
-                            ->sortDesc()
-                            ->values();
+                        ->where('class_id', $classId)
+                        ->where('school_id', $schoolId)
+                        ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                        ->get()
+                        ->groupBy('student_id')
+                        ->map(function ($scores) {
+                            return $scores->sum('score'); // Daima tumia jumla kwa rank
+                        })
+                        ->sortDesc()
+                        ->values();
 
-            $position = $allScores->search($combineOption == 'average' ? $average : $total) + 1;
+            $position = $allScores->search($total) + 1;
 
             $finalData[] = compact('subjectName', 'teacher', 'subjectCode', 'examScores', 'total', 'average', 'position');
         }
 
         $students = $results->first();
-        $schoolInfo = school::findOrFail($schoolId);
+        $schoolInfo = $results->first();
+        // return $schoolInfo;
 
         // =================== EXAM HEADERS WITH DATES ===================
         $examHeadersWithDates = $results
@@ -2080,54 +2135,63 @@ class ResultsController extends Controller
                 return [$item->symbolic_abbr => $item->exam_date];
             })->unique()->toBase(); // toBase() to allow ->values()
 
-        // =================== EXAM AVERAGE PER EXAM DATE ===================
+       // =================== EXAM AVERAGE PER EXAM DATE ===================
         $examAverages = [];
-        foreach ($examHeadersWithDates as $abbr => $date) {
+        foreach ($examHeaders as $exam) {
             $totalPerExam = 0;
             $countPerExam = 0;
+            $abbr = $exam['abbr'];
+            $date = $exam['date'];
 
             foreach ($finalData as $subject) {
-                $score = $subject['examScores'][$abbr] ?? null;
+                $score = $subject['examScores'][$abbr.'_'.$date] ?? null;
                 if (is_numeric($score)) {
                     $totalPerExam += $score;
                     $countPerExam++;
                 }
             }
 
-            $examAverages[$abbr] = $countPerExam > 0 ? round($totalPerExam / $countPerExam, 1) : 0;
+            $examAverages[$abbr.'_'.$date] = $countPerExam > 0 ? number_format($totalPerExam / $countPerExam, 2) : 0;
         }
 
         // =================== GENERAL AVERAGE ===================
         $sumOfAverages = array_sum($examAverages);
-        $studentGeneralAverage = count($examAverages) > 0 ? round($sumOfAverages / count($examAverages), 1) : 0;
+        $studentGeneralAverage = count($examAverages) > 0 ? number_format($sumOfAverages / count($examAverages), 2) : 0;
 
         // =================== GENERAL POSITION ===================
         $studentId = $results->first()->student_id ?? null;
 
         $studentTotalScores = Examination_result::where('class_id', $classId)
-                                        ->where('school_id', $schoolId)
-                                        ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                                        ->get()
-                                        ->groupBy('student_id')
-                                        ->map(function ($studentResults) {
-                                            return $studentResults->sum('score'); // Jumla ya alama za kila mwanafunzi
-                                        });
+                            ->where('school_id', $schoolId)
+                            ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                            ->get()
+                            ->groupBy('student_id')
+                            ->map(function ($studentResults) {
+                                // Sum all scores for this student
+                                return $studentResults->sum('score');
+                            })->sortDesc();
 
-        // 1. Panga alama kwa mpangilio wa kubwa hadi ndogo (DESC)
-        $sortedScores = $studentTotalScores->sortDesc()->values()->all();
+        $allStudentIds = $studentTotalScores->keys()->values()->all(); // sorted student IDs
 
-        // 2. Tafuta alama zisizorudiwa (unique scores) kwa mpangilio
-        $uniqueScores = array_unique($sortedScores);
-        rsort($uniqueScores); // Sort high to low
-
-        // 3. Tafuta nafasi ya mwanafunzi kwa kurejelea alama zake
-        $studentScore = $studentTotalScores->get($studentId, 0);
-        $generalPosition = array_search($studentScore, $uniqueScores) + 1;
-
-        // 4. Jumla ya wanafunzi (totalStudents)
-        $totalStudents = count($studentTotalScores);
-
+        $index = array_search($studentId, $allStudentIds);
+        $generalPosition = $index !== false ? $index + 1 : '-';
+        $totalStudents = count($allStudentIds);
         $totalScoreForStudent = $results->sum('score');
+
+        // =================== EXAM SPECIFICATIONS ===================
+        $examSpecifications = $results
+            ->map(function($item) {
+                return [
+                    'abbr' => $item->symbolic_abbr,
+                    'full_name' => $item->exam_type,
+                    'date' => $item->exam_date
+                ];
+            })
+            ->unique(function($item) {
+                return $item['abbr'].$item['full_name'];
+            })
+            ->values()
+            ->keyBy('abbr'); // We key by abbreviation for easy lookup
 
         $pdf = \PDF::loadView('generated_reports.compiled_report', compact(
             'finalData',
@@ -2142,7 +2206,7 @@ class ResultsController extends Controller
             'totalStudents',
             'students',
             'reports',
-            'schoolInfo',
+            'schoolInfo', 'examSpecifications',
             'school', 'report', 'class', 'studentTotalScores', 'totalScoreForStudent'
         ));
         // return $pdf->stream('compiled_report.pdf'); // au ->download() kama unataka ipakuliwe
@@ -2254,33 +2318,32 @@ class ResultsController extends Controller
                     'parent_id' => $student['parent_id'],
                     'student_name' => strtoupper($student['first_name'] . ', '. $student['last_name'][0]),
                     'position' => $positionText,
-                    'total_average' => round($student['total_average'], 1),
-                    'course_averages' => $student['course_averages'],
-                    'total_score' => $student['total_score'],
-                    'total_course_average' => $student['course_averages']->sum(),
+                    'total_average' => number_format($student['total_average'], 1),
+                    'total_score' => $student['total_score'], // Tumia hii badala ya total_course_average
+                    // 'report_title' => $report->title,
+                    // 'report_date' => Carbon::parse($report->created_at)->format('d-m-Y'),
                 ];
             });
 
-            // STEP 7: Send SMS to parents (Assuming you have SMS logic)
+            // STEP 7: Send SMS to parents
             foreach ($parentsPayload as $payload) {
                 $schoolInfo = school::find($schoolId);
                 $link = "https://shuleapp.tech";
                 $nextSmsService = new NextSmsService();
                 $sender = $schoolInfo->sender_id ?? "SHULE APP";
                 $parent = Parents::find($payload['parent_id']);
-                $user = User::findOrFail($parent->user_id); // Assuming relationship exists
+                $user = User::findOrFail($parent->user_id);
                 $phoneNumber = $this->formatPhoneNumber($user->phone);
-                // return $user;
+                $reportDate = Carbon::parse($report->created_at)->format('d-m-Y');
+
                 $message = "Matokeo ya {$payload['student_name']}\n"
                     ."Mtihani wa ". strtoupper($report->title)."\n"
-                    ."Tar. " .Carbon::parse($report->created_at)->format('d-m-Y'). " ni:\n"
-                    . "Jumla: {$payload['total_course_average']}, Wastani {$payload['total_average']}\n"
+                    ."Tar. {$reportDate} ni:\n"
+                    . "Jumla: {$payload['total_score']}, Wastani {$payload['total_average']}\n"
                     . "Nafasi ya {$payload['position']}.\n"
                     . "Tembelea {$link} kuona ripoti.";
 
-                // Send SMS (Example using a hypothetical SMS service)
                 // Log::info("Sending SMS to {$user->phone}: $message");
-
                 $response = $nextSmsService->sendSmsByNext($sender, $phoneNumber, $message, uniqid());
             }
 
@@ -2365,6 +2428,7 @@ class ResultsController extends Controller
                     ->where('examination_results.school_id', $schoolId)
                     ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
                     ->get();
+
         $totalCandidates = $results->pluck('student_id')->unique()->count();
         // 4. GROUP RESULTS BY STUDENT AND CALCULATE AVERAGES
         $studentData = [];
@@ -2382,7 +2446,7 @@ class ResultsController extends Controller
                     $average = $subjectScores->avg();
 
                     if (!is_null($average)) {
-                        $roundedAverage = round($average);
+                        $roundedAverage = number_format($average, 2);
                         $studentSubjectAverages[$subject->course_code] = [
                             'score' => $roundedAverage,
                             'grade' => $this->calculateGrade($roundedAverage, $results->first()->marking_style)
@@ -2397,7 +2461,7 @@ class ResultsController extends Controller
                     }
             }
 
-            $overallAverage = $subjectCount > 0 ? round($totalScore / $subjectCount, 1) : 0;
+            $overallAverage = $subjectCount > 0 ? number_format($totalScore / $subjectCount, 2) : 0;
 
             $studentData[] = [
                 'student_id' => $student->id,
@@ -2405,8 +2469,8 @@ class ResultsController extends Controller
                 'gender' => $student->gender,
                 'student_name' => $student->first_name . ' ' . ($student->middle_name ? $student->middle_name . ' ' : '') . $student->last_name,
                 'subject_averages' => $studentSubjectAverages,
-                'total' => round($totalScore, 1),
-                'average' => $overallAverage,
+                'total' => number_format($totalScore, 2),
+                'average' => number_format($overallAverage, 2),
                 'grade' => $this->calculateGrade($overallAverage, $results->first()->marking_style),
             ];
         }
@@ -2463,7 +2527,7 @@ class ResultsController extends Controller
             }
 
             if ($studentCount > 0) {
-                $subjectAverage = round($subjectTotal / $studentCount, 1);
+                $subjectAverage = number_format($subjectTotal / $studentCount, 2);
                 $subjectAverages[$subject->course_code] = [
                     'average' => $subjectAverage,
                     'grade' => $this->calculateGrade($subjectAverage, $results->first()->marking_style)
@@ -2474,7 +2538,7 @@ class ResultsController extends Controller
             }
         }
 
-        $overallTotalAverage = $subjectCount > 0 ? round($overallTotalAverage / $subjectCount, 1) : 0;
+        $overallTotalAverage = $subjectCount > 0 ? number_format($overallTotalAverage / $subjectCount, 3) : 0;
         $overallGrade = $this->calculateGrade($overallTotalAverage, $results->first()->marking_style);
 
         // 8. PREPARE SUBJECT RANKING DATA WITH POSITIONS
@@ -2488,7 +2552,7 @@ class ResultsController extends Controller
                 }
             }
 
-            $subjectAverage = count($subjectAverages) > 0 ? round(array_sum($subjectAverages) / count($subjectAverages), 2) : 0;
+            $subjectAverage = count($subjectAverages) > 0 ? number_format(array_sum($subjectAverages) / count($subjectAverages), 2) : 0;
 
             $subjectPerformance[] = [
                 'subject_id' => $subject->id,
@@ -2622,10 +2686,16 @@ class ResultsController extends Controller
 
         $classResultsGrouped = $results->groupBy('subjectId');
 
-        $examHeaders = $results
-            ->pluck('symbolic_abbr', 'exam_type_id')
-            ->unique()
-            ->values();
+         // Badilisha uundaji wa examHeaders kuwa kwa kila mtihani tofauti
+        $examHeaders = $results->map(function($item) {
+            return [
+                'abbr' => $item->symbolic_abbr,
+                'date' => $item->exam_date,
+                'display' => $item->symbolic_abbr . ' ' . \Carbon\Carbon::parse($item->exam_date)->format('d M Y')
+            ];
+        })->unique(function($item) {
+            return $item['abbr'].$item['date']; // Unique kwa mchanganyiko wa abbreviation na tarehe
+        })->values();
 
         $finalData = [];
         $combineOption = $reports->combine_option ?? 'individual';
@@ -2640,25 +2710,32 @@ class ResultsController extends Controller
             $average = 0;
 
             if ($combineOption == 'individual') {
-                foreach ($examHeaders as $examTypeId => $abbr) {
-                    $score = $subjectResults->where('symbolic_abbr', $abbr)->first()->score ?? null;
-                    $examScores[$abbr] = $score;
+                foreach ($examHeaders as $exam) {
+                    $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
+                            ->where('exam_date', $exam['date'])
+                            ->first()->score ?? null;
+                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
                 }
+
                 $total = collect($examScores)->filter()->sum();
-                $average = count(array_filter($examScores)) > 0 ? $total / count(array_filter($examScores)) : 0;
+                $average = collect($examScores)->filter()->avg() ?? 0;
 
             } elseif ($combineOption == 'sum') {
-                foreach ($examHeaders as $examTypeId => $abbr) {
-                    $score = $subjectResults->where('symbolic_abbr', $abbr)->first()->score ?? 0;
-                    $examScores[$abbr] = $score;
+                foreach ($examHeaders as $exam) {
+                    $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
+                                            ->where('exam_date', $exam['date'])
+                                            ->first()->score ?? null;
+                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
                 }
                 $total = collect($examScores)->sum();
                 $average = count(array_filter($examScores)) > 0 ? $total / count(array_filter($examScores)) : 0;
 
             } elseif ($combineOption == 'average') {
-                foreach ($examHeaders as $examTypeId => $abbr) {
-                    $score = $subjectResults->where('symbolic_abbr', $abbr)->first()->score ?? null;
-                    $examScores[$abbr] = $score;
+                foreach ($examHeaders as $exam) {
+                    $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
+                                            ->where('exam_date', $exam['date'])
+                                            ->first()->score ?? null;
+                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
                 }
                 $filtered = collect($examScores)->filter();
                 $total = 0;
@@ -2666,30 +2743,25 @@ class ResultsController extends Controller
             }
 
             $allScores = Examination_result::where('course_id', $subjectId)
-                            ->where('class_id', $classId)
-                            ->where('school_id', $schoolId)
-                            ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                            ->get()
-                            ->groupBy('student_id')
-                            ->map(function ($scores) use ($combineOption) {
-                                if ($combineOption == 'sum') {
-                                    return $scores->sum('score');
-                                } elseif ($combineOption == 'average') {
-                                    return $scores->avg('score');
-                                } else {
-                                    return $scores->sum('score');
-                                }
-                            })
-                            ->sortDesc()
-                            ->values();
+                        ->where('class_id', $classId)
+                        ->where('school_id', $schoolId)
+                        ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                        ->get()
+                        ->groupBy('student_id')
+                        ->map(function ($scores) {
+                            return $scores->sum('score'); // Daima tumia jumla kwa rank
+                        })
+                        ->sortDesc()
+                        ->values();
 
-            $position = $allScores->search($combineOption == 'average' ? $average : $total) + 1;
+            $position = $allScores->search($total) + 1;
 
             $finalData[] = compact('subjectName', 'teacher', 'subjectCode', 'examScores', 'total', 'average', 'position');
         }
 
         $students = $results->first();
         $schoolInfo = $results->first();
+        // return $schoolInfo;
 
         // =================== EXAM HEADERS WITH DATES ===================
         $examHeadersWithDates = $results
@@ -2697,54 +2769,63 @@ class ResultsController extends Controller
                 return [$item->symbolic_abbr => $item->exam_date];
             })->unique()->toBase(); // toBase() to allow ->values()
 
-        // =================== EXAM AVERAGE PER EXAM DATE ===================
+       // =================== EXAM AVERAGE PER EXAM DATE ===================
         $examAverages = [];
-        foreach ($examHeadersWithDates as $abbr => $date) {
+        foreach ($examHeaders as $exam) {
             $totalPerExam = 0;
             $countPerExam = 0;
+            $abbr = $exam['abbr'];
+            $date = $exam['date'];
 
             foreach ($finalData as $subject) {
-                $score = $subject['examScores'][$abbr] ?? null;
+                $score = $subject['examScores'][$abbr.'_'.$date] ?? null;
                 if (is_numeric($score)) {
                     $totalPerExam += $score;
                     $countPerExam++;
                 }
             }
 
-            $examAverages[$abbr] = $countPerExam > 0 ? round($totalPerExam / $countPerExam, 1) : 0;
+            $examAverages[$abbr.'_'.$date] = $countPerExam > 0 ? number_format($totalPerExam / $countPerExam, 2) : 0;
         }
 
         // =================== GENERAL AVERAGE ===================
         $sumOfAverages = array_sum($examAverages);
-        $studentGeneralAverage = count($examAverages) > 0 ? round($sumOfAverages / count($examAverages), 1) : 0;
+        $studentGeneralAverage = count($examAverages) > 0 ? number_format($sumOfAverages / count($examAverages), 2) : 0;
 
         // =================== GENERAL POSITION ===================
         $studentId = $results->first()->student_id ?? null;
 
         $studentTotalScores = Examination_result::where('class_id', $classId)
-                                        ->where('school_id', $schoolId)
-                                        ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                                        ->get()
-                                        ->groupBy('student_id')
-                                        ->map(function ($studentResults) {
-                                            return $studentResults->sum('score'); // Jumla ya alama za kila mwanafunzi
-                                        });
+                            ->where('school_id', $schoolId)
+                            ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                            ->get()
+                            ->groupBy('student_id')
+                            ->map(function ($studentResults) {
+                                // Sum all scores for this student
+                                return $studentResults->sum('score');
+                            })->sortDesc();
 
-        // 1. Panga alama kwa mpangilio wa kubwa hadi ndogo (DESC)
-        $sortedScores = $studentTotalScores->sortDesc()->values()->all();
+        $allStudentIds = $studentTotalScores->keys()->values()->all(); // sorted student IDs
 
-        // 2. Tafuta alama zisizorudiwa (unique scores) kwa mpangilio
-        $uniqueScores = array_unique($sortedScores);
-        rsort($uniqueScores); // Sort high to low
-
-        // 3. Tafuta nafasi ya mwanafunzi kwa kurejelea alama zake
-        $studentScore = $studentTotalScores->get($studentId, 0);
-        $generalPosition = array_search($studentScore, $uniqueScores) + 1;
-
-        // 4. Jumla ya wanafunzi (totalStudents)
-        $totalStudents = count($studentTotalScores);
-
+        $index = array_search($studentId, $allStudentIds);
+        $generalPosition = $index !== false ? $index + 1 : '-';
+        $totalStudents = count($allStudentIds);
         $totalScoreForStudent = $results->sum('score');
+
+        // =================== EXAM SPECIFICATIONS ===================
+        $examSpecifications = $results
+            ->map(function($item) {
+                return [
+                    'abbr' => $item->symbolic_abbr,
+                    'full_name' => $item->exam_type,
+                    'date' => $item->exam_date
+                ];
+            })
+            ->unique(function($item) {
+                return $item['abbr'].$item['full_name'];
+            })
+            ->values()
+            ->keyBy('abbr'); // We key by abbreviation for easy lookup
 
         $pdf = \PDF::loadView('generated_reports.compiled_report', compact(
             'finalData',
@@ -2759,7 +2840,7 @@ class ResultsController extends Controller
             'totalStudents',
             'students',
             'reports',
-            'schoolInfo',
+            'schoolInfo', 'examSpecifications',
             'school', 'report', 'class', 'studentTotalScores', 'totalScoreForStudent'
         ));
         // return $pdf->stream('compiled_report.pdf'); // au ->download() kama unataka ipakuliwe
@@ -2784,19 +2865,38 @@ class ResultsController extends Controller
      // function to delete compiled results*************************************************
     public function destroyReport($class, $year, $school, $reportId)
     {
-        $school_id = Hashids::decode($school);
-        $class_id = Hashids::decode($class);
-        $report_id = Hashids::decode($reportId);
+        try {
+            // Validate and decode parameters
+            $school_id = Hashids::decode($school);
+            $class_id = Hashids::decode($class);
+            $report_id = Hashids::decode($reportId);
 
-        $report = generated_reports::find($report_id[0]);
-        // delete the report
-        if ($report) {
+            if (empty($school_id) || empty($class_id) || empty($report_id)) {
+                return redirect()
+                    ->route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])
+                    ->with('error', 'Invalid parameters');
+            }
+
+            // Find the report
+            $report = generated_reports::find($report_id[0]);
+
+            if (!$report) {
+                return redirect()
+                    ->route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])
+                    ->with('error', 'Report not found');
+            }
+
+            // Delete the report
             $report->delete();
-            Alert()->toast('Report deleted successfully.', 'success');
-            return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
-        } else {
-            Alert()->toast('Report not found.', 'error');
-            return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
+
+            return redirect()
+                ->route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])
+                ->with('success', 'Report deleted successfully');
+
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])
+                ->with('error', 'Error deleting report: ' . $e->getMessage());
         }
     }
 
