@@ -270,14 +270,14 @@
                             @foreach($subjectCodes as $code)
                                 <td style="text-align:center">
                                     @if(isset($student['subject_averages'][$code]['score']))
-                                        {{ $student['subject_averages'][$code]['score'] }}
+                                        {{ number_format($student['subject_averages'][$code]['score'], 1) }}
                                     @else
                                         X
                                     @endif
                                 </td>
                             @endforeach
-                            <td style="text-align:center">{{ $student['total']  }}</td>
-                            <td style="text-align:center">{{ $student['average'] }}</td>
+                            <td style="text-align:center">{{ number_format($student['total'],2 ) }}</td>
+                            <td style="text-align:center">{{ number_format($student['average'], 3) }}</td>
                             <td style="text-align:center; text-transform:uppercase">
                                 {{ $student['grade'] === 'ABS' ? 'ABS' : $student['grade'] }}
                             </td>
@@ -309,7 +309,7 @@
                             <tr>
                                 <td style="text-transform: uppercase">{{ $subject['subject_name'] }} </td>
                                 <td style="text-transform: uppercase; text-align:center">{{ $subject['subject_code'] }} </td>
-                                <td style="text-align:center">{{ $subject['average'] }}</td>
+                                <td style="text-align:center">{{ number_format($subject['average'], 2) }}</td>
                                 <td style="text-align:center">{{ $subject['position'] }}</td>
                                     @if ($subject['grade']=='A')
                                         <td style="background:rgb(117, 244, 48); padding:2px 10px ">grade {{ $subject['grade']}} - <i>EXCELLENT</i></td>
