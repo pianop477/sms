@@ -77,5 +77,6 @@ class Kernel extends HttpKernel
         'activeUser' => \App\Http\Middleware\ActiveUserMiddleware::class,
         'block.ip' => \App\Http\Middleware\BlockSuspiciousIP::class,
         'user.agent' => \App\Http\Middleware\CheckUserAgent::class,
+        'manager.head.academic' => \App\Http\Middleware\sharedAccessMiddleware::class,
     ];
 }
