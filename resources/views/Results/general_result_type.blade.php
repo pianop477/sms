@@ -112,7 +112,7 @@
                                                             <div class="col-md-12 mb-3">
                                                                 <div class="row">
                                                                     <div class="col-6">
-                                                                        <p class="text-danger" style="font-weight: bold">Examination Results data sets</p>
+                                                                        <p class="text-danger" style="font-weight: bold">Examination Results Data Sets</p>
                                                                         <hr>
                                                                         @if ($groupedByMonth->isEmpty())
                                                                             <p class="text-danger">No exam results records found</p>
@@ -169,8 +169,8 @@
                                 <thead>
                                     <tr>
                                         <th>Title</th>
-                                        <th>Created at</th>
-                                        <th>Created by</th>
+                                        <th>Issued at</th>
+                                        <th>Issued by</th>
                                         <th>Display Mode</th>
                                         <th class="text-center">Action</th>
                                     </tr>

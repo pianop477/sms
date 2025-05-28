@@ -426,31 +426,36 @@ class ResultsController extends Controller
 
     public function examTypesByClass($school, $year, $class)
     {
-        $school_id = Hashids::decode($school);
-        $class_id = Hashids::decode($class);
-        $user = Auth::user();
 
-        $schools = school::find($school_id[0]);
-        $classes = Grade::find($class_id[0]);
-        // return $classes;
+        try {
+            $school_id = Hashids::decode($school);
+            $class_id = Hashids::decode($class);
+            $user = Auth::user();
 
-        if($user->school_id != $schools->id){
-            Alert()->toast('You are not authorized to view this page', 'error');
-            return redirect()->route('error.page');
-        }
+            if (empty($school_id[0]) || empty($class_id[0])) {
+                abort(404, 'Invalid school or class ID');
+            }
 
-        $results = Examination_result::query()
+            $schools = school::find($school_id[0]);
+            $classes = Grade::find($class_id[0]);
+
+            if (!$schools || !$classes) {
+                abort(404, 'School or class not found');
+            }
+
+            $schools = school::find($school_id[0]);
+            $classes = Grade::find($class_id[0]);
+
+             $results = Examination_result::query()
                                     ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
                                     ->select(
                                         'examination_results.*',
                                         'examinations.id as exam_type_id', 'examinations.exam_type'
                                     )
-                                    ->where('examination_results.school_id', $schools->id)
+                                    ->where('examination_results.school_id', $school_id[0])
                                     ->whereYear('examination_results.exam_date', $year)
-                                    ->where('examination_results.class_id', $classes->id)
+                                    ->where('examination_results.class_id', $class_id[0])
                                     ->get();
-
-                $grades = Grade::find($class);
 
                 $months = [
                     'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4, 'May' => 5, 'June' => 6,
@@ -474,13 +479,6 @@ class ResultsController extends Controller
                     return Carbon::parse($item->exam_date)->format('Y-m-d');
                 });
 
-                //get compiled results
-                $compiled_results = compiled_results::where('school_id', $schools->id)
-                                                    ->where('class_id', $classes->id)
-                                                    ->get();
-
-                $groupedByExamType = $results->groupBy('exam_type_id'); // Group by exam type using results
-                $compiledGroupByExam = $compiled_results->groupBy('report_name'); // Group by exam type using compiled results
 
                 $reports = generated_reports::query()
                                                 ->join('users', 'users.id', '=', 'generated_reports.created_by')
@@ -490,7 +488,14 @@ class ResultsController extends Controller
                                                 ->orderBy('generated_reports.title')
                                                 ->paginate(5);
 
-                return view('Results.general_result_type', compact('schools', 'reports', 'groupedByMonth', 'compiledGroupByExam', 'year', 'exams', 'grades', 'classes', 'groupedByExamType'));
+                return view('Results.general_result_type', compact('schools', 'reports', 'groupedByMonth', 'compiledGroupByExam', 'year', 'exams', 'classes', 'groupedByExamType'));
+
+        }
+        catch(Exception $e) {
+            //  Log::error("examTypesByClass error: " . $e->getMessage());
+            return redirect()->route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])->with('error', $e->getMessage());
+        }
+
     }
 
     //function for displaying general results by term ***************************************
@@ -2892,20 +2897,18 @@ class ResultsController extends Controller
     public function destroyReport($class, $year, $school, $reportId)
     {
         try {
-            // Validate and decode parameters
             $school_id = Hashids::decode($school);
             $class_id = Hashids::decode($class);
             $report_id = Hashids::decode($reportId);
 
-            if (empty($school_id) || empty($class_id) || empty($report_id)) {
+            // Validate decoded IDs
+            if (empty($school_id[0]) || empty($class_id[0]) || empty($report_id[0])) {
                 return redirect()
                     ->route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])
                     ->with('error', 'Invalid parameters');
             }
 
-            // Find the report
             $report = generated_reports::find($report_id[0]);
-            // return $report;
 
             if (!$report) {
                 return redirect()
@@ -2913,17 +2916,25 @@ class ResultsController extends Controller
                     ->with('error', 'Report not found');
             }
 
-            // Delete the report
+            // Store IDs before deletion
+            $school_id = $report->school_id;
+            $class_id = $report->class_id;
+
             $report->delete();
 
             return redirect()
-                ->route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])
+                ->route('results.examTypesByClass', [
+                    'school' => Hashids::encode($school_id),
+                    'year' => $year,
+                    'class' => Hashids::encode($class_id)
+                ])
                 ->with('success', 'Report deleted successfully');
 
         } catch (\Exception $e) {
+            Log::error("Delete report error: " . $e->getMessage());
             return redirect()
                 ->route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])
-                ->with('error', 'Error deleting report: ' . $e->getMessage());
+                ->with('error', 'Error deleting report');
         }
     }
 
