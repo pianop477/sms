@@ -426,35 +426,23 @@ class ResultsController extends Controller
 
     public function examTypesByClass($school, $year, $class)
     {
+        $school_id = Hashids::decode($school);
+        $class_id = Hashids::decode($class);
+        $user = Auth::user();
 
-        try {
-            $school_id = Hashids::decode($school);
-            $class_id = Hashids::decode($class);
-            $user = Auth::user();
+        $schools = school::find($school_id[0]);
+        $classes = Grade::find($class_id[0]);
+        // return $classes;
 
-            if (empty($school_id[0]) || empty($class_id[0])) {
-                abort(404, 'Invalid school or class ID');
-            }
-
-            $schools = school::find($school_id[0]);
-            $classes = Grade::find($class_id[0]);
-
-            if (!$schools || !$classes) {
-                abort(404, 'School or class not found');
-            }
-
-            $schools = school::find($school_id[0]);
-            $classes = Grade::find($class_id[0]);
-
-             $results = Examination_result::query()
+        $results = Examination_result::query()
                                     ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
                                     ->select(
                                         'examination_results.*',
                                         'examinations.id as exam_type_id', 'examinations.exam_type'
                                     )
-                                    ->where('examination_results.school_id', $school_id[0])
+                                    ->where('examination_results.school_id', $schools->id)
                                     ->whereYear('examination_results.exam_date', $year)
-                                    ->where('examination_results.class_id', $class_id[0])
+                                    ->where('examination_results.class_id', $classes->id)
                                     ->get();
 
                 $months = [
@@ -479,6 +467,13 @@ class ResultsController extends Controller
                     return Carbon::parse($item->exam_date)->format('Y-m-d');
                 });
 
+                //get compiled results
+                $compiled_results = compiled_results::where('school_id', $schools->id)
+                                                    ->where('class_id', $classes->id)
+                                                    ->get();
+
+                $groupedByExamType = $results->groupBy('exam_type_id'); // Group by exam type using results
+                $compiledGroupByExam = $compiled_results->groupBy('report_name'); // Group by exam type using compiled results
 
                 $reports = generated_reports::query()
                                                 ->join('users', 'users.id', '=', 'generated_reports.created_by')
@@ -489,13 +484,6 @@ class ResultsController extends Controller
                                                 ->paginate(5);
 
                 return view('Results.general_result_type', compact('schools', 'reports', 'groupedByMonth', 'compiledGroupByExam', 'year', 'exams', 'classes', 'groupedByExamType'));
-
-        }
-        catch(Exception $e) {
-            //  Log::error("examTypesByClass error: " . $e->getMessage());
-            return redirect()->route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])->with('error', $e->getMessage());
-        }
-
     }
 
     //function for displaying general results by term ***************************************
