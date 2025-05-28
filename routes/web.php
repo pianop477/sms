@@ -123,7 +123,6 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     route will be managed by school head teacher or school manager==============================================*/
     Route::middleware(['ManagerOrTeacher'])->group(function(){
         //teachers panel management =======================================================================
-        // Route::resource('Teachers', TeachersController::class);
         Route::get('Teachers-list', [TeachersController::class, 'showTeachersList'])->name('Teachers.index');
         Route::post('Teachers-registration', [TeachersController::class, 'registerTeachers'])->name('Teachers.store');
         Route::put('{teachers}/Update-teachers', [TeachersController::class, 'updateTeachers'])->name('Update.teachers');

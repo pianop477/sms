@@ -1654,7 +1654,20 @@ class ResultsController extends Controller
         foreach ($classResultsGrouped as $subjectId => $subjectResults) {
             $subjectName = $subjectResults->first()->course_name;
             $subjectCode = $subjectResults->first()->course_code;
-            $teacher = $subjectResults->first()->teacher_first_name . '. ' . $subjectResults->first()->teacher_last_name[0];
+
+             // onyesha mwalimu wa sasa na kama hayupo onyesha mwalimu wa zamani
+            $currentTeacher = DB::table('class_learning_courses')
+                ->join('teachers', 'teachers.id', '=', 'class_learning_courses.teacher_id')
+                ->join('users', 'users.id', '=', 'teachers.user_id')
+                ->where('class_learning_courses.class_id', $classId)
+                ->where('class_learning_courses.course_id', $subjectId)
+                ->where('class_learning_courses.status', 1)
+                ->select('users.first_name', 'users.last_name')
+                ->first();
+
+            $teacher = $currentTeacher
+                ? $currentTeacher->first_name . '. ' . $currentTeacher->last_name[0]
+                : $subjectResults->first()->teacher_first_name . '. ' . $subjectResults->first()->teacher_last_name[0];
 
             $examScores = [];
             $total = 0;
@@ -2069,7 +2082,20 @@ class ResultsController extends Controller
         foreach ($classResultsGrouped as $subjectId => $subjectResults) {
             $subjectName = $subjectResults->first()->course_name;
             $subjectCode = $subjectResults->first()->course_code;
-            $teacher = $subjectResults->first()->teacher_first_name . '. ' . $subjectResults->first()->teacher_last_name[0];
+
+            // onyesha mwalimu wa sasa na kama hayupo onyesha mwalimu wa zamani
+            $currentTeacher = DB::table('class_learning_courses')
+                ->join('teachers', 'teachers.id', '=', 'class_learning_courses.teacher_id')
+                ->join('users', 'users.id', '=', 'teachers.user_id')
+                ->where('class_learning_courses.class_id', $classId)
+                ->where('class_learning_courses.course_id', $subjectId)
+                ->where('class_learning_courses.status', 1)
+                ->select('users.first_name', 'users.last_name')
+                ->first();
+
+            $teacher = $currentTeacher
+                ? $currentTeacher->first_name . '. ' . $currentTeacher->last_name[0]
+                : $subjectResults->first()->teacher_first_name . '. ' . $subjectResults->first()->teacher_last_name[0];
 
             $examScores = [];
             $total = 0;
@@ -2879,6 +2905,7 @@ class ResultsController extends Controller
 
             // Find the report
             $report = generated_reports::find($report_id[0]);
+            return $report;
 
             if (!$report) {
                 return redirect()

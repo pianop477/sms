@@ -350,29 +350,29 @@
     </table>
         @if(count($examSpecifications) > 0)
         <table class="report-table" style="margin-top: 20px;">
-        <tbody>
-            <tr>
-                <td colspan="7" style="background: rgb(187, 163, 56); font-size: 12px"><strong>Specification Table</strong></td>
-            </tr>
-            <tr>
-                <th colspan="2">Examination Code</th>
-                <th colspan="3">Examination Name</th>
-                <th colspan="2">Examination Date</th>
-            </tr>
-            @foreach ($examSpecifications as $spec )
+            <tbody>
                 <tr>
-                    <td colspan="2" style="text-transform: uppercase">{{ $spec['abbr'] }}</td>
-                    <td colspan="3" style="text-transform: capitalize">{{ $spec['full_name'] }}</td>
-                    <td colspan="2">{{ \Carbon\Carbon::parse($spec['date'])->format('d F Y') }}</td>
+                    <td colspan="7" style="background: rgb(187, 163, 56); font-size: 12px"><strong>Exam Codes Key</strong></td>
                 </tr>
-            @endforeach
-            <tr>
-                <td colspan="7" style="text-align: center; font-style: italic;">
-                    Note: "X" indicates that the student did not take the exam.
-                </td>
-            </tr>
-        </tbody>
-    </table>
+                <tr>
+                    <th colspan="3">Exam Code</th>
+                    <th colspan="4">Exam Description</th>
+                </tr>
+                @foreach ($examSpecifications as $spec )
+                    <tr>
+                        <td colspan="3" style="text-transform: uppercase">{{ $spec['abbr'] }}</td>
+                        <td colspan="4" style="text-transform: capitalize">{{ $spec['full_name'] }}</td>
+                    </tr>
+                @endforeach
+                <tr>
+                    <td colspan="7" style="text-align: center; font-style: italic;">
+                        Note: "X" indicates that the student did not take the exam.
+                        <br>
+                        Codes above represent different exam types (e.g., Midterm, Final, etc.).
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     @endif
 @elseif ($reports->combine_option === 'sum')
     <!-- Similar optimized table structure for 'sum' option -->
