@@ -2909,7 +2909,7 @@ class ResultsController extends Controller
 
             if (!$report) {
                 return redirect()
-                    ->route('results.examTypesByClass', ['school' => Hashids::encode($school), 'year' => $year, 'class' => Hashids::encode($class)])
+                    ->route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])
                     ->with('error', 'Report not found');
             }
 
@@ -2917,12 +2917,12 @@ class ResultsController extends Controller
             $report->delete();
 
             return redirect()
-                ->route('results.examTypesByClass', ['school' => Hashids::encode($school), 'year' => $year, 'class' => Hashids::encode($class)])
+                ->route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])
                 ->with('success', 'Report deleted successfully');
 
         } catch (\Exception $e) {
             return redirect()
-                ->route('results.examTypesByClass', ['school' => Hashids::encode($school), 'year' => $year, 'class' => Hashids::encode($class)])
+                ->route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])
                 ->with('error', 'Error deleting report: ' . $e->getMessage());
         }
     }
