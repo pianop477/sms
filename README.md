@@ -37,18 +37,18 @@ this is the welcome page where the program starts.
 
 Since the program is designed using Php - Laravel framework during installation it allow user to make database migration. use this command to make migration as php artisan migrate --seed, this command migrate all tables and seed the default records which will be used by the super user admin account with the following credentials
 
-email: <pianop477@gmail.com>
-password: shule@2024
+email:
+password:
 
 ## ROLES AND PERMISSION
 
 There are several roles which have different Permission depending to its account type as follows;
 Account types;
 
-1. Admin account - indicated by usertype = 1
-2. Manager account - indicated by usertype = 2
-3. Teacher account - indicated by usertype = 3
-4. Parent account - indicated by usertype = 4
+1. Admin account
+2. Manager account
+3. Teacher account
+4. Parent account
 
 ## ADMIN ACCOUNT
 
@@ -76,7 +76,7 @@ This account handle the following request as follows;
 ## TEACHERS ACCOUNTS
 
 At this account type there are different roles assigned to teachers as follow;
-1 - Normal teacher, 2 -  Head teacher, 3 - Academic Teacher, 4 - Class teacher
+Normal teacher, Head teacher, Academic Teacher, Class teacher
 this roles are assigned to Teachers accounts depending to their position they have. Allow me to describe the roles as follows
 
 ## NORMAL TEACHER
@@ -144,10 +144,6 @@ This page is displayed once if user want to perform a certain request which the 
 In general the middleware set rules for user to access a certain request in this program, and once the validation for this middleware fails it return error as show here below;
 ![image](https://github.com/user-attachments/assets/d47c94c5-860c-45cc-881b-d0ad2015ad4e)
 
-##BEEM API DOCS
-API KEY = 947863ca54be8767
-SECRET KEY = YjJhZjcyYmIxNzllNDlmMDhiOTFkNzRlMTUyN2IwNDdiN2NhYWEyNGNiYWE5MjhhYmViMjRhZGQwMzc4MjRjOA==
-
 ## CONTACT
 
 For any suggestion you can contact me through the following alternatives;
@@ -156,10 +152,8 @@ For any suggestion you can contact me through the following alternatives;
 2. Email: <pianop477@gmail.com>
 
 The program designed and developed by Piano.
-<<<<<<< HEAD
-Thank you
+
 =======
 
 ### Thank you
 
->>>>>>> d977b076efde862c6dcddcbb060d523665b7e155

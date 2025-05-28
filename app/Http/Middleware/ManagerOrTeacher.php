@@ -27,7 +27,7 @@ class ManagerOrTeacher
             }
 
             // Check if the user is a teacher with role_id = 2
-            if ($user->teacher && $user->teacher->role_id == 2 || $user->teacher && $user->teacher->role_id == 3) {
+            if ($user->teacher && $user->teacher->role_id == 2) {
                 return $next($request);
             }
         }

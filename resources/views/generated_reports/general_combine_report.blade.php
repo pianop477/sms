@@ -29,7 +29,7 @@
                 bottom: 0;
                 width: 100%;
                 border-top: 1px solid #ddd;
-                padding-top: 10px;
+                padding-top: 20px;
             }
             thead {
                 display: table-header-group;
@@ -325,7 +325,6 @@
                             </tr>
                         @endforeach
                     </table>
-                    <hr>
                 </div>
                 <div class="final-summary">
                     <table class="table table-bordered" style="font-size: 12px; text-align:center;">
