@@ -10,6 +10,7 @@ use App\Http\Controllers\ExamController;
 use App\Http\Controllers\GeneratedReportController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ManagerController;
+use App\Http\Controllers\PackagesController;
 use App\Http\Controllers\ParentsController;
 use App\Http\Controllers\PdfGeneratorController;
 use App\Http\Controllers\ResultsController;
@@ -199,6 +200,17 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::put('Publish-combine-report/school/{school}/year/{year}/class/{class}/report/{report}', [ResultsController::class, 'publishCombinedReport'])->name('publish.combined.report');
         Route::get('/General-combined-report/school/{school}/year/{year}/class/{class}/report/{report}', [ResultsController::class, 'downloadGeneralCombinedReport'])->name('download.general.combined');
         Route::put('Unpublish/combined-report/school/{school}/year/{year}/class/{class}/report/{report}', [ResultsController::class, 'unpublishCombinedReport'])->name('Unpublish.combined.report');
+
+        // packages management
+        Route::get('/Packages/year', [PackagesController::class, 'packagesByYear'])->name('package.byYear');
+        Route::get('Package/by/class/year/{year}', [PackagesController::class, 'packageByClass'])->name('package.byClass');
+        Route::get('/holiday/package/list/year/{year}/class/{class}', [PackagesController::class, 'packagesLists'])->name('packages.list');
+        Route::get('Download/package/id/{id}', [PackagesController::class, 'downloadPackage'])->name('download.holiday.package');
+
+        //generate general attendance report
+        Route::get('Attendance-report', [AttendanceController::class, 'getField'])->name('attendance.fill.form');
+        Route::post('Attendances', [AttendanceController::class, 'genaralAttendance'])->name('manage.attendance');
+        Route::post('Generate-attendance-report', [AttendanceController::class, 'generateClassReport'])->name('class.attendance.report');
     });
 
     // 2. ROUTE ACCESS FOR EITHER MANAGER OR HEAD TEACHER ONLY ===========================================================================
@@ -254,11 +266,6 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
 
     //3. ROUTE ACCESS FOR EITHER HEAD TEACHER OR ACADEMIC ONLY ============================================================================
     Route::middleware(['CheckUsertype:3', 'CheckRoleType:2,3'])->group(function () {
-         //generate general attendance report
-        Route::get('Attendance-report', [AttendanceController::class, 'getField'])->name('attendance.fill.form');
-        Route::post('Attendances', [AttendanceController::class, 'genaralAttendance'])->name('manage.attendance');
-        Route::post('Generate-attendance-report', [AttendanceController::class, 'generateClassReport'])->name('class.attendance.report');
-
         // classes management
         Route::post('Register-class', [ClassesController::class, 'registerClass'])->name('Classes.store');
         Route::get('{id}/Edit-class', [ClassesController::class, 'editClass'])->name('Classes.edit');
@@ -310,6 +317,12 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('{id}/Edit-courses', [CoursesController::class, 'editCourse'])->name('course.edit');
         Route::put('{id}/Update-courses', [CoursesController::class, 'updateCourse'])->name('course.update');
         Route::post('Assign-class-course', [CoursesController::class, 'assignClassCourse'])->name('course.assign');
+
+        //holiday packages management
+        Route::post('Upload/package', [PackagesController::class, 'uploadPackage'])->name('package.upload');
+        Route::get('Delete/package/id/{id}', [PackagesController::class, 'deletePackage'])->name('delete.holiday.package');
+        Route::put('Activate/package/id/{id}', [PackagesController::class, 'activatePackage'])->name('activate.holiday.package');
+        Route::put('Deactivate/package/id/{id}', [PackagesController::class, 'deactivatePackage'])->name('deactivate.holiday.package');
     });
 
     //4. ROUTES ACCESS FOR ALL USERS ========================================================================================================
@@ -345,6 +358,9 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('student/{student}/Courses-list', [CoursesController::class, 'viewStudentCourses'])->name('student.courses.list');
         Route::get('/Student-report/school/{school}/year/{year}/class/{class}/report/{report}/student/{student}', [ResultsController::class, 'parentDownloadStudentCombinedReport'])->name('student.combined.report');
         Route::get('Student/view/id/{student}', [StudentsController::class, 'studentProfile'])->name('students.profile');
+
+        //parent download holiday package
+        Route::get('/download/package/id/{id}', [PackagesController::class, 'parentDownloadPackage'])->name('student.holiday.package');
     });
 
     // 6. ROUTE ACCESS FOR CLASS TEACHER ONLY ============================================================================================

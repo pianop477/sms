@@ -38,4 +38,8 @@ return [
         'sender_id' => env('BEEM_SENDER_ID'),
     ],
 
+    'virustotal' => [
+        'key' => env('VIRUS_TOTAL_API_KEY'),
+    ],
+
 ];

@@ -160,7 +160,7 @@
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
                                         <td class="text-uppercase">{{$teacher->member_id}}</td>
-                                        <td class="text-capitalize">{{$teacher->first_name. ' '. $teacher->last_name}}</td>
+                                        <td class="text-capitalize">{{ucwords(strtolower($teacher->first_name. ' '. $teacher->last_name))}}</td>
                                         <td class="text-capitalize">{{$teacher->gender[0]}}</td>
                                         <td class="text-capitalize text-white">
                                             @if ($teacher->role_id == 1)

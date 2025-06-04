@@ -83,16 +83,6 @@ class ExamController extends Controller
         $user = Auth::user();
         $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
 
-        $exists = class_learning_courses::where('course_id', $courseId)
-                                        ->where('class_id', $classId)
-                                        ->where('teacher_id', $loggedTeacher->id)
-                                        ->exists();
-
-        if (!$exists) {
-            Alert()->toast('You are not authorized to view this page', 'error');
-            return to_route('score.prepare.form', Hashids::encode($courseId));
-        }
-
         // Pata wanafunzi wa darasa husika
         $students = Student::where('class_id', $classId)
                             ->where('status', 1)

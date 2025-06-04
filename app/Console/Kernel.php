@@ -24,6 +24,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('logins:clean-old')->everyMinute();
         $schedule->command('security:blocked-user-agents')->everyMinute();
         $schedule->command('cleanup:old-reports')->everyMinute();
+        $schedule->command('packages:deactivate-expired')->daily();
     }
 
     /**

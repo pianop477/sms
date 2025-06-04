@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Hash;
 use Laravel\Ui\Presets\React;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\Rules\Password;
 
 class HomeController extends Controller
@@ -355,7 +356,8 @@ class HomeController extends Controller
             return view('profile.change-password');
         }
 
-    public function storePassword(Request $request) {
+    public function storePassword(Request $request)
+    {
 
         $this->validate($request, [
             'current_password' => ['required', 'string'],
@@ -438,6 +440,13 @@ class HomeController extends Controller
             'address' => 'nullable|string|max:255',
         ]);
 
+        // scan image file for virus
+        $scanResult = $this->scanFileForViruses($request->file('image'));
+        if (!$scanResult['clean']) {
+            Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
+            return redirect()->back();
+        }
+
         // Update user data
         $userData->first_name = $request->fname;
         $userData->last_name = $request->lname;
@@ -483,5 +492,37 @@ class HomeController extends Controller
 
         Alert()->toast('Profile Updated successfully', 'success');
         return back();
+    }
+
+    private function scanFileForViruses($file): array
+    {
+        // For production, use actual API
+        if (app()->environment('production')) {
+            $apiKey = config('services.virustotal.key');
+            try {
+                $response = Http::withHeaders(['x-apikey' => $apiKey])
+                            ->attach('file', fopen($file->path(), 'r'))
+                            ->post('https://www.virustotal.com/api/v3/files');
+
+                if ($response->successful()) {
+                    $scanId = $response->json()['data']['id'];
+                    $analysis = Http::withHeaders(['x-apikey' => $apiKey])
+                                ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
+
+                    return [
+                        'clean' => $analysis->json()['data']['attributes']['stats']['malicious'] === 0,
+                        'message' => $analysis->json()['data']['attributes']['status']
+                    ];
+                }
+            } catch (\Exception $e) {
+                return [
+                    'clean' => false,
+                    'message' => 'Scan failed: '.$e->getMessage()
+                ];
+            }
+        }
+
+        // For local development, just mock a successful scan
+        return ['clean' => true, 'message' => 'Development mode - scan bypassed'];
     }
 }

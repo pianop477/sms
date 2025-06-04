@@ -61,13 +61,13 @@
                                 <a class="nav-link active" title="Profile" href="#student" data-toggle="tab"><i class="fas fa-user-graduate"></i> Student</a>
                             </li>
                             <li class="flex-sm-fill text-sm-center nav-item">
-                                <a class="nav-link" href="#parents" title="Parents" data-toggle="tab"><i class="fas fa-user-shield"></i> Parents</a>
+                                <a class="nav-link" href="#parents" title="Parents" data-toggle="tab"><i class="fas fa-user-shield"></i> Parents info</a>
                             </li>
                             <li class="flex-sm-fill text-sm-center nav-item">
                                 <a class="nav-link" href="#subjects" title="Subjects" data-toggle="tab"><i class="ti-book"></i> Subjects</a>
                             </li>
                             <li class="flex-sm-fill text-sm-center nav-item">
-                                <a class="nav-link" href="#attendance" title="Attendance" data-toggle="tab"><i class="fas fa-calendar-check"></i> Attendance</a>
+                                <a class="nav-link" href="#attendance" title="Attendance" data-toggle="tab"><i class="fas fa-calendar-check"></i> Attendances</a>
                             </li>
                             <li class="flex-sm-fill text-sm-center nav-item">
                                 <a class="nav-link" href="#results" title="Results" data-toggle="tab"><i class="fas fa-chart-bar"></i> Results</a>
@@ -77,6 +77,9 @@
                                     <a class="nav-link" href="#transport" title="Transport" data-toggle="tab"><i class="fas fa-bus"></i> Transport</a>
                                 </li>
                             @endif
+                            <li class="flex-sm-fill text-sm-center nav-item">
+                                <a class="nav-link" href="#package" title="Package" data-toggle="tab"><i class="fas fa-layer-group"></i> Packages</a>
+                            </li>
                         </ul>
                     </div>
                     <div class="card-body">
@@ -353,6 +356,55 @@
                                 </table>
                             </div>
                             @endif
+
+                            {{-- holiday package tab-pane --}}
+                            <div class="tab-pane" id="package">
+                                <p class="text-center text-primary">Holiday Package for <span class="text-uppercase"><strong>{{$class->class_name}}</strong></span></p>
+                                <table class="table table-responsive-md table-striped table-bordered table-hover">
+                                    <thead>
+                                        <tr class="text-capitalize">
+                                            <th scope="col">#</th>
+                                            <th scope="col">title</th>
+                                            <th scope="col">Description</th>
+                                            <th scope="col">term</th>
+                                            <th scope="col">Status</th>
+                                            <th scope="col">released at</th>
+                                            <th scope="col">Expire on</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if ($packages->isEmpty())
+                                            <tr>
+                                                <td colspan="8" class="text-danger text-center">No Holiday Package Available!</td>
+                                            </tr>
+                                        @else
+                                            @foreach ($packages as $item )
+                                                <tr class="text-capitalize">
+                                                    <td>{{$loop->iteration}}</td>
+                                                    <td>{{$item->title}}</td>
+                                                    <td>{{$item->description}}</td>
+                                                    <td>term {{$item->term}}</td>
+                                                    <td>
+                                                        @if ($item->is_active == true)
+                                                            <span class="badge badge-success">Active <i class="fas fa-unlock"></i></span>
+                                                        @else
+                                                            <span class="badge badge-danger">Locked <i class="fas fa-lock"></i></span>
+                                                        @endif
+                                                    </td>
+                                                    <td>{{\Carbon\Carbon::parse($item->release_date)->format('d-m-Y')}}</td>
+                                                    <td>{{\Carbon\Carbon::parse($item->due_date)->format('d-m-Y')}}</td>
+                                                    <td>
+                                                        <a href="{{route('student.holiday.package', ['id' => Hashids::encode($item->id), 'preview' => true])}}" target="_blank" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="top" title="Download Package" onclick="return confirm('Are you sure you want to download this package?')">
+                                                            <i class="fas fa-download"></i> Download
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @endif
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
