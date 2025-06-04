@@ -395,9 +395,15 @@
                                                     <td>{{\Carbon\Carbon::parse($item->release_date)->format('d-m-Y')}}</td>
                                                     <td>{{\Carbon\Carbon::parse($item->due_date)->format('d-m-Y')}}</td>
                                                     <td>
+                                                        @if ($item->is_active == true)
                                                         <a href="{{route('student.holiday.package', ['id' => Hashids::encode($item->id), 'preview' => true])}}" target="_blank" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="top" title="Download Package" onclick="return confirm('Are you sure you want to download this package?')">
                                                             <i class="fas fa-download"></i> Download
                                                         </a>
+                                                        @else
+                                                        <a href="" data-toggle="tooltip" data-placement="top" title="Package locked" class="btn btn-xs btn-secondary disabled">
+                                                            <i class="fas fa-lock"></i> Download
+                                                        </a>
+                                                        @endif
                                                     </td>
                                                 </tr>
                                             @endforeach
