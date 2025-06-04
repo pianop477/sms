@@ -430,14 +430,18 @@ class HomeController extends Controller
             $parent = Parents::where('user_id', $userData->id)->first();
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'fname' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
             'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,' . $userData->id,
             'email' => 'nullable|unique:users,email,' . $userData->id,
-            'gender' => 'required|In:female,male',
+            'gender' => 'required|in:female,male',
             'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
             'address' => 'nullable|string|max:255',
+        ], [
+            'image.image' => 'The file must be a valid image (JPG, PNG, JPEG).',
+            'image.mimes' => 'Only JPG, PNG, and JPEG files are allowed.',
+            'image.max' => 'The image must not exceed 1MB in size.',
         ]);
 
         // scan image file for virus
