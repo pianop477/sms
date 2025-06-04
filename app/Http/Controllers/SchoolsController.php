@@ -79,10 +79,12 @@ class SchoolsController extends Controller
                 return back();
             }
             // Virus scanning
-            $scanResult = $this->scanFileForViruses($request->file('logo'));
-            if (!$scanResult['clean']) {
-                Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
-                return redirect()->back();
+            if($request->hasFile('logo')) {
+                $scanResult = $this->scanFileForViruses($request->file('logo'));
+                if (!$scanResult['clean']) {
+                    Alert()->toast('Uploaded file is infected with a virus: ' . $scanResult['message'], 'error');
+                    return back();
+                }
             }
 
             //store schools information

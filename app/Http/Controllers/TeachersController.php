@@ -337,10 +337,13 @@ class TeachersController extends Controller
             'email' => 'nullable|string|email|unique:users,email,'.$user->id,
         ]);
 
-        $scanResult = $this->scanFileForViruses($request->file('image'));
-        if (!$scanResult['clean']) {
-            Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
-            return redirect()->back();
+        if($request->hasFile('image')) {
+            // Scan the image for viruses
+            $scanResult = $this->scanFileForViruses($request->file('image'));
+            if (!$scanResult['clean']) {
+                Alert()->toast('Image scan failed: ' . $scanResult['message'], 'error');
+                return back();
+            }
         }
 
         try {

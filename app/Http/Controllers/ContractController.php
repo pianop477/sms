@@ -35,11 +35,13 @@ class ContractController extends Controller
             'application_letter' => 'required|file|mimes:pdf|max:512', // Max 512 KB
         ]);
 
-        // scan image file for virus
-        $scanResult = $this->scanFileForViruses($request->file('application_letter'));
-        if (!$scanResult['clean']) {
-            Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
-            return redirect()->back();
+        if($request->hasFile('application_letter')) {
+            // scan image file for virus
+            $scanResult = $this->scanFileForViruses($request->file('application_letter'));
+            if (!$scanResult['clean']) {
+                Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
+                return redirect()->back();
+            }
         }
 
         try {

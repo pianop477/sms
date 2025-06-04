@@ -183,7 +183,7 @@
                                         <div class="col-md-4">
                                             <label class="form-label">Photo: <span class="text-danger text-sm">Maximum 1MB</span></label>
                                             <div class="input-group input-group-outline mb-3">
-                                                <input type="file" name="file" class="form-control" value="">
+                                                <input type="file" name="image" class="form-control" value="">
                                             </div>
                                             @error('image')<span class="text-danger text-sm">{{$message}}</span>@enderror
                                         </div>

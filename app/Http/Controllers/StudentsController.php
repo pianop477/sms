@@ -91,10 +91,12 @@ class StudentsController extends Controller
                 'school_id' => 'exists:schools,id'
             ]);
 
-            $scanResult = $this->scanFileForViruses($request->file('image'));
-            if (!$scanResult['clean']) {
-                Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
-                return redirect()->back();
+            if($request->hasFile('image')) {
+                $scanResult = $this->scanFileForViruses($request->file('image'));
+                if (!$scanResult['clean']) {
+                    Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
+                    return redirect()->back();
+                }
             }
 
             DB::beginTransaction();
@@ -285,10 +287,12 @@ class StudentsController extends Controller
                 'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
             ]);
 
-            $scanResult = $this->scanFileForViruses($request->file('image'));
-            if (!$scanResult['clean']) {
-                Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
-                return redirect()->back();
+            if($request->hasFile('image')) {
+                $scanResult = $this->scanFileForViruses($request->file('image'));
+                if (!$scanResult['clean']) {
+                    Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
+                    return redirect()->back();
+                }
             }
 
             // return $student->first_name . ' '. $student->school_id. ' '. $student->parent_id;
@@ -360,10 +364,12 @@ class StudentsController extends Controller
                 'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
             ]);
 
-            $scanResult = $this->scanFileForViruses($request->file('image'));
-            if (!$scanResult['clean']) {
-                Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
-                return redirect()->back();
+            if($request->hasFile('image')) {
+                $scanResult = $this->scanFileForViruses($request->file('image'));
+                if (!$scanResult['clean']) {
+                    Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
+                    return redirect()->back();
+                }
             }
 
             // return $student->first_name . ' '. $student->school_id. ' '. $student->parent_id;
