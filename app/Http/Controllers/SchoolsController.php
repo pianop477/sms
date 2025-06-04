@@ -34,7 +34,8 @@ class SchoolsController extends Controller
         $this->nextSmsService = $nextSmsService;
     }
 
-    public function index() {
+    public function index()
+    {
         $schools = school::orderBy('school_name', 'ASC')->orderBy('school_name', 'ASC')->get();
         return view('Schools.index', ['schools' => $schools]);
     }
@@ -77,6 +78,13 @@ class SchoolsController extends Controller
                 Alert()->toast('This school already exists', 'error');
                 return back();
             }
+            // Virus scanning
+            $scanResult = $this->scanFileForViruses($request->file('logo'));
+            if (!$scanResult['clean']) {
+                Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
+                return redirect()->back();
+            }
+
             //store schools information
             $school = new school();
             $school->school_name = $request->name;
@@ -465,6 +473,38 @@ class SchoolsController extends Controller
     {
         $attempts = DB::table('failed_logins')->orderByDesc('attempted_at')->paginate(20);
         return view('Schools.failed-logins', compact('attempts'));
+    }
+
+     private function scanFileForViruses($file): array
+    {
+        // For production, use actual API
+        if (app()->environment('production')) {
+            $apiKey = config('services.virustotal.key');
+            try {
+                $response = Http::withHeaders(['x-apikey' => $apiKey])
+                            ->attach('file', fopen($file->path(), 'r'))
+                            ->post('https://www.virustotal.com/api/v3/files');
+
+                if ($response->successful()) {
+                    $scanId = $response->json()['data']['id'];
+                    $analysis = Http::withHeaders(['x-apikey' => $apiKey])
+                                ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
+
+                    return [
+                        'clean' => $analysis->json()['data']['attributes']['stats']['malicious'] === 0,
+                        'message' => $analysis->json()['data']['attributes']['status']
+                    ];
+                }
+            } catch (\Exception $e) {
+                return [
+                    'clean' => false,
+                    'message' => 'Scan failed: '.$e->getMessage()
+                ];
+            }
+        }
+
+        // For local development, just mock a successful scan
+        return ['clean' => true, 'message' => 'Development mode - scan bypassed'];
     }
 
 }

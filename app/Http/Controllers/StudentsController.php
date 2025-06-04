@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\class_learning_courses;
 use App\Models\Class_teacher;
 use App\Models\Grade;
+use App\Models\holiday_package;
 use App\Models\Parents;
 use App\Models\school;
 use App\Models\Student;
@@ -14,6 +15,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Psy\Command\WhereamiCommand;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Storage;
@@ -66,7 +68,7 @@ class StudentsController extends Controller
 
     //  store and save new student records *****************************************************************
     public function createNew(Request $request, $class)
-        {
+    {
             $decoded = Hashids::decode($class);
             if(empty($decoded)) {
                 Alert()->toast('No such class was found', 'error');
@@ -88,6 +90,12 @@ class StudentsController extends Controller
                 'image' => 'nullable|image|max:1024|mimes:jpg,jpeg,png',
                 'school_id' => 'exists:schools,id'
             ]);
+
+            $scanResult = $this->scanFileForViruses($request->file('image'));
+            if (!$scanResult['clean']) {
+                Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
+                return redirect()->back();
+            }
 
             DB::beginTransaction();
             try {
@@ -277,6 +285,12 @@ class StudentsController extends Controller
                 'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
             ]);
 
+            $scanResult = $this->scanFileForViruses($request->file('image'));
+            if (!$scanResult['clean']) {
+                Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
+                return redirect()->back();
+            }
+
             // return $student->first_name . ' '. $student->school_id. ' '. $student->parent_id;
             $student->first_name = $request->fname;
             $student->middle_name = $request->middle;
@@ -345,6 +359,12 @@ class StudentsController extends Controller
                 'driver' => 'integer|nullable|exists:transports,id',
                 'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
             ]);
+
+            $scanResult = $this->scanFileForViruses($request->file('image'));
+            if (!$scanResult['clean']) {
+                Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
+                return redirect()->back();
+            }
 
             // return $student->first_name . ' '. $student->school_id. ' '. $student->parent_id;
             $student->first_name = $request->fname;
@@ -602,6 +622,12 @@ class StudentsController extends Controller
                 'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
                 'school_id' => 'exists:schools,id',
             ]);
+
+            $scanResult = $this->scanFileForViruses($request->file('image'));
+            if (!$scanResult['clean']) {
+                Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
+                return redirect()->back();
+            }
 
             // Check for existing student records
             $existingStudent = Student::whereRaw("
@@ -990,6 +1016,47 @@ class StudentsController extends Controller
                                         ->orderBY('users.first_name')
                                         ->get();
 
-        return view('profile.student_profile', compact('students', 'myClassTeacher', 'class_course', 'class'));
+        // fetch active holiday package
+        $packages = holiday_package::where('school_id', $user->school_id)
+                                    ->where('class_id', $class->id)
+                                    ->where('is_active', true)
+                                    ->orderBy('created_at', 'DESC')
+                                    ->orderBy('updated_at', 'DESC')
+                                    ->take(5)
+                                    ->get();
+
+        return view('profile.student_profile', compact('students', 'myClassTeacher', 'class_course', 'class', 'packages'));
+    }
+
+    private function scanFileForViruses($file): array
+    {
+        // For production, use actual API
+        if (app()->environment('production')) {
+            $apiKey = config('services.virustotal.key');
+            try {
+                $response = Http::withHeaders(['x-apikey' => $apiKey])
+                            ->attach('file', fopen($file->path(), 'r'))
+                            ->post('https://www.virustotal.com/api/v3/files');
+
+                if ($response->successful()) {
+                    $scanId = $response->json()['data']['id'];
+                    $analysis = Http::withHeaders(['x-apikey' => $apiKey])
+                                ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
+
+                    return [
+                        'clean' => $analysis->json()['data']['attributes']['stats']['malicious'] === 0,
+                        'message' => $analysis->json()['data']['attributes']['status']
+                    ];
+                }
+            } catch (\Exception $e) {
+                return [
+                    'clean' => false,
+                    'message' => 'Scan failed: '.$e->getMessage()
+                ];
+            }
+        }
+
+        // For local development, just mock a successful scan
+        return ['clean' => true, 'message' => 'Development mode - scan bypassed'];
     }
 }

@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use RealRashid\SweetAlert\Facades\Alert;
 use Vinkla\Hashids\Facades\Hashids;
@@ -33,6 +34,13 @@ class ContractController extends Controller
             'contract_type' => 'required|string|in:probation,new,renewal',
             'application_letter' => 'required|file|mimes:pdf|max:512', // Max 512 KB
         ]);
+
+        // scan image file for virus
+        $scanResult = $this->scanFileForViruses($request->file('application_letter'));
+        if (!$scanResult['clean']) {
+            Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
+            return redirect()->back();
+        }
 
         try {
             $user = Auth::user();
@@ -118,7 +126,7 @@ class ContractController extends Controller
         $teacher = Teacher::where('user_id', $user->id)->firstOrFail();
         if ($contract->teacher_id != $teacher->id) {
             // Alert::error('Error', 'The selected Contract is not uploaded by you');
-            Alert()->toast('The selected Contract is not uploaded by you', 'error');
+            Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
 
@@ -148,7 +156,7 @@ class ContractController extends Controller
         $teacher = Teacher::where('user_id', $user->id)->firstOrFail();
         if ($contract->teacher_id != $teacher->id) {
             // Alert::error('Error', 'The selected Contract is not uploaded by you');
-            Alert()->toast('The selected Contract is not uploaded by you', 'error');
+            Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
 
@@ -169,6 +177,13 @@ class ContractController extends Controller
             'contract_type' => 'required|string|in:new,renewal, extension, probation',
             'application_letter' => 'required|file|mimes:pdf|max:512'
         ]);
+
+        // scan image file for virus
+        $scanResult = $this->scanFileForViruses($request->file('application_letter'));
+        if (!$scanResult['clean']) {
+            Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
+            return redirect()->back();
+        }
 
         try {
             $filePath = '';
@@ -428,6 +443,38 @@ class ContractController extends Controller
 
         $pdf = \PDF::loadView('Contract.contract_file', compact('contract'));
         return $pdf->stream('Report.pdf');
+    }
+
+    private function scanFileForViruses($file): array
+    {
+        // For production, use actual API
+        if (app()->environment('production')) {
+            $apiKey = config('services.virustotal.key');
+            try {
+                $response = Http::withHeaders(['x-apikey' => $apiKey])
+                            ->attach('file', fopen($file->path(), 'r'))
+                            ->post('https://www.virustotal.com/api/v3/files');
+
+                if ($response->successful()) {
+                    $scanId = $response->json()['data']['id'];
+                    $analysis = Http::withHeaders(['x-apikey' => $apiKey])
+                                ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
+
+                    return [
+                        'clean' => $analysis->json()['data']['attributes']['stats']['malicious'] === 0,
+                        'message' => $analysis->json()['data']['attributes']['status']
+                    ];
+                }
+            } catch (\Exception $e) {
+                return [
+                    'clean' => false,
+                    'message' => 'Scan failed: '.$e->getMessage()
+                ];
+            }
+        }
+
+        // For local development, just mock a successful scan
+        return ['clean' => true, 'message' => 'Development mode - scan bypassed'];
     }
 
 }

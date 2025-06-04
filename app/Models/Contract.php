@@ -24,10 +24,10 @@ class Contract extends Model
     ];
 
     protected $dates = [
-        'start_date',
-        'end_date',
-        'approved_at',
-        'applied_at',
+        'start_date' => 'datetime:Y-m-d',
+        'end_date' => 'datetime:Y-m-d',
+        'approved_at' => 'datetime:Y-m-d',
+        'applied_at' => 'datetime:Y-m-d',
     ];
 
     protected $casts = [

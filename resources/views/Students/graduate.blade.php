@@ -5,11 +5,11 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-10">
-                            <h4 class="header-title text-center text-uppercase">Standard seven - graduated students</h4>
-                            <span class="text-danger">Select year to view student lists</span>
+                            <h4 class="header-title text-center text-capitalize">Standard seven - graduated students</h4>
+                            <span class="text-danger">Select year</span>
                         </div>
                         <div class="col-2">
-                            <a href="" class="float-right"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                            <a href="{{route('home')}}" class="float-right"><i class="fas fa-arrow-circle-left" style=""></i> Back</a>
                         </div>
                     </div>
                     <div class="list-group">

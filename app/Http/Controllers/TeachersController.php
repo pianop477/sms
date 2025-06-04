@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Log;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\PDF as PDF;
+use Illuminate\Support\Facades\Http;
 use Vinkla\Hashids\Facades\Hashids;
 
 class TeachersController extends Controller
@@ -210,7 +211,7 @@ class TeachersController extends Controller
         $user = Auth::user();
         $schoolData = school::find($user->school_id);
         do {
-            // Generate a random 4-digit number between 1000 and 9999
+            // Generate a random 4-digit number between 1 and 9999
             $memberIdNumber = str_pad(mt_rand(1, 999), 4, '0', STR_PAD_LEFT);
 
             // Check if this admission number already exists
@@ -336,6 +337,11 @@ class TeachersController extends Controller
             'email' => 'nullable|string|email|unique:users,email,'.$user->id,
         ]);
 
+        $scanResult = $this->scanFileForViruses($request->file('image'));
+        if (!$scanResult['clean']) {
+            Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
+            return redirect()->back();
+        }
 
         try {
             // Update user
@@ -564,6 +570,38 @@ class TeachersController extends Controller
                             ->orderBy('users.first_name', 'ASC')
                             ->get();
         return view('Teachers.trash', ['teachers' => $teachers]);
+    }
+
+    private function scanFileForViruses($file): array
+    {
+        // For production, use actual API
+        if (app()->environment('production')) {
+            $apiKey = config('services.virustotal.key');
+            try {
+                $response = Http::withHeaders(['x-apikey' => $apiKey])
+                            ->attach('file', fopen($file->path(), 'r'))
+                            ->post('https://www.virustotal.com/api/v3/files');
+
+                if ($response->successful()) {
+                    $scanId = $response->json()['data']['id'];
+                    $analysis = Http::withHeaders(['x-apikey' => $apiKey])
+                                ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
+
+                    return [
+                        'clean' => $analysis->json()['data']['attributes']['stats']['malicious'] === 0,
+                        'message' => $analysis->json()['data']['attributes']['status']
+                    ];
+                }
+            } catch (\Exception $e) {
+                return [
+                    'clean' => false,
+                    'message' => 'Scan failed: '.$e->getMessage()
+                ];
+            }
+        }
+
+        // For local development, just mock a successful scan
+        return ['clean' => true, 'message' => 'Development mode - scan bypassed'];
     }
 
 
