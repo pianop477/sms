@@ -387,13 +387,13 @@
                                                     <td>term {{$item->term}}</td>
                                                     <td>
                                                         @if ($item->is_active == true)
-                                                            <span class="badge badge-success">Active <i class="fas fa-unlock"></i></span>
+                                                            <span class="badge badge-success">Active</i></span>
                                                         @else
-                                                            <span class="badge badge-danger">Locked <i class="fas fa-lock"></i></span>
+                                                            <span class="badge badge-danger">Inactive</span>
                                                         @endif
                                                     </td>
-                                                    <td>{{\Carbon\Carbon::parse($item->release_date)->format('d-m-Y')}}</td>
-                                                    <td>{{\Carbon\Carbon::parse($item->due_date)->format('d-m-Y')}}</td>
+                                                    <td>{{$item->release_date ?? 'Null'}}</td>
+                                                    <td>{{$item->due_date ?? 'Null'}}</td>
                                                     <td>
                                                         @if ($item->is_active == true)
                                                         <a href="{{route('student.holiday.package', ['id' => Hashids::encode($item->id), 'preview' => true])}}" target="_blank" class="btn btn-xs btn-success" data-toggle="tooltip" data-placement="top" title="Download Package" onclick="return confirm('Are you sure you want to download this package?')">
@@ -401,7 +401,7 @@
                                                         </a>
                                                         @else
                                                         <a href="" data-toggle="tooltip" data-placement="top" title="Package locked" class="btn btn-xs btn-secondary disabled">
-                                                            <i class="fas fa-lock"></i> Download
+                                                            <i class="fas fa-lock"></i> Locked
                                                         </a>
                                                         @endif
                                                     </td>
