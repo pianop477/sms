@@ -428,11 +428,11 @@ class ParentsController extends Controller
             'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,'.$user->id,
             'email' => 'nullable|unique:users,email,'.$user->id,
             'street' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
+            'file' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
         ]);
 
         // scan image file for virus
-        $scanResult = $this->scanFileForViruses($request->file('image'));
+        $scanResult = $this->scanFileForViruses($request->file('file'));
         if (!$scanResult['clean']) {
             Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
             return redirect()->back();
@@ -444,9 +444,9 @@ class ParentsController extends Controller
         $user->gender = $request->gender;
         $user->email = $request->email;
 
-        if($request->hasFile('image')) {
+        if($request->hasFile('file')) {
             // Log::info('Image upload detected');
-            $image = $request->file('image');
+            $image = $request->file('file');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
             $imageDestinationPath = public_path('assets/img/profile');
 
