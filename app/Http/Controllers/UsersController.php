@@ -10,6 +10,7 @@ use App\Services\BeemSmsService;
 use App\Services\NextSmsService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
@@ -36,7 +37,8 @@ class UsersController extends Controller
     }
 
     // register parents out of the system, in the sign up page *****************************************
-    public function create(Request $req) {
+    public function create(Request $req)
+    {
         $this->validate($req, [
             'fname' => ['required', 'string', 'max:255'],
             'lname' => ['required','string', 'max:255'],
@@ -58,6 +60,14 @@ class UsersController extends Controller
         if($parentExists) {
             Alert()->toast('This accounts already exists', 'error');
             return back();
+        }
+
+        if($req->hasFile('image')) {
+            $scanResult = $this->scanFileForViruses($req->file('image'));
+            if (!$scanResult['clean']) {
+                Alert()->toast('Uploaded file is infected with a virus: ' . $scanResult['message'], 'error');
+                return back();
+            }
         }
 
         $users = new User();
@@ -138,7 +148,8 @@ class UsersController extends Controller
     }
 
     // managers registration form, but now this is not working any more *************************************
-    public function managerForm() {
+    public function managerForm()
+    {
         $schools = school::where('status', '=', 1)->orderBy('school_name', 'ASC')->get();
         $managers = User::query()
                         ->join('schools', 'schools.id', '=', 'users.school_id')
@@ -305,5 +316,37 @@ class UsersController extends Controller
     public function constructionPage ()
     {
         return view('Error.construction');
+    }
+
+     private function scanFileForViruses($file): array
+    {
+        // For production, use actual API
+        if (app()->environment('production')) {
+            $apiKey = config('services.virustotal.key');
+            try {
+                $response = Http::withHeaders(['x-apikey' => $apiKey])
+                            ->attach('file', fopen($file->path(), 'r'))
+                            ->post('https://www.virustotal.com/api/v3/files');
+
+                if ($response->successful()) {
+                    $scanId = $response->json()['data']['id'];
+                    $analysis = Http::withHeaders(['x-apikey' => $apiKey])
+                                ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
+
+                    return [
+                        'clean' => $analysis->json()['data']['attributes']['stats']['malicious'] === 0,
+                        'message' => $analysis->json()['data']['attributes']['status']
+                    ];
+                }
+            } catch (\Exception $e) {
+                return [
+                    'clean' => false,
+                    'message' => 'Scan failed: '.$e->getMessage()
+                ];
+            }
+        }
+
+        // For local development, just mock a successful scan
+        return ['clean' => true, 'message' => 'Development mode - scan bypassed'];
     }
 }

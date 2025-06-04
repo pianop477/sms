@@ -441,10 +441,12 @@ class HomeController extends Controller
         ]);
 
         // scan image file for virus
-        $scanResult = $this->scanFileForViruses($request->file('image'));
-        if (!$scanResult['clean']) {
-            Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
-            return redirect()->back();
+        if($request->hasFile('image')) {
+            $scanResult = $this->scanFileForViruses($request->file('image'));
+            if (!$scanResult['clean']) {
+                Alert()->toast('Uploaded file is infected with a virus: ' . $scanResult['message'], 'error');
+                return back();
+            }
         }
 
         // Update user data

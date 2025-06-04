@@ -428,14 +428,16 @@ class ParentsController extends Controller
             'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,'.$user->id,
             'email' => 'nullable|unique:users,email,'.$user->id,
             'street' => 'required|string|max:255',
-            'file' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
+            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
         ]);
 
         // scan image file for virus
-        $scanResult = $this->scanFileForViruses($request->file('file'));
-        if (!$scanResult['clean']) {
-            Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
-            return redirect()->back();
+        if($request->hasFile('image')) {
+            $scanResult = $this->scanFileForViruses($request->file('image'));
+            if (!$scanResult['clean']) {
+                Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
+                return redirect()->back();
+            }
         }
 
         $user->first_name = $request->fname;
@@ -444,9 +446,9 @@ class ParentsController extends Controller
         $user->gender = $request->gender;
         $user->email = $request->email;
 
-        if($request->hasFile('file')) {
+        if($request->hasFile('image')) {
             // Log::info('Image upload detected');
-            $image = $request->file('file');
+            $image = $request->file('image');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
             $imageDestinationPath = public_path('assets/img/profile');
 
