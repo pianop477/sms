@@ -512,6 +512,4 @@ class AttendanceController extends Controller
             return view('Attendance.general_pdf_report', compact('fileUrl', 'fileName'));
         }
     }
-
-
 }

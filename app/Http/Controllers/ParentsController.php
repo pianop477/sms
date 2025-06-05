@@ -94,8 +94,24 @@ class ParentsController extends Controller
             'class' => 'required|integer|exists:grades,id',
             'group' => 'required|string|in:a,b,c,d,e',
             'bus_no' => 'nullable|integer|exists:transports,id',
-            'passport' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
+            'passport' => 'nullable|image|mimes:jpg,png,jpeg,giff,tiff,bmp|max:1024',
+        ], [
+            'phone.regex' => 'The phone number must be 10 digits long.',
+            'phone.unique' => 'The phone number has already been taken.',
+            'email.unique' => 'The email has already been taken.',
+            'passport.image' => 'The file must be an image file of type: jpg, png, jpeg,giff,tiff,bmp.',
+            'passport.mimes' => 'The image must be a file of type: jpg, png, jpeg,giff,tiff,bmp.',
+            'passport.max' => 'The image may not be greater than 1MB.',
         ]);
+
+        if($request->hasFile('passport')) {
+            // Scan the uploaded file for viruses
+            $scanResult = $this->scanFileForViruses($request->file('passport'));
+            if (!$scanResult['clean']) {
+                Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
+                return redirect()->back();
+            }
+        }
 
         DB::beginTransaction();
         try {
@@ -428,7 +444,15 @@ class ParentsController extends Controller
             'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,'.$user->id,
             'email' => 'nullable|unique:users,email,'.$user->id,
             'street' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
+            'image' => 'nullable|image|mimes:jpg,png,jpeg,tiff,bmp,giff|max:1024',
+        ],
+        [
+            'phone.regex' => 'The phone number must be 10 digits long.',
+            'phone.unique' => 'The phone number has already been taken.',
+            'email.unique' => 'The email has already been taken.',
+            'image.image' => 'The file must be an image file of type: jpg, png, jpeg.',
+            'image.mimes' => 'The image must be a file of type: jpg, png, jpeg.',
+            'image.max' => 'The image may not be greater than 1MB.',
         ]);
 
         // scan image file for virus

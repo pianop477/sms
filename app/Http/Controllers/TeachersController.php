@@ -95,6 +95,14 @@ class TeachersController extends Controller
             'street' => 'required|string|max:255',
             'joined' => 'required|date_format:Y',
             'school_id' => 'exists:schools, id'
+        ], [
+            'fname.required' => 'First name is required',
+            'lname.required' => 'Last name is required',
+            'dob.required' => 'Date of birth is required',
+            'phone.required' => 'Phone number is required',
+            'phone.regex' => 'Phone number must be 10 digits',
+            'qualification.required' => 'Qualification is required',
+            'street.required' => 'Street address is required',
         ]);
 
         $user = Auth::user();
@@ -335,6 +343,14 @@ class TeachersController extends Controller
             'joined_at' => 'required|date_format:Y',
             'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
             'email' => 'nullable|string|email|unique:users,email,'.$user->id,
+        ], [
+            'fname.required' => 'First name is required',
+            'lname.required' => 'Last name is required',
+            'dob.required' => 'Date of birth is required',
+            'phone.required' => 'Phone number is required',
+            'phone.regex' => 'Phone number must be 10 digits',
+            'qualification.required' => 'Qualification is required',
+            'street.required' => 'Street address is required',
         ]);
 
         if($request->hasFile('image')) {

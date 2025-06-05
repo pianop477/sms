@@ -82,6 +82,11 @@ class RolesController extends Controller
          $this->validate($request, [
              'teacher' => 'integer|exists:teachers,id',
              'group' => 'required|string|max:1',
+         ], [
+             'teacher.integer' => 'Please select a valid teacher',
+             'teacher.exists' => 'The selected teacher does not exist',
+             'group.required' => 'Group is required',
+             'group.max' => 'Group must be a single character',
          ]);
 
          // Check if the selected teacher is already assigned to another class in the same school
@@ -242,7 +247,7 @@ class RolesController extends Controller
                                             ->where('class_teachers.teacher_id', '=', $teacherId->id)
                                             ->where('class_teachers.school_id', $teacherId->school_id)
                                             ->firstOrFail();
-    $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
+        $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
                                 ->select('teachers.*', 'users.first_name', 'users.last_name')
                                 ->where('teachers.status', '=', 1)
                                 ->whereNotIn('teachers.role_id', [2, 3])
@@ -397,6 +402,9 @@ class RolesController extends Controller
 
         $request->validate([
             'role' => 'required|exists:roles,id',
+        ], [
+            'role.required' => 'Please select a role',
+            'role.exists' => 'The selected role does not exist',
         ]);
 
 

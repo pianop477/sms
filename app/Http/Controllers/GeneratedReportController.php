@@ -23,6 +23,11 @@ class GeneratedReportController extends Controller
             'class_id' => 'required|integer',
             'exam_dates' => 'required|array',
             'combine_option' => 'required|in:sum,average,individual',
+        ], [
+            'exam_type.required' => 'Select Exam type',
+            'class_id.required' => 'Class ID is required',
+            'exam_dates.required' => 'At least one exam date must be selected',
+            'combine_option.required' => 'Choose aggregate method for your report',
         ]);
 
         $selectedDataSet = $request->input('exam_dates', []);

@@ -367,6 +367,7 @@
                                             <th scope="col">title</th>
                                             <th scope="col">Description</th>
                                             <th scope="col">term</th>
+                                            <th scope="col">year</th>
                                             <th scope="col">Status</th>
                                             <th scope="col">released at</th>
                                             <th scope="col">Expire on</th>
@@ -376,7 +377,7 @@
                                     <tbody>
                                         @if ($packages->isEmpty())
                                             <tr>
-                                                <td colspan="8" class="text-danger text-center">No Holiday Package Available!</td>
+                                                <td colspan="9" class="text-danger text-center">No Holiday Package Available!</td>
                                             </tr>
                                         @else
                                             @foreach ($packages as $item )
@@ -385,6 +386,7 @@
                                                     <td>{{$item->title}}</td>
                                                     <td>{{$item->description}}</td>
                                                     <td>term {{$item->term}}</td>
+                                                    <td>{{$item->year}}</td>
                                                     <td>
                                                         @if ($item->is_active == true)
                                                             <span class="badge badge-success">Active</i></span>
@@ -400,7 +402,7 @@
                                                             <i class="fas fa-download"></i> Download
                                                         </a>
                                                         @else
-                                                        <a href="" data-toggle="tooltip" data-placement="top" title="Package locked" class="btn btn-xs btn-secondary disabled">
+                                                        <a href="" data-toggle="tooltip" data-placement="top" title="Package locked" class="btn btn-xs btn-danger disabled">
                                                             <i class="fas fa-lock"></i> Locked
                                                         </a>
                                                         @endif

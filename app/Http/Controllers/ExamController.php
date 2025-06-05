@@ -68,6 +68,11 @@ class ExamController extends Controller
             'exam_date' => 'required|date_format:Y-m-d',
             'term' => 'required',
             'marking_style' => 'required|integer'
+        ], [
+            'exam_type.required' => 'Please select an examination type',
+            'exam_date.required' => 'Please select an exam date',
+            'term.required' => 'Please select a term',
+            'marking_style.required' => 'Please select a marking style'
         ]);
 
         // Capture values
@@ -139,6 +144,15 @@ class ExamController extends Controller
             'exam_date' => 'required|date|date_format:Y-m-d',
             'term' => 'required|in:i,ii',
             'marking_style' => 'required|in:1,2',
+        ], [
+            'course_id.required' => 'Course is required',
+            'class_id.required' => 'Class is required',
+            'teacher_id.required' => 'Teacher is required',
+            'school_id.required' => 'School is required',
+            'exam_id.required' => 'Exam type is required',
+            'exam_date.required' => 'Exam date is required',
+            'term.required' => 'Term is required',
+            'marking_style.required' => 'Marking style is required'
         ]);
 
         // Define validation rules conditionally based on marking style
@@ -243,6 +257,9 @@ class ExamController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'abbreviation' => 'required|string|max:8'
+        ], [
+            'name.required' => 'Examination type name is required',
+            'abbreviation.required' => 'Examination code is required'
         ]);
 
         $existingRecords = Examination::where('exam_type', '=', $request->name)->where('symbolic_abbr', $request->abbreviation)->where('school_id', '='. Auth::user()->school_id)->exists();
@@ -292,6 +309,9 @@ class ExamController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'abbreviation' => 'required|string|max:8'
+        ], [
+            'name.required' => 'Examination type name is required',
+            'abbreviation.required' => 'Examination code is required'
         ]);
 
         $exam = Examination::findOrFail($exams);

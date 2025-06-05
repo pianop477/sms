@@ -33,6 +33,11 @@ class ContractController extends Controller
         $this->validate($request, [
             'contract_type' => 'required|string|in:probation,new,renewal',
             'application_letter' => 'required|file|mimes:pdf|max:512', // Max 512 KB
+        ], [
+            'contract_type.required' => 'Select Contract type',
+            'application_letter.required' => 'Application letter is required',
+            'application_letter.mimes' => 'Application letter must be a PDF file',
+            'application_letter.max' => 'Application letter must not exceed 512 KB',
         ]);
 
         if($request->hasFile('application_letter')) {
@@ -178,6 +183,11 @@ class ContractController extends Controller
         $this->validate($request, [
             'contract_type' => 'required|string|in:new,renewal, extension, probation',
             'application_letter' => 'required|file|mimes:pdf|max:512'
+        ], [
+            'contract_type.required' => 'Select Contract type',
+            'application_letter.required' => 'Application letter is required',
+            'application_letter.mimes' => 'Application letter must be a PDF file',
+            'application_letter.max' => 'Application letter must not exceed 512 KB',
         ]);
 
         // scan image file for virus
@@ -332,6 +342,11 @@ class ContractController extends Controller
         $this->validate($request, [
             'duration' => 'required|integer',
             'remark' => 'required|string|max:255',
+        ], [
+            'duration.required' => 'Contract duration is required',
+            'duration.integer' => 'Contract duration must be a valid number of months',
+            'remark.required' => 'Remarks are required',
+            'remark.max' => 'Remarks must not exceed 255 characters',
         ]);
 
         $approved_at = Carbon::now();
@@ -364,6 +379,9 @@ class ContractController extends Controller
 
         $this->validate($request, [
             'remark' => 'required|string|max:255',
+        ], [
+            'remark.required' => 'Remarks are required',
+            'remark.max' => 'Remarks must not exceed 255 characters',
         ]);
 
         $contract->update([

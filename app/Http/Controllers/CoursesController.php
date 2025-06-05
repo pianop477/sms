@@ -187,6 +187,10 @@ class CoursesController extends Controller
             'sname' => 'required|string|max:255',
             'scode' => 'required|string|max:10',
             'school_id' => 'integer|exists:schools,id'
+        ], [
+            'sname.required' => 'Course name is required',
+            'scode.required' => 'Course code is required',
+            'school_id.exists' => 'School does not exist'
         ]);
 
         $ifExists = Subject::where('course_name', $request->sname)
@@ -228,6 +232,9 @@ class CoursesController extends Controller
         $this->validate($request, [
             'sname' => 'required|string|max:255',
             'scode' => 'required|string|max:10'
+        ], [
+            'sname.required' => 'Course name is required',
+            'scode.required' => 'Course code is required'
         ]);
 
         $course->update([
@@ -246,6 +253,11 @@ class CoursesController extends Controller
             'class_id' => 'integer|exists:grades,id',
             'teacher_id' => 'integer|exists:teachers,id',
             'school_id' => 'integer|exists:schools,id'
+        ], [
+            'course_id.exists' => 'Course does not exist',
+            'class_id.exists' => 'Class does not exist',
+            'teacher_id.exists' => 'Teacher does not exist',
+            'school_id.exists' => 'School does not exist'
         ]);
 
         //check if course already exists to that class

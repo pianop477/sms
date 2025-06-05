@@ -89,6 +89,11 @@ class StudentsController extends Controller
                 'group' => 'required|string|in:A,B,C,D',
                 'image' => 'nullable|image|max:1024|mimes:jpg,jpeg,png',
                 'school_id' => 'exists:schools,id'
+            ], [
+                'fname.required' => 'First name is required',
+                'middle.required' => 'Middle name is required',
+                'lname.required' => 'Last name is required',
+
             ]);
 
             if($request->hasFile('image')) {
@@ -285,6 +290,12 @@ class StudentsController extends Controller
                 'dob' => 'required|date|date_format:Y-m-d',
                 'driver' => 'integer|nullable|exists:transports,id',
                 'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
+            ], [
+                'fname.required' => 'First name is required',
+                'middle.required' => 'Middle name is required',
+                'lname.required' => 'Last name is required',
+                'parent.exists' => 'Parent does not exist',
+                'class.exists' => 'Class does not exist',
             ]);
 
             if($request->hasFile('image')) {
@@ -362,6 +373,11 @@ class StudentsController extends Controller
                 'dob' => 'required|date|date_format:Y-m-d',
                 'driver' => 'integer|nullable|exists:transports,id',
                 'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
+            ], [
+                'fname.required' => 'First name is required',
+                'middle.required' => 'Middle name is required',
+                'lname.required' => 'Last name is required',
+                'class.exists' => 'Class does not exist',
             ]);
 
             if($request->hasFile('image')) {
@@ -627,6 +643,11 @@ class StudentsController extends Controller
                 'group' => 'required|string|in:A,B,C,D',
                 'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
                 'school_id' => 'exists:schools,id',
+            ], [
+                'fname.required' => 'First name is required',
+                'middle.required' => 'Middle name is required',
+                'lname.required' => 'Last name is required',
+                'grade.exists' => 'Selected class does not exist',
             ]);
 
             $scanResult = $this->scanFileForViruses($request->file('image'));
@@ -1026,6 +1047,7 @@ class StudentsController extends Controller
         $packages = holiday_package::where('school_id', $user->school_id)
                                     ->where('class_id', $class->id)
                                     // ->where('is_active', true)
+                                    ->whereYear('year', date('Y'))
                                     ->orderBy('created_at', 'DESC')
                                     ->orderBy('updated_at', 'DESC')
                                     ->take(5)
