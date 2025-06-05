@@ -26,6 +26,11 @@ class SendMessageController extends Controller
             'name' => 'required|string|max:255',
             'phone' => 'required|regex:/^[0-9]{10}$/',
             'message' => 'required|string|max:500'
+        ], [
+            'name.required' => 'Name is required',
+            'phone.required' => 'Phone number is required',
+            'phone.regex' => 'Phone number must be 10 digits',
+            'message.required' => 'Message is required',
         ]);
         $sendFeeback = new message();
         $sendFeeback->name = $request->name;

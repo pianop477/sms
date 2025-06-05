@@ -90,6 +90,13 @@ class PackagesController extends Controller
             'class' => 'required|integer|exists:grades,id',
             'term' => 'required|in:i,ii',
             'package_file' => 'required|file|mimes:pdf|max:2048',
+        ], [
+            'title.required' => 'Package title is required',
+            'class.required' => 'Class selection is required',
+            'term.required' => 'Term selection is required',
+            'package_file.required' => 'Package file is required',
+            'package_file.mimes' => 'Only PDF files are allowed',
+            'package_file.max' => 'File size must not exceed 2MB',
         ]);
 
         // Check for existing package

@@ -363,6 +363,12 @@ class HomeController extends Controller
             'current_password' => ['required', 'string'],
             'new_password' => ['required', 'string', Password::min(8)->letters()->numbers()],
             'confirm_password' => ['required', 'same:new_password'],
+        ], [
+            'current_password.required' => 'Current password is required',
+            'new_password.required' => 'New password is required',
+            'new_password.min' => 'New password must be at least 8 characters long',
+            'confirm_password.required' => 'Confirm password is required',
+            'confirm_password.same' => 'Confirm password must match the new password',
         ]);
 
         try {
@@ -436,8 +442,15 @@ class HomeController extends Controller
             'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,' . $userData->id,
             'email' => 'nullable|unique:users,email,' . $userData->id,
             'gender' => 'required|in:female,male',
-            'image' => 'nullable|mimes:jpg,png,jpeg|max:1024',
+            'image' => 'nullable|image|mimes:jpg,png,jpeg,tiff,giff,bmp|max:1024',
             'address' => 'nullable|string|max:255',
+        ],
+        [
+            'fname.required' => 'First name is required',
+            'lname.required' => 'Last name is required',
+            'phone.required' => 'Phone number is required',
+            'phone.regex' => 'Phone number must be 10 digits',
+            'email.unique' => 'Email already exists',
         ]);
 
         // scan image file for virus

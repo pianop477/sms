@@ -54,6 +54,13 @@ class UsersController extends Controller
             'password_confirmation' => ['same:password'],
             'image' => ['nullable', 'image', 'mimes:jpg,png,jpeg', 'max:1024'],
             'street' => ['required', 'string', 'max:255'],
+        ], [
+            'fname.required' => 'First name is required',
+            'lname.required' => 'Last name is required',
+            'email.unique' => 'Email already exists',
+            'phone.required' => 'Phone number is required',
+            'phone.regex' => 'Phone number must be 10 digits',
+            'phone.unique' => 'Phone number already exists',
         ]);
 
         $parentExists = User::where('phone', $req->phone)->where('school_id', $req->school)->exists();
@@ -183,6 +190,13 @@ class UsersController extends Controller
             'email' => 'nullable|unique:users,email',
             'gender' => 'required|string|max:10',
             'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone',
+        ], [
+            'fname.required' => 'First name is required',
+            'lname.required' => 'Last name is required',
+            'email.unique' => 'Email already exists',
+            'phone.required' => 'Phone number is required',
+            'phone.regex' => 'Phone number must be 10 digits',
+            'phone.unique' => 'Phone number already exists',
         ]);
 
         $isExisting = User::where('phone', $request->phone)->exists();

@@ -67,6 +67,9 @@ class SmsController extends Controller
         $this->validate($request, [
             'class' => 'nullable|required_if:send_to_all,0|integer|exists:grades,id',
             'message_content' => 'required|string',
+        ], [
+            'class.required_if' => 'Please select a class or check "Send to All"',
+            'message_content.required' => 'Message content is required',
         ]);
 
         // Check if "Send to All" is selected
@@ -161,6 +164,9 @@ class SmsController extends Controller
         $this->validate($request, [
             'class' => 'nullable|required_if:send_to_all,0|integer|exists:grades,id',
             'message_content' => 'required|string',
+        ], [
+            'class.required_if' => 'Please select a class or check "Send to All"',
+            'message_content.required' => 'Message content is required',
         ]);
 
         $sendToAllClasses = $request->has('send_to_all');

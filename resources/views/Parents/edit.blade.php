@@ -30,6 +30,7 @@
                         <h6 class="profile-username text-center text-primary text-uppercase">
                             <b>{{ucwords(strtolower($parents->first_name. ' '. $parents->last_name))}}</b>
                         </h6>
+                        <p class="text-muted text-center text-capitalize">{{_('#parent')}}</p>
                         <br>
                         <br>
                         <ul class="list-group list-group-flush mb-3">

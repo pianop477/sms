@@ -34,6 +34,9 @@ class ClassesController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:255',
+        ], [
+            'name.required' => 'Class name is required',
+            'code.required' => 'Class code is required',
         ]);
         // Check if a record with the same combination already exists
             $existingRecord = Grade::where('class_name', $request->name)
@@ -94,6 +97,9 @@ class ClassesController extends Controller
         $request->validate([
             'cname' => 'required|string|max:255',
             'ccode' => 'required|string|max:255',
+        ], [
+            'cname.required' => 'Class name is required',
+            'ccode.required' => 'Class code is required',
         ]);
 
         $class->update([

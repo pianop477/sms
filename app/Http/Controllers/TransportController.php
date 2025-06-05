@@ -43,6 +43,12 @@ class TransportController extends Controller
             'phone' => 'required|regex:/^[0-9]{10}$/|unique:transports,phone',
             'bus' => 'required|string|max:255',
             'routine' => 'required|string|max:255',
+        ], [
+            'fullname.required' => 'Driver name is required',
+            'phone.required' => 'Phone number is required',
+            'phone.regex' => 'Phone number must be 10 digits',
+            'bus.required' => 'Bus number is required',
+            'routine.required' => 'Routine is required',
         ]);
 
         try {
@@ -180,6 +186,13 @@ class TransportController extends Controller
             'phone' => 'required|regex:/^[0-9]{10}$/|unique:transports,phone,'.$trans->phone,
             'bus_no' => 'required|string|max|255',
             'routine' => 'required|string|max:255'
+        ], [
+            'fullname.required' => 'Driver name is required',
+            'phone.required' => 'Phone number is required',
+            'phone.regex' => 'Phone number must be 10 digits',
+            'bus_no.required' => 'Bus number is required',
+            'routine.required' => 'Routine is required',
+            'phone.unique' => 'This phone number is already registered for another driver',
         ]);
 
         try {

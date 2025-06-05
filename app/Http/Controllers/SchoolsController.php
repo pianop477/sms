@@ -68,7 +68,21 @@ class SchoolsController extends Controller
             'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone',
             'gender' => 'required|string|max:255',
             'sender_name' => 'nullable|string|max:11'
+        ], [
+            'name.required' => 'School name is required',
+            'reg_no.required' => 'School registration number is required',
+            'abbriv.required' => 'Abbreviation code is required',
+            'postal.required' => 'Postal address is required',
+            'postal_name.required' => 'Postal name is required',
+            'country.required' => 'Country is required',
+            'fname.required' => 'First name is required',
+            'lname.required' => 'Last name is required',
+            'email.unique' => 'Email already exists',
+            'phone.required' => 'Phone number is required',
+            'phone.regex' => 'Phone number must be 10 digits long',
+            'phone.unique' => 'Phone number already exists',
         ]);
+
         try {
 
             //check if exists
@@ -263,6 +277,13 @@ class SchoolsController extends Controller
             'postal_name' => 'required|string|max:255',
             'country' => 'required|string',
             'sender_name' => 'nullable|string|max:11'
+        ], [
+            'name.required' => 'School name is required',
+            'reg_no.required' => 'School registration number is required',
+            'abbriv.required' => 'Abbreviation code is required',
+            'postal.required' => 'Postal address is required',
+            'postal_name.required' => 'Postal name is required',
+            'country.required' => 'Country is required',
         ]);
 
         $schools = school::findOrFail($decoded[0]);
