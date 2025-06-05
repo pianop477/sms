@@ -341,7 +341,7 @@ class TeachersController extends Controller
             'street' => 'required|string|max:255',
             'gender' => 'required|max:20',
             'joined_at' => 'required|date_format:Y',
-            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
+            'image' => 'nullable|mimes:jpg,png,jpeg|max:1024',
             'email' => 'nullable|string|email|unique:users,email,'.$user->id,
         ], [
             'fname.required' => 'First name is required',

@@ -87,7 +87,7 @@ class StudentsController extends Controller
                 'dob' => 'required|date|date_format:Y-m-d',
                 'driver' => 'nullable|exists:transports,id',
                 'group' => 'required|string|in:A,B,C,D',
-                'image' => 'nullable|image|max:1024|mimes:jpg,jpeg,png',
+                'image' => 'nullable|max:1024|mimes:jpg,jpeg,png',
                 'school_id' => 'exists:schools,id'
             ], [
                 'fname.required' => 'First name is required',
@@ -289,7 +289,7 @@ class StudentsController extends Controller
                 'gender' => 'required|max:255',
                 'dob' => 'required|date|date_format:Y-m-d',
                 'driver' => 'integer|nullable|exists:transports,id',
-                'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
+                'image' => 'nullable|mimes:jpg,png,jpeg|max:1024',
             ], [
                 'fname.required' => 'First name is required',
                 'middle.required' => 'Middle name is required',
@@ -372,7 +372,7 @@ class StudentsController extends Controller
                 'gender' => 'required|max:255',
                 'dob' => 'required|date|date_format:Y-m-d',
                 'driver' => 'integer|nullable|exists:transports,id',
-                'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
+                'image' => 'nullable|mimes:jpg,png,jpeg|max:1024',
             ], [
                 'fname.required' => 'First name is required',
                 'middle.required' => 'Middle name is required',
@@ -641,7 +641,7 @@ class StudentsController extends Controller
                 'dob' => 'required|date|date_format:Y-m-d',
                 'driver' => 'nullable|integer|exists:transports,id',
                 'group' => 'required|string|in:A,B,C,D',
-                'image' => 'nullable|image|mimes:jpg,png,jpeg|max:1024',
+                'image' => 'nullable|mimes:jpg,png,jpeg|max:1024',
                 'school_id' => 'exists:schools,id',
             ], [
                 'fname.required' => 'First name is required',
