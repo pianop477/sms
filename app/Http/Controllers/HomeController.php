@@ -442,7 +442,7 @@ class HomeController extends Controller
             'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,' . $userData->id,
             'email' => 'nullable|unique:users,email,' . $userData->id,
             'gender' => 'required|in:female,male',
-            'image' => 'nullable|image|mimes:jpg,png,jpeg,tiff,giff,bmp|max:1024',
+            'image' => 'nullable|mimes:jpg,png,jpeg,tiff,giff,bmp|max:1024',
             'address' => 'nullable|string|max:255',
         ],
         [
@@ -451,6 +451,8 @@ class HomeController extends Controller
             'phone.required' => 'Phone number is required',
             'phone.regex' => 'Phone number must be 10 digits',
             'email.unique' => 'Email already exists',
+            'image.mimes' => 'Image must be a file of type: jpg, png, jpeg, tiff, giff, bmp.',
+            'image.max' => 'Image size must not exceed 1MB',
         ]);
 
         // scan image file for virus

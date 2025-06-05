@@ -58,7 +58,7 @@ class SchoolsController extends Controller
             'name' => 'required|string|max:255',
             'reg_no' => 'required|string|max:255',
             'abbriv' => 'required|string|max:4',
-            'logo' => 'image|max:1024|mimes:png,jpg,jpeg',
+            'logo' => 'max:1024|mimes:png,jpg,jpeg',
             'postal' => 'required|string|max:255',
             'postal_name' => 'required|string|max:255',
             'country' => 'required|string',
@@ -271,7 +271,7 @@ class SchoolsController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'reg_no' => 'required|string|max:255',
-            'logo' => 'image|max:1024|mimes:png,jpg,jpeg',
+            'logo' => 'max:1024|mimes:png,jpg,jpeg',
             'abbriv' => 'required|string|max:4',
             'postal' => 'required|string|max:255',
             'postal_name' => 'required|string|max:255',
