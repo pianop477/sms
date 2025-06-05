@@ -33,7 +33,7 @@ return [
 
     'lifetime' => env('SESSION_LIFETIME', 120),
 
-    'expire_on_close' => true,
+    'expire_on_close' => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -46,7 +46,7 @@ return [
     |
     */
 
-    'encrypt' => false,
+    'encrypt' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -168,7 +168,7 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    'secure' => env('SESSION_SECURE_COOKIE', true),
 
     /*
     |--------------------------------------------------------------------------
