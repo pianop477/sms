@@ -5,7 +5,7 @@
     <div class="col-12 mt-2">
         <div class="row">
             <div class="col-10">
-                <h4 class="text-capitalize ">User Account Information</h4>
+                <h4 class="text-capitalize ">User Account</h4>
             </div>
             <div class="col-2">
                 <a href="{{route('home')}}" class="btn btn-info float-right btn-xs"><i class="fas fa-arrow-circle-left"></i> Back</a>
@@ -32,13 +32,13 @@
                         </h6>
                         <p class="text-muted text-center">
                             @if ($user->usertype == 1)
-                                <b><span class="text-muted">{{_('System Administrator')}}</span></b>
+                                <b><span class="text-muted">{{_('#System Administrator')}}</span></b>
                             @elseif ($user->usertype == 2)
-                                <b><span class="text-muted">{{_('School Administrator')}}</span></b>
+                                <b><span class="text-muted">{{_('#School Administrator')}}</span></b>
                             @elseif($user->usertype == 3)
-                                <b><span class="text-muted">{{_('Teacher')}}</span></b><br>
+                                <b><span class="text-muted">{{_('#Teacher')}}</span></b><br>
                             @else
-                                <b><span class="text-muted">{{_('Parent')}}</span></b>
+                                <b><span class="text-muted">{{_('#Parent')}}</span></b>
                             @endif
                         </p>
                         <br>
@@ -82,10 +82,10 @@
                     <div class="card-header p-1">
                         <ul class="nav nav-pills flex-column flex-sm-row">
                             <li class="flex-sm-fill text-sm-center nav-item">
-                                <a class="nav-link active" title="Profile" href="#profile" data-toggle="tab"><i class="fas fa-user"></i> Account Profile</a>
+                                <a class="nav-link active" title="Profile" href="#profile" data-toggle="tab"><i class="fas fa-user"></i> Profile</a>
                             </li>
                             <li class="flex-sm-fill text-sm-center nav-item">
-                                <a class="nav-link" href="#edit" title="Update" data-toggle="tab"><i class="fas fa-user-pen"></i> Edit Account Information</a>
+                                <a class="nav-link" href="#edit" title="Update" data-toggle="tab"><i class="fas fa-user-pen"></i> Edit Account</a>
                             </li>
                         </ul>
                     </div>
