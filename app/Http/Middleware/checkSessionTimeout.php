@@ -22,26 +22,28 @@ class checkSessionTimeout
      public function handle(Request $request, Closure $next)
     {
         if (Auth::check()) {
-            // Ikiwa session_start_time haipo, weka sasa hivi (user ka-login tu)
-            if (!session()->has('session_start_time')) {
-                session(['session_start_time' => now()]);
+            // 1. Angalia kama session ya mwisho (last activity) ipo
+            if (!session()->has('last_activity')) {
+                session(['last_activity' => now()]);
             }
 
-            // Linganisha muda wa sasa na ule aliowekewa mwanzo
-            $sessionDuration = now()->diffInMinutes(session('session_start_time'));
+            // 2. Piga update "last_activity" kwa kila request
+            session(['last_activity' => now()]);
 
-            // Kama muda umepita zaidi ya masaa 2 (dakika 120), fanya logout
-            if ($sessionDuration >= 120) {
+            // 3. Angalia kama muda wa session umekwisha (120 dakika bila activity)
+            $inactiveTime = now()->diffInMinutes(session('last_activity'));
+
+            if ($inactiveTime >= 120) {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
 
-                return redirect()->route('login')->with('error', 'Session expired. Please login again');
+                return redirect()->route('login')
+                    ->with('error', 'Session has expired please login again.');
             }
         }
 
         return $next($request);
     }
-
 
 }
