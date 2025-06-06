@@ -165,7 +165,7 @@
             bottom: -30px;
             align-content: space-around;
             font-size: 12px;
-            border-top: 1px solid black;
+            /* border-top: 1px solid black; */
         }
         .page-number:before {
             content: "Page " counter(page);
