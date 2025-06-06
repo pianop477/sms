@@ -1757,23 +1757,47 @@ class ResultsController extends Controller
 
         $totalScoreForStudent = $validScores->sum('score');
 
-        // =================== GENERAL POSITION ===================
+        // =================== GENERAL POSITION (WITH TIE RANKING) ===================
         $studentId = $results->first()->student_id ?? null;
 
+        // Get all students' total scores
         $studentTotalScores = Examination_result::where('class_id', $classId)
             ->where('school_id', $schoolId)
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->get()
             ->groupBy('student_id')
             ->map(function ($studentResults) {
-                return $studentResults->sum('score');  // Jumla ya alama halisi
-            })
-            ->sortDesc();
+                return $studentResults->sum('score');
+            });
 
-        $allStudentIds = $studentTotalScores->keys()->values()->all();
-        $index = array_search($studentId, $allStudentIds);
-        $generalPosition = $index !== false ? $index + 1 : '-';
-        $totalStudents = count($allStudentIds);
+        // Sort students by score (descending) and apply tie ranking
+        $sortedStudents = $studentTotalScores->sortDesc()->values();
+
+        $rank = 1;
+        $previousScore = null;
+        $previousRank = 1;
+
+        $studentsWithRank = collect();
+        foreach ($sortedStudents as $index => $score) {
+            if ($previousScore !== null && $score < $previousScore) {
+                $rank = $index + 1;
+            }
+
+            $studentsWithRank->push([
+                'student_id' => $studentTotalScores->keys()[$index],
+                'score' => $score,
+                'rank' => $rank
+            ]);
+
+            $previousScore = $score;
+            $previousRank = $rank;
+        }
+
+        // Find current student's position
+        $studentPosition = $studentsWithRank->firstWhere('student_id', $studentId)['rank'] ?? '-';
+        $totalStudents = $sortedStudents->count();
+
+        $generalPosition = $studentPosition;
 
         // =================== EXAM SPECIFICATIONS ===================
         $examSpecifications = $results
@@ -1820,7 +1844,7 @@ class ResultsController extends Controller
         if($reports->status == 1) {
             $examDates = $reports->exam_dates;
 
-            // STEP 1: Fetch all results for the student (same query as PDF)
+            // STEP 1: Fetch all results for the student
             $results = Examination_result::query()
                             ->join('students', 'students.id', '=', 'examination_results.student_id')
                             ->join('grades', 'grades.id', '=', 'examination_results.class_id')
@@ -1848,27 +1872,49 @@ class ResultsController extends Controller
                 return to_route('students.combined.report', ['school' => $school, 'year' => $year, 'class' => $class, 'report' => $report]);
             }
 
-            // STEP 2: Calculate totals (same as PDF)
+            // STEP 2: Calculate totals
             $studentTotal = $results->sum('score');
             $studentAverage = $results->avg('score');
 
-            // STEP 3: Calculate position (same as PDF)
+            // STEP 3: Calculate position WITH TIE RANKING (like publishCombinedReport)
             $allStudentsScores = Examination_result::where('class_id', $classId)
-                                ->where('school_id', $schoolId)
-                                ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                                ->get()
-                                ->groupBy('student_id')
-                                ->map(function ($studentResults) {
-                                    return $studentResults->sum('score');
-                                })
-                                ->sortDesc();
+                ->where('school_id', $schoolId)
+                ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                ->get()
+                ->groupBy('student_id')
+                ->map(function ($studentResults) {
+                    return $studentResults->sum('score');
+                })
+                ->sortDesc();
 
-            $uniqueScores = $allStudentsScores->unique()->sortDesc()->values();
-            $studentScore = $allStudentsScores->get($studentId, 0);
-            $position = $studentScore ? $uniqueScores->search($studentScore) + 1 : '-';
-            $totalStudents = $allStudentsScores->count();
+            // Apply tie ranking logic
+            $sortedStudents = $allStudentsScores->sortDesc()->values();
 
-            // STEP 4: Get parent info
+            $rank = 1;
+            $previousScore = null;
+            $studentsWithRank = collect();
+
+            foreach ($sortedStudents as $index => $score) {
+                if ($previousScore !== null && $score < $previousScore) {
+                    $rank = $index + 1; // Only increase rank if score is different
+                }
+
+                $studentsWithRank->push([
+                    'student_id' => $allStudentsScores->keys()[$index],
+                    'score' => $score,
+                    'rank' => $rank
+                ]);
+
+                $previousScore = $score;
+            }
+
+            // Find current student's position
+            $studentRank = $studentsWithRank->firstWhere('student_id', $studentId)['rank'] ?? '-';
+            $totalStudents = $sortedStudents->count();
+
+            $position = $studentRank;
+
+            // Rest of the code remains the same...
             $studentData = $results->first();
             $parentId = $studentData->parent_id ?? null;
 
@@ -1887,7 +1933,7 @@ class ResultsController extends Controller
                 return to_route('students.combined.report', ['school' => $school, 'year' => $year, 'class' => $class, 'report' => $report]);
             }
 
-            // STEP 5: Format SMS message (updated to match PDF calculations)
+            // Format SMS message
             $formattedPhone = $this->formatPhoneNumber($phoneNumber);
             $studentName = strtoupper($studentData->first_name . ', '. $studentData->last_name[0]);
             $reportDate = Carbon::parse($reports->created_at)->format('d-m-Y');
@@ -1902,7 +1948,6 @@ class ResultsController extends Controller
                 . "Nafasi ya {$position} kati ya {$totalStudents}.\n"
                 . "Tembelea {$link} kuona ripoti.";
 
-            // STEP 6: Send SMS
             try {
                 $nextSmsService = new NextSmsService();
                 // $response = $nextSmsService->sendSmsByNext(
@@ -2100,23 +2145,47 @@ class ResultsController extends Controller
 
         $totalScoreForStudent = $validScores->sum('score');
 
-        // =================== GENERAL POSITION ===================
+        // =================== GENERAL POSITION (WITH TIE RANKING) ===================
         $studentId = $results->first()->student_id ?? null;
 
+        // Get all students' total scores
         $studentTotalScores = Examination_result::where('class_id', $classId)
             ->where('school_id', $schoolId)
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->get()
             ->groupBy('student_id')
             ->map(function ($studentResults) {
-                return $studentResults->sum('score');  // Jumla ya alama halisi
-            })
-            ->sortDesc();
+                return $studentResults->sum('score');
+            });
 
-        $allStudentIds = $studentTotalScores->keys()->values()->all();
-        $index = array_search($studentId, $allStudentIds);
-        $generalPosition = $index !== false ? $index + 1 : '-';
-        $totalStudents = count($allStudentIds);
+        // Sort students by score (descending) and apply tie ranking
+        $sortedStudents = $studentTotalScores->sortDesc()->values();
+
+        $rank = 1;
+        $previousScore = null;
+        $previousRank = 1;
+
+        $studentsWithRank = collect();
+        foreach ($sortedStudents as $index => $score) {
+            if ($previousScore !== null && $score < $previousScore) {
+                $rank = $index + 1;
+            }
+
+            $studentsWithRank->push([
+                'student_id' => $studentTotalScores->keys()[$index],
+                'score' => $score,
+                'rank' => $rank
+            ]);
+
+            $previousScore = $score;
+            $previousRank = $rank;
+        }
+
+        // Find current student's position
+        $studentPosition = $studentsWithRank->firstWhere('student_id', $studentId)['rank'] ?? '-';
+        $totalStudents = $sortedStudents->count();
+
+        $generalPosition = $studentPosition;
 
         // =================== EXAM SPECIFICATIONS ===================
         $examSpecifications = $results
@@ -2731,23 +2800,47 @@ class ResultsController extends Controller
 
         $totalScoreForStudent = $validScores->sum('score');
 
-        // =================== GENERAL POSITION ===================
+        // =================== GENERAL POSITION (WITH TIE RANKING) ===================
         $studentId = $results->first()->student_id ?? null;
 
+        // Get all students' total scores
         $studentTotalScores = Examination_result::where('class_id', $classId)
             ->where('school_id', $schoolId)
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->get()
             ->groupBy('student_id')
             ->map(function ($studentResults) {
-                return $studentResults->sum('score');  // Jumla ya alama halisi
-            })
-            ->sortDesc();
+                return $studentResults->sum('score');
+            });
 
-        $allStudentIds = $studentTotalScores->keys()->values()->all();
-        $index = array_search($studentId, $allStudentIds);
-        $generalPosition = $index !== false ? $index + 1 : '-';
-        $totalStudents = count($allStudentIds);
+        // Sort students by score (descending) and apply tie ranking
+        $sortedStudents = $studentTotalScores->sortDesc()->values();
+
+        $rank = 1;
+        $previousScore = null;
+        $previousRank = 1;
+
+        $studentsWithRank = collect();
+        foreach ($sortedStudents as $index => $score) {
+            if ($previousScore !== null && $score < $previousScore) {
+                $rank = $index + 1;
+            }
+
+            $studentsWithRank->push([
+                'student_id' => $studentTotalScores->keys()[$index],
+                'score' => $score,
+                'rank' => $rank
+            ]);
+
+            $previousScore = $score;
+            $previousRank = $rank;
+        }
+
+        // Find current student's position
+        $studentPosition = $studentsWithRank->firstWhere('student_id', $studentId)['rank'] ?? '-';
+        $totalStudents = $sortedStudents->count();
+
+        $generalPosition = $studentPosition;
 
         // =================== EXAM SPECIFICATIONS ===================
         $examSpecifications = $results
