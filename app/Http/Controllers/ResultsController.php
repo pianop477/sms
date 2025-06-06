@@ -896,7 +896,7 @@ class ResultsController extends Controller
 
                 // Construct the SMS message
                 $messageContent = "Matokeo ya ". strtoupper($fullname).", \n";
-                $messageContent .= "Mtihani wa ". strtoupper($student->exam_type).", Tar. {$dateFormat} ni: \n";
+                $messageContent .= "Mtihani wa ". strtoupper($student->exam_type).", wa {$dateFormat} ni: \n";
                 $messageContent .= "Jumla {$student->total_marks}, Wastani " . number_format($student->average_marks) . ", Nafasi ya {$student->rank} kati ya {$totalStudents}. \n";
                 $messageContent .= "Tembelea {$url} kuona ripoti";
 
@@ -1422,7 +1422,7 @@ class ResultsController extends Controller
             $sender = $schools->sender_id ?? "SHULE APP";
             $destination = $this->formatPhoneNumber($users->phone);
             $messageContent = "Matokeo ya ". strtoupper($fullName )." Mtihani wa ". strtoupper($examination).",\n";
-            $messageContent .= "Tar. {$dateFormat} ni: \n";
+            $messageContent .= "wa {$dateFormat} ni: \n";
             $messageContent .= "Jumla $totalScore, Wastani ". number_format($averageScore) .", Nafasi $studentRank kati ya $totalStudents. Tembelea {$url} kuona ripoti";
             $reference = uniqid();
 
@@ -1988,7 +1988,7 @@ class ResultsController extends Controller
 
             $message = "Matokeo ya ". strtoupper($studentName)."\n";
             $message .= "Mtihani wa ". strtoupper($reportName)."\n";
-            $message .= "Tar. {$date} ni: \n";
+            $message .= "wa {$date} ni: \n";
             $message .= "Jumla: {$studentTotal}, Wastani {$studentGeneralAverage}, Nafasi ya {$generalPosition} kati ya {$totalStudents}\n";
             $message .= "Tembelea {$url} kuona ripoti";
 
@@ -2357,7 +2357,7 @@ class ResultsController extends Controller
 
                 $message = "Matokeo ya {$payload['student_name']}\n"
                     ."Mtihani wa ". strtoupper($report->title)."\n"
-                    ."Tar. {$reportDate} ni:\n"
+                    ."wa {$reportDate} ni:\n"
                     . "Jumla: {$payload['total_score']}, Wastani {$payload['total_average']}\n"
                     . "Nafasi ya {$payload['position']}.\n"
                     . "Tembelea {$link} kuona ripoti.";
