@@ -1902,14 +1902,14 @@ class ResultsController extends Controller
 
             try {
                 $nextSmsService = new NextSmsService();
-                // $response = $nextSmsService->sendSmsByNext(
-                //     $sender,
-                //     $formattedPhone,
-                //     $message,
-                //     uniqid()
-                // );
+                $response = $nextSmsService->sendSmsByNext(
+                    $sender,
+                    $formattedPhone,
+                    $message,
+                    uniqid()
+                );
 
-                Log::info("Sending SMS to {$formattedPhone}: {$message}");
+                // Log::info("Sending SMS to {$formattedPhone}: {$message}");
                 Alert()->toast('Results SMS has been Re-sent successfully', 'success');
                 return to_route('students.combined.report', [
                     'school' => $school,
@@ -2282,13 +2282,13 @@ class ResultsController extends Controller
                 $message = "Matokeo ya {$payload['student_name']}\n"
                     ."Mtihani wa ". strtoupper($report->title)."\n"
                     ."wa {$reportDate} ni:\n"
-                    . "Jumla ya alama: {$payload['total_score']}\n"
+                    . "Jumla: {$payload['total_score']}\n"
                     . "Wastani: {$payload['total_average']}\n"
                     . "Nafasi ya {$payload['position']}.\n"
                     . "Tembelea {$link} kuona ripoti.";
 
-                Log::info("Sending SMS to {$phoneNumber}: {$message}");
-                // $response = $nextSmsService->sendSmsByNext($sender, $phoneNumber, $message, uniqid());
+                // Log::info("Sending SMS to {$phoneNumber}: {$message}");
+                $response = $nextSmsService->sendSmsByNext($sender, $phoneNumber, $message, uniqid());
             }
 
             Alert()->toast('Report has been published and sent to parents successfully!', 'success');
@@ -2414,25 +2414,33 @@ class ResultsController extends Controller
                 'gender' => $student->gender,
                 'student_name' => $student->first_name . ' ' . ($student->middle_name ? $student->middle_name . ' ' : '') . $student->last_name,
                 'subject_averages' => $studentSubjectAverages,
-                'total' => number_format($totalScore, 2),
-                'average' => number_format($overallAverage, 2),
+                'total' => round($totalScore, 2),
+                'average' => round($overallAverage, 2),
                 'grade' => $this->calculateGrade($overallAverage, $results->first()->marking_style),
             ];
         }
 
         // 5. CALCULATE STUDENT RANKS WITH TIE HANDLING
-        $groupedByTotal = collect($studentData)->groupBy('total');
-        $sortedGroups = $groupedByTotal->sortKeysDesc();
-        $rank = 1;
+        $sortedStudents = collect($studentData)->sortByDesc('total')->values();
         $rankedStudents = [];
+        $previousScore = null;
+        $currentRank = 0;
+        $skip = 0;
 
-        foreach ($sortedGroups as $totalScore => $studentsWithSameScore) {
-            $count = count($studentsWithSameScore);
-            foreach ($studentsWithSameScore as $student) {
-                $student['rank'] = $rank;
-                $rankedStudents[] = $student;
+        foreach ($sortedStudents as $index => $student) {
+            if ($previousScore !== null && $student['total'] == $previousScore) {
+                // Tie: keep same rank
+                $student['rank'] = $currentRank;
+                $skip++;
+            } else {
+                // New rank
+                $currentRank = $index + 1;
+                $student['rank'] = $currentRank;
+                $skip = 0;
             }
-            $rank += $count;
+
+            $rankedStudents[] = $student;
+            $previousScore = $student['total'];
         }
 
         // 6. CALCULATE GRADE DISTRIBUTION SUMMARY
