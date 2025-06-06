@@ -219,7 +219,7 @@ class ExamController extends Controller
 
                 if ($existingRecord) {
                     Alert::toast('Examination results already submitted for this Course', 'error');
-                    return redirect()->route('score.prepare.form', Hashids::encode($request->course_id));
+                    return redirect()->route('home');
                 }
 
                 // Insert the result into the examination_results table
@@ -623,8 +623,6 @@ class ExamController extends Controller
 
         return view('Examinations.results_pdf_report', compact('pdfUrl', 'year', 'id', 'month', 'class_course', 'date', 'exam_id',));  // Pass the URL to the view
     }
-
-
 
     protected function determineGrade($score, $marking_style)
     {
