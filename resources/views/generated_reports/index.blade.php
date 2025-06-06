@@ -74,7 +74,7 @@
                             @foreach ($finalData as $subject)
                                 <tr>
                                     <td class="text-capitalize">{{ $subject['subjectName'] }} <span class="text-uppercase">({{ $subject['subjectCode'] }})</span></td>
-                                    <td class="text-capitalize">{{$subject['teacher']}}</td>
+                                    <td class="text-capitalize">{{ucwords(strtolower($subject['teacher']))}}</td>
 
                                     @if($combineOption == 'individual')
                                         {{-- Display all exam dates for each exam type --}}

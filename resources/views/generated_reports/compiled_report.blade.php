@@ -189,7 +189,7 @@
             @foreach ($finalData as $subject)
                 <tr>
                     <td class="subject-name" style="text-transform: capitalize">{{ $subject['subjectName'] }} <span class="" style="text-transform: uppercase">({{ $subject['subjectCode'] }})</span></td>
-                    <td class="teacher-name">{{$subject['teacher']}}</td>
+                    <td class="teacher-name">{{ucwords(strtolower($subject['teacher']))}}</td>
                      @foreach($examHeaders as $exam)
                         <td class="exam-score text-center">{{ $subject['examScores'][$exam['abbr'].'_'.$exam['date']] ?? 'X' }}</td>
                     @endforeach
