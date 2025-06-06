@@ -19,7 +19,7 @@
                             <th>Phone</th>
                             <th>Score</th>
                             <th>Total</th>
-                            <th>Average</th>
+                            {{-- <th>Average</th> --}}
                             <th class="text-center">Action</th>
                         </tr>
                     </thead>
@@ -69,7 +69,7 @@
                                     </td>
 
                                     <td>{{ $total }}</td>
-                                    <td>{{ $count > 0 ? round($total / $count, 2) : '-' }}</td>
+                                    {{-- <td>{{ $count > 0 ? round($total / $count, 2) : '-' }}</td> --}}
                                     <td>
                                         <ul class="d-flex justify-content-center list-unstyled mb-0">
                                             <li class="mr-2">
