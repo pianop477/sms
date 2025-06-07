@@ -63,6 +63,7 @@ class ResultsController extends Controller
                                     ->where('students.parent_id', $parent->id)
                                     ->where('examination_results.school_id', $user->school_id)
                                     ->where('examination_results.class_id', $students->class_id)
+                                    ->where('examination_results.status', 2) // Assuming 2 is the status for published results
                                     ->orderBy('examination_results.exam_date', 'DESC')
                                     ->get();
 
@@ -109,6 +110,7 @@ class ResultsController extends Controller
                     ->where('examination_results.school_id', $students->school_id)
                     ->where('students.parent_id', $parent->id)
                     ->where('examination_results.class_id', $students->class_id)
+                    ->where('examination_results.status', 2) // Assuming 2 is the status for published results
                     ->orderBy('examinations.exam_type', 'asc')
                     ->get();
 
@@ -233,6 +235,7 @@ class ResultsController extends Controller
                     ->where('examination_results.class_id', $studentId->class_id)
                     ->whereDate('exam_date', Carbon::parse($date)) // Filtering by date
                     ->where('examination_results.school_id', $user->school_id)
+                    ->where('examination_results.status', 2) // Assuming 2 is the status for published results
                     ->where('students.parent_id', $parent->id)
                     ->get();
 
