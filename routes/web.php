@@ -200,6 +200,8 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::put('Publish-combine-report/school/{school}/year/{year}/class/{class}/report/{report}', [ResultsController::class, 'publishCombinedReport'])->name('publish.combined.report');
         Route::get('/General-combined-report/school/{school}/year/{year}/class/{class}/report/{report}', [ResultsController::class, 'downloadGeneralCombinedReport'])->name('download.general.combined');
         Route::put('Unpublish/combined-report/school/{school}/year/{year}/class/{class}/report/{report}', [ResultsController::class, 'unpublishCombinedReport'])->name('Unpublish.combined.report');
+        Route::post('Send-results-sms/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/student/{student}/date/{date}', [ResultsController::class, 'sendResultSms'])->name('sms.results');
+        Route::get('Delete-student-result/school/{school}/year/{year}/class/{class}/examType/{examTyoe}/month/{month}/student/{student}/date/{date}', [ResultsController::class, 'deleteStudentResult'])->name('delete.student.result');
 
         // packages management
         Route::get('/Packages/year', [PackagesController::class, 'packagesByYear'])->name('package.byYear');
@@ -298,8 +300,6 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::put('Publish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/date/{date}', [ResultsController::class, 'publishResult'])->name('publish.results');
         Route::put('Unpublish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/date/{date}', [ResultsController::class, 'unpublishResult'])->name('unpublish.results');
         Route::get('Delete-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/date/{date}', [ResultsController::class, 'deleteResults'])->name('delete.results');
-        Route::post('Send-results-sms/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/student/{student}/date/{date}', [ResultsController::class, 'sendResultSms'])->name('sms.results');
-        Route::get('Delete-student-result/school/{school}/year/{year}/class/{class}/examType/{examTyoe}/month/{month}/student/{student}/date/{date}', [ResultsController::class, 'deleteStudentResult'])->name('delete.student.result');
         Route::post('Submit-compiled-results/school/{school}/year/{year}/class/{class}', [ResultsController::class, 'saveCompiledResults'])->name('submit.compiled.results');
         Route::post('/update-score', [ResultsController::class, 'updateScore'])->name('update.score');
 
