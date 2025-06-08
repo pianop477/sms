@@ -34,7 +34,7 @@
                         <ul class="list-group list-group-flush mb-3">
                             <li class="list-group-item">
                                 <b>Gender</b>
-                                <span class="float-right text-capitalize">{{$students->gender[0]}}</span>
+                                <span class="float-right text-capitalize">{{$students->gender}}</span>
                             </li>
                             <li class="list-group-item">
                                 <b>Stream</b>
@@ -363,11 +363,9 @@
                                 <table class="table table-responsive-md table-striped table-bordered table-hover">
                                     <thead>
                                         <tr class="text-capitalize">
-                                            <th scope="col">#</th>
                                             <th scope="col">title</th>
                                             <th scope="col">Description</th>
                                             <th scope="col">term</th>
-                                            <th scope="col">year</th>
                                             <th scope="col">Status</th>
                                             <th scope="col">released at</th>
                                             <th scope="col">Expire on</th>
@@ -382,11 +380,9 @@
                                         @else
                                             @foreach ($packages as $item )
                                                 <tr class="text-capitalize">
-                                                    <td>{{$loop->iteration}}</td>
                                                     <td>{{$item->title}}</td>
                                                     <td>{{$item->description}}</td>
                                                     <td>term {{$item->term}}</td>
-                                                    <td>{{$item->year}}</td>
                                                     <td>
                                                         @if ($item->is_active == true)
                                                             <span class="badge badge-success">Active</i></span>
