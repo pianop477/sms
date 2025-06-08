@@ -2868,6 +2868,12 @@ class ResultsController extends Controller
             $school_id = $report->school_id;
             $class_id = $report->class_id;
 
+            if($report->status == 1) {
+                return redirect()
+                    ->route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])
+                    ->with('error', 'Cannot delete a published report');
+            }
+
             $report->delete();
 
             return redirect()
