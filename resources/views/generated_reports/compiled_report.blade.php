@@ -368,7 +368,7 @@
                     <td colspan="7" style="text-align: center; font-style: italic;">
                         Note: "X" indicates that the student did not take the exam.
                         <br>
-                        Codes above represent different exam types (e.g., Midterm, Final, etc.).
+                        Codes above represent different exam types (e.g. Midterm, Terminal, etc.).
                     </td>
                 </tr>
             </tbody>
