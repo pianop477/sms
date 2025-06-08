@@ -73,7 +73,7 @@
                         <tbody>
                             @foreach ($finalData as $subject)
                                 <tr>
-                                    <td class="text-capitalize">{{ $subject['subjectName'] }} <span class="text-uppercase">({{ $subject['subjectCode'] }})</span></td>
+                                    <td class="text-capitalize">{{ ucwords(strtolower($subject['subjectName'])) }} <span class="text-uppercase">({{ $subject['subjectCode'] }})</span></td>
                                     <td class="text-capitalize">{{ucwords(strtolower($subject['teacher']))}}</td>
 
                                     @if($combineOption == 'individual')
@@ -283,8 +283,8 @@
                         <tbody>
                             @foreach ($finalData as $subject)
                                 <tr>
-                                    <td class="text-capitalize">{{ $subject['subjectName'] }} <span class="text-uppercase">({{ $subject['subjectCode'] }})</span></td>
-                                    <td class="text-capitalize">{{$subject['teacher']}}</td>
+                                    <td class="text-capitalize">{{ ucwords(strtolower($subject['subjectName'])) }} <span class="text-uppercase">({{ $subject['subjectCode'] }})</span></td>
+                                    <td class="text-capitalize">{{ucwords(strtolower($subject['teacher']))}}</td>
                                     <td class="text-center">{{ $subject['total'] }}</td>
                                     <td class="text-center">{{ number_format($subject['average'], 2) }}</td>
                                     <td class="text-center">
@@ -431,8 +431,8 @@
                         <tbody>
                             @foreach ($finalData as $subject)
                                 <tr>
-                                    <td class="text-capitalize">{{ $subject['subjectName'] }} <span class="text-uppercase">({{ $subject['subjectCode'] }})</span></td>
-                                    <td class="text-capitalize">{{$subject['teacher']}}</td>
+                                    <td class="text-capitalize">{{ ucwords(strtolower($subject['subjectName'])) }} <span class="text-uppercase">({{ $subject['subjectCode'] }})</span></td>
+                                    <td class="text-capitalize">{{ucwords(strtolower($subject['teacher']))}}</td>
                                     <td class="text-center">{{ number_format($subject['average'], 2) }}</td>
                                     <td class="text-center">
                                         @if ($results->first()->marking_style === 1)
