@@ -16,6 +16,7 @@
                     </div>
                     <div class="login-form-body">
                         <h4 class="text-danger text-center">Please Contact Admin for registration or support</h4>
+                        <p>0678 669 000</p>
                         {{-- <div class="form-gp">
                             <label for="exampleInputName1">First Name</label>
                             <input type="text" id="exampleInputName1" name="fname" value="{{old('fname')}}">
