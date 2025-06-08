@@ -65,7 +65,8 @@ class CoursesController extends Controller
                                     ->select('users.first_name', 'users.last_name', 'teachers.*')
                                     ->orderBy('users.first_name')
                                     ->where('teachers.school_id', $class->school_id)
-                                    ->whereIn('role_id', [1,3,4])
+                                    // ->whereIn('role_id', [1,2,3,4])
+                                    ->where('teachers.status', 1)
                                     ->orderBy('users.first_name')
                                     ->get();
 
@@ -141,7 +142,7 @@ class CoursesController extends Controller
         $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
                                     ->select('teachers.*', 'users.first_name', 'users.last_name')
                                     ->where('teachers.id', '!=', $classCourse->teacherId)
-                                    ->where('teachers.role_id', '!=', 2)
+                                    ->where('teachers.status', 1)
                                     ->where('teachers.school_id', $user->school_id)
                                     ->orderBy('users.first_name')
                                     ->get();

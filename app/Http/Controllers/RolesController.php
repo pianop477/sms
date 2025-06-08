@@ -250,7 +250,7 @@ class RolesController extends Controller
         $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
                                 ->select('teachers.*', 'users.first_name', 'users.last_name')
                                 ->where('teachers.status', '=', 1)
-                                ->whereNotIn('teachers.role_id', [2, 3])
+                                ->whereNotIn('teachers.role_id', [2, 3, 4])
                                 ->where('teachers.school_id', '=', Auth::user()->school_id)
                                 ->orderBy('users.first_name')
                                 ->get();
