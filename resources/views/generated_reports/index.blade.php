@@ -14,7 +14,7 @@
                     <h5 class="mb-1 text-uppercase">{{$schoolInfo->school_name}}</h5>
                     <h6 class="mb-1 text-capitalize">{{$schoolInfo->postal_address}}, {{$schoolInfo->postal_name}} - {{$schoolInfo->country}}</h6>
                     <h6 class="pt-3 text-capitalize">Student's Progress Report</h6>
-                    <p class="mb-0 text-center text-capitalize">Report Title: <strong>{{ $reports->title }} - {{$year}}</strong></p>
+                    <p class="mb-0 text-center text-capitalize">Report Title: <strong>{{ $reports->title }} - {{\Carbon\Carbon::parse($reports->created_at)->format('d/m/Y')}}</strong></p>
                 </div>
                 <div class="col-md-2">
                     @if($student->image == null)
