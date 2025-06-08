@@ -219,7 +219,7 @@
                                             @foreach ($class_course as $course)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
-                                                <td class="text-capitalize">{{ $course->course_name }}</td>
+                                                <td class="text-capitalize">{{ ucwords(strtolower($course->course_name)) }}</td>
                                                 <td class="text-uppercase">{{ $course->course_code }}</td>
                                                 <td class="d-flex align-items-center">
                                                     @if (!empty($course->image) && file_exists(public_path('assets/img/profile/' . $course->image)))
@@ -231,7 +231,7 @@
                                                         <i class="fas fa-user-tie rounded-circle bg-secondary d-flex justify-content-center align-items-center"
                                                         style="width: 40px; height: 40px; font-size: 20px; color: white;"></i>
                                                     @endif
-                                                    <span class="text-capitalize ms-2" style="margin-left: 5px">{{ $course->first_name }} {{ $course->last_name }}</span>
+                                                    <span class="text-capitalize ms-2" style="margin-left: 5px">{{ ucwords(strtolower($course->first_name. ' '. $course->last_name)) }}</span>
                                                 </td>
                                                 <td class="">
                                                     <i class="fas fa-phone"></i>
@@ -245,7 +245,7 @@
                                     </tbody>
                                 </table>
                                 <hr>
-                                <p><b>Class Teacher Details</b></p>
+                                <p class="text-uppercase"><b>Class Teacher</b></p>
                                 <ul class="list-group list-group-flush">
                                     @if ($myClassTeacher->isEmpty())
                                         <li class="list-group-item text-center text-danger">
@@ -266,12 +266,12 @@
                                                 <ul class="list-group w-100">
                                                     <li class="list-group-item">Name:
                                                         <span class="text-uppercase font-weight-bold float-right">
-                                                            {{ $classTeacher->first_name }} {{ $classTeacher->last_name }}
+                                                            {{ ucwords(strtolower($classTeacher->first_name. ' '. $classTeacher->last_name)) }}
                                                         </span>
                                                     </li>
                                                     <li class="list-group-item">Gender:
                                                         <span class="text-capitalize font-weight-bold float-right">
-                                                            {{ $classTeacher->gender }}
+                                                            {{ ucwords(strtolower($classTeacher->gender)) }}
                                                         </span>
                                                     </li>
                                                     <li class="list-group-item">Phone:
@@ -303,7 +303,7 @@
                                 <ul class="list-group">
                                     <a href="{{route('attendance.byYear', ['student' => Hashids::encode($students->id)])}}">
                                         <li class="list-group-item">
-                                            <h6 class="text-primary">>> Check Attendance</h6>
+                                            <h6 class="text-primary">>> Attendance Reports</h6>
                                         </li>
                                     </a>
                                 </ul>
@@ -315,7 +315,7 @@
                                 <ul class="list-group">
                                     <a href="{{route('results.index', ['student' => Hashids::encode($students->id)])}}">
                                         <li class="list-group-item">
-                                            <h6 class="text-primary">>> Check Results Reports</h6>
+                                            <h6 class="text-primary">>> Results Reports</h6>
                                         </li>
                                     </a>
                                 </ul>
@@ -340,7 +340,7 @@
                                         </tr>
                                         <tr>
                                             <th><b>Gender</b></th>
-                                            <td class="text-capitalize">{{$students->driver_gender[0]}}</td>
+                                            <td class="text-capitalize">{{ucwords(strtolower($students->driver_gender))}}</td>
                                         </tr>
                                         <tr>
                                             <th><b>Bus Number</b></th>
@@ -349,7 +349,7 @@
                                         <tr>
                                             <th><b>School Bus Route</b></th>
                                             <td class="text-capitalize">
-                                               {{$students->routine}}
+                                               {{ucwords(strtolower($students->routine))}}
                                             </td>
                                         </tr>
                                     </tbody>
@@ -380,9 +380,9 @@
                                         @else
                                             @foreach ($packages as $item )
                                                 <tr class="text-capitalize">
-                                                    <td>{{$item->title}}</td>
-                                                    <td>{{$item->description}}</td>
-                                                    <td>term {{$item->term}}</td>
+                                                    <td>{{ucwords(strtolower($item->title))}}</td>
+                                                    <td>{{ucwords(strtolower($item->description))}}</td>
+                                                    <td>term {{ucwords(strtolower($item->term))}}</td>
                                                     <td>
                                                         @if ($item->is_active == true)
                                                             <span class="badge badge-success">Active</i></span>
