@@ -4,7 +4,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-10">
-                    <h4 class="header-title text-center text-uppercase">Edit Change Class Teacher</h4>
+                    <h4 class="header-title text-center text-uppercase">Edit/Change Class Teacher</h4>
                 </div>
                 <div class="col-2">
                     <a href="{{route('Class.Teachers', ['class' => Hashids::encode($classTeacher->class_id)])}}"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
