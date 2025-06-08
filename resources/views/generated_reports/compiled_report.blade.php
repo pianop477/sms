@@ -143,7 +143,7 @@
     <tr>
         <td>
             <h5 style="margin:5px 0; padding:0;">STUDENT'S PROGRESS REPORT</h5>
-            <h5 style="margin:0; padding:0;"> {{ $reports->title }} - {{ \Carbon\Carbon::parse($reports->created_at)->format('d/F/Y') }}</h5>
+            <h5 style="margin:0; padding:0;"> {{ $reports->title }} - {{ \Carbon\Carbon::parse($reports->created_at)->format('d/m/Y') }}</h5>
         </td>
     </tr>
 </table>
