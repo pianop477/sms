@@ -1,108 +1,94 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Student Academic Report</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             font-size: 12px;
             line-height: 1.4;
-            margin: 0;
-            padding: 0;
         }
         .header {
             width: 100%;
             margin-bottom: 10px;
             border-bottom: 2px solid #333;
             padding-bottom: 5px;
-            position: relative;
         }
-        .logo {
-            position: absolute;
-            left: 0;
-            top: 0;
+        .header td {
+            vertical-align: top;
         }
         .school-info {
             text-align: center;
-            padding-top: 5px;
             text-transform: uppercase;
-            font-size: 18px;
+            font-size: 16px;
         }
-        .student-image {
-            position: absolute;
-            right: 0;
-            top: 0;
-            text-align: center;
-        }
-        .student-image img {
-            width: 70px;
-            height: 70px;
-            /* border-radius: 5px; */
-            /* border: 1px solid #ddd; */
-        }
-        .student-details {
+        .report-header {
             width: 100%;
-            margin: 10px 0;
-            font-size: 12px;
+            margin-bottom: 10px;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 14px;
+            text-transform: uppercase;
+            border-bottom: #333 solid 1px;
         }
-        .student-details td {
+        .student-info {
+            width: 100%;
+            margin-bottom: 15px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        .student-info td {
             vertical-align: top;
             padding: 2px 5px;
-        }
-        .section-title {
-            font-weight: bold;
-            text-align: center;
-            margin: 10px 0 5px 0;
-            text-transform: uppercase;
-            border-bottom: 1px solid #333;
-            padding-bottom: 3px;
         }
         .report-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 15px;
-            font-size: 11px;
+            font-size: 12px;
         }
         .report-table th, .report-table td {
             border: 1px solid #ddd;
-            padding: 5px;
+            padding: 6px;
             text-align: center;
         }
         .report-table th {
             background-color: #f2f2f2;
             font-weight: bold;
-            text-transform: uppercase;
         }
         .subject-name {
             text-align: left;
+            width: 20%;
         }
         .teacher-name {
             text-align: left;
+            width: 15%;
         }
-        .summary-row {
+        .exam-score {
+            width: 8%;
+        }
+        .summary-row td {
             font-weight: bold;
-            background-color: #f9f9f9;
+            padding: 6px;
         }
         .excellent {
             background-color: #75f430;
-            padding: 2px 5px;
+            padding: 2px 4px;
         }
         .good {
             background-color: #99faed;
-            padding: 2px 5px;
+            padding: 2px 4px;
         }
         .pass {
             background-color: #eddc71;
-            padding: 2px 5px;
+            padding: 2px 4px;
         }
         .poor {
             background-color: #b6b0b0;
-            padding: 2px 5px;
+            padding: 2px 4px;
         }
         .fail {
             background-color: #eb4b4b;
-            padding: 2px 5px;
+            padding: 2px 4px;
         }
         .footer {
             position: fixed;
@@ -113,171 +99,202 @@
             font-size: 10px;
             color: #666;
         }
-        .performance-summary {
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #ddd;
-            background-color: #f9f9f9;
+        .rotate-text {
+            transform: rotate(-90deg);
+            transform-origin: left top 0;
+            white-space: nowrap;
+            display: inline-block;
+            position: relative;
+            width: 20px;
+            height: 20px;
+            margin-top: 20px;
         }
-        .performance-item {
-            margin: 5px 0;
-        }
-        @media print {
-            .header, .footer {
-                position: fixed;
-                left: 0;
-                right: 0;
-            }
-            .header {
-                top: 0;
-            }
-            .footer {
-                bottom: 0;
-            }
-            body {
-                padding-top: 120px;
-                padding-bottom: 30px;
-            }
+        .compact-header {
+            font-size: 10px;
+            line-height: 1.2;
         }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <div class="logo">
-        <img src="{{ public_path('assets/img/logo/'.$results->first()->logo) }}" alt="Logo" width="70">
-    </div>
-    <div class="school-info">
-        <h3 style="margin:0; padding:0;">THE UNITED REPUBLIC OF TANZANIA</h3>
-        <h4 style="margin:0; padding:0;">PRESIDENT OFFICE - TAMISEMI</h4>
-        <h4 style="margin:0; padding:0;">{{ $results->first()->school_name }}</h4>
-        <h5 style="margin:0; padding:0;">{{ $results->first()->postal_address }} - {{ $results->first()->postal_name }}, {{ $results->first()->country }}</h5>
-        <h5 style="margin:5px 0; padding:0;">STUDENT'S ACADEMIC REPORT</h5>
-    </div>
-    <div class="student-image">
-        @php
-            $imagePath = public_path('assets/img/students/' . $studentId->image);
-            $defaultImagePath = public_path('assets/img/students/student.jpg');
-        @endphp
-
-        @if(file_exists($imagePath) && !is_dir($imagePath))
-            <img src="{{ $imagePath }}" alt="Student Image">
-        @else
-            <img src="{{ $defaultImagePath }}" alt="Student Image">
-        @endif
-        <p style="margin:2px 0; font-size:10px;">Adm.No: {{ strtoupper($results->first()->admission_number) }}</p>
-    </div>
-</div>
-
-<div class="section-title">A. Student Information</div>
-
-<table class="student-details">
+<table class="header">
     <tr>
-        <td width="50%">
-            <strong>Student Full Name:</strong> {{ strtoupper($studentId->first_name) }} {{ strtoupper($studentId->middle_name) }} {{ strtoupper($studentId->last_name) }}<br>
-            <strong>Gender:</strong> {{ ucfirst($studentId->gender) }}
+        <td width="15%">
+            <img src="{{ public_path('assets/img/logo/'.$results->first()->logo) }}" alt="Logo" width="70">
         </td>
-        <td width="50%">
-            <strong>Class:</strong> {{ strtoupper($results->first()->class_name) }}<br>
-            <strong>Stream:</strong> {{ strtoupper($studentId->group) }}
+        <td width="70%" class="school-info">
+            <h3 style="margin:0; padding:0;">THE UNITED REPUBLIC OF TANZANIA</h3>
+            <h3 style="margin:0; padding:0;">PRESIDENT OFFICE - TAMISEMI</h3>
+            <h4 style="margin:0; padding:0;">{{ $results->first()->school_name }}</h4>
+            <h5 style="margin:0; padding:0;">{{ $results->first()->postal_address }} - {{ $results->first()->postal_name }}, {{ $results->first()->country }}</h5>
+        </td>
+        <td width="15%" align="right">
+            @php
+                $imagePath = public_path('assets/img/students/' . $studentId->image);
+                $defaultImagePath = public_path('assets/img/students/student.jpg');
+            @endphp
+            @if(file_exists($imagePath) && !is_dir($imagePath))
+                <img src="{{ $imagePath }}" width="70" class="rounded-circle">
+            @else
+                <img src="{{ $defaultImagePath }}" width="70" class="rounded-circle">
+            @endif
         </td>
     </tr>
 </table>
-
-<div class="section-title">B. Examination Details</div>
-
-<table class="student-details">
+<table class="report-header">
     <tr>
-        <td width="50%">
-            <strong>Examination Type:</strong> {{ strtoupper($results->first()->exam_type) }}<br>
-            <strong>Term:</strong> {{ strtoupper($results->first()->Exam_term) }}
-        </td>
-        <td width="50%">
-            <strong>Exam Date:</strong> {{ \Carbon\Carbon::parse($date)->format('d-F-Y') }}
+        <td>
+            <h5 style="margin:5px 0; padding:0;">STUDENT'S PROGRESS REPORT</h5>
+            <h5 style="margin:0; padding:0;"> {{ strtoupper($results->first()->exam_type) }} - {{ \Carbon\Carbon::parse($date)->format('d/F/Y')  }}</h5>
         </td>
     </tr>
 </table>
-
-<div class="section-title">C. Student Overall Performance</div>
-
-<table class="report-table" style="font-size: 12px;">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th class="subject-name">Subject</th>
-            <th class="teacher-name">Teacher</th>
-            <th>Code</th>
-            <th>Score</th>
-            <th>Grade</th>
-            <th>Position</th>
-            <th>Remarks</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach ($results as $index => $result)
+<p style="padding: 3px; background:rgb(187, 163, 56); text-align:center; font-size: 12px;"><strong>Student's Information</strong></p>
+<table class="student-info">
+    <tr>
+        <td width="50%">
+            <strong>Admission Number:</strong> <span class="">{{ strtoupper($results->first()->admission_number) }}</span><br>
+            <strong>Student Name:</strong> <span class="">{{ strtoupper($studentId->first_name) }} {{ strtoupper($studentId->middle_name) }} {{ strtoupper($studentId->last_name) }}</span><br>
+            <strong>Gender:</strong> <span class="">{{ ucfirst($studentId->gender) }}</span>
+        </td>
+        <td width="50%">
+            <strong>Class:</strong> <span class="">{{ strtoupper($results->first()->class_name) }}</span><br>
+            <strong>Stream:</strong> <span class="">{{ strtoupper($studentId->group) }}</span><br>
+            <strong>Term:</strong> <span class="">{{ strtoupper($results->first()->Exam_term) }}</span>
+        </td>
+    </tr>
+</table>
+<table class="report-table">
+        <thead>
             <tr>
-                <td>{{ $index + 1 }}</td>
-                <td class="subject-name">{{ ucwords(strtolower($result->course_name)) }}</td>
-                <td class="teacher-name">{{ ucwords(strtolower($result->teacher_first_name. '. '.$result->teacher_last_name[0])) }}</td>
-                <td style="text-transform: uppercase">{{ $result->course_code }}</td>
-                <td>{{ $result->score ?? 'X' }}</td>
-                <td>{{ $result->score ? $result->grade : 'X' }}</td>
-                <td>{{ $result->score ? $result->courseRank : 'X' }}</td>
-                <td style="font-style: italic">{{ $result->score ? $result->remarks : 'X' }}</td>
+                <th class="subject-name">Subject Name</th>
+                <th class="teacher-name">Subject Code</th>
+                <th class="text-center">Teacher</th>
+                <th>Score</th>
+                <th>Grade</th>
+                <th>Rank</th>
+                <th>Remarks</th>
             </tr>
-        @endforeach
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach ($results as $index => $result)
+                <tr>
+                    <td class="subject-name" style="text-transform: capitalize">{{ ucwords(strtolower($result->course_name)) }}</td>
+                    <td class="teacher-name">{{ ucwords(strtoupper($result->course_code)) }}</td>
+                    <td>{{ ucwords(strtolower($result->teacher_first_name. '. '.$result->teacher_last_name[0])) }}</td>
+                    <td>{{ $result->score ?? 'X' }}</td>
+                    <td>{{ $result->score ? $result->grade : 'X' }}</td>
+                    <td>{{ $result->score ? $result->courseRank : 'X' }}</td>
+                    <td style="font-style: italic">{{ $result->score ? $result->remarks : 'X' }}</td>
+                </tr>
+            @endforeach
+            <tr>
+                <td colspan="7"></td>
+            </tr>
+            <tr class="summary-row">
+                <td colspan="7" style="background: rgb(187, 163, 56)">Overall Performance Summary</td>
+            </tr>
+            <tr class="summary-row">
+                <td colspan="1">
+                    Total Marks: <strong>{{ $totalScore }}</strong>
+                </td>
+                <td colspan="1">
+                    Average: <strong>{{ number_format($averageScore, 3) }}</strong>
+                </td>
+                    @php
+                        $grade = '';
+                        $gradeClass = '';
+                        if($results->first()->marking_style == 1) {
+                            if ($averageScore >= 40.5) {
+                                $grade = 'A';
+                                $gradeClass = 'excellent';
+                            } elseif ($averageScore >= 30.5) {
+                                $grade = 'B';
+                                $gradeClass = 'good';
+                            } elseif ($averageScore >= 20.5) {
+                                $grade = 'C';
+                                $gradeClass = 'pass';
+                            } elseif ($averageScore >= 10.5) {
+                                $grade = 'D';
+                                $gradeClass = 'poor';
+                            } else {
+                                $grade = 'E';
+                                $gradeClass = 'fail';
+                            }
+                        }
+                        else {
+                            if ($averageScore >= 81) {
+                                $grade = 'A';
+                                $gradeClass = 'excellent';
+                            } elseif ($averageScore >= 61) {
+                                $grade = 'B';
+                                $gradeClass = 'good';
+                            } elseif ($averageScore >= 41) {
+                                $grade = 'C';
+                                $gradeClass = 'pass';
+                            } elseif ($averageScore >= 21) {
+                                $grade = 'D';
+                                $gradeClass = 'poor';
+                            } else {
+                                $grade = 'E';
+                                $gradeClass = 'fail';
+                            }
+                        }
+                    @endphp
+                <td colspan="1" class="text-center">
+                    Grade: <strong>
+                        {{ $grade }}
+                    </strong>
+                </td>
+                <td colspan="2">
+                    Position: <strong style="text-decoration:underline">{{ $studentRank }} out of {{ $rankings->count() }}</strong>
+                </td>
+                <td colspan="2" class="text-center">
+                    General Remarks:
+                    @if ($results->first()->marking_style == 1)
+                        @if ($averageScore >= 40.5)
+                            <span class="excellent">EXCELLENT</span>
+                        @elseif ($averageScore >= 30.5)
+                            <span class="good">GOOD</span>
+                        @elseif ($averageScore >= 20.5)
+                            <span class="pass">PASS</span>
+                        @elseif ($averageScore >= 10.5)
+                            <span class="poor">POOR</span>
+                        @else
+                            <span class="fail">FAIL</span>
+                        @endif
+                    @else
+                        @if ($averageScore >= 80.5)
+                            <span class="excellent">EXCELLENT</span>
+                        @elseif ($averageScore >= 60.5)
+                            <span class="good">GOOD</span>
+                        @elseif ($averageScore >= 40.5)
+                            <span class="pass">PASS</span>
+                        @elseif ($averageScore >= 20.5)
+                            <span class="poor">POOR</span>
+                        @else
+                            <span class="fail">FAIL</span>
+                        @endif
+                    @endif
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table class="report-table" style="margin-top: 20px;">
+            <tbody>
+                <tr>
+                    <td colspan="7" style="background: rgb(187, 163, 56); font-size: 12px"><strong>Descriptions</strong></td>
+                </tr>
+                <tr>
+                    <td colspan="7" style="text-align: center; font-style: italic;">
+                        Note: "X" indicates that the student did not take the exam.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
 
-<div class="performance-summary">
-    <div class="performance-item"><strong>Total Marks:</strong> {{ $totalScore }}</div>
-    <div class="performance-item"><strong>Overall Average:</strong> {{ number_format($averageScore, 2) }}</div>
-    @php
-        $grade = '';
-        $gradeClass = '';
-        if($results->first()->marking_style == 1) {
-            if ($averageScore >= 40.5) {
-                $grade = "'A' - EXCELLENT";
-                $gradeClass = 'excellent';
-            } elseif ($averageScore >= 30.5) {
-                $grade = "'B' - GOOD";
-                $gradeClass = 'good';
-            } elseif ($averageScore >= 20.5) {
-                $grade = "'C' - PASS";
-                $gradeClass = 'pass';
-            } elseif ($averageScore >= 10.5) {
-                $grade = "'D' - POOR";
-                $gradeClass = 'poor';
-            } else {
-                $grade = "'E' - FAIL";
-                $gradeClass = 'fail';
-            }
-        }
-        else {
-            if ($averageScore >= 81) {
-                $grade = "'A' - EXCELLENT";
-                $gradeClass = 'excellent';
-            } elseif ($averageScore >= 61) {
-                $grade = "'B' - GOOD";
-                $gradeClass = 'good';
-            } elseif ($averageScore >= 41) {
-                $grade = "'C' - PASS";
-                $gradeClass = 'pass';
-            } elseif ($averageScore >= 21) {
-                $grade = "'D' - POOR";
-                $gradeClass = 'poor';
-            } else {
-                $grade = "'E' - FAIL";
-                $gradeClass = 'fail';
-            }
-        }
-    @endphp
-    <div class="performance-item"><strong>Grade Level:</strong> <span class="{{ $gradeClass }}">{{ $grade }}</span></div>
-    <div class="performance-item"><strong>Position:</strong> {{ $studentRank }} out of {{ $rankings->count() }} students</div>
-</div>
-
-<div class="footer">
-    <span style="text-transform: capitalize">&copy; Copyright {{ $results->first()->school_name }} - {{ date('Y') }}</span>
+<div class="footer" style="text-transform: capitalize;">
+    &copy; {{ $results->first()->school_name }} - {{ date('Y') }}.
 </div>
 
 </body>
