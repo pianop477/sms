@@ -42,7 +42,7 @@
                                     @foreach ($class_course as $course)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td class="text-capitalize">{{ $course->course_name }}</td>
+                                            <td class="text-capitalize">{{ ucwords(strtolower($course->course_name)) }}</td>
                                             <td class="text-uppercase">{{ $course->course_code }}</td>
                                             <td class="d-flex align-items-center">
                                                 @if (!empty($course->image) && file_exists(public_path('assets/img/profile/' . $course->image)))
@@ -54,7 +54,7 @@
                                                     <i class="fas fa-user-tie rounded-circle bg-secondary d-flex justify-content-center align-items-center"
                                                        style="width: 40px; height: 40px; font-size: 20px; color: white;"></i>
                                                 @endif
-                                                 <span class="text-capitalize ms-2" style="margin-left: 5px">{{ $course->first_name }} {{ $course->last_name }}</span>
+                                                 <span class="text-capitalize ms-2" style="margin-left: 5px">{{ ucwords(strtolower($course->first_name. ' '. $course->last_name)) }}</span>
                                             </td>
                                             <td class="">
                                                 <i class="fas fa-phone"></i>
@@ -96,7 +96,7 @@
                             <ul class="list-group w-100">
                                 <li class="list-group-item">Name:
                                     <span class="text-uppercase font-weight-bold">
-                                        {{ $classTeacher->first_name }} {{ $classTeacher->last_name }}
+                                        {{ ucwords(strtolower($classTeacher->first_name. ' '. $classTeacher->last_name)) }}
                                     </span>
                                 </li>
                                 <li class="list-group-item">Gender:
@@ -114,7 +114,7 @@
                                 </li>
                                 <li class="list-group-item">Class:
                                     <span class="text-uppercase font-weight-bold">
-                                        {{ $classTeacher->class_name }} - {{ $classTeacher->group }}
+                                        {{ ucwords(strtolower($classTeacher->class_name)) }} - {{ ucwords(strtoupper($classTeacher->group)) }}
                                     </span>
                                 </li>
                             </ul>
