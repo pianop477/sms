@@ -15,6 +15,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use RealRashid\SweetAlert\Facades\Alert;
 use Vinkla\Hashids\Facades\Hashids;
@@ -178,10 +179,13 @@ class RolesController extends Controller
 
             //notify via SMS after password reset
             $nextSmsService = new NextSmsService();
-            $link = "https://shuleapp.tech";
+            $link = "https://shuleapp.tech/Login";
 
             $senderId = $school->sender_id ?? "SHULE APP";
-            $message = "Your password has been reset to (shule2025). Kindly visit {$link} login to your account and change your password.";
+            $message = "Hello {$users->first_name} \n";
+            $message .= "your username: {$users->phone}\n";
+            $message .="Password: shule2025\n";
+            $message .= "Login at {$link} to change your password.";
             $destination = $this->formatPhoneNumber($users->phone);
             $reference = uniqid();
             $payload = [
@@ -190,7 +194,8 @@ class RolesController extends Controller
                 'text' => $message,
                 'reference' => $reference,
             ];
-            // dd($payload);
+
+            // Log::info("Sending to ". $payload['to']. " Message says ". $payload['text']);
 
             $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
