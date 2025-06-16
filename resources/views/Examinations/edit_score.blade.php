@@ -7,11 +7,11 @@
             <div class="card">
                 <div class="card-header">
                     <div class="row">
-                        <div class="col-10">
-                            <h4 class="text-center text-capitalize">Edit Saved Results - {{ ucwords(strtoupper($courseName)) }} ({{ ucwords(strtoupper($className)) }})</h4>
+                        <div class="col-12 col-md-10 order-1 order-md-0">
+                            <h4 class="text-center text-md-left text-capitalize">Edit Saved Results - {{ ucwords(strtoupper($courseName)) }} ({{ ucwords(strtoupper($className)) }})</h4>
                         </div>
-                        <div class="col-2">
-                            <a href="{{route('home')}}" class="text-white btn btn-info float-right"><i class="fas fa-arrow-alt-circle-left"></i> Back to Home</a>
+                        <div class="col-12 col-md-2 order-0 order-md-1 mb-2 mb-md-0">
+                            <a href="{{route('home')}}" class="text-white btn btn-info float-md-right w-100 w-md-auto"><i class="fas fa-arrow-circle-left"></i> Back Home</a>
                         </div>
                     </div>
                 </div>
