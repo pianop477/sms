@@ -229,13 +229,13 @@
         </tbody>
     </table>
     <footer>
-    <span class="copyright">
-      &copy; {{ ucwords(strtolower(Auth::user()->school->school_name)) }} – {{ date('Y') }}
-    </span>
-    <span class="page-number"></span>
-    <span class="printed">
-      Printed at: {{ now()->format('d-M-Y H:i') }}
-    </span>
-  </footer>
+        <span class="copyright">
+        &copy; {{ ucwords(strtolower(Auth::user()->school->school_name)) }} – {{ date('Y') }}
+        </span>
+        <span class="page-number"></span>
+        <span class="printed">
+        Printed at: {{ now()->format('d-M-Y H:i') }}
+        </span>
+    </footer>
 </body>
 </html>
