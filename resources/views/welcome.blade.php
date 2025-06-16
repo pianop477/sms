@@ -48,7 +48,7 @@
     <div class="container mx-auto h-full flex flex-col justify-center items-center text-center relative z-10 text-white pt-40">
       <h1 class="text-4xl md:text-6xl font-bold mb-6">Karibu ShuleApp</h1>
       <p class="text-xl md:text-2xl mb-8">Suluhisho lako Bora la Usimamizi wa Elimu</p>
-      <a href="{{route('login')}}" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full text-lg font-semibold transition">Ingia Sasa</a>
+      <a href="{{route('login')}}" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full text-lg font-semibold transition">Ingia Hapa</a>
     </div>
   </section>
 
