@@ -45,6 +45,7 @@
             margin: 0;
             padding: 0;
             background-color: #f8f9fa;
+            margin-bottom: 40px;
         }
         @media print {
             .no-print {
@@ -113,17 +114,37 @@
             height: 40px;
             border-radius: 50%;
         }
-
-        .footer {
+        footer {
             position: fixed;
-            bottom: -30px;
-            align-content: space-around;
-            font-size: 12px;
-            /* border-top: 1px solid black; */
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 25px;
+            font-size: 10px;
+            border-top: 1px solid #ddd;
+            padding: 4px 20px;
+            text-align: center;
+            background-color: white; /* Hakikisha footer ina background */
+            z-index: 1000; /* Hakikisha footer iko juu ya content */
         }
-        .page-number:before {
-            content: "Page " counter(page);
+        footer .page-number:after {
+            /* content: "Page " counter(page); */
         }
+        footer .copyright {
+            float: left;
+            margin-left: 10px;
+        }
+        footer .printed {
+            float: right;
+            margin-right: 10px;
+        }
+        /* Clear floats */
+        footer:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
 
     </style>
 </head>
@@ -208,13 +229,14 @@
             <p>No data found!</p>
         @endif
     </div>
-    <div class="footer">
-        <footer>
-            <div class="footer-content">
-                <div class="page-number"></div>
-                <span class="printed-on">Printed on: {{ \Carbon\Carbon::now()->format('d-m-Y H:i') }}</span>
-            </div>
-        </footer>
-    </div>
+    <footer>
+        <span class="copyright">
+        &copy; {{ ucwords(strtolower(Auth::user()->school->school_name)) }} – {{ date('Y') }}
+        </span>
+        <span class="page-number"></span>
+        <span class="printed">
+        Printed at: {{ now()->format('d-M-Y H:i') }}
+        </span>
+  </footer>
 </body>
 </html>

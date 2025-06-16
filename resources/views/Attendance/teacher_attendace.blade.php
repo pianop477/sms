@@ -8,8 +8,8 @@
                     <h4 class="header-title">Generate Attendance Report</h4>
                 </div>
                 <div class="col-2">
-                    <a href="{{ route('home') }}">
-                        <i class="fas fa-circle-arrow-left text-secondary" style="font-size: 2rem"></i>
+                    <a href="{{ route('home') }}" class="btn btn-info float-right">
+                        <i class="fas fa-circle-arrow-left" style=""></i> Back
                     </a>
                 </div>
             </div>

@@ -486,29 +486,29 @@ class ExamController extends Controller
         $resultDate = Carbon::parse($date)->format('Y-m-d');
 
         $results = Examination_result::query()
-            ->join('students', 'students.id', '=', 'examination_results.student_id')
-            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-            ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
-            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-            ->leftJoin('schools', 'schools.id', '=', 'students.school_id')
-            ->select(
-                'examination_results.*', 'grades.class_name', 'grades.class_code', 'examinations.exam_type',
-                'students.first_name', 'students.id as studentId', 'students.middle_name', 'students.last_name', 'students.gender', 'students.group', 'students.class_id', 'students.admission_number',
-                'subjects.course_name', 'subjects.course_code', 'users.first_name as teacher_firstname', 'students.status',
-                'users.last_name as teacher_lastname', 'users.gender as teacher_gender', 'users.phone as teacher_phone', 'schools.school_reg_no'
-            )
-            ->where('examination_results.course_id', $class_course->course_id)
-            ->where('examination_results.class_id', $class_course->class_id)
-            ->where('students.status', 1)
-            ->where('examination_results.exam_type_id', $exam_id)
-            ->where('examination_results.school_id', $user->school_id)
-            ->whereDate('examination_results.exam_date', $resultDate)
-            ->distinct()
-            ->orderBy('examination_results.score', 'desc')
-            ->orderBy('students.first_name', 'asc')
-            ->get();
+                    ->join('students', 'students.id', '=', 'examination_results.student_id')
+                    ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+                    ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+                    ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+                    ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
+                    ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+                    ->leftJoin('schools', 'schools.id', '=', 'students.school_id')
+                    ->select(
+                        'examination_results.*', 'grades.class_name', 'grades.class_code', 'examinations.exam_type',
+                        'students.first_name', 'students.id as studentId', 'students.middle_name', 'students.last_name', 'students.gender', 'students.group', 'students.class_id', 'students.admission_number',
+                        'subjects.course_name', 'subjects.course_code', 'users.first_name as teacher_firstname', 'students.status',
+                        'users.last_name as teacher_lastname', 'users.gender as teacher_gender', 'users.phone as teacher_phone', 'schools.school_reg_no'
+                    )
+                    ->where('examination_results.course_id', $class_course->course_id)
+                    ->where('examination_results.class_id', $class_course->class_id)
+                    ->where('students.status', 1)
+                    ->where('examination_results.exam_type_id', $exam_id)
+                    ->where('examination_results.school_id', $user->school_id)
+                    ->whereDate('examination_results.exam_date', $resultDate)
+                    ->distinct()
+                    ->orderBy('examination_results.score', 'desc')
+                    ->orderBy('students.first_name', 'asc')
+                    ->get();
 
         // Initialize grade counts
         $gradeCounts = [
@@ -520,8 +520,13 @@ class ExamController extends Controller
         ];
 
         // Calculate grades, positions, and average score
-        $totalScore = 0;
-        $totalRecords = $results->count();
+        $validResults = $results
+                        ->whereNotNull('score')
+                        ->filter(fn($res) => is_numeric($res->score) && $res->score >= 0);
+
+        $totalScore = $validResults->sum('score');
+        $totalRecords = $validResults->count();
+        $averageScore = $totalRecords > 0 ? $totalScore / $totalRecords : 0;
 
         // Sort results by score descending
         $results = $results->sortByDesc('score')->values();
@@ -557,7 +562,6 @@ class ExamController extends Controller
                     $gradeCounts['E']++;
                 } else {
                     $result->grade = 'ABS';
-                    // $gradeCounts['E']++;
                 }
             } else {
                 if ($result->score >= 80.5) {
@@ -577,17 +581,15 @@ class ExamController extends Controller
                     $gradeCounts['E']++;
                 } else {
                     $result->grade = 'ABS';
-                    // $gradeCounts['E']++;
                 }
             }
 
             // Assign position
             $result->position = $position;
-            // Sum total score
-            $totalScore += $result->score;
+            // Usiweke $totalScore += $result->score hapa kwa sababu tumehesabu tayari
         }
 
-        $averageScore = $totalRecords > 0 ? $totalScore / $totalRecords : 0;
+        // $averageScore = $totalRecords > 0 ? $totalScore / $totalRecords : 0;
         $averageGrade = $this->determineGrade($averageScore, $results->first()->marking_style);
 
         // Count number of students by gender
