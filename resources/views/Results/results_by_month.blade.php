@@ -151,24 +151,33 @@
             }
             footer {
             position: fixed;
-            bottom: -30px;
-            left: 0px;
-            right: 0px;
-            height: 50px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 25px;
+            font-size: 10px;
+            border-top: 1px solid #ddd;
+            padding: 4px 20px;
             text-align: center;
-            line-height: 35px;
-            font-size: 12px;
-
+            background-color: white; /* Hakikisha footer ina background */
+            z-index: 1000; /* Hakikisha footer iko juu ya content */
         }
-        .footer {
-            position: fixed;
-            bottom: -30px;
-            align-content: space-around;
-            font-size: 12px;
-            border-top: 1px solid black;
+        footer .page-number:after {
+        content: "Page " counter(page);
         }
-        .page-number:before {
-            content: "Page " counter(page);
+        footer .copyright {
+        float: left;
+        margin-left: 10px;
+        }
+        footer .printed {
+        float: right;
+        margin-right: 10px;
+        }
+        /* Clear floats */
+        footer:after {
+        content: "";
+        display: table;
+        clear: both;
         }
     </style>
 </head>
@@ -415,8 +424,14 @@
             </div>
         </div>
     </div>
-    <footer class="footer">
-        <div class="page-number"></div>
+    <footer>
+        <span class="copyright">
+        &copy; {{ ucwords(strtolower(Auth::user()->school->school_name)) }} – {{ date('Y') }}
+        </span>
+        <span class="page-number"></span>
+        <span class="printed">
+        Printed at: {{ now()->format('d-M-Y H:i') }}
+        </span>
     </footer>
 </body>
 </html>
