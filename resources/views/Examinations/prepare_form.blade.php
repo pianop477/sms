@@ -8,7 +8,7 @@
                     <h4 class="header-title text-capitalize">results form - preliminary information</h4>
                 </div>
                 <div class="col-4">
-                    <a href="{{ route('home') }}" class="float-right">
+                    <a href="{{ route('home') }}" class="float-right btn btn-info">
                         <i class="fas fa-arrow-circle-left"></i> Back
                     </a>
                 </div>

@@ -24,22 +24,25 @@
                     <div id="{{ Str::slug($month) }}" class="date-list mt-2" style="display: none; padding-left: 20px;">
                         <p class="text-danger">Select Date to get result</p>
                         @foreach ($dates as $date => $results)
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <a href="{{ route('results.byMonth', ['course' => Hashids::encode($class_course->id), 'year' => $year, 'examType' => Hashids::encode($exam_id), 'month' => $month, 'date' => $date]) }}" target="">
-                                        <button type="button" class="list-group-item list-group-item-action">
-                                            <p class="text-primary" style="text-decoration: underline;"><i class="fas fa-calendar-alt"></i> {{ \Carbon\Carbon::parse($date)->format('d-m-Y') }}</p>
-                                        </button>
-                                    </a>
-                                    <div class="col-md-2">
-                                        <a href="{{ route('results.delete.byTeacher', ['course' => Hashids::encode($class_course->id), 'year' => $year, 'examType' => Hashids::encode($exam_id), 'month' => $month, 'date' => $date]) }}"
-                                        class="btn btn-danger btn-xs"
-                                        onclick="return confirm('Are you sure you want to delete this result for date: {{\Carbon\Carbon::parse($date)->format('d-m-Y')}}?')">
-                                            <i class="fas fa-trash"></i> Delete
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
+                            <div class="row align-items-center mb-2">
+                        <div class="col-md-10">
+                            <a href="{{ route('results.byMonth', ['course' => Hashids::encode($class_course->id), 'year' => $year, 'examType' => Hashids::encode($exam_id), 'month' => $month, 'date' => $date]) }}">
+                            <button type="button" class="list-group-item list-group-item-action w-100">
+                                <p class="text-success mb-0" style="text-decoration: underline;">
+                                <i class="fas fa-file-pdf-o"></i>
+                                {{ \Carbon\Carbon::parse($date)->format('d-m-Y') }}
+                                </p>
+                            </button>
+                            </a>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <a href="{{ route('results.delete.byTeacher', ['course' => Hashids::encode($class_course->id), 'year' => $year, 'examType' => Hashids::encode($exam_id), 'month' => $month, 'date' => $date]) }}"
+                            class="btn btn-danger btn-sm"
+                            onclick="return confirm('Are you sure you want to delete this result for date: {{\Carbon\Carbon::parse($date)->format('d-m-Y')}}?')">
+                            <i class="fas fa-trash"></i> Delete
+                            </a>
+                        </div>
+                        </div>
                         @endforeach
                     </div>
                 @endforeach

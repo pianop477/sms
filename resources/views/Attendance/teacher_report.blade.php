@@ -154,30 +154,40 @@
             color: #333;
         }
 
-        .footer {
+        footer {
             position: fixed;
             bottom: 0;
             left: 0;
-            width: 100%;
-            text-align: center;
-            font-size: 12px;
-            color: #666;
-            background-color: #fff;
-            padding: 5px 0;
+            right: 0;
+            height: 25px;
+            font-size: 10px;
             border-top: 1px solid #ddd;
+            padding: 4px 20px;
+            text-align: center;
+            background-color: white; /* Hakikisha footer ina background */
+            z-index: 1000; /* Hakikisha footer iko juu ya content */
         }
-
-        .page-number {
-            display: inline-block;
-            margin-right: 20px;
-        }
-
-        .printed-on {
-            display: inline-block;
-        }
-
-        .page-number:before {
+        footer .page-number:after {
             content: "Page " counter(page);
+        }
+        footer .copyright {
+            float: left;
+            margin-left: 10px;
+        }
+        footer .printed {
+            float: right;
+            margin-right: 10px;
+        }
+        /* Clear floats */
+        footer:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        .attendance-section:nth-child(n + 2) {
+            page-break-before: always;
+            page-break-inside: avoid;
         }
     </style>
 </head>
@@ -227,9 +237,12 @@
                         }
                     @endphp
                     <div>
-                        <h6 style="text-transform: uppercase; border: 1px solid black; border-radius: 4px; padding: 5px;">
-                            Time Duration: <strong>{{ \Carbon\Carbon::parse($month)->format('F Y') }}</strong>
-                        </h6>
+                        <div class="attendance-section">
+                            <h6 style="text-transform: uppercase; border: 1px solid black; border-radius: 4px; padding: 5px;">
+                                Time Duration: <strong>{{ \Carbon\Carbon::parse($month)->format('F Y') }}</strong>
+                            </h6>
+                        </div>
+
                         <div class="summary-header">
                             <p>Attendance Report Summary</p>
                         </div>
@@ -310,22 +323,14 @@
     </div>
 
     <!-- Footer -->
-    <div class="footer">
-        <div class="page-number"></div>
-        <span class="printed-on">Printed on: {{ \Carbon\Carbon::now()->format('d-m-Y H:i') }}</span>
-    </div>
-
-    <script>
-        // Add page numbers
-        document.addEventListener("DOMContentLoaded", function() {
-            const pages = document.querySelectorAll('.container > div');
-            pages.forEach((page, index) => {
-                const pageNumber = page.querySelector('.page');
-                if (pageNumber) {
-                    pageNumber.textContent = index + 1;
-                }
-            });
-        });
-    </script>
+    <footer>
+        <span class="copyright">
+        &copy; {{ ucwords(strtolower(Auth::user()->school->school_name)) }} – {{ date('Y') }}
+        </span>
+        <span class="page-number"></span>
+        <span class="printed">
+        Printed at: {{ now()->format('d-M-Y H:i') }}
+        </span>
+  </footer>
 </body>
 </html>

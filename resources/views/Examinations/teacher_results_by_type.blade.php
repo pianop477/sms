@@ -2,238 +2,240 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>My Subject results</title>
-
+    <title>Subject Results Report</title>
     <style>
-        /* Inline your Bootstrap CSS styles here */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            font-size: 12px;
+            color: #333;
             margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-        }
-        @media print {
-            .no-print {
-                display: none;
-            }
-            h1, h2, h4, h5, h6 {
-                text-transform: uppercase;
-                text-align: center
-            }
-            .print-only {
-                display: block;
-            }
-            .footer {
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-                border-top: 1px solid #ddd;
-                padding-top: 10px;
-            }
-            thead {
-                display: table-header-group;
-                background-color: gray; /* Adds a gray background to thead */
-            }
-            tbody {
-                display: table-row-group;
-            }
-            .table {
-                border: 1px solid black;
-                border-collapse: collapse;
-                width: 100%;
-            }
-            .table th,
-            .table td {
-                border: 1px solid black;
-            }
+            padding: 20px;
+            padding-bottom: 50px; /* Ongeza padding chini kwa footer */
         }
 
-        .container {
-            display: flex;
-            padding: 5px;
-            flex-direction: row;
-            flex-wrap: wrap;
-        }
-        .logo {
-            position: absolute;
-            width: 70px;
-            left: 7px;
-            top: 5px;
-            color: inherit;
-        }
         .header {
             text-align: center;
-            position: relative;
-            top: 0;
-            left: 40px;
+            margin-bottom: 10px;
+        }
+
+        .header img {
+            float: left;
+            width: 70px;
+            height: auto;
+        }
+
+        .header h3, .header h4, .header h5 {
+            margin: 2px;
             text-transform: uppercase;
-            line-height: 1px;
+            font-size: 16px;
         }
-        .summary-header {
-            margin-top: 5px;
-            text-align: center;
-            text-transform: capitalize;
-            font-size: 20px;
+
+        hr {
+            border: 0;
+            border-top: 2px solid #ccc;
+            margin: 10px 0;
         }
-        .summary-content {
-            display: flex;
-            flex-direction: row;
-            text-transform: capitalize
+
+        .info, .summary, .grades {
+            margin-bottom: 15px;
         }
-        .course-details {
-            position: relative;
-            left: 5px;
+
+        .info p, .summary p {
+            margin: 2px 0;
+        }
+
+        .summary-table, .results-table {
             width: 100%;
-            line-height: 5px;
-        }
-        .grade-summary {
-            position: absolute;
-            width: 50%;
-            left: 45%;
-            top: 23%
-        }
-        .table {
-            width: 100%;
-            border: 1px solid black;
             border-collapse: collapse;
+            margin-top: 5px;
         }
 
-        .table th, .table td {
-            border: 1px solid #dee2e6;
-            padding: 2px;
-            text-align: left;
-            text-transform: capitalize
+        .summary-table th,
+        .summary-table td,
+        .results-table th,
+        .results-table td {
+            border: 1px solid #aaa;
+            padding: 4px;
+            text-align: center;
         }
 
-        .table th {
+        .summary-table th {
             background-color: #343a40;
             color: #fff;
+        }
+
+        .results-table th {
+            background-color: #f1f1f1;
+        }
+
+        .average-box {
+            padding: 8px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            width: fit-content;
+            margin-top: 10px;
+        }
+
+        .grade-badge {
+            padding: 2px 8px;
+            border-radius: 3px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .grade-A { background-color: #28a745; }
+        .grade-B { background-color: #17a2b8; }
+        .grade-C { background-color: #ffc107; color: #000; }
+        .grade-D { background-color: #fd7e14; }
+        .grade-E { background-color: #dc3545; }
+
+        .absent {
+            background-color: #dc3545;
+            color: #fff;
+            padding: 2px 6px;
+            font-weight: bold;
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 25px;
+            font-size: 10px;
+            border-top: 1px solid #ddd;
+            padding: 4px 20px;
             text-align: center;
+            background-color: white; /* Hakikisha footer ina background */
+            z-index: 1000; /* Hakikisha footer iko juu ya content */
         }
-
-        .table td {
-            background-color: #fff;
+        footer .page-number:after {
+        content: "Page " counter(page);
         }
-
+        footer .copyright {
+        float: left;
+        margin-left: 10px;
+        }
+        footer .printed {
+        float: right;
+        margin-right: 10px;
+        }
+        /* Clear floats */
+        footer:after {
+        content: "";
+        display: table;
+        clear: both;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">
-            <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 70px;">
-        </div>
-        <div class="header">
-            <h3>{{_('the united republic of tanzania')}}</h3>
-            <h4>{{_("the president's office - ralg")}}</h4>
-            <h4>{{ Auth::user()->school->school_name }} - {{ Auth::user()->school->postal_address }}, {{ Auth::user()->school->postal_name }}</h4>
-            <h5>{{ $results->first()->exam_type }} Results for {{ $month }} - {{ $year }}</h5>
-        </div>
+    <div class="header">
+        <img src="{{ public_path('assets/img/logo/' . Auth::user()->school->logo) }}" alt="logo">
+        <h3>THE UNITED REPUBLIC OF TANZANIA</h3>
+        <h4>THE PRESIDENT'S OFFICE - RALG</h4>
+        <h4>{{ Auth::user()->school->school_name }} - {{ Auth::user()->school->postal_address }}, {{ Auth::user()->school->postal_name }}</h4>
+        <h5>{{ $results->first()->exam_type }} Results - {{ $month }} {{ $year }}</h5>
     </div>
+
     <hr>
-    <div class="summary-content">
-        <div class="course-details">
-            <p style="font-weight: bold">Course information Summary</p>
-            <hr>
-            <div>
-                <p>Subject: <span style="text-transform: uppercase"><strong>{{$subjectCourse->course_name}} - {{$subjectCourse->course_code}}</strong></span></p>
-                <p>Teacher: <strong>{{$results->first()->teacher_firstname}}, {{$results->first()->teacher_lastname[0]}}</strong></p>
-                <p>Exam Type: <strong>{{$results->first()->exam_type}}</strong></p>
-                <p>Date: <strong>{{\Carbon\Carbon::parse($results->first()->exam_date)->format('d-F-Y')}}</strong></p>
-                <p>Term: <strong><span style="text-transform: uppercase">{{$results->first()->Exam_term}}</span></strong></p>
-            </div>
-        </div>
+
+    <div class="info">
+        <p><strong>Subject:</strong> {{ strtoupper($subjectCourse->course_name) }} - {{ strtoupper($subjectCourse->course_code) }}</p>
+        <p><strong>Teacher:</strong> {{ ucwords(strtolower($results->first()->teacher_firstname)) }} {{ strtoupper($results->first()->teacher_lastname[0]) }}.</p>
+        <p><strong>Exam Date:</strong> {{ \Carbon\Carbon::parse($results->first()->exam_date)->format('d F Y') }}</p>
+        <p><strong>Term:</strong> {{ strtoupper($results->first()->Exam_term) }}</p>
     </div>
+
+    <div class="grades">
+        <p><strong>Performance Summary</strong></p>
+        <table class="summary-table">
+            <tr>
+                <th>Grade</th>
+                <th>A</th>
+                <th>B</th>
+                <th>C</th>
+                <th>D</th>
+                <th>E</th>
+            </tr>
+            <tr>
+                <td><strong>Number</strong></td>
+                <td>{{ $gradeCounts['A'] }}</td>
+                <td>{{ $gradeCounts['B'] }}</td>
+                <td>{{ $gradeCounts['C'] }}</td>
+                <td>{{ $gradeCounts['D'] }}</td>
+                <td>{{ $gradeCounts['E'] }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="average-box">
+        <p><strong>Average Score:</strong> {{ number_format($averageScore, 2) }}</p>
+        <p><strong>Grade:</strong>
+            <span class="grade-badge grade-{{ $averageGrade }}">{{ $averageGrade }} -
+                @php
+                    echo match($averageGrade) {
+                        'A' => 'Excellent',
+                        'B' => 'Good',
+                        'C' => 'Pass',
+                        'D' => 'Poor',
+                        'E' => 'Fail',
+                        default => 'N/A'
+                    };
+                @endphp
+            </span>
+        </p>
+    </div>
+
     <hr>
-    <div class="">
-        <p style="">Performance Summary</p>
-            <table class="table" style="border: 1px solid black; border-collapse:collapse; text-align:center">
-                <tr>
-                    <th>Grade</th>
-                    <th>A</th>
-                    <th>B</th>
-                    <th>C</th>
-                    <th>D</th>
-                    <th>E</th>
-                </tr>
-                <tr>
-                    <td style="text-align: center">Number</td>
-                    <td style="text-align: center">{{$gradeCounts['A']}}</td>
-                    <td style="text-align: center">{{$gradeCounts['B']}}</td>
-                    <td style="text-align: center">{{$gradeCounts['C']}}</td>
-                    <td style="text-align: center">{{$gradeCounts['D']}}</td>
-                    <td style="text-align: center">{{$gradeCounts['E']}}</td>
-                </tr>
-            </table>
-    </div>
-    <div style="align-items: center">
-        @php
-            if($averageGrade == 'A') {
-                $bgColor = 'rgb(117, 244, 48)';
-                $comment = 'Excellent';
-            }
-            if($averageGrade == 'B') {
-                $bgColor = 'rgb(153, 250, 237)';
-                $comment = 'Good';
-            }
-            if($averageGrade == 'C') {
-                $bgColor = 'rgb(237, 220, 113)';
-                $comment = 'Pass';
-            }
-            if($averageGrade == 'D') {
-                $bgColor = 'rgb(235, 75, 75)';
-                $comment = 'Poor';
-            }
-            if($averageGrade == 'E') {
-                $bgColor = 'rgb(182, 176, 176)';
-                $comment = 'Fail';
-            }
-        @endphp
-        <p><strong>Average: {{number_format($averageScore, 2)}}</strong></p>
-        <p><strong>Grade: <span style="padding: 4px; background:{{$bgColor}}">{{$averageGrade}} - {{$comment}}</span></strong></p>
-    </div>
-    <hr>
-    <p style="text-transform:capitalize; text-align:center;">students examination results records</p>
-    <table class="table table-bordered table-hover">
+
+    <h4 style="text-align:center;">Students Examination Records</h4>
+    <table class="results-table">
         <thead>
             <tr>
                 <th>#</th>
-                <th style="text-align:center">Reg No.</th>
+                <th>Admission No.</th>
                 <th>Student Name</th>
-                <th style="text-align:center">Gender</th>
-                <th style="text-align:center">Stream</th>
-                <th style="text-align:center">Marks</th>
-                <th style="text-align:center">Grade</th>
-                <th style="text-align:center">Position</th>
+                <th>Gender</th>
+                <th>Stream</th>
+                <th>Marks</th>
+                <th>Grade</th>
+                <th>Position</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($results as $result)
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td style="text-align:center"><span style="text-transform: uppercase">{{$result->admission_number}}</td>
-                    <td>{{ucwords(strtolower($result->first_name. ' '. $result->middle_name. ' '.$result->last_name  ))}}</td>
-                    <td style="text-align:center">{{$result->gender[0]}}</td>
-                    <td style="text-align:center">{{$result->group}}</td>
-                    <td style="text-align:center">
-                        @if ( $result->score === null)
-                            <span style="background:rgb(235, 75, 75); padding:2px 10px ">X</span>
-                        @else
-                            {{ $result->score }}
-                        @endif
-                    </td>
-                    <td style="text-align:center">{{$result->grade}}</td>
-                    <td style="text-align:center">
-                        @if ($result->score === null)
-                            <span style="background:rgb(235, 75, 75); padding:2px 10px ">X</span>
-                        @else
-                            {{$result->position}}
-                        @endif
-                    </td>
-                </tr>
+            <tr>
+                <td>{{ $loop->iteration }}</td>
+                <td>{{ strtoupper($result->admission_number) }}</td>
+                <td style="text-align: left">{{ ucwords(strtolower($result->first_name . ' ' . $result->middle_name . ' ' . $result->last_name)) }}</td>
+                <td>{{ ucfirst($result->gender[0]) }}</td>
+                <td>{{ $result->group }}</td>
+                <td>
+                    @if ($result->score === null)
+                        <span class="absent">X</span>
+                    @else
+                        {{ $result->score }}
+                    @endif
+                </td>
+                <td>{{ $result->grade }}</td>
+                <td>
+                    @if ($result->score === null)
+                        <span class="absent">X</span>
+                    @else
+                        {{ $result->position }}
+                    @endif
+                </td>
+            </tr>
             @endforeach
         </tbody>
     </table>
+    <footer>
+    <span class="copyright">
+      &copy; {{ ucwords(strtolower(Auth::user()->school->school_name)) }} – {{ date('Y') }}
+    </span>
+    <span class="page-number"></span>
+    <span class="printed">
+      Printed at: {{ now()->format('d-M-Y H:i') }}
+    </span>
+  </footer>
 </body>
 </html>
