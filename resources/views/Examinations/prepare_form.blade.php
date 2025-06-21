@@ -5,10 +5,10 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-8">
-                    <h4 class="header-title text-capitalize">results form - preliminary information</h4>
+                    <h4 class="header-title text-capitalize">results form | pre-information</h4>
                 </div>
                 <div class="col-4">
-                    <a href="{{ route('home') }}" class="float-right btn btn-info">
+                    <a href="{{ route('home') }}" class="float-right btn btn-info btn-xs">
                         <i class="fas fa-arrow-circle-left"></i> Back
                     </a>
                 </div>
@@ -24,7 +24,7 @@
                 <div class="form-row">
                     <!-- Examination -->
                     <div class="col-md-3 mb-3">
-                        <label for="exam_type">Exam Type</label>
+                        <label for="exam_type">Examination Type</label>
                         <select name="exam_type" id="exam_type" class="form-control text-capitalize" required>
                             <option value="">-- Select Exam type --</option>
                             @foreach ($exams as $exam)
@@ -35,7 +35,6 @@
                         <div class="text-danger text-sm">{{ $message }}</div>
                         @enderror
                     </div>
-
                     <!-- Exam Date -->
                     <div class="col-md-3 mb-3">
                         <label for="exam_date">Uploading Date</label>
@@ -80,40 +79,32 @@
                     </button>
                 @else
                     <div class="row">
-                        <div class="col-6">
-                           <div class="row">
-                            <div class="col-sm-12">
-                                <span class="text-danger" style="font-size: 10px; font-style:italic">Expiry Date: {{\Carbon\Carbon::parse($saved_results->first()->expiry_date)->format('d-m-Y  H:i:s')}}</span>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-8">
-                                    <a href="{{route('form.saved.values', ['course' => Hashids::encode($class_course->course_id),
-                                        'teacher' => Hashids::encode($class_course->teacher_id),
-                                        'school' => Hashids::encode($class_course->school_id),
-                                        'class' => Hashids::encode($class_course->class_id),
-                                        'type' => $saved_results->first()->exam_type_id,
-                                        'date' => $saved_results->first()->exam_date,
-                                        'term' => $saved_results->first()->exam_term,
-                                        'style' => $saved_results->first()->marking_style])}}"
-                                        class="btn btn-warning" onclick="" title="Pending score">Pending Results</a>
-                                </div>
-                                <div class="col-4 mt-3">
-                                    <a href="{{route('results.draft.delete', ['course' => Hashids::encode($class_course->course_id),
-                                                'teacher' => Hashids::encode($class_course->teacher_id),
-                                                'type' => $saved_results->first()->exam_type_id,
-                                                'class' => Hashids::encode($class_course->class_id),
-                                                'date' => $saved_results->first()->exam_date])}}" onclick="return confirm('Are you sure you want to delete this results? you cant recover it later')"
-                                                title="Delete pending results">
-                                        <i class="fas fa-trash text-danger" style="font-size: 1rem;"></i>
-                                    </a>
-                                </div>
-                            </div>
-                           </div>
+                        <div class="col-12">
+                            <p class="text-danger text-center" style="font-style:italic">Expiry Date: {{\Carbon\Carbon::parse($saved_results->first()->expiry_date)->format('d-m-Y  H:i:s')}}</p>
+                            <hr>
                         </div>
-                        <div class="col-6">
-                            <button class="btn btn-primary float-right" id="saveButton" type="submit">
-                                Next Step <i class="ti-arrow-right"></i>
-                            </button>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <a href="{{route('form.saved.values', ['course' => Hashids::encode($class_course->course_id),
+                                    'teacher' => Hashids::encode($class_course->teacher_id),
+                                    'school' => Hashids::encode($class_course->school_id),
+                                    'class' => Hashids::encode($class_course->class_id),
+                                    'type' => $saved_results->first()->exam_type_id,
+                                    'date' => $saved_results->first()->exam_date,
+                                    'term' => $saved_results->first()->exam_term,
+                                    'style' => $saved_results->first()->marking_style])}}"
+                                    class="btn btn-warning btn-xs" onclick="" title="Pending score">Pending Results</a>
+                            </div>
+                            <div class="col-6">
+                                <a href="{{route('results.draft.delete', ['course' => Hashids::encode($class_course->course_id),
+                                    'teacher' => Hashids::encode($class_course->teacher_id),
+                                    'type' => $saved_results->first()->exam_type_id,
+                                    'class' => Hashids::encode($class_course->class_id),
+                                    'date' => $saved_results->first()->exam_date])}}" onclick="return confirm('Are you sure you want to delete this results? you cant recover it later')"
+                                    title="Delete score">
+                                    <i class="fas fa-trash text-danger"></i> Delete
+                                </a>
+                            </div>
                         </div>
                     </div>
                 @endif
