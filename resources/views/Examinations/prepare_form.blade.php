@@ -83,7 +83,7 @@
                     </div>
                     <hr>
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-6">
                             <a href="{{route('form.saved.values', ['course' => Hashids::encode($class_course->course_id),
                                 'teacher' => Hashids::encode($class_course->teacher_id),
                                 'school' => Hashids::encode($class_course->school_id),
