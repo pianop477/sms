@@ -78,7 +78,7 @@
                         Next Step <i class="ti-arrow-right"></i>
                     </button>
                 @else
-                    <div class="col-12 justify-content-between d-flex">
+                    <div class="col-12">
                         <button class="btn btn-primary float-right" id="saveButton" type="submit">
                             Next Step <i class="ti-arrow-right"></i>
                         </button>
