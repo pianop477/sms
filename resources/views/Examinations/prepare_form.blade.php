@@ -78,8 +78,14 @@
                         Next Step <i class="ti-arrow-right"></i>
                     </button>
                 @else
+                    <div class="col-12 justify-content-between d-flex">
+                        <button class="btn btn-primary float-right" id="saveButton" type="submit">
+                            Next Step <i class="ti-arrow-right"></i>
+                        </button>
+                    </div>
+                    <hr>
                     <div class="col-12">
-                        <p class="text-danger text-sm text-center" style="font-style:italic">Expiry Date: {{\Carbon\Carbon::parse($saved_results->first()->expiry_date)->format('d-m-Y  H:i')}}</p>
+                        <p class="text-danger text-center" style="font-style:italic; font-size:12px;">Expiry Date: {{\Carbon\Carbon::parse($saved_results->first()->expiry_date)->format('d-m-Y  H:i')}}</p>
                     </div>
                     <div class="row">
                         <div class="col-6">
@@ -98,7 +104,7 @@
                                     'teacher' => Hashids::encode($class_course->teacher_id),
                                     'type' => $saved_results->first()->exam_type_id,
                                     'class' => Hashids::encode($class_course->class_id),
-                                    'date' => $saved_results->first()->exam_date])}}" onclick="return confirm('Are you sure you want to delete this results? you cant recover it later')"
+                                    'date' => $saved_results->first()->exam_date])}}" onclick="return confirm('Are you sure you want to delete this pending results? you cannot recover after delete')"
                                     title="Delete score"
                                     class="btn btn-danger btn-xs float-right">
                                     <i class="fas fa-trash"></i> Delete
