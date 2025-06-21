@@ -8,7 +8,7 @@
                     <h4 class="header-title text-capitalize">results form | pre-information</h4>
                 </div>
                 <div class="col-4">
-                    <a href="{{ route('home') }}" class="float-right btn btn-info btn-xs">
+                    <a href="{{ route('home') }}" class="float-right btn btn-info">
                         <i class="fas fa-arrow-circle-left"></i> Back
                     </a>
                 </div>
@@ -97,7 +97,7 @@
                                 'date' => $saved_results->first()->exam_date,
                                 'term' => $saved_results->first()->exam_term,
                                 'style' => $saved_results->first()->marking_style])}}"
-                                class="btn btn-warning btn-xs" onclick="" title="Pending score">Pending Results</a>
+                                class="btn btn-warning" onclick="" title="Pending score">Pending Results</a>
                             </div>
                             <div class="col-6">
                                 <a href="{{route('results.draft.delete', ['course' => Hashids::encode($class_course->course_id),
@@ -106,7 +106,7 @@
                                     'class' => Hashids::encode($class_course->class_id),
                                     'date' => $saved_results->first()->exam_date])}}" onclick="return confirm('Are you sure you want to delete this pending results? you cannot recover after delete')"
                                     title="Delete score"
-                                    class="btn btn-danger btn-xs float-right">
+                                    class="btn btn-danger float-right">
                                     <i class="fas fa-trash"></i> Delete
                                 </a>
                             </div>
