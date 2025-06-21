@@ -78,22 +78,21 @@
                         Next Step <i class="ti-arrow-right"></i>
                     </button>
                 @else
+                    <div class="col-12">
+                        <p class="text-danger text-center" style="font-style:italic">Expiry Date: {{\Carbon\Carbon::parse($saved_results->first()->expiry_date)->format('d-m-Y  H:i:s')}}</p>
+                    </div>
+                    <hr>
                     <div class="row">
-                        <div class="col-12">
-                            <p class="text-danger text-center" style="font-style:italic">Expiry Date: {{\Carbon\Carbon::parse($saved_results->first()->expiry_date)->format('d-m-Y  H:i:s')}}</p>
-                            <hr>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <a href="{{route('form.saved.values', ['course' => Hashids::encode($class_course->course_id),
-                                    'teacher' => Hashids::encode($class_course->teacher_id),
-                                    'school' => Hashids::encode($class_course->school_id),
-                                    'class' => Hashids::encode($class_course->class_id),
-                                    'type' => $saved_results->first()->exam_type_id,
-                                    'date' => $saved_results->first()->exam_date,
-                                    'term' => $saved_results->first()->exam_term,
-                                    'style' => $saved_results->first()->marking_style])}}"
-                                    class="btn btn-warning btn-xs" onclick="" title="Pending score">Pending Results</a>
+                        <div class="col-sm-6">
+                            <a href="{{route('form.saved.values', ['course' => Hashids::encode($class_course->course_id),
+                                'teacher' => Hashids::encode($class_course->teacher_id),
+                                'school' => Hashids::encode($class_course->school_id),
+                                'class' => Hashids::encode($class_course->class_id),
+                                'type' => $saved_results->first()->exam_type_id,
+                                'date' => $saved_results->first()->exam_date,
+                                'term' => $saved_results->first()->exam_term,
+                                'style' => $saved_results->first()->marking_style])}}"
+                                class="btn btn-warning btn-xs" onclick="" title="Pending score">Pending Results</a>
                             </div>
                             <div class="col-6">
                                 <a href="{{route('results.draft.delete', ['course' => Hashids::encode($class_course->course_id),
@@ -101,12 +100,12 @@
                                     'type' => $saved_results->first()->exam_type_id,
                                     'class' => Hashids::encode($class_course->class_id),
                                     'date' => $saved_results->first()->exam_date])}}" onclick="return confirm('Are you sure you want to delete this results? you cant recover it later')"
-                                    title="Delete score">
-                                    <i class="fas fa-trash text-danger"></i> Delete
+                                    title="Delete score"
+                                    class="btn btn-danger btn-xs float-right">
+                                    <i class="fas fa-trash"></i> Delete
                                 </a>
                             </div>
                         </div>
-                    </div>
                 @endif
             </form>
         </div>
