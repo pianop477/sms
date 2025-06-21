@@ -79,9 +79,8 @@
                     </button>
                 @else
                     <div class="col-12">
-                        <p class="text-danger text-center" style="font-style:italic">Expiry Date: {{\Carbon\Carbon::parse($saved_results->first()->expiry_date)->format('d-m-Y  H:i:s')}}</p>
+                        <p class="text-danger text-sm text-center" style="font-style:italic">Expiry Date: {{\Carbon\Carbon::parse($saved_results->first()->expiry_date)->format('d-m-Y  H:i')}}</p>
                     </div>
-                    <hr>
                     <div class="row">
                         <div class="col-6">
                             <a href="{{route('form.saved.values', ['course' => Hashids::encode($class_course->course_id),
