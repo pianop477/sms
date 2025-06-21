@@ -774,9 +774,9 @@
                                         @foreach ($courses as $course )
                                         <tr>
                                             <td class="text-capitalize">
-                                                {{$course->course_name}}
+                                                {{ucwords(strtolower($course->course_name))}}
                                             </td>
-                                            <td class="text-uppercase">{{$course->class_code}}</td>
+                                            <td class="text-uppercase">{{strtoupper($course->class_code)}}</td>
                                             <td>
                                                 @if ($course->status == 1)
                                                 <ul class="d-flex justify-content-center">
@@ -1149,7 +1149,7 @@
                             <table class="table table-hover text-center" id="">
                                 <thead>
                                     <tr class="text-capitalize">
-                                        <th>Course name</th>
+                                        <th>Subject</th>
                                         <th>Class</th>
                                         <th class="text-center">Action</th>
                                     </tr>
@@ -1167,9 +1167,9 @@
                                         @foreach ($courses as $course )
                                         <tr>
                                             <td class="text-capitalize">
-                                                {{$course->course_name}}
+                                                {{ucwords(strtolower($course->course_name))}}
                                             </td>
-                                            <td class="text-uppercase">{{$course->class_code}}</td>
+                                            <td class="text-uppercase">{{strtoupper($course->class_code)}}</td>
                                             <td>
                                                 @if ($course->status == 1)
                                                 <ul class="d-flex justify-content-center">
@@ -1399,7 +1399,7 @@
                             <table class="table table-hover text-center" id="">
                                 <thead>
                                     <tr class="text-capitalize">
-                                        <th>Course name</th>
+                                        <th>Subject</th>
                                         <th>Class</th>
                                         <th class="text-center">Action</th>
                                     </tr>
@@ -1409,7 +1409,7 @@
                                         <tr>
                                             <td colspan="5">
                                                 <div class="alert alert-warning text-center">
-                                                    No any subject assigned for you
+                                                    No any subject assigned for you!
                                                 </div>
                                             </td>
                                         </tr>
@@ -1417,9 +1417,9 @@
                                         @foreach ($courses as $course )
                                         <tr>
                                             <td class="text-capitalize">
-                                                {{$course->course_name}}
+                                                {{ucwords(strtolower($course->course_name))}}
                                             </td>
-                                            <td class="text-uppercase">{{$course->class_code}}</td>
+                                            <td class="text-uppercase">{{strtoupper($course->class_code)}}</td>
                                             <td>
                                                 @if ($course->status == 1)
                                                 <ul class="d-flex justify-content-center">
