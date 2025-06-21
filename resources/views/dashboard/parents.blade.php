@@ -158,7 +158,6 @@
                                 <thead class="text-capitalize">
                                     <tr class="">
                                         <th scope="col">Student Name</th>
-                                        <th scope="col" style="">Class</th>
                                         <th scope="col" class="text-center">Action</th>
                                     </tr>
                                 </thead>
@@ -167,12 +166,11 @@
                                         <tr>
                                             <td class="text-uppercase">
                                                 {{-- <a href="{{route('parent.show.student', ['student' => Hashids::encode($student->id)])}}"></a> --}}
-                                                {{$student->first_name. ' '.$student->middle_name.' ' .$student->last_name}}
+                                                {{strtoupper($student->first_name. ' '.$student->middle_name.' ' .$student->last_name)}}
                                             </td>
-                                            <td class="text-uppercase">{{$student->class_code}} {{$student->group}}</td>
                                             <td>
                                                 <ul class="d-flex justify-content-center">
-                                                    <a href="{{route('students.profile', ['student' => Hashids::encode($student->id)])}}" class="btn btn-xs btn-success">Manage</a>
+                                                    <a href="{{route('students.profile', ['student' => Hashids::encode($student->id)])}}" class="btn btn-success">Manage</a>
                                                 </ul>
                                             </td>
                                         </tr>
