@@ -781,7 +781,7 @@
                                                 @if ($course->status == 1)
                                                 <ul class="d-flex justify-content-center">
                                                     <div class="btn-group" role="group">
-                                                        <button id="btnGroupDrop" type="button" class="btn btn-success btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <button id="btnGroupDrop" type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                             Manage
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
@@ -1124,7 +1124,7 @@
                                                 <td>
                                                     <ul class="d-flex justify-content-center">
                                                         <li class="">
-                                                            <a href="{{ route('attendance.get.form', ['class' => Hashids::encode($class->id)]) }}" class="btn btn-info btn-xs p-1">
+                                                            <a href="{{ route('attendance.get.form', ['class' => Hashids::encode($class->id)]) }}" class="btn btn-info p-1">
                                                                 <i class="ti-settings"> REPORT</i>
                                                             </a>
                                                         </li>
@@ -1174,7 +1174,7 @@
                                                 @if ($course->status == 1)
                                                 <ul class="d-flex justify-content-center">
                                                     <div class="btn-group" role="group">
-                                                        <button id="btnGroupDrop" type="button" class="btn btn-success btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <button id="btnGroupDrop" type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                             Manage
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
@@ -1424,7 +1424,7 @@
                                                 @if ($course->status == 1)
                                                 <ul class="d-flex justify-content-center">
                                                     <div class="btn-group" role="group">
-                                                        <button id="btnGroupDrop" type="button" class="btn btn-success btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <button id="btnGroupDrop" type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                             Manage
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
