@@ -162,6 +162,8 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('Graduate-student', [StudentsController::class, 'callGraduateStudents'])->name('graduate.students');
         Route::get('Graduate-students/year/{year}', [StudentsController::class, 'graduatedStudentByYear'])->name('graduate.student.by.year');
         Route::get('Export-graduate-students/year/{year}', [StudentsController::class, 'exportGraduateStudents'])->name('graduate.students.export');
+        Route::get('/graduate-students/{year}', [StudentsController::class, 'graduatedStudentByYear'])->name('graduate.students.by.year');
+        Route::put('graduate-students/revert/year/{year}', [StudentsController::class, 'revertStudentBatch'])->name('revert.student.batch');
         Route::post('{student}/Delete-student', [StudentsController::class, 'destroy'])->name('Students.destroy');
         Route::get('Student-trash', [StudentsController::class, 'studentTrashList'])->name('students.trash');
         Route::put('{student}/Restore-trashed-students', [StudentsController::class, 'restoreTrashList'])->name('student.restored.trash');

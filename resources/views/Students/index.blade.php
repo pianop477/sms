@@ -74,23 +74,33 @@
                                         <div class="form-row">
                                             <div class="col-md-12 mb-3">
                                                 <label for="validationCustom01">Class name</label>
-                                                <select name="class_id" id="" class="form-control text-uppercase" required>
+                                                <select name="class_id" id="classSelect" class="form-control text-uppercase" required>
                                                     <option value="">--Select Class--</option>
                                                     @if ($classes->isEmpty())
                                                         <option value="" class="text-danger">No more classes found</option>
-                                                        <option value="0" class="text-success font-weight-bold" style="font-size: 15px">🎓 Graduate Class 🎉</option>
+                                                        <option value="0" class="text-success font-weight-bold" style="font-size: 13px">🎓 Graduate Class 🎉</option>
                                                     @else
                                                         @foreach ($classes as $class)
                                                             <option value="{{$class->id}}" class="">{{$class->class_name}}</option>
                                                         @endforeach
-                                                        <option value="0" class="text-success font-weight-bold" style="font-size: 15px">🎓 Graduate Class 🎉</option>
+                                                        <option value="0" class="text-success font-weight-bold" style="font-size: 13px">🎓 Graduate Class 🎉</option>
                                                     @endif
                                                 </select>
-                                                @error('name')
-                                                <div class="invalid-feedback">
+                                                @error('class_id')
+                                                <div class="invalid-feedback text-danger">
                                                     {{$message}}
                                                 </div>
                                                 @enderror
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="col-md-12 mb-3" id="graduationYearField" style="display: none;">
+                                                <label for="graduation_year">Graduation Year</label>
+                                                <input type="number" name="graduation_year" id="graduation_year"
+                                                    class="form-control"
+                                                    min="{{date('Y') - 5}}" max="{{date('Y')}}"
+                                                    value="{{old('graduation_year')}}">
+                                                <small class="text-muted">Please enter the graduation year</small>
                                             </div>
                                         </div>
                                     </div>
@@ -108,10 +118,10 @@
                     </div>
                     @endif
                     <div class="col-3">
-                        <a href="{{route('classes.list', ['class' => Hashids::encode($classId->id)])}}" class="float-right"><i class="fas fa-arrow-circle-left"></i> Back</a>
+                        <a href="{{route('classes.list', ['class' => Hashids::encode($classId->id)])}}" class="float-right btn btn-secondary btn-xs"><i class="fas fa-arrow-circle-left"></i> Back</a>
                     </div>
                     <div class="col-3">
-                            <a type="#" class="btn p-0 float-right btn-link" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus-circle"></i> New
+                            <a type="#" class="btn p-2 float-right btn-info text-white btn-xs" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus-circle"></i> New
                             </a>
                             <div class="modal fade bd-example-modal-lg">
                                 <div class="modal-dialog modal-lg">
@@ -382,6 +392,50 @@
                 setTimeout(() => {
                     form.submit();
                 }, 500);
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            const classSelect = document.getElementById('classSelect');
+            const graduationYearField = document.getElementById('graduationYearField');
+            const upGradeButton = document.getElementById('upGradeButton');
+            const form = document.querySelector('form');
+
+            classSelect.addEventListener('change', function() {
+                if (this.value === '0') {
+                    // User selected Graduate Class
+                    graduationYearField.style.display = 'block';
+                } else {
+                    graduationYearField.style.display = 'none';
+                }
+            });
+
+            form.addEventListener('submit', function(e) {
+                if (classSelect.value === '0') {
+                    e.preventDefault(); // Stop form submission
+
+                    // Show confirmation dialog
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You are about to graduate this class!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, graduate them!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Check if graduation year is provided
+                            const graduationYear = document.getElementById('graduation_year').value;
+                            if (!graduationYear) {
+                                Swal.fire('Error!', 'Please enter graduation year', 'error');
+                                return;
+                            }
+
+                            // Submit the form
+                            form.submit();
+                        }
+                    });
+                }
             });
         });
 </script>

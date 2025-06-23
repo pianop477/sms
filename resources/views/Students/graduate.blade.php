@@ -9,7 +9,7 @@
                             <span class="text-danger">Select year</span>
                         </div>
                         <div class="col-2">
-                            <a href="{{route('home')}}" class="float-right"><i class="fas fa-arrow-circle-left" style=""></i> Back</a>
+                            <a href="{{route('home')}}" class="float-right btn btn-info"><i class="fas fa-arrow-circle-left" style=""></i> Back</a>
                         </div>
                     </div>
                     <div class="list-group">

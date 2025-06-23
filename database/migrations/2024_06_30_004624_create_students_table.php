@@ -31,6 +31,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->integer('status')->default(1);
             $table->boolean('graduated')->default(false);
+            $table->year('graduated_at')->nullable();
             $table->timestamps();
         });
     }

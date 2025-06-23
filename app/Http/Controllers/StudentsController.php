@@ -496,35 +496,77 @@ class StudentsController extends Controller
     public function promoteClass($class, Request $request)
     {
         $decoded = Hashids::decode($class);
+        if (empty($decoded)) {
+            Alert()->toast('Invalid class identifier', 'error');
+            return back();
+        }
 
         $user = Auth::user();
-        $class = Grade::find($decoded[0]);
-        if (! $class) {
+        $classes = Grade::find($decoded[0]);
+
+        if (!$classes) {
             Alert()->toast('No such class was found', 'error');
             return back();
         }
 
-        if($class->school_id != $user->school_id) {
+        if ($classes->school_id != $user->school_id) {
             Alert()->toast('You are not authorized to perform this action', 'error');
             return back();
         }
 
         $this->validate($request, [
-            'class_id' => 'required',
+            'class_id' => 'required|integer',
+            'graduation_year' => 'nullable|integer|min:'.(date('Y')-5).'|max:'.(date('Y'))
+        ], [
+            'class_id.required' => "Select class you want to upgrade to",
+            'graduation_year.min' => 'Invalid year format, minimum is five years ago',
+            'graduation_year.max' => 'Invalid year format'
         ]);
 
-        if ($request->class_id == 0) {
-            // Mark students as graduated
-            Student::where('class_id', $class->id)->where('school_id', $user->schoo_id)->update(['graduated' => true, 'status' => 0]);
-            Alert()->toast('Students graduate batch has been submitted successfully', 'success');
-            return back();
-        } else {
-            // Promote students to the next class
-            Student::where('class_id', $class->id)->where('school_id', $user->school_id)->update(['class_id' => $request->class_id]);
+        try {
+            DB::beginTransaction();
 
-            Alert()->toast('Students batch have been upgraded to the next class', 'success');
-            return back();
+            if ($request->class_id == 0) {
+                $updated = Student::where('class_id', $classes->id)
+                    ->where('school_id', $user->school_id) // Fix typo here
+                    ->update([
+                        'graduated' => true,
+                        'graduated_at' => $request->graduation_year,
+                        'status' => $request->class_id, // or whatever status value you want
+                    ]);
+            } else {
+                // Promote to next class
+                $updated = Student::where('class_id', $classes->id)
+                    ->where('school_id', $user->school_id)
+                    ->update(['class_id' => $request->class_id]);
+            }
+
+            DB::commit();
+
+            if ($updated) {
+                Alert()->toast(
+                    $request->class_id == 0
+                        ? 'Students graduated batch saved successfully'
+                        : 'Students promoted and upgraded successfully',
+                    'success'
+                );
+            } else {
+                Alert()->toast('No students were found to update', 'info');
+            }
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Alert()->toast('An error occurred during the operation', 'error');
+            // Log::error("Promotion error: " . $e->getMessage());
         }
+
+        return back();
+    }
+
+    //call graduate batch group by time updated ************************************************
+    public function callGraduateBatch()
+    {
+        $user = Auth::user();
 
     }
 
@@ -535,8 +577,8 @@ class StudentsController extends Controller
         $studentsByYear = Student::where('school_id', $user->school_id)
                         ->where('graduated', true)
                         ->where('status', 0)
-                        ->select(DB::raw('YEAR(updated_at) as year'), 'id', 'first_name', 'updated_at')
-                        ->orderBy('updated_at', )
+                        ->select(DB::raw('YEAR(graduated_at) as year'), 'id', 'first_name', 'graduated_at')
+                        ->orderBy('graduated_at', 'desc')
                         ->get()
                         ->groupBy('year');
         return view('Students.graduate', compact('studentsByYear'));
@@ -548,16 +590,27 @@ class StudentsController extends Controller
     {
         $user = Auth::user();
 
+        // Get all distinct years for grouping links
+        $graduationYears = Student::where('school_id', $user->school_id)
+                            ->where('graduated', true)
+                            ->where('status', 0)
+                            ->selectRaw('YEAR(graduated_at) as year')
+                            ->distinct()
+                            ->orderBy('year', 'DESC')
+                            ->pluck('year');
+
+        // Get students for the selected year
         $GraduatedStudents = Student::query()
                                     ->join('schools', 'schools.id', '=', 'students.school_id')
                                     ->select('students.*', 'schools.school_reg_no', 'schools.abbriv_code')
                                     ->where('school_id', $user->school_id)
                                     ->where('students.graduated', true)
                                     ->where('students.status', 0)
-                                    ->whereYear('students.updated_at', $year)
+                                    ->whereYear('students.graduated_at', $year)
                                     ->orderBy('students.first_name')
                                     ->get();
-        return view('Students.graduate_students_list', compact('GraduatedStudents', 'year'));
+
+        return view('Students.graduate_students_list', compact('GraduatedStudents', 'year', 'graduationYears'));
     }
 
     //export graduated students in a specific year**********************************************************
@@ -571,11 +624,44 @@ class StudentsController extends Controller
                                     ->where('school_id', $user->school_id)
                                     ->where('students.graduated', true)
                                     ->where('students.status', 0)
-                                    ->whereYear('students.updated_at', $year)
+                                    ->whereYear('students.graduated_at', $year)
                                     ->orderBy('students.first_name')
                                     ->get();
         $pdf = \PDF::loadView('Students.ExportedGraduates', compact('studentExport', 'year'));
         return $pdf->stream('Graduate_students_'.$year.'.pdf');
+    }
+
+    // revert graduate student batch **********************************************************************
+    public function revertStudentBatch(Request $request, $year)
+    {
+        $user = Auth::user();
+
+        try {
+            DB::beginTransaction();
+
+            // Update the students who graduated in the specified year
+            $updated = Student::where('school_id', $user->school_id)
+                ->whereYear('graduated_at', $year)
+                ->update([
+                    'graduated' => false,
+                    'graduated_at' => null,
+                    'status' => 1, // Set status to active
+                ]);
+
+            DB::commit();
+
+            if ($updated) {
+                Alert()->toast('Students reverted to active status successfully', 'success');
+            } else {
+                Alert()->toast('No students were found to update', 'info');
+            }
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Alert()->toast('An error occurred during the operation', 'error');
+        }
+
+        return back();
     }
 
     //export to pdf ======================********************************************************************
