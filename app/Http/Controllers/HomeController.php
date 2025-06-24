@@ -146,7 +146,7 @@ class HomeController extends Controller
                                         )
                                         ->where('parents.user_id', '=', $user->id)
                                         ->where('students.school_id', $user->school_id)
-                                        ->where('students.status', 1)
+                                        ->whereIn('students.status', [0, 1, 2])
                                         ->orderBy('students.first_name', 'ASC')
                                         ->get();
                 $classes = Grade::where('status', '=', 1)->where('school_id', $user->school_id)->get();

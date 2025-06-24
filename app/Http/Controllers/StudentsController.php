@@ -918,6 +918,62 @@ class StudentsController extends Controller
         ]);
     }
 
+    public function classTeacherStudentProfile($student)
+    {
+        $decoded = Hashids::decode($student);
+        // return $decoded;
+        $user = Auth::user();
+        // return $user;
+        $parent = Parents::where('user_id', $user->id)->first();
+        // return $parent;
+        $data = Student::query()
+                        ->join('parents', 'parents.id', '=', 'students.parent_id')
+                        ->join('grades', 'grades.id', '=', 'students.class_id')
+                        ->join('users', 'users.id', '=', 'parents.user_id')
+                        ->join('schools', 'schools.id', '=', 'students.school_id')
+                        ->leftJoin('transports', 'transports.id', '=', 'students.transport_id')
+                        ->select(
+                            'students.*',
+                            'parents.user_id as parent_user_id',
+                            'parents.address',
+                            'users.first_name as parent_first_name',
+                            'users.last_name as parent_last_name',
+                            'users.id as user_id',
+                            'users.created_at as parent_created_at',
+                            'parents.id as parent_id',
+                            'users.phone',
+                            'users.gender as parent_gender',
+                            'grades.class_name',
+                            'grades.class_code',
+                            'grades.id as class_id',
+                            'transports.driver_name', 'transports.gender as driver_gender', 'transports.phone as driver_phone', 'transports.bus_no',
+                            'transports.routine',
+                            'grades.id as grade_class_id',
+                            'schools.school_reg_no', 'schools.abbriv_code'
+                        )
+                        ->where('students.id', '=', $decoded[0])
+                        // ->where('students.parent_id', $parent->id)
+                        ->where('students.school_id', $user->school_id)
+                        ->where('students.status', 1)
+                        ->first();
+
+        // Check if the data is found
+        if (!$data) {
+            // Handle the case where no data is found, e.g., return a 404 response
+            Alert()->toast('No student found', 'error');
+            return back();
+        }
+
+        // The student gender can be accessed directly from $data
+        $studentGender = $data->gender;
+
+        return view('Students.class_teacher_student_profile', [
+            'students' => $data,
+            'studentGender' => $studentGender
+        ]);
+    }
+
+
     // parent modify student data ****************************************************************************
     public function modify($student)
     {

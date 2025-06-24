@@ -48,6 +48,16 @@
                                     <span class="float-right badge badge-secondary text-capitalize">Inactive</span>
                                 @endif
                             </li>
+                            @if ($students->status === 0)
+                                <li class="list-group-item">
+                                    <b>Reason</b>
+                                    @if ($students->graduated_at == null)
+                                        <span class="float-right badge bg-danger text-capitalize">Account Blocked</span>
+                                    @else
+                                        <span class="float-right badge bg-success text-capitalize text-white">graduated</span>
+                                    @endif
+                                </li>
+                            @endif
                         </ul>
                         <a href="{{route('parent.edit.student', ['students' => Hashids::encode($students->id)])}}" class="btn btn-block btn-primary" data-toggle="tooltip" data-placement="button" title="Edit"> Edit</a>
                     </div>

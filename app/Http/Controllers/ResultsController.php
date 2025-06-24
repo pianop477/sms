@@ -62,11 +62,11 @@ class ResultsController extends Controller
                                     ->where('student_id', $students->id)
                                     ->where('students.parent_id', $parent->id)
                                     ->where('examination_results.school_id', $user->school_id)
-                                    ->where('examination_results.class_id', $students->class_id)
                                     ->where('examination_results.status', 2) // Assuming 2 is the status for published results
                                     ->orderBy('examination_results.exam_date', 'DESC')
                                     ->get();
 
+        // return $results;
         $groupedData = $results->groupBy(function ($item) {
             return Carbon::parse($item->exam_date)->format('Y');
         })->map(function ($yearGroup) {
@@ -109,7 +109,6 @@ class ResultsController extends Controller
                     ->where('student_id', $students->id)
                     ->where('examination_results.school_id', $students->school_id)
                     ->where('students.parent_id', $parent->id)
-                    ->where('examination_results.class_id', $students->class_id)
                     ->where('examination_results.status', 2) // Assuming 2 is the status for published results
                     ->orderBy('examinations.exam_type', 'asc')
                     ->get();
@@ -182,7 +181,6 @@ class ResultsController extends Controller
             ->where('examination_results.school_id', $user->school_id)
             ->where('students.parent_id', $parent->id)
             ->where('examination_results.student_id', $students->id)
-            ->where('examination_results.class_id', $students->class_id)
             ->orderBy('examination_results.exam_date') // Sorting ya moja kwa moja kabla ya grouping
             ->get();
 
@@ -232,7 +230,6 @@ class ResultsController extends Controller
                     )
                     ->where('examination_results.student_id', $studentId->id)
                     ->where('examination_results.exam_type_id', $exam_id[0])
-                    ->where('examination_results.class_id', $studentId->class_id)
                     ->whereDate('exam_date', Carbon::parse($date)) // Filtering by date
                     ->where('examination_results.school_id', $user->school_id)
                     ->where('examination_results.status', 2) // Assuming 2 is the status for published results
@@ -245,7 +242,7 @@ class ResultsController extends Controller
 
         // Calculate rankings
         $rankings = Examination_result::query()
-                    ->where('examination_results.class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
+                    ->where('examination_results.class_id', $results->first()->class_id) // Angalia wanafunzi wa darasa hili pekee
                     ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
                     ->where('examination_results.exam_type_id', $exam_id[0]) // Angalia aina ya mtihani
                     ->where('examination_results.school_id', $user->school_id)
@@ -838,8 +835,8 @@ class ResultsController extends Controller
                 // Calculate ranks based on total marks
                 $studentsData = $studentsData->map(function ($student) use ($studentResults) {
                 $courses = $studentResults->where('student_id', $student->student_id)
-                    ->map(fn($result) => "{$result->course_code}={$result->score}")
-                    ->implode(', ');
+                            ->map(fn($result) => "{$result->course_code}={$result->score}")
+                            ->implode("\n");
 
                 $totalMarks = $studentResults->where('student_id', $student->student_id)->sum('score');
                 $averageMarks = $totalMarks / $studentResults->where('student_id', $student->student_id)->count();
@@ -900,7 +897,7 @@ class ResultsController extends Controller
                 // Construct the SMS message
                 $messageContent = "Matokeo ya ". strtoupper($fullname).", \n";
                 $messageContent .= "Mtihani wa ". strtoupper($student->exam_type).", wa Tar. {$dateFormat} ni: \n";
-                $messageContent .= strtoupper($student->courses). "\n";
+                $messageContent .= strtoupper($student->courses) . "\n";
                 $messageContent .= "Jumla {$student->total_marks}, Wastani " . number_format($student->average_marks) . ", Nafasi ya {$student->rank} kati ya {$totalStudents}. \n";
                 $messageContent .= "Tembelea {$url} kuona ripoti";
 
@@ -1007,6 +1004,17 @@ class ResultsController extends Controller
                 'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8, 'September' => 9,
                 'October' => 10, 'November' => 11, 'December' => 12,
             ];
+
+            $isPublished = Examination_result::where('school_id', $schools->id)
+                                                ->where('class_id', $class_id[0])
+                                                ->where('exam_type_id', $exam_id[0])
+                                                ->whereDate('exam_date', $date)
+                                                ->where('status', 2)
+                                                ->exists();
+            if($isPublished) {
+                Alert()->toast('Results data set is already published. Cannot delete.', 'error');
+                return to_route('results.monthsByExamType',[$school, 'year' => $year, 'class' => $class, 'examType' => $examType]);
+            }
 
             $existInCompile = generated_reports::where('class_id', $class_id[0])
                                                 ->whereJsonContains('exam_dates', $date)
@@ -1393,7 +1401,7 @@ class ResultsController extends Controller
 
             $courseScores = [];
             foreach ($results as $result) {
-                $courseScores[] = "{$result->course_code}={$result->score}";
+                $courseScores[] = "{$result->course_code}={$result->score} \n";
             }
 
             $totalStudents = $rankings->count();
@@ -1427,7 +1435,7 @@ class ResultsController extends Controller
             $destination = $this->formatPhoneNumber($users->phone);
             $messageContent = "Matokeo ya ". strtoupper($fullName ).", Mtihani wa ". strtoupper($examination).",\n";
             $messageContent .= "wa Tar. {$dateFormat} ni: \n";
-            $messageContent .= strtoupper(implode(', ', $courseScores)) . "\n";
+            $messageContent .= strtoupper(implode($courseScores));
             $messageContent .= "Jumla $totalScore, Wastani ". number_format($averageScore) .", Nafasi $studentRank kati ya $totalStudents. Tembelea {$url} kuona ripoti";
             $reference = uniqid();
 
@@ -1925,14 +1933,14 @@ class ResultsController extends Controller
 
             try {
                 $nextSmsService = new NextSmsService();
-                // $response = $nextSmsService->sendSmsByNext(
-                //     $sender,
-                //     $formattedPhone,
-                //     $message,
-                //     uniqid()
-                // );
+                $response = $nextSmsService->sendSmsByNext(
+                    $sender,
+                    $formattedPhone,
+                    $message,
+                    uniqid()
+                );
 
-                Log::info("Sending SMS to {$formattedPhone}: {$message}");
+                // Log::info("Sending SMS to {$formattedPhone}: {$message}");
                 Alert()->toast('Results SMS has been Re-sent successfully', 'success');
                 return to_route('students.combined.report', [
                     'school' => $school,
@@ -2329,8 +2337,8 @@ class ResultsController extends Controller
                     . "Nafasi ya {$payload['position']}.\n"
                     . "Tembelea {$link} kuona ripoti.";
 
-                Log::info("Sending SMS to {$phoneNumber}: {$message}");
-                // $response = $nextSmsService->sendSmsByNext($sender, $phoneNumber, $message, uniqid());
+                // Log::info("Sending SMS to {$phoneNumber}: {$message}");
+                $response = $nextSmsService->sendSmsByNext($sender, $phoneNumber, $message, uniqid());
             }
 
             Alert()->toast('Report has been published and sent to parents successfully!', 'success');

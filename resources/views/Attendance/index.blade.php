@@ -69,35 +69,41 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($studentList as $student)
+                    @if ($studentList->isEmpty())
                         <tr>
-                            <input type="hidden" name="student_id[]" value="{{ $student->id }}">
-                            <td>{{$loop->iteration}}</td>
-                            <td>
-                                <a href="{{ route('Students.show', ['student' => Hashids::encode($student->id)]) }}">
-                                    {{ ucwords(strtolower($student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name)) }}
-                                </a>
-                            </td>
-                            <td class="text-uppercase text-center">{{ $student->gender[0] }}</td>
-                            <input type="hidden" name="group[{{ $student->id }}]" value="{{ $student->group }}">
-                            <td>
-                                <ul class="d-flex justify-content-center">
-                                    <li class="mr-3">
-                                        <input type="radio" name="attendance_status[{{ $student->id }}]" required value="present" {{ old('attendance_status.' . $student->id) == 'present' ? 'checked' : '' }}> Pres
-                                    </li>
-                                    <li class="mr-3">
-                                        <input type="radio" name="attendance_status[{{ $student->id }}]" value="absent" {{ old('attendance_status.' . $student->id) == 'absent' ? 'checked' : '' }}> Abs
-                                    </li>
-                                    <li class="mr-3">
-                                        <input type="radio" name="attendance_status[{{ $student->id }}]" value="permission" {{ old('attendance_status.' . $student->id) == 'permission' ? 'checked' : '' }}> Perm
-                                    </li>
-                                </ul>
-                                @error('attendance_status.' . $student->id)
-                                    <span class="text-sm text-danger">{{ $message }}</span>
-                                @enderror
-                            </td>
+                            <td colspan="4" class="text-center text-danger">No students enrolled to this class!</td>
                         </tr>
-                    @endforeach
+                    @else
+                        @foreach ($studentList as $student)
+                            <tr>
+                                <input type="hidden" name="student_id[]" value="{{ $student->id }}">
+                                <td>{{$loop->iteration}}</td>
+                                <td>
+                                    <a href="{{ route('class.teacher.student.profile', ['student' => Hashids::encode($student->id)]) }}">
+                                        {{ ucwords(strtolower($student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name)) }}
+                                    </a>
+                                </td>
+                                <td class="text-uppercase text-center">{{ $student->gender[0] }}</td>
+                                <input type="hidden" name="group[{{ $student->id }}]" value="{{ $student->group }}">
+                                <td>
+                                    <ul class="d-flex justify-content-center">
+                                        <li class="mr-3">
+                                            <input type="radio" name="attendance_status[{{ $student->id }}]" required value="present" {{ old('attendance_status.' . $student->id) == 'present' ? 'checked' : '' }}> Pres
+                                        </li>
+                                        <li class="mr-3">
+                                            <input type="radio" name="attendance_status[{{ $student->id }}]" value="absent" {{ old('attendance_status.' . $student->id) == 'absent' ? 'checked' : '' }}> Abs
+                                        </li>
+                                        <li class="mr-3">
+                                            <input type="radio" name="attendance_status[{{ $student->id }}]" value="permission" {{ old('attendance_status.' . $student->id) == 'permission' ? 'checked' : '' }}> Perm
+                                        </li>
+                                    </ul>
+                                    @error('attendance_status.' . $student->id)
+                                        <span class="text-sm text-danger">{{ $message }}</span>
+                                    @enderror
+                                </td>
+                            </tr>
+                        @endforeach
+                    @endif
                 </tbody>
             </table>
         </div>
