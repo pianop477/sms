@@ -201,8 +201,7 @@ class AttendanceController extends Controller
                     ->where('attendances.student_id', '=', $students->id)
                     ->where('attendances.school_id', $user->school_id)
                     ->where('students.parent_id', $parent->id)
-                    ->where('students.status', 1)
-                    ->where('students.graduated', 0)
+                    ->whereIn('students.status', [0, 1, 2])
                     ->orderBy('attendances.attendance_date', 'DESC');
 
                 // Paginate the raw data
@@ -254,7 +253,7 @@ class AttendanceController extends Controller
                                             ->where('attendances.student_id', '=', $students->id)
                                             ->where('attendances.school_id', $user->school_id)
                                             ->where('students.parent_id', $parent->id)
-                                            ->where('students.status', 1)
+                                            ->whereIn('students.status', [0, 1, 2])
                                             ->orderBy('attendances.attendance_date', 'DESC')
                                             ->get();
         $groupedAttendance = $attendances->groupBy(function ($item) {
