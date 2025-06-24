@@ -887,7 +887,7 @@ class ResultsController extends Controller
             foreach ($studentsData as $student) {
                 $phoneNumber = $this->formatPhoneNumber($student->phone);
                 $dateFormat = Carbon::parse($date)->format('d-m-Y');
-                $fullname = $student->first_name . ', '. $student->last_name[0];
+                $fullname = $student->first_name . ' '. $student->last_name;
                 if (!$phoneNumber) {
                     // Log::error("Invalid phone number for {$student->first_name}: {$student->phone}");
                     return response()->json([
@@ -899,7 +899,8 @@ class ResultsController extends Controller
 
                 // Construct the SMS message
                 $messageContent = "Matokeo ya ". strtoupper($fullname).", \n";
-                $messageContent .= "Mtihani wa ". strtoupper($student->exam_type).", wa {$dateFormat} ni: \n";
+                $messageContent .= "Mtihani wa ". strtoupper($student->exam_type).", wa Tar. {$dateFormat} ni: \n";
+                $messageContent .= strtoupper($student->courses). "\n";
                 $messageContent .= "Jumla {$student->total_marks}, Wastani " . number_format($student->average_marks) . ", Nafasi ya {$student->rank} kati ya {$totalStudents}. \n";
                 $messageContent .= "Tembelea {$url} kuona ripoti";
 
@@ -1348,7 +1349,7 @@ class ResultsController extends Controller
             // Hakikisha kuwa kuna data kwenye $results
             if ($results->isEmpty()) {
                 // Log::error("Hakuna matokeo yaliyopatikana kwa mwanafunzi: {$studentInfo->id}");
-                Alert()->toast('This data set is locked 🔐', 'error');
+                Alert()->toast('This result data set is locked 🔐', 'error');
                 return redirect()->back();
             }
 
@@ -1385,7 +1386,7 @@ class ResultsController extends Controller
             $studentRank = $ranks[$studentInfo->id] ?? null;
 
             // Prepare the message content
-            $fullName = $studentInfo->first_name. ', '. $studentInfo->last_name[0];
+            $fullName = $studentInfo->first_name. ' '. $studentInfo->last_name;
             $examination = $results->first()->exam_type;
             $term = $results->first()->Exam_term;
             $schoolName = $results->first()->school_name;
@@ -1424,8 +1425,9 @@ class ResultsController extends Controller
             $nextSmsService = new NextSmsService();
             $sender = $schools->sender_id ?? "SHULE APP";
             $destination = $this->formatPhoneNumber($users->phone);
-            $messageContent = "Matokeo ya ". strtoupper($fullName )." Mtihani wa ". strtoupper($examination).",\n";
-            $messageContent .= "wa {$dateFormat} ni: \n";
+            $messageContent = "Matokeo ya ". strtoupper($fullName ).", Mtihani wa ". strtoupper($examination).",\n";
+            $messageContent .= "wa Tar. {$dateFormat} ni: \n";
+            $messageContent .= strtoupper(implode(', ', $courseScores)) . "\n";
             $messageContent .= "Jumla $totalScore, Wastani ". number_format($averageScore) .", Nafasi $studentRank kati ya $totalStudents. Tembelea {$url} kuona ripoti";
             $reference = uniqid();
 
@@ -1890,7 +1892,7 @@ class ResultsController extends Controller
 
             // Format SMS message
             $formattedPhone = $this->formatPhoneNumber($phoneNumber);
-            $studentName = strtoupper($studentData->first_name . ', '. $studentData->last_name[0]);
+            $studentName = strtoupper($studentData->first_name . ' '. $studentData->last_name);
             $reportDate = Carbon::parse($reports->created_at)->format('d-m-Y');
             $schoolInfo = school::find($schoolId);
             $sender = $schoolInfo->sender_id ?? "SHULE APP";
@@ -1898,7 +1900,7 @@ class ResultsController extends Controller
 
             $message = "Matokeo ya {$studentName}\n"
                 ."Mtihani wa ". strtoupper($reports->title)."\n"
-                ."wa {$reportDate} ni:\n"
+                ."wa Tar. {$reportDate} ni:\n"
                 . "Jumla: {$studentTotal}, Wastani: ".number_format($studentAverage, 2)."\n"
                 . "Nafasi ya {$position} kati ya {$totalStudents}.\n"
                 . "Tembelea {$link} kuona ripoti.";
