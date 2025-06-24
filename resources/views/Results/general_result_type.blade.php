@@ -171,7 +171,7 @@
                                         <th>Title</th>
                                         <th>Issued at</th>
                                         <th>Issued by</th>
-                                        <th>Display Mode</th>
+                                        <th class="text-center">Display Mode</th>
                                         <th class="text-center">Action</th>
                                     </tr>
                                 </thead>
@@ -186,7 +186,7 @@
                                                 <td class="text-capitalize">{{ $report->title }}</td>
                                                 <td>{{ \Carbon\Carbon::parse($report->created_at)->format('d-m-Y') }}</td>
                                                 <td>{{ ucwords(strtolower($report->first_name. '. '.  $report->last_name[0])) }}</td>
-                                                <td class="text-capitalize">{{$report->combine_option}}</td>
+                                                <td class="text-capitalize text-center">{{$report->combine_option}}</td>
                                                 <td>
                                                     <ul class="d-flex justify-content-center">
                                                         <li class="mr-3">

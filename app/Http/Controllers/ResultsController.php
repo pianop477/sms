@@ -1590,7 +1590,7 @@ class ResultsController extends Controller
                             ]);
         // return $studentsReport;
 
-        return view('Results.combined_result_month', compact('reports', 'classes', 'class', 'report', 'allScores', 'myReportData', 'year', 'school',));
+        return view('Results.combined_result_month', compact('reports', 'classes', 'class', 'reports', 'allScores', 'myReportData', 'year', 'school',));
 
     }
     // end of compiled results by month
@@ -1819,8 +1819,10 @@ class ResultsController extends Controller
                                 'students.gender',
                                 'examination_results.score',
                                 'examination_results.exam_date',
+                                'examination_results.course_id',
                                 'grades.class_name',
-                                'examinations.symbolic_abbr'
+                                'examinations.symbolic_abbr',
+                                'subjects.course_code'
                             )
                             ->get();
 
@@ -1829,12 +1831,21 @@ class ResultsController extends Controller
                 return to_route('students.combined.report', ['school' => $school, 'year' => $year, 'class' => $class, 'report' => $report]);
             }
 
+            // STEP 2: Group results by subject and calculate averages
+            $subjectAverages = $results->groupBy('course_id')->map(function ($subjectResults) {
+                return [
+                    'course_code' => $subjectResults->first()->course_code,
+                    'average' => $subjectResults->avg('score')
+                ];
+            });
+
             // STEP 2: Calculate totals
             $studentTotal = $results->sum('score');
+            $studentAverageTotal = number_format($subjectAverages->sum('average'));
             $studentAverage = $results->avg('score');
 
             // STEP 3: Calculate position WITH TIE RANKING (like publishCombinedReport)
-            $allStudentsScores = Examination_result::where('class_id', $classId)
+            $allStudentsScores = Examination_result::where('class_id', $reports->class_id)
                 ->where('school_id', $schoolId)
                 ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
                 ->get()
@@ -1898,23 +1909,30 @@ class ResultsController extends Controller
             $sender = $schoolInfo->sender_id ?? "SHULE APP";
             $link = "https://shuleapp.tech";
 
+            // Build subject results part of the message
+            $subjectResultsText = "";
+            foreach ($subjectAverages as $subject) {
+                $subjectResultsText .= strtoupper($subject['course_code']) . ": " . number_format($subject['average']) . "\n";
+            }
+
             $message = "Matokeo ya {$studentName}\n"
                 ."Mtihani wa ". strtoupper($reports->title)."\n"
                 ."wa Tar. {$reportDate} ni:\n"
-                . "Jumla: {$studentTotal}, Wastani: ".number_format($studentAverage, 2)."\n"
+                . $subjectResultsText
+                . "Jumla: {$studentAverageTotal}, Wastani: ".number_format($studentAverage)."\n"
                 . "Nafasi ya {$position} kati ya {$totalStudents}.\n"
                 . "Tembelea {$link} kuona ripoti.";
 
             try {
                 $nextSmsService = new NextSmsService();
-                $response = $nextSmsService->sendSmsByNext(
-                    $sender,
-                    $formattedPhone,
-                    $message,
-                    uniqid()
-                );
+                // $response = $nextSmsService->sendSmsByNext(
+                //     $sender,
+                //     $formattedPhone,
+                //     $message,
+                //     uniqid()
+                // );
 
-                // Log::info("Sending SMS to {$formattedPhone}: {$message}");
+                Log::info("Sending SMS to {$formattedPhone}: {$message}");
                 Alert()->toast('Results SMS has been Re-sent successfully', 'success');
                 return to_route('students.combined.report', [
                     'school' => $school,
@@ -2205,28 +2223,38 @@ class ResultsController extends Controller
 
             // STEP 3: Fetch all exam results for these dates (same as PDF logic)
             $results = Examination_result::query()
-                ->join('students', 'students.id', '=', 'examination_results.student_id')
-                ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                ->where('examination_results.class_id', $classId)
-                ->where('examination_results.school_id', $schoolId)
-                ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                ->select(
-                    'students.id as student_id',
-                    'students.first_name',
-                    'students.middle_name',
-                    'students.last_name',
-                    'students.parent_id',
-                    'examinations.symbolic_abbr',
-                    'examination_results.score',
-                    'examination_results.exam_date'
-                )
-                ->get();
+                        ->join('students', 'students.id', '=', 'examination_results.student_id')
+                        ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+                        ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+                        ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+                        ->where('examination_results.class_id', $classId)
+                        ->where('examination_results.school_id', $schoolId)
+                        ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                        ->select(
+                            'students.id as student_id',
+                            'students.first_name',
+                            'students.middle_name',
+                            'students.last_name',
+                            'students.parent_id',
+                            'examinations.symbolic_abbr',
+                            'examination_results.score',
+                            'examination_results.exam_date',
+                            'examination_results.course_id',
+                            'subjects.course_code'
+                        )
+                        ->get();
 
             // STEP 4: Group results by student and calculate TOTAL SCORE (like PDF)
             $studentsData = $results->groupBy('student_id')->map(function ($studentResults) {
-                $totalScore = $studentResults->sum('score');
+                // Group by subject and calculate averages
+                $subjectAverages = $studentResults->groupBy('course_id')->map(function ($subjectResults) {
+                    return [
+                        'course_code' => $subjectResults->first()->course_code,
+                        'average' => $subjectResults->avg('score')
+                    ];
+                });
+
+                $totalScore = $subjectAverages->sum('average');
                 $totalAverage = $studentResults->avg('score'); // Direct average of all scores
 
                 return [
@@ -2237,6 +2265,7 @@ class ResultsController extends Controller
                     'parent_id' => $studentResults->first()->parent_id,
                     'total_score' => $totalScore,
                     'total_average' => $totalAverage,
+                    'subject_averages' => $subjectAverages,
                 ];
             });
 
@@ -2264,12 +2293,19 @@ class ResultsController extends Controller
                 $totalStudents = $studentsWithRank->count();
                 $positionText = "{$student['rank']} kati ya {$totalStudents}";
 
+                // Build subject results text
+                $subjectResultsText = "";
+                foreach ($student['subject_averages'] as $subject) {
+                    $subjectResultsText .= strtoupper($subject['course_code']) . "=" . number_format($subject['average']) . "\n";
+                }
+
                 return [
                     'parent_id' => $student['parent_id'],
-                    'student_name' => strtoupper($student['first_name'] . ', '. $student['last_name'][0]),
+                    'student_name' => strtoupper($student['first_name'] . ' '. $student['last_name']),
                     'position' => $positionText,
-                    'total_score' => $student['total_score'],
-                    'total_average' => number_format($student['total_average'], 2), // 2 decimal places like PDF
+                    'total_score' => number_format($student['total_score']),
+                    'total_average' => number_format($student['total_average']), // 2 decimal places like PDF
+                    'subject_results' => $subjectResultsText
                 ];
             });
 
@@ -2286,14 +2322,15 @@ class ResultsController extends Controller
 
                 $message = "Matokeo ya {$payload['student_name']}\n"
                     ."Mtihani wa ". strtoupper($report->title)."\n"
-                    ."wa {$reportDate} ni:\n"
+                    ."wa Tar. {$reportDate} ni:\n"
+                    . $payload['subject_results']
                     . "Jumla: {$payload['total_score']}\n"
                     . "Wastani: {$payload['total_average']}\n"
                     . "Nafasi ya {$payload['position']}.\n"
                     . "Tembelea {$link} kuona ripoti.";
 
-                // Log::info("Sending SMS to {$phoneNumber}: {$message}");
-                $response = $nextSmsService->sendSmsByNext($sender, $phoneNumber, $message, uniqid());
+                Log::info("Sending SMS to {$phoneNumber}: {$message}");
+                // $response = $nextSmsService->sendSmsByNext($sender, $phoneNumber, $message, uniqid());
             }
 
             Alert()->toast('Report has been published and sent to parents successfully!', 'success');

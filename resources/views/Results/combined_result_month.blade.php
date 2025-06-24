@@ -73,10 +73,10 @@
                                     <td>
                                         <ul class="d-flex justify-content-center list-unstyled mb-0">
                                             <li class="mr-2">
-                                                <a href="{{route('students.report', ['school' => Hashids::encode($student->student_school_id), 'year' => $year, 'class' => Hashids::encode($student->student_class_id), 'report' => Hashids::encode($reports->id), 'student' => Hashids::encode($student->studentId)])}}" title="Preview Report" class="btn btn-success btn-xs" onclick="return confirm('Are you sure you want to preview report?')">Preview</a>
+                                                <a href="{{route('students.report', ['school' => Hashids::encode($student->student_school_id), 'year' => $year, 'class' => Hashids::encode($reports->class_id), 'report' => Hashids::encode($reports->id), 'student' => Hashids::encode($student->studentId)])}}" title="Preview Report" class="btn btn-success btn-xs" onclick="return confirm('Are you sure you want to preview report?')">Preview</a>
                                             </li>
                                             <li>
-                                                <form action="{{route('send.sms.combine.report', ['school'=> Hashids::encode($student->student_school_id), 'year'=> $year, 'class'=>Hashids::encode($student->student_class_id), 'report'=> Hashids::encode($reports->id), 'student'=>Hashids::encode($student->studentId)])}}" method="POST">
+                                                <form action="{{route('send.sms.combine.report', ['school'=> Hashids::encode($student->student_school_id), 'year'=> $year, 'class'=>Hashids::encode($reports->class_id), 'report'=> Hashids::encode($reports->id), 'student'=>Hashids::encode($student->studentId)])}}" method="POST">
                                                     @csrf
                                                     <button type="submit" title="Send SMS" class="btn btn-warning btn-xs"  onclick="return confirm('Are you sure you want to Re-send SMS?')">SMS</button>
                                                 </form>
