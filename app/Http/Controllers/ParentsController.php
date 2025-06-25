@@ -187,14 +187,15 @@ class ParentsController extends Controller
 
             DB::commit();
 
-                $url = "https://shuleapp.tech";
+                $url = "https://shuleapp.tech/login";
 
                 $nextSmsService = new NextSmsService();
                 $senderId = $school->sender_id ?? "SHULE APP";
-                $message = "Welcome to ShuleApp, Your Login details are: ";
-                $message .= " Username: {$users->phone}";
-                $message .= " Password: shule2025."; // Default password
-                $message .= " Visit {$url} to Login";
+                $message = "Hello {$users->first_name} {$users->last_name},\n";
+                $message .= "Welcome to ShuleApp, Your Login details are:\n";
+                $message .= " Username: {$users->phone}\n";
+                $message .= " Password: shule2025.\n"; // Default password
+                $message .= " Click here {$url} to Login";
 
                 $reference = uniqid();
                 $formattedPhone = $this->formatPhoneNumber($users->phone);

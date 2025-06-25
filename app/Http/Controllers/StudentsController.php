@@ -863,7 +863,7 @@ class StudentsController extends Controller
     }
 
     //show student profile new version by teacher
-    public function showStudentProfileByTeacher($student)
+    public function getStudentProfile($student)
     {
         $decoded = Hashids::decode($student);
         // return $decoded;
