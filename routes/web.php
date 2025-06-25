@@ -168,7 +168,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('Student-trash', [StudentsController::class, 'studentTrashList'])->name('students.trash');
         Route::put('{student}/Restore-trashed-students', [StudentsController::class, 'restoreTrashList'])->name('student.restored.trash');
         Route::get('{student}/Delete-student-permanent', [StudentsController::class, 'deletePerStudent'])->name('student.delete.permanent');
-        Route::get('Student/profile/id/{student}', [StudentsController::class, 'showStudentProfileByTeacher'])->name('teacher.student.profile');
+        Route::get('Manage/Student-profile/id/{student}', [StudentsController::class, 'getStudentProfile'])->name('manage.student.profile');
         Route::get('{student}/Show-Students', [StudentsController::class, 'showRecords'])->name('Students.show');
         Route::get('Edit-student/{students}', [StudentsController::class, 'modify'])->name('students.modify');
         Route::put('{students}/Update-student', [StudentsController::class, 'updateRecords'])->name('students.update.records');
