@@ -8,7 +8,7 @@
             <div class="col-row">
                 <div class="d-flex">
                     <div class="col-8">
-                        <h4 class="header-title text-center text-capitalize">Timetable configuration settings</h4>
+                        <h4 class="header-title text-capitalize">Timetable configuration settings</h4>
                     </div>
                     <div class="col-4">
                         <button type="button" class="btn btn-info float-right btn-xs" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus"></i> New Config

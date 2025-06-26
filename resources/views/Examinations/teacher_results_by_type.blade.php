@@ -168,7 +168,7 @@
     </div>
 
     <div class="average-box">
-        <p><strong>Average Score:</strong> {{ number_format($averageScore, 2) }}</p>
+        <p><strong>Subject Average:</strong> {{ number_format($averageScore, 2) }}</p>
         <p><strong>Grade:</strong>
             <span class="grade-badge grade-{{ $averageGrade }}">{{ $averageGrade }} -
                 @php
@@ -208,7 +208,7 @@
                 <td>{{ strtoupper($result->admission_number) }}</td>
                 <td style="text-align: left">{{ ucwords(strtolower($result->first_name . ' ' . $result->middle_name . ' ' . $result->last_name)) }}</td>
                 <td>{{ ucfirst($result->gender[0]) }}</td>
-                <td>{{ $result->group }}</td>
+                <td>{{ strtoupper($result->group) }}</td>
                 <td>
                     @if ($result->score === null)
                         <span class="absent">X</span>
