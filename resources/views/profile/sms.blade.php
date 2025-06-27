@@ -36,7 +36,7 @@
                                 <h6 class="mb-0"><i class="fas fa-users-class me-2"></i> Send to Individual Class</h6>
                             </div>
                             <div class="card-body">
-                                <label for="classSelect" class="form-label">Select Class</label>
+                                {{-- <label for="classSelect" class="form-label">Select Class</label> --}}
                                 <select name="class" id="classSelect" class="text-uppercase form-control @error('class') is-invalid @enderror">
                                     <option value="">-- Select class --</option>
                                     @forelse ($classes as $class)
