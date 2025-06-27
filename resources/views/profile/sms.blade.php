@@ -95,7 +95,7 @@
                                     name="message_content"
                                     id="message_content"
                                     class="form-control flex-grow-1"
-                                    placeholder="Enter your message here . . . . ."
+                                    placeholder="Write your message here . . . . ."
                                     required
                                     maxlength="306">{{ old('message_content') }}</textarea>
                                 <div class="d-flex justify-content-between mt-2">
