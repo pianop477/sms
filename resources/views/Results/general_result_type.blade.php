@@ -130,8 +130,8 @@
                                                                         @endif
                                                                     </div>
                                                                     <div class="col-6">
-                                                                        <p class="text-danger fw-bold float-right">Aggregation Method</p>
-                                                                        <div class="mt-3 float-right">
+                                                                        <p class="text-danger fw-bold">Aggregation Method</p>
+                                                                        <div class="mt-4">
                                                                             <input type="radio" name="combine_option" value="sum" required>
                                                                             <label>Display Total Marks Only</label> <br>
 
