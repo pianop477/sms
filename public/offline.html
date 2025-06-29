@@ -3,81 +3,266 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offline</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <link rel="stylesheet" href="{{asset('assets/fontawesome-free-6.5.2-web/css/all.css')}}">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <title>Offline | Connection Required</title>
+    <!-- Single Font Awesome import -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts for better typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #4361ee;
+            --danger: #e63946;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background: #f4f4f4;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
             margin: 0;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: var(--dark);
+            text-align: center;
+            line-height: 1.6;
         }
 
         .offline-container {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
             max-width: 90%;
-            width: 400px;
+            width: 450px;
+            transform: translateY(0);
+            animation: fadeInUp 0.5s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .offline-icon {
-            font-size: 50px;
-            color: red;
-            margin-bottom: 15px;
+            font-size: 5rem;
+            color: var(--danger);
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
         }
 
         h1 {
-            color: #333;
-            font-size: 24px;
-            margin-bottom: 10px;
+            color: var(--dark);
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 15px;
         }
 
         p {
-            font-size: 16px;
-            color: #666;
+            font-size: 1rem;
+            color: var(--gray);
+            margin-bottom: 25px;
+        }
+
+        .connection-status {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: rgba(230, 57, 70, 0.1);
+            color: var(--danger);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .retry-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(67, 97, 238, 0.2);
+        }
+
+        .retry-btn:hover {
+            background-color: #3a56d4;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(67, 97, 238, 0.25);
+        }
+
+        .retry-btn i {
+            margin-right: 8px;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 2px;
+            margin-top: 25px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--primary), #5a67d8);
+            transition: width 0.3s ease;
+        }
+
+        .tips {
+            margin-top: 30px;
+            text-align: left;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding-top: 20px;
+        }
+
+        .tips h3 {
+            font-size: 1rem;
+            color: var(--dark);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .tips ul {
+            padding-left: 20px;
+            margin: 0;
+        }
+
+        .tips li {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 8px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .offline-container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .offline-icon {
+                font-size: 4rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="offline-container">
-        <i class="fas fa-wifi-slash" style="font-size: 2rem;"></i>
-        <h1>You are offline</h1>
-        <p>Check your internet connection and try again.</p>
+        <div class="connection-status">
+            <i class="fas fa-circle" style="font-size: 0.5rem; vertical-align: middle; margin-right: 6px;"></i>
+            OFFLINE
+        </div>
+        <i class="fas fa-wifi-slash offline-icon"></i>
+        <h1>No Internet Connection</h1>
+        <p>We can't connect to the internet right now. Please check your connection and try again.</p>
+
+        <button class="retry-btn" id="retryBtn">
+            <i class="fas fa-sync-alt"></i> Try Again
+        </button>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="tips">
+            <h3>Quick Fixes:</h3>
+            <ul>
+                <li>Check your Wi-Fi or mobile data connection</li>
+                <li>Restart your router or modem</li>
+                <li>Disable any VPN or proxy services</li>
+            </ul>
+        </div>
     </div>
 
     <script>
-        function checkConnection() {
-            if (navigator.onLine) {
-                let lastURL = sessionStorage.getItem('lastURL');
-                if (lastURL) {
-                    window.location.href = lastURL; // Rudi kwenye ukurasa wa awali
-                } else {
-                    location.reload(); // Kama hakuna URL iliyohifadhiwa, refresh ukurasa
-                }
-            }
-        }
-
-        // Hifadhi URL ya mwisho kabla ya kuingia offline
+        // Store last visited URL
         if (!navigator.onLine) {
-            sessionStorage.setItem('lastURL', document.referrer);
+            sessionStorage.setItem('lastURL', document.referrer || window.location.href);
         }
 
-        // Angalia kama mtandao umerudi kila baada ya sekunde 5
-        setInterval(checkConnection, 5000);
+        // Check connection status
+        function checkConnection() {
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const retryBtn = document.getElementById('retryBtn');
 
-        // Sikiliza event ya mtandao kurudi (real-time)
-        window.addEventListener('online', checkConnection);
+            retryBtn.disabled = true;
+            progressContainer.style.display = 'block';
+
+            // Animate progress bar
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = `${progress}%`;
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    if (navigator.onLine) {
+                        const lastURL = sessionStorage.getItem('lastURL');
+                        window.location.href = lastURL || window.location.origin;
+                    } else {
+                        progressContainer.style.display = 'none';
+                        retryBtn.disabled = false;
+                        progressBar.style.width = '0';
+                    }
+                }
+            }, 100);
+        }
+
+        // Manual retry button
+        document.getElementById('retryBtn').addEventListener('click', checkConnection);
+
+        // Auto-check every 10 seconds
+        setInterval(() => {
+            if (navigator.onLine) {
+                const lastURL = sessionStorage.getItem('lastURL');
+                window.location.href = lastURL || window.location.origin;
+            }
+        }, 10000);
+
+        // Listen for online event
+        window.addEventListener('online', () => {
+            const lastURL = sessionStorage.getItem('lastURL');
+            setTimeout(() => {
+                window.location.href = lastURL || window.location.origin;
+            }, 1500);
+        });
     </script>
-
 </body>
 </html>
-
