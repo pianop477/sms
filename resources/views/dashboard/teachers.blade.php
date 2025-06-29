@@ -1191,6 +1191,11 @@
                                 <i class="fas fa-user-check fa-2x text-info"></i>
                             </div>
                         </div>
+                        <div class="mt-3">
+                            <span class="text-white small d-flex align-items-center">
+                                View All <i class="fas fa-arrow-right ms-2"></i>
+                            </span>
+                        </div>
                     </div>
                 </a>
             </div>
@@ -1210,6 +1215,11 @@
                             <i class="fas fa-users fa-2x text-purple"></i>
                         </div>
                     </div>
+                    <div class="mt-3">
+                        <span class="text-white small d-flex align-items-center">
+                            View All <i class="fas fa-arrow-right ms-2"></i>
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1227,6 +1237,11 @@
                         <div class="bg-white rounded-circle p-3">
                             <i class="ti-book fa-2x text-warning"></i>
                         </div>
+                    </div>
+                    <div class="mt-3">
+                        <span class="text-white small d-flex align-items-center">
+                            View All <i class="fas fa-arrow-right ms-2"></i>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -1541,6 +1556,11 @@
                                 <i class="ti-book fa-2x text-warning"></i>
                             </div>
                         </div>
+                        <div class="mt-3">
+                        <span class="text-white small d-flex align-items-center">
+                            View All <i class="fas fa-arrow-right ms-2"></i>
+                        </span>
+                    </div>
                     </div>
                 </div>
             </div>
