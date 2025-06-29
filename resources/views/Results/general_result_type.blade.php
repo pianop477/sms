@@ -122,7 +122,7 @@
                                                                                     <div style="margin-bottom: 6px;">
                                                                                         <label>
                                                                                             <input type="checkbox" style="font-size: 16px;" name="exam_dates[]" value="{{$date}}">
-                                                                                            {{\Carbon\Carbon::parse($date)->format('d-m-Y')}} => {{ucwords(strtolower($resultDate->first()->exam_type))}} ({{ucwords(strtolower('term '.$resultDate->first()->Exam_term))}})
+                                                                                            {{\Carbon\Carbon::parse($date)->format('d-m-Y')}} ==> {{ucwords(strtolower($resultDate->first()->exam_type))}} ({{ucwords(strtolower('term '.$resultDate->first()->Exam_term))}})
                                                                                         </label>
                                                                                     </div>
                                                                                 @endforeach
