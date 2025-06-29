@@ -1489,45 +1489,45 @@
 
         {{-- check for normal teachers contract --}}
         @if ($contract == null)
+            <div class="alert alert-danger alert-dismissible fade show">
+                <strong>Contract Status:</strong> Not applied.
+                <a href="{{route('contract.index')}}" class="alert-link">Apply here</a>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @else
+            @if($contract->status == 'expired')
                 <div class="alert alert-danger alert-dismissible fade show">
-                    <strong>Contract Status:</strong> Not applied.
-                    <a href="{{route('contract.index')}}" class="alert-link">Apply here</a>
+                    <strong>Contract Status:</strong> Expired
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-                @else
-                @if($contract->status == 'expired')
-                    <div class="alert alert-danger alert-dismissible fade show">
-                        <strong>Contract Status:</strong> Expired
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @elseif ($contract->status == 'rejected')
-                    <div class="alert alert-secondary alert-dismissible fade show">
-                        <strong>Contract Status:</strong> Rejected |
-                        <a href="{{route('contract.index')}}" class="alert-link">View details</a>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
-                    <div class="alert alert-warning alert-dismissible fade show">
-                        <strong>Contract Status:</strong> Expiring soon ({{ $contract->end_date->format('d/m/Y') }})
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @elseif ($contract->status == 'pending')
-                    <div class="alert alert-info alert-dismissible fade show">
-                        <strong>Contract Status:</strong> Pending |
-                        <a href="{{route('contract.index')}}" class="alert-link">View details</a>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @else
-                    <div class="alert alert-success alert-dismissible fade show">
-                        <strong>Contract Status:</strong> Active (Expires: {{ $contract->end_date->format('d/m/Y') }}) |
-                        <a href="{{route('contract.index')}}" class="alert-link">View contract</a>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
+            @elseif ($contract->status == 'rejected')
+                <div class="alert alert-secondary alert-dismissible fade show">
+                    <strong>Contract Status:</strong> Rejected |
+                    <a href="{{route('contract.index')}}" class="alert-link">View details</a>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
+                <div class="alert alert-warning alert-dismissible fade show">
+                    <strong>Contract Status:</strong> Expiring soon ({{ $contract->end_date->format('d/m/Y') }})
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @elseif ($contract->status == 'pending')
+                <div class="alert alert-info alert-dismissible fade show">
+                    <strong>Contract Status:</strong> Pending |
+                    <a href="{{route('contract.index')}}" class="alert-link">View details</a>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @else
+                <div class="alert alert-success alert-dismissible fade show">
+                    <strong>Contract Status:</strong> Active (Expires: {{ $contract->end_date->format('d/m/Y') }}) |
+                    <a href="{{route('contract.index')}}" class="alert-link">View contract</a>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
             @endif
+        @endif
         <div class="row">
-        <!-- Stats Card for Normal Teacher -->
-        <div class="col-md-4 mb-4">
+            <!-- Stats Card for Normal Teacher -->
+            <div class="col-md-4 mb-4">
                 <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #bf950a 0%, #ff9800 100%);">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
@@ -1544,7 +1544,6 @@
                     </div>
                 </div>
             </div>
-        </div>
             <div class="col-lg-8 mt-0">
                 <div class="card">
                     <div class="card-body">
