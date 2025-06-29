@@ -131,7 +131,7 @@
                                                                     </div>
                                                                     <div class="col-6">
                                                                         <p class="text-danger fw-bold">Aggregation Method</p>
-                                                                        <div class="mt-3 float-rright">
+                                                                        <div class="mt-3 float-right">
                                                                             <input type="radio" name="combine_option" value="sum" required>
                                                                             <label>Display Total Marks Only</label> <br>
 
