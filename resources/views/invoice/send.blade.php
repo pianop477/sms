@@ -44,7 +44,7 @@
                 </div>
 
                 <div class="col-md-12 mb-3">
-                    <button class="btn btn-success float-right" id="saveButton" type="submit">Send Bill</button>
+                    <button class="btn btn-success float-right" id="saveButton" onclick="return confirm('Are you sure you want to send this invoice report?')" type="submit">Send Bill</button>
                 </div>
             </form>
 
