@@ -15,6 +15,7 @@ use App\Models\Transport;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use RealRashid\SweetAlert\Facades\Alert;
+use Vinkla\Hashids\Facades\Hashids;
 
 class ManagerController extends Controller
 {
@@ -114,63 +115,70 @@ class ManagerController extends Controller
         abort(404);
     }
 
-    public function updateStatus($school, Request $request) {
-        $user_status = User::where('school_id', $school)->firstOrFail();
-        // $school_id = $user_status->school_id;
+    public function updateStatus($school, Request $request)
+    {
+        $school_id = Hashids::decode($school)[0];
+        $user_status = User::where('school_id', $school_id)->where('usertype', 2)->get();
+        // return $user_status;
+
         $status = $request->input('status', 0);
-
-        // Update the status of the user
-        $user_status->status = $status;
-        $user_status->update();
-
-        // Update the status of the school associated with the user
-        $school_info = School::findOrFail($school);
-        $school_info->status = $status;
-        $school_info->update();
-
-            // Update the status of all users associated with the school
-            User::where('school_id', $school_info->id)->update(['status' => $status]);
-
-            // Update the status of all teachers associated with the school
-            Teacher::where('school_id', $school_info->id)->update(['status' => $status]);
-
-            // Update the status of all parents associated with the school
-            Parents::where('school_id', $school_info->id)->update(['status' => $status]);
-
-            //update the status of all classes associated with the school
-            Grade::where('school_id', $school_info->id)->update(['status' => $status]);
-
-            //update the status of all subjects associated with the school
-            Subject::where('school_id', $school_info->id)->update(['status' => $status]);
-
-            //update the status of all transport associated with the school
-            Transport::where('school_id', $school_info->id)->update(['status' => $status]);
-        if($school_info) {
-            Alert()->toast('User Blocked Successfully', 'success');
-            return back();
-        } else {
-            Alert()->toast('Something went wrong, try again', 'error');
-            return back();
+        foreach($user_status as $row) {
+            // Update the status of the user
+            $row->status = $status;
+            $row->update();
         }
+            // Update the status of the school associated with the user
+            $school_info = School::findOrFail($school_id);
+            $school_info->status = $status;
+            $school_info->update();
+
+                // Update the status of all users associated with the school
+                User::where('school_id', $school_info->id)->whereIn('usertype', [3,4])->update(['status' => $status]);
+
+                // Update the status of all teachers associated with the school
+                Teacher::where('school_id', $school_info->id)->update(['status' => $status]);
+
+                // Update the status of all parents associated with the school
+                Parents::where('school_id', $school_info->id)->update(['status' => $status]);
+
+                //update the status of all classes associated with the school
+                Grade::where('school_id', $school_info->id)->update(['status' => $status]);
+
+                //update the status of all subjects associated with the school
+                Subject::where('school_id', $school_info->id)->update(['status' => $status]);
+
+                //update the status of all transport associated with the school
+                Transport::where('school_id', $school_info->id)->update(['status' => $status]);
+
+            if($school_info) {
+                Alert()->toast('User Blocked Successfully', 'success');
+                return back();
+            } else {
+                Alert()->toast('Something went wrong, try again', 'error');
+                return back();
+            }
 
     }
 
     public function activateStatus($school, Request $request) {
-        $user_status = User::where('school_id', $school)->firstOrFail();
+        $school_id = Hashids::decode($school)[0];
+        $user_status = User::where('school_id', $school_id)->where('usertype', 2)->get();
         // $school_id = $user_status->school_id;
         $status = $request->input('status', 1);
 
-        // Update the status of the user
-        $user_status->status = $status;
-        $user_status->update();
+        foreach($user_status as $row) {
+            // Update the status of the user
+            $row->status = $status;
+            $row->update();
+        }
 
         // Update the status of the school associated with the user
-        $school_info = School::findOrFail($school);
+        $school_info = School::findOrFail($school_id);
         $school_info->status = $status;
         $school_info->update();
 
             // Update the status of all users associated with the school
-            User::where('school_id', $school_info->id)->update(['status' => $status]);
+            User::where('school_id', $school_info->id)->whereIn('usertype', [3,4])->update(['status' => $status]);
 
             // Update the status of all teachers associated with the school
             Teacher::where('school_id', $school_info->id)->update(['status' => $status]);

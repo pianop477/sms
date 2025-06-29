@@ -276,6 +276,7 @@
 
         // PWA Installation Prompt kwa Android/Chrome
         window.addEventListener('beforeinstallprompt', (event) => {
+            console.log('beforeinstallprompt fired');
             event.preventDefault();
             deferredPrompt = event;
             showInstallButton(installButton);

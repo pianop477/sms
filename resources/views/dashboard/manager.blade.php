@@ -19,122 +19,154 @@
         @endphp
 
         <div class="col-md-4 mt-3 mb-3">
-            <a href="{{route('Teachers.index')}}">
-                <div class="card" style="background: #e176a6">
-                    <div class="">
-                        <div class="p-4 d-flex justify-content-between align-items-center">
-                            <div class="seofct-icon"><i class="fas fa-user-tie"></i> Teachers</div>
-                            <h2 class="text-white">
-                                @if (count($teachers) > 29)
-                                    30+
-                                @else
-                                    {{count($teachers)}}
-                                @endif
-                            </h2>
+                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #e176a6 0%, #d04a88 100%);">
+                    <a href="{{route('Teachers.index')}}" class="text-decoration-none">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Teachers</h6>
+                                    <h2 class="text-white mb-0">
+                                        @if (count($teachers) > 99) 100+ @else {{count($teachers)}} @endif
+                                    </h2>
+                                </div>
+                                <div class="bg-white rounded-circle p-3">
+                                    <i class="fas fa-user-tie fa-2x text-pink"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-white small d-flex align-items-center">
+                                    View All <i class="fas fa-arrow-right ms-2"></i>
+                                </span>
+                            </div>
                         </div>
-                        <canvas id="" height="50"></canvas>
-                    </div>
+                    </a>
                 </div>
-            </a>
-        </div>
-        <div class="col-md-4 mt-md-3 mb-3">
-            <a href="{{route('Parents.index')}}">
-                <div class="card" style="background: #c84fe0">
-                    <div class="">
-                        <div class="p-4 d-flex justify-content-between align-items-center">
-                            <div class="seofct-icon"><i class="fas fa-user-shield"></i> Parents</div>
-                            <h2 class="text-white">
-                                @if (count($parents) > 999)
-                                    1000+
-                                @else
-                                    {{count($parents)}}
-                                @endif
-                            </h2>
+            </div>
+        <div class="col-md-4 mt-3 mb-3">
+                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #c84fe0 0%, #9c27b0 100%);">
+                    <a href="{{route('Parents.index')}}" class="text-decoration-none">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Parents</h6>
+                                    <h2 class="text-white mb-0">
+                                        @if (count($parents) > 1999) 2000+ @else {{count($parents)}} @endif
+                                    </h2>
+                                </div>
+                                <div class="bg-white rounded-circle p-3">
+                                    <i class="fas fa-user-shield fa-2x text-purple"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-white small d-flex align-items-center">
+                                    View All <i class="fas fa-arrow-right ms-2"></i>
+                                </span>
+                            </div>
                         </div>
-                        <canvas id="" height="50"></canvas>
-                    </div>
+                    </a>
                 </div>
-            </a>
-        </div>
-        <div class="col-md-4 mt-md-3 mb-3">
-            <a href="{{route('classes.list')}}">
-                <div class="card" style="background: #098ddf">
-                    <div class="">
-                        <div class="p-4 d-flex justify-content-between align-items-center">
-                            <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Students</div>
-                            <h2 class="text-white">
-                                @if (count($students) > 999)
-                                    1000+
-                                @else
-                                    {{count($students)}}
-                                @endif
-                            </h2>
+            </div>
+        <div class="col-md-4 mt-3 mb-3">
+                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #098ddf 0%, #0568a8 100%);">
+                    <a href="{{route('classes.list')}}" class="text-decoration-none">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Students</h6>
+                                    <h2 class="text-white mb-0">
+                                        @if (count($students) > 1999) 2000+ @else {{count($students)}} @endif
+                                    </h2>
+                                </div>
+                                <div class="bg-white rounded-circle p-3">
+                                    <i class="fas fa-user-graduate fa-2x text-info"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-white small d-flex align-items-center">
+                                    View All <i class="fas fa-arrow-right ms-2"></i>
+                                </span>
+                            </div>
                         </div>
-                        <canvas id="" height="50"></canvas>
-                    </div>
+                    </a>
                 </div>
-            </a>
+            </div>
         </div>
     </div>
 </div>
 <div class="col-lg-12">
     <div class="row">
-        <div class="col-md-4 mt-2 mb-3">
-            <a href="{{route('courses.index')}}">
-                <div class="card" style="background: #9fbc71">
-                    <div class="">
-                        <div class="p-4 d-flex justify-content-between align-items-center">
-                            <div class="seofct-icon"><i class="ti-book"></i> Open Courses</div>
-                            <h2 class="text-white">
-                                @if (count($subjects) > 19)
-                                    20+
-                                @else
-                                    {{count($subjects)}}
-                                @endif
-                            </h2>
+        <div class="col-md-4 mt-3 mb-3">
+                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #9fbc71 0%, #689f38 100%);">
+                    <a href="{{route('courses.index')}}" class="text-decoration-none">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Open Courses</h6>
+                                    <h2 class="text-white mb-0">
+                                        @if (count($subjects) > 49) 50+ @else {{count($subjects)}} @endif
+                                    </h2>
+                                </div>
+                                <div class="bg-white rounded-circle p-3">
+                                    <i class="ti-book fa-2x text-success"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-white small d-flex align-items-center">
+                                    View All <i class="fas fa-arrow-right ms-2"></i>
+                                </span>
+                            </div>
                         </div>
-                        <canvas id="" height="50"></canvas>
-                    </div>
+                    </a>
                 </div>
-            </a>
-        </div>
-        <div class="col-md-4 mt-md-2 mb-3">
-            <a href="{{route('Classes.index')}}">
-                <div class="card" style="background: #bf950a">
-                    <div class="">
-                        <div class="p-4 d-flex justify-content-between align-items-center">
-                            <div class="seofct-icon"><i class="ti-blackboard"></i> Classes</div>
-                            <h2 class="text-white">
-                                @if (count($classes) > 9)
-                                    10+
-                                @else
-                                    {{count($classes)}}
-                                @endif
-                            </h2>
+            </div>
+        <div class="col-md-4 mt-3 mb-3">
+                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #bf950a 0%, #ff9800 100%);">
+                    <a href="{{route('Classes.index')}}" class="text-decoration-none">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Classes</h6>
+                                    <h2 class="text-white mb-0">
+                                        @if (count($classes) > 49) 50+ @else {{count($classes)}} @endif
+                                    </h2>
+                                </div>
+                                <div class="bg-white rounded-circle p-3">
+                                    <i class="ti-blackboard fa-2x text-warning"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-white small d-flex align-items-center">
+                                    View All <i class="fas fa-arrow-right ms-2"></i>
+                                </span>
+                            </div>
                         </div>
-                        <canvas id="" height="50"></canvas>
-                    </div>
+                    </a>
                 </div>
-            </a>
-        </div>
-        <div class="col-md-4 mt-md-2 mb-3">
-            <a href="{{route('Transportation.index')}}">
-                <div class="card" style="background: #329688">
-                    <div class="">
-                        <div class="p-4 d-flex justify-content-between align-items-center">
-                            <div class="seofct-icon"><i class="fas fa-bus"></i> School Buses</div>
-                            <h2 class="text-white">
-                                @if (count($buses) > 19)
-                                    20+
-                                @else
-                                    {{count($buses)}}
-                                @endif
-                            </h2>
+            </div>
+        <div class="col-md-4 mt-3 mb-3">
+                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #329688 0%, #00796b 100%);">
+                    <a href="{{route('Transportation.index')}}" class="text-decoration-none">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>School Buses</h6>
+                                    <h2 class="text-white mb-0">
+                                        @if (count($buses) > 49) 50+ @else {{count($buses)}} @endif
+                                    </h2>
+                                </div>
+                                <div class="bg-white rounded-circle p-3">
+                                    <i class="fas fa-bus fa-2x text-teal"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-white small d-flex align-items-center">
+                                    View All <i class="fas fa-arrow-right ms-2"></i>
+                                </span>
+                            </div>
                         </div>
-                        <canvas id="" height="50"></canvas>
-                    </div>
+                    </a>
                 </div>
-            </a>
+            </div>
         </div>
     </div>
 </div>

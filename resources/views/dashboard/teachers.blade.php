@@ -9,137 +9,190 @@
         <div class="row">
             <div class="col-md-12">
                 @if ($contract == null)
-                    <p class="alert alert-danger text-capitalize">contract status: <strong>Not applied.</strong> | please apply <a href="{{route('contract.index')}}">here</a></p>
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <strong>Contract Status:</strong> Not applied.
+                    <a href="{{route('contract.index')}}" class="alert-link">Apply here</a>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
                 @else
-                    @if($contract->status == 'expired')
-                        <p class="text-capitalize alert alert-danger">contract status: <strong>{{$contract->status}}</strong></p>
-                        @elseif ($contract->status == 'rejected')
-                            <p class="text-capitalize alert alert-secondary">contract status: <strong>{{$contract->status}}</strong> | view <a href="{{route('contract.index')}}">here</a></p>
-                        @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
-                            <p class="text-capitalize alert alert-warning">contract status: <strong>expiring soon</strong></p>
-                        @elseif ($contract->status == 'pending')
-                            <p class="text-capitalize alert alert-info">contract status: <strong> {{$contract->status}}</strong> | view <a href="{{route('contract.index')}}"> here</a></p>
-                        @else
-                        <p class="text-capitalize alert alert-success">contract status: <strong>active</strong> | view contract <a href="{{route('contract.index')}}"> here</a></p>
-                    @endif
+                @if($contract->status == 'expired')
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Expired
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @elseif ($contract->status == 'rejected')
+                    <div class="alert alert-secondary alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Rejected |
+                        <a href="{{route('contract.index')}}" class="alert-link">View details</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
+                    <div class="alert alert-warning alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Expiring soon ({{ $contract->end_date->format('d/m/Y') }})
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @elseif ($contract->status == 'pending')
+                    <div class="alert alert-info alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Pending |
+                        <a href="{{route('contract.index')}}" class="alert-link">View details</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @else
+                    <div class="alert alert-success alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Active (Expires: {{ $contract->end_date->format('d/m/Y') }}) |
+                        <a href="{{route('contract.index')}}" class="alert-link">View contract</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
                 @endif
+            @endif
             </div>
         </div>
             <div class="row">
-                <div class="col-md-4 mt-3 mb-3">
-                    <a href="">
-                        <div class="card" style="background: #e176a6;">
-                            <div class="{{route('Teachers.index')}}">
-                                <div class="p-4 d-flex justify-content-between align-items-center">
-                                    <div class="seofct-icon"><i class="fas fa-user-tie"></i> Teachers</div>
-                                    <h2 class="text-white">
-                                        @if (count($teachers) > 29)
-                                            30+
-                                        @else
-                                            {{count($teachers)}}
-                                        @endif
+            <!-- Stats Cards -->
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #e176a6 0%, #d04a88 100%);">
+                    <a href="{{route('Teachers.index')}}" class="text-decoration-none">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Teachers</h6>
+                                    <h2 class="text-white mb-0">
+                                        @if (count($teachers) > 99) 100+ @else {{count($teachers)}} @endif
                                     </h2>
                                 </div>
-                                <canvas id="" height="50"></canvas>
+                                <div class="bg-white rounded-circle p-3">
+                                    <i class="fas fa-user-tie fa-2x text-pink"></i>
+                                </div>
                             </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-4 mt-md-3 mb-3">
-                    <a href="{{route('Parents.index')}}">
-                        <div class="card" style="background: #c84fe0;">
-                            <div class="">
-                                <div class="p-4 d-flex justify-content-between align-items-center">
-                                    <div class="seofct-icon"><i class="fas fa-user-shield"></i> Parents</div>
-                                    <h2 class="text-white">
-                                        @if (count($parents) > 999)
-                                            1000+
-                                        @else
-                                            {{count($parents)}}
-                                        @endif
-                                    </h2>
-                                </div>
-                                <canvas id="" height="50"></canvas>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-4 mt-md-3 mb-3">
-                    <a href="{{route('classes.list')}}">
-                        <div class="card" style="background: #098ddf;">
-                            <div class="">
-                                <div class="p-4 d-flex justify-content-between align-items-center">
-                                    <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Students</div>
-                                    <h2 class="text-white">
-                                        @if (count($students) > 999)
-                                            1000+
-                                        @else
-                                            {{count($students)}}
-                                        @endif
-                                    </h2>
-                                </div>
-                                <canvas id="" height="50"></canvas>
+                            <div class="mt-3">
+                                <span class="text-white small d-flex align-items-center">
+                                    View All <i class="fas fa-arrow-right ms-2"></i>
+                                </span>
                             </div>
                         </div>
                     </a>
                 </div>
             </div>
-        </div>
-        <div class="col-lg-12">
-            <div class="row">
-                <div class="col-md-4 mt-2 mb-3">
-                    <a href="">
-                        <div class="card" style="background: #9fbc71;">
-                            <div class="{{route('courses.index')}}">
-                                <div class="p-4 d-flex justify-content-between align-items-center">
-                                    <div class="seofct-icon"><i class="ti-book"></i> Open Courses</div>
-                                    <h2 class="text-white">
-                                        @if (count($subjects) > 19)
-                                            20+
-                                        @else
-                                            {{count($subjects)}}
-                                        @endif
+
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #c84fe0 0%, #9c27b0 100%);">
+                    <a href="{{route('Parents.index')}}" class="text-decoration-none">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Parents</h6>
+                                    <h2 class="text-white mb-0">
+                                        @if (count($parents) > 1999) 2000+ @else {{count($parents)}} @endif
                                     </h2>
                                 </div>
-                                <canvas id="" height="50"></canvas>
+                                <div class="bg-white rounded-circle p-3">
+                                    <i class="fas fa-user-shield fa-2x text-purple"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-white small d-flex align-items-center">
+                                    View All <i class="fas fa-arrow-right ms-2"></i>
+                                </span>
                             </div>
                         </div>
                     </a>
                 </div>
-                <div class="col-md-4 mt-md-2 mb-3">
-                    <a href="{{route('Classes.index')}}">
-                        <div class="card" style="background: #bf950a;">
-                            <div class="">
-                                <div class="p-4 d-flex justify-content-between align-items-center">
-                                    <div class="seofct-icon"><i class="ti-blackboard"></i> Classes</div>
-                                    <h2 class="text-white">
-                                        @if (count($classes) > 9)
-                                            10+
-                                        @else
-                                            {{count($classes)}}
-                                        @endif
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #098ddf 0%, #0568a8 100%);">
+                    <a href="{{route('classes.list')}}" class="text-decoration-none">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Students</h6>
+                                    <h2 class="text-white mb-0">
+                                        @if (count($students) > 1999) 2000+ @else {{count($students)}} @endif
                                     </h2>
                                 </div>
-                                <canvas id="" height="50"></canvas>
+                                <div class="bg-white rounded-circle p-3">
+                                    <i class="fas fa-user-graduate fa-2x text-info"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-white small d-flex align-items-center">
+                                    View All <i class="fas fa-arrow-right ms-2"></i>
+                                </span>
                             </div>
                         </div>
                     </a>
                 </div>
-                <div class="col-md-4 mt-md-2 mb-3">
-                    <a href="{{route('Transportation.index')}}">
-                        <div class="card" style="background: #329688;">
-                            <div class="">
-                                <div class="p-4 d-flex justify-content-between align-items-center">
-                                    <div class="seofct-icon"><i class="fas fa-bus"></i> School Buses</div>
-                                    <h2 class="text-white">
-                                        @if (count($buses) > 19)
-                                            20+
-                                        @else
-                                            {{count($buses)}}
-                                        @endif
+            </div>
+
+            <!-- Second Row of Cards -->
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #9fbc71 0%, #689f38 100%);">
+                    <a href="{{route('courses.index')}}" class="text-decoration-none">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Open Courses</h6>
+                                    <h2 class="text-white mb-0">
+                                        @if (count($subjects) > 49) 50+ @else {{count($subjects)}} @endif
                                     </h2>
                                 </div>
-                                <canvas id="" height="50"></canvas>
+                                <div class="bg-white rounded-circle p-3">
+                                    <i class="ti-book fa-2x text-success"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-white small d-flex align-items-center">
+                                    View All <i class="fas fa-arrow-right ms-2"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #bf950a 0%, #ff9800 100%);">
+                    <a href="{{route('Classes.index')}}" class="text-decoration-none">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Classes</h6>
+                                    <h2 class="text-white mb-0">
+                                        @if (count($classes) > 49) 50+ @else {{count($classes)}} @endif
+                                    </h2>
+                                </div>
+                                <div class="bg-white rounded-circle p-3">
+                                    <i class="ti-blackboard fa-2x text-warning"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-white small d-flex align-items-center">
+                                    View All <i class="fas fa-arrow-right ms-2"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #329688 0%, #00796b 100%);">
+                    <a href="{{route('Transportation.index')}}" class="text-decoration-none">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> School Buses</h6>
+                                    <h2 class="text-white mb-0">
+                                        @if (count($buses) > 49) 50+ @else {{count($buses)}} @endif
+                                    </h2>
+                                </div>
+                                <div class="bg-white rounded-circle p-3">
+                                    <i class="fas fa-bus fa-2x text-teal"></i>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <span class="text-white small d-flex align-items-center">
+                                    View All <i class="fas fa-arrow-right ms-2"></i>
+                                </span>
                             </div>
                         </div>
                     </a>
@@ -535,122 +588,170 @@
         <div class="row">
             <div class="col-12">
                 @if ($contract == null)
-                    <p class="alert alert-danger text-capitalize">contract status: <strong>Not applied.</strong> | please apply <a href="{{route('contract.index')}}">here</a></p>
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <strong>Contract Status:</strong> Not applied.
+                    <a href="{{route('contract.index')}}" class="alert-link">Apply here</a>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
                 @else
-                    @if($contract->status == 'expired')
-                        <p class="text-capitalize alert alert-danger">contract status: <strong>{{$contract->status}}</strong></p>
-                        @elseif ($contract->status == 'rejected')
-                            <p class="text-capitalize alert alert-secondary">contract status: <strong>{{$contract->status}}</strong> | view <a href="{{route('contract.index')}}">here</a></p>
-                        @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
-                            <p class="text-capitalize alert alert-warning">contract status: <strong>expiring soon</strong></p>
-                        @elseif ($contract->status == 'pending')
-                            <p class="text-capitalize alert alert-info">contract status: <strong> {{$contract->status}}</strong> | view <a href="{{route('contract.index')}}"> here</a></p>
-                        @else
-                        <p class="text-capitalize alert alert-success">contract status: <strong>active</strong> | view contract <a href="{{route('contract.index')}}"> here</a></p>
-                    @endif
+                @if($contract->status == 'expired')
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Expired
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @elseif ($contract->status == 'rejected')
+                    <div class="alert alert-secondary alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Rejected |
+                        <a href="{{route('contract.index')}}" class="alert-link">View details</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
+                    <div class="alert alert-warning alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Expiring soon ({{ $contract->end_date->format('d/m/Y') }})
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @elseif ($contract->status == 'pending')
+                    <div class="alert alert-info alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Pending |
+                        <a href="{{route('contract.index')}}" class="alert-link">View details</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @else
+                    <div class="alert alert-success alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Active (Expires: {{ $contract->end_date->format('d/m/Y') }}) |
+                        <a href="{{route('contract.index')}}" class="alert-link">View contract</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
                 @endif
+            @endif
             </div>
         </div>
             <div class="row">
-                <div class="col-md-4 mt-3 mb-3">
-                    <a href="{{route('Teachers.index')}}">
-                        <div class="card" style="background: #e176a6">
-                            <div class="">
-                                <div class="p-4 d-flex justify-content-between align-items-center">
-                                    <div class="seofct-icon"><i class="fas fa-user-tie"></i> Teachers</div>
-                                    <h2 class="text-white">
-                                        @if (count($teachers) > 29)
-                                            30+
-                                        @else
-                                            {{count($teachers)}}
-                                        @endif
-                                    </h2>
-                                </div>
-                                <canvas id="" height="50"></canvas>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-4 mt-md-3 mb-3">
-                    <a href="{{route('classes.list')}}">
-                        <div class="card" style="background: #098ddf">
-                            <div class="">
-                                <div class="p-4 d-flex justify-content-between align-items-center">
-                                    <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Students</div>
-                                    <h2 class="text-white">
-                                        @if(count($students) > 999)
-                                            1000+
-                                        @else
-                                            {{count($students)}}
-                                        @endif
-                                    </h2>
-                                </div>
-                                <canvas id="" height="50"></canvas>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-4 mt-3 mb-3">
-                    <a href="{{route('courses.index')}}">
-                        <div class="card" style="background: #9fbc71">
-                            <div class="">
-                                <div class="p-4 d-flex justify-content-between align-items-center">
-                                    <div class="seofct-icon"><i class="ti-book"></i> Open Courses</div>
-                                    <h2 class="text-white">
-                                        @if (count($subjects) > 19)
-                                            20+
-                                        @else
-                                            {{count($subjects)}}
-                                        @endif
-                                    </h2>
-                                </div>
-                                <canvas id="" height="50"></canvas>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-12">
-            <div class="row">
-                <div class="col-md-4 mt-md-2 mb-3">
-                    <a href="{{route('Classes.index')}}">
-                        <div class="card" style="background:#bf950a">
-                            <div class="">
-                                <div class="p-4 d-flex justify-content-between align-items-center">
-                                    <div class="seofct-icon"><i class="ti-blackboard"></i> Classes</div>
-                                    <h2 class="text-white">
-                                        @if (count($classes) > 9)
-                                            10+
-                                        @else
-                                            {{count($classes)}}
-                                        @endif
-                                    </h2>
-                                </div>
-                                <canvas id="" height="50"></canvas>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-4 mt-2 mb-3">
-                    <div class="card" style="background: #b14fbe">
-                        <div class="">
-                            <div class="p-4 d-flex justify-content-between align-items-center">
-                                <div class="seofct-icon"><i class="ti-book"></i> My Courses</div>
-                                <h2 class="text-white">
-                                    @if ( $courses->where('status', 1)->count() > 2)
-                                        3+
-                                    @else
-                                        {{ $courses->where('status', 1)->count() }}
-                                    @endif
+        <!-- Stats Cards for Academic Teacher -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #e176a6 0%, #d04a88 100%);">
+                <a href="{{route('Teachers.index')}}" class="text-decoration-none">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Teachers</h6>
+                                <h2 class="text-white mb-0">
+                                    @if (count($teachers) > 99) 100+ @else {{count($teachers)}} @endif
                                 </h2>
                             </div>
-                            <canvas id="" height="50"></canvas>
+                            <div class="bg-white rounded-circle p-3">
+                                <i class="fas fa-user-tie fa-2x text-pink"></i>
+                            </div>
                         </div>
+                        <div class="mt-3">
+                            <span class="text-white small d-flex align-items-center">
+                                View All <i class="fas fa-arrow-right ms-2"></i>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #098ddf 0%, #0568a8 100%);">
+                <a href="{{route('classes.list')}}" class="text-decoration-none">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Students</h6>
+                                <h2 class="text-white mb-0">
+                                    @if(count($students) > 1999) 2000+ @else {{count($students)}} @endif
+                                </h2>
+                            </div>
+                            <div class="bg-white rounded-circle p-3">
+                                <i class="fas fa-user-graduate fa-2x text-info"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <span class="text-white small d-flex align-items-center">
+                                View All <i class="fas fa-arrow-right ms-2"></i>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #9fbc71 0%, #689f38 100%);">
+                <a href="{{route('courses.index')}}" class="text-decoration-none">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Open Courses</h6>
+                                <h2 class="text-white mb-0">
+                                    @if (count($subjects) > 49) 50+ @else {{count($subjects)}} @endif
+                                </h2>
+                            </div>
+                            <div class="bg-white rounded-circle p-3">
+                                <i class="ti-book fa-2x text-success"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <span class="text-white small d-flex align-items-center">
+                                View All <i class="fas fa-arrow-right ms-2"></i>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Second Row for Academic Teacher -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #bf950a 0%, #ff9800 100%);">
+                <a href="{{route('Classes.index')}}" class="text-decoration-none">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Classes</h6>
+                                <h2 class="text-white mb-0">
+                                    @if (count($classes) > 49) 50+ @else {{count($classes)}} @endif
+                                </h2>
+                            </div>
+                            <div class="bg-white rounded-circle p-3">
+                                <i class="ti-blackboard fa-2x text-warning"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <span class="text-white small d-flex align-items-center">
+                                View All <i class="fas fa-arrow-right ms-2"></i>
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #b14fbe 0%, #8e24aa 100%);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> My Courses</h6>
+                            <h2 class="text-white mb-0">
+                                {{ $courses->where('status', 1)->count() }}
+                            </h2>
+                        </div>
+                        <div class="bg-white rounded-circle p-3">
+                            <i class="ti-book fa-2x text-purple"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <span class="text-white small d-flex align-items-center">
+                            View All <i class="fas fa-arrow-right ms-2"></i>
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
         <hr class="dark horizontal py-0">
         {{-- academic panel end here =========================================== --}}
         {{-- academic teacher its courses records start here ====================== --}}
@@ -1039,67 +1140,98 @@
 
         {{-- check for class teacher contract --}}
         @if ($contract == null)
-            <p class="alert alert-danger text-capitalize">contract status: <strong>Not applied.</strong> | please apply <a href="{{route('contract.index')}}">here</a></p>
-        @else
-            @if($contract->status == 'expired')
-                <p class="text-capitalize alert alert-danger">contract status: <strong>{{$contract->status}}</strong></p>
-            @elseif ($contract->status == 'rejected')
-                <p class="text-capitalize alert alert-secondary">contract status: <strong>{{$contract->status}}</strong> | view <a href="{{route('contract.index')}}">here</a></p>
-            @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
-                <p class="text-capitalize alert alert-warning">contract status: <strong>expiring soon</strong></p>
-            @elseif ($contract->status == 'pending')
-                <p class="text-capitalize alert alert-info">contract status: <strong> {{$contract->status}}</strong> | view <a href="{{route('contract.index')}}"> here</a></p>
-            @else
-                <p class="text-capitalize alert alert-success">contract status: <strong>active</strong></p>
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <strong>Contract Status:</strong> Not applied.
+                    <a href="{{route('contract.index')}}" class="alert-link">Apply here</a>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                @else
+                @if($contract->status == 'expired')
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Expired
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @elseif ($contract->status == 'rejected')
+                    <div class="alert alert-secondary alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Rejected |
+                        <a href="{{route('contract.index')}}" class="alert-link">View details</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
+                    <div class="alert alert-warning alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Expiring soon ({{ $contract->end_date->format('d/m/Y') }})
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @elseif ($contract->status == 'pending')
+                    <div class="alert alert-info alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Pending |
+                        <a href="{{route('contract.index')}}" class="alert-link">View details</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @else
+                    <div class="alert alert-success alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Active (Expires: {{ $contract->end_date->format('d/m/Y') }}) |
+                        <a href="{{route('contract.index')}}" class="alert-link">View contract</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
             @endif
-    @endif
         <div class="row">
-                <div class="col-md-4 mt-md-3 mb-3">
-                    <a href="{{ route('get.student.list', ['class' => Hashids::encode($myClass->first()->id)]) }}">
-                        <div class="card" style="background:#098ddf">
-                            <div class="">
-                                <div class="p-4 d-flex justify-content-between align-items-center">
-                                    <div class="seofct-icon"><i class="fas fa-person-circle-check"></i> My Attendance</div>
-                                    <h2 class="text-white">{{ $myClass->count() }}</h2>
-                                </div>
-                                <canvas id="" height="50"></canvas>
+        <!-- Stats Cards for Class Teacher -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #098ddf 0%, #0568a8 100%);">
+                <a href="{{ route('get.student.list', ['class' => Hashids::encode($myClass->first()->id)]) }}" class="text-decoration-none">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> My Attendance</h6>
+                                <h2 class="text-white mb-0">{{ $myClass->count() }}</h2>
                             </div>
-                        </div>
-                    </a>
-                </div>
-
-                {{-- second card --}}
-                <div class="col-md-4 mt-md-3 mb-3">
-                    <div class="card" style="background:#c84fe0">
-                        <div class="">
-                            <div class="p-4 d-flex justify-content-between align-items-center">
-                                <div class="seofct-icon"><i class="fas fa-user-graduate"></i> Students</div>
-                                @foreach ($classData as $data )
-                                <h2 class="text-white">{{$data['maleCount'] + $data['femaleCount']}}</h2>
-                                @endforeach
+                            <div class="bg-white rounded-circle p-3">
+                                <i class="fas fa-user-check fa-2x text-info"></i>
                             </div>
-                            <canvas id="" height="50"></canvas>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4 mt-3 mb-3">
-                    <div class="card" style="background: #bf950a">
-                        <div class="">
-                            <div class="p-4 d-flex justify-content-between align-items-center">
-                                <div class="seofct-icon"><i class="ti-book"></i> My Courses</div>
-                                <h2 class="text-white">
-                                    @if ($courses->where('status', 1)->count() > 2)
-                                        3+
-                                    @else
-                                        {{$courses->where('status', 1)->count()}}
-                                    @endif
-                                </h2>
-                            </div>
-                            <canvas id="" height="50"></canvas>
-                        </div>
-                    </div>
-                </div>
+                </a>
+            </div>
         </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #c84fe0 0%, #9c27b0 100%);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Students</h6>
+                            @foreach ($classData as $data )
+                            <h2 class="text-white mb-0">{{$data['maleCount'] + $data['femaleCount']}}</h2>
+                            @endforeach
+                        </div>
+                        <div class="bg-white rounded-circle p-3">
+                            <i class="fas fa-users fa-2x text-purple"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #bf950a 0%, #ff9800 100%);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> My Courses</h6>
+                            <h2 class="text-white mb-0">
+                                {{$courses->where('status', 1)->count()}}
+                            </h2>
+                        </div>
+                        <div class="bg-white rounded-circle p-3">
+                            <i class="ti-book fa-2x text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
         <div class="row">
                 <div class="col-lg-6 mt-0">
                     <div class="card">
@@ -1357,38 +1489,62 @@
 
         {{-- check for normal teachers contract --}}
         @if ($contract == null)
-            <p class="alert alert-danger text-capitalize">contract status: <strong>Not applied.</strong> | please apply <a href="{{route('contract.index')}}">here</a></p>
-        @else
-            @if($contract->status == 'expired')
-                <p class="text-capitalize alert alert-danger">contract status: <strong>{{$contract->status}}</strong></p>
-            @elseif ($contract->status == 'rejected')
-                <p class="text-capitalize alert alert-secondary">contract status: <strong>{{$contract->status}}</strong> | view <a href="{{route('contract.index')}}">here</a></p>
-            @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
-                <p class="text-capitalize alert alert-warning">contract status: <strong>expiring soon</strong></p>
-            @elseif ($contract->status == 'pending')
-                <p class="text-capitalize alert alert-info">contract status: <strong> {{$contract->status}}</strong> | view <a href="{{route('contract.index')}}"> here</a></p>
-            @else
-                <p class="text-capitalize alert alert-success">contract status: <strong>active</strong></p>
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <strong>Contract Status:</strong> Not applied.
+                    <a href="{{route('contract.index')}}" class="alert-link">Apply here</a>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                @else
+                @if($contract->status == 'expired')
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Expired
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @elseif ($contract->status == 'rejected')
+                    <div class="alert alert-secondary alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Rejected |
+                        <a href="{{route('contract.index')}}" class="alert-link">View details</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
+                    <div class="alert alert-warning alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Expiring soon ({{ $contract->end_date->format('d/m/Y') }})
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @elseif ($contract->status == 'pending')
+                    <div class="alert alert-info alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Pending |
+                        <a href="{{route('contract.index')}}" class="alert-link">View details</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @else
+                    <div class="alert alert-success alert-dismissible fade show">
+                        <strong>Contract Status:</strong> Active (Expires: {{ $contract->end_date->format('d/m/Y') }}) |
+                        <a href="{{route('contract.index')}}" class="alert-link">View contract</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
             @endif
-    @endif
         <div class="row">
-            <div class="col-md-4 mt-5 mb-3">
-                <div class="card" style="background: #bf950a">
-                    <div class="">
-                        <div class="p-4 d-flex justify-content-between align-items-center">
-                            <div class="seofct-icon"><i class="ti-book"></i> My Courses</div>
-                            <h2 class="text-white">
-                                @if ($courses->where('status', 1)->count() > 2)
-                                    3+
-                                @else
+        <!-- Stats Card for Normal Teacher -->
+        <div class="col-md-4 mb-4">
+                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #bf950a 0%, #ff9800 100%);">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> My Courses</h6>
+                                <h2 class="text-white mb-0">
                                     {{$courses->where('status', 1)->count()}}
-                                @endif
-                            </h2>
+                                </h2>
+                            </div>
+                            <div class="bg-white rounded-circle p-3">
+                                <i class="ti-book fa-2x text-warning"></i>
+                            </div>
                         </div>
-                        <canvas id="" height="50"></canvas>
                     </div>
                 </div>
             </div>
+        </div>
             <div class="col-lg-8 mt-0">
                 <div class="card">
                     <div class="card-body">

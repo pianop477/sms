@@ -14,7 +14,7 @@
                                 <a href="{{route('register.manager')}}"><i class="fa fa-users"></i><span> Managers</span></a>
                             </li>
                             <li class="mega-menu">
-                                <a href="{{route('Schools.index')}}"><i class="fas fa-building"></i> <span>Schools</span></a>
+                                <a href="{{route('Schools.index')}}"><i class="fas fa-university"></i> <span>Schools</span></a>
                             </li>
                             <li>
                                 <a href="{{route('admin.reset.password')}}"><i class="ti-key"></i><span>User Password Reset</span></a>
