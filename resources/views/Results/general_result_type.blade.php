@@ -118,7 +118,7 @@
                                                                             <p class="text-danger">No exam results records found</p>
                                                                         @else
                                                                             <div style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
-                                                                                @foreach ($groupedByMonth->take(5) as $date => $resultDate)
+                                                                                @foreach ($groupedByMonth as $date => $resultDate)
                                                                                     <div style="margin-bottom: 8px;">
                                                                                         <label>
                                                                                             <input type="checkbox" style="font-size: 16px;" name="exam_dates[]" value="{{$date}}">
@@ -126,18 +126,6 @@
                                                                                         </label>
                                                                                     </div>
                                                                                 @endforeach
-                                                                                @if ($groupedByMonth->count() > 5)
-                                                                                    <div style="display: none;">
-                                                                                    @foreach ($groupedByMonth->slice(5) as $date => $resultDate)
-                                                                                        <div style="margin-bottom: 8px;">
-                                                                                            <label>
-                                                                                                <input type="checkbox" style="font-size: 16px;" name="exam_dates[]" value="{{$date}}">
-                                                                                                {{\Carbon\Carbon::parse($date)->format('d-m-Y')}} => {{ucwords(strtolower($resultDate->first()->exam_type))}} ({{ucwords(strtolower('term '.$resultDate->first()->Exam_term))}})
-                                                                                            </label>
-                                                                                        </div>
-                                                                                    @endforeach
-                                                                                    </div>
-                                                                                @endif
                                                                             </div>
                                                                         @endif
                                                                     </div>
