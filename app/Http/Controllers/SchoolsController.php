@@ -474,11 +474,20 @@ class SchoolsController extends Controller
             $payload = [
                 'from' => 'SHULE APP',
                 'to' => $this->formatPhoneNumber($managerInfo->phone),
-                'text' => "Habari, Pokea Ankara ya malipo ya matumizi ya mfumo kuanzia ". Carbon::parse($schoolInfo->service_start_date)->format('d/m/Y'). " mpaka " .
-                            Carbon::parse($schoolInfo->service_start_date)->format('d/m/Y') . " Kiasi cha Tzs. ". number_format($studentCount * $cost) . ", Asante kwa kuchagua ShuleApp",
+                'text' => "Habari,\n"
+                        ."Ankara ya malipo ya mfumo wa ShuleApp "
+                        ."Kuanzia ". Carbon::parse($schoolInfo->service_start_date)->format('d/m/Y')
+                        ." Hadi ". Carbon::parse($schoolInfo->service_end_date)->format('d/m/Y') . "\n"
+                        ."Jumla: TZS ". number_format($studentCount * $cost, 0, '.', ',') . "/= \n"
+                        ."(Wanafunzi ". $studentCount . " @ TZS ". number_format($cost, 0, '.', ',') . ")\n"
+                        ."Fanya Malipo kupitia: \n"
+                        ."NMB# 50510028891 - Jina: FRANK M. MASAKA au \n"
+                        ."Mixx Lipa Namba #15966786 - Jina: PIANO SHOP\n"
+                        ."Asante kwa kutumia shuleApp, endelea kufurahia huduma zetu.\n",
                 'reference' => uniqid()
             ];
             // return $payload['text'];
+            // Log::info($payload['text']);
 
             $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
