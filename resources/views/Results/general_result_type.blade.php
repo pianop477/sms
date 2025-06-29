@@ -117,9 +117,9 @@
                                                                         @if ($groupedByMonth->isEmpty())
                                                                             <p class="text-danger">No exam results records found</p>
                                                                         @else
-                                                                            <div style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
+                                                                            <div style="max-height: 170px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
                                                                                 @foreach ($groupedByMonth as $date => $resultDate)
-                                                                                    <div style="margin-bottom: 8px;">
+                                                                                    <div style="margin-bottom: 6px;">
                                                                                         <label>
                                                                                             <input type="checkbox" style="font-size: 16px;" name="exam_dates[]" value="{{$date}}">
                                                                                             {{\Carbon\Carbon::parse($date)->format('d-m-Y')}} => {{ucwords(strtolower($resultDate->first()->exam_type))}} ({{ucwords(strtolower('term '.$resultDate->first()->Exam_term))}})
@@ -131,14 +131,16 @@
                                                                     </div>
                                                                     <div class="col-6">
                                                                         <p class="text-danger fw-bold">Aggregation Method</p>
-                                                                        <input type="radio" name="combine_option" value="sum" required>
-                                                                        <label>Display Total Marks Only</label> <br>
+                                                                        <div class="mt-3 float-rright">
+                                                                            <input type="radio" name="combine_option" value="sum" required>
+                                                                            <label>Display Total Marks Only</label> <br>
 
-                                                                        <input type="radio" name="combine_option" value="average" required>
-                                                                        <label>Display Average Score Only</label> <br>
+                                                                            <input type="radio" name="combine_option" value="average" required>
+                                                                            <label>Display Average Score Only</label> <br>
 
-                                                                        <input type="radio" name="combine_option" value="individual" required>
-                                                                        <label>Display Individual Subject Scores</label>
+                                                                            <input type="radio" name="combine_option" value="individual" required>
+                                                                            <label>Display Individual Subject Scores</label>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
 
