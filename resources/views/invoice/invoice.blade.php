@@ -13,7 +13,7 @@
                                     {{-- <p class="text-center font-weight-bold">ShuleApp</p> --}}
                                 </div>
                                 <div class="iv-right col-10 text-right">
-                                    <span>SHULEAPP - ADMIN</span>
+                                    <span>SHULEAPP - ADMININISTRATOR</span>
                                     <p class="text-capitalize">{{Auth::user()->first_name}} {{Auth::user()->last_name}}</p>
                                     <p>{{Auth::user()->email}}</p>
                                     <p>{{Auth::user()->phone}}</p>
@@ -25,7 +25,7 @@
                                 <div class="invoice-address">
                                     <h4>Billed To</h4>
                                     <h5 class="text-uppercase">{{$schools->school_name}}</h5>
-                                    <p class="text-capitalize">{{$managers->first()->first_name}} {{$managers->first()->last_name}}</p>
+                                    {{-- <p class="text-capitalize">{{$managers->first()->first_name}} {{$managers->first()->last_name}}</p> --}}
                                     <p class="text-capitalize">{{$schools->postal_address}} - {{$schools->postal_name}}</p>
                                     <p class="text-capitalize">{{$schools->country}}</p>
                                     <p>{{$managers->first()->email}}</p>
@@ -46,7 +46,7 @@
                                 <thead>
                                     <tr class="text-capitalize">
                                         <th class="text-center" style="width: 5%;">#</th>
-                                        <th class="text-left" style="">description</th>
+                                        <th class="text-left" style="">service description</th>
                                         <th class="text-left">Service Time Duration</th>
                                         <th style="">No.Students</th>
                                         <th style="" style="max-width: 10px">Unit Cost</th>
