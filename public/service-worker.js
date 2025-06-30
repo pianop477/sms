@@ -1,6 +1,6 @@
-const CACHE_NAME = 'ShuleApp-cache-v3.2.1'; // Update version as needed
+const CACHE_NAME = 'ShuleApp-cache-v3.2.2'; // Update version as needed
 const ASSETS_TO_CACHE = [
-    '/manifest.json?v=3.2.1',  // Only manifest should be cached
+    '/manifest.json?v=3.2.2',  // Only manifest should be cached
     '/assets/css/styles.css', // CSS should be cached
     '/assets/js/scripts.js',  // JS should be cached
     '/icons/icon.png',       // Icon should be cached

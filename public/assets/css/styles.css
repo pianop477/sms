@@ -206,7 +206,9 @@
 
 .mainheader-area {
     background: #ccdfee;
-    border-bottom: 3px solid orange;
+    border-bottom: 3px solid transparent;
+    border-image: linear-gradient(to right, #3498db, #e74c3c);
+    border-image-slice: 1;
     padding-left: 10px;
     position: relative;
     z-index: 99;
