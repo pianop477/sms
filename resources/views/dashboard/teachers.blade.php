@@ -294,7 +294,6 @@
                 <div class="col-md-6 mt-2 mb-3">
                     <div class="card">
                         <div id="qualificationChart" style="width: 100%; height: 400px;"></div>
-
                         <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
                         <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
                         <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
@@ -357,7 +356,7 @@
             <div class="row">
                 <div class="col-md-4 mt-2 mb-3">
                     <div class="card">
-                        <div class="card-title mt-2">
+                        <div class="card-title mt-2 border-bottom">
                             <h6 class="text-center">Students Registration</h6>
                         </div>
                         <table class="table table-sm table-hover table-responsive-sm table-bordered table-sm" style="background: #e3d39e">
@@ -422,7 +421,7 @@
                 </div>
                 <div class="col-md-4 mt-2 mb-3">
                     <div class="card">
-                        <div class="card-title mt-2">
+                        <div class="card-title mt-2 border-bottom">
                             <h6 class="text-center">Students Registration</h6>
                         </div>
                         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -490,7 +489,7 @@
                 </div>
                 <div class="col-lg-4 mt-2 mb-3">
                     <div class="card">
-                        <div class="card-title mt-2">
+                        <div class="card-title mt-2 border-bottom">
                             <h6 class="text-center">Today's Attendance: {{\Carbon\Carbon::parse($today)->format('d-m-Y')}}</h6>
                         </div>
                         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -843,9 +842,7 @@
                             myChart.setOption(option);
                         });
                     </script>
-
                 </div>
-
             </div>
             <div class="col-lg-6 mt-0">
                 <div class="card">
@@ -911,7 +908,7 @@
             <div class="row">
                 <div class="col-md-4 mt-2 mb-3">
                     <div class="card">
-                        <div class="card-title mt-2">
+                        <div class="card-title mt-2 border-bottom">
                             <h6 class="text-center">Students Registration</h6>
                         </div>
                         <table class="table table-sm table-hover table-responsive-sm table-bordered table-sm" style="background: #e3d39e">
@@ -947,7 +944,7 @@
                             @endif
                         </table>
                         <hr class="dark horizontal py-0">
-                        <div class="card-title">
+                        <div class="card-title border-bottom mt-2">
                             <h6 class="text-center mt-2">Teachers Registration</h6>
                         </div>
                         <table class="table table-sm table-responsive-sm table-bordered table-hover" style="background: #e4abcf;">
@@ -976,7 +973,7 @@
                 </div>
                 <div class="col-md-4 mt-2 mb-3">
                     <div class="card">
-                        <div class="card-title mt-2">
+                        <div class="card-title mt-2 border-bottom">
                             <h6 class="text-center">Students Enrollment</h6>
                         </div>
                         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1044,7 +1041,7 @@
                 </div>
                 <div class="col-lg-4 mt-2 mb-3">
                     <div class="card">
-                        <div class="card-title mt-2">
+                        <div class="card-title mt-2 border-bottom">
                             <h6 class="text-center">Today's Attendance: {{\Carbon\Carbon::parse($today)->format('d-m-Y')}}</h6>
                         </div>
                         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1346,7 +1343,7 @@
             </div>
             <div class="col-lg-6 mt-1">
                 <div class="card">
-                    <div class="card-title mt-1">
+                    <div class="card-title mt-1 border-bottom">
                         <h6 class="text-center">Students Enrollment</h6>
                     </div>
                     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1415,7 +1412,7 @@
             </div>
             <div class="col-lg-6 mt-1">
                 <div class="card">
-                    <div class="card-title mt-1">
+                    <div class="card-title mt-1 border-bottom">
                         <h6 class="text-center">Today's Attendance: {{\Carbon\Carbon::today()->format('d-m-Y')}}</h6>
                         {{-- <p class="text-center font-style-italic">Today is: {{\Carbon\Carbon::today()->format('d-m-Y')}}</p> --}}
                     </div>
