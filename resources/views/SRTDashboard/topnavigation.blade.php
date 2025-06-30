@@ -31,7 +31,7 @@
             </div>
 
             {{-- User Profile --}}
-            <div class="dropdown d-flex align-items-center">
+            <div class="dropdown d-flex align-items-center ms-md-auto">
                 @php
                     $profileImg = Auth::user()->image
                                   ? 'assets/img/profile/' . Auth::user()->image
