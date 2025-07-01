@@ -544,11 +544,71 @@
                                 <p class="text-center text-muted">No attendance records found for today.</p>`;
                         }
                     })();
+
+                     // Authorization check
+                    @if (Auth::user()->usertype != 2)
+                        window.location.href = '/error-page';
+                    @endif
                 </script>
             </div>
         </div>
     </div>
 </div>
+<style>
+    .card-hover {
+        transition: all 0.3s ease;
+    }
+    .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .bg-success-lighten {
+        background-color: rgba(40, 167, 69, 0.1);
+    }
+    .bg-warning-lighten {
+        background-color: rgba(255, 193, 7, 0.1);
+    }
+    .bg-secondary-lighten {
+        background-color: rgba(108, 117, 125, 0.1);
+    }
+    .table-centered td, .table-centered th {
+        vertical-align: middle;
+    }
+    @media (max-width: 768px) {
+        .table-responsive {
+            border: 0;
+        }
+        .table-responsive thead {
+            display: none;
+        }
+        .table-responsive tr {
+            display: block;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .table-responsive td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: right;
+            padding-left: 50%;
+            position: relative;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        .table-responsive td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 15px;
+            font-weight: bold;
+            text-align: left;
+        }
+        .btn-group {
+            display: flex;
+            gap: 5px;
+        }
+    }
+</style>
 
 @endsection
 

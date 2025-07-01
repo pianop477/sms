@@ -141,7 +141,7 @@
                                 </h2>
                             </div>
                             <div class="bg-white rounded-circle p-3">
-                                <i class="ti-blackboard fa-2x text-warning"></i>
+                                <i class="ti-blackboard fa-2x text-dark"></i>
                             </div>
                         </div>
                         <div class="mt-3">
@@ -184,7 +184,7 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="header-title mb-0">Running Institutions</h4>
+                    <h4 class="header-title mb-0">Registered Institutions</h4>
                     <a href="{{route('Schools.index')}}" class="btn btn-primary btn-sm">
                         <i class="fas fa-plus me-1"></i> Add New
                     </a>
@@ -195,7 +195,7 @@
                             <tr>
                                 <th width="5%">#</th>
                                 <th width="25%">Institute Name</th>
-                                <th width="15%">Reg No</th>
+                                <th width="15%">Admission#</th>
                                 <th width="25%">Address</th>
                                 <th width="15%">Status</th>
                                 <th width="15%" class="text-center">Actions</th>
@@ -240,7 +240,7 @@
                                                     data-bs-toggle="tooltip"
                                                     title="Deactivate"
                                                     onclick="return confirm('Are you sure you want to block this school?')">
-                                                <i class="ti-na"></i>
+                                                <i class="ti-na text-dark"></i>
                                             </button>
                                         </form>
                                         @else
@@ -350,10 +350,10 @@
         new Chart(ctx1, {
             type: 'line',
             data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                 datasets: [{
                     label: 'New Schools',
-                    data: [12, 19, 3, 5, 2, 3],
+                    data: [12, 19, 3, 5, 2, 3, 7, 8, 10, 15, 20, 25, 30],
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 2,
