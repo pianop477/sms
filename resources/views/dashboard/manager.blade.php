@@ -96,76 +96,75 @@
 <div class="col-lg-12">
     <div class="row">
         <div class="col-md-4 mt-3 mb-3">
-                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #9fbc71 0%, #689f38 100%);">
-                    <a href="{{route('courses.index')}}" class="text-decoration-none">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Open Courses</h6>
-                                    <h2 class="text-white mb-0">
-                                        @if (count($subjects) > 49) 50+ @else {{count($subjects)}} @endif
-                                    </h2>
-                                </div>
-                                <div class="bg-white rounded-circle p-3">
-                                    <i class="ti-book fa-2x text-success"></i>
-                                </div>
+            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #9fbc71 0%, #689f38 100%);">
+                <a href="{{route('courses.index')}}" class="text-decoration-none">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Open Courses</h6>
+                                <h2 class="text-white mb-0">
+                                    @if (count($subjects) > 49) 50+ @else {{count($subjects)}} @endif
+                                </h2>
                             </div>
-                            <div class="mt-3">
-                                <span class="text-white small d-flex align-items-center">
-                                    View All <i class="fas fa-arrow-right ms-2"></i>
-                                </span>
+                            <div class="bg-white rounded-circle p-3">
+                                <i class="ti-book fa-2x text-success"></i>
                             </div>
                         </div>
-                    </a>
-                </div>
+                        <div class="mt-3">
+                            <span class="text-white small d-flex align-items-center">
+                                View All <i class="fas fa-arrow-right ms-2"></i>
+                            </span>
+                        </div>
+                    </div>
+                </a>
             </div>
+        </div>
         <div class="col-md-4 mt-3 mb-3">
-                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #bf950a 0%, #ff9800 100%);">
-                    <a href="{{route('Classes.index')}}" class="text-decoration-none">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Classes</h6>
-                                    <h2 class="text-white mb-0">
-                                        @if (count($classes) > 49) 50+ @else {{count($classes)}} @endif
-                                    </h2>
-                                </div>
-                                <div class="bg-white rounded-circle p-3">
-                                    <i class="ti-blackboard fa-2x text-dark"></i>
-                                </div>
+            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #bf950a 0%, #ff9800 100%);">
+                <a href="{{route('Classes.index')}}" class="text-decoration-none">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Classes</h6>
+                                <h2 class="text-white mb-0">
+                                    @if (count($classes) > 49) 50+ @else {{count($classes)}} @endif
+                                </h2>
                             </div>
-                            <div class="mt-3">
-                                <span class="text-white small d-flex align-items-center">
-                                    View All <i class="fas fa-arrow-right ms-2"></i>
-                                </span>
+                            <div class="bg-white rounded-circle p-3">
+                                <i class="ti-blackboard fa-2x text-dark"></i>
                             </div>
                         </div>
-                    </a>
-                </div>
+                        <div class="mt-3">
+                            <span class="text-white small d-flex align-items-center">
+                                View All <i class="fas fa-arrow-right ms-2"></i>
+                            </span>
+                        </div>
+                    </div>
+                </a>
             </div>
+        </div>
         <div class="col-md-4 mt-3 mb-3">
-                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #329688 0%, #00796b 100%);">
-                    <a href="{{route('Transportation.index')}}" class="text-decoration-none">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>School Buses</h6>
-                                    <h2 class="text-white mb-0">
-                                        @if (count($buses) > 49) 50+ @else {{count($buses)}} @endif
-                                    </h2>
-                                </div>
-                                <div class="bg-white rounded-circle p-3">
-                                    <i class="fas fa-bus fa-2x text-teal"></i>
-                                </div>
+            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #329688 0%, #00796b 100%);">
+                <a href="{{route('Transportation.index')}}" class="text-decoration-none">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>School Buses</h6>
+                                <h2 class="text-white mb-0">
+                                    @if (count($buses) > 49) 50+ @else {{count($buses)}} @endif
+                                </h2>
                             </div>
-                            <div class="mt-3">
-                                <span class="text-white small d-flex align-items-center">
-                                    View All <i class="fas fa-arrow-right ms-2"></i>
-                                </span>
+                            <div class="bg-white rounded-circle p-3">
+                                <i class="fas fa-bus fa-2x text-teal"></i>
                             </div>
                         </div>
-                    </a>
-                </div>
+                        <div class="mt-3">
+                            <span class="text-white small d-flex align-items-center">
+                                View All <i class="fas fa-arrow-right ms-2"></i>
+                            </span>
+                        </div>
+                    </div>
+                </a>
             </div>
         </div>
     </div>
