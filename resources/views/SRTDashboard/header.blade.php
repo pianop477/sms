@@ -17,7 +17,7 @@
     <!-- others css -->
     <link rel="stylesheet" href="{{asset('assets/css/typography.css')}}">
     <link rel="stylesheet" href="{{asset('assets/css/default-css.css')}}">
-    <link rel="stylesheet" href="{{asset('assets/css/styles.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/css/styles.css')}}?v={{ filemtime(public_path('assets/css/styles.css')) }}">
     <link rel="stylesheet" href="{{asset('assets/css/responsive.css')}}">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>

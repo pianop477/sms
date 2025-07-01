@@ -1,22 +1,22 @@
-const CACHE_NAME = 'ShuleApp-cache-v3.2.2'; // Update version as needed
+const CACHE_NAME = 'ShuleApp-cache-v3.3'; // Ongeza version number
 const ASSETS_TO_CACHE = [
-    '/manifest.json?v=3.2.2',  // Only manifest should be cached
-    '/assets/css/styles.css', // CSS should be cached
-    '/assets/js/scripts.js',  // JS should be cached
-    '/icons/icon.png',       // Icon should be cached
-    '/icons/icon_2.png',     // Icon should be cached
-    '/icons/icon_3.png',     // Icon should be cached
-    '/offline.html'          // Offline page should be cached
-];
+    '/manifest.json',
+    '/assets/css/styles.css',
+    '/assets/js/scripts.js',
+    '/icons/icon.png',
+    '/icons/icon_2.png',
+    '/icons/icon_3.png',
+    '/icons/icon_4.png',
+    '/offline.html'
+].map(url => `${url}?v=3.3`); // Auto-add version parameter
 
-// Install Event - Cache only necessary assets (manifest, logos, css, js, offline page)
+// Install Event
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(ASSETS_TO_CACHE);
-        })
+        caches.open(CACHE_NAME)
+            .then((cache) => cache.addAll(ASSETS_TO_CACHE))
+            .then(() => self.skipWaiting())
     );
-    self.skipWaiting();
 });
 
 // Activate Event - Cleanup old caches
@@ -30,36 +30,43 @@ self.addEventListener('activate', (event) => {
                     }
                 })
             );
-        })
+        }).then(() => self.clients.claim())
     );
-    self.clients.claim();
 });
 
-// Fetch Event - Directly fetch from the network, with fallback to offline page if offline
+// Fetch Event - Network first with cache fallback for static assets
 self.addEventListener('fetch', (event) => {
     const requestUrl = new URL(event.request.url);
 
-    // Check if the request is for one of the cached static files
-    if (
-        ['/manifest.json', '/assets/css/styles.css', '/assets/js/scripts.js', '/icons/icon.png', '/icons/icon_2.png', '/icons/icon_3.png'].includes(requestUrl.pathname)
-    ) {
+    // Skip non-GET requests
+    if (event.request.method !== 'GET') return;
+
+    // Handle static assets
+    if (ASSETS_TO_CACHE.some(asset => {
+        const assetUrl = new URL(asset, self.location.origin).pathname;
+        return requestUrl.pathname === assetUrl.split('?')[0];
+    })) {
         event.respondWith(
-            caches.match(event.request).then((cachedResponse) => {
-                // If the request is cached, return the cached version; otherwise, fetch from network
-                return cachedResponse || fetch(event.request);
-            }).catch(() => {
-                // If the network fails, serve the offline page
-                return caches.match('/offline.html');
-            })
+            fetch(event.request)
+                .then(networkResponse => {
+                    // Update cache with fresh response
+                    return caches.open(CACHE_NAME)
+                        .then(cache => {
+                            cache.put(event.request, networkResponse.clone());
+                            return networkResponse;
+                        });
+                })
+                .catch(() => {
+                    return caches.match(event.request)
+                        .then(cachedResponse => cachedResponse || caches.match('/offline.html'));
+                })
         );
         return;
     }
 
-    // For all other requests, fetch directly from the network, no caching
+    // For other requests: Network first, offline page fallback
     event.respondWith(
-        fetch(event.request).catch(() => {
-            // If the network is not available, serve the offline page
-            return caches.match('/offline.html');
-        })
+        fetch(event.request)
+            .catch(() => caches.match('/offline.html'))
     );
 });
