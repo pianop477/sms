@@ -49,11 +49,12 @@
                                 @enderror
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label for="validationCustom01">Sender Name</label>
+                                <label for="validationCustom01">Sender ID</label>
                                 <input type="text" name="sender_name" class="form-control" id="validationCustom01" placeholder="Enter Sender ID" value="{{old('sender_name')}}">
                                 @error('sender_name')
                                 <div class="text-danger">{{$message}}</div>
                                 @enderror
+                                <small class="text-muted">Enter sender ID name as it appear to your service provider</small>
                             </div>
                         </div>
                         <div class="form-row">
@@ -75,7 +76,7 @@
                             </div>
                         </div>
                         <hr>
-                        <h6 class="header-title">Manager's information</h6>
+                        <h6 class="header-title">School Admin information</h6>
                         <div class="form-row">
                             <div class="col-md-4 mb-3">
                                 <label for="validationCustom01">First name</label>
@@ -128,7 +129,7 @@
                         </div>
                         <div class="form-row">
                             <div class="col-md-12 mb-3">
-                                <button class="btn btn-success" id="saveButton" type="submit">Submit</button>
+                                <button class="btn btn-success float-right" id="saveButton" type="submit">Add School</button>
                             </div>
                         </div>
                     </form>
@@ -148,7 +149,7 @@
                                     <th scope="col">sender id</th>
                                     <th scope="col">Abbreviation</th>
                                     <th scope="col">Registration No</th>
-                                    <th class="text-center">School Logo</th>
+                                    <th class="text-center">Logo</th>
                                     <th scope="col">status</th>
                                     <th scope="col">Action</th>
                                 </tr>
@@ -265,8 +266,8 @@
                                                             <form action="" method="POST" novalidate="" class="needs-validation" enctype="multipart/form-data" role="form">
 
                                                                 <div class="modal-footer">
-                                                                {{-- <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button> --}}
-                                                                <button type="button" class="btn btn-danger">Close</button>
+                                                                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                                                {{-- <button type="button" class="btn btn-danger">Close</button> --}}
                                                             </form>
                                                         </div>
                                                     </div>

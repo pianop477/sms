@@ -11,7 +11,7 @@
                         {{-- school administrator links --}}
                         @if (Auth::user()->usertype == 1 )
                             <li>
-                                <a href="{{route('register.manager')}}"><i class="fa fa-users"></i><span> Managers</span></a>
+                                <a href="{{route('register.manager')}}"><i class="fa fa-users"></i><span> School Administrators</span></a>
                             </li>
                             <li class="mega-menu">
                                 <a href="{{route('Schools.index')}}"><i class="fas fa-university"></i> <span>Schools</span></a>
