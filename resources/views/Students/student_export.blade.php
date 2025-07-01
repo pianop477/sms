@@ -2,178 +2,196 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Students</title>
+    <title>Students Report - {{ Auth::user()->school->school_name }}</title>
     <style>
-        /* Inline your Bootstrap CSS styles here */
-        body {
-            font-family: Arial, sans-serif;
+        body, html {
             margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-        }
-        @media print {
-            .no-print {
-                display: none;
-            }
-            h1, h2, h4, h5, h6 {
-                text-transform: uppercase;
-                text-align: center
-            }
-            .print-only {
-                display: block;
-            }
-            .footer {
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-                border-top: 1px solid #ddd;
-                padding-top: 10px;
-            }
-            thead {
-                display: table-header-group;
-                background-color: gray; /* Adds a gray background to thead */
-            }
-            tbody {
-                display: table-row-group;
-            }
-            .table {
-                border: 1px solid black;
-                border-collapse: collapse;
-                width: 100%;
-            }
-            .table th,
-            .table td {
-                border: 1px solid black;
-            }
+            padding: 30px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 12px;
+            background: #fff;
+            color: #2c3e50;
         }
 
-        .container {
+        .header-container {
             display: flex;
-            padding: 5px;
-            flex-direction: row;
-            flex-wrap: wrap;
-        }
-        .logo {
-            position: absolute;
-            width: 50px;
-            left: 7px;
-            top: 20px;
-            color: inherit;
-        }
-        .header {
-            text-align: center;
+            align-items: center;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
             position: relative;
-            top: 0;
-            left: 40px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            font-size: 24px;
-            color: #343a40;
         }
+
+        .school-logo {
+            position: absolute;
+            left: 0;
+            height: 70px;
+            width: auto;
+            max-width: 80px;
+        }
+
+        .school-info {
+            width: 100%;
+            text-align: center;
+        }
+
+        .school-info h4 {
+            font-size: 18px;
+            margin: 5px 0;
+            text-transform: uppercase;
+            color: #1a5276;
+        }
+
+        .school-info h5 {
+            font-size: 13px;
+            margin: 3px 0;
+        }
+
+        .table-container {
+            margin-top: 15px;
+        }
+
         .table {
             width: 100%;
-            border: 1px solid black;
             border-collapse: collapse;
-        }
-
-        .table th, .table td {
-            border: 1px solid #dee2e6;
-            text-align: left;
-            text-transform: capitalize
+            font-size: 11.5px;
         }
 
         .table th {
-            background-color: #343a40;
+            background-color: #293d4a;
             color: #fff;
+            padding: 8px 5px;
+            border: 1px solid #dcdcdc;
+            text-transform: uppercase;
+            font-weight: bold;
             text-align: center;
         }
 
         .table td {
-            background-color: #fff;
+            padding: 6px 5px;
+            border: 1px solid #eee;
+            vertical-align: middle;
         }
 
-        .table img {
-            display: block;
-            margin: 0 auto;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+        .table tr:nth-child(even) {
+            background-color: #f5f8fa;
         }
 
-        .footer {
+        .table tr:hover {
+            background-color: #f0f0f0;
+        }
+
+       footer {
             position: fixed;
-            bottom: -30px;
-            align-content: space-around;
-            font-size: 12px;
-            /* border-top: 1px solid black; */
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 25px;
+            font-size: 10px;
+            border-top: 1px solid #ddd;
+            padding: 4px 20px;
+            text-align: center;
+            background-color: white; /* Hakikisha footer ina background */
+            z-index: 1000; /* Hakikisha footer iko juu ya content */
         }
-        .page-number:before {
-            content: "Page " counter(page);
+        footer .page-number:after {
+        content: "Page " counter(page);
         }
-
+        footer .copyright {
+        float: left;
+        margin-left: 10px;
+        }
+        footer .printed {
+        float: right;
+        margin-right: 10px;
+        }
+        /* Clear floats */
+        footer:after {
+        content: "";
+        display: table;
+        clear: both;
+        }
+        .no-records {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            margin-top: 50px;
+        }
     </style>
 </head>
 <body>
-    <div class="col-md-12">
-        <div class="card mt-2">
-            <div class="card-body">
-                <div class="container">
-                    <div class="logo">
-                        <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 80px;">
-                    </div>
-                    <div class="header">
-                        <h4 class="text-uppercase">{{Auth::user()->school->school_name}}</h4>
-                        <h5 class="text-uppercase">{{$students->first()->class_name}} Students</h5>
-                    </div>
-                </div>
-                @if ($students->isEmpty())
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="alert alert-warning text-center mt-3" role="alert">
-                                <p>No records found!</p>
-                            </div>
-                        </div>
-                    </div>
-                @else
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th style="text-align: center">Admission No</th>
-                            <th>Gender</th>
-                            <th>Stream</th>
-                            <th>Student Name</th>
-                            <th>Dob</th>
-                            <th>Street</th>
-                            <th>Parent Phone</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($students as $student)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td style="text-transform: uppercase; text-align:center">{{ $student->admission_number }}</td>
-                                <td style="text-transform: uppercase; text-align:center;">{{ $student->gender[0] }}</td>
-                                <td style="text-transform: uppercase; text-align:center">{{ $student->group }}</td>
-                                <td style="text-transform: capitalize">{{ ucwords(strtolower($student->first_name. ' '. $student->middle_name. ' '. $student->last_name)) }}</td>
-                                <td>{{ \Carbon\Carbon::parse($student->dob)->format('d/m/Y') }}</td>
-                                <td class="" style="text-transform: capitalize">{{ $student->address }}</td>
-                                <td>{{$student->phone}}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                </div>
-            @endif
-            </div>
+    <div class="header-container">
+        @if(Auth::user()->school->logo)
+            <img class="school-logo" src="{{ public_path('assets/img/logo/' . Auth::user()->school->logo) }}" alt="School Logo">
+        @endif
+        <div class="school-info">
+            <h4>{{ Auth::user()->school->school_name }}</h4>
+            <h5>{{ strtoupper(Auth::user()->school->postal_address) }} - {{ strtoupper(Auth::user()->school->postal_name) }}</h5>
+            <h5>{{ ucwords(strtolower($students->first()->class_name)) ?? 'CLASS' }} Students List</h5>
         </div>
     </div>
-    <div class="footer">
-        <footer>
-            <div class="page-number"></div>
-        </footer>
-    </div>
+
+    @if ($students->isEmpty())
+        <p class="no-records">No student records found</p>
+    @else
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Adm No</th>
+                        <th>Gender</th>
+                        <th>Stream</th>
+                        <th>Student Name</th>
+                        <th>DOB</th>
+                        <th>Address</th>
+                        <th>Parent Phone</th>
+                        <th>School Bus</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($students as $student)
+                    <tr>
+                        <td style="text-align: center;">{{ $loop->iteration }}</td>
+                        <td style="text-align: center;">{{ strtoupper($student->admission_number) }}</td>
+                        <td style="text-align: center;">{{ strtoupper($student->gender[0]) }}</td>
+                        <td style="text-align: center;">{{ strtoupper($student->group) }}</td>
+                        <td>{{ ucwords(strtolower($student->first_name.' '.$student->middle_name.' '.$student->last_name)) }}</td>
+                        <td style="text-align: center;">{{ $student->dob ? \Carbon\Carbon::parse($student->dob)->format('d/m/Y') : '' }}</td>
+                        <td>{{ ucwords(strtolower($student->address)) }}</td>
+                        <td>{{ $student->phone }}</td>
+                        <td style="text-align: center;">
+                            @if($student->transport_id == null)
+                                <span style="color: red; font-weight: bold;">No</span>
+                            @else
+                                <span style="color: green; font-weight: bold;">Yes</span>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
+
+    <footer>
+        <span class="copyright">
+        &copy; {{ ucwords(strtolower(Auth::user()->school->school_name)) }} – {{ date('Y') }}
+        </span>
+        <span class="page-number"></span>
+        <span class="printed">
+        Printed at: {{ now()->format('d-M-Y H:i') }}
+        </span>
+    </footer>
+
+    <script>
+        // Optional dynamic pagination script placeholder
+        document.addEventListener('DOMContentLoaded', function() {
+            const pages = document.querySelectorAll('.page-number');
+            pages.forEach((page, index) => {
+                page.textContent = index + 1;
+            });
+        });
+    </script>
 </body>
 </html>

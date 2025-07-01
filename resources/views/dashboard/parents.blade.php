@@ -18,6 +18,11 @@
                             <i class="fas fa-user-graduate fa-2x text-purple"></i>
                         </div>
                     </div>
+                    <div class="mt-3">
+                        <span class="text-white small d-flex align-items-center">
+                            View All <i class="fas fa-arrow-right ms-2"></i>
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
