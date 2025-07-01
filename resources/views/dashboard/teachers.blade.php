@@ -162,7 +162,7 @@
                                     </h2>
                                 </div>
                                 <div class="bg-white rounded-circle p-3">
-                                    <i class="ti-blackboard fa-2x text-warning"></i>
+                                    <i class="ti-blackboard fa-2x text-dark"></i>
                                 </div>
                             </div>
                             <div class="mt-3">
@@ -715,7 +715,7 @@
                                 </h2>
                             </div>
                             <div class="bg-white rounded-circle p-3">
-                                <i class="ti-blackboard fa-2x text-warning"></i>
+                                <i class="ti-blackboard fa-2x text-dark"></i>
                             </div>
                         </div>
                         <div class="mt-3">
@@ -1232,7 +1232,7 @@
                             </h2>
                         </div>
                         <div class="bg-white rounded-circle p-3">
-                            <i class="ti-book fa-2x text-warning"></i>
+                            <i class="ti-book fa-2x text-dark"></i>
                         </div>
                     </div>
                     <div class="mt-3">
@@ -1550,7 +1550,7 @@
                                 </h2>
                             </div>
                             <div class="bg-white rounded-circle p-3">
-                                <i class="ti-book fa-2x text-warning"></i>
+                                <i class="ti-book fa-2x text-dark"></i>
                             </div>
                         </div>
                         <div class="mt-3">
