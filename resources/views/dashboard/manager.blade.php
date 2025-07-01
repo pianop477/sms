@@ -19,76 +19,75 @@
         @endphp
 
         <div class="col-md-4 mt-3 mb-3">
-                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #e176a6 0%, #d04a88 100%);">
-                    <a href="{{route('Teachers.index')}}" class="text-decoration-none">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Teachers</h6>
-                                    <h2 class="text-white mb-0">
-                                        @if (count($teachers) > 99) 100+ @else {{count($teachers)}} @endif
-                                    </h2>
-                                </div>
-                                <div class="bg-white rounded-circle p-3">
-                                    <i class="fas fa-user-tie fa-2x text-pink"></i>
-                                </div>
+            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #e176a6 0%, #d04a88 100%);">
+                <a href="{{route('Teachers.index')}}" class="text-decoration-none">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Teachers</h6>
+                                <h2 class="text-white mb-0">
+                                    @if (count($teachers) > 99) 100+ @else {{count($teachers)}} @endif
+                                </h2>
                             </div>
-                            <div class="mt-3">
-                                <span class="text-white small d-flex align-items-center">
-                                    View All <i class="fas fa-arrow-right ms-2"></i>
-                                </span>
+                            <div class="bg-white rounded-circle p-3">
+                                <i class="fas fa-user-tie fa-2x text-pink"></i>
                             </div>
                         </div>
-                    </a>
-                </div>
+                        <div class="mt-3">
+                            <span class="text-white small d-flex align-items-center">
+                                View All <i class="fas fa-arrow-right ms-2"></i>
+                            </span>
+                        </div>
+                    </div>
+                </a>
             </div>
+        </div>
         <div class="col-md-4 mt-3 mb-3">
-                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #c84fe0 0%, #9c27b0 100%);">
-                    <a href="{{route('Parents.index')}}" class="text-decoration-none">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Parents</h6>
-                                    <h2 class="text-white mb-0">
-                                        @if (count($parents) > 1999) 2000+ @else {{count($parents)}} @endif
-                                    </h2>
-                                </div>
-                                <div class="bg-white rounded-circle p-3">
-                                    <i class="fas fa-user-shield fa-2x text-purple"></i>
-                                </div>
+            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #c84fe0 0%, #9c27b0 100%);">
+                <a href="{{route('Parents.index')}}" class="text-decoration-none">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Parents</h6>
+                                <h2 class="text-white mb-0">
+                                    @if (count($parents) > 1999) 2000+ @else {{count($parents)}} @endif
+                                </h2>
                             </div>
-                            <div class="mt-3">
-                                <span class="text-white small d-flex align-items-center">
-                                    View All <i class="fas fa-arrow-right ms-2"></i>
-                                </span>
+                            <div class="bg-white rounded-circle p-3">
+                                <i class="fas fa-user-shield fa-2x text-purple"></i>
                             </div>
                         </div>
-                    </a>
-                </div>
+                        <div class="mt-3">
+                            <span class="text-white small d-flex align-items-center">
+                                View All <i class="fas fa-arrow-right ms-2"></i>
+                            </span>
+                        </div>
+                    </div>
+                </a>
             </div>
+        </div>
         <div class="col-md-4 mt-3 mb-3">
-                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #098ddf 0%, #0568a8 100%);">
-                    <a href="{{route('classes.list')}}" class="text-decoration-none">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Students</h6>
-                                    <h2 class="text-white mb-0">
-                                        @if (count($students) > 1999) 2000+ @else {{count($students)}} @endif
-                                    </h2>
-                                </div>
-                                <div class="bg-white rounded-circle p-3">
-                                    <i class="fas fa-user-graduate fa-2x text-info"></i>
-                                </div>
+            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #098ddf 0%, #0568a8 100%);">
+                <a href="{{route('classes.list')}}" class="text-decoration-none">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Students</h6>
+                                <h2 class="text-white mb-0">
+                                    @if (count($students) > 1999) 2000+ @else {{count($students)}} @endif
+                                </h2>
                             </div>
-                            <div class="mt-3">
-                                <span class="text-white small d-flex align-items-center">
-                                    View All <i class="fas fa-arrow-right ms-2"></i>
-                                </span>
+                            <div class="bg-white rounded-circle p-3">
+                                <i class="fas fa-user-graduate fa-2x text-info"></i>
                             </div>
                         </div>
-                    </a>
-                </div>
+                        <div class="mt-3">
+                            <span class="text-white small d-flex align-items-center">
+                                View All <i class="fas fa-arrow-right ms-2"></i>
+                            </span>
+                        </div>
+                    </div>
+                </a>
             </div>
         </div>
     </div>
