@@ -126,10 +126,9 @@
                             {{-- parent tab pane --}}
                             <div class="tab-pane" id="edit">
                                 <p class="text-center"><strong>Edit Account Information</strong></span></p>
-                                <form action="{{route('update.profile', $user->id)}}" method="POST" novalidate="" class="needs-validation" onsubmit="preventDefault();">
+                                <form action="{{route('update.profile', $user->id)}}" method="POST" enctype="multipart/form-data" novalidate="" class="needs-validation" onsubmit="preventDefault();">
                                     @csrf
                                     @method('PUT')
-
                                     <div class="row">
                                         <div class="col-md-6">
                                             <label class="form-label">First Name</label>

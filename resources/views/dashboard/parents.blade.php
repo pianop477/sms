@@ -52,7 +52,6 @@
 
                                         <form class="needs-validation" novalidate action="{{ route('register.student') }}" method="POST" enctype="multipart/form-data">
                                             @csrf
-
                                             <!-- Name Section -->
                                             <div class="row mb-3">
                                                 <div class="col-md-4">
