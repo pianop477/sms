@@ -144,12 +144,11 @@
                             <thead class="text-capitalize">
                                 <tr>
                                     <th scope="col">#</th>
-                                    <th scope="col">Member ID</th>
+                                    <th scope="col">Member#</th>
                                     <th scope="col">Teacher's Name</th>
                                     <th scope="col">Gender</th>
                                     <th scope="col">role</th>
                                     <th scope="col">Phone</th>
-                                    <th scope="col">Qualification</th>
                                     <th scope="col">Joined</th>
                                     <th scope="col">status</th>
                                     <th scope="col">Action</th>
@@ -159,8 +158,19 @@
                                 @foreach ($teachers as $teacher )
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
-                                        <td class="text-uppercase">{{$teacher->member_id}}</td>
-                                        <td class="text-capitalize">{{ucwords(strtolower($teacher->first_name. ' '. $teacher->last_name))}}</td>
+                                        <td>{{strtoupper($teacher->member_id)}}</td>
+                                        <td class="d-flex align-items-center">
+                                                @if (!empty($teacher->image) && file_exists(public_path('assets/img/profile/' . $teacher->image)))
+                                                    <img src="{{ asset('assets/img/profile/' . $teacher->image) }}"
+                                                         alt="Profile Picture"
+                                                         class="rounded-circle"
+                                                         style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
+                                                @else
+                                                    <i class="fas fa-user-tie rounded-circle bg-secondary d-flex justify-content-center align-items-center"
+                                                       style="width: 50px; height: 50px; font-size: 20px; color: white;"></i>
+                                                @endif
+                                                 <span class="text-capitalize ms-2" style="margin-left: 5px"> {{ucwords(strtolower($teacher->first_name. ' '. $teacher->last_name))}}</span>
+                                        </td>
                                         <td class="text-capitalize">{{$teacher->gender[0]}}</td>
                                         <td class="text-capitalize text-white">
                                             @if ($teacher->role_id == 1)
@@ -172,17 +182,6 @@
                                             @endif
                                         </td>
                                         <td>{{$teacher->phone}}</td>
-                                        <td>
-                                            @if ($teacher->qualification == 1)
-                                                <span class="">Masters</span>
-                                            @elseif ($teacher->qualification == 2)
-                                                <span class="">Degree</span>
-                                            @elseif ($teacher->qualification == 3)
-                                                <span class="">Diploma</span>
-                                            @elseif ($teacher->qualification == 4)
-                                                <span class="">Certificate</span>
-                                            @endif
-                                        </td>
                                         <td>{{$teacher->joined}}</td>
                                         <td>
                                             @if ($teacher->status ==1)

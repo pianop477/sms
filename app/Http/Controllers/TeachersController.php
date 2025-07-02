@@ -41,7 +41,7 @@ class TeachersController extends Controller
                             ->join('users', 'users.id', '=', 'teachers.user_id')
                             ->join('schools', 'schools.id', '=', 'teachers.school_id')
                             ->join('roles', 'roles.id', '=', 'teachers.role_id')
-                            ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.email', 'roles.role_name',)
+                            ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.email', 'roles.role_name', 'users.image')
                             ->where('teachers.school_id', '=', $userLogged->school_id)
                             ->whereIn('teachers.status', [0,1])
                             ->where('teachers.role_id', '!=', 2)

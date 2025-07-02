@@ -119,7 +119,7 @@
 
                             {{-- parent tab pane --}}
                             <div class="tab-pane" id="qualification">
-                                <p class="text-center text-primary"><strong>Qualification Information</strong></span></p>
+                                <p class="text-center text-dark"><strong>Qualification Information</strong></span></p>
                                 <table class="table table-condensed table-responsive-md">
                                     <tbody>
                                         <th>Qualification</th>
@@ -139,28 +139,24 @@
                             </div>
 
                             <div class="tab-pane" id="subjects">
-                                <p class="text-primary text-center">Teaching subject information</p>
+                                <p class="text-dark text-center">Teaching subject information</p>
                                 <table class="table table-condensed table-responsive-md">
                                     <thead>
                                         <th>#</th>
                                         <th>Class</th>
-                                        <th>Class Code</th>
                                         <th>Course</th>
-                                        <th>Course Code</th>
                                     </thead>
                                     <tbody>
                                         @if ($subjects->isEmpty())
                                         <tr>
-                                            <td colspan="5" class="text-danger text-center">No courses assigned for you</td>
+                                            <td colspan="3" class="text-danger text-center">No courses assigned for you</td>
                                         </tr>
                                         @else
                                             @foreach ($subjects as $subject)
                                                 <tr>
                                                     <td>{{$loop->iteration}}</td>
-                                                    <td>{{ucwords(strtoupper($subject->class_name))}}</td>
-                                                    <td>{{ucwords(strtoupper($subject->course_code))}}</td>
-                                                    <td>{{ucwords(strtoupper($subject->course_name))}}</td>
-                                                    <td>{{ucwords(strtoupper($subject->course_code))}}</td>
+                                                    <td>{{ucwords(strtoupper($subject->class_name))}} - {{ucwords(strtoupper($subject->class_code))}}</td>
+                                                    <td>{{ucwords(strtoupper($subject->course_name))}} - {{ucwords(strtoupper($subject->course_code))}}</td>
                                                 </tr>
                                             @endforeach
                                         @endif
