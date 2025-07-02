@@ -289,7 +289,7 @@
                                     <thead class="text-capitalize">
                                         <tr>
                                             <th scope="col" class="text-center"><input type="checkbox" id="selectAll"> All</th>
-                                            <th scope="col" class="text-center">Adm No.</th>
+                                            <th scope="col" class="text-center">Adm #.</th>
                                             <th scope="col">First Name</th>
                                             <th scope="col">Middle Name</th>
                                             <th scope="col">Surname</th>
@@ -307,7 +307,20 @@
                                                     {{$loop->iteration}}
                                                 </td>
                                                 <td class="text-uppercase text-center">{{$student->admission_number}}</td>
-                                                <td class="text-capitalize">{{ucwords(strtolower($student->first_name))}}</td>
+                                                <td class="d-flex align-items-center">
+                                                        @if (!empty($student->image) && file_exists(public_path('assets/img/students/' . $student->image)))
+                                                            <img src="{{ asset('assets/img/students/' . $student->image) }}"
+                                                                alt="Profile Picture"
+                                                                class="rounded-circle"
+                                                                style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
+                                                        @else
+                                                            <img src="{{ asset('assets/img/students/student.jpg') }}"
+                                                                alt="Profile Picture"
+                                                                class="rounded-circle"
+                                                                style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
+                                                        @endif
+                                                        <span class="text-capitalize ms-2" style="margin-left: 5px"> {{ucwords(strtolower($student->first_name))}}</span>
+                                                </td>
                                                 <td class="text-capitalize">{{ucwords(strtolower($student->middle_name))}}</td>
                                                 <td class="text-capitalize">{{ucwords(strtolower($student->last_name))}}</td>
                                                 <td class="text-center text-capitalize">{{$student->gender[0]}}</td>
