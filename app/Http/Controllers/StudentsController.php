@@ -87,13 +87,21 @@ class StudentsController extends Controller
                 'dob' => 'required|date|date_format:Y-m-d',
                 'driver' => 'nullable|exists:transports,id',
                 'group' => 'required|string|in:A,B,C,D',
-                'image' => 'nullable|max:1024|mimes:jpg,jpeg,png',
+                'image' => [
+                    'nullable',
+                    'file',
+                    'mimetypes:image/jpeg,image/png,image/jpg',
+                    'max:1024'
+                ],
                 'school_id' => 'exists:schools,id'
             ], [
                 'fname.required' => 'First name is required',
                 'middle.required' => 'Middle name is required',
                 'lname.required' => 'Last name is required',
-
+                'dob.required' => 'Date of birth is required',
+                'group.required' => 'stream must be provided',
+                'image.mimetypes' => 'Image must be a file of type: jpg, png, jpeg',
+                'image.max' => 'Image size must not exceed 1MB',
             ]);
 
             if($request->hasFile('image')) {
@@ -289,13 +297,22 @@ class StudentsController extends Controller
                 'gender' => 'required|max:255',
                 'dob' => 'required|date|date_format:Y-m-d',
                 'driver' => 'integer|nullable|exists:transports,id',
-                'image' => 'nullable|mimes:jpg,png,jpeg|max:1024',
+                'image' => [
+                    'nullable',
+                    'file',
+                    'mimetypes:image/jpeg,image/png,image/jpg',
+                    'max:1024'
+                ],
             ], [
                 'fname.required' => 'First name is required',
                 'middle.required' => 'Middle name is required',
                 'lname.required' => 'Last name is required',
                 'parent.exists' => 'Parent does not exist',
                 'class.exists' => 'Class does not exist',
+                'group.required' => 'stream must be provided',
+                'dob.required' => 'Date of birth is required',
+                'image.mimetypes' => 'Image must be a file of type: jpg, png, jpeg',
+                'image.max' => 'Image size must not exceed 1MB',
             ]);
 
             if($request->hasFile('image')) {
@@ -372,12 +389,21 @@ class StudentsController extends Controller
                 'gender' => 'required|max:255',
                 'dob' => 'required|date|date_format:Y-m-d',
                 'driver' => 'integer|nullable|exists:transports,id',
-                'image' => 'nullable|mimes:jpg,png,jpeg|max:1024',
+                'image' => [
+                    'nullable',
+                    'file',
+                    'mimetypes:image/jpeg,image/png,image/jpg',
+                    'max:1024'
+                ],
             ], [
                 'fname.required' => 'First name is required',
                 'middle.required' => 'Middle name is required',
                 'lname.required' => 'Last name is required',
                 'class.exists' => 'Class does not exist',
+                'group.required' => 'stream must be provided',
+                'dob.required' => 'Date of birth is required',
+                'image.mimetypes' => 'Image must be a file of type: jpg, png, jpeg',
+                'image.max' => 'Image size must not exceed 1MB',
             ]);
 
             if($request->hasFile('image')) {
@@ -727,13 +753,22 @@ class StudentsController extends Controller
                 'dob' => 'required|date|date_format:Y-m-d',
                 'driver' => 'nullable|integer|exists:transports,id',
                 'group' => 'required|string|in:A,B,C,D',
-                'image' => 'nullable|mimes:jpg,png,jpeg|max:1024',
+                'image' => [
+                    'nullable',
+                    'file',
+                    'mimetypes:image/jpeg,image/png,image/jpg',
+                    'max:1024'
+                ],
                 'school_id' => 'exists:schools,id',
             ], [
                 'fname.required' => 'First name is required',
                 'middle.required' => 'Middle name is required',
                 'lname.required' => 'Last name is required',
                 'grade.exists' => 'Selected class does not exist',
+                'group.required' => 'stream must be provided',
+                'dob.required' => 'Date of birth is required',
+                'image.mimetypes' => 'Image must be a file of type: jpg, png, jpeg',
+                'image.max' => 'Image size must not exceed 1MB',
             ]);
 
             $scanResult = $this->scanFileForViruses($request->file('image'));
