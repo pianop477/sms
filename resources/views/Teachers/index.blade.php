@@ -7,7 +7,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-8">
-                        <h4 class="header-title text-uppercase text-center">Teachers list</h4>
+                        <h4 class="header-title text-capitalize">Registered Teachers</h4>
                     </div>
                     <div class="col-2 mt-2">
                         <div class="btn-group" role="group">
