@@ -45,7 +45,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <h4 class="header-title text-uppercase text-center">{{$classId->class_name. ' Students list - ('.$classId->class_code.')'}}</h4>
+                        <h4 class="header-title text-uppercase">{{$classId->class_name. ' Students list - ('.$classId->class_code.')'}}</h4>
                     </div>
                 </div>
                 <div class="row col-md-6 float-right">

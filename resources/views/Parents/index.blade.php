@@ -7,7 +7,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-8">
-                        <h4 class="header-title text-uppercase text-center">Parents list</h4>
+                        <h4 class="header-title text-capitalize">Registered Parents</h4>
                     </div>
                     <div class="col-md-2">
                         <div class="col-4">

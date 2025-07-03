@@ -76,7 +76,7 @@
                         <div class="tab-content">
                             {{-- profile tab pane --}}
                             <div class="active tab-pane" id="teacher">
-                                <p class="text-center text-primary">Personal Particulars</p>
+                                <p class="text-center text-dark"><strong>Personal Particulars</strong></p>
                                 <table class="table table-condensed table-responsive-md">
                                     <tbody>
                                         <tr>
@@ -139,12 +139,12 @@
                             </div>
 
                             <div class="tab-pane" id="subjects">
-                                <p class="text-dark text-center">Teaching subject information</p>
+                                <p class="text-dark text-center"><strong>Teaching subject information</strong></p>
                                 <table class="table table-condensed table-responsive-md">
                                     <thead>
                                         <th>#</th>
                                         <th>Class</th>
-                                        <th>Course</th>
+                                        <th>Subject</th>
                                     </thead>
                                     <tbody>
                                         @if ($subjects->isEmpty())
