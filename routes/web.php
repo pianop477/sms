@@ -120,6 +120,8 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::put('{user}/Block-admin-accounts', [UsersController::class, 'blockAdminAccount'])->name('admin.account.block');
         Route::put('{user}/Unblock-admin-accounts', [UsersController::class, 'unblockAdminAccount'])->name('admin.account.unblock');
         Route::get('{user}/Delete-admin-accounts', [UsersController::class, 'deleteAdminAccount'])->name('admin.account.destroy');
+        Route::get('{user}/Edit-admin-accounts', [UsersController::class, 'editAdminAccount'])->name('admin.account.edit');
+        Route::put('{user}/Update-admin-accounts', [UsersController::class, 'updateAdminAccount'])->name('admin.account.update');
     });
 
     //1. SHARED ROUTES ACCESS MANAGER/HEAD TEACHER/ACADEMIC =======================================
