@@ -162,7 +162,7 @@
                                             {{$school->school_name}}
                                         </td>
                                         <td class="text-uppercase">
-                                            {{$school->sender_id}}
+                                            {{$school->sender_id ?? 'Not set'}}
                                         </td>
                                         <td class="text-uppercase">
                                             {{$school->abbriv_code}}
