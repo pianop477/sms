@@ -18,6 +18,8 @@ use Illuminate\Validation\Rules\Unique;
 use PhpOffice\PhpSpreadsheet\Calculation\Engine\FormattedNumber;
 use RealRashid\SweetAlert\Facades\Alert;
 use Vinkla\Hashids\Facades\Hashids;
+use Intervention\Image\Facades\Image;
+use Illuminate\Support\Str;
 
 class UsersController extends Controller
 {
@@ -330,6 +332,74 @@ class UsersController extends Controller
     public function constructionPage ()
     {
         return view('Error.construction');
+    }
+
+    public function editAdminAccount($user)
+    {
+        $id = Hashids::decode($user);
+        $user = User::findOrFail($id[0]);
+        return view('Admin.edit', compact('user'));
+    }
+
+
+    public function updateAdminAccount(Request $request, $user)
+    {
+        $userId = Hashids::decode($user);
+        $userInfo = User::findOrFail($userId[0]);
+
+        if(!$userInfo) {
+            Alert()->toast('User information does not exist', 'error');
+            return to_route('admin.accounts');
+        }
+
+        $this->validate($request, [
+            'fname' => 'required|string|max:255',
+            'lname' => 'required|string|max:255',
+            'email' => 'nullable|unique:users,email,'.$userInfo->id,
+            'gender' => 'required|string|max:10',
+            'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,'.$userInfo->id,
+            'image' => 'nullable|image|max:1024|mimes:jpg,png,tiff,jpeg',
+        ], [
+            'fname.required' => 'First name is required',
+            'lname.required' => 'Last name is required',
+            'email.unique' => 'Email already exists',
+            'phone.required' => 'Phone number is required',
+            'phone.regex' => 'Phone number must be 10 digits',
+            'phone.unique' => 'Phone number already exists',
+            'image.image' => 'Your file must be an image file type',
+            'image.max' => 'Image file must not exceed 1 Megabyte',
+            'image.mimes' => 'Your file must be type of jpg, jpeg, png, tiff'
+        ]);
+
+        $updateData = [
+            'first_name' => $request->fname,
+            'last_name' => $request->lname,
+            'phone' => $request->phone,
+            'email' => $request->email,
+            'gender' => $request->gender,
+        ];
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            $imageDestinationPath = public_path('assets/img/profile');
+
+            if (!file_exists($imageDestinationPath)) {
+                mkdir($imageDestinationPath, 0755, true);
+            }
+
+            if ($userInfo->image && file_exists($imageDestinationPath.'/'.$userInfo->image)) {
+                unlink($imageDestinationPath.'/'.$userInfo->image);
+            }
+
+            $image->move($imageDestinationPath, $imageName);
+            $updateData['image'] = $imageName;
+        }
+
+        $userInfo->update($updateData);
+
+        Alert()->toast('User account updated successfully', 'success');
+        return to_route('admin.account.edit', ['user' => $user]);
     }
 
      private function scanFileForViruses($file): array

@@ -185,7 +185,7 @@
                                 @forelse ($students as $student)
                                 <tr>
                                     <td class="text-uppercase">
-                                        {{ strtoupper($student->first_name.' '.$student->middle_name.' '.$student->last_name) }}
+                                        {{ strtoupper($student->first_name.' '.$student->middle_name.' '.$student->last_name) }} - {{strtoupper($student->class_code)}}
                                     </td>
                                     <td class="text-center">
                                         <a href="{{ route('students.profile', ['student' => Hashids::encode($student->id)]) }}"
@@ -276,23 +276,27 @@
         }
         .table-responsive td {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            text-align: right;
-            padding-left: 50%;
+            justify-content: center; /* Changed from space-between to center */
+            align-items: center; /* Uncommented and added to center vertically */
+            text-align: center;
+            padding-left: 15px; /* Changed from 50% to 15px */
             position: relative;
             border-bottom: 1px solid #f1f1f1;
+            width: 100%; /* Added to ensure full width */
         }
         .table-responsive td::before {
-            content: attr(data-label);
-            position: absolute;
-            left: 15px;
-            font-weight: bold;
-            text-align: left;
+            display: none; /* Removed the data-label pseudo-element */
         }
         .btn-group {
             display: flex;
             gap: 5px;
+            justify-content: center; /* Center the buttons */
+            width: 100%;
+        }
+
+        /* Additional rule for the action button cell */
+        .table-responsive td.text-center {
+            justify-content: center;
         }
     }
 </style>

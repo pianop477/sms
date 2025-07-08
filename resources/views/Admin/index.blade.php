@@ -119,6 +119,7 @@
                                             @if ($user->status == 1)
                                             <td>
                                                 <ul class="d-flex justify-content-center">
+                                                    <li class="mr-3"><a href="{{route('admin.account.edit', ['user' => Hashids::encode($user->id)])}}" class="text-primary"><i class="ti-eye"></i></a></li>
                                                     <li class="mr-3">
                                                         <form action="{{route('admin.account.block', ['user' => Hashids::encode($user->id)])}}" method="POST">
                                                             @csrf

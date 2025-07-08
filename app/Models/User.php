@@ -26,10 +26,11 @@ class User extends Authenticatable
         'usertype',
         'password',
         'school_id',
-        'status'
+        'status',
+        'image'
     ];
 
-    protected $guarded = ['id'];
+    protected $guarded = ['id', 'updated_at', 'created_at'];
 
 
     /**
