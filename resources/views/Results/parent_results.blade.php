@@ -134,9 +134,9 @@
                 $defaultImagePath = public_path('assets/img/students/student.jpg');
             @endphp
             @if(file_exists($imagePath) && !is_dir($imagePath))
-                <img src="{{ $imagePath }}" width="80" class="rounded-circle">
+                <img src="{{ $imagePath }}" width="80" class="rounded-circle" style="border-radius: 10px">
             @else
-                <img src="{{ $defaultImagePath }}" width="80" class="rounded-circle">
+                <img src="{{ $defaultImagePath }}" width="80" class="rounded-circle" style="border-radius: 10px">
             @endif
         </td>
     </tr>
