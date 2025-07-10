@@ -19,12 +19,12 @@
                         <div class="text-center">
                             @if ($teachers->image == NULL)
                                 @if ($teachers->gender == 'male')
-                                    <img src="{{asset('assets/img/profile/avatar.jpg')}}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
+                                    <img src="{{asset('assets/img/profile/avatar.jpg')}}" alt="" class="profile-user img img-fluid rounded-circle" width="300px" height="300px">
                                 @else
-                                    <img src="{{asset('assets/img/profile/avatar-female.jpg')}}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
+                                    <img src="{{asset('assets/img/profile/avatar-female.jpg')}}" alt="" class="profile-user img img-fluid rounded-circle" width="300px" height="300px">
                                 @endif
                             @else
-                                <img src="{{asset('assets/img/profile/'. $teachers->image)}}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
+                                <img src="{{asset('assets/img/profile/'. $teachers->image)}}" alt="" class="profile-user img img-fluid rounded-circle" width="300px" height="300px">
                             @endif
                         </div>
                         <h6 class="profile-username text-center text-primary text-uppercase">

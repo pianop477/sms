@@ -6,22 +6,22 @@
             {{-- Header Section --}}
             <div class="row align-items-center border-bottom pb-3 mb-3">
                 <div class="col-md-2">
-                    <img src="{{ asset('assets/img/logo/' .$schoolInfo->logo) }}" alt="School Logo" width="70">
+                    <img src="{{ asset('assets/img/logo/' .$schoolInfo->logo) }}" alt="School Logo" width="80">
                 </div>
                 <div class="col-md-8 text-center">
                     <h4 class="mb-1 text-uppercase">{{_('the united republic of tanzania')}}</h4>
                     <h4 class="mb-1 text-uppercase">{{_('president office - tamisemi')}}</h4>
                     <h5 class="mb-1 text-uppercase">{{$schoolInfo->school_name}}</h5>
                     <h6 class="mb-1 text-capitalize">{{$schoolInfo->postal_address}}, {{$schoolInfo->postal_name}} - {{$schoolInfo->country}}</h6>
-                    <h6 class="pt-3 text-capitalize">Student's Progress Report</h6>
-                    <p class="mb-0 text-center text-capitalize">Report Title: <strong>{{ $reports->title }} - {{\Carbon\Carbon::parse($reports->created_at)->format('d/m/Y')}}</strong></p>
+                    <h6 class="pt-3 text-capitalize">Student's Academic Report</h6>
+                    <p class="mb-0 text-center text-capitalize"><strong>{{ $reports->title }} Report - {{\Carbon\Carbon::parse($reports->created_at)->format('d/m/Y')}}</strong></p>
                 </div>
                 <div class="col-md-2">
                     @if($student->image == null)
-                        <img src="{{ asset('assets/img/students/student.jpg') }}" alt="Student" width="70" class="rounded-circle">
+                        <img src="{{ asset('assets/img/students/student.jpg') }}" alt="Student" width="300px" height="300px" class="rounded-circle">
                         <p class="text-muted">Student Photo</p>
                     @else
-                    <img src="{{asset('assets/img/students/' . $student->image)}}" alt="Student" width="70" class="rounded-circle">
+                    <img src="{{asset('assets/img/students/' . $student->image)}}" alt="Student" width="300px" height="300px" class="rounded-circle">
                     <p class="text-muted">Student Photo</p>
                     @endif
                 </div>

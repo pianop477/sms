@@ -120,7 +120,7 @@
 <table class="header">
     <tr>
         <td width="15%">
-            <img src="{{ public_path('assets/img/logo/'.$results->first()->logo) }}" alt="Logo" width="70">
+            <img src="{{ public_path('assets/img/logo/'.$results->first()->logo) }}" alt="Logo" width="80">
         </td>
         <td width="70%" class="school-info">
             <h3 style="margin:0; padding:0;">THE UNITED REPUBLIC OF TANZANIA</h3>
@@ -134,9 +134,9 @@
                 $defaultImagePath = public_path('assets/img/students/student.jpg');
             @endphp
             @if(file_exists($imagePath) && !is_dir($imagePath))
-                <img src="{{ $imagePath }}" width="70" class="rounded-circle">
+                <img src="{{ $imagePath }}" width="300px" height="300px" class="rounded-circle">
             @else
-                <img src="{{ $defaultImagePath }}" width="70" class="rounded-circle">
+                <img src="{{ $defaultImagePath }}" width="300px" height="300px" class="rounded-circle">
             @endif
         </td>
     </tr>
@@ -144,8 +144,8 @@
 <table class="report-header">
     <tr>
         <td>
-            <h5 style="margin:5px 0; padding:0;">STUDENT'S PROGRESS REPORT</h5>
-            <h5 style="margin:0; padding:0;"> {{ strtoupper($results->first()->exam_type) }} - {{ \Carbon\Carbon::parse($date)->format('d/m/Y')  }}</h5>
+            <h5 style="margin:5px 0; padding:0;">STUDENT'S ACADEMIC REPORT</h5>
+            <h5 style="margin:0; padding:0;"> {{ strtoupper($results->first()->exam_type) }} Report - {{ \Carbon\Carbon::parse($date)->format('d/m/Y')  }}</h5>
         </td>
     </tr>
 </table>
