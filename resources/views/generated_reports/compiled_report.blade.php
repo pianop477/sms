@@ -132,9 +132,9 @@
         </td>
         <td width="15%" align="right">
             @if($students->image == null)
-                <img src="{{ public_path('assets/img/students/student.jpg') }}" width="80" class="rounded-circle">
+                <img src="{{ public_path('assets/img/students/student.jpg') }}" width="80" class="rounded-circle" style="border-radius: 10px">
             @else
-                <img src="{{ public_path('assets/img/students/' . $students->image) }}" width="80" class="rounded-circle">
+                <img src="{{ public_path('assets/img/students/' . $students->image) }}" width="80" class="rounded-circle" style="border-radius: 10px">
             @endif
         </td>
     </tr>
