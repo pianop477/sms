@@ -44,7 +44,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 15px;
-            font-size: 12px;
+            font-size: 11px;
         }
         .report-table th, .report-table td {
             border: 1px solid #ddd;
@@ -122,7 +122,7 @@
 <table class="header">
     <tr>
         <td width="15%">
-            <img src="{{ public_path('assets/img/logo/' . $schoolInfo->logo) }}" alt="Logo" width="70">
+            <img src="{{ public_path('assets/img/logo/' . $schoolInfo->logo) }}" alt="Logo" width="80">
         </td>
         <td width="70%" class="school-info">
             <h3 style="margin:0; padding:0;">THE UNITED REPUBLIC OF TANZANIA</h3>
@@ -132,9 +132,9 @@
         </td>
         <td width="15%" align="right">
             @if($students->image == null)
-                <img src="{{ public_path('assets/img/students/student.jpg') }}" width="70" class="rounded-circle">
+                <img src="{{ public_path('assets/img/students/student.jpg') }}" width="300px" height="300px" class="rounded-circle">
             @else
-                <img src="{{ public_path('assets/img/students/' . $students->image) }}" width="70" class="rounded-circle">
+                <img src="{{ public_path('assets/img/students/' . $students->image) }}" width="300px" height="300px" class="rounded-circle">
             @endif
         </td>
     </tr>
@@ -142,8 +142,8 @@
 <table class="report-header">
     <tr>
         <td>
-            <h5 style="margin:5px 0; padding:0;">STUDENT'S PROGRESS REPORT</h5>
-            <h5 style="margin:0; padding:0;"> {{ $reports->title }} - {{ \Carbon\Carbon::parse($reports->created_at)->format('d/m/Y') }}</h5>
+            <h5 style="margin:5px 0; padding:0;">STUDENT'S ACADEMIC REPORT</h5>
+            <h5 style="margin:0; padding:0;"> {{ $reports->title }} Report - {{ \Carbon\Carbon::parse($reports->created_at)->format('d/m/Y') }}</h5>
         </td>
     </tr>
 </table>
@@ -188,7 +188,7 @@
         <tbody>
             @foreach ($finalData as $subject)
                 <tr>
-                    <td class="subject-name" style="text-transform: capitalize">{{ ucwords(strtolower($subject['subjectName'])) }} <span class="" style="text-transform: uppercase">({{ ucwords(strtoupper($subject['subjectCode'])) }})</span></td>
+                    <td class="subject-name" style="text-transform: capitalize">{{ ucwords(strtolower($subject['subjectName'])) }} <br> <span class="" style="text-transform: uppercase">({{ ucwords(strtoupper($subject['subjectCode'])) }})</span></td>
                     <td class="teacher-name">{{ucwords(strtolower($subject['teacher']))}}</td>
                      @foreach($examHeaders as $exam)
                         <td class="exam-score text-center">{{ $subject['examScores'][$exam['abbr'].'_'.$exam['date']] ?? 'X' }}</td>
