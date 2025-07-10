@@ -31,7 +31,7 @@
                             <b>{{ucwords(strtolower($teachers->first_name. ' '. $teachers->last_name))}}</b>
                         </h6>
                         <p class="text-muted text-center">
-                            <b>Member ID #: <span class="text-uppercase"> {{$teachers->member_id}}</span></b>
+                            <b>ID #: <span class="text-uppercase"> {{$teachers->member_id}}</span></b>
                         </p>
                         <br>
                         <br>
