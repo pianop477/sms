@@ -18,9 +18,9 @@
                     <div class="card-body box-profile">
                         <div class="text-center">
                             @if ($students->image == Null)
-                                <img src="{{asset('assets/img/students/student.jpg')}}" alt="" class="profile-user img img-fluid rounded-circle" width="300px" height="300px">
+                                <img src="{{asset('assets/img/students/student.jpg')}}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
                             @else
-                                <img src="{{asset('assets/img/students/'. $students->image)}}" alt="" class="profile-user img img-fluid rounded-circle" width="300px" height="300px">
+                                <img src="{{asset('assets/img/students/'. $students->image)}}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
                             @endif
                         </div>
                         <h6 class="profile-username text-center text-primary text-uppercase">
@@ -34,7 +34,7 @@
                         <ul class="list-group list-group-flush mb-3">
                             <li class="list-group-item">
                                 <b>Gender</b>
-                                <span class="float-right text-capitalize">{{$students->gender[0]}}</span>
+                                <span class="float-right text-capitalize">{{$students->gender}}</span>
                             </li>
                             <li class="list-group-item">
                                 <b>Stream</b>

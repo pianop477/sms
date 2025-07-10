@@ -21,7 +21,7 @@
                         <img src="{{ asset('assets/img/students/student.jpg') }}" alt="Student" width="300px" height="300px" class="rounded-circle">
                         <p class="text-muted">Student Photo</p>
                     @else
-                    <img src="{{asset('assets/img/students/' . $student->image)}}" alt="Student" width="300px" height="300px" class="rounded-circle">
+                    <img src="{{asset('assets/img/students/' . $student->image)}}" alt="Student" width="150px" height="150px" class="rounded-circle">
                     <p class="text-muted">Student Photo</p>
                     @endif
                 </div>

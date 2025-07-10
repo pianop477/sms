@@ -132,9 +132,9 @@
         </td>
         <td width="15%" align="right">
             @if($students->image == null)
-                <img src="{{ public_path('assets/img/students/student.jpg') }}" width="300px" height="300px" class="rounded-circle">
+                <img src="{{ public_path('assets/img/students/student.jpg') }}" width="80" class="rounded-circle">
             @else
-                <img src="{{ public_path('assets/img/students/' . $students->image) }}" width="300px" height="300px" class="rounded-circle">
+                <img src="{{ public_path('assets/img/students/' . $students->image) }}" width="80" class="rounded-circle">
             @endif
         </td>
     </tr>
@@ -188,7 +188,7 @@
         <tbody>
             @foreach ($finalData as $subject)
                 <tr>
-                    <td class="subject-name" style="text-transform: capitalize">{{ ucwords(strtolower($subject['subjectName'])) }} <br> <span class="" style="text-transform: uppercase">({{ ucwords(strtoupper($subject['subjectCode'])) }})</span></td>
+                    <td class="subject-name" style="text-transform: capitalize">{{ ucwords(strtolower($subject['subjectName'])) }} <span class="" style="text-transform: uppercase">({{ ucwords(strtoupper($subject['subjectCode'])) }})</span></td>
                     <td class="teacher-name">{{ucwords(strtolower($subject['teacher']))}}</td>
                      @foreach($examHeaders as $exam)
                         <td class="exam-score text-center">{{ $subject['examScores'][$exam['abbr'].'_'.$exam['date']] ?? 'X' }}</td>
