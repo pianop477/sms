@@ -174,11 +174,11 @@
             margin-right: 10px;
         }
         /* Clear floats */
-        /* footer:after {
+        footer:after {
             content: "";
             display: table;
             clear: both;
-        } */
+        }
     </style>
 </head>
 <body>
