@@ -179,9 +179,6 @@
             display: table;
             clear: both;
         }
-        .page-number:before {
-            content: "Page " counter(page);
-        }
     </style>
 </head>
 <body>
