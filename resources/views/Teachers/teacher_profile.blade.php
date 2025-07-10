@@ -19,12 +19,12 @@
                         <div class="text-center">
                             @if ($teachers->image == NULL)
                                 @if ($teachers->gender == 'male')
-                                    <img src="{{asset('assets/img/profile/avatar.jpg')}}" alt="" class="profile-user img img-fluid rounded-circle" width="300px" height="300px">
+                                    <img src="{{asset('assets/img/profile/avatar.jpg')}}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
                                 @else
-                                    <img src="{{asset('assets/img/profile/avatar-female.jpg')}}" alt="" class="profile-user img img-fluid rounded-circle" width="300px" height="300px">
+                                    <img src="{{asset('assets/img/profile/avatar-female.jpg')}}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
                                 @endif
                             @else
-                                <img src="{{asset('assets/img/profile/'. $teachers->image)}}" alt="" class="profile-user img img-fluid rounded-circle" width="300px" height="300px">
+                                <img src="{{asset('assets/img/profile/'. $teachers->image)}}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
                             @endif
                         </div>
                         <h6 class="profile-username text-center text-primary text-uppercase">
@@ -38,7 +38,7 @@
                         <ul class="list-group list-group-flush mb-3">
                             <li class="list-group-item">
                                 <b>Gender</b>
-                                <span class="float-right text-capitalize">{{$teachers->gender[0]}}</span>
+                                <span class="float-right text-capitalize">{{$teachers->gender}}</span>
                             </li>
                             <li class="list-group-item">
                                 <b>Job Title</b>
