@@ -20,7 +20,9 @@ class Contract extends Model
         'status',
         'approved_at',
         'applied_at',
-        'remarks'
+        'remarks',
+        'verify_token',
+        'qr_code_path',
     ];
 
     protected $dates = [

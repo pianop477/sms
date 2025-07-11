@@ -82,7 +82,7 @@
                                                                         <p class="text-center text-danger">Applicant Details</p>
                                                                         <ul class="list-group">
                                                                             <li class="list-group-item text-capitalize">Applicant Name: <strong>{{$row->first_name}} {{$row->last_name}}</strong> - Gender: <strong>{{$row->gender}}</strong></li>
-                                                                            <li class="list-group-item text-capitalize">Member ID: <strong>{{$row->member_id}}</strong></li>
+                                                                            <li class="list-group-item text-capitalize">Member ID: <strong>{{strtoupper($row->member_id)}}</strong></li>
                                                                             <li class="list-group-item text-capitalize">Application Type: <strong>{{$row->contract_type}} Contract</strong></li>
                                                                           </ul>
                                                                     </div>
@@ -144,7 +144,7 @@
                                                                         <p class="text-center text-danger">Applicant Details</p>
                                                                         <ul class="list-group">
                                                                             <li class="list-group-item text-capitalize">Applicant Name: <strong>{{$row->first_name}} {{$row->last_name}}</strong> - Gender: <strong>{{$row->gender}}</strong></li>
-                                                                            <li class="list-group-item text-capitalize">Member ID: <strong>{{$row->member_id}}</strong></li>
+                                                                            <li class="list-group-item text-capitalize">Member ID: <strong>{{strtoupper($row->member_id)}}</strong></li>
                                                                             <li class="list-group-item text-capitalize">Application Type: <strong>{{$row->contract_type}} Contract</strong></li>
                                                                           </ul>
                                                                     </div>
@@ -167,7 +167,7 @@
                                                                     </div>
                                                             </div>
                                                                 <div class="modal-footer">
-                                                                <button type="button" class="btn" data-dismiss="modal">Close</button>
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                                                 <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to reject this request?')">Reject</button>
                                                             </form>
                                                             </div>

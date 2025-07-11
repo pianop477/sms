@@ -17,10 +17,59 @@
             text-transform: uppercase;
             line-height: 1px;
         }
-        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0 30px; }
-        .footer { position: fixed; bottom: 0; width: 100%; text-align: center; font-size: 12px; }
-        .content { margin-top: 30px; }
+        body { font-family: "DejaVu Sans", "Times New Roman", serif;}
+        .container { border-bottom: 1px solid #000; padding-bottom: 10px; margin-bottom: 20px;  }
         .signature { margin-top: 50px; text-align: center; }
+
+        .qr-wrapper {
+            position: absolute;
+            right: 1cm;
+            bottom: 1cm;
+            text-align: center;
+            font-size: 7pt;
+        }
+
+        .qr-wrapper img {
+            width: 90px;
+            height: 90px;
+            border: 1px solid #ccc;
+        }
+
+        .validation-text {
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 15px;
+            font-size: 10px;
+            border-top: 1px solid #ddd;
+            padding: 4px 15px;
+            text-align: center;
+            background-color: white; /* Hakikisha footer ina background */
+            z-index: 1000; /* Hakikisha footer iko juu ya content */
+        }
+        footer .page-number:after {
+            /* content: "Page " counter(page); */
+        }
+        footer .copyright {
+            float: left;
+            margin-left: 10px;
+        }
+        footer .printed {
+            float: right;
+            margin-right: 10px;
+        }
+        /* Clear floats */
+        footer:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
     </style>
 </head>
 <body>
@@ -62,14 +111,23 @@
     <!-- Signature Section -->
     <div class="signature">
         <p>Sincerely,</p>
-        <p><strong>{{ $contract['authorized_person_name'] ?? 'Authorized Representative' }}</strong></p>
-        <p>Position: <strong>{{ $contract['authorized_person_position'] ?? 'Manager' }}</strong></p>
-        <p style="text-transform: capitalize"><strong>{{ $contract['school_name'] }}</strong></p>
+        <p><strong>{{ $contract['authorized_person_name'] ?? 'AUTHORIZED REPRESENTATIVE' }}</strong></p>
+        {{-- <p>Position: <strong>{{ $contract['authorized_person_position'] ?? 'Manager' }}</strong></p> --}}
+    </div>
+
+    <div class="qr-wrapper">
+        <img src="{{ $qrImage }}" alt="QR Code">
+        <div class="validation-text">Scan to verify</div>
     </div>
 
     <!-- Footer -->
-    <div class="footer">
-        <p>&copy; {{ now()->year }} <span style="text-transform: capitalize">{{ $contract['school_name'] }}</span>. All rights reserved.</p>
-    </div>
+    <footer>
+        <span class="copyright">
+        &copy; {{ ucwords(strtolower(Auth::user()->school->school_name)) }} – {{ date('Y') }}
+        </span>
+        <span class="printed">
+        Printed at: {{ now()->format('d-M-Y H:i') }}
+        </span>
+    </footer>
 </body>
 </html>

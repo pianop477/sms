@@ -39,7 +39,7 @@
                     </div>
                 @else
                     <div class="alert alert-success alert-dismissible fade show">
-                        <strong>Contract Status:</strong> Active (Expires: {{ $contract->end_date->format('d/m/Y') }}) |
+                        <strong>Contract Status:</strong> Active (Expires at: {{ $contract->end_date }}) |
                         <a href="{{route('contract.index')}}" class="alert-link">View contract</a>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
@@ -617,7 +617,7 @@
                     </div>
                 @else
                     <div class="alert alert-success alert-dismissible fade show">
-                        <strong>Contract Status:</strong> Active (Expires: {{ $contract->end_date->format('d/m/Y') }}) |
+                        <strong>Contract Status:</strong> Active (Expires at: {{$contract->end_date }}) |
                         <a href="{{route('contract.index')}}" class="alert-link">View contract</a>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
@@ -1167,7 +1167,7 @@
                     </div>
                 @else
                     <div class="alert alert-success alert-dismissible fade show">
-                        <strong>Contract Status:</strong> Active (Expires: {{ $contract->end_date->format('d/m/Y') }}) |
+                        <strong>Contract Status:</strong> Active (Expires at: {{$contract->end_date}}) |
                         <a href="{{route('contract.index')}}" class="alert-link">View contract</a>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
@@ -1531,7 +1531,7 @@
                 </div>
             @else
                 <div class="alert alert-success alert-dismissible fade show">
-                    <strong>Contract Status:</strong> Active (Expires: {{ $contract->end_date->format('d/m/Y') }}) |
+                    <strong>Contract Status:</strong> Active (Expires at: {{ $contract->end_date }}) |
                     <a href="{{route('contract.index')}}" class="alert-link">View contract</a>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>

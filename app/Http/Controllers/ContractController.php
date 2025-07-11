@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Contract;
 use App\Models\Teacher;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -13,6 +14,8 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use RealRashid\SweetAlert\Facades\Alert;
 use Vinkla\Hashids\Facades\Hashids;
+use Illuminate\Support\Str;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ContractController extends Controller
 {
@@ -186,8 +189,8 @@ class ContractController extends Controller
         ], [
             'contract_type.required' => 'Select Contract type',
             'application_letter.required' => 'Application letter is required',
-            'application_letter.mimes' => 'Application letter must be a PDF file',
-            'application_letter.max' => 'Application letter must not exceed 512 KB',
+            'application_letter.mimes' => 'Application letter file must be a PDF file',
+            'application_letter.max' => 'Application letter file must not exceed 512 KB',
         ]);
 
         // scan image file for virus
@@ -351,6 +354,8 @@ class ContractController extends Controller
 
         $approved_at = Carbon::now();
         $endDate = $approved_at->copy()->addMonth($request->duration);
+        $token = (string) Str::uuid(); // Generate a unique UUID for verification
+        $qrPath = 'contracts/qr_codes/' . time() . '.png';
 
         $contract->update([
             'status' => $request->input('status', 'approved'),
@@ -359,6 +364,8 @@ class ContractController extends Controller
             'approved_at' => $approved_at,
             'duration' => $request->input('duration'),
             'remarks' => $request->input('remark'),
+            'verify_token' => $token,
+            'qr_code_path' => $qrPath,
         ]);
 
         // Alert::success('Done', 'The request has been approved successfully');
@@ -461,9 +468,46 @@ class ContractController extends Controller
             return redirect()->back();
         }
 
-        $pdf = \PDF::loadView('Contract.contract_file', compact('contract'));
-        return $pdf->stream('Report.pdf');
+        $qrPayload = route('contracts.verify', $contract->verify_token);
+
+        $qrSvg = QrCode::format('svg')      // ← SVG haina utegemezi wa imagick
+             ->size(150)
+             ->margin(1)
+             ->generate($qrPayload);
+
+        $qrImage = 'data:image/svg+xml;base64,' . base64_encode($qrSvg);
+
+        $pdf = Pdf::loadView('Contract.contract_file', [
+            'contract'  => $contract,
+            'qrImage'   => $qrImage,
+            'verifyUrl' => $qrPayload,
+        ]);
+
+        return $pdf->stream('Contract_' . $contract->member_id . '.pdf');
     }
+
+    public function verify($token)
+    {
+        $contract = Contract::query()
+                        ->join('teachers', 'teachers.id', '=', 'contracts.teacher_id')
+                        ->join('schools', 'schools.id', '=', 'contracts.school_id')
+                        ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+                        ->select(
+                            'contracts.*', 'teachers.member_id', 'users.first_name', 'users.last_name',
+                            'schools.school_name'
+                        )
+                        ->where('verify_token', $token)
+                        ->first();
+
+        if (! $contract) {
+            abort(404, 'Contract not found');
+        }
+
+        return view('Contract.verify', [
+            'contract' => $contract,
+        ]);
+    }
+
 
     private function scanFileForViruses($file): array
     {
