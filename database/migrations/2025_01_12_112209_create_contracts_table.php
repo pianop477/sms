@@ -26,6 +26,8 @@ return new class extends Migration
             $table->timestamp('approved_at')->nullable();
             $table->timestamp('applied_at')->nullable();
             $table->string('remarks')->nullable();
+            $table->uuid('verify_token')->nullable()->unique();
+            $table->string('qr_code_path')->nullable();
             $table->timestamps();
         });
     }

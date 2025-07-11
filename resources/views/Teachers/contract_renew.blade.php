@@ -65,7 +65,7 @@
                             <table class="table table-hover progress-table" id="myTable">
                                 <thead class="text-capitalize">
                                     <th scope="col">#</th>
-                                    <th scope="col">Contract Type</th>
+                                    <th scope="col">Application Type</th>
                                     <th scope="col">Applied_at</th>
                                     <th scope="col">Updated_at</th>
                                     <th scope="col">Status</th>

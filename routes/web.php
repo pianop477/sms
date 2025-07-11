@@ -71,7 +71,8 @@ Auth::routes();
 // ROUTES ACCESS FOR USERS TO SEND FEEDBACK TO THE SYSTEM AND GET SUPPORT ================================================================
     Route::post('/Feedback', [SendMessageController::class, 'store'])->name('send.feedback.message');
 
-
+//ROUTES ACCESS TO SCAN AND VERIFY QR CODE FOR CONTRACTS =========================================================
+    Route::get('/contracts/verify/{token}', [ContractController::class, 'verify'])->name('contracts.verify');
 
 // MIDDLEWARE FILTERING STARTS HERE **************************************************************************************
 Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 'block.ip', 'user.agent')->group(function () {

@@ -32,7 +32,7 @@
                             <tbody>
                                 @foreach ($allContracts as $row )
                                     <tr class="text-center">
-                                        <td>{{$row->member_id}}</td>
+                                        <td>{{strtoupper($row->member_id)}}</td>
                                         <td class="text-capitalize">{{$row->first_name. ' '. $row->last_name}}</td>
                                         <td class="text-capitalize">{{$row->contract_type}}</td>
                                         <td class="text-capitalize">
