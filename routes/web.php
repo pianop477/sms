@@ -3,6 +3,8 @@ use App\Exports\StudentsExport;
 use App\Exports\TeachersExport;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\CertificateGeneratorController;
+use App\Http\Controllers\CertificateTemplateController;
 use App\Http\Controllers\ClassesController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\CoursesController;
@@ -74,6 +76,8 @@ Auth::routes();
 //ROUTES ACCESS TO SCAN AND VERIFY QR CODE FOR CONTRACTS =========================================================
     Route::get('/contracts/verify/{token}', [ContractController::class, 'verify'])->name('contracts.verify');
 
+    Route::get('cert/verify/{token}', [CertificateGeneratorController::class,'show'])->name('cert.verify');
+
 // MIDDLEWARE FILTERING STARTS HERE **************************************************************************************
 Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 'block.ip', 'user.agent')->group(function () {
 
@@ -123,6 +127,10 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('{user}/Delete-admin-accounts', [UsersController::class, 'deleteAdminAccount'])->name('admin.account.destroy');
         Route::get('{user}/Edit-admin-accounts', [UsersController::class, 'editAdminAccount'])->name('admin.account.edit');
         Route::put('{user}/Update-admin-accounts', [UsersController::class, 'updateAdminAccount'])->name('admin.account.update');
+
+        //certificates templates
+        Route::resource('templates', App\Http\Controllers\CertificateTemplateController::class)->except(['show']);
+        Route::get('templates/{template}/file', [CertificateTemplateController::class, 'file'])->name('templates.file');
     });
 
     //1. SHARED ROUTES ACCESS MANAGER/HEAD TEACHER/ACADEMIC =======================================
@@ -165,7 +173,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('Graduate-student', [StudentsController::class, 'callGraduateStudents'])->name('graduate.students');
         Route::get('Graduate-students/year/{year}', [StudentsController::class, 'graduatedStudentByYear'])->name('graduate.student.by.year');
         Route::get('Export-graduate-students/year/{year}', [StudentsController::class, 'exportGraduateStudents'])->name('graduate.students.export');
-        Route::get('/graduate-students/{year}', [StudentsController::class, 'graduatedStudentByYear'])->name('graduate.students.by.year');
+        Route::get('/graduate-students', [StudentsController::class, 'graduatedStudentByYear'])->name('graduate.students.by.year');
         Route::put('graduate-students/revert/year/{year}', [StudentsController::class, 'revertStudentBatch'])->name('revert.student.batch');
         Route::post('{student}/Delete-student', [StudentsController::class, 'destroy'])->name('Students.destroy');
         Route::get('Student-trash', [StudentsController::class, 'studentTrashList'])->name('students.trash');

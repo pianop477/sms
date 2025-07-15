@@ -361,7 +361,7 @@ class StudentsController extends Controller
 
             $student->save();
             Alert()->toast('Student records updated successfully', 'success');
-            return redirect()->route('teacher.student.profile', Hashids::encode($student->id));
+            return redirect()->route('manage.student.profile', Hashids::encode($student->id));
 
     }
 
@@ -589,13 +589,6 @@ class StudentsController extends Controller
         return back();
     }
 
-    //call graduate batch group by time updated ************************************************
-    public function callGraduateBatch()
-    {
-        $user = Auth::user();
-
-    }
-
     //call graduate class list by year updated_at ****************************************************************
     public function callGraduateStudents()
     {
@@ -612,7 +605,7 @@ class StudentsController extends Controller
     }
 
     //show graduated students in a specific year **************************************************************
-    public function graduatedStudentByYear($year)
+    public function graduatedStudentByYear()
     {
         $user = Auth::user();
 
@@ -624,7 +617,7 @@ class StudentsController extends Controller
                             ->distinct()
                             ->orderBy('year', 'DESC')
                             ->pluck('year');
-
+        // dd($graduationYears);
         // Get students for the selected year
         $GraduatedStudents = Student::query()
                                     ->join('schools', 'schools.id', '=', 'students.school_id')
@@ -632,11 +625,11 @@ class StudentsController extends Controller
                                     ->where('school_id', $user->school_id)
                                     ->where('students.graduated', true)
                                     ->where('students.status', 0)
-                                    ->whereYear('students.graduated_at', $year)
+                                    // ->whereYear('students.graduated_at', $graduationYears)
                                     ->orderBy('students.first_name')
                                     ->get();
 
-        return view('Students.graduate_students_list', compact('GraduatedStudents', 'year', 'graduationYears'));
+        return view('Students.graduate_students_list', compact('GraduatedStudents', 'graduationYears'));
     }
 
     //export graduated students in a specific year**********************************************************
