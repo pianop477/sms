@@ -64,7 +64,7 @@
                                         <a href="{{route('attendance.fill.form')}}"><i class="fas fa-calendar-check"></i><span> Attendance</span></a>
                                     </li>
                                     <li><a href="{{route('package.byYear')}}"><i class="fas fa-layer-group"></i> Holiday Packages</a></li>
-                                    <li><a href="{{route('graduate.students')}}"><i class="fas fa-graduation-cap"></i> Graduate Students</a></li>
+                                    <li><a href="{{route('graduate.students.by.year')}}"><i class="fas fa-graduation-cap"></i> Graduate Students</a></li>
                                 </ul>
                             </li>
                             <li>

@@ -50,19 +50,21 @@
                             <p class="mb-0">
                             <i class="fas fa-users"></i> Graduated Students ({{ $batchStudents->count() }})
                             </p>
-                            <form action="{{route('revert.student.batch', ['year' => $gradYear])}}" method="POST" id="revertForm-{{$gradYear}}">
-                                @csrf
-                                @method('PUT')
-                                <button type="button" class="btn btn-warning btn-xs p-1" style="border-radius: 8px;"
-                                        onclick="if(confirm('Are you sure you want to revert this batch?')) { document.getElementById('revertForm-{{$gradYear}}').submit(); }">
-                                    <i class="fas fa-refresh"></i>
-                                    Revert
-                                </button>
-                            </form>
+                            <div class="float-right mr-3">
+                                <form action="{{route('revert.student.batch', ['year' => $gradYear])}}" method="POST" id="revertForm-{{$gradYear}}">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="button" class="btn btn-warning btn-xs p-1" style="border-radius: 8px;"
+                                            onclick="if(confirm('Are you sure you want to revert this batch?')) { document.getElementById('revertForm-{{$gradYear}}').submit(); }">
+                                        <i class="fas fa-refresh"></i>
+                                        Revert
+                                    </button>
+                                </form>
+                            </div>
                             <a href="{{ route('graduate.students.export', ['year' => $gradYear]) }}"
-                            target="_blank"
-                            class="btn btn-success btn-xs" style="border-radius: 8px;">
-                            <i class="fas fa-file-pdf"></i> PDF
+                                target="_blank"
+                                class="btn btn-success btn-xs float-right" style="border-radius: 8px;">
+                                <i class="fas fa-file-pdf"></i> PDF
                             </a>
                         </div>
                         <table class="table table-sm table-responsive-md table-striped table-hover mb-0">
