@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ResultsExport;
 use App\Models\compiled_results;
 use App\Models\Examination;
 use App\Models\Examination_result;
@@ -26,6 +27,7 @@ use RealRashid\SweetAlert\Facades\Alert as FacadesAlert;
 use RealRashid\SweetAlert\Facades\Alert;
 use Vinkla\Hashids\Facades\Hashids;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ResultsController extends Controller
 {
@@ -539,7 +541,7 @@ class ResultsController extends Controller
     }
 
 
-    public function resultsByMonth($school, $year, $class, $examType, $month, $date)
+    public function resultsByMonth($school, $year, $class, $examType, $month, $date, Request $request)
     {
         $school_id = Hashids::decode($school);
         $class_id = Hashids::decode($class);
@@ -722,6 +724,25 @@ class ResultsController extends Controller
 
             return $grades;
         });
+
+        if ($request->has('export_excel')) {
+            return Excel::download(
+                new ResultsExport(
+                    $results,
+                    $totalUniqueStudents,
+                    $sumOfCourseAverages,
+                    $generalClassAvg,
+                    $totalFemaleGrades,
+                    $totalMaleGrades,
+                    $sortedStudentsResults,
+                    $sortedCourses,
+                    $subjectGradesByGender,
+                    $date,
+                    $courses
+                ),
+                'exam_results.xlsx'
+            );
+        }
 
 
         // Generate the PDF
