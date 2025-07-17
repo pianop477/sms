@@ -536,8 +536,10 @@ class ResultsController extends Controller
                 ];
             });
         });
+        $classes = Grade::find($class_id[0]);
+        $exams = Examination::find($exam_id[0]);
 
-        return view('Results.months_by_exam_type', compact('schools', 'results', 'year', 'class_id', 'exam_id', 'groupedByMonth'));
+        return view('Results.months_by_exam_type', compact('schools', 'results', 'year', 'classes', 'exams', 'class_id', 'exam_id', 'groupedByMonth'));
     }
 
 
@@ -738,9 +740,9 @@ class ResultsController extends Controller
                     $sortedCourses,
                     $subjectGradesByGender,
                     $date,
-                    $courses
+                    $courses,
                 ),
-                'exam_results.xlsx'
+                'examination results.xlsx'
             );
         }
 

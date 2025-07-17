@@ -13,9 +13,14 @@
         }
     </style>
         <div class="col-md-12 mt-5">
+            <div class="card col-md-12 text-center">
+                <div class="card-body">
+                    <h5>Results for {{strtoupper($classes->class_code)}} - {{$year}}</h5>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-md-5 mt-2">
-                    <div class="card">
+                    <div class="card" style="border-top: 5px solid gold;">
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-8">
@@ -45,7 +50,7 @@
                     </div>
                 </div>
                 <div class="col-md-7 mt-2">
-                    <div class="card">
+                    <div class="card" style="border-top: 5px solid #33a4c6;">
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-8">
