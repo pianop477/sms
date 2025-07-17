@@ -76,8 +76,6 @@ Auth::routes();
 //ROUTES ACCESS TO SCAN AND VERIFY QR CODE FOR CONTRACTS =========================================================
     Route::get('/contracts/verify/{token}', [ContractController::class, 'verify'])->name('contracts.verify');
 
-    Route::get('cert/verify/{token}', [CertificateGeneratorController::class,'show'])->name('cert.verify');
-
 // MIDDLEWARE FILTERING STARTS HERE **************************************************************************************
 Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 'block.ip', 'user.agent')->group(function () {
 
@@ -127,10 +125,6 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('{user}/Delete-admin-accounts', [UsersController::class, 'deleteAdminAccount'])->name('admin.account.destroy');
         Route::get('{user}/Edit-admin-accounts', [UsersController::class, 'editAdminAccount'])->name('admin.account.edit');
         Route::put('{user}/Update-admin-accounts', [UsersController::class, 'updateAdminAccount'])->name('admin.account.update');
-
-        //certificates templates
-        Route::resource('templates', App\Http\Controllers\CertificateTemplateController::class)->except(['show']);
-        Route::get('templates/{template}/file', [CertificateTemplateController::class, 'file'])->name('templates.file');
     });
 
     //1. SHARED ROUTES ACCESS MANAGER/HEAD TEACHER/ACADEMIC =======================================
