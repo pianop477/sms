@@ -26,6 +26,8 @@ use App\Http\Controllers\TeachersController;
 use App\Http\Controllers\TimetableController;
 use App\Http\Controllers\TransportController;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\WebAuthn\WebAuthnLoginController;
+use App\Http\Controllers\WebAuthn\WebAuthnRegisterController;
 use App\Models\Attendance;
 use App\Models\Examination_result;
 use App\Models\Parents;
@@ -63,6 +65,15 @@ Route::post('login', [LoginController::class, 'login'])
             ->name('login');
 
 Auth::routes();
+
+// Show biometric login page
+Route::get('/login/biometric', [WebAuthnLoginController::class, 'show'])->name('webauthn.login');
+
+// Start WebAuthn login challenge
+Route::post('/login/biometric/options', [WebAuthnLoginController::class, 'options'])->name('webauthn.login.options');
+
+// Verify credential and login
+Route::post('/login/biometric/verify', [WebAuthnLoginController::class, 'verify'])->name('webauthn.login.verify');
 
 // ROUTE ACCESS FOR PARENTS REGISTRATION =================================================================================================
     Route::prefix('Register')->group(function () {
