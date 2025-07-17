@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ShuleApp-cache-v3.3.1'; // Ongeza version number
+const CACHE_NAME = 'ShuleApp-cache-v4.0.1'; // Ongeza version number
 const ASSETS_TO_CACHE = [
     '/manifest.json',
     '/assets/css/styles.css',
@@ -8,7 +8,7 @@ const ASSETS_TO_CACHE = [
     '/icons/icon_3.png',
     '/icons/icon_4.png',
     '/offline.html'
-].map(url => `${url}?v=3.3.1`); // Auto-add version parameter
+].map(url => `${url}?v=4.0.1`); // Auto-add version parameter
 
 // Install Event
 self.addEventListener('install', (event) => {

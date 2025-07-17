@@ -5,7 +5,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-10">
-                        <h4 class="header-title text-center text-uppercase">students generated report - {{$reports->title}} ({{$myReportData->first()->class_code}})</h4>
+                        <h4 class="header-title text-center text-uppercase">students generated report - {{$reports->title}} ({{$myReportData->first()->class_code}}) - {{$year}}</h4>
                     </div>
                     <div class="col-2">
                         <a href="{{route('results.examTypesByClass', ['school' => Hashids::encode($reports->school_id), 'year' => $year, 'class' => Hashids::encode($reports->class_id)])}}" class="float-right btn btn-info btn-xs"><i class="fas fa-arrow-circle-left"></i> Back</a>

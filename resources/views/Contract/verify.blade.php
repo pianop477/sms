@@ -218,7 +218,7 @@
                 </span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">Expires At: </span>
+                <span class="detail-label">Expire on: </span>
                 <span class="detail-value">{{$contract->end_date}}</span>
             </div>
         </div>
@@ -226,7 +226,6 @@
         <a href="{{route('welcome')}}" class="btn-ok">
             RETURN TO HOME
         </a>
-
         <div class="footer">
             &copy; {{ ucwords(strtolower($contract->school_name)) }} – {{ date('Y') }}. All rights reserved.
         </div>

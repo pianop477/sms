@@ -5,7 +5,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-10">
-                    <h4 class="header-title text-center text-uppercase">Select Month</h4>
+                    <h4 class="header-title text-center text-uppercase">{{strtoupper($classes->class_code)}} {{ucwords(strtolower($exams->exam_type))}} Results - {{$year}}</h4>
                 </div>
                 <div class="col-2">
                     <a href="{{ route('results.examTypesByClass', ['school' => Hashids::encode($schools->id), 'year' => $year, 'class' => Hashids::encode($class_id)]) }}" class="float-right btn btn-info btn-xs">
