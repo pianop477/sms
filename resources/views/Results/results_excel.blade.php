@@ -9,11 +9,11 @@
     <table>
             <tr><th>THE UNITED REPUBLIC OF TANZANIA</th></tr>
             <tr><th>THE PRESIDENT'S OFFICE - RALG</th></tr>
-            <tr><th>{{Auth::user()->school->school_name}}</th></tr>
+            <tr><th>{{strtoupper(Auth::user()->school->school_name)}}</th></tr>
     </table>
     <table>
-            <tr><th>{{$results->first()->class_name}} {{$results->first()->exam_type}} Results - {{\Carbon\Carbon::parse($date)->format('d.m.Y')}}</th></tr>
-            <tr><th style="font-weight:normal">TERM: {{$results->first()->Exam_term}}</th></tr>
+            <tr><th>{{strtoupper($results->first()->class_name)}} {{strtoupper($results->first()->exam_type)}} Results - {{\Carbon\Carbon::parse($date)->format('d.m.Y')}}</th></tr>
+            <tr><th style="font-weight:normal">TERM: {{strtoupper($results->first()->Exam_term)}}</th></tr>
             <tr><th style="font-weight:normal">NUMBER OF CANDIDATES: {{$totalUniqueStudents}}</th></tr>
             <tr><th style="font-weight:normal">CLASS AVERAGE: <strong>{{number_format($sumOfCourseAverages, 4)}}</strong>
                 @if($results->first()->marking_style == 1)
@@ -91,7 +91,7 @@
                 <th>Sex</th>
                 <th>Student Name</th>
                 @foreach ($results->groupBy('course_id')->keys() as $courseId)
-                    <th>{{ $results->firstWhere('course_id', $courseId)->course_code }}</th>
+                    <th>{{ strtoupper($results->firstWhere('course_id', $courseId)->course_code) }}</th>
                 @endforeach
                 <th>Total</th>
                 <th>Avg</th>
@@ -102,9 +102,9 @@
         <tbody>
             @foreach ($sortedStudentsResults as $studentResult)
             <tr>
-                <td>{{ $studentResult['admission_number'] }}</td>
-                <td>{{ $studentResult['gender'][0] }}</td>
-                <td>{{ $studentResult['student_name'] }}</td>
+                <td>{{ strtoupper($studentResult['admission_number']) }}</td>
+                <td>{{ strtoupper($studentResult['gender'][0]) }}</td>
+                <td>{{ ucwords(strtolower($studentResult['student_name'])) }}</td>
                 @foreach ($studentResult['courses'] as $course)
                     <td>{{ $course['score'] ?? 'X' }}</td>
                 @endforeach
@@ -131,11 +131,11 @@
         </tr>
         @foreach ($sortedCourses as $course)
         <tr>
-            <td>{{ $course['course_name'] }}</td>
-            <td>{{ $course['course_code'] }}</td>
+            <td>{{ ucwords(strtolower($course['course_name'] ))}}</td>
+            <td>{{ strtoupper($course['course_code']) }}</td>
             <td>{{ number_format($course['average_score'], 2) }}</td>
             <td>{{ $course['position'] }}</td>
-            <td>{{ $course['grade'] }}</td>
+            <td>{{ strtoupper($course['grade'] )}}</td>
         </tr>
         @endforeach
     </table>
