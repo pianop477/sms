@@ -259,12 +259,18 @@
       <p class="login-subtitle">Enter your Email to Reset Password</p>
     </div>
 
-    @if(session('error'))
-      <div style="background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 6px; border-left: 3px solid #ef4444; margin-bottom: 16px; font-size: 13px;">
+    @if(session('status'))
+      <div style="background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: 6px; border-left: 3px solid #10b981; margin-bottom: 16px; font-size: 13px;">
         <i class="fas fa-exclamation-circle" style="margin-right: 6px;"></i>
-        {{ session('error') }}
+        {{ session('status') }}
       </div>
     @endif
+    @error(('email'))
+      <div style="background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 6px; border-left: 3px solid #ef4444; margin-bottom: 16px; font-size: 13px;">
+        <i class="fas fa-exclamation-circle" style="margin-right: 6px;"></i>
+        {{ $message }}
+      </div>
+    @enderror
 
     <form id="loginForm" method="POST" action="{{ route('password.email') }}">
       @csrf

@@ -259,34 +259,48 @@
       <p class="login-subtitle">Update New Password</p>
     </div>
 
-    @if(session('error'))
+    @if(Session::has('error'))
       <div style="background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 6px; border-left: 3px solid #ef4444; margin-bottom: 16px; font-size: 13px;">
         <i class="fas fa-exclamation-circle" style="margin-right: 6px;"></i>
-        {{ session('error') }}
+        {{ Session::get('error') }}
+      </div>
+    @endif
+    @if (Session::has('success'))
+      <div style="background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: 6px; border-left: 3px solid #10b981; margin-bottom: 16px; font-size: 13px;">
+        <i class="fas fa-check-circle" style="margin-right: 6px;"></i>
+        {{ Session::get('success') }}
       </div>
     @endif
 
     <form id="loginForm" method="POST" action="{{ route('password.update') }}">
       @csrf
-
+      <input type="hidden" name="token" value="{{ $token }}">
       <div class="form-group">
         <label for="login" class="form-label">Email</label>
         <input type="text" id="login" name="email" value="{{ $email ?? old('email') }}" class="form-control" placeholder="user@example.com" required />
+        @error('email')
+          <span class="text-danger">{{$message}}</span>
+        @enderror
       </div>
-
       <div class="form-group" style="position: relative;">
         <label for="password" class="form-label">Password</label>
         <input type="password" id="password" name="password" value="{{old('password')}}" class="form-control" placeholder="••••••••" required />
         <button type="button" class="password-toggle" id="togglePassword">
           <i class="fas fa-eye"></i>
         </button>
+        @error('password')
+          <span class="text-danger">{{$message}}</span>
+        @enderror
       </div>
       <div class="form-group" style="position: relative;">
         <label for="password" class="form-label">Confirm Password</label>
-        <input type="password" id="password" name="password_confirmation" value="{{password_confirmation}}"  class="form-control" placeholder="••••••••" required />
+        <input type="password" id="password" name="password_confirmation" value="{{old('password_confirmation')}}"  class="form-control" placeholder="••••••••" required />
         <button type="button" class="password-toggle" id="togglePassword">
           <i class="fas fa-eye"></i>
         </button>
+        @error('password_confirmation')
+          <span class="text-danger">{{$message}}</span>
+        @enderror
       </div>
       <button type="submit" class="btn btn-primary" id="loginBtn">
         <span id="btnText">Reset Password</span>
