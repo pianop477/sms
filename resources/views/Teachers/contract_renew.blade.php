@@ -117,7 +117,7 @@
                                                 <td>
                                                     <ul class="d-flex justify-content-center">
                                                         <li class="mr-3"><a href="{{route('contract.edit', ['id' => Hashids::encode($row->id)])}}" class="text-primary"><i class="ti-pencil"></i></a></li>
-                                                        <li class="mr-3"><a href="{{route('contract.destroy', $row->id)}}" onclick="return confirm('Are you sure you want to delete this application?')" class="text-danger"><i class="ti-trash"></i></a></li>
+                                                        <li class="mr-3"><a href="{{route('contract.destroy', ['id' => Hashids::encode($row->id)])}}" onclick="return confirm('Are you sure you want to delete this application?')" class="text-danger"><i class="ti-trash"></i></a></li>
                                                     </ul>
                                                 </td>
                                             </tr>
