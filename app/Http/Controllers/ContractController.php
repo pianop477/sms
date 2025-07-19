@@ -255,6 +255,7 @@ class ContractController extends Controller
     public function destroy($id)
     {
         $decode = Hashids::decode($id);
+        return $decode;
         $contract = Contract::find($decode[0]);
         if(! $contract) {
             // Alert::error('Failed', 'No such contract found');
