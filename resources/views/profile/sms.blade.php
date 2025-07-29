@@ -126,17 +126,28 @@
 </div>
 
 <!-- JavaScript Section -->
-@section('scripts')
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Character Counter Logic
         const textarea = document.getElementById("message_content");
         const charCount = document.getElementById("charCount");
         const maxChars = 306;
 
+        // Initial display
+        charCount.textContent = maxChars;
+
         textarea.addEventListener("input", function () {
-            const remaining = maxChars - textarea.value.length;
+            let currentLength = textarea.value.length;
+
+            // If over limit, trim the value
+            if (currentLength > maxChars) {
+                textarea.value = textarea.value.substring(0, maxChars);
+                currentLength = maxChars;
+            }
+
+            const remaining = maxChars - currentLength;
             charCount.textContent = remaining;
+
+            // Add red text warning when remaining is less than 50
             charCount.classList.toggle("text-danger", remaining < 50);
         });
 
@@ -165,6 +176,5 @@
         });
     });
 </script>
-@endsection
 
 @endsection
