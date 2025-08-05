@@ -1503,7 +1503,7 @@ class ResultsController extends Controller
         $request->validate([
             'student_id' => 'required|integer',
             'subject_id' => 'required|integer',
-            'score' => 'required|numeric',
+            'score' => 'nullable|numeric',
         ]);
 
         // Tafuta rekodi ya alama kwenye database
