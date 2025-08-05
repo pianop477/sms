@@ -154,10 +154,10 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 15px;
+            height: 10px;
             font-size: 10px;
             border-top: 1px solid #ddd;
-            padding: 4px 15px;
+            padding: 2px 10px;
             text-align: center;
             background-color: white; /* Hakikisha footer ina background */
             z-index: 1000; /* Hakikisha footer iko juu ya content */
