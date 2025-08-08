@@ -55,7 +55,7 @@ class BiometricController extends Controller
 
         return response()->json([
             'success' => true,
-            'phone' => substr($user->phone, -2) // Last 3 digits for display
+            'phone' => substr($user->phone, -4) // Last 3 digits for display
         ]);
     }
 
