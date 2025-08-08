@@ -312,176 +312,333 @@
     <i class="fas fa-check-circle"></i>
     <span id="toastMessage">Message here</span>
   </div>
-
   <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const togglePassword = document.getElementById('togglePassword');
-    const passwordInput = document.getElementById('password');
-    const toast = document.getElementById('toast');
-    const toastMessage = document.getElementById('toastMessage');
+document.addEventListener('DOMContentLoaded', function () {
+    // Elements
+    const setupBioBtn = document.getElementById('setupBioBtn');
     const bioBtn = document.getElementById('bioBtn');
     const bioBtnText = document.getElementById('bioBtnText');
-    const setupBioBtn = document.getElementById('setupBioBtn');
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
     const loginForm = document.getElementById('loginForm');
     const loginBtn = document.getElementById('loginBtn');
 
-    // Password show/hide toggle
-    togglePassword.addEventListener('click', function () {
-      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-      passwordInput.setAttribute('type', type);
-      this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
-    });
-
-    // Toast function
-    function showToast(message, type = 'success', duration = 3000) {
-      const icon = toast.querySelector('i');
-      icon.className =
-        type === 'error'
-          ? 'fas fa-times-circle'
-          : type === 'warning'
-          ? 'fas fa-exclamation-triangle'
-          : 'fas fa-check-circle';
-
-      toastMessage.textContent = message;
-      toast.className = 'toast show';
-      setTimeout(() => {
-        toast.className = 'toast';
-      }, duration);
-    }
-
-    // Disable biometric if not supported
+    // Check WebAuthn support
     if (!window.PublicKeyCredential) {
-      bioBtn.disabled = true;
-      bioBtn.style.opacity = '0.7';
-      bioBtn.style.cursor = 'not-allowed';
-      bioBtnText.textContent = 'Biometrics Not Supported';
-      setupBioBtn.style.display = 'none';
+        bioBtn.disabled = true;
+        bioBtn.style.opacity = '0.7';
+        bioBtn.style.cursor = 'not-allowed';
+        bioBtnText.textContent = 'Biometrics Not Supported';
+        if (setupBioBtn) setupBioBtn.style.display = 'none';
     } else if (!localStorage.getItem('bio_login')) {
-      bioBtnText.textContent = 'Set Up Biometrics';
+        bioBtnText.textContent = 'Set Up Biometrics';
     }
 
-    // Setup biometrics login identifier
-    setupBioBtn.addEventListener('click', function (e) {
-      e.preventDefault();
-      const login = prompt('Enter your email or phone (same as used to register biometrics):');
-      if (!login) return;
-      localStorage.setItem('bio_login', login);
-      showToast('Biometrics setup ready!', 'success');
-      bioBtnText.textContent = 'Use Biometrics';
-    });
+    // Helper functions
+    function showToast(message, type = 'success', duration = 3000) {
+        const icon = toast.querySelector('i');
+        icon.className = type === 'error' ? 'fas fa-times-circle' :
+                        type === 'warning' ? 'fas fa-exclamation-triangle' :
+                        'fas fa-check-circle';
 
-    // Convert Base64URL to Uint8Array helper
-    function base64urlToUint8Array(base64urlString) {
-      const base64 = base64urlString.replace(/-/g, '+').replace(/_/g, '/')
-        .padEnd(Math.ceil(base64urlString.length / 4) * 4, '=');
-      const binaryString = window.atob(base64);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
-      return bytes;
+        toastMessage.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), duration);
     }
 
-    // Convert Uint8Array to Base64URL helper
+    function base64urlToUint8Array(base64url) {
+        const padding = '='.repeat((4 - (base64url.length % 4)) % 4);
+        const base64 = (base64url + padding)
+            .replace(/-/g, '+')
+            .replace(/_/g, '/');
+        const rawData = atob(base64);
+        const buffer = new Uint8Array(rawData.length);
+
+        for (let i = 0; i < rawData.length; i++) {
+            buffer[i] = rawData.charCodeAt(i);
+        }
+
+        return buffer;
+    }
+
     function uint8ArrayToBase64url(buffer) {
-      const base64String = btoa(String.fromCharCode(...new Uint8Array(buffer)));
-      return base64String.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        const bytes = new Uint8Array(buffer);
+        let binary = '';
+        bytes.forEach(byte => binary += String.fromCharCode(byte));
+        return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
     }
 
-    // Biometric login using WebAuthn (vanilla)
-    bioBtn.addEventListener('click', async function () {
-      const identifier = localStorage.getItem('bio_login');
-      if (!identifier) {
-        showToast('Please set up biometrics first', 'warning');
-        return;
-      }
+    // Biometric Setup Flow with OTP
+    if (setupBioBtn) {
+        setupBioBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
 
-      const originalContent = bioBtn.innerHTML;
-      bioBtn.innerHTML = '<span class="spinner"></span> Authenticating...';
-      bioBtn.disabled = true;
+            const username = prompt('Enter your email or phone to register biometrics:');
+            if (!username) return;
 
-      try {
-        // Request options from server for login challenge
-        const optionsRes = await fetch("{{ route('webauthn.login.options') }}", {
-          method: 'POST',
-          headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ username: identifier }),
+            try {
+                // Show loading state
+                setupBioBtn.innerHTML = '<span class="spinner"></span> Sending OTP...';
+                setupBioBtn.disabled = true;
+
+                // Send OTP request
+                const otpResponse = await fetch("/biometric/send-otp", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ username })
+                });
+
+                const otpData = await otpResponse.json();
+
+                if (!otpData.success) {
+                    throw new Error(otpData.message || 'Failed to send OTP');
+                }
+
+                // Create OTP modal
+                const otpModal = document.createElement('div');
+                otpModal.id = 'otpModal';
+                otpModal.style.cssText = `
+                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                    background: rgba(0,0,0,0.7); z-index: 1000;
+                    display: flex; justify-content: center; align-items: center;
+                `;
+
+                otpModal.innerHTML = `
+                    <div style="background: #1e293b; padding: 24px; border-radius: 12px; width: 90%; max-width: 320px;">
+                        <h3 style="margin-top: 0; text-align: center; color: white;">Verify OTP</h3>
+                        <p style="color: #94a3b8; text-align: center; margin-bottom: 16px;">
+                            OTP sent to phone ending with ${otpData.phone.slice(-3)}
+                        </p>
+                        <input type="text" id="otpInput" placeholder="Enter 6-digit OTP"
+                            style="width: 100%; padding: 12px; margin-bottom: 16px;
+                            text-align: center; font-size: 18px; letter-spacing: 4px;"
+                            maxlength="6" inputmode="numeric" pattern="\\d*">
+                        <button id="verifyOtpBtn" style="width: 100%; padding: 12px; background: #6366f1;
+                            color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            Verify OTP
+                        </button>
+                        <p style="text-align: center; margin-top: 12px; font-size: 13px; color: #94a3b8;">
+                            Didn't receive OTP? <a href="#" id="resendOtp" style="color: #6366f1;">Resend</a>
+                        </p>
+                    </div>
+                `;
+
+                document.body.appendChild(otpModal);
+
+                // Handle OTP verification
+                document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
+                    const otp = document.getElementById('otpInput').value.trim();
+                    if (otp.length !== 5 || !/^\d+$/.test(otp)) {
+                        showToast('Please enter a valid OTP', 'error');
+                        return;
+                    }
+
+                    const verifyResponse = await fetch("/biometric/verify-otp", {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ username, otp })
+                    });
+
+                    const verifyData = await verifyResponse.json();
+
+                    if (!verifyData.success) {
+                        throw new Error(verifyData.message || 'Invalid OTP');
+                    }
+
+                    // Proceed with WebAuthn registration
+                    await registerBiometricCredential(username);
+                    document.body.removeChild(otpModal);
+                });
+
+                // Handle OTP resend
+                document.getElementById('resendOtp').addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    await fetch("/biometric/send-otp", {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ username })
+                    });
+                    showToast('OTP resent successfully', 'success');
+                });
+
+            } catch (error) {
+                console.error('Biometric setup error:', error);
+                showToast(error.message, 'error');
+                if (document.getElementById('otpModal')) {
+                    document.body.removeChild(document.getElementById('otpModal'));
+                }
+            } finally {
+                setupBioBtn.innerHTML = 'Set Up Biometrics';
+                setupBioBtn.disabled = false;
+            }
         });
+    }
 
-        if (!optionsRes.ok) throw new Error('Failed to get authentication options');
+    // WebAuthn Registration
+    async function registerBiometricCredential(username) {
+        try {
+            // 1. Pata options
+            const optionsRes = await fetch("/webauthn/register/options", {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username })
+            });
 
-        let options = await optionsRes.json();
-        console.log('Login options from server:', options);
+            const options = await optionsRes.json();
 
-        // Decode binary data in options
-        options.challenge = base64urlToUint8Array(options.challenge);
+            // 2. Tengeneza credential
+            const credential = await navigator.credentials.create({
+                publicKey: {
+                    ...options,
+                    challenge: base64urlToUint8Array(options.challenge),
+                    user: {
+                        ...options.user,
+                        id: base64urlToUint8Array(options.user.id)
+                    }
+                }
+            });
 
-        if (options.allowCredentials) {
-          options.allowCredentials = options.allowCredentials.map(cred => ({
-            ...cred,
-            id: base64urlToUint8Array(cred.id),
-            transports: ['internal']  // ✅ This enables fingerprint prompt
-          }));
+            // 3. Verify na server
+            const verificationRes = await fetch("/webauthn/register/verify", {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: credential.id,
+                    rawId: uint8ArrayToBase64url(credential.rawId),
+                    response: {
+                        attestationObject: uint8ArrayToBase64url(credential.response.attestationObject),
+                        clientDataJSON: uint8ArrayToBase64url(credential.response.clientDataJSON)
+                    },
+                    username: username // Username/phone ya user
+                })
+            });
+
+            const result = await verificationRes.json();
+            if (result.success) {
+                showToast('Biometric registration successful!', 'success');
+            }
+        } catch (error) {
+            console.error('Registration failed:', error);
+            alert('Failed: ' + error.message);
         }
+    }
 
-        // Force biometric prompt if possible
-        options.userVerification = 'required';
+    // Biometric Login
+    if (bioBtn) {
+        bioBtn.addEventListener('click', async function() {
+            const username = localStorage.getItem('bio_login');
+            if (!username) {
+                showToast('Please set up biometrics first', 'warning');
+                return;
+            }
 
-        // Call WebAuthn API
-        const assertion = await navigator.credentials.get({ publicKey: options });
+            const originalContent = bioBtn.innerHTML;
+            bioBtn.innerHTML = '<span class="spinner"></span> Authenticating...';
+            bioBtn.disabled = true;
 
-        // Prepare data to send to backend
-        const authData = {
-          id: assertion.id,
-          rawId: uint8ArrayToBase64url(assertion.rawId),
-          response: {
-            authenticatorData: uint8ArrayToBase64url(assertion.response.authenticatorData),
-            clientDataJSON: uint8ArrayToBase64url(assertion.response.clientDataJSON),
-            signature: uint8ArrayToBase64url(assertion.response.signature),
-            userHandle: assertion.response.userHandle ? uint8ArrayToBase64url(assertion.response.userHandle) : null,
-          },
-          type: assertion.type,
-        };
+            try {
+                // Get authentication options
+                const optionsRes = await fetch("/webauthn/login/options", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: localStorage.getItem('bio_login')
+                    })
+                });
 
-        // Send result to backend for verification
-        const verifyRes = await fetch("{{ route('webauthn.login.verify') }}", {
-          method: 'POST',
-          headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(authData),
+                if (!optionsRes.ok) throw new Error('Failed to get authentication options');
+
+                const options = await optionsRes.json();
+
+                // Convert values
+                const publicKey = {
+                    ...options,
+                    challenge: base64urlToUint8Array(options.challenge),
+                    allowCredentials: options.allowCredentials?.map(cred => ({
+                        ...cred,
+                        id: base64urlToUint8Array(cred.id),
+                        transports: ['internal']
+                    })),
+                    userVerification: 'required'
+                };
+
+                // Get assertion
+                const assertion = await navigator.credentials.get({ publicKey });
+
+                // Verify assertion
+                const verifyRes = await fetch("/webauthn/login/verify", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: assertion.id,
+                        rawId: uint8ArrayToBase64url(assertion.rawId),
+                        type: assertion.type,
+                        response: {
+                            authenticatorData: uint8ArrayToBase64url(assertion.response.authenticatorData),
+                            clientDataJSON: uint8ArrayToBase64url(assertion.response.clientDataJSON),
+                            signature: uint8ArrayToBase64url(assertion.response.signature),
+                            userHandle: assertion.response.userHandle ?
+                                uint8ArrayToBase64url(assertion.response.userHandle) : null
+                        }
+                    })
+                });
+
+                const verifyData = await verifyRes.json();
+
+                if (verifyData.success) {
+                    showToast('Biometric login successful!', 'success');
+                    setTimeout(() => {
+                        window.location.href = verifyData.redirect || '/dashboard';
+                    }, 1000);
+                } else {
+                    throw new Error(verifyData.message || 'Authentication failed');
+                }
+
+            } catch (error) {
+                console.error('Biometric login error:', error);
+                showToast(error.message || 'Authentication failed', 'error');
+            } finally {
+                bioBtn.innerHTML = originalContent;
+                bioBtn.disabled = false;
+            }
         });
-
-        const result = await verifyRes.json();
-
-        if (result.success) {
-          showToast('Biometric login successful!', 'success');
-          setTimeout(() => {
-            window.location.href = result.redirect || '{{ route('home') }}';
-          }, 1000);
-        } else {
-          throw new Error(result.message || 'Biometric login failed');
-        }
-
-      } catch (error) {
-        console.error(error);
-        showToast(error.message || 'Unexpected error', 'error');
-        bioBtn.innerHTML = originalContent;
-        bioBtn.disabled = false;
-      }
-    });
+    }
 
     // Show spinner on normal login
-    loginForm.addEventListener('submit', function () {
-      loginBtn.innerHTML = '<span class="spinner"></span> Signing In...';
-      loginBtn.disabled = true;
-    });
-  });
+    if (loginForm) {
+        loginForm.addEventListener('submit', function() {
+            loginBtn.innerHTML = '<span class="spinner"></span> Signing In...';
+            loginBtn.disabled = true;
+        });
+    }
+});
 </script>
+
 
 @include('SRTDashboard.script')
 @include('sweetalert::alert')

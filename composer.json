@@ -18,6 +18,7 @@
         "maatwebsite/excel": "^3.1",
         "realrashid/sweet-alert": "^7.1",
         "simplesoftwareio/simple-qrcode": "^4.2",
+        "spomky-labs/base64url": "^2.0",
         "vernes/yiimailer": "^4.0",
         "vinkla/hashids": "^11.0"
     },
