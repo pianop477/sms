@@ -6,11 +6,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laragear\WebAuthn\Contracts\WebAuthnAuthenticatable;
+use Laragear\WebAuthn\Models\WebAuthnCredential;
+use Laragear\WebAuthn\WebAuthnAuthentication;
 use Laravel\Sanctum\HasApiTokens;
+use Laragear\WebAuthn\webauthnCredentials;
 
-class User extends Authenticatable
+class User extends Authenticatable implements WebAuthnAuthenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, WebAuthnAuthentication;
 
     /**
      * The attributes that are mass assignable.
@@ -82,4 +86,6 @@ class User extends Authenticatable
     {
         return $this->hasOne(Teacher::class, 'user_id');
     }
+
+    // User.php
 }

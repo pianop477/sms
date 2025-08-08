@@ -3,6 +3,7 @@ use App\Exports\StudentsExport;
 use App\Exports\TeachersExport;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\BiometricController;
 use App\Http\Controllers\CertificateGeneratorController;
 use App\Http\Controllers\CertificateTemplateController;
 use App\Http\Controllers\ClassesController;
@@ -75,6 +76,10 @@ Route::post('/login/biometric/options', [WebAuthnLoginController::class, 'option
 // Verify credential and login
 Route::post('/login/biometric/verify', [WebAuthnLoginController::class, 'verify'])->name('webauthn.login.verify');
 
+
+Route::post('/webauthn/register/options', [WebAuthnRegisterController::class, 'options'])->name('webauthn.register.options');
+Route::post('/webauthn/register/verify', [WebAuthnRegisterController::class, 'register'])->name('webauthn.register.verify');
+
 // ROUTE ACCESS FOR PARENTS REGISTRATION =================================================================================================
     Route::prefix('Register')->group(function () {
         Route::get('Parents', [UsersController::class, 'index'])->name('users.form');
@@ -86,6 +91,16 @@ Route::post('/login/biometric/verify', [WebAuthnLoginController::class, 'verify'
 
 //ROUTES ACCESS TO SCAN AND VERIFY QR CODE FOR CONTRACTS =========================================================
     Route::get('/contracts/verify/{token}', [ContractController::class, 'verify'])->name('contracts.verify');
+
+    // Biometric OTP Routes
+    Route::post('/biometric/send-otp', [BiometricController::class, 'sendOtp']);
+    Route::post('/biometric/verify-otp', [BiometricController::class, 'verifyOtp']);
+
+    // WebAuthn Routes (existing)
+    Route::post('/webauthn/register/options', [WebAuthnRegisterController::class, 'registerOptions']);
+    Route::post('/webauthn/register/verify', [WebAuthnRegisterController::class, 'registerVerify']);
+    Route::post('/webauthn/login/options', [WebAuthnLoginController::class, 'loginOptions']);
+    Route::post('/webauthn/login/verify', [WebAuthnLoginController::class, 'loginVerify']);
 
 // MIDDLEWARE FILTERING STARTS HERE **************************************************************************************
 Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 'block.ip', 'user.agent')->group(function () {
