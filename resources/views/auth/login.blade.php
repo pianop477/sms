@@ -407,7 +407,7 @@
                     `;
 
                     otpModal.innerHTML = `
-                        <div style="background: #1e293b; padding: 24px; border-radius: 12px; width: 90%; max-width: 320px;">
+                        <div style="background: #1e293b; padding: 24px; border-radius: 12px; width: 90%; max-width: 300px;">
                             <h3 style="margin-top: 0; text-align: center; color: white;">Verify OTP</h3>
                             <p style="color: #94a3b8; text-align: center; margin-bottom: 16px;">
                                 OTP sent to phone ending with ${otpData.phone.slice(-3)}
