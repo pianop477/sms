@@ -413,7 +413,7 @@
                                 OTP sent to phone ending with ${otpData.phone.slice(-3)}
                             </p>
                             <input type="text" id="otpInput" placeholder="Enter OTP"
-                                style="width: 80%; padding: 10px; margin-bottom: 14px;
+                                style="width: 100%; padding: 10px; margin-bottom: 14px;
                                 text-align: center; font-size: 18px; letter-spacing: 4px;"
                                 maxlength="5" inputmode="numeric" pattern="\\d*">
                             <button id="verifyOtpBtn" style="width: 100%; padding: 12px; background: #6366f1;
