@@ -40,7 +40,7 @@ class BiometricController extends Controller
             'reference' => 'otp-'.uniqid(),
         ];
 
-        // $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+        $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
         $beemSmsService = new BeemSmsService();
         $sender = "shuleApp";
@@ -51,7 +51,7 @@ class BiometricController extends Controller
             'dest_addr' => $this->formatPhoneNumber($user->phone),
         ];
 
-        $response = $beemSmsService->sendSms($sender, $message, $recipients);
+        // $response = $beemSmsService->sendSms($sender, $message, $recipients);
 
         return response()->json([
             'success' => true,
