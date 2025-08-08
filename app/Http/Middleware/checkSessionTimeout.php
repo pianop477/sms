@@ -33,13 +33,13 @@ class checkSessionTimeout
             // 3. Angalia kama muda wa session umekwisha (120 dakika bila activity)
             $inactiveTime = now()->diffInMinutes(session('last_activity'));
 
-            if ($inactiveTime >= 120) {
+            if ($inactiveTime >= 60) {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
 
                 return redirect()->route('login')
-                    ->with('error', 'Session has expired please login again.');
+                    ->Alert()->toast('Session has expired please login again.', 'error');
             }
         }
 
