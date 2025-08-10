@@ -22,9 +22,10 @@ class WebAuthnRegisterController extends Controller
                 ->firstOrFail();
 
         // 2. Angalia kama tayari ana credentials
-        if ($user->webauthnCredentials()->exists()) {
+        $credential_exsts = WebAuthnCredential::where('user_id', $user->id)->count();
+        if ($credential_exsts >= 3) {
             return response()->json([
-                'error' => 'User already has biometric credentials registered',
+                'error' => 'User has already registered the maximum number of biometric credentials.',
                 'has_registered' => true
             ], 409); // HTTP 409 Conflict
         }
@@ -39,7 +40,7 @@ class WebAuthnRegisterController extends Controller
             'user' => [
                 'id' => base64_encode($user->id), // Encode user ID
                 'name' => $user->email,
-                'displayName' => $user->name
+                'displayName' => $user->first_name
             ],
             'pubKeyCredParams' => [
                 ['type' => 'public-key', 'alg' => -7],  // ES256

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\WebAuthnCredential;
 use App\Services\BeemSmsService;
 use App\Services\NextSmsService;
 use Illuminate\Support\Facades\Cache;
@@ -25,9 +26,18 @@ class BiometricController extends Controller
             ], 404);
         }
 
+        //check if user already registered in webauthn
+        $bio_exist = WebAuthnCredential::where('user_id', $user->id)->count();
+        if($bio_exist >= 3) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You have already reached the maximum number of biometric registrations.'
+            ], 429);
+        }
+
         // Generate OTP (6 digits)
         $otp = rand(10000, 99999);
-        Cache::put('bio_otp_'.$user->id, $otp, now()->addMinutes(2));
+        Cache::put('bio_otp_'.$user->id, $otp, now()->addMinutes(1));
 
         // Send OTP via SMS (implement your SMS service here)
         $nextSmsService = new NextSmsService();
@@ -40,7 +50,7 @@ class BiometricController extends Controller
             'reference' => 'otp-'.uniqid(),
         ];
 
-        $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+        // $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
         $beemSmsService = new BeemSmsService();
         $sender = "shuleApp";
@@ -51,7 +61,7 @@ class BiometricController extends Controller
             'dest_addr' => $this->formatPhoneNumber($user->phone),
         ];
 
-        // $response = $beemSmsService->sendSms($sender, $message, $recipients);
+        $response = $beemSmsService->sendSms($sender, $message, $recipients);
 
         return response()->json([
             'success' => true,
