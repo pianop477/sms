@@ -22,14 +22,20 @@ class checkSessionTimeout
     public function handle(Request $request, Closure $next)
     {
         if (Auth::check()) {
-            // 1. Angalia kama session ya 'last_activity' ipo, kama haipo, weka sasa
+            // 1. Initialize last_activity if missing
             if (!session()->has('last_activity')) {
                 session(['last_activity' => now()]);
             }
 
-            // 2. Angalia muda wa inactivity (TUUMA UPDATE last_activity IKIWA USER AMEFANYA KITENDO HALISI)
-            $inactiveTime = now()->diffInMinutes(session('last_activity'));
+            // 2. Parse last_activity (handle both DateTime and timestamp)
+            $lastActivity = session('last_activity');
+            $lastActivityTime = is_int($lastActivity)
+                ? Carbon::createFromTimestamp($lastActivity)
+                : Carbon::parse($lastActivity);
 
+            $inactiveTime = now()->diffInMinutes($lastActivityTime);
+
+            // 3. Logout if inactive for 60+ minutes
             if ($inactiveTime >= 60) {
                 Auth::logout();
                 $request->session()->invalidate();
@@ -39,10 +45,9 @@ class checkSessionTimeout
                     ->with('error', 'Session imekwisha. Tafadhali ingia tena.');
             }
 
-            // 3. UPDATE last_activity IKIWA REQUEST NI KITENDO HALISI (SIYO BACKGROUND REQUEST)
-            // Mfano: AJAX, favicon.ico, livewire, asset requests hazina budi ZISIUPDATE last_activity
+            // 4. Update last_activity for non-background requests
             if (!$this->isBackgroundRequest($request)) {
-                session(['last_activity' => now()]);
+                session(['last_activity' => now()]); // Stores as DateTime
             }
         }
 
