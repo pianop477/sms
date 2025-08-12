@@ -65,7 +65,7 @@ class BiometricController extends Controller
 
         return response()->json([
             'success' => true,
-            'phone' => substr($user->phone, -4) // Last 3 digits for display
+            'phone' => substr($user->phone, -3) // Last 3 digits for display
         ]);
     }
 
@@ -115,6 +115,28 @@ class BiometricController extends Controller
         Cache::forget('bio_otp_'.$user->id);
 
         return response()->json(['success' => true]);
+    }
+
+    public function deleteCredentials(Request $request)
+    {
+        $user = User::where('email', $request->username)
+                    ->orWhere('phone', $request->username)
+                    ->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found'
+            ], 404);
+        }
+
+        // Futa credentials za webauthn
+        $user->webauthnCredentials()->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Biometric credentials deleted successfully'
+        ]);
     }
 
 }

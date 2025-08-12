@@ -102,6 +102,9 @@ Route::post('/webauthn/register/verify', [WebAuthnRegisterController::class, 're
     Route::post('/webauthn/login/options', [WebAuthnLoginController::class, 'loginOptions']);
     Route::post('/webauthn/login/verify', [WebAuthnLoginController::class, 'loginVerify']);
 
+    // routes/web.php
+    Route::post('/webauthn/delete-credentials', [BiometricController::class, 'deleteCredentials']);
+
 // MIDDLEWARE FILTERING STARTS HERE **************************************************************************************
 Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 'block.ip', 'user.agent')->group(function () {
 
