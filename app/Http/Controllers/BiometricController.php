@@ -42,7 +42,7 @@ class BiometricController extends Controller
         // Send OTP via SMS (implement your SMS service here)
         $nextSmsService = new NextSmsService();
         $sender_id = "SHULE APP";
-        $message = "Your OTP is: $otp use it for biometric verification. Expires in 2 minutes.";
+        $message = "Your biometric verification OTP is: $otp. Expires in 2 minutes. Ignore if you didn’t request this.";
         $payload = [
             'from' => $sender_id,
             'to' => $this->formatPhoneNumber($user->phone),
@@ -50,18 +50,18 @@ class BiometricController extends Controller
             'reference' => 'otp-'.uniqid(),
         ];
 
-        // $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+        $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
         $beemSmsService = new BeemSmsService();
         $sender = "shuleApp";
         $recipient_id = 1;
-        $message = "Your OTP is: $otp use it for biometric verification. Expires in 2 minutes.";
+        // $message = "Your OTP is: $otp use it for biometric verification. Expires in 2 minutes.";
         $recipients[] = [
             'recipient_id' => $recipient_id++,
             'dest_addr' => $this->formatPhoneNumber($user->phone),
         ];
 
-        $response = $beemSmsService->sendSms($sender, $message, $recipients);
+        // $response = $beemSmsService->sendSms($sender, $message, $recipients);
 
         return response()->json([
             'success' => true,
