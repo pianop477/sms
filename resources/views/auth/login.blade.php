@@ -77,7 +77,7 @@
     }
 
     .form-control {
-      width: 100%;
+      width: 93%;
       padding: 9px 12px;
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -200,7 +200,7 @@
 
     .toast {
       position: fixed;
-      bottom: 20px;
+      top: 20px;
       right: 20px;
       background: rgba(0, 0, 0, 0.8);
       color: white;
@@ -311,6 +311,25 @@
     input:checked + .slider:before {
       transform: translateX(20px);
     }
+
+    .setup-bio {
+    display: block;
+    text-align: center;
+    margin-top: 14px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+}
+
+    .setup-bio:hover {
+        color: var(--accent);
+    }
+
+    /* Style maalum kwa clear button */
+    #clearBioBtn:hover {
+        color: #f87171;
+        text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -365,12 +384,15 @@
     </div>
 
     <div id="biometricSection" style="display: none;">
-      <div class="divider">or continue with</div>
-      <button id="bioBtn" class="bio-btn">
-        <i class="fas fa-fingerprint" style="font-size: 1.5rem"></i>
-        <span id="bioBtnText">Set Up Biometrics</span>
-      </button>
-      <a href="#" id="setupBioBtn" class="setup-bio">Set up biometric authentication</a>
+        <div class="divider">or continue with</div>
+        <button id="bioBtn" class="bio-btn">
+            <i class="fas fa-fingerprint" style="font-size: 1.5rem"></i>
+            <span id="bioBtnText">Use Biometric</span>
+        </button>
+        <div id="biometricActions" style="display: none; justify-content: center; gap: 10px; margin-top: 10px;">
+            <a href="#" id="setupBioBtn" class="setup-bio">Set up biometric authentication</a>
+            <a href="#" id="clearBioBtn" class="setup-bio" style="color: #f87171;">Clear Biometric</a>
+        </div>
     </div>
   </div>
 
@@ -400,23 +422,21 @@
         const loginBtn = document.getElementById('loginBtn');
         const togglePassword = document.getElementById('togglePassword');
         const password = document.getElementById('password');
+        const clearBioBtn = document.getElementById('clearBioBtn');
+        const biometricActions = document.getElementById('biometricActions');
 
-        // Set initial state from localStorage
-        if (biometricToggle) {
-            biometricToggle.checked = bioSettings.enabled;
+        // Set initial state
+        function updateBiometricUI() {
+            if (biometricToggle) biometricToggle.checked = bioSettings.enabled;
+            if (biometricSection) biometricSection.style.display = bioSettings.enabled ? 'block' : 'none';
+            if (biometricActions) biometricActions.style.display = bioSettings.enabled ? 'flex' : 'none';
+            if (bioBtnText) bioBtnText.textContent = bioSettings.registered ? 'Use Biometric' : 'Set Up Biometrics';
+            if (setupBioBtn) setupBioBtn.style.display = bioSettings.registered ? 'none' : 'block';
+            if (clearBioBtn) clearBioBtn.style.display = bioSettings.registered ? 'block' : 'none';
         }
 
-        if (biometricSection) {
-            biometricSection.style.display = bioSettings.enabled ? 'block' : 'none';
-        }
-
-        if (bioBtnText) {
-            bioBtnText.textContent = bioSettings.registered ? 'Use Biometric' : 'Set Up Biometrics';
-        }
-
-        if (setupBioBtn) {
-            setupBioBtn.style.display = bioSettings.registered ? 'none' : 'block';
-        }
+        // Initialize UI
+        updateBiometricUI();
 
         // Password toggle visibility
         if (togglePassword) {
@@ -444,15 +464,12 @@
             biometricToggle.addEventListener('change', function(e) {
                 bioSettings.enabled = e.target.checked;
                 localStorage.setItem('bioSettings', JSON.stringify(bioSettings));
-
-                if (biometricSection) {
-                    biometricSection.style.display = bioSettings.enabled ? 'block' : 'none';
-                }
+                updateBiometricUI();
             });
         }
 
         // Helper functions
-        function showToast(message, type = 'success', duration = 3000) {
+        function showToast(message, type = 'success', duration = 5000) {
             const icon = toast.querySelector('i');
             icon.className = type === 'error' ? 'fas fa-times-circle' :
                             type === 'warning' ? 'fas fa-exclamation-triangle' :
@@ -545,7 +562,7 @@
                         <div style="background: #1e293b; padding: 24px; border-radius: 12px; width: 90%; max-width: 320px;">
                             <h3 style="margin-top: 0; text-align: center; color: white;">Verify OTP</h3>
                             <p style="color: #94a3b8; text-align: center; margin-bottom: 16px;">
-                                OTP sent to phone ending with ${otpData.phone.slice(-4)}
+                                OTP sent to phone ending with****-***-${otpData.phone.slice(-3)}
                             </p>
                             <div class="otp-container">
                                 ${Array(5).fill().map((_, i) => `
@@ -558,7 +575,7 @@
                             </div>
                             <button id="verifyOtpBtn" style="width: 100%; padding: 12px; background: #6366f1;
                                 color: white; border: none; border-radius: 8px; cursor: pointer;">
-                                Verify OTP
+                                <span id="verifyOtpBtnText">Verify OTP</span>
                             </button>
                             <p style="text-align: center; margin-top: 12px; font-size: 13px; color: #94a3b8;">
                                 Didn't receive OTP? <a href="#" id="resendOtp" style="color: #6366f1;">Resend</a>
@@ -603,6 +620,8 @@
                     document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
                         const otpDigits = document.querySelectorAll('.otp-digit');
                         const otp = Array.from(otpDigits).map(d => d.value).join('');
+                        const verifyBtn = document.getElementById('verifyOtpBtn');
+                        const verifyBtnText = document.getElementById('verifyOtpBtnText');
 
                         if (otp.length !== 5 || !/^\d+$/.test(otp)) {
                             showToast('Please enter a valid OTP', 'error');
@@ -610,6 +629,10 @@
                         }
 
                         try {
+                            // Show loading state
+                            verifyBtn.disabled = true;
+                            verifyBtnText.innerHTML = '<span class="spinner"></span> Verifying...';
+
                             let verifyResponse;
                             try {
                                 verifyResponse = await fetch("/biometric/verify-otp", {
@@ -618,8 +641,14 @@
                                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                                         'Content-Type': 'application/json',
                                         'Accept': 'application/json'
+                                        // 'X-Requested-With': 'XMLHttpRequest'
                                     },
-                                    body: JSON.stringify({ username, otp })
+                                    body: JSON.stringify({
+                                        username: username,
+                                        otp: otp,
+                                        is_pwa: true // Ongeza flag kwa ajili ya PWA
+                                    }),
+                                    credentials: 'include'
                                 });
                             } catch (error) {
                                 // Fallback for PWA
@@ -652,6 +681,11 @@
                         } catch (error) {
                             console.error('OTP verification error:', error);
                             showToast(error.message || 'Verification failed. Please try in browser if using PWA.', 'error');
+                        } finally {
+                            if (verifyBtn && verifyBtnText) {
+                                verifyBtn.disabled = false;
+                                verifyBtnText.textContent = 'Verify OTP';
+                            }
                         }
                     });
 
@@ -863,7 +897,7 @@
                     if (verifyData.success) {
                         showToast('Biometric login successful!', 'success');
                         setTimeout(() => {
-                            window.location.href = verifyData.redirect || '/dashboard';
+                            window.location.href = verifyData.redirect || '/home';
                         }, 1000);
                     } else {
                         throw new Error(verifyData.message || 'Authentication failed');
@@ -878,6 +912,57 @@
                 }
             });
         }
+        // Clear Biometric Functionality
+        if (clearBioBtn) {
+            clearBioBtn.addEventListener('click', async function(e) {
+                e.preventDefault();
+
+                if (!bioSettings.username) {
+                    showToast('No biometric data found', 'error');
+                    return;
+                }
+
+                if (!confirm('Are you sure you want to delete your biometric login data?')) {
+                    return;
+                }
+
+                try {
+                    clearBioBtn.innerHTML = '<span class="spinner"></span> Clearing...';
+
+                    const deleteResponse = await fetch("/webauthn/delete-credentials", {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ username: bioSettings.username })
+                    });
+
+                    const result = await deleteResponse.json();
+
+                    if (result.success) {
+                        // Update settings
+                        bioSettings.registered = false;
+                        bioSettings.username = null;
+                        localStorage.setItem('bioSettings', JSON.stringify(bioSettings));
+
+                        // Update UI
+                        updateBiometricUI();
+                        showToast('Biometric data deleted successfully', 'success');
+                    } else {
+                        throw new Error(result.message || 'Failed to delete biometric data');
+                    }
+                } catch (error) {
+                    console.error('Clear biometric error:', error);
+                    showToast(error.message || 'Failed to delete biometric data', 'error');
+                } finally {
+                    if (clearBioBtn) {
+                        clearBioBtn.innerHTML = 'Clear Biometric';
+                    }
+                }
+            });
+        }
 
         // Show spinner on normal login
         if (loginForm) {
@@ -888,5 +973,7 @@
         }
     });
   </script>
+
+  @include('sweetalert::alert')
 </body>
 </html>

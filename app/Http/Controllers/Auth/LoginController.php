@@ -62,15 +62,14 @@ class LoginController extends Controller
         $maxAttempts = 3;
         $decayMinutes = 15;
 
-        // Record the attempt first
+        // Check for rate limiting BEFORE attempting login
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             $seconds = RateLimiter::availableIn($key);
             Alert()->toast('Account locked. Try again in ' . ceil($seconds / 60) . ' minutes.', 'error');
             return redirect()->back();
         }
 
-        RateLimiter::hit($key, $decayMinutes * 60);
-        $loginType = $this->username(); // could be 'email' or 'username' depending on your logic
+        $loginType = $this->username();
         $credentials = [
             $loginType => $request->username,
             'password' => $request->password,
@@ -86,6 +85,9 @@ class LoginController extends Controller
             Alert()->toast('Hello 🤩 Welcome back to ShuleApp', 'success');
             return redirect()->intended($this->redirectPath());
         }
+
+        // Increment failed attempts only if login failed
+        RateLimiter::hit($key, $decayMinutes * 60);
 
         // Log failed login details in database
         DB::table('failed_logins')->insert([
