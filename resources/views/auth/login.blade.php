@@ -561,9 +561,8 @@
                     otpModal.innerHTML = `
                         <div style="background: #1e293b; padding: 24px; border-radius: 12px; width: 90%; max-width: 320px;">
                             <h3 style="margin-top: 0; text-align: center; color: white;">Verify OTP</h3>
-                            <p style="color: #94a3b8; text-align: center; margin-bottom: 16px;">
-                                OTP sent to phone ending with****-***-${otpData.phone.slice(-3)}
-                            </p>
+                            <p style="color: #94a3b8; text-align: center; margin-bottom: 16px;">OTP sent to phone ending with</p>
+                            <p style="color: #94a3b8; text-align: center; margin-bottom: 16px;">****-***-${otpData.phone.slice(-3)}</p>
                             <div class="otp-container">
                                 ${Array(5).fill().map((_, i) => `
                                     <input type="text" id="otp-digit-${i}" class="otp-digit"
@@ -804,7 +803,7 @@
                 const username = bioSettings.username;
 
                 if (!username) {
-                    showToast('Please set up biometrics first', 'warning');
+                    showToast('Click Setup Biometric Authentication below to register your device', 'warning');
                     return;
                 }
 
