@@ -897,7 +897,7 @@
                         showToast('Biometric login successful!', 'success');
                         setTimeout(() => {
                             window.location.href = verifyData.redirect || '/home';
-                        }, 1000);
+                        }, 500);
                     } else {
                         throw new Error(verifyData.message || 'Authentication failed');
                     }
