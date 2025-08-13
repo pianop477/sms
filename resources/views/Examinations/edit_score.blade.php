@@ -15,7 +15,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="card-body">
                     <p class="text-center text-capitalize">Examination Type: <strong>{{$examName}}</strong></p>
                     <p class="text-center text-capitalize">Exam Date: <strong>{{\Carbon\Carbon::parse($examDate)->format('d-m-Y')}}</strong></p>

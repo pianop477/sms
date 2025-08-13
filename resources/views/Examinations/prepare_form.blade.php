@@ -37,7 +37,7 @@
                     </div>
                     <!-- Exam Date -->
                     <div class="col-md-3 mb-3">
-                        <label for="exam_date">Uploading Date</label>
+                        <label for="exam_date">Upload Date</label>
                         <input type="date" name="exam_date" class="form-control" id="exam_date" required
                                value="{{ old('exam_date') }}"
                                min="{{ \Carbon\Carbon::now()->subYears(1)->format('Y-m-d') }}"
@@ -85,7 +85,7 @@
                     </div>
                     <hr>
                     <div class="col-12">
-                        <p class="text-danger text-center" style="font-style:italic; font-size:12px;">Expiry Date: {{\Carbon\Carbon::parse($saved_results->first()->expiry_date)->format('d-m-Y  H:i')}}</p>
+                        <p class="text-danger text-center" style="font-style:italic; font-size:11px;">Results will expire on: {{\Carbon\Carbon::parse($saved_results->first()->expiry_date)->format('d-m-Y  H:i')}}</p>
                     </div>
                     <div class="row">
                         <div class="col-6">

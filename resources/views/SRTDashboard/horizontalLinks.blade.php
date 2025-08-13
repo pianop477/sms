@@ -51,7 +51,7 @@
                                 <ul class="submenu">
                                     <li><a href="{{route('Classes.index')}}"><i class="fas fa-chalkboard-teacher"></i><span> Classes</span></a></li>
                                     <li><a href="{{route('courses.index')}}"><i class="fas fa-book-open"></i><span> Courses</span></a></li>
-                                    <li><a href="{{route('exams.index')}}"><i class="fas fa-clipboard-list"></i>Examination</a></li>
+                                    <li><a href="{{route('exams.index')}}"><i class="fas fa-clipboard-list"></i>Examinations</a></li>
                                     <li><a href="{{route('results.general', ['school' => Hashids::encode(Auth::user()->school_id)])}}"><i class="fas fa-chart-bar"></i>Results</a></li>
                                     {{-- <li><a href="{{route('timetable.settings')}}"><i class="fas fa-file-circle-check"></i> Timetable</a></li> --}}
                                 </ul>
@@ -103,7 +103,7 @@
                                 <ul class="submenu">
                                     <li><a href="{{route('Classes.index')}}"><i class="fas fa-chalkboard-teacher"></i><span> Classes</span></a></li>
                                     <li><a href="{{route('courses.index')}}"><i class="fas fa-book-open"></i><span> Courses</span></a></li>
-                                    <li><a href="{{route('exams.index')}}"><i class="fas fa-clipboard-list"></i>Examination</a></li>
+                                    <li><a href="{{route('exams.index')}}"><i class="fas fa-clipboard-list"></i>Examinations</a></li>
                                     <li><a href="{{route('results.general', ['school' => Hashids::encode(Auth::user()->school_id)])}}"><i class="fas fa-chart-bar"></i>Results</a></li>
                                     {{-- <li><a href="{{route('under.construction.page')}}"><i class="fas fa-file-circle-check"></i> Timetable</a></li> --}}
                                 </ul>
