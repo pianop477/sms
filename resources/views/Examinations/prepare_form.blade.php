@@ -127,7 +127,7 @@
                                     'date' => $saved_results->first()->exam_date,
                                     'term' => $saved_results->first()->exam_term,
                                     'style' => $saved_results->first()->marking_style
-                                ])}" class="btn btn-warning">
+                            ])}}" class="btn btn-warning">
                                     <i class="fas fa-edit mr-1"></i> Edit Pending Results
                                 </a>
 
