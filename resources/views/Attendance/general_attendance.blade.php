@@ -26,7 +26,7 @@
                     @enderror
                 </div>
                 <div class="col-md-3 mb-3">
-                    <label for="validationCustom02">Stand Date</label>
+                    <label for="validationCustom02">Start Date</label>
                     <input type="date" name="start" class="form-control" id="validationCustom02" required value="{{old('start')}}" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
                     @error('start')
                     <div class="text-danger text-sm">
