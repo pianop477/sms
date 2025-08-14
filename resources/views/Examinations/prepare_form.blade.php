@@ -85,7 +85,7 @@
                     </div>
                     <hr>
                     <div class="col-12">
-                        <p class="text-danger text-center" style="font-style:italic; font-size:10px;">Results will expire on: {{\Carbon\Carbon::parse($saved_results->first()->expiry_date)->format('d-m-Y  H:i')}}</p>
+                        <p class="text-danger text-center" style="font-style:italic; font-size:11px;">Results will expire on: {{\Carbon\Carbon::parse($saved_results->first()->expiry_date)->format('d-m-Y  H:i')}}</p>
                     </div>
                     <div class="row">
                         <div class="col-6">
