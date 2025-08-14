@@ -309,7 +309,7 @@
                                                 <td class="text-uppercase text-center">{{$student->admission_number}}</td>
                                                 <td class="d-flex align-items-center">
                                                         @if (!empty($student->image))
-                                                            <img src="{{ asset('assets/img/students/' . $student->image) }}"
+                                                            <img src="{{ asset('assets/img/students/' . $student->image) ?? asset('assets/img/students/student.jpg') }}"
                                                                 alt="Profile Picture"
                                                                 class="rounded-circle"
                                                                 style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">

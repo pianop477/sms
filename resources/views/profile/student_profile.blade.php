@@ -20,7 +20,7 @@
                             @if ($students->image == Null)
                                 <img src="{{asset('assets/img/students/student.jpg')}}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
                             @else
-                                <img src="{{asset('assets/img/students/'. $students->image)}}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
+                                <img src="{{asset('assets/img/students/'. $students->image) ?? asset('assets/img/students/student.jpg')}}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
                             @endif
                         </div>
                         <h6 class="profile-username text-center text-primary text-uppercase">
