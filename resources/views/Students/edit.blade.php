@@ -46,7 +46,7 @@
                 <h4 class="header-title">Edit Students Information</h4>
             </div>
             <div class="col-2">
-                <a href="{{route('create.selected.class', ['class' => Hashids::encode($students->grade_class_id)])}}" class=""><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                <a href="{{route('create.selected.class', ['class' => Hashids::encode($students->grade_class_id)])}}" class="btn btn-info float-right"><i class="fas fa-arrow-circle-left"></i> Back</a>
             </div>
         </div>
         <form class="needs-validation" novalidate="" action="{{route('students.update.records', ['students' => Hashids::encode($students->id)])}}" method="POST" enctype="multipart/form-data">
