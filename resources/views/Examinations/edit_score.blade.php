@@ -7,7 +7,10 @@
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-primary text-white">
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
-                        <h4 class="mb-3 mb-md-0 text-center text-md-left">Edit Saved Results - {{ ucwords(strtoupper($courseName)) }} ({{ ucwords(strtoupper($className)) }})</h4>
+                        <h4 class="mb-3 mb-md-0 text-center text-md-left">
+                            <i class="fas fa-edit mr-2"></i>
+                            Edit Results - {{ strtoupper($courseName) }} ({{ strtoupper($className) }})
+                        </h4>
                         <a href="{{route('home')}}" class="btn btn-light text-primary">
                             <i class="fas fa-arrow-circle-left mr-2"></i> Back to Dashboard
                         </a>
