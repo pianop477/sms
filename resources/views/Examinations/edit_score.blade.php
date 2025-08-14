@@ -164,7 +164,6 @@
     </div>
 </div>
 
-@section('scripts')
 <script>
     $(document).ready(function() {
         // Initialize select2
@@ -239,5 +238,4 @@
         })();
     });
 </script>
-@endsection
 @endsection
