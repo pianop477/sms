@@ -308,7 +308,7 @@
                                                 </td>
                                                 <td class="text-uppercase text-center">{{$student->admission_number}}</td>
                                                 <td class="d-flex align-items-center">
-                                                        @if (!empty($student->image) && file_exists(public_path('assets/img/students/' . $student->image)))
+                                                        @if (!empty($student->image))
                                                             <img src="{{ asset('assets/img/students/' . $student->image) }}"
                                                                 alt="Profile Picture"
                                                                 class="rounded-circle"
