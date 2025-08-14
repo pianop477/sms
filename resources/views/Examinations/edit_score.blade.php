@@ -179,7 +179,7 @@
         });
 
         // Grade calculation on score input
-        $('.score-input').on('blur', function() {
+        $('.score-input').on('input', function() {
             const row = $(this).closest('tr');
             const score = parseFloat($(this).val());
             const gradeInput = row.find('.grade-input');
