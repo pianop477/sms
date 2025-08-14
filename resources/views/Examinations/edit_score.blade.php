@@ -147,12 +147,12 @@
 
                         <!-- Action Buttons -->
                         <div class="d-flex flex-column flex-md-row justify-content-center align-items-center gap-3 mt-4 pt-3 border-top">
-                            <button type="submit" class="btn btn-warning btn-lg px-4" name="action" value="save"
+                            <button type="submit" class="btn btn-warning btn-lg px-4 mr-3" name="action" value="save"
                                     onclick="return confirm('Save these results as draft for later editing?')">
                                 <i class="fas fa-save mr-2"></i> Save Draft
                             </button>
 
-                            <button type="submit" class="btn btn-success btn-lg px-4" name="action" value="submit"
+                            <button type="submit" class="btn btn-success btn-lg px-4 mr-3" name="action" value="submit"
                                     onclick="return confirm('WARNING: Final submission cannot be edited. Are you sure?')">
                                 <i class="fas fa-check-circle mr-2"></i> Submit Final Results
                             </button>
