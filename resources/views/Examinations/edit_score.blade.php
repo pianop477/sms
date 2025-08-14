@@ -59,8 +59,9 @@
                         <input type="hidden" name="marking_style" value="{{ $marking_style }}">
                         <p class="text-center text-danger"><i>(Enter score from 0 to {{ $marking_style == 1 ? '50' : '100' }} correctly)</i></p>
 
-                        <table class="table-responsive mb-4 table-bordered table-hover">
-                            <thead>
+                        <div class="table-responsive mb-4">
+                            <table class="table table-bordered table-hover">
+                            <thead class="thead-dark">
                                 <tr>
                                     <th width="5%">#</th>
                                     <th width="45%">Student Name</th>
@@ -134,7 +135,7 @@
                                 @endforeach
                             </tbody>
                         </table>
-
+                        </div>
                         <div class="d-flex justify-content-center my-3">
                             <!-- Save to Draft -->
                             <button type="submit" class="btn btn-warning mr-3" name="action" value="save" onclick="return confirm('Are you sure you want to save results to draft?')">
