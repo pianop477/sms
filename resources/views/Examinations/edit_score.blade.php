@@ -128,14 +128,13 @@
                                             </td>
                                             <td>
                                                 <input type="number" name="scores[{{ $student->id }}]"
-                                                       class="form-control score-input"
+                                                       class="score-input"
                                                        value="{{ $score }}"
                                                        min="0"
-                                                       max="{{ $marking_style == 1 ? '50' : '100' }}"
-                                                       required>
+                                                       max="{{ $marking_style == 1 ? '50' : '100' }}">
                                             </td>
                                             <td>
-                                                <input type="text" class="form-control grade-input text-center font-weight-bold"
+                                                <input type="text" class="grade-input text-center font-weight-bold"
                                                        value="{{ $grade }}"
                                                        disabled
                                                        style="background-color: {{ $bgColor }}">
