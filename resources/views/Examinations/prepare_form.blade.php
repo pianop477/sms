@@ -126,7 +126,6 @@
     </div>
 </div>
 
-@push('styles')
 <style>
     .bg-gradient-primary {
         background: linear-gradient(45deg, #007bff, #0056d2);
@@ -139,9 +138,7 @@
         padding-top: 5px;
     }
 </style>
-@endpush
 
-@push('scripts')
 <script>
     $(function() {
         $('.select2').select2({ width: '100%' });
@@ -162,5 +159,4 @@
         })();
     });
 </script>
-@endpush
 @endsection
