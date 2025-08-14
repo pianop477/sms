@@ -74,13 +74,13 @@
                     </div>
                 </div>
                 @if ($saved_results->isEmpty())
-                    <button class="btn btn-primary float-right" id="saveButton" type="submit">
-                        Next Step <i class="ti-arrow-right"></i>
+                    <button class="btn btn-primary float-left" id="saveButton" type="submit">
+                        Save & Proceed <i class="ti-arrow-right"></i>
                     </button>
                 @else
                     <div class="col-12 justify-content-between d-flex">
-                        <button class="btn btn-primary float-right" id="saveButton" type="submit">
-                            Next Step <i class="ti-arrow-right"></i>
+                        <button class="btn btn-primary float-left" id="saveButton" type="submit">
+                            Save & Proceed <i class="ti-arrow-right"></i>
                         </button>
                     </div>
                     <hr>
