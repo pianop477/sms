@@ -114,18 +114,24 @@
             height: 40px;
             border-radius: 50%;
         }
+        @page {
+            margin-top: 8mm;
+            margin-bottom: 8mm; /* Ongeza nafasi ya chini kwa footer */
+            margin-left: 10mm;
+            margin-right: 10mm;
+        }
         footer {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 15px;
+            height: 8mm; /*urefu wa footer*/
             font-size: 10px;
+            padding-top: 8px;
             border-top: 1px solid #ddd;
-            padding: 4px 15px;
             text-align: center;
-            background-color: white; /* Hakikisha footer ina background */
-            z-index: 1000; /* Hakikisha footer iko juu ya content */
+            background-color: white;
+            z-index: 1000;
         }
         footer .page-number:after {
             /* content: "Page " counter(page); */
