@@ -115,6 +115,26 @@
             font-size: 10px;
             line-height: 1.2;
         }
+
+        @page {
+            margin-top: 8mm;
+            margin-bottom: 8mm; /* Ongeza nafasi ya chini kwa footer */
+            margin-left: 10mm;
+            margin-right: 10mm;
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 8mm; /*urefu wa footer*/
+            font-size: 10px;
+            padding-top: 8px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            background-color: white;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
@@ -611,9 +631,15 @@
     </table>
 @endif
 
-<div class="footer" style="text-transform: capitalize;">
-    &copy; {{ $schoolInfo->school_name }} - {{ date('Y') }}.
-</div>
+    <footer>
+        <span class="copyright">
+        &copy; {{ ucwords(strtolower(Auth::user()->school->school_name)) }} – {{ date('Y') }}
+        </span>
+        {{-- <span class="page-number"></span> --}}
+        <span class="printed">
+        Printed at: {{ now()->format('d-M-Y H:i') }}
+        </span>
+  </footer>
 
 </body>
 </html>

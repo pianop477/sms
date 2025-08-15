@@ -151,15 +151,21 @@
     .table th:nth-child(11),
     .table td:nth-child(11) { width: 7%; } /* Status */
 
+        @page {
+            margin-top: 8mm;
+            margin-bottom: 8mm; /* Ongeza nafasi ya chini kwa footer */
+            margin-left: 10mm;
+            margin-right: 10mm;
+        }
         footer {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 25px;
+            height: 8mm; /*urefu wa footer*/
             font-size: 10px;
+            padding-top: 8px;
             border-top: 1px solid #ddd;
-            padding: 4px 20px;
             text-align: center;
             background-color: white;
             z-index: 1000;

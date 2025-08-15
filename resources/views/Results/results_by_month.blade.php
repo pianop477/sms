@@ -24,13 +24,6 @@
             .print-only {
                 display: block;
             }
-            .footer {
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-                border-top: 1px solid #ddd;
-                padding-top: 10px;
-            }
             thead {
                 display: table-header-group;
                 background-color: gray; /* Adds a gray background to thead */
@@ -47,6 +40,9 @@
             .table td {
                 border: 1px solid black;
             }
+            footer {
+                display: block !important;
+            }
         }
 
         .container {
@@ -57,7 +53,10 @@
             margin-top: 5px;
         }
         @page {
-            margin: 8mm;
+            margin-top: 8mm;
+            margin-bottom: 8mm; /* Ongeza nafasi ya chini kwa footer */
+            margin-left: 10mm;
+            margin-right: 10mm;
         }
         .logo {
             position: absolute;
@@ -149,35 +148,35 @@
             .final-summary {
                 text-transform: uppercase;
             }
-            footer {
+        footer {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 10px;
+            height: 8mm; /*urefu wa footer*/
             font-size: 10px;
+            padding-top: 8px;
             border-top: 1px solid #ddd;
-            padding: 2px 10px;
             text-align: center;
-            background-color: white; /* Hakikisha footer ina background */
-            z-index: 1000; /* Hakikisha footer iko juu ya content */
+            background-color: white;
+            z-index: 1000;
         }
         footer .page-number:after {
-        content: "Page " counter(page);
+            content: "Page " counter(page);
         }
         footer .copyright {
-        float: left;
-        margin-left: 10px;
+            float: left;
+            margin-left: 10px;
         }
         footer .printed {
-        float: right;
-        margin-right: 10px;
+            float: right;
+            margin-right: 10px;
         }
         /* Clear floats */
         footer:after {
-        content: "";
-        display: table;
-        clear: both;
+            content: "";
+            display: table;
+            clear: both;
         }
     </style>
 </head>

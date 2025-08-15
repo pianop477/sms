@@ -49,9 +49,9 @@
 @if ($attendanceExists)
     <div class="alert alert-success text-center mt-3">
         <h6>Attendance for {{ \Carbon\Carbon::parse($selectedDate)->format('d-m-Y') }} has already been submitted.</h6>
-        <p>See you later <span style="font-size: 2rem;" class="waving">👋</span></p>
+        <p>Thanks for your Commitment <span style="font-size: 2rem;" class="waving">👋</span></p>
         <hr>
-        <p><a href="{{ route('home') }}" class="btn btn-primary btn-sm">Go Back</a></p>
+        <p><a href="{{ route('home') }}" class="btn btn-primary btn-sm">Go Home</a></p>
     </div>
 @else
     {{-- Ikiwa attendance haipo, onyesha fomu ya attendance --}}
