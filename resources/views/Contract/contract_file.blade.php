@@ -23,7 +23,7 @@
 
         .qr-wrapper {
             position: absolute;
-            right: 1cm;
+            right: 8cm;
             bottom: 1cm;
             text-align: center;
             font-size: 7pt;
