@@ -445,6 +445,7 @@ class AttendanceController extends Controller
             ->where('attendances.school_id', Auth::user()->school_id)
             ->where('students.status', 1)
             ->orderBy('attendances.attendance_date', 'ASC')
+            ->orderBy('students.group', 'ASC')
             ->orderBy('students.gender', 'DESC')
             ->orderBy('students.first_name', 'ASC')
             ->get();
