@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\otps;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\WebAuthnCredential;
 use App\Services\BeemSmsService;
 use App\Services\NextSmsService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
 
 class BiometricController extends Controller
 {
@@ -16,8 +19,8 @@ class BiometricController extends Controller
         $request->validate(['username' => 'required']);
 
         $user = User::where('email', $request->username)
-                   ->orWhere('phone', $request->username)
-                   ->first();
+                ->orWhere('phone', $request->username)
+                ->first();
 
         if (!$user) {
             return response()->json([
@@ -26,7 +29,6 @@ class BiometricController extends Controller
             ], 404);
         }
 
-        //check if user already registered in webauthn
         $bio_exist = WebAuthnCredential::where('user_id', $user->id)->count();
         if($bio_exist >= 3) {
             return response()->json([
@@ -37,35 +39,44 @@ class BiometricController extends Controller
 
         // Generate OTP (6 digits)
         $otp = rand(10000, 99999);
-        Cache::put('bio_otp_'.$user->id, $otp, now()->addMinutes(1));
 
-        // Send OTP via SMS (implement your SMS service here)
+        // Delete/expire old OTPs
+        otps::where('user_id', $user->id)
+            ->where('used', false)
+            ->where('expires_at', '>', now())
+            ->update(['expires_at' => now()]); // mark as expired
+
+        // Create new OTP
+        otps::create([
+            'user_id' => $user->id,
+            'otp' => Hash::make($otp),
+            'expires_at' => now()->addMinutes(1),
+            'used' => false,
+        ]);
+
+        // Send SMS (mfano NextSmsService)
+        $message = "Your biometric verification OTP is: $otp. Expires in 1 minutes. Do not share this code with anyone.";
         $nextSmsService = new NextSmsService();
-        $sender_id = "SHULE APP";
-        $message = "Your biometric verification OTP is: $otp. Expires in 2 minutes. Ignore if you didn’t request this.";
-        $payload = [
-            'from' => $sender_id,
-            'to' => $this->formatPhoneNumber($user->phone),
-            'text' => $message,
-            'reference' => 'otp-'.uniqid(),
-        ];
-
-        $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+        // $response = $nextSmsService->sendSmsByNext(
+        //     "SHULE APP",
+        //     $this->formatPhoneNumber($user->phone),
+        //     $message,
+        //     'otp-'.uniqid()
+        // );
 
         $beemSmsService = new BeemSmsService();
         $sender = "shuleApp";
         $recipient_id = 1;
-        // $message = "Your OTP is: $otp use it for biometric verification. Expires in 2 minutes.";
         $recipients[] = [
             'recipient_id' => $recipient_id++,
             'dest_addr' => $this->formatPhoneNumber($user->phone),
         ];
 
-        // $response = $beemSmsService->sendSms($sender, $message, $recipients);
+        $response = $beemSmsService->sendSms($sender, $message, $recipients);
 
         return response()->json([
             'success' => true,
-            'phone' => substr($user->phone, -3) // Last 3 digits for display
+            'phone' => substr($user->phone, -3)
         ]);
     }
 
@@ -92,8 +103,8 @@ class BiometricController extends Controller
         ]);
 
         $user = User::where('email', $request->username)
-                   ->orWhere('phone', $request->username)
-                   ->first();
+                ->orWhere('phone', $request->username)
+                ->first();
 
         if (!$user) {
             return response()->json([
@@ -102,19 +113,27 @@ class BiometricController extends Controller
             ], 404);
         }
 
-        $storedOtp = Cache::get('bio_otp_'.$user->id);
+        // Tafuta OTP ya hivi karibuni isiyokuwa used na bado haija-expire
+        $otpRecord = otps::where('user_id', $user->id)
+                    ->where('used', false)
+                    ->where('expires_at', '>', now())
+                    ->latest() // tunachukua ya mwisho iliyotengenezwa
+                    ->first();
 
-        if ($request->otp != $storedOtp) {
+        if (!$otpRecord || !Hash::check($request->otp, $otpRecord->otp)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid OTP'
+                'message' => 'Invalid or expired OTP'
             ], 401);
         }
 
-        // OTP is valid
-        Cache::forget('bio_otp_'.$user->id);
+        // Mark OTP kama imetumika
+        $otpRecord->update(['used' => true]);
 
-        return response()->json(['success' => true]);
+        return response()->json([
+            'success' => true,
+            'message' => 'OTP verified successfully'
+        ]);
     }
 
     public function deleteCredentials(Request $request)
