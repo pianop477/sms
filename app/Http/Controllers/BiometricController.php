@@ -57,12 +57,12 @@ class BiometricController extends Controller
         // Send SMS (mfano NextSmsService)
         $message = "Your biometric verification OTP is: $otp. Expires in 1 minutes. Do not share this code with anyone.";
         $nextSmsService = new NextSmsService();
-        // $response = $nextSmsService->sendSmsByNext(
-        //     "SHULE APP",
-        //     $this->formatPhoneNumber($user->phone),
-        //     $message,
-        //     'otp-'.uniqid()
-        // );
+        $response = $nextSmsService->sendSmsByNext(
+            "SHULE APP",
+            $this->formatPhoneNumber($user->phone),
+            $message,
+            'otp-'.uniqid()
+        );
 
         $beemSmsService = new BeemSmsService();
         $sender = "shuleApp";
@@ -72,7 +72,7 @@ class BiometricController extends Controller
             'dest_addr' => $this->formatPhoneNumber($user->phone),
         ];
 
-        $response = $beemSmsService->sendSms($sender, $message, $recipients);
+        // $response = $beemSmsService->sendSms($sender, $message, $recipients);
 
         return response()->json([
             'success' => true,
