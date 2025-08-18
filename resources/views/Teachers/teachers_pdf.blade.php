@@ -153,16 +153,16 @@
 
         @page {
             margin-top: 8mm;
-            margin-bottom: 8mm; /* Ongeza nafasi ya chini kwa footer */
-            margin-left: 10mm;
-            margin-right: 10mm;
+            margin-bottom: 12mm; /* Ongeza nafasi ya chini kwa footer */
+            margin-left: 8mm;
+            margin-right: 8mm;
         }
         footer {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 8mm; /*urefu wa footer*/
+            height: 4mm; /*urefu wa footer*/
             font-size: 10px;
             padding-top: 8px;
             border-top: 1px solid #ddd;
