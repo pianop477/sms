@@ -445,7 +445,7 @@
                                     <th>Roster ID#</th>
                                     <th>Attended</th>
                                     <th>Rate</th>
-                                    <th>created by</th>
+                                    <th>Created by</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
@@ -505,7 +505,7 @@
                 @else
                     <div class="empty-state">
                         <i class="fas fa-clipboard-check empty-icon"></i>
-                        <h3>No Reports Pending</h3>
+                        <h3>No Pending Reports</h3>
                         <p class="text-muted">All reports have been processed successfully</p>
                     </div>
                 @endif
