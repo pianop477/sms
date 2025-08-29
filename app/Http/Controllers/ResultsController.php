@@ -922,7 +922,7 @@ class ResultsController extends Controller
                 $messageContent .= "Mtihani wa ". strtoupper($student->exam_type).", wa Tar. {$dateFormat} ni: \n";
                 $messageContent .= strtoupper($student->courses) . "\n";
                 $messageContent .= "Jumla {$student->total_marks}, Wastani " . number_format($student->average_marks) . ", Nafasi ya {$student->rank} kati ya {$totalStudents}. \n";
-                $messageContent .= "Tembelea {$url} kuona ripoti";
+                $messageContent .= "Pakua ripoti hapa {$url} ";
 
                 // Prepare the recipients array
                 $recipients = [
@@ -1459,7 +1459,7 @@ class ResultsController extends Controller
             $messageContent = "Matokeo ya ". strtoupper($fullName ).", Mtihani wa ". strtoupper($examination).",\n";
             $messageContent .= "wa Tar. {$dateFormat} ni: \n";
             $messageContent .= strtoupper(implode($courseScores));
-            $messageContent .= "Jumla $totalScore, Wastani ". number_format($averageScore) .", Nafasi $studentRank kati ya $totalStudents. Tembelea {$url} kuona ripoti";
+            $messageContent .= "Jumla $totalScore, Wastani ". number_format($averageScore) .", Nafasi $studentRank kati ya $totalStudents. Pakua ripoti hapa {$url}";
             $reference = uniqid();
 
             $payload = [
@@ -1952,7 +1952,7 @@ class ResultsController extends Controller
                 . $subjectResultsText
                 . "Jumla: {$studentAverageTotal}, Wastani: ".number_format($studentAverage)."\n"
                 . "Nafasi ya {$position} kati ya {$totalStudents}.\n"
-                . "Tembelea {$link} kuona ripoti.";
+                . "Pakua ripoti hapa {$link}.";
 
             try {
                 $nextSmsService = new NextSmsService();
@@ -2358,7 +2358,7 @@ class ResultsController extends Controller
                     . "Jumla: {$payload['total_score']}\n"
                     . "Wastani: {$payload['total_average']}\n"
                     . "Nafasi ya {$payload['position']}.\n"
-                    . "Tembelea {$link} kuona ripoti.";
+                    . "Pakua ripoti hapa {$link}";
 
                 // Log::info("Sending SMS to {$phoneNumber}: {$message}");
                 $response = $nextSmsService->sendSmsByNext($sender, $phoneNumber, $message, uniqid());

@@ -43,8 +43,8 @@
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-4 mb-3">
-                                                    <label for="validationCustom02">Last name</label>
-                                                    <input type="text" required name="lname" class="form-control" id="validationCustom02" placeholder="Last name" required="" value="{{old('lname')}}">
+                                                    <label for="validationCustom02">Other names</label>
+                                                    <input type="text" required name="lname" class="form-control" id="validationCustom02" placeholder="Middle & Last name" required="" value="{{old('lname')}}">
                                                     @error('lname')
                                                     <div class="text-danger">{{$message}}</div>
                                                     @enderror

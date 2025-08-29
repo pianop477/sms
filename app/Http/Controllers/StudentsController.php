@@ -1222,8 +1222,41 @@ class StudentsController extends Controller
                                     ->orderBy('updated_at', 'DESC')
                                     ->take(5)
                                     ->get();
+        $studentPicture = $students->image;
+        $imagePath = public_path('assets/img/students/' .$studentPicture);
+        return view('profile.student_profile', compact('students', 'myClassTeacher', 'class_course', 'class', 'packages', 'imagePath'));
+    }
 
-        return view('profile.student_profile', compact('students', 'myClassTeacher', 'class_course', 'class', 'packages'));
+    public function downloadProfilePicture ($student)
+    {
+        $id = Hashids::decode($student);
+
+        $students = Student::query()
+                            ->join('grades', 'grades.id', '=', 'students.class_id')
+                            ->join('parents', 'parents.id', '=', 'students.parent_id')
+                            ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+                            ->leftJoin('transports', 'transports.id', '=', 'students.transport_id')
+                            ->select(
+                                'students.*',
+                                'grades.class_name', 'grades.class_code',
+                                'parents.address',
+                                'users.first_name as parent_first_name', 'users.last_name as parent_last_name',
+                                'users.phone', 'transports.driver_name', 'transports.bus_no', 'transports.routine', 'transports.gender as driver_gender',
+                                'transports.phone as driver_phone', 'users.gender as parent_gender', 'users.created_at as parent_created_at',
+                                'users.email',
+                            )
+                            ->findOrFail($id[0]);
+        $studentPicture = $students->image;
+        $filePath = public_path('assets/img/students/' . $studentPicture);
+
+        if (!file_exists($filePath)) {
+            abort(404, 'No picture found');
+        }
+
+        // Unaweza kuweka jina la file wakati linapakuliwa
+        $fileName = $students->first_name . '_' . $students->last_name . '.jpg';
+
+        return response()->download($filePath, $fileName);
     }
 
     private function scanFileForViruses($file): array

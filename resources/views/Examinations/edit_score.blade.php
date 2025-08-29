@@ -1,9 +1,9 @@
 @extends('SRTDashboard.frame')
 
 @section('content')
-<div class="container-fluid">
+<div class="container">
     <div class="row justify-content-center">
-        <div class="col-12 col-xl-10 mt-4">
+        <div class="col-12 mt-4">
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-primary text-white">
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
@@ -12,7 +12,7 @@
                             Edit Results - {{ strtoupper($courseName) }} ({{ strtoupper($className) }})
                         </h4>
                         <a href="{{route('home')}}" class="btn btn-light text-primary">
-                            <i class="fas fa-arrow-circle-left mr-2"></i> Back to Dashboard
+                            <i class="fas fa-arrow-circle-left mr-2"></i> Go to Dashboard
                         </a>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                                 <tr>
                                     <th width="5%">#</th>
                                     <th width="45%">Student Name</th>
-                                    <th width="25%">Score (0-{{ $marking_style == 1 ? '50' : '100' }})</th>
+                                    <th width="25%">Score</th>
                                     <th width="25%">Grade</th> <!-- Added Grade Column -->
                                 </tr>
                             </thead>

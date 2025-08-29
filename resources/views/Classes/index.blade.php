@@ -9,16 +9,16 @@
             <div class="col-row">
                 <div class="d-flex">
                     <div class="col-8">
-                        <h4 class="header-title text-center text-uppercase">Classes</h4>
+                        <h4 class="header-title text-center text-uppercase">Classes list</h4>
                     </div>
                     <div class="col-4">
-                        <button type="button" class="btn btn-link float-right" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus"></i> New Class
+                        <button type="button" class="btn btn-info btn-xs float-right" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus"></i> New Class
                         </button>
                         <div class="modal fade bd-example-modal-lg">
                             <div class="modal-dialog modal-lg">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title">Classes Registration Form</h5>
+                                        <h5 class="modal-title">Register New Class</h5>
                                         <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                     </div>
                                     <div class="modal-body">
@@ -114,7 +114,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-10">
-                    <h4 class="header-title text-center text-uppercase">Assign Class Teachers</h4>
+                    <h4 class="header-title text-center text-uppercase">Class Teachers</h4>
                 </div>
             </div>
             @if ($classes->isEmpty())

@@ -14,22 +14,17 @@ class sharedAccessMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next)
+   public function handle(Request $request, Closure $next)
     {
         $user = Auth::user();
 
-        if($user)
-        {
-            if($user->usertype == 2)
-            {
-                return $next($request);
-            }
-
-            if($user->teacher && $user->teacher->role_id == 2 || $user->teacher && $user->teacher->role_id == 3)
-            {
+        if ($user) {
+            if (
+                $user->usertype == 2 ||
+                ($user->teacher && in_array($user->teacher->role_id, [2, 3]))
+            ) {
                 return $next($request);
             }
         }
-
     }
 }

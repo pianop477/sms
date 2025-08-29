@@ -25,6 +25,7 @@ use App\Http\Controllers\StudentsController;
 use App\Http\Controllers\SubjectsController;
 use App\Http\Controllers\TeachersController;
 use App\Http\Controllers\TimetableController;
+use App\Http\Controllers\TodRosterController;
 use App\Http\Controllers\TransportController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\WebAuthn\WebAuthnLoginController;
@@ -249,13 +250,13 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('Attendance-report', [AttendanceController::class, 'getField'])->name('attendance.fill.form');
         Route::post('Attendances', [AttendanceController::class, 'genaralAttendance'])->name('manage.attendance');
         Route::post('Generate-attendance-report', [AttendanceController::class, 'generateClassReport'])->name('class.attendance.report');
+        Route::get('Deleted-teachers', [TeachersController::class, 'trashedTeachers'])->name('Teachers.trashed');
     });
 
     // 2. ROUTE ACCESS FOR EITHER MANAGER OR HEAD TEACHER ONLY ===========================================================================
     Route::middleware(['ManagerOrTeacher'])->group(function(){
         //teachers panel management =======================================================================
         Route::put('{teacher}/Delete-teacher', [TeachersController::class, 'deleteTeacher'])->name('Teachers.remove');
-        Route::get('Deleted-teachers', [TeachersController::class, 'trashedTeachers'])->name('Teachers.trashed');
 
         // users management & permission
         Route::get('Password-Reset', [RolesController::class, 'userPassword'])->name('users.lists');
@@ -369,6 +370,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::post('Change-password', [HomeController::class, 'storePassword'])->name('change.new.password');
         Route::get('Persona-details', [HomeController::class, 'showProfile'])->name('show.profile');
         Route::put('{user}/Personal-details', [HomeController::class, 'updateProfile'])->name('update.profile');
+        Route::get('/student-profile-picture/{student}', [StudentsController::class, 'downloadProfilePicture'])->name('student.profile.picture');
     });
 
     // 5. ROUTE ACCESS FOR PARENTS ONLY ===================================================================================================
@@ -453,4 +455,18 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Alert()->toast('Goodbyee see you back later 👋', 'success');
         return redirect()->route('login');
     })->name('logout');
+
+    Route::get('Teachers-roster', [TodRosterController::class, 'index'])->name('tod.roster.index');
+    Route::post('Submit-tod-roster', [TodRosterController::class, 'assignTeachers'])->name('tod.roster.store');
+    Route::delete('Delete-tod-roster/{id}', [TodRosterController::class, 'destroy'])->name('tod.roster.destroy');
+    Route::put('Activate-tod-roster/{id}', [TodRosterController::class, 'activate'])->name('tod.roster.activate');
+
+    // teacher to fill their report for the day
+    Route::get('Daily-school-report/create', [TodRosterController::class, 'create'])->name('tod.report.create');
+    Route::get('/api/attendance/fetch', [TodRosterController::class, 'fetchAttendance']);
+    Route::post('Daily-school-report', [TodRosterController::class, 'store'])->name('tod.report.store');
+
+    //head teacher or academic report access daily report
+    Route::get('Daily-school-report', [TodRosterController::class, 'getSchoolReport'])->name('get.school.report');
+
 });

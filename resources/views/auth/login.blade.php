@@ -397,7 +397,11 @@
   </div>
 
   <div class="footer">
-    &copy; {{ date('Y') }} ShuleApp. All rights reserved.
+        @php
+            $startYear = 2025;
+            $currentYear = date('Y');
+        @endphp
+    &copy; {{ $startYear == $currentYear ? $startYear : $startYear . ' - ' . $currentYear }} ShuleApp. All rights reserved.
   </div>
 
   <div id="toast" class="toast">
