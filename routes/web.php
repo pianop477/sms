@@ -468,5 +468,8 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
 
     //head teacher or academic report access daily report
     Route::get('Daily-school-report', [TodRosterController::class, 'getSchoolReport'])->name('get.school.report');
+    Route::get('Daily-school-report/date/{date}', [TodRosterController::class, 'reportByDate'])->name('report.by.date');
+    Route::delete('Daily-school-report/{date}/delete', [TodRosterController::class, 'destroyReport'])->name('report.reject');
+    Route::put('Daily-school-report/{id}/update', [TodRosterController::class, 'updateDailyReport'])->name('report.update');
 
 });

@@ -17,8 +17,10 @@ class daily_report_details extends Model
         'lunch_time',
         'teachers_attendance',
         'student_attendance',
-        'event',
+        'daily_new_event',
         'tod_remarks',
         'headteacher_comment',
+        'status',
+        'approved_by'
     ];
 }

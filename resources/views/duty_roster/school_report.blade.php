@@ -444,7 +444,7 @@
                                     <th>Report Date</th>
                                     <th>Roster ID#</th>
                                     <th>Attended</th>
-                                    <th>Rate</th>
+                                    <th>Attended Rate</th>
                                     <th>Created by</th>
                                     <th>Status</th>
                                     <th>Actions</th>
@@ -471,7 +471,7 @@
                                         <td>{{ \Carbon\Carbon::parse($report->report_date)->format('M d, Y') }}</td>
                                         <td class="text-uppercase">{{ $report->roster_id }}</td>
                                         <td>
-                                            <div><small>Boys:</small> {{ $report->present_boys }}, Girls:</small> {{ $report->present_girls }}</div>
+                                            <div><small>Boys: {{ $report->present_boys }}</small>, <small>Girls: {{ $report->present_girls }}</small></div>
                                             <div><small><b>Total: {{ $totalAtt }}</b></small></div>
                                         </td>
                                         <td>
@@ -486,14 +486,15 @@
                                         </td>
                                         <td>
                                             <div class="action-btns">
-                                                <a href="" class="btn btn-action btn-primary">
-                                                    <i class="fas fa-eye"></i> View
+                                                <a href="{{route('report.by.date', ['date' => $report->report_date])}}" class="btn btn-action btn-approve" onclick="return confirm('Are you sure you want to view and approve this school daily report for {{\Carbon\Carbon::parse($report->report_date)->format('d-m-Y')}}?')">
+                                                    <i class="fas fa-check"></i> Approve
                                                 </a>
-                                                    <form action="" method="POST">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-action btn-approve">
-                                                            <i class="fas fa-check"></i> Approve
-                                                        </button>
+                                                <form action="{{route('report.reject', ['date' => $report->report_date])}}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-action btn-reject" onclick="return confirm('Are you sure you want to delete this school daily report for {{\Carbon\Carbon::parse($report->report_date)->format('d-m-Y')}}?')">
+                                                        <i class="fas fa-trash"></i> Delete
+                                                    </button>
                                                 </form>
                                             </div>
                                         </td>
