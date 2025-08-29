@@ -431,7 +431,7 @@
         <!-- Reports Table Card -->
         <div class="main-card animate-fadeIn">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h3><i class="fas fa-tasks"></i> Pending Approval Reports</h3>
+                <h3><i class="fas fa-tasks"></i> Pending Reports</h3>
                 <span class="badge bg-light text-dark py-2 px-3">{{ $pendingReports }} Pending</span>
             </div>
             <div class="card-body">
@@ -441,12 +441,12 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Date</th>
-                                    <th>Class</th>
-                                    <th>Registered</th>
-                                    <th>Attendance</th>
+                                    <th>Report Date</th>
+                                    <th>Roster ID#</th>
+                                    <th>Attended</th>
                                     <th>Rate</th>
-                                    <th>Remarks</th>
+                                    <th>created by</th>
+                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -454,8 +454,8 @@
                                 @foreach($reports as $key => $report)
                                     @php
                                         $totalReg = $report->registered_boys + $report->registered_girls;
-                                        $totalAtt = $report->attendance_boys + $report->attendance_girls;
-                                        $rate = $totalReg > 0 ? round(($totalAtt / $totalReg) * 100, 1) : 0;
+                                        $totalAtt = $report->present_boys + $report->present_girls;
+                                        $rate = $totalRegistered > 0 ? round(($totalAtt / $totalRegistered) * 100, 1) : 0;
 
                                         if ($rate >= 80) {
                                             $progressClass = 'bg-success';
@@ -465,50 +465,35 @@
                                             $progressClass = 'bg-danger';
                                         }
                                     @endphp
+
                                     <tr>
-                                        <td class="fw-bold">{{ $key+1 }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($report->date)->format('M d, Y') }}</td>
-                                        <td><span class="badge badge-class">{{ $report->class->name ?? 'N/A' }}</span></td>
+                                        <td>{{ $key+1 }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($report->report_date)->format('M d, Y') }}</td>
+                                        <td class="text-uppercase">{{ $report->roster_id }}</td>
                                         <td>
-                                            <div><small class="text-muted">Boys:</small> {{ $report->registered_boys }}</div>
-                                            <div><small class="text-muted">Girls:</small> {{ $report->registered_girls }}</div>
-                                            <div class="fw-bold mt-1">Total: {{ $totalReg }}</div>
+                                            <div><small>Boys:</small> {{ $report->present_boys }}, Girls:</small> {{ $report->present_girls }}</div>
+                                            <div><small><b>Total: {{ $totalAtt }}</b></small></div>
                                         </td>
                                         <td>
-                                            <div><small class="text-muted">Boys:</small> {{ $report->attendance_boys }}</div>
-                                            <div><small class="text-muted">Girls:</small> {{ $report->attendance_girls }}</div>
-                                            <div class="fw-bold mt-1">Total: {{ $totalAtt }}</div>
-                                        </td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="attendance-progress flex-grow-1 me-2">
-                                                    <div class="progress-bar {{ $progressClass }}" style="width: {{ $rate }}%;"></div>
-                                                </div>
-                                                <span class="fw-bold">{{ $rate }}%</span>
+                                            <div class="progress">
+                                                <div class="progress-bar {{ $progressClass }}" style="width: {{ $rate }}%"></div>
                                             </div>
+                                            <span>{{ $rate }}%</span>
                                         </td>
-                                        <td>
-                                            @if($report->remarks)
-                                                <span class="d-inline-block text-truncate" style="max-width: 150px;" data-bs-toggle="tooltip" title="{{ $report->remarks }}">
-                                                    {{ $report->remarks }}
-                                                </span>
-                                            @else
-                                                <span class="text-muted">No remarks</span>
-                                            @endif
+                                        <td class="text-capitalize">{{ $report->first_name }} {{ $report->last_name }}</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-danger text-white text-capitalize">{{$report->status}}</span>
                                         </td>
                                         <td>
                                             <div class="action-btns">
-                                                <form action="{{ route('school_report.approve', $report->id) }}" method="POST">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-action btn-approve">
-                                                        <i class="fas fa-check"></i> Approve
-                                                    </button>
-                                                </form>
-                                                <form action="{{ route('school_report.reject', $report->id) }}" method="POST">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-action btn-reject">
-                                                        <i class="fas fa-times"></i> Reject
-                                                    </button>
+                                                <a href="" class="btn btn-action btn-primary">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                                    <form action="" method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-action btn-approve">
+                                                            <i class="fas fa-check"></i> Approve
+                                                        </button>
                                                 </form>
                                             </div>
                                         </td>

@@ -78,6 +78,7 @@ class TodRosterController extends Controller
                             ->join('users', 'users.id', '=', 'teachers.user_id')
                             ->select('teachers.id', 'users.first_name', 'users.last_name')
                             ->whereIn('role_id', [1, 4])
+                            ->where('teachers.status', 1)
                             ->orderBy('users.first_name')
                             ->get();
         return view('duty_roster.index', compact('rosters', 'teachers'));
@@ -385,10 +386,31 @@ class TodRosterController extends Controller
     {
         $today = Carbon::today()->format('Y-m-d');
         $pendingReports = daily_report_details::where('status', 'pending')->count();
-        $reports = daily_report_attendance::get();
+        $reports = daily_report_attendance::query()
+                                ->join('daily_report_details', 'daily_report_attendances.daily_report_id', '=', 'daily_report_details.id')
+                                ->leftJoin('tod_rosters', 'daily_report_details.tod_roster_id', '=', 'tod_rosters.id')
+                                ->leftJoin('teachers', 'tod_rosters.teacher_id', '=', 'teachers.id')
+                                ->leftJoin('users', 'teachers.user_id', '=', 'users.id')
+                                ->selectRaw('
+                                    daily_report_details.report_date,
+                                    SUM(daily_report_attendances.registered_boys) as registered_boys,
+                                    SUM(daily_report_attendances.registered_girls) as registered_girls,
+                                    SUM(daily_report_attendances.present_boys) as present_boys,
+                                    SUM(daily_report_attendances.present_girls) as present_girls,
+                                    tod_rosters.roster_id,
+                                    users.first_name,
+                                    users.last_name,
+                                    daily_report_details.status
+                                ')
+                                ->where('daily_report_details.status', 'pending')
+                                ->groupBy('tod_rosters.roster_id', 'users.first_name', 'users.last_name', 'daily_report_details.report_date', 'daily_report_details.status')
+                                ->orderBy('daily_report_details.report_date', 'desc')
+                                ->get();
+
+        // return $reports;
         $totalRegistered = Student::where('status', 1)->count();
         $reportSummary = daily_report_attendance::query()
-                                    ->join('dailY_report_details', 'daily_report_attendances.daily_report_id', '=', 'daily_report_details.id')
+                                    ->join('daily_report_details', 'daily_report_attendances.daily_report_id', '=', 'daily_report_details.id')
                                     ->select('daily_report_attendances.*', 'daily_report_details.report_date')
                                     ->where('daily_report_details.report_date', $today);
         return view('duty_roster.school_report',compact('reports', 'totalRegistered', 'pendingReports', 'today', 'reportSummary'));
