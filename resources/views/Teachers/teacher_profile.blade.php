@@ -46,7 +46,7 @@
                                 <div class="modal-dialog modal-dialog-centered modal-lg">
                                     <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="studentPhotoModalLabel">Student Photo</h5>
+                                        <h5 class="modal-title" id="studentPhotoModalLabel">Teacher Photo</h5>
                                         <button type="button" class="btn-close btn btn-danger btn-xs" data-bs-dismiss="modal" aria-label="Close">Close</button>
                                     </div>
                                     <div class="modal-body text-center">
