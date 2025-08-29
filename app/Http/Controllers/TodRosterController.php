@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Vinkla\Hashids\Facades\Hashids;
 
 class TodRosterController extends Controller
 {
@@ -331,22 +332,34 @@ class TodRosterController extends Controller
 
             // 3️⃣ Hifadhi attendance records ikiwa zipo
             if ($request->has('attendance')) {
-                // Log::info('Attendance data found: ' . json_encode($request->attendance));
+                // \Log::info('Attendance data found: ' . json_encode($request->attendance));
 
-                foreach ($request->attendance as $classId => $values) {
-                    // Skip total row or invalid class IDs
-                    if ($classId === 'total' || !is_numeric($classId)) {
-                        // Log::info('Skipping class ID: ' . $classId);
+                foreach ($request->attendance as $key => $values) {
+                    // Tenga class_id na stream kutoka kwenye key
+                    $keyParts = explode('_', $key);
+
+                    // Hakikisha key ina sehemu mbili (class_id na stream)
+                    if (count($keyParts) < 2) {
+                        // \Log::info('Skipping invalid key format: ' . $key);
                         continue;
                     }
 
-                    // Log::info('Processing class ID: ' . $classId . ' with values: ' . json_encode($values));
+                    $classId = $keyParts[0];
+                    $stream = $keyParts[1];
+
+                    // Skip rows with invalid class_id
+                    if ($classId === 'undefined' || $classId === 'total' || !is_numeric($classId)) {
+                        // \Log::info('Skipping invalid class ID: ' . $classId);
+                        continue;
+                    }
+
+                    // \Log::info('Processing class ID: ' . $classId . ', stream: ' . $stream . ' with values: ' . json_encode($values));
 
                     try {
                         $attendance = daily_report_attendance::create([
                             'daily_report_id'  => $report->id,
                             'class_id'         => (int)$classId,
-                            'group'            => $values['group'] ?? null,
+                            'group'            => $stream, // Tumia stream from the key
                             'registered_boys'  => isset($values['registered_boys']) ? (int)$values['registered_boys'] : 0,
                             'registered_girls' => isset($values['registered_girls']) ? (int)$values['registered_girls'] : 0,
                             'present_boys'     => isset($values['present_boys']) ? (int)$values['present_boys'] : 0,
@@ -357,16 +370,17 @@ class TodRosterController extends Controller
                             'permission_girls' => isset($values['permission_girls']) ? (int)$values['permission_girls'] : 0,
                         ]);
 
-                        // Log::info('Successfully saved attendance for class ID: ' . $classId);
+                        // \Log::info('Successfully saved attendance for class ID: ' . $classId . ', stream: ' . $stream);
                     } catch (\Exception $e) {
-                        // Log::error('Error saving attendance for class ID ' . $classId . ': ' . $e->getMessage());
-                        throw $e;
+                        // \Log::error('Error saving attendance for class ID ' . $classId . ', stream: ' . $stream . ': ' . $e->getMessage());
+                        // Continue with other records instead of throwing error
+                        continue;
                     }
                 }
             } else {
-                // Log::info('No attendance data found in request');
-                Alert()->toast('No attendance data provided.', 'info');
-                return redirect()->route('tod.report.create');
+                // \Log::info('No attendance data found in request');
+                Alert()->toast('No attendance data provided.', 'warning');
+                return back();
             }
 
             DB::commit();
@@ -414,6 +428,86 @@ class TodRosterController extends Controller
                                     ->select('daily_report_attendances.*', 'daily_report_details.report_date')
                                     ->where('daily_report_details.report_date', $today);
         return view('duty_roster.school_report',compact('reports', 'totalRegistered', 'pendingReports', 'today', 'reportSummary'));
+    }
+
+
+    public function reportByDate($date)
+    {
+        $reportDetails = daily_report_details::where('report_date', $date)->first();
+        // return $reportDetails;
+        $roster = TodRoster::findOrFail($reportDetails->tod_roster_id);
+        // return $roster;
+
+        $dailyAttendance = daily_report_attendance::query()
+                            ->join('grades', 'grades.id', '=', 'daily_report_attendances.class_id')
+                            ->select('daily_report_attendances.*', 'grades.class_code')
+                            ->where('daily_report_id', $reportDetails->id)
+                            ->orderBy('grades.class_code', 'ASC')
+                            ->orderBY('daily_report_attendances.group', 'ASC')
+                            ->get();
+        $user = Auth::user();
+        $school = school::findOrFail($user->school_id);
+        return view('duty_roster.report_preview', compact('reportDetails', 'roster', 'dailyAttendance', 'school'));
+
+    }
+
+    public function destroyReport ($date)
+    {
+        $reportDetails = daily_report_details::where('report_date', $date)->first();
+        // return $reportDetails;
+        if(!$reportDetails) {
+            Alert()->toast('Failed to get report details', 'error');
+            return back();
+        }
+        $dailyAttendance = daily_report_attendance::where('daily_report_id', $reportDetails->id)->get();
+        if($dailyAttendance) {
+            foreach($dailyAttendance as $row) {
+                $row->delete();
+            }
+        }
+
+        $reportDetails->delete();
+
+        Alert()->toast('Daily report deleted successfully', 'success');
+        return redirect()->route('get.school.report');
+    }
+
+    public function updateDailyReport(Request $request, $id)
+    {
+        $decode = Hashids::decode($id);
+        $report = daily_report_details::findOrFail($decode[0]);
+
+        if(!$report) {
+            Alert()->toast('Failed to get report details', 'error');
+            return back();
+        }
+
+        $user = Auth::user();
+
+        $this->validate($request, [
+            'parade' => 'sometimes|string|max:255',
+            'break_time' => 'sometimes|string|max:255',
+            'lunch_time' => 'sometimes|string|max:255',
+            'teachers_attendance' => 'sometimes|string|max:255',
+            'daily_new_event' => 'nullable|sometimes|string|max:255',
+            'tod_remarks' => 'sometimes|string|max:255',
+            'headteacher_comment' => 'required|string|max:255',
+        ]);
+
+        $report->update([
+            'parade' => $request->parade,
+            'break_time' => $request->break_time,
+            'lunch_time' => $request->lunch_time,
+            'teacher_attendance' => $request->teachers_attendance,
+            'daily_new_event' => $request->daily_new_event ?? '',
+            'tod_remarks' => $request->tod_remarks,
+            'headteacher_comment' => $request->headteacher_comment,
+            'status' => 'approved',
+            'approved_by' => $user->first_name . ' '. $user->last_name
+        ]);
+
+        Alert()->toast('Daily report has been approved and submitted successfully', 'success');
+        return redirect()->route('get.school.report');
     }
 
 }

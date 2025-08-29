@@ -411,7 +411,7 @@
                         </div>
 
                         <div class="table-responsive">
-                            <table class="table table-bordered">
+                            <table class="table table-bordered table-responsive-md">
                                 <thead>
                                     <tr>
                                         <th rowspan="2">Class</th>
@@ -735,22 +735,24 @@
                                 return value === 0 ? 'class="table-danger"' : '';
                             }
 
+                            // Badilisha kwenye JavaScript code yako
                             attendanceTableBody.innerHTML += `
                                 <tr ${isTotal ? 'class="table-secondary fw-bold"' : ''}>
                                     <td style="text-transform:uppercase">${record.class_code} ${record.stream ?? ''}</td>
-                                    <td>${record.registered_boys}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}][registered_boys]" value="${record.registered_boys}">` : ''}</td>
-                                    <td>${record.registered_girls}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}][registered_girls]" value="${record.registered_girls}">` : ''}</td>
+                                    <td>${record.registered_boys}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][registered_boys]" value="${record.registered_boys}">` : ''}</td>
+                                    <td>${record.registered_girls}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][registered_girls]" value="${record.registered_girls}">` : ''}</td>
                                     <td>${Number(record.registered_boys) + Number(record.registered_girls)}</td>
-                                    <td ${highlightIfZero(record.attended_boys)}>${record.attended_boys}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}][present_boys]" value="${record.attended_boys}">` : ''}</td>
-                                    <td ${highlightIfZero(record.attended_girls)}>${record.attended_girls}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}][present_girls]" value="${record.attended_girls}">` : ''}</td>
+                                    <td ${highlightIfZero(record.attended_boys)}>${record.attended_boys}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][present_boys]" value="${record.attended_boys}">` : ''}</td>
+                                    <td ${highlightIfZero(record.attended_girls)}>${record.attended_girls}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][present_girls]" value="${record.attended_girls}">` : ''}</td>
                                     <td ${highlightIfZero(record.attended_boys + record.attended_girls)}>${record.attended_boys + record.attended_girls}</td>
-                                    <td ${highlightIfZero(record.absent_boys)}>${record.absent_boys}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}][absent_boys]" value="${record.absent_boys}">` : ''}</td>
-                                    <td ${highlightIfZero(record.absent_girls)}>${record.absent_girls}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}][absent_girls]" value="${record.absent_girls}">` : ''}</td>
+                                    <td ${highlightIfZero(record.absent_boys)}>${record.absent_boys}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][absent_boys]" value="${record.absent_boys}">` : ''}</td>
+                                    <td ${highlightIfZero(record.absent_girls)}>${record.absent_girls}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][absent_girls]" value="${record.absent_girls}">` : ''}</td>
                                     <td ${highlightIfZero(record.absent_boys + record.absent_girls)}>${record.absent_boys + record.absent_girls}</td>
-                                    <td ${highlightIfZero(record.permission_boys)}>${record.permission_boys}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}][permission_boys]" value="${record.permission_boys}">` : ''}</td>
-                                    <td ${highlightIfZero(record.permission_girls)}>${record.permission_girls}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}][permission_girls]" value="${record.permission_girls}">` : ''}</td>
+                                    <td ${highlightIfZero(record.permission_boys)}>${record.permission_boys}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][permission_boys]" value="${record.permission_boys}">` : ''}</td>
+                                    <td ${highlightIfZero(record.permission_girls)}>${record.permission_girls}${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][permission_girls]" value="${record.permission_girls}">` : ''}</td>
                                     <td ${highlightIfZero(record.permission_boys + record.permission_girls)}>${record.permission_boys + record.permission_girls}</td>
-                                    ${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}][group]" value="${record.stream || ''}">` : ''}
+                                    ${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][group]" value="${record.stream || ''}">` : ''}
+                                    ${!isTotal ? `<input type="hidden" name="attendance[${record.class_id}_${record.stream}][class_id]" value="${record.class_id}">` : ''}
                                 </tr>`;
                         });
                     }
