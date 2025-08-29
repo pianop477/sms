@@ -199,7 +199,7 @@ class ExamController extends Controller
                 );
             }
 
-            Alert::toast('Examination results have been saved to the draft', 'success');
+            Alert::toast('Examination results has been saved to the draft', 'success');
             return to_route('home');
             // return to_route('score.prepare.form', Hashids::encode($request->course_id));
         }
@@ -237,7 +237,7 @@ class ExamController extends Controller
                 ]);
             }
 
-            Alert::toast('Examination results have been submitted successfully', 'success');
+            Alert::toast('Examination results has been submitted successfully', 'success');
             // return redirect()->route('score.prepare.form', Hashids::encode($request->course_id));
             return redirect()->route('home');
         }
@@ -971,7 +971,7 @@ class ExamController extends Controller
                                     ->where('status', 2)
                                     ->exists();
         if ($isPublished) {
-            Alert()->toast('Results have already been published. Cannot delete.', 'error');
+            Alert()->toast('Results has already been published. Cannot delete.', 'error');
             return to_route('results.byExamType', ['course' => $course, 'year' => $year, 'examType' => $examType]);
         }
 

@@ -98,7 +98,7 @@
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="validationCustom01">Email</label>
-                    <input type="email" name="email" class="form-control" value="{{old('email', $teachers->email)}}" required>
+                    <input type="email" name="email" class="form-control" value="{{old('email', $teachers->email)}}">
                     @error('email')
                     <div class="text-danger">{{$message}}</div>
                     @enderror

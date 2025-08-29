@@ -16,7 +16,7 @@ class TransportController extends Controller
     public function getSchoolBuses()
     {
         $user = Auth::user();
-        $transport = Transport::where('school_id', $user->school_id)->get();
+        $transport = Transport::where('school_id', $user->school_id)->orderBy('driver_name', 'asc')->get();
         return view('Transport.index', ['transport' => $transport]);
     }
     /**

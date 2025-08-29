@@ -37,9 +37,9 @@
                         </div>
                         <div class="col-md-2 text-end">
                             <a href="{{ route('results.delete.byTeacher', ['course' => Hashids::encode($class_course->id), 'year' => $year, 'examType' => Hashids::encode($exam_id), 'month' => $month, 'date' => $date]) }}"
-                            class="btn btn-danger btn-sm"
+                            class="btn btn-danger"
                             onclick="return confirm('Are you sure you want to delete this result for date: {{\Carbon\Carbon::parse($date)->format('d-m-Y')}}?')">
-                            <i class="fas fa-trash"></i> Delete
+                            <i class="fas fa-trash" style="font-size:1.5rem;"></i>
                             </a>
                         </div>
                         </div>

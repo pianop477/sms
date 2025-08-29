@@ -34,6 +34,36 @@
                             <b>ID #: <span class="text-uppercase"> {{$teachers->member_id}}</span></b>
                         </p>
                         <br>
+                        @if ($teachers->image != Null)
+                            <a href="javascript:void(0)"
+                                    data-photo="{{ asset('assets/img/profile/' . $teachers->image) }}"
+                                    class="btn btn-block btn-outline-danger btn-xs view-photo"
+                                    data-toggle="tooltip" data-placement="top" title="View Photo">
+                                        <i class="fas fa-image"></i> View Photo
+                                    </a>
+                            <!-- Modal -->
+                            <div class="modal fade" id="studentPhotoModal" tabindex="-1" aria-labelledby="studentPhotoModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                    <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="studentPhotoModalLabel">Student Photo</h5>
+                                        <button type="button" class="btn-close btn btn-danger btn-xs" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                                    </div>
+                                    <div class="modal-body text-center">
+                                        <img id="student-photo" src="" alt="Student Photo" class="img-fluid rounded shadow">
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                                <style>
+                                #student-photo {
+                                    max-width: 90%;
+                                    max-height: 60vh;
+                                    object-fit: contain;
+                                }
+                                </style>
+
+                        @endif
                         <br>
                         <ul class="list-group list-group-flush mb-3">
                             <li class="list-group-item">
@@ -92,7 +122,7 @@
                                         <tr>
                                             <th><b><i class="fas fa-envelope"></i> Email</b></th>
                                             @if ($teachers->email == Null)
-                                                <td class="text-danger">Email not Provided</td>
+                                                <td class="text-danger">N/A</td>
                                             @else
                                                 <td>{{$teachers->email}}</td>
                                             @endif
@@ -171,6 +201,14 @@
     </div>
 </div>
 <script>
-
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('.view-photo').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var photoUrl = this.getAttribute('data-photo');
+                document.getElementById('student-photo').setAttribute('src', photoUrl);
+                $('#studentPhotoModal').modal('show');
+            });
+        });
+    });
 </script>
 @endsection

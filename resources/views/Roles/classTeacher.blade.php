@@ -122,11 +122,11 @@
                             </thead>
                             <tbody>
                                 @foreach ($classTeacher as $teacher )
-                                    <tr class="text-capitalize text-center">
+                                    <tr class="text-capitalize">
                                         <td>{{$loop->iteration}}</td>
-                                        <td class="text-uppercase">{{$teacher->class_name}}</td>
+                                        <td class="text-uppercase text-center">{{$teacher->class_name}}</td>
                                         <td class="text-capitalize text-center">Stream {{$teacher->group}}</td>
-                                        <td>{{$teacher->teacher_first_name. ' '. $teacher->teacher_last_name}}</td>
+                                        <td class="text-center">{{$teacher->teacher_first_name. ' '. $teacher->teacher_last_name}}</td>
                                         <td>
                                             <ul class="d-flex justify-content-center">
                                                 <li class="mr-3">

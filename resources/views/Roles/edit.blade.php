@@ -4,10 +4,10 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-10">
-                    <h4 class="header-title text-center text-uppercase">Edit/Change Class Teacher</h4>
+                    <h4 class="header-title text-uppercase">Edit/Change Class Teacher</h4>
                 </div>
                 <div class="col-2">
-                    <a href="{{route('Class.Teachers', ['class' => Hashids::encode($classTeacher->class_id)])}}"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                    <a href="{{route('Class.Teachers', ['class' => Hashids::encode($classTeacher->class_id)])}}" class="btn btn-info btn-xs float-right"><i class="fas fa-arrow-circle-left" style=""></i> Back</a>
                 </div>
             </div>
             <form class="needs-validation" novalidate="" action="{{route('roles.update.class.teacher', ['classTeacher' => Hashids::encode($classTeacher->id)])}}" method="POST" enctype="multipart/form-data">
@@ -23,6 +23,7 @@
                         </div>
                         @enderror
                     </div>
+                    <div class="col-md-2"></div>
                     <div class="col-md-4 mb-3">
                         <label for="validationCustom02">Class Code</label>
                         <input type="text" name="code" disabled class="form-control text-uppercase" id="validationCustom02" placeholder="Last name" required="" value="{{$classTeacher->class_code}}">
@@ -44,9 +45,10 @@
                         </div>
                         @enderror
                     </div>
+                    <div class="col-md-2"></div>
                     <div class="col-md-4 mb-3">
                         <label for="validationCustom01">Teacher's Name</label>
-                        <select name="teacher" id="validationCustom01" class="form-control text-uppercase">
+                        <select name="teacher" id="validationCustom01" class="form-control text-capitalize" required>
                             <option value="{{$classTeacher->teacher_id}}" selected>{{$classTeacher->first_name}} {{$classTeacher->last_name}}</option>
                             @if ($teachers->isEmpty())
                                 <option value="" class="text-danger">No teachers found</option>
@@ -63,7 +65,7 @@
                         @enderror
                     </div>
                 </div>
-                <button class="btn btn-primary" id="saveButton" type="submit">Save changes</button>
+                <button class="btn btn-success" id="saveButton" type="submit">Save changes</button>
             </form>
         </div>
     </div>

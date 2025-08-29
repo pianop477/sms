@@ -255,7 +255,7 @@
                                         <td class="text-capitalize">{{ucwords(strtolower($parent->first_name. ' '. $parent->last_name))}}</td>
                                         <td class="text-capitalize">{{$parent->gender[0]}}</td>
                                         <td>{{$parent->phone}}</td>
-                                        <td>{{ucwords(strtolower($parent->email ?? 'null'))}}</td>
+                                        <td>{{ucwords(strtolower($parent->email ?? 'N/A'))}}</td>
                                         <td>
                                             @if ($parent->status ==1)
                                                 <span class="badge bg-success text-white">{{_('Active')}}</span>
