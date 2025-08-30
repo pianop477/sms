@@ -43,7 +43,7 @@
                                 @foreach ($teachers as $teacher )
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
-                                        <td class="text-capitalize">{{$teacher->first_name. ' '. $teacher->last_name}}</td>
+                                        <td class="text-capitalize">{{ucwords(strtolower($teacher->first_name. ' '. $teacher->last_name))}}</td>
                                         <td class="text-capitalize">{{$teacher->gender[0]}}</td>
                                         <td>{{$teacher->phone}}</td>
                                         <td>{{$teacher->email}}</td>
