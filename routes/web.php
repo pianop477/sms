@@ -251,6 +251,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::post('Attendances', [AttendanceController::class, 'genaralAttendance'])->name('manage.attendance');
         Route::post('Generate-attendance-report', [AttendanceController::class, 'generateClassReport'])->name('class.attendance.report');
         Route::get('Deleted-teachers', [TeachersController::class, 'trashedTeachers'])->name('Teachers.trashed');
+        Route::get('/api/search-students', [StudentsController::class, 'searchStudent'])->name('api.search.students');
     });
 
     // 2. ROUTE ACCESS FOR EITHER MANAGER OR HEAD TEACHER ONLY ===========================================================================

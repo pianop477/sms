@@ -17,11 +17,20 @@
                 <div class="card card-outline" style="border-top: 3px solid blue;">
                     <div class="card-body box-profile">
                         <div class="text-center">
-                            @if ($students->image == Null)
-                                <img src="{{asset('assets/img/students/student.jpg')}}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
-                            @else
-                                <img src="{{asset('assets/img/students/'. $students->image) ?? asset('assets/img/students/student.jpg')}}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
-                            @endif
+                            @php
+                                // Determine the image path
+                                $imageName = $students->image;
+                                $imagePath = public_path('assets/img/students/' . $imageName);
+
+                                // Check if the image exists and is not empty
+                                if (!empty($imageName) && file_exists($imagePath)) {
+                                    $avatarImage = asset('assets/img/students/' . $imageName);
+                                } else {
+                                    // Use default avatar based on gender
+                                    $avatarImage = asset('assets/img/students/' . ($students->gender == 'male' ? 'student.jpg' : 'student.jpg'));
+                                }
+                            @endphp
+                            <img src="{{ $avatarImage }}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
                         </div>
                         <h6 class="profile-username text-center text-primary text-uppercase">
                             <b>{{ucwords(strtolower($students->first_name. ' '. $students->middle_name. ' '. $students->last_name))}}</b>
@@ -30,11 +39,10 @@
                             <b>Admission #: <span class="text-uppercase"> {{$students->admission_number}}</span></b>
                         </p>
                         <br>
-                        @if ($students->image != Null)
                             <ul class="d-flex justify-content-center">
                                 <li class="mr-2">
                                     <a href="javascript:void(0)"
-                                    data-photo="{{ asset('assets/img/students/' . $students->image) }}"
+                                    data-photo="{{ $avatarImage }}"
                                     class="btn btn-outline-danger btn-xs view-photo"
                                     data-toggle="tooltip" data-placement="top" title="View Photo">
                                         <i class="fas fa-image"></i> View Photo
@@ -57,6 +65,7 @@
                                         <button type="button" class="btn-close btn btn-danger btn-xs" data-bs-dismiss="modal" aria-label="Close">Close</button>
                                     </div>
                                     <div class="modal-body text-center">
+                                        <h6 class="text-primary text-center">{{strtoupper($students->first_name .' ' . $students->middle_name. ' '. $students->last_name)}}</h6>
                                         <img id="student-photo" src="" alt="Student Photo" class="img-fluid rounded shadow">
                                     </div>
                                     </div>
@@ -69,7 +78,6 @@
                                     object-fit: contain;
                                 }
                                 </style>
-                        @endif
                         <br>
                         <br>
                         <ul class="list-group list-group-flush mb-3">
@@ -159,7 +167,7 @@
                                             <th><b>School Bus</b></th>
                                             <td class="text-capitalize">
                                                 @if ($students->transport_id == Null)
-                                                    <span class="">No</span>
+                                                    <span class="">N/A</span>
                                                 @else
                                                     <span class="">Yes</span>
 
@@ -194,7 +202,7 @@
                                             <th><i class="fas fa-envelope"></i> Email</th>
                                             <td>
                                                 @if ($students->email == NULL)
-                                                    <span class="text-danger">No email provided</span>
+                                                    <span class="text-danger">N/A</span>
                                                 @else
                                                     <a href="mailto:{{ $students->parent_email }}" class="text-decoration-none text-dark">
                                                         {{ $students->email }}
@@ -230,7 +238,7 @@
                                             <th><i class="fas fa-envelope"></i> Email</th>
                                             <td>
                                                 @if ($students->email == NULL)
-                                                    <span class="text-danger">No email provided</span>
+                                                    <span class="text-danger">N/A</span>
                                                 @else
                                                     <a href="mailto:{{ $students->parent_email }}" class="text-decoration-none text-dark">
                                                         {{ $students->email }}

@@ -25,6 +25,11 @@ class sharedAccessMiddleware
             ) {
                 return $next($request);
             }
+
+            return redirect()->route('error.page');
         }
+
+        // Redirect to login if user is not authenticated
+        return redirect()->route('login')->with('error', 'You must be logged in to access this page.');
     }
 }

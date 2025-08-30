@@ -437,7 +437,7 @@
             <div class="card-body">
                 @if($reports->count() > 0)
                     <div class="table-responsive">
-                        <table class="reports-table">
+                        <table class="reports-table table-responsive-md">
                             <thead>
                                 <tr>
                                     <th>#</th>

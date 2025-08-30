@@ -308,17 +308,20 @@
                                                 </td>
                                                 <td class="text-uppercase text-center">{{$student->admission_number}}</td>
                                                 <td class="d-flex align-items-center">
-                                                        @if (!empty($student->image))
-                                                            <img src="{{ asset('assets/img/students/' . $student->image) ?? asset('assets/img/students/student.jpg') }}"
-                                                                alt="Profile Picture"
-                                                                class="rounded-circle"
-                                                                style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
-                                                        @else
-                                                            <img src="{{ asset('assets/img/students/student.jpg') }}"
-                                                                alt="Profile Picture"
-                                                                class="rounded-circle"
-                                                                style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
-                                                        @endif
+                                                        @php
+                                                            // Determine the image path
+                                                            $imageName = $student->image;
+                                                            $imagePath = public_path('assets/img/students/' . $imageName);
+
+                                                            // Check if the image exists and is not empty
+                                                            if (!empty($imageName) && file_exists($imagePath)) {
+                                                                $avatarImage = asset('assets/img/students/' . $imageName);
+                                                            } else {
+                                                                // Use default avatar based on gender
+                                                                $avatarImage = asset('assets/img/students/' . ($student->gender == 'male' ? 'student.jpg' : 'student.jpg'));
+                                                            }
+                                                        @endphp
+                                                        <img src="{{ $avatarImage }}" alt="" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
                                                         <span class="text-capitalize ms-2" style="margin-left: 5px"> {{ucwords(strtolower($student->first_name))}}</span>
                                                 </td>
                                                 <td class="text-capitalize">{{ucwords(strtolower($student->middle_name))}}</td>
