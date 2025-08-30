@@ -17,15 +17,20 @@
                 <div class="card card-outline" style="border-top: 3px solid blue;">
                     <div class="card-body box-profile">
                         <div class="text-center">
-                            @if ($user->image == Null)
-                                @if ($user->gender == 'male')
-                                    <img src="{{asset('assets/img/profile/avatar.jpg')}}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
-                                @else
-                                    <img src="{{asset('assets/img/profile/avatar-female.jpg')}}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
-                                @endif
-                            @else
-                                <img src="{{asset('assets/img/profile/'. $user->image)}}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
-                            @endif
+                            @php
+                                // Determine the image path
+                                $imageName = $user->image;
+                                $imagePath = public_path('assets/img/profile/' . $imageName);
+
+                                // Check if the image exists and is not empty
+                                if (!empty($imageName) && file_exists($imagePath)) {
+                                    $avatarImage = asset('assets/img/profile/' . $imageName);
+                                } else {
+                                    // Use default avatar based on gender
+                                    $avatarImage = asset('assets/img/profile/' . ($user->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                }
+                            @endphp
+                            <img src="{{ $avatarImage }}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
                         </div>
                         <h6 class="profile-username text-center text-primary text-uppercase">
                             <b>{{ucwords(strtolower($user->first_name. ' '. $user->last_name))}}</b>
@@ -42,26 +47,26 @@
                             @endif
                         </p>
                         <br>
-                        @if ($user->image != Null)
-                            <a href="javascript:void(0)"
-                                    data-photo="{{ asset('assets/img/profile/' . $user->image) }}"
-                                    class="btn btn-block btn-outline-danger btn-xs view-photo"
-                                    data-toggle="tooltip" data-placement="top" title="View Photo">
-                                        <i class="fas fa-image"></i> View Photo
-                                    </a>
-                            <!-- Modal -->
-                            <div class="modal fade" id="studentPhotoModal" tabindex="-1" aria-labelledby="studentPhotoModalLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered modal-lg">
-                                    <div class="modal-content">
+                        <a href="javascript:void(0)"
+                                data-photo="{{ $avatarImage }}"
+                                class="btn btn-block btn-outline-danger btn-xs view-photo"
+                                data-toggle="tooltip" data-placement="top" title="View Photo">
+                                <i class="fas fa-image"></i> View Photo
+                        </a>
+                        <!-- Modal -->
+                        <div class="modal fade" id="studentPhotoModal" tabindex="-1" aria-labelledby="studentPhotoModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="studentPhotoModalLabel">Profile Photo</h5>
                                         <button type="button" class="btn-close btn btn-danger btn-xs" data-bs-dismiss="modal" aria-label="Close">Close</button>
                                     </div>
-                                    <div class="modal-body text-center">
-                                        <img id="student-photo" src="" alt="Student Photo" class="img-fluid rounded shadow">
-                                    </div>
-                                    </div>
+                                <div class="modal-body text-center">
+                                        <h6 class="text-primary text-center">{{strtoupper($user->first_name .' '. $user->last_name)}}</h6>
+                                        <img id="student-photo" src="" alt="User Photo" class="img-fluid rounded shadow">
                                 </div>
+                            </div>
+                        </div>
                             </div>
                                 <style>
                                 #student-photo {
@@ -70,8 +75,6 @@
                                     object-fit: contain;
                                 }
                                 </style>
-
-                        @endif
                         <br>
                         <ul class="list-group list-group-flush mb-3">
                             @if ($user->usertype == 3)

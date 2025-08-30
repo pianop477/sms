@@ -9,7 +9,7 @@
                 <h4 class="header-title">Edit Drivers & Bus Information</h4>
             </div>
             <div class="col-2">
-                <a href="{{route('Transportation.index')}}"><i class="fas fa-arrow-circle-left text-secondary" style="font-size: 2rem;"></i></a>
+                <a href="{{route('Transportation.index')}}" class="btn btn-info btn-xs float-right"><i class="fas fa-arrow-circle-left" style=""></i> Back</a>
             </div>
            </div>
             <form class="needs-validation" novalidate="" action="{{route('transport.update.records', ['transport' => Hashids::encode($transport->id)])}}" method="POST" enctype="multipart/form-data">
@@ -18,7 +18,7 @@
                 <div class="form-row">
                     <div class="col-md-4 mb-3">
                         <label for="validationCustom01">Drivers Full Name</label>
-                        <input type="text" name="fullname" class="form-control text-uppercase" id="validationCustom01" placeholder="Full Name" value="{{$transport->driver_name}}" required="">
+                        <input type="text" name="fullname" class="form-control text-capitalize" id="validationCustom01" placeholder="Full Name" value="{{$transport->driver_name}}" required="">
                         @error('fullname')
                         <div class="text-danger">
                             {{$message}}
@@ -51,7 +51,7 @@
                 <div class="form-row">
                     <div class="col-md-4 mb-3">
                         <label for="validationCustom02">School Bus Number</label>
-                        <input type="text" name="bus_no" class="form-control text-uppercase" id="validationCustom02" placeholder="Bus Number" required="" value="{{$transport->bus_no}}">
+                        <input type="text" name="bus_no" class="form-control text-capitalize" id="validationCustom02" placeholder="Bus Number" required="" value="{{$transport->bus_no}}">
                         @error('bus_no')
                         <div class="text-danger">
                            {{$message}}
@@ -60,7 +60,7 @@
                     </div>
                     <div class="col-md-4 mb-3">
                         <label for="validationCustom02">School Bus Routine</label>
-                        <textarea name="routine" class="form-control text-uppercase" id="validationCustom02" cols="50" rows="4">{{$transport->routine}}</textarea>
+                        <textarea name="routine" class="form-control text-capitalize" id="validationCustom02" cols="50" rows="4">{{$transport->routine}}</textarea>
                         @error('phone')
                         <div class="text-danger">
                            {{$message}}

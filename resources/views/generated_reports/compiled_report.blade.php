@@ -151,11 +151,20 @@
             <h5 style="margin:0; padding:0;">{{ $schoolInfo->postal_address }}, {{ $schoolInfo->postal_name }} - {{ $schoolInfo->country }}</h5>
         </td>
         <td width="15%" align="right">
-            @if($students->image == null)
-                <img src="{{ public_path('assets/img/students/student.jpg') }}" width="80" class="rounded-circle" style="border-radius: 10px">
-            @else
-                <img src="{{ public_path('assets/img/students/' . $students->image) }}" width="80" class="rounded-circle" style="border-radius: 10px">
-            @endif
+            @php
+                // Determine the image path
+                $imageName = $students->image;
+                $imagePath = public_path('assets/img/students/' . $imageName);
+
+                // Check if the image exists and is not empty
+                if (!empty($imageName) && file_exists($imagePath)) {
+                    $avatarImage = public_path('assets/img/students/' . $imageName);
+                } else {
+                // Use default avatar based on gender
+                    $avatarImage = public_path('assets/img/students/' . ($students->gender == 'male' ? 'student.jpg' : 'student.jpg'));
+                }
+            @endphp
+            <img src="{{ $avatarImage }}" alt="" width="80" class="rounded-circle" style="border-radius: 10px">
         </td>
     </tr>
 </table>

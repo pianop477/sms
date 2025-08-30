@@ -160,16 +160,21 @@
                                         <td>{{$loop->iteration}}</td>
                                         <td>{{strtoupper($teacher->member_id)}}</td>
                                         <td class="d-flex align-items-center">
-                                                @if (!empty($teacher->image) && file_exists(public_path('assets/img/profile/' . $teacher->image)))
-                                                    <img src="{{ asset('assets/img/profile/' . $teacher->image) }}"
-                                                         alt="Profile Picture"
-                                                         class="rounded-circle"
-                                                         style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
-                                                @else
-                                                    <i class="fas fa-user-tie rounded-circle bg-secondary d-flex justify-content-center align-items-center"
-                                                       style="width: 50px; height: 50px; font-size: 20px; color: white;"></i>
-                                                @endif
-                                                 <span class="text-capitalize ms-2" style="margin-left: 5px"> {{ucwords(strtolower($teacher->first_name. ' '. $teacher->last_name))}}</span>
+                                            @php
+                                                // Determine the image path
+                                                $imageName = $teacher->image;
+                                                $imagePath = public_path('assets/img/profile/' . $imageName);
+
+                                                // Check if the image exists and is not empty
+                                                if (!empty($imageName) && file_exists($imagePath)) {
+                                                    $avatarImage = asset('assets/img/profile/' . $imageName);
+                                                } else {
+                                                    // Use default avatar based on gender
+                                                    $avatarImage = asset('assets/img/profile/' . ($teacher->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                                }
+                                            @endphp
+                                            <img src="{{ $avatarImage }}" alt="" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
+                                            <span class="text-capitalize ms-2" style="margin-left: 5px"> {{ucwords(strtolower($teacher->first_name. ' '. $teacher->last_name))}}</span>
                                         </td>
                                         <td class="text-capitalize">{{$teacher->gender[0]}}</td>
                                         <td class="text-capitalize text-white">

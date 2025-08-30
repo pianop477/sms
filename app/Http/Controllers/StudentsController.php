@@ -1250,7 +1250,9 @@ class StudentsController extends Controller
         $filePath = public_path('assets/img/students/' . $studentPicture);
 
         if (!file_exists($filePath)) {
-            abort(404, 'No picture found');
+            // abort(404, 'No picture found');
+            Alert()->toast('No picture found', 'error');
+            return back();
         }
 
         // Unaweza kuweka jina la file wakati linapakuliwa
@@ -1259,35 +1261,89 @@ class StudentsController extends Controller
         return response()->download($filePath, $fileName);
     }
 
+   public function searchStudent(Request $request)
+    {
+            $query = strtolower(trim($request->query('search_query', '')));
+
+            if ($query === '') {
+                return response()->json(['students' => []]);
+            }
+
+            $students = Student::query()
+                            ->join('parents', 'parents.id', '=', 'students.parent_id')
+                            ->join('grades', 'grades.id', '=', 'students.class_id') // double check hii relation yako
+                            ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+                            ->leftJoin('transports', 'transports.id', '=', 'students.transport_id')
+                            ->where('students.status', 1)
+                            ->where(function ($q) use ($query) {
+                                $q->whereRaw("LOWER(CONCAT(students.first_name, ' ', students.middle_name, ' ', students.last_name)) LIKE ?", ["%{$query}%"])
+                                ->orWhere('students.admission_number', 'LIKE', "%{$query}%");
+                            })
+                            ->orderBy('students.first_name')
+                            ->limit(10)
+                            ->select([
+                                'students.id',
+                                'students.first_name',
+                                'students.middle_name',
+                                'students.last_name',
+                                'students.admission_number',
+                                'students.gender',
+                                'students.dob',
+                                'students.image', 'students.group', 'transports.driver_name',
+                                'grades.class_name as grade_name',
+                                'users.phone as parent_phone',
+                            ])
+                            ->get();
+
+            $data = $students->map(function ($s) {
+                return [
+                    'id' => $s->id,
+                    'name' => trim("{$s->first_name} {$s->middle_name} {$s->last_name}"),
+                    'admission_number' => $s->admission_number ?? 'N/A',
+                    'class_name' => $s->grade_name ?? 'N/A',
+                    'gender' => $s->gender ?? 'N/A',
+                    'dob' => $s->dob ?? 'N/A',
+                    'driver_name' => $s->driver_name ?? 'N/A',
+                    'group' => $s->group ?? 'N/A',
+                    'phone' => $s->parent_phone ?? 'N/A',
+                    'image_url' => $s->image && file_exists(public_path("assets/img/students/{$s->image}"))
+                        ? asset("assets/img/students/{$s->image}")
+                        : asset("assets/img/students/student.jpg"),
+                ];
+            });
+
+            return response()->json(['students' => $data]);
+    }
+
     private function scanFileForViruses($file): array
     {
-        // For production, use actual API
-        if (app()->environment('production')) {
-            $apiKey = config('services.virustotal.key');
-            try {
-                $response = Http::withHeaders(['x-apikey' => $apiKey])
-                            ->attach('file', fopen($file->path(), 'r'))
-                            ->post('https://www.virustotal.com/api/v3/files');
+                // For production, use actual API
+                if (app()->environment('production')) {
+                    $apiKey = config('services.virustotal.key');
+                    try {
+                        $response = Http::withHeaders(['x-apikey' => $apiKey])
+                                    ->attach('file', fopen($file->path(), 'r'))
+                                    ->post('https://www.virustotal.com/api/v3/files');
 
-                if ($response->successful()) {
-                    $scanId = $response->json()['data']['id'];
-                    $analysis = Http::withHeaders(['x-apikey' => $apiKey])
-                                ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
+                        if ($response->successful()) {
+                            $scanId = $response->json()['data']['id'];
+                            $analysis = Http::withHeaders(['x-apikey' => $apiKey])
+                                        ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
 
-                    return [
-                        'clean' => $analysis->json()['data']['attributes']['stats']['malicious'] === 0,
-                        'message' => $analysis->json()['data']['attributes']['status']
-                    ];
+                            return [
+                                'clean' => $analysis->json()['data']['attributes']['stats']['malicious'] === 0,
+                                'message' => $analysis->json()['data']['attributes']['status']
+                            ];
+                        }
+                    } catch (\Exception $e) {
+                        return [
+                            'clean' => false,
+                            'message' => 'Scan failed: '.$e->getMessage()
+                        ];
+                    }
                 }
-            } catch (\Exception $e) {
-                return [
-                    'clean' => false,
-                    'message' => 'Scan failed: '.$e->getMessage()
-                ];
-            }
-        }
 
-        // For local development, just mock a successful scan
-        return ['clean' => true, 'message' => 'Development mode - scan bypassed'];
+                // For local development, just mock a successful scan
+                return ['clean' => true, 'message' => 'Development mode - scan bypassed'];
+            }
     }
-}

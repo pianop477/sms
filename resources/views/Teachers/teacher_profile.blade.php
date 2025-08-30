@@ -17,15 +17,20 @@
                 <div class="card card-outline" style="border-top: 3px solid blue;">
                     <div class="card-body box-profile">
                         <div class="text-center">
-                            @if ($teachers->image == NULL)
-                                @if ($teachers->gender == 'male')
-                                    <img src="{{asset('assets/img/profile/avatar.jpg')}}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
-                                @else
-                                    <img src="{{asset('assets/img/profile/avatar-female.jpg')}}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
-                                @endif
-                            @else
-                                <img src="{{asset('assets/img/profile/'. $teachers->image)}}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
-                            @endif
+                            @php
+                                // Determine the image path
+                                $imageName = $teachers->image;
+                                $imagePath = public_path('assets/img/profile/' . $imageName);
+
+                                // Check if the image exists and is not empty
+                                if (!empty($imageName) && file_exists($imagePath)) {
+                                    $avatarImage = asset('assets/img/profile/' . $imageName);
+                                } else {
+                                    // Use default avatar based on gender
+                                    $avatarImage = asset('assets/img/profile/' . ($teachers->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                }
+                            @endphp
+                            <img src="{{ $avatarImage }}" alt="" class="profile-user img img-fluid rounded-circle" style="width: 100px;">
                         </div>
                         <h6 class="profile-username text-center text-primary text-uppercase">
                             <b>{{ucwords(strtolower($teachers->first_name. ' '. $teachers->last_name))}}</b>
@@ -34,9 +39,8 @@
                             <b>ID #: <span class="text-uppercase"> {{$teachers->member_id}}</span></b>
                         </p>
                         <br>
-                        @if ($teachers->image != Null)
                             <a href="javascript:void(0)"
-                                    data-photo="{{ asset('assets/img/profile/' . $teachers->image) }}"
+                                    data-photo="{{ $avatarImage }}"
                                     class="btn btn-block btn-outline-danger btn-xs view-photo"
                                     data-toggle="tooltip" data-placement="top" title="View Photo">
                                         <i class="fas fa-image"></i> View Photo
@@ -50,10 +54,11 @@
                                         <button type="button" class="btn-close btn btn-danger btn-xs" data-bs-dismiss="modal" aria-label="Close">Close</button>
                                     </div>
                                     <div class="modal-body text-center">
+                                        <h6 class="text-primary text-center">{{strtoupper($teachers->first_name .' '. $teachers->last_name)}}</h6>
                                         <img id="student-photo" src="" alt="Student Photo" class="img-fluid rounded shadow">
                                     </div>
-                                    </div>
                                 </div>
+                            </div>
                             </div>
                                 <style>
                                 #student-photo {
@@ -62,8 +67,6 @@
                                     object-fit: contain;
                                 }
                                 </style>
-
-                        @endif
                         <br>
                         <ul class="list-group list-group-flush mb-3">
                             <li class="list-group-item">

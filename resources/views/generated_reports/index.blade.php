@@ -17,13 +17,21 @@
                     <p class="mb-0 text-center text-capitalize"><strong>{{ $reports->title }} Report - {{\Carbon\Carbon::parse($reports->created_at)->format('d/m/Y')}}</strong></p>
                 </div>
                 <div class="col-md-2">
-                    @if($student->image == null)
-                        <img src="{{ asset('assets/img/students/student.jpg') }}" alt="Student" width="300px" height="300px" class="rounded-circle">
-                        <p class="text-muted">Student Photo</p>
-                    @else
-                    <img src="{{asset('assets/img/students/' . $student->image)}}" alt="Student" width="150px" height="150px" class="rounded-circle">
+                    @php
+                        // Determine the image path
+                        $imageName = $student->image;
+                        $imagePath = public_path('assets/img/students/' . $imageName);
+
+                        // Check if the image exists and is not empty
+                        if (!empty($imageName) && file_exists($imagePath)) {
+                            $avatarImage = asset('assets/img/students/' . $imageName);
+                        } else {
+                        // Use default avatar based on gender
+                            $avatarImage = asset('assets/img/students/' . ($student->gender == 'male' ? 'student.jpg' : 'student.jpg'));
+                        }
+                    @endphp
+                    <img src="{{ $avatarImage }}" alt="" width="80" class="rounded-circle" style="border-radius: 10px">
                     <p class="text-muted">Student Photo</p>
-                    @endif
                 </div>
             </div>
 

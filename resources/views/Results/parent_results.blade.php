@@ -150,14 +150,19 @@
         </td>
         <td width="15%" align="right">
             @php
-                $imagePath = public_path('assets/img/students/' . $studentId->image);
-                $defaultImagePath = public_path('assets/img/students/student.jpg');
+                // Determine the image path
+                $imageName = $studentId->image;
+                $imagePath = public_path('assets/img/students/' . $imageName);
+
+                // Check if the image exists and is not empty
+                if (!empty($imageName) && file_exists($imagePath)) {
+                    $avatarImage = public_path('assets/img/students/' . $imageName);
+                } else {
+                // Use default avatar based on gender
+                    $avatarImage = public_path('assets/img/students/' . ($studentId->gender == 'male' ? 'student.jpg' : 'student.jpg'));
+                }
             @endphp
-            @if(file_exists($imagePath) && !is_dir($imagePath))
-                <img src="{{ $imagePath }}" width="80" class="rounded-circle" style="border-radius: 10px">
-            @else
-                <img src="{{ $defaultImagePath }}" width="80" class="rounded-circle" style="border-radius: 10px">
-            @endif
+            <img src="{{ $avatarImage }}" alt="" width="80" class="rounded-circle" style="border-radius: 10px">
         </td>
     </tr>
 </table>
