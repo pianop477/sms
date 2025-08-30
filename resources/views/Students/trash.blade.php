@@ -44,7 +44,7 @@
                                         <tr>
                                             <td class="text-uppercase">{{$student->admission_number}}</td>
                                             <td class="text-capitalize">
-                                                {{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}
+                                                {{ucwords(strtolower($student->first_name. ' '. $student->middle_name. ' ' .$student->last_name))}}
                                             </td>
                                             <td class="text-capitalize">{{$student->gender[0]}}</td>
                                             <td class="text-uppercase">{{$student->class_name}}</td>
