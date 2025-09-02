@@ -1,197 +1,296 @@
 @extends('SRTDashboard.frame')
 @section('content')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<!-- Pakia Select2 CSS -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-<!-- Pakia Select2 JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-<style>
-    /* Override Select2 default styles to match Bootstrap form-control */
-    .select2-container .select2-selection--single {
-        height: 38px !important;  /* Ensure same height as form-control */
-        border: 1px solid #ccc !important; /* Border to match Bootstrap */
-        border-radius: 4px !important; /* Rounded corners to match Bootstrap */
-        padding: 6px 12px !important; /* Padding to match form-control */
-    }
-    .select2-container {
-    width: 100% !important; /* Ensure Select2 takes full width of the parent */
-    }
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #6f42c1;
+            --success-color: #1cc88a;
+            --info-color: #36b9cc;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+            --light-color: #f8f9fc;
+            --dark-color: #5a5c69;
+        }
 
-    .select2-container {
-        width: 100% !important; /* Set full width for Select2 container */
-        max-width: 100% !important; /* Ensure it does not exceed container */
-    }
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
 
-    .select2-selection--single {
-        width: 100% !important; /* Set width of the selection box */
-    }
-    .select2-selection--single {
-        width: 100% !important; /* Ensure selection box inside Select2 also takes full width */
-    }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            margin-bottom: 20px;
+        }
 
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-        color: #495057; /* Match the default text color */
-        line-height: 26px; /* Align text */
-    }
+        .header-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
 
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 30px; /* Arrow should be aligned */
-    }
+        .btn-action {
+            border-radius: 5px;
+            padding: 8px 15px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
 
-</style>
-<div class="row">
-    <div class="col-12 mt-5">
-        <div class="card">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-8">
-                        <h4 class="header-title text-uppercase">assigned Class Teachers: <span style="text-decoration: underline"><strong>{{ $classes->class_name}}</strong></span></h4>
-                    </div>
-                    <div class="col-2">
-                        <a href="{{route('Classes.index', ['class' => Hashids::encode($classes->id)])}}" class="btn btn-xs btn-info float-right"><i class="fas fa-arrow-circle-left"></i> Back</a>
-                    </div>
-                    <div class="col-2">
-                        <button type="button" class="btn btn-primary btn-xs p-1 float-right" data-toggle="modal" data-target=".bd-example-modal-md"><i class="fas fa-user-plus"></i> Assign
-                        </button>
-                        <div class="modal fade bd-example-modal-md">
-                            <div class="modal-dialog modal-md">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Assign Class Teacher</h5>
-                                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form class="needs-validation" novalidate="" action="{{route('Class.teacher.assign', ['classes' => Hashids::encode($classes->id)])}}" method="POST" enctype="multipart/form-data">
-                                            @csrf
-                                            <div class="form-row">
-                                                <div class="col-md-6 mb-3">
-                                                    <label for="validationCustom01">Teacher's Name</label>
-                                                    <select name="teacher" id="parentSelect" class="form-control select2 text-capitalize" required>
-                                                        <option value="">-- Select Class Teacher --</option>
-                                                        @if ($teachers->isEmpty())
-                                                            <option value="" class="text-danger">No teachers found</option>
-                                                        @else
-                                                            @foreach ($teachers as $teacher)
-                                                                <option value="{{$teacher->id}}">{{ucwords(strtolower($teacher->teacher_first_name))}} {{ucwords(strtolower($teacher->teacher_last_name))}}</option>
-                                                            @endforeach
-                                                        @endif
-                                                    </select>
-                                                    @error('teacher')
-                                                    <div class="text-danger">
-                                                        {{$message}}
-                                                    </div>
-                                                    @enderror
-                                                </div>
-                                                <div class="col-md-6 mb-3">
-                                                    <label for="validationCustom02">Class Group</label>
-                                                    <select name="group" id="" class="form-control text-capitalize" required>
-                                                        <option value="">-- Select Class Group --</option>
-                                                        <option value="A">Stream A</option>
-                                                        <option value="B">stream B</option>
-                                                        <option value="C">stream C</option>
-                                                    </select>
-                                                    @error('group')
-                                                    <div class="text-danger">
-                                                       {{$message}}
-                                                    </div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-success" id="saveButton">Assign</button>
-                                    </div>
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-table {
+            background-color: white;
+        }
+
+        .progress-table thead {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .progress-table th {
+            padding: 15px 10px;
+            font-weight: 600;
+            vertical-align: middle;
+        }
+
+        .progress-table td {
+            padding: 15px 10px;
+            vertical-align: middle;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .action-buttons a, .action-buttons button {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .modal-header {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .form-control:focus, .form-select:focus, .select2-container--focus .select2-selection {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25) !important;
+        }
+
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 0.375rem !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 36px !important;
+            padding-left: 12px !important;
+            color: #495057 !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px !important;
+        }
+
+        .class-name-highlight {
+            color: var(--secondary-color);
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .table-responsive {
+                overflow-x: auto;
+            }
+
+            .btn-action {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Header Section -->
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <h4 class="header-title text-uppercase">Assigned Class Teachers: <span class="class-name-highlight">{{ $classes->class_name}}</span></h4>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex justify-content-end gap-2 flex-wrap">
+                                    <a href="{{route('Classes.index', ['class' => Hashids::encode($classes->id)])}}" class="btn btn-info btn-action mr-2">
+                                        <i class="fas fa-arrow-circle-left me-1"></i> Back
+                                    </a>
+                                    <button type="button" class="btn btn-primary btn-action" data-bs-toggle="modal" data-bs-target="#assignModal">
+                                        <i class="fas fa-user-plus me-1"></i> Assign Teacher
+                                    </button>
                                 </div>
-                            </form>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="single-table">
-                    <div class="table-responsive">
-                        <table class="table table-hover progress-table" id="myTable">
-                            <thead class="text-capitalize text-center">
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Class Name</th>
-                                    <th scope="col">Class Group</th>
-                                    <th scope="col">Teacher Name</th>
-                                    <th scope="col" class="text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($classTeacher as $teacher )
-                                    <tr class="text-capitalize">
-                                        <td>{{$loop->iteration}}</td>
-                                        <td class="text-uppercase text-center">{{$teacher->class_name}}</td>
-                                        <td class="text-capitalize text-center">Stream {{$teacher->group}}</td>
-                                        <td class="text-center">{{$teacher->teacher_first_name. ' '. $teacher->teacher_last_name}}</td>
-                                        <td>
-                                            <ul class="d-flex justify-content-center">
-                                                <li class="mr-3">
-                                                    <a href="{{route('roles.edit', ['teacher' => Hashids::encode($teacher->id)])}}"><i class="ti-pencil"></i></a>
-                                                </li>
-                                                <li>
-                                                    <a href="{{route('roles.destroy', ['teacher' => Hashids::encode($teacher->id)])}}" onclick="return confirm('Are you sure you want to remove {{ strtoupper($teacher->teacher_first_name) }} {{ strtoupper($teacher->teacher_last_name) }} from this class?')">
-                                                        <i class="ti-trash text-danger"></i>
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+
+                        <!-- Teachers Table -->
+                        <div class="single-table">
+                            <div class="table-responsive">
+                                <table class="table table-hover progress-table" id="teachersTable">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Class Name</th>
+                                            <th scope="col">Class Group</th>
+                                            <th scope="col">Teacher Name</th>
+                                            <th scope="col" class="text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($classTeacher as $teacher)
+                                            <tr>
+                                                <td>{{$loop->iteration}}</td>
+                                                <td class="text-uppercase fw-bold">{{$teacher->class_name}}</td>
+                                                <td class="">
+                                                    <span class="badge bg-info text-white">Stream {{$teacher->group}}</span>
+                                                </td>
+                                                <td class="fw-medium text-capitalize">{{$teacher->teacher_first_name}} {{$teacher->teacher_last_name}}</td>
+                                                <td>
+                                                    <div class="action-buttons">
+                                                        <a href="{{route('roles.edit', ['teacher' => Hashids::encode($teacher->id)])}}" class="btn btn-sm btn-secondary" title="Edit">
+                                                            <i class="ti-pencil"></i>
+                                                        </a>
+                                                        <a href="{{route('roles.destroy', ['teacher' => Hashids::encode($teacher->id)])}}" class="btn btn-sm btn-danger" title="Remove" onclick="return confirm('Are you sure you want to remove {{ strtoupper($teacher->teacher_first_name) }} {{ strtoupper($teacher->teacher_last_name) }} from this class?')">
+                                                            <i class="ti-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<script>
-    window.onload = function() {
-        // Hakikisha jQuery na Select2 inapatikana
-        if (typeof $.fn.select2 !== 'undefined') {
-            // Fanya initialization ya Select2
-            $('#parentSelect').select2({
-                placeholder: "Search...",
-                allowClear: true
-            }).on('select2:open', function () {
-                $('.select2-results__option').css('text-transform', 'capitalize');  // Capitalize option text
-            });
-        } else {
-            console.error("Select2 haijapakiwa!");
-        }
-    };
 
+    <!-- Assign Teacher Modal -->
+    <div class="modal fade" id="assignModal" tabindex="-1" aria-labelledby="assignModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="assignModalLabel">Assign Class Teacher</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="needs-validation" novalidate action="{{route('Class.teacher.assign', ['classes' => Hashids::encode($classes->id)])}}" method="POST">
+                        @csrf
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="teacherSelect" class="form-label">Teacher's Name</label>
+                                <select name="teacher" id="teacherSelect" class="form-control select2" required>
+                                    <option value="">-- Select Class Teacher --</option>
+                                    @if ($teachers->isEmpty())
+                                        <option value="" class="text-danger" disabled>No teachers found</option>
+                                    @else
+                                        @foreach ($teachers as $teacher)
+                                            <option value="{{$teacher->id}}">{{ucwords(strtolower($teacher->teacher_first_name))}} {{ucwords(strtolower($teacher->teacher_last_name))}}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                @error('teacher')
+                                <div class="text-danger small mt-2">
+                                    {{$message}}
+                                </div>
+                                @enderror
+                            </div>
+                        </div>
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const form = document.querySelector(".needs-validation");
-        const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
-
-        if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
-
-        form.addEventListener("submit", function (event) {
-            event.preventDefault(); // Zuia submission ya haraka
-
-            // Disable button na badilisha maandishi
-            submitButton.disabled = true;
-            submitButton.innerHTML = `<span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span> Please Wait...`;
-
-            // Hakikisha form haina errors kabla ya kutuma
-            if (!form.checkValidity()) {
-                form.classList.add("was-validated");
-                submitButton.disabled = false; // Warudishe button kama kuna errors
-                submitButton.innerHTML = "Save";
-                return;
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="groupSelect" class="form-label">Class Group</label>
+                                <select name="group" id="groupSelect" class="form-control" required>
+                                    <option value="">-- Select Class Group --</option>
+                                    <option value="A">Stream A</option>
+                                    <option value="B">Stream B</option>
+                                    <option value="C">Stream C</option>
+                                </select>
+                                @error('group')
+                                <div class="text-danger small mt-2">
+                                   {{$message}}
+                                </div>
+                                @enderror
+                            </div>
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" id="saveButton" class="btn btn-success">Assign Teacher</button>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Initialize Select2
+            if (typeof $.fn.select2 !== 'undefined') {
+                $('#teacherSelect').select2({
+                    placeholder: "Search teacher...",
+                    allowClear: true,
+                    dropdownParent: $('#assignModal')
+                }).on('select2:open', function () {
+                    $('.select2-results__option').css('text-transform', 'capitalize');
+                });
+            } else {
+                console.error("Select2 is not loaded!");
             }
 
-            // Chelewesha submission kidogo ili button ibadilike kwanza
-            setTimeout(() => {
-                form.submit();
-            }, 500);
+            const form = document.querySelector(".needs-validation");
+            const submitButton = document.getElementById("saveButton");
+
+            if (!form || !submitButton) return;
+
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                // Disable button and show loading state
+                submitButton.disabled = true;
+                submitButton.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Assigning...`;
+
+                // Check form validity
+                if (!form.checkValidity()) {
+                    form.classList.add("was-validated");
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = "Assign Teacher";
+                    return;
+                }
+
+                // Delay submission to show loading state
+                setTimeout(() => {
+                    form.submit();
+                }, 500);
+            });
         });
-    });
-</script>
+    </script>
+</body>
+</html>
 @endsection

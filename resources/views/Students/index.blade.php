@@ -273,7 +273,7 @@
                                             <td class="text-capitalize">{{ucwords(strtolower($student->middle_name))}}</td>
                                             <td class="text-capitalize">{{ucwords(strtolower($student->last_name))}}</td>
                                             <td class="text-center text-capitalize">
-                                                <span class="badge bg-info">{{$student->gender[0]}}</span>
+                                                <span class="badge bg-info text-white">{{$student->gender[0]}}</span>
                                             </td>
                                             <td class="text-center">
                                                 <span class="badge badge-stream badge-stream-{{$student->group}}">{{$student->group}}</span>
