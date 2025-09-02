@@ -1297,7 +1297,7 @@ class StudentsController extends Controller
 
             $data = $students->map(function ($s) {
                 return [
-                    'id' => $s->id,
+                    'id' => Hashids::encode($s->id),
                     'name' => trim("{$s->first_name} {$s->middle_name} {$s->last_name}"),
                     'admission_number' => $s->admission_number ?? 'N/A',
                     'class_name' => $s->grade_name ?? 'N/A',

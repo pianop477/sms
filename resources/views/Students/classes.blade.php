@@ -144,7 +144,12 @@
                                     <h4 class="mb-3">Student Details</h4>
                                     <div class="row">
                                         <div class="col-sm-6">
-                                            <p class="mb-2 text-capitalize"><span class="info-label">Name:</span> <span id="infoName">-</span></p>
+                                            <p class="mb-2 text-capitalize">
+                                                <span class="info-label">Name:</span>
+                                                <a id="studentProfileLink" href="#">
+                                                    <span class="text-dark fw-bold" style="text-decoration: underline" id="infoName">-</span>
+                                                </a>
+                                            </p>
                                             <p class="mb-2 text-uppercase"><span class="info-label">Class:</span> <span id="infoClass">-</span></p>
                                             <p class="mb-2 text-capitalize"><span class="info-label">Stream:</span> <span id="infoStream">-</span></p>
                                             <p class="mb-2 text-uppercase"><span class="info-label">Admission #:</span> <span id="infoId">-</span></p>
@@ -186,6 +191,7 @@
         const searchInput = document.getElementById('searchInput');
         const resultsContainer = document.getElementById('searchResults');
         const studentInfo = document.getElementById('studentInfo');
+        const $studentId = document.getElementById('studentId');
 
         searchInput.addEventListener('keyup', function() {
             const query = this.value.trim();
@@ -232,9 +238,14 @@
             document.getElementById('infoStream').textContent = student.group || 'N/A';
             document.getElementById('inforTrans').textContent = student.driver_name || 'N/A';
 
+            // update profile link dynamically
+            const profileLink = document.getElementById('studentProfileLink');
+            profileLink.href = `{{ url('Manage/Student-profile/id') }}/${student.id}`;
+
             studentInfo.style.display = 'block';
             resultsContainer.style.display = 'none';
         }
+
 </script>
 
 @endsection
