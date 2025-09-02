@@ -1,458 +1,492 @@
 @extends('SRTDashboard.frame')
 @section('content')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<!-- Pakia Select2 CSS -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-<!-- Pakia Select2 JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-<style>
-    /* Override Select2 default styles to match Bootstrap form-control */
-    .select2-container .select2-selection--single {
-        height: 38px !important;  /* Ensure same height as form-control */
-        border: 1px solid #ccc !important; /* Border to match Bootstrap */
-        border-radius: 4px !important; /* Rounded corners to match Bootstrap */
-        padding: 6px 12px !important; /* Padding to match form-control */
-    }
-    .select2-container {
-    width: 100% !important; /* Ensure Select2 takes full width of the parent */
-    }
+    <meta charset="UTF-8">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #6f42c1;
+            --success-color: #1cc88a;
+            --info-color: #36b9cc;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+            --light-color: #f8f9fc;
+            --dark-color: #5a5c69;
+        }
 
-    .select2-container {
-        width: 100% !important; /* Set full width for Select2 container */
-        max-width: 100% !important; /* Ensure it does not exceed container */
-    }
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-    .select2-selection--single {
-        width: 100% !important; /* Set width of the selection box */
-    }
-    .select2-selection--single {
-        width: 100% !important; /* Ensure selection box inside Select2 also takes full width */
-    }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
 
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-        color: #495057; /* Match the default text color */
-        line-height: 26px; /* Align text */
-    }
+        .header-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
 
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 30px; /* Arrow should be aligned */
-    }
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
 
-</style>
-<div class="row">
-    <div class="col-12 mt-5">
-        <div class="card">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        <h4 class="header-title text-uppercase">{{$classId->class_name. ' Students list - ('.$classId->class_code.')'}}</h4>
-                    </div>
-                </div>
-                <div class="row col-md-6 float-right">
-                    @if ($students->isNotEmpty())
-                    <div class="col-3">
-                            <!-- Button trigger modal -->
-                        <button type="button" class="btn btn-info btn-xs float-right" data-toggle="modal" data-target="#exampleModal">
-                            <i class="fas fa-exchange-alt"></i> Promotes
-                        </button>
+        .progress-table {
+            background-color: white;
+        }
 
-                        <!-- Modal -->
-                        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Promote Students to the Next class</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                                </div>
-                                <div class="modal-body">
-                                    <span class="text-danger text-capitalize">select class you want to promote students</span>
-                                    <form class="needs-validation" novalidate="" action="{{route('promote.student.class', ['class' => Hashids::encode($classId->id)])}}" method="POST" enctype="multipart/form-data">
-                                        @csrf
-                                        @method('PUT')
-                                        <div class="form-row">
-                                            <div class="col-md-12 mb-3">
-                                                <label for="validationCustom01">Class name</label>
-                                                <select name="class_id" id="classSelect" class="form-control text-uppercase" required>
-                                                    <option value="">--Select Class--</option>
-                                                    @if ($classes->isEmpty())
-                                                        <option value="" class="text-danger">No more classes found</option>
-                                                        <option value="0" class="text-success font-weight-bold" style="font-size: 13px">🎓 Graduate Class 🎉</option>
-                                                    @else
-                                                        @foreach ($classes as $class)
-                                                            <option value="{{$class->id}}" class="">{{$class->class_name}}</option>
-                                                        @endforeach
-                                                        <option value="0" class="text-success font-weight-bold" style="font-size: 13px">🎓 Graduate Class 🎉</option>
-                                                    @endif
-                                                </select>
-                                                @error('class_id')
-                                                <div class="invalid-feedback text-danger">
-                                                    {{$message}}
-                                                </div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="form-row">
-                                            <div class="col-md-12 mb-3" id="graduationYearField" style="display: none;">
-                                                <label for="graduation_year">Graduation Year</label>
-                                                <input type="number" name="graduation_year" id="graduation_year"
-                                                    class="form-control"
-                                                    min="{{date('Y') - 5}}" max="{{date('Y')}}"
-                                                    value="{{old('graduation_year')}}">
-                                                <small class="text-muted">Please enter the graduation year</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                        <button type="submit" id="upGradeButton" class="btn btn-success" onclick="return confirm('Are you sure you want to promote this class?')">Upgrade</button>
-                                    </div>
-                                </form>
+        .progress-table thead {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .progress-table th {
+            padding: 15px 10px;
+            font-weight: 600;
+        }
+
+        .progress-table td {
+            padding: 15px 10px;
+            vertical-align: middle;
+        }
+
+        .btn-xs {
+            padding: 0.35rem 0.5rem;
+            font-size: 0.75rem;
+            line-height: 1.2;
+            border-radius: 0.35rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .action-buttons a, .action-buttons button {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .student-avatar {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid #e3e6f0;
+        }
+
+        .modal-header {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+            border: 1px solid #ccc !important;
+            border-radius: 4px !important;
+            padding: 6px 12px !important;
+        }
+
+        .select2-container {
+            width: 100% !important;
+        }
+
+        .student-info-card {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .badge-stream {
+            padding: 0.5em 0.8em;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .badge-stream-A {
+            background-color: #e8f0fe;
+            color: #1a73e8;
+        }
+
+        .badge-stream-B {
+            background-color: #e6f4ea;
+            color: #0f9d58;
+        }
+
+        .badge-stream-C {
+            background-color: #fce8e6;
+            color: #d93025;
+        }
+
+        .form-control:focus, .select2-container--focus .select2-selection {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25) !important;
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .table-responsive {
+                overflow-x: auto;
+            }
+        }
+    </style>
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Header Section -->
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <h4 class="header-title text-uppercase">{{$classId->class_name}} Students list - ({{$classId->class_code}})</h4>
                             </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <a href="{{route('export.student.pdf', ['class' => Hashids::encode($classId->id)])}}" target="_blank" class="float-right btn btn-primary btn-xs"><i class="fas fa-cloud-arrow-down"></i> Export</a>
-                    </div>
-                    @endif
-                    <div class="col-3">
-                        <a href="{{route('classes.list', ['class' => Hashids::encode($classId->id)])}}" class="float-right btn btn-secondary btn-xs"><i class="fas fa-arrow-circle-left"></i> Back</a>
-                    </div>
-                    <div class="col-3">
-                            <a type="#" class="btn p-2 float-right btn-info text-white btn-xs" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-plus-circle"></i> New
-                            </a>
-                            <div class="modal fade bd-example-modal-lg">
-                                <div class="modal-dialog modal-lg">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title text-uppercase">{{$classId->class_name}} Students Registration Form</h5>
-                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form class="needs-validation" novalidate="" action="{{route('student.store', ['class' => Hashids::encode($classId->id)])}}" method="POST" enctype="multipart/form-data">
-                                                @csrf
-                                                <div class="form-row">
-                                                    <div class="col-md-4 mb-3">
-                                                        <label for="validationCustom01">First name</label>
-                                                        <input type="text" required name="fname" class="form-control" id="validationCustom01" placeholder="First name" value="{{old('fname')}}" required="">
-                                                        @error('fname')
-                                                        <div class="invalid-feedback">
-                                                            {{$message}}
-                                                        </div>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="col-md-4 mb-3">
-                                                        <label for="validationCustom02">Middle name</label>
-                                                        <input type="text" required name="middle" class="form-control" id="validationCustom02" placeholder="Middle name" required="" value="{{old('middle')}}">
-                                                        @error('middle')
-                                                        <div class="invalid-feedback">
-                                                        {{$message}}
-                                                        </div>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="col-md-4 mb-3">
-                                                        <label for="validationCustom02">Last name</label>
-                                                        <input type="text" required name="lname" class="form-control" id="validationCustom02" placeholder="Last name" required="" value="{{old('lname')}}">
-                                                        @error('lname')
-                                                        <div class="invalid-feedback">
-                                                        {{$message}}
-                                                        </div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-                                                <div class="form-row">
-                                                    <div class="col-md-4 mb-3">
-                                                        <label for="validationCustom01">Gender</label>
-                                                        <select name="gender" required id="validationCustom01" class="form-control text-capitalize" required>
-                                                            <option value="">-- select gender --</option>
-                                                            <option value="male">male</option>
-                                                            <option value="female">female</option>
-                                                        </select>
-                                                        @error('gender')
-                                                        <div class="invalid-feedback">
-                                                            {{$message}}
-                                                        </div>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="col-md-4 mb-3">
-                                                        <label for="validationCustom02">Date of Birth</label>
-                                                        <input type="date" required id="customDatePicker" name="dob" class="form-control" id="validationCustom02" placeholder="Enter your birth date" required="" value="{{old('dob')}}" min="{{\Carbon\Carbon::now()->subYears(17)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(3)->format('Y-m-d')}}">
-                                                        @error('dob')
-                                                        <div class="invalid-feedback">
-                                                        {{$message}}
-                                                        </div>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="col-md-4 mb-3">
-                                                        <label for="validationCustomUsername">Parent/Guardian Name</label>
-                                                            <select name="parent" id="parentSelect" class="form-control select2 text-capitalize" required>
-                                                                <option value="">Select Parent</option>
-                                                                @if ($parents->isEmpty())
-                                                                    <option value="" disabled class="text-danger text-capitalize">No parents records found</option>
-                                                                @else
-                                                                    @foreach ($parents as $parent)
-                                                                        <option value="{{$parent->id}}">
-                                                                            {{ucwords(strtoupper($parent->first_name . ' ' . $parent->last_name))}} - {{$parent->phone}}
-                                                                        </option>
-                                                                    @endforeach
-                                                                @endif
-                                                            </select>
-                                                            @error('parent')
-                                                            <div class="invalid-feedback">
-                                                                {{$message}}
-                                                            </div>
-                                                            @enderror
-                                                    </div>
-                                                </div>
-                                                <div class="form-row">
-                                                    <div class="col-md-4 mb-3">
-                                                        <label for="validationCustom01">Class Group</label>
-                                                        <select name="group" id="validationCustom02" required class="form-control">
-                                                            <option value="">--Select Stream--</option>
-                                                            <option value="a">Stream A</option>
-                                                            <option value="b">Stream B</option>
-                                                            <option value="c">Stream C</option>
-                                                        </select>
-                                                        {{-- <input type="text" name="group" required id="validationCustomUsername" class="form-control text-uppercase" placeholder="Enter Group A, B or C" id="validationCustom02" value="{{old('dob')}}" required> --}}
-                                                        @error('group')
-                                                        <div class="invalid-feedback">
-                                                            {{$message}}
-                                                        </div>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="col-md-4 mb-3">
-                                                        <label for="validationCustomUsername">Bus Number:<small class="text-sm text-muted">Select if using School bus</small></label>
-                                                        <div class="input-group">
-                                                            <select name="driver" id="validationCustomUsername" class="form-control text-uppercase">
-                                                                <option value="">-- select bus number --</option>
-                                                                @if ($buses->isEmpty())
-                                                                    <option value="" class="text-danger text-capitalize" disabled>No school bus records found</option>
-                                                                @else
-                                                                    @foreach ($buses as $bus)
-                                                                        <option value="{{$bus->id}}">Bus No. {{$bus->bus_no}}</option>
-                                                                    @endforeach
-                                                                @endif
-                                                            </select>
-                                                            @error('driver')
-                                                            <div class="invalid-feedback">
-                                                                {{$message}}
-                                                            </div>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4 mb-3">
-                                                        <label for="validationCustomUsername">Photo :<small class="text-sm text-danger">(Optional)</small></label>
-                                                        <div class="input-group">
-                                                            <input type="file" name="image" id="validationCustomUsername" class="form-control" value="{{old('image')}}">
-                                                            @error('image')
-                                                            <div class="invalid-feedback">
-                                                                {{$message}}
-                                                            </div>
-                                                            @enderror
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                            <button type="submit" id="saveButton" class="btn btn-success">Save</button>
-                                        </div>
-                                    </div>
-                                </form>
+                            <div class="col-md-4">
+                                <div class="d-flex justify-content-end gap-2 flex-wrap">
+                                    @if ($students->isNotEmpty())
+                                    <button type="button" class="btn btn-info btn-xs mr-1" data-bs-toggle="modal" data-bs-target="#promoteModal">
+                                        <i class="fas fa-exchange-alt me-1"></i> Promote
+                                    </button>
+                                    <a href="{{route('export.student.pdf', ['class' => Hashids::encode($classId->id)])}}" target="_blank" class="btn btn-primary btn-xs mr-1">
+                                        <i class="fas fa-cloud-arrow-down me-1"></i> Export
+                                    </a>
+                                    @endif
+                                    <a href="{{route('classes.list', ['class' => Hashids::encode($classId->id)])}}" class="btn btn-secondary btn-xs mr-1">
+                                        <i class="fas fa-arrow-circle-left me-1"></i> Back
+                                    </a>
+                                    <button type="button" class="btn btn-success btn-xs mr-1" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+                                        <i class="fas fa-plus-circle me-1"></i> New
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                </div>
-                <div class="single-table mt-5">
-                    <form action="{{ route('students.batchUpdateStream') }}" novalidate class="needs-validation" method="POST">
-                        @csrf
-                            <div class="col-md-12 mb-3">
-                                <div class="row">
-                                    <div class="col-md-2">
-                                        <label for="">Transfer Student Stream</label>
-                                        <select name="new_stream" class="form-control text-capitalize" required>
-                                            <option value="">-- Select Stream --</option>
-                                            <option value="A">Stream A</option>
-                                            <option value="B">Stream B</option>
-                                            <option value="C">Stream C</option>
-                                        </select>
+
+                        <!-- Student Info Summary -->
+                        <div class="student-info-card">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-users fa-2x me-3"></i>
+                                        <div>
+                                            <h6 class="mb-0"> Total Students</h6>
+                                            <h3 class="mb-0"> {{ $students->count() }}</h3>
+                                        </div>
                                     </div>
-                                    <div class="col-md-3 mt-4">
-                                        <button type="submit" class="btn btn-warning btn-xs text-capitalize" onclick="return confirm('Are you sure you want to move selected students to a new stream?')"><i class="fas fa-random"></i> Move</button>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-male fa-2x me-3"></i>
+                                        <div>
+                                            <h6 class="mb-0"> Boys</h6>
+                                            <h3 class="mb-0"> {{ $students->filter(fn($s) => strtolower($s->gender) === 'male')->count() }}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-female fa-2x me-3"></i>
+                                        <div>
+                                            <h6 class="mb-0"> Girls</h6>
+                                            <h3 class="mb-0"> {{ $students->filter(fn($s)=> strtolower($s->gender) === 'female')->count() }}</h3>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="table-responsive">
+                        </div>
+
+                        <!-- Batch Update Form -->
+                        <form action="{{ route('students.batchUpdateStream') }}" novalidate class="needs-validation mb-4" method="POST">
+                            @csrf
+                            <div class="row align-items-end">
+                                <div class="col-md-3">
+                                    <label class="form-label">Transfer Student Stream</label>
+                                    <select name="new_stream" class="form-select text-capitalize" required>
+                                        <option value="">-- Select Stream --</option>
+                                        <option value="A">Stream A</option>
+                                        <option value="B">Stream B</option>
+                                        <option value="C">Stream C</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="submit" class="btn btn-warning btn-xs text-capitalize" onclick="return confirm('Are you sure you want to move selected students to a new stream?')">
+                                        <i class="fas fa-random me-1"></i> Shift Stream
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Students Table -->
+                            <div class="table-responsive mt-4">
                                 <table class="table table-hover progress-table" id="myTable">
-                                    <thead class="text-capitalize">
+                                    <thead>
                                         <tr>
                                             <th scope="col" class="text-center"><input type="checkbox" id="selectAll"> All</th>
-                                            <th scope="col" class="text-center">Adm #.</th>
-                                            <th scope="col">First Name</th>
+                                            <th scope="col" class="text-center">Adm #</th>
+                                            <th scope="col">Student</th>
                                             <th scope="col">Middle Name</th>
                                             <th scope="col">Surname</th>
                                             <th scope="col" class="text-center">Gender</th>
                                             <th scope="col" class="text-center">Stream</th>
-                                            <th scope="col">DoB</th>
-                                            <th scope="col" class="text-center">Action</th>
+                                            <th scope="col">Date of Birth</th>
+                                            <th scope="col" class="text-center">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($students as $student )
-                                            <tr>
-                                                <td class="text-center">
-                                                    <input type="checkbox" name="student[]" value="{{$student->id}}">
-                                                    {{$loop->iteration}}
-                                                </td>
-                                                <td class="text-uppercase text-center">{{$student->admission_number}}</td>
-                                                <td class="d-flex align-items-center">
-                                                        @php
-                                                            // Determine the image path
-                                                            $imageName = $student->image;
-                                                            $imagePath = public_path('assets/img/students/' . $imageName);
+                                        @foreach ($students as $student)
+                                        <tr>
+                                            <td class="text-center">
+                                                <input type="checkbox" name="student[]" value="{{$student->id}}">
+                                            </td>
+                                            <td class="text-uppercase text-center fw-bold">{{$student->admission_number}}</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    @php
+                                                        $imageName = $student->image;
+                                                        $imagePath = public_path('assets/img/students/' . $imageName);
 
-                                                            // Check if the image exists and is not empty
-                                                            if (!empty($imageName) && file_exists($imagePath)) {
-                                                                $avatarImage = asset('assets/img/students/' . $imageName);
-                                                            } else {
-                                                                // Use default avatar based on gender
-                                                                $avatarImage = asset('assets/img/students/' . ($student->gender == 'male' ? 'student.jpg' : 'student.jpg'));
-                                                            }
-                                                        @endphp
-                                                        <img src="{{ $avatarImage }}" alt="" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
-                                                        <span class="text-capitalize ms-2" style="margin-left: 5px"> {{ucwords(strtolower($student->first_name))}}</span>
-                                                </td>
-                                                <td class="text-capitalize">{{ucwords(strtolower($student->middle_name))}}</td>
-                                                <td class="text-capitalize">{{ucwords(strtolower($student->last_name))}}</td>
-                                                <td class="text-center text-capitalize">{{$student->gender[0]}}</td>
-                                                <td class="text-center text-capitalize">{{$student->group}}</td>
-                                                <td>
-                                                    {{ \Carbon\Carbon::parse($student->dob)->format('M d, Y') }}
-                                                </td>
-                                                <td>
-                                                    <ul class="d-flex justify-content-center">
-                                                        <li class="mr-3">
-                                                            <a href="{{route('students.modify', ['students' => Hashids::encode($student->id)])}}"><i class="ti-pencil text-primary"></i></a>
-                                                        </li>
-                                                        <li class="mr-3">
-                                                            <a href="{{route('manage.student.profile', ['student' => Hashids::encode($student->id)])}}"><i class="ti-eye text-secondary"></i></a>
-                                                        </li>
-
-                                                        <li>
-                                                            <form action="{{route('Students.destroy', ['student' => Hashids::encode($student->id)])}}" method="POST">
-                                                                @csrf
-                                                                <button class="btn btn-link p-0" onclick="return confirm('Are you sure you want to block {{strtoupper($student->first_name)}} {{strtoupper($student->middle_name)}} {{strtoupper($student->last_name)}}?')">
-                                                                    <i class="ti-trash text-danger"></i>
-                                                                </button>
-                                                            </form>
-                                                        </li>
-                                                    </ul>
-                                                </td>
-                                            </tr>
+                                                        if (!empty($imageName) && file_exists($imagePath)) {
+                                                            $avatarImage = asset('assets/img/students/' . $imageName);
+                                                        } else {
+                                                            $avatarImage = asset('assets/img/students/student.jpg');
+                                                        }
+                                                    @endphp
+                                                    <img src="{{ $avatarImage }}" alt="Student Avatar" class="student-avatar">
+                                                    <span class="text-capitalize">{{ucwords(strtolower($student->first_name))}}</span>
+                                                </div>
+                                            </td>
+                                            <td class="text-capitalize">{{ucwords(strtolower($student->middle_name))}}</td>
+                                            <td class="text-capitalize">{{ucwords(strtolower($student->last_name))}}</td>
+                                            <td class="text-center text-capitalize">
+                                                <span class="badge bg-info">{{$student->gender[0]}}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge badge-stream badge-stream-{{$student->group}}">{{$student->group}}</span>
+                                            </td>
+                                            <td>{{\Carbon\Carbon::parse($student->dob)->format('M d, Y')}}</td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <a href="{{route('students.modify', ['students' => Hashids::encode($student->id)])}}" class="btn btn-sm btn-primary" title="Edit">
+                                                        <i class="ti-pencil"></i>
+                                                    </a>
+                                                    <a href="{{route('manage.student.profile', ['student' => Hashids::encode($student->id)])}}" class="btn btn-sm btn-info" title="View">
+                                                        <i class="ti-eye"></i>
+                                                    </a>
+                                                    <form action="{{route('Students.destroy', ['student' => Hashids::encode($student->id)])}}" method="POST">
+                                                        @csrf
+                                                        <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to block {{strtoupper($student->first_name)}} {{strtoupper($student->middle_name)}} {{strtoupper($student->last_name)}}?')" title="Delete">
+                                                            <i class="ti-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
                             </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Promote Students Modal -->
+    <div class="modal fade" id="promoteModal" tabindex="-1" aria-labelledby="promoteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-uppercase" id="promoteModalLabel">Promote Students to the Next Class</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-danger mb-3">Select class you want to promote students to</p>
+                    <form class="needs-validation" novalidate action="{{route('promote.student.class', ['class' => Hashids::encode($classId->id)])}}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+                        <div class="mb-3">
+                            <label for="classSelect" class="form-label">Class Name</label>
+                            <select name="class_id" id="classSelect" class="form-select text-uppercase" required>
+                                <option value="">--Select Class--</option>
+                                @if ($classes->isEmpty())
+                                    <option value="" class="text-danger">No more classes found</option>
+                                    <option value="0" class="text-success fw-bold">🎓 Graduate Class 🎉</option>
+                                @else
+                                    @foreach ($classes as $class)
+                                        <option value="{{$class->id}}">{{$class->class_name}}</option>
+                                    @endforeach
+                                    <option value="0" class="text-success fw-bold">🎓 Graduate Class 🎉</option>
+                                @endif
+                            </select>
+                        </div>
+                        <div class="mb-3" id="graduationYearField" style="display: none;">
+                            <label for="graduation_year" class="form-label">Graduation Year</label>
+                            <input type="number" name="graduation_year" id="graduation_year" class="form-control" min="{{date('Y') - 5}}" max="{{date('Y')}}" value="{{old('graduation_year')}}">
+                            <div class="form-text">Please enter the graduation year</div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to promote this class?')">Upgrade</button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-</div>
- <script>
 
-    document.getElementById('selectAll').addEventListener('change', function() {
-            const checkboxes = document.querySelectorAll('input[name="student[]"]');
-            checkboxes.forEach(checkbox => checkbox.checked = this.checked);
-    });
+    <!-- Add Student Modal -->
+    <div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-uppercase" id="addStudentModalLabel">{{$classId->class_name}} Student Registration</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="needs-validation" novalidate action="{{route('student.store', ['class' => Hashids::encode($classId->id)])}}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="fname" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="fname" name="fname" value="{{old('fname')}}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="middle" class="form-label">Middle Name</label>
+                                <input type="text" class="form-control" id="middle" name="middle" value="{{old('middle')}}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="lname" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lname" name="lname" value="{{old('lname')}}" required>
+                            </div>
+                        </div>
 
-    window.onload = function() {
-        // Hakikisha jQuery na Select2 inapatikana
-        if (typeof $.fn.select2 !== 'undefined') {
-            // Fanya initialization ya Select2
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="gender" class="form-label">Gender</label>
+                                <select class="form-select" id="gender" name="gender" required>
+                                    <option value="">-- select gender --</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="dob" class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="dob" name="dob" value="{{old('dob')}}" required min="{{\Carbon\Carbon::now()->subYears(17)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(3)->format('Y-m-d')}}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="parentSelect" class="form-label">Parent/Guardian</label>
+                                <select name="parent" id="parentSelect" class="form-select" required>
+                                    <option value="">Select Parent</option>
+                                    @if ($parents->isEmpty())
+                                        <option value="" disabled class="text-danger">No parents records found</option>
+                                    @else
+                                        @foreach ($parents as $parent)
+                                            <option value="{{$parent->id}}">
+                                                {{ucwords(strtoupper($parent->first_name . ' ' . $parent->last_name))}} - {{$parent->phone}}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="group" class="form-label">Class Group</label>
+                                <select class="form-select" id="group" name="group" required>
+                                    <option value="">--Select Stream--</option>
+                                    <option value="a">Stream A</option>
+                                    <option value="b">Stream B</option>
+                                    <option value="c">Stream C</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="bus" class="form-label">Bus Number</label>
+                                <select name="driver" id="bus" class="form-select">
+                                    <option value="">-- select bus number --</option>
+                                    @if ($buses->isEmpty())
+                                        <option value="" disabled class="text-danger">No school bus records found</option>
+                                    @else
+                                        @foreach ($buses as $bus)
+                                            <option value="{{$bus->id}}">Bus No. {{$bus->bus_no}}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                <div class="form-text">Select if using School bus</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="image" class="form-label">Photo</label>
+                                <input type="file" class="form-control" id="image" name="image">
+                                <div class="form-text">Optional</div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-success">Save Student</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Select2
             $('#parentSelect').select2({
                 placeholder: "Search Parent...",
-                allowClear: true
-            }).on('select2:open', function () {
-                $('.select2-results__option').css('text-transform', 'capitalize');  // Capitalize option text
+                allowClear: true,
+                dropdownParent: $('#addStudentModal')
             });
-        } else {
-            console.error("Select2 haijapakiwa!");
-        }
-    };
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const form = document.querySelector(".needs-validation");
-            const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
-
-            if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
-
-            form.addEventListener("submit", function (event) {
-                event.preventDefault(); // Zuia submission ya haraka
-
-                // Disable button na badilisha maandishi
-                submitButton.disabled = true;
-                submitButton.innerHTML = `<span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span> Please Wait...`;
-
-                // Hakikisha form haina errors kabla ya kutuma
-                if (!form.checkValidity()) {
-                    form.classList.add("was-validated");
-                    submitButton.disabled = false; // Warudishe button kama kuna errors
-                    submitButton.innerHTML = "Save";
-                    return;
-                }
-
-                // Chelewesha submission kidogo ili button ibadilike kwanza
-                setTimeout(() => {
-                    form.submit();
-                }, 500);
+            // Select all checkboxes
+            document.getElementById('selectAll').addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('input[name="student[]"]');
+                checkboxes.forEach(checkbox => checkbox.checked = this.checked);
             });
-        });
-        document.addEventListener('DOMContentLoaded', function() {
+
+            // Show/hide graduation year field
             const classSelect = document.getElementById('classSelect');
             const graduationYearField = document.getElementById('graduationYearField');
-            const upGradeButton = document.getElementById('upGradeButton');
-            const form = document.querySelector('form');
 
-            classSelect.addEventListener('change', function() {
-                if (this.value === '0') {
-                    // User selected Graduate Class
-                    graduationYearField.style.display = 'block';
-                } else {
-                    graduationYearField.style.display = 'none';
-                }
-            });
+            if (classSelect) {
+                classSelect.addEventListener('change', function() {
+                    if (this.value === '0') {
+                        graduationYearField.style.display = 'block';
+                    } else {
+                        graduationYearField.style.display = 'none';
+                    }
+                });
+            }
 
-            form.addEventListener('submit', function(e) {
-                if (classSelect.value === '0') {
-                    e.preventDefault(); // Stop form submission
-
-                    // Show confirmation dialog
-                    Swal.fire({
-                        title: 'Are you sure?',
-                        text: "You are about to graduate this class!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, graduate them!'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Check if graduation year is provided
-                            const graduationYear = document.getElementById('graduation_year').value;
-                            if (!graduationYear) {
-                                Swal.fire('Error!', 'Please enter graduation year', 'error');
-                                return;
-                            }
-
-                            // Submit the form
-                            form.submit();
-                        }
-                    });
-                }
+            // Form validation and submission handling
+            const forms = document.querySelectorAll('.needs-validation');
+            forms.forEach(form => {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                });
             });
         });
-</script>
+    </script>
 @endsection
