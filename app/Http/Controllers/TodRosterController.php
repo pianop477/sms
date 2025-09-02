@@ -510,4 +510,14 @@ class TodRosterController extends Controller
         return redirect()->route('get.school.report');
     }
 
+    public function viewReport(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date'
+        ]);
+
+
+    }
+
 }

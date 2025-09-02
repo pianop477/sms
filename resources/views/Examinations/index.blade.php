@@ -1,152 +1,271 @@
 @extends('SRTDashboard.frame')
 
 @section('content')
-<div class="row">
-    <div class="col-12 mt-5">
-        <div class="card">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-10">
-                        <h4 class="header-title text-uppercase">Tests & Examination Type</h4>
-                    </div>
-                    @if (Route::has('exams.store'))
-                    <div class="col-2">
-                        <button type="button" class="btn btn-primary btn-xs p-1 float-right" data-toggle="modal" data-target=".bd-example-modal-md"><i class="fas fa-circle-plus"></i> Add New
-                        </button>
-                        <div class="modal fade bd-example-modal-md">
-                            <div class="modal-dialog modal-md">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Register Examination or Test</h5>
-                                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form class="needs-validation" novalidate="" action="{{route('exams.store')}}" method="POST" enctype="multipart/form-data">
-                                            @csrf
-                                            <div class="form-row">
-                                                <div class="col-md-6 mb-3">
-                                                    <label for="validationCustom01">Examination Name</label>
-                                                    <input type="text" name="name" class="form-control text-capitalize" id="validationCustom01" placeholder="Exam name or test" value="" required="">
-                                                    @error('name')
-                                                    <div class="text-danger">
-                                                        {{$message}}
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #6f42c1;
+            --success-color: #1cc88a;
+            --info-color: #36b9cc;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+            --light-color: #f8f9fc;
+            --dark-color: #5a5c69;
+        }
+
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            margin-bottom: 20px;
+        }
+
+        .header-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn-action {
+            border-radius: 5px;
+            padding: 8px 15px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-table {
+            background-color: white;
+        }
+
+        .progress-table thead {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .progress-table th {
+            padding: 15px 10px;
+            font-weight: 600;
+            vertical-align: middle;
+        }
+
+        .progress-table td {
+            padding: 15px 10px;
+            vertical-align: middle;
+        }
+
+        .badge-status {
+            padding: 0.5em 0.8em;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .action-buttons a, .action-buttons button {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .modal-header {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .table-responsive {
+                overflow-x: auto;
+            }
+
+            .btn-action {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- Header Section -->
+                        <div class="row mb-4">
+                            <div class="col-md-10">
+                                <h4 class="header-title">Tests & Examination Types</h4>
+                            </div>
+                            @if (Route::has('exams.store'))
+                            <div class="col-md-2 text-end">
+                                <button type="button" class="btn btn-primary btn-action float-right" data-bs-toggle="modal" data-bs-target="#addExamModal">
+                                    <i class="fas fa-circle-plus me-1"></i> Add New
+                                </button>
+                            </div>
+                            @endif
+                        </div>
+
+                        <!-- Exams Table -->
+                        <div class="single-table">
+                            <div class="table-responsive">
+                                <table class="table table-hover progress-table" id="examsTable">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Examination Type</th>
+                                            <th scope="col" class="text-center">Symbolic Abbreviation</th>
+                                            <th scope="col" class="text-center">Status</th>
+                                            <th scope="col" class="text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($exams as $exam)
+                                            <tr>
+                                                <td>{{$loop->iteration}}</td>
+                                                <td class="text-uppercase fw-medium">{{$exam->exam_type}}</td>
+                                                <td class="text-uppercase text-center fw-bold">{{$exam->symbolic_abbr}}</td>
+                                                <td class="text-center">
+                                                    @if ($exam->status == 1)
+                                                        <span class="badge-status bg-success text-white">Open</span>
+                                                    @else
+                                                        <span class="badge-status bg-danger text-white">Closed</span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    <div class="action-buttons">
+                                                        @if ($exam->status == 1)
+                                                            <a href="{{route('exams.type.edit', $exam->id)}}" class="btn btn-sm btn-secondary" title="Edit">
+                                                                <i class="ti-pencil"></i>
+                                                            </a>
+                                                            <form action="{{route('exams.block', $exam->id)}}" method="POST">
+                                                                @csrf
+                                                                @method('PUT')
+                                                                <button type="submit" class="btn btn-sm btn-warning" title="Block" onclick="return confirm('Are you sure you want to Block {{strtoupper($exam->exam_type)}} Examination test?')">
+                                                                    <i class="ti-na"></i>
+                                                                </button>
+                                                            </form>
+                                                            <a href="{{route('exams.destroy', $exam->id)}}" class="btn btn-sm btn-danger" title="Delete" onclick="return confirm('Are you sure you want to Delete this Examination test permanently?')">
+                                                                <i class="ti-trash"></i>
+                                                            </a>
+                                                        @else
+                                                            <form action="{{route('exams.unblock', $exam->id)}}" method="POST">
+                                                                @csrf
+                                                                @method('PUT')
+                                                                <button type="submit" class="btn btn-sm btn-success" title="Unblock" onclick="return confirm('Are you sure you want to Unblock {{strtoupper($exam->exam_type)}} Examination test?')">
+                                                                    <i class="ti-reload"></i>
+                                                                </button>
+                                                            </form>
+                                                        @endif
                                                     </div>
-                                                    @enderror
-                                                </div>
-                                                <div class="col-md-6 mb-3">
-                                                    <label for="validationCustom01">Exam code</label>
-                                                    <input type="text" name="abbreviation" class="form-control text-capitalize" id="validationCustom01" placeholder="Exam code" value="{{old('abbreviation')}}" required="">
-                                                    @error('abbreviation')
-                                                    <div class="text-danger">
-                                                        {{$message}}
-                                                    </div>
-                                                    @enderror
-                                                </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                        <button type="submit" id="saveButton" class="btn btn-success">Save</button>
-                                    </div>
-                                </div>
-                            </form>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                    </div>
-                    @endif
-                    </div>
-                </div>
-                <div class="single-table">
-                    <div class="table-responsive-md">
-                        <table class="table table-hover progress-table" id="myTable">
-                            <thead class="text-uppercase">
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Examination Type</th>
-                                    <th scope="col" class="text-center">symbolic abbreviation</th>
-                                    <th scope="col" class="text-center">Status</th>
-                                    {{-- @if (Route::has(['exams.block', 'exams.destroy', 'exams.edit', 'exams.unblock', 'exams.update'])) --}}
-                                    <th scope="col" class="text-center">Action</th>
-                                    {{-- @endif --}}
-                                </tr>
-                            </thead>
-                            @foreach ($exams as $exam)
-                                <tr>
-                                    <td>{{$loop->iteration}}</td>
-                                    <td class="text-uppercase">{{$exam->exam_type}}</td>
-                                    <td class="text-uppercase text-center">{{$exam->symbolic_abbr}}</td>
-                                    <td class="text-center">
-                                        @if ($exam->status ==  1)
-                                            <span class="badge bg-success text-white">{{_('Open')}}</span>
-                                            @else
-                                            <span class="badge bg-danger text-white">{{_('Closed')}}</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <ul class="d-flex justify-content-center">
-                                            @if ($exam->status == 1)
-                                                <li class="mr-3">
-                                                    <a href="{{route('exams.type.edit', $exam->id)}}"><i class="ti-pencil text-primary"></i></a>
-                                                </li>
-                                                <li class="mr-3">
-                                                    <form action="{{route('exams.block', $exam->id)}}" method="POST">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <button type="submit" class=" btn btn-link p-0" onclick="return confirm('Are you sure you want to Block {{strtoupper($exam->exam_type)}} Examination test?')"><i class="ti-na text-secondary"></i></button>
-                                                    </form>
-                                                </li>
-                                                <li>
-                                                    <a href="{{route('exams.destroy', $exam->id)}}" onclick="return confirm('Are you sure you want to Delete this Examination test permanently?')"><i class="ti-trash text-danger"></i></a>
-                                                </li>
-                                            @else
-                                                <li>
-                                                    <form action="{{route('exams.unblock', $exam->id)}}" method="POST">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <button type="submit" class="btn btn-link p-0" onclick="return confirm('Are you sure you want to Unblock {{strtoupper($exam->exam_type)}} Examination test?')"><i class="ti-reload text-success"></i></button>
-                                                    </form>
-                                                </li>
-                                            @endif
-                                        </ul>
-                                    </td>
-                                </tr>
-                            @endforeach
-                            <tbody>
-
-                            </tbody>
-                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const form = document.querySelector(".needs-validation");
-        const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
 
-        if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
+    <!-- Add Exam Modal -->
+    @if (Route::has('exams.store'))
+    <div class="modal fade" id="addExamModal" tabindex="-1" aria-labelledby="addExamModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addExamModalLabel">Register Examination or Test</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="needs-validation" novalidate action="{{route('exams.store')}}" method="POST">
+                        @csrf
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Examination Name</label>
+                                <input type="text" name="name" class="form-control" id="name" placeholder="Exam name or test" required>
+                                @error('name')
+                                <div class="text-danger small">
+                                    {{$message}}
+                                </div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="abbreviation" class="form-label">Exam Code</label>
+                                <input type="text" name="abbreviation" class="form-control text-uppercase" id="abbreviation" placeholder="Exam code" required>
+                                @error('abbreviation')
+                                <div class="text-danger small">
+                                    {{$message}}
+                                </div>
+                                @enderror
+                            </div>
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" id="saveButton" class="btn btn-success">Save Exam</button>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+    @endif
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector(".needs-validation");
+            const submitButton = document.getElementById("saveButton");
 
-        form.addEventListener("submit", function (event) {
-            event.preventDefault(); // Zuia submission ya haraka
+            if (!form || !submitButton) return;
 
-            // Disable button na badilisha maandishi
-            submitButton.disabled = true;
-            submitButton.innerHTML = `<span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span> Please Wait...`;
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();
 
-            // Hakikisha form haina errors kabla ya kutuma
-            if (!form.checkValidity()) {
-                form.classList.add("was-validated");
-                submitButton.disabled = false; // Warudishe button kama kuna errors
-                submitButton.innerHTML = "Save";
-                return;
-            }
+                // Disable button and show loading state
+                submitButton.disabled = true;
+                submitButton.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Saving...`;
 
-            // Chelewesha submission kidogo ili button ibadilike kwanza
-            setTimeout(() => {
-                form.submit();
-            }, 500);
+                // Check form validity
+                if (!form.checkValidity()) {
+                    form.classList.add("was-validated");
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = "Save Exam";
+                    return;
+                }
+
+                // Delay submission to show loading state
+                setTimeout(() => {
+                    form.submit();
+                }, 500);
+            });
         });
-    });
-</script>
+    </script>
 @endsection

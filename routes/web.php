@@ -472,5 +472,6 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     Route::get('Daily-school-report/date/{date}', [TodRosterController::class, 'reportByDate'])->name('report.by.date');
     Route::delete('Daily-school-report/{date}/delete', [TodRosterController::class, 'destroyReport'])->name('report.reject');
     Route::put('Daily-school-report/{id}/update', [TodRosterController::class, 'updateDailyReport'])->name('report.update');
+    Route::get('Daily-school-report/view', [TodRosterController::class, 'viewReport'])->name('report.view');
 
 });
