@@ -236,7 +236,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="importModalLabel">Import Parents File</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Close</button>
                 </div>
                 <div class="modal-body">
                     <form class="needs-validation" novalidate action="{{route('import.parents.students')}}" method="POST" enctype="multipart/form-data">
@@ -272,7 +272,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="parentModalLabel">Parent Registration Form</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Close</button>
                 </div>
                 <div class="modal-body">
                     <form class="needs-validation" novalidate action="{{route('Parents.store')}}" method="POST" enctype="multipart/form-data">

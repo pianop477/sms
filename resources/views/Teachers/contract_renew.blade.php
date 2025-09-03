@@ -1,79 +1,126 @@
 @extends('SRTDashboard.frame')
-
 @section('content')
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .page-header h4 {
+        margin: 0;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .card {
+        border-radius: 12px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+    .btn {
+        border-radius: 25px;
+        font-weight: 600;
+    }
+    .form-control {
+        border-radius: 8px;
+    }
+    .modal-content {
+        border-radius: 15px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.2);
+    }
+    .badge {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+        border-radius: 20px;
+    }
+</style>
+
+{{-- Header --}}
+<div class="page-header mt-4 mb-4">
+    <h4><i class="fas fa-file-contract"></i> My Contracts Catalog</h4>
+    <button type="button" class="btn btn-light" data-toggle="modal" data-target=".bd-example-modal-lg">
+        <i class="fas fa-plus"></i> Apply Contract
+    </button>
+</div>
+
+{{-- Main Card --}}
 <div class="row">
-    <div class="col-12 mt-5">
+    <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <div class="row">
-                    <div class="col-8">
-                        <h4 class="header-title text-uppercase text-center">My Contracts Catalog</h4>
-                    </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-xs btn-info float-right" data-toggle="modal" data-target=".bd-example-modal-lg">
-                            <i class="fas fa-plus"></i> Apply Contract
-                        </button>
-                        <div class="modal fade bd-example-modal-lg">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Contract Application Form</h5>
-                                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form class="needs-validation" novalidate="" action="{{route('contract.store')}}" method="POST" enctype="multipart/form-data">
-                                            @csrf
-                                            <div class="form-row">
-                                                <div class="col-md-6 mb-3">
-                                                    <label for="validationCustom01">Contract type</label>
-                                                    <select name="contract_type" id="validationCustom01" required class="form-control">
-                                                        <option value="">-- Select Contract Type --</option>
-                                                        <option value="new">New contract</option>
-                                                        <option value="probation">Probation Contract</option>
-                                                        <option value="renewal">Renew Contract</option>
-                                                    </select>
-                                                    @error('contract_type')
-                                                    <div class="text-danger">
-                                                        {{$message}}
-                                                    </div>
-                                                    @enderror
-                                                </div>
-                                                <div class="col-md-6 mb-3">
-                                                    <label for="validationCustom02">Application Letter</label>
-                                                    <input type="file" required name="application_letter" class="form-control" id="validationCustom02" placeholder="" required="" value="">
-                                                    @error('application_letter')
-                                                    <div class="text-danger">
-                                                       {{$message}}
-                                                    </div>
-                                                    @enderror
-                                                </div>
-                                            </div>
+
+                {{-- Modal --}}
+                <div class="modal fade bd-example-modal-lg">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header bg-light">
+                                <h5 class="modal-title"><i class="fas fa-pen-nib"></i> Contract Application Form</h5>
+                                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                            </div>
+                            <div class="modal-body">
+                                <form class="needs-validation" novalidate
+                                      action="{{ route('contract.store') }}"
+                                      method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="form-row">
+                                        <div class="col-md-6 mb-3">
+                                            <label>Contract Type</label>
+                                            <select name="contract_type" required class="form-control">
+                                                <option value="">-- Select Contract Type --</option>
+                                                <option value="new">New contract</option>
+                                                <option value="probation">Probation Contract</option>
+                                                <option value="renewal">Renew Contract</option>
+                                            </select>
+                                            @error('contract_type')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label>Application Letter</label>
+                                            <input type="file" name="application_letter" required class="form-control">
+                                            @error('application_letter')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                                        <button type="submit" id="saveButton" class="btn btn-success">Submit Application</button>
+                                        <button type="button" class="btn btn-danger" data-dismiss="modal">
+                                            <i class="fas fa-times-circle"></i> Close
+                                        </button>
+                                        <button type="submit" id="saveButton" class="btn btn-success">
+                                            <i class="fas fa-paper-plane"></i> Submit Application
+                                        </button>
                                     </div>
-                                </div>
-                            </form>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="single-table">
+
+                {{-- Table --}}
+                <div class="single-table mt-3">
                     <div class="table-responsive">
                         @if ($contracts->isEmpty())
-                            <table class="table table-hover progress-table" id="myTable">
+                            <table class="table table-hover progress-table">
                                 <thead class="text-capitalize">
-                                    <th scope="col">#</th>
-                                    <th scope="col">Application Type</th>
-                                    <th scope="col">Applied_at</th>
-                                    <th scope="col">Updated_at</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Action</th>
+                                    <tr class="text-center">
+                                        <th>#</th>
+                                        <th>Application Type</th>
+                                        <th>Applied At</th>
+                                        <th>Updated At</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td colspan="6" class="text-center text-danger">No Contract record found</td>
+                                        <td colspan="6" class="text-center text-danger">
+                                            No Contract record found
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -239,37 +286,67 @@
                         @endif
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
 </div>
+
+{{-- Scripts --}}
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const form = document.querySelector(".needs-validation");
-        const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
+        const submitButton = document.getElementById("saveButton");
 
-        if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
+        if (!form || !submitButton) return;
 
         form.addEventListener("submit", function (event) {
-            event.preventDefault(); // Zuia submission ya haraka
+            event.preventDefault();
 
-            // Disable button na badilisha maandishi
+            // Disable button + spinner
             submitButton.disabled = true;
-            submitButton.innerHTML = `<span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span> Please Wait...`;
+            submitButton.innerHTML =
+                `<span class="spinner-border spinner-border-sm text-white" role="status"></span> Submitting...`;
 
-            // Hakikisha form haina errors kabla ya kutuma
             if (!form.checkValidity()) {
                 form.classList.add("was-validated");
-                submitButton.disabled = false; // Warudishe button kama kuna errors
-                submitButton.innerHTML = "Submit Application";
+                submitButton.disabled = false;
+                submitButton.innerHTML = `<i class="fas fa-paper-plane"></i> Submit Application`;
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Failed',
+                    text: 'Please fill in all required fields before submitting.',
+                    confirmButtonColor: '#185a9d'
+                });
+
                 return;
             }
 
-            // Chelewesha submission kidogo ili button ibadilike kwanza
+            // Delay kidogo ili spinner ionekane
             setTimeout(() => {
                 form.submit();
-            }, 500);
+            }, 600);
         });
     });
+
+    // Success/Failure feedback kutoka session
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: '{{ session("success") }}',
+            confirmButtonColor: '#43cea2'
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: '{{ session("error") }}',
+            confirmButtonColor: '#d33'
+        });
+    @endif
 </script>
 @endsection

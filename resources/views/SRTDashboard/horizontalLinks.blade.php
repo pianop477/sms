@@ -70,7 +70,7 @@
                                 <a href="javascript:void(0)"><i class="fa fa-file-archive"></i><span>Staff & HR</span></a>
                                 <ul class="submenu">
                                     <li><a href="{{route('tod.roster.index')}}"><i class="fas fa-file"></i> Duty Rosters</a></li>
-                                    <li><a href="{{route('contract.index')}}"><i class="fa fa-exchange-alt"></i> Contract Request</a></li>
+                                    <li><a href="{{route('contract.index')}}"><i class="fas fa-briefcase"></i> Manage Contracts</a></li>
                                 </ul>
                             </li>
 
@@ -137,7 +137,7 @@
                                 <a href="javascript:void(0)"><i class="fa fa-file-archive"></i><span>Staff & HR</span></a>
                                 <ul class="submenu">
                                     <li><a href="{{route('tod.roster.index')}}"><i class="fas fa-file"></i> Duty Rosters</a></li>
-                                    <li><a href="{{route('contract.management')}}"><i class="fa fa-exchange-alt"></i> Contract Requests</a></li>
+                                    <li><a href="{{route('contract.management')}}"><i class="fas fa-briefcase"></i> Manage Contracts</a></li>
                                 </ul>
                             </li>
 
@@ -154,7 +154,7 @@
                         {{-- Contract Requests (Other roles) --}}
                         @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 1 || Auth::user()->usertype ==3 && Auth::user()->teacher->role_id == 4)
                             <li>
-                                <a href="{{route('contract.index')}}"><i class="fa fa-exchange-alt"></i><span> Contract Requests</span></a>
+                                <a href="{{route('contract.index')}}"><i class="fas fa-briefcase"></i><span> Manage Contracts</span></a>
                             </li>
                         @endif
                     </ul>
