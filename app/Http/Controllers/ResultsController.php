@@ -44,7 +44,10 @@ class ResultsController extends Controller
     {
         $decoded = Hashids::decode($student);
 
-        $students = Student::find($decoded[0]);
+        $students = Student::query()
+                        ->join('grades', 'grades.id', '=', 'students.class_id')
+                        ->select('students.*', 'grades.class_name', 'grades.class_code')
+                        ->find($decoded[0]);
         if(! $students) {
             Alert()->toast('No such student was found', 'error');
             return back();

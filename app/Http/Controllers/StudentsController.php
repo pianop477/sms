@@ -1227,39 +1227,51 @@ class StudentsController extends Controller
         return view('profile.student_profile', compact('students', 'myClassTeacher', 'class_course', 'class', 'packages', 'imagePath'));
     }
 
-    public function downloadProfilePicture ($student)
+    public function downloadProfilePicture($student)
     {
         $id = Hashids::decode($student);
-
-        $students = Student::query()
-                            ->join('grades', 'grades.id', '=', 'students.class_id')
-                            ->join('parents', 'parents.id', '=', 'students.parent_id')
-                            ->leftJoin('users', 'users.id', '=', 'parents.user_id')
-                            ->leftJoin('transports', 'transports.id', '=', 'students.transport_id')
-                            ->select(
-                                'students.*',
-                                'grades.class_name', 'grades.class_code',
-                                'parents.address',
-                                'users.first_name as parent_first_name', 'users.last_name as parent_last_name',
-                                'users.phone', 'transports.driver_name', 'transports.bus_no', 'transports.routine', 'transports.gender as driver_gender',
-                                'transports.phone as driver_phone', 'users.gender as parent_gender', 'users.created_at as parent_created_at',
-                                'users.email',
-                            )
-                            ->findOrFail($id[0]);
-        $studentPicture = $students->image;
-        $filePath = public_path('assets/img/students/' . $studentPicture);
-
-        if (!file_exists($filePath)) {
-            // abort(404, 'No picture found');
-            Alert()->toast('No picture found', 'error');
+        if (empty($id)) {
+            // abort(404, 'Student not found');
+            Alert()->toast('No such student was found', 'error');
             return back();
         }
 
-        // Unaweza kuweka jina la file wakati linapakuliwa
-        $fileName = $students->first_name . '_' . $students->last_name . '.jpg';
+        $studentRecord = Student::query()
+            ->join('grades', 'grades.id', '=', 'students.class_id')
+            ->join('parents', 'parents.id', '=', 'students.parent_id')
+            ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+            ->leftJoin('transports', 'transports.id', '=', 'students.transport_id')
+            ->select(
+                'students.*',
+                'grades.class_name', 'grades.class_code',
+                'parents.address',
+                'users.first_name as parent_first_name', 'users.last_name as parent_last_name',
+                'users.phone', 'transports.driver_name', 'transports.bus_no', 'transports.routine',
+                'transports.gender as driver_gender', 'transports.phone as driver_phone',
+                'users.gender as parent_gender', 'users.created_at as parent_created_at',
+                'users.email',
+            )
+            ->findOrFail($id[0]);
 
+        // hakikisha tuna jina la picha
+        if (empty($studentRecord->image)) {
+            // return back()->with('error', 'No picture set for this student.');
+            Alert()->toast('No picture set for this student.', 'error');
+            return back();
+        }
+
+        $filePath = public_path('assets/img/students/' . $studentRecord->image);
+
+        if (!file_exists($filePath)) {
+            // return back()->with('error', 'Picture file does not exist on the server.');
+            Alert()->toast('Picture file does not exist on the server.', 'error');
+            return back();
+        }
+
+        $fileName = $studentRecord->first_name . '_' . $studentRecord->last_name . '.jpg';
         return response()->download($filePath, $fileName);
     }
+
 
    public function searchStudent(Request $request)
     {

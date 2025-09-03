@@ -1,97 +1,486 @@
 @extends('SRTDashboard.frame')
 @section('content')
-    <div class="col-md-12 mt-3">
-        <div class="card">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-10">
-                        <h4 class="header-title text-center text-uppercase">students generated report - {{$reports->title}} ({{$myReportData->first()->class_code}}) - {{$year}}</h4>
+    <style>
+        :root {
+            --primary: #4e54c8;
+            --secondary: #8f94fb;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --success: #28a745;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+
+        body {
+            /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 25px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header-custom::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            transform: rotate(30deg);
+        }
+
+        .header-title {
+            font-weight: 700;
+            margin: 0;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            font-size: 28px;
+        }
+
+        .report-highlight {
+            color: #ffd700;
+            font-weight: 700;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+            text-transform: uppercase;
+        }
+
+        .class-highlight {
+            color: #ffd700;
+            font-weight: 600;
+        }
+
+        .year-highlight {
+            color: #ffd700;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .btn-back {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            color: white;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .table-custom {
+            margin-bottom: 0;
+            width: 100%;
+        }
+
+        .table-custom thead th {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .table-custom tbody td {
+            padding: 15px;
+            vertical-align: middle;
+            border-color: #e9ecef;
+        }
+
+        .table-custom tbody tr {
+            transition: all 0.3s;
+        }
+
+        .table-custom tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .admission-number {
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+
+        .phone-number {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .score-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .exam-date-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid #e9ecef;
+        }
+
+        .exam-date-header {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .scores-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .score-item {
+            background: white;
+            border-radius: 6px;
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 70px;
+            transition: all 0.3s;
+        }
+
+        .score-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .course-code {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .score-input {
+            width: 50px;
+            text-align: center;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            padding: 4px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .absent-badge {
+            background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%);
+            color: white;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .total-score {
+            font-weight: 700;
+            color: var(--success);
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .action-list {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        .btn-action {
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            border: none;
+            font-size: 14px;
+        }
+
+        .btn-preview {
+            background: linear-gradient(135deg, var(--success) 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-preview:hover {
+            background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-sms {
+            background: linear-gradient(135deg, var(--warning) 0%, #ffd54f 100%);
+            color: #856404;
+        }
+
+        .btn-sms:hover {
+            background: linear-gradient(135deg, #ffb300 0%, #ffa000 100%);
+            color: #856404;
+            transform: translateY(-2px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #fff9e6 0%, #ffeeb5 100%);
+            border-radius: 15px;
+            border-left: 5px solid var(--warning);
+        }
+
+        .empty-state i {
+            font-size: 60px;
+            color: var(--warning);
+            margin-bottom: 15px;
+        }
+
+        .empty-state h5 {
+            color: #856404;
+            font-weight: 600;
+        }
+
+        .floating-icons {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 60px;
+            opacity: 0.1;
+            color: white;
+            z-index: 0;
+        }
+
+        @media (max-width: 992px) {
+            .scores-grid {
+                justify-content: center;
+            }
+
+            .action-list {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .btn-action {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .table-custom {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .card-body {
+                padding: 20px;
+            }
+
+            .header-title {
+                font-size: 24px;
+            }
+
+            .exam-date-section {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="glass-card">
+            <div class="card-header-custom">
+                <div class="row align-items-center">
+                    <div class="col-md-10">
+                        <h4 class="header-title">
+                            <i class="fas fa-file-alt me-2"></i>
+                            Students Generated Report - <span class="report-highlight"> {{$reports->title}}</span>
+                            (<span class="class-highlight text-uppercase">{{$myReportData->first()->class_code}}</span>) -
+                            <span class="year-highlight">{{$year}}</span>
+                        </h4>
                     </div>
-                    <div class="col-2">
-                        <a href="{{route('results.examTypesByClass', ['school' => Hashids::encode($reports->school_id), 'year' => $year, 'class' => Hashids::encode($reports->class_id)])}}" class="float-right btn btn-info btn-xs"><i class="fas fa-arrow-circle-left"></i> Back</a>
+                    <div class="col-md-2">
+                        <a href="{{route('results.examTypesByClass', ['school' => Hashids::encode($reports->school_id), 'year' => $year, 'class' => Hashids::encode($reports->class_id)])}}" class="btn btn-back btn-xs float-right">
+                            <i class="fas fa-arrow-circle-left me-1"></i> Back
+                        </a>
                     </div>
                 </div>
-                <table class="table table-responsive-md table-hover table-striped" id="myTable">
-                    <thead>
-                        <tr class="text-capitalize">
-                            <th class="text-center">Adm #</th>
-                            <th>Student Name</th>
-                            <th>Phone</th>
-                            <th>Score</th>
-                            <th>Total</th>
-                            {{-- <th>Average</th> --}}
-                            <th class="text-center">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if ($myReportData->isEmpty())
-                            <tr>
-                                <td colspan="7" class="text-center text-danger">No Students records found</td>
-                            </tr>
-                        @else
-                            @foreach ($myReportData as $student)
+                <i class="fas fa-chart-pie floating-icons"></i>
+            </div>
+            <div class="card-body">
+                @if ($myReportData->isEmpty())
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h5> No Student Records Found</h5>
+                        <p class="mb-0"> There are no student records available for this report.</p>
+                    </div>
+                @else
+                    <div class="table-container">
+                        <table class="table table-custom" id="myTable">
+                            <thead class="table-dark">
                                 <tr>
-                                    <td class="text-center text-uppercase">{{ $student->admission_number }}</td>
-                                    <td class="text-capitalize">{{ ucwords(strtolower($student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name)) }}</td>
-                                    <td>{{ $student->phone }}</td>
-                                    <td>
-                                        @php
-                                            $total = 0;
-                                            $count = 0;
-                                        @endphp
-
-                                        @foreach ($reports->exam_dates as $exam_date)
-                                            <div class="mb-2">
-                                                <strong>{{ \Carbon\Carbon::parse($exam_date)->format('d M, Y') }}</strong>
-                                                <div class="d-flex flex-wrap gap-1 mt-1">
-                                                    @foreach ($allScores[$student->student_id] ?? [] as $course_id => $dates)
-                                                        @if (isset($dates[$exam_date]))
-                                                            @php
-                                                                $score = $dates[$exam_date][0]->score;
-                                                                $course = $dates[$exam_date][0]->course_code;
-                                                                $total += $score;
-                                                                $count++;
-                                                            @endphp
-                                                            <div class="me-1 mb-1">
-                                                                <small>{{ $course }}</small><br>
-                                                                <input type="number" value="{{ $score }}" class="form-control form-control-sm" style="width: 60px;" readonly>
-                                                            </div>
-                                                        @else
-                                                            <div class="me-1 mb-1">
-                                                                <small>Null</small><br>
-                                                                <input type="text" value="ABS" class="form-control form-control-sm text-danger" style="width: 60px;" readonly>
-                                                            </div>
-                                                        @endif
-                                                    @endforeach
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </td>
-
-                                    <td>{{ $total }}</td>
-                                    {{-- <td>{{ $count > 0 ? round($total / $count, 2) : '-' }}</td> --}}
-                                    <td>
-                                        <ul class="d-flex justify-content-center list-unstyled mb-0">
-                                            <li class="mr-2">
-                                                <a href="{{route('students.report', ['school' => Hashids::encode($student->student_school_id), 'year' => $year, 'class' => Hashids::encode($reports->class_id), 'report' => Hashids::encode($reports->id), 'student' => Hashids::encode($student->studentId)])}}" title="Preview Report" class="btn btn-success btn-xs" onclick="return confirm('Are you sure you want to preview report?')">Preview</a>
-                                            </li>
-                                            <li>
-                                                <form action="{{route('send.sms.combine.report', ['school'=> Hashids::encode($student->student_school_id), 'year'=> $year, 'class'=>Hashids::encode($reports->class_id), 'report'=> Hashids::encode($reports->id), 'student'=>Hashids::encode($student->studentId)])}}" method="POST">
-                                                    @csrf
-                                                    <button type="submit" title="Send SMS" class="btn btn-warning btn-xs"  onclick="return confirm('Are you sure you want to Re-send SMS?')">SMS</button>
-                                                </form>
-                                            </li>
-                                        </ul>
-                                    </td>
+                                    <th class="text-center">Adm #</th>
+                                    <th>Student Name</th>
+                                    <th>Phone</th>
+                                    <th>Score</th>
+                                    <th>Total</th>
+                                    <th class="text-center">Action</th>
                                 </tr>
-                            @endforeach
-                        @endif
-                    </tbody>
-                </table>
-                <script>
+                            </thead>
+                            <tbody>
+                                @foreach ($myReportData as $student)
+                                    <tr>
+                                        <td class="text-center">
+                                            <span class="admission-number">{{ $student->admission_number }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="student-name">
+                                                {{ ucwords(strtolower($student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name)) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="phone-number">{{ $student->phone }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="score-container">
+                                                @php
+                                                    $total = 0;
+                                                    $count = 0;
+                                                @endphp
 
-                </script>
+                                                @foreach ($reports->exam_dates as $exam_date)
+                                                    <div class="exam-date-section">
+                                                        <div class="exam-date-header">
+                                                            <i class="fas fa-calendar-day"></i>
+                                                            {{ \Carbon\Carbon::parse($exam_date)->format('d M, Y') }}
+                                                        </div>
+                                                        <div class="scores-grid">
+                                                            @foreach ($allScores[$student->student_id] ?? [] as $course_id => $dates)
+                                                                @if (isset($dates[$exam_date]))
+                                                                    @php
+                                                                        $score = $dates[$exam_date][0]->score;
+                                                                        $course = $dates[$exam_date][0]->course_code;
+                                                                        $total += $score;
+                                                                        $count++;
+                                                                    @endphp
+                                                                    <div class="score-item">
+                                                                        <span class="course-code">{{ $course }}</span>
+                                                                        <input type="number" value="{{ $score }}" class="score-input" readonly>
+                                                                    </div>
+                                                                @else
+                                                                    <div class="score-item">
+                                                                        <span class="course-code">N/A</span>
+                                                                        <span class="absent-badge">ABS</span>
+                                                                    </div>
+                                                                @endif
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="total-score">{{ $total }}</span>
+                                        </td>
+                                        <td>
+                                            <ul class="action-list">
+                                                <li>
+                                                    <a href="{{route('students.report', ['school' => Hashids::encode($student->student_school_id), 'year' => $year, 'class' => Hashids::encode($reports->class_id), 'report' => Hashids::encode($reports->id), 'student' => Hashids::encode($student->studentId)])}}"
+                                                       title="Preview Report" class="btn-action btn-preview"
+                                                       onclick="return confirm('Are you sure you want to preview report?')">
+                                                        <i class="fas fa-eye me-1"></i> Preview
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <form action="{{route('send.sms.combine.report', ['school'=> Hashids::encode($student->student_school_id), 'year'=> $year, 'class'=>Hashids::encode($reports->class_id), 'report'=> Hashids::encode($reports->id), 'student'=>Hashids::encode($student->studentId)])}}"
+                                                          method="POST">
+                                                        @csrf
+                                                        <button type="submit" title="Send SMS" class="btn-action btn-sms"
+                                                                onclick="return confirm('Are you sure you want to Re-send SMS?')">
+                                                            <i class="fas fa-sms me-1"></i> SMS
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
+
+    <script>
+        // Add subtle animations to table rows
+        document.addEventListener("DOMContentLoaded", function() {
+            const tableRows = document.querySelectorAll('.table-custom tbody tr');
+
+            tableRows.forEach((row, index) => {
+                row.style.opacity = "0";
+                row.style.transform = "translateY(20px)";
+
+                setTimeout(() => {
+                    row.style.transition = "all 0.5s ease";
+                    row.style.opacity = "1";
+                    row.style.transform = "translateY(0)";
+                }, index * 100);
+            });
+        });
+    </script>
 @endsection

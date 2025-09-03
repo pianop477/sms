@@ -1,93 +1,142 @@
 @extends('SRTDashboard.frame')
+@section('content')
 
-    @section('content')
-    <div class="card mt-5">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-10">
-                    <h4 class="header-title">Generate Attendance Report</h4>
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .page-header h4 {
+        margin: 0;
+        font-weight: 600;
+    }
+    .card {
+        border-radius: 12px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+    .btn-primary {
+        border-radius: 25px;
+        font-weight: 600;
+        padding: 0.6rem 1.3rem;
+    }
+    .form-control {
+        border-radius: 8px;
+    }
+    #preloader {
+        position: fixed;
+        top:0; left:0;
+        width:100%; height:100%;
+        background: rgba(255,255,255,0.9);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+</style>
+
+{{-- Header --}}
+<div class="page-header mt-4 mb-4">
+    <h4><i class="fas fa-file-alt"></i> Generate Attendance Report</h4>
+    <a href="{{ route('home') }}" class="btn btn-light">
+        <i class="fas fa-circle-arrow-left"></i> Back
+    </a>
+</div>
+
+{{-- Form Card --}}
+<div class="card">
+    <div class="card-body">
+        <form class="needs-validation" novalidate
+              action="{{ route('attendance.generate.report', ['classTeacher' => Hashids::encode($classTeacher->id)]) }}"
+              method="POST" enctype="multipart/form-data" onsubmit="showPreloader(event)">
+            @csrf
+            <div class="form-row">
+                <div class="col-md-4 mb-3">
+                    <label class="font-weight-bold">Class</label>
+                    <input type="text" disabled name="class"
+                           class="form-control text-uppercase"
+                           value="{{ $classTeacher->class_name }}" required>
+                    @error('class')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
-                <div class="col-2">
-                    <a href="{{ route('home') }}" class="btn btn-info float-right">
-                        <i class="fas fa-circle-arrow-left" style=""></i> Back
-                    </a>
+                <div class="col-md-4 mb-3">
+                    <label class="font-weight-bold">Start Date</label>
+                    <input type="date" name="start" class="form-control"
+                           required value="{{ old('month') }}"
+                           max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                    @error('month')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="font-weight-bold">End Date</label>
+                    <input type="date" name="end" class="form-control"
+                           required value="{{ old('month') }}"
+                           max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                    @error('month')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
-            <form class="needs-validation" novalidate="" action="{{ route('attendance.generate.report', ['classTeacher' => Hashids::encode($classTeacher->id)]) }}" method="POST" enctype="multipart/form-data" onsubmit="showPreloader(event)">
-                @csrf
-                <div class="form-row">
-                    <div class="col-md-4 mb-3">
-                        <label for="validationCustom01">Class</label>
-                        <input type="text" disabled name="class" class="form-control text-uppercase" value="{{ $classTeacher->class_name }}" id="validationCustom02" required>
-                        @error('class')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                        @enderror
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="validationCustom02">Start Date</label>
-                        <input type="date" name="start" class="form-control" id="validationCustom02" placeholder="" required  value="{{ old('month') }}" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
-                        @error('month')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                        @enderror
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="validationCustom02">End Date</label>
-                        <input type="date" name="end" class="form-control" id="validationCustom02" placeholder="" required value="{{ old('month') }}" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
-                        @error('month')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                        @enderror
-                    </div>
-                </div>
-                <div class="col-md-12 mb-3">
-                    <button class="btn btn-primary float-right" type="submit"><i class="ti-settings"></i> Generate</button>
-                </div>
-            </form>
-            <div id="preloader" style="display:none;">
-                <div class="error-area ptb--100 text-center">
-                    <div class="container">
-                        <div class="error-content">
-                            <h5>Loading....</h5>
-                            <p>Retrieving Data, please wait.....</p>
-                        </div>
-                    </div>
-                </div>
+            <div class="col-md-12 mb-3">
+                <button class="btn btn-primary float-right" type="submit">
+                    <i class="fas fa-cogs"></i> Generate
+                </button>
             </div>
-        </div>
+        </form>
     </div>
+</div>
 
-    <script>
-        function showPreloader(event) {
-            const form = event.target; // Chukua form element
-            const submitButton = form.querySelector('button[type="submit"]');
+{{-- Preloader --}}
+<div id="preloader" style="display:none;">
+    <div class="text-center">
+        <div class="spinner-border text-primary mb-3" style="width:3rem;height:3rem;" role="status"></div>
+        <h5>Generating Report...</h5>
+        <p class="text-muted">Retrieving Data, please wait...</p>
+    </div>
+</div>
 
-            if (form.checkValidity()) {
-                // Onyesha preloader ndani ya button na disable button
-                submitButton.innerHTML = '<i class="ti-settings"></i> Generating...';
-                submitButton.disabled = true;
+{{-- Scripts --}}
+<script>
+    function showPreloader(event) {
+        const form = event.target;
+        const submitButton = form.querySelector('button[type="submit"]');
 
-                // Ruhusu submission ifanyike kawaida (ili PDF ipakuliwe)
-            } else {
-                // Zuia submission ikiwa form si sahihi na onyesha validation errors
-                event.preventDefault();
-                form.classList.add('was-validated');
-            }
+        if (form.checkValidity()) {
+            // Onyesha preloader
+            document.getElementById("preloader").style.display = "flex";
+
+            // Disable button
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            submitButton.disabled = true;
+        } else {
+            event.preventDefault();
+            form.classList.add('was-validated');
+
+            // SweetAlert notification
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing Fields',
+                text: 'Please fill all required fields before generating the report.',
+                confirmButtonColor: '#2575fc'
+            });
         }
+    }
 
-        // **Hakikisha button inarudi kwenye hali yake ikiwa user anarudi nyuma**
-        window.addEventListener("pageshow", function(event) {
-            const submitButton = document.querySelector('button[type="submit"]');
-            if (submitButton) {
-                submitButton.innerHTML = '<i class="ti-settings"></i> Generate';
-                submitButton.disabled = false;
-            }
-        });
-    </script>
-
-
-    @endsection
+    // Reset button on back navigation
+    window.addEventListener("pageshow", function(event) {
+        const submitButton = document.querySelector('button[type="submit"]');
+        if (submitButton) {
+            submitButton.innerHTML = '<i class="fas fa-cogs"></i> Generate';
+            submitButton.disabled = false;
+        }
+        document.getElementById("preloader").style.display = "none";
+    });
+</script>
+@endsection

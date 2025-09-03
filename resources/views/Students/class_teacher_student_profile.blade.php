@@ -142,7 +142,7 @@
                 <h4 class="text-primary fw-bold border-bottom pb-2">STUDENT INFORMATION</h4>
             </div>
             <div class="col-md-2 text-end">
-                <a href="{{ url()->previous() }}" class="btn btn-info btn-action">
+                <a href="{{ url()->previous() }}" class="btn btn-info btn-action float-right">
                     <i class="fas fa-arrow-circle-left me-1"></i> Back
                 </a>
             </div>
@@ -165,7 +165,7 @@
                         @endphp
                         <img src="{{ $avatarImage }}" class="profile-img" alt="Student Photo">
                         <h5 class="profile-name mb-1 text-capitalize">{{ucwords(strtolower($students->first_name. ' '. $students->middle_name. ' '. $students->last_name))}}</h4>
-                        <p class="mb-0 text-uppercase">Admission #: <strong>{{$students->admission_number}}</strong></p>
+                        <p class="mb-0 text-uppercase text-white">Admission #: <strong>{{$students->admission_number}}</strong></p>
                     </div>
 
                     <div class="card-body">

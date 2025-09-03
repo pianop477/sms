@@ -473,7 +473,7 @@
                                                                 {{ $classTeacher->phone }}
                                                             </a>
                                                         </p>
-                                                        <p class="mb-0"><strong>Class:</strong> {{ $classTeacher->class_name }} - {{ $classTeacher->group }}</p>
+                                                        <p class="mb-0 text-uppercase"><strong>Class:</strong> {{ $classTeacher->class_name }} - {{ $classTeacher->group }}</p>
                                                     </div>
                                                 </div>
                                             </div>
