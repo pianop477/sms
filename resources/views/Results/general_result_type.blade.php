@@ -515,7 +515,7 @@
                                                                     @csrf
                                                                     @method('PUT')
                                                                     <button class="btn btn-link p-0 action-link" type="submit" title="Publish report" onclick="return confirm('Are you sure you want to Publish this report?')">
-                                                                        <i class="fas fa-toggle-off"></i>
+                                                                        <i class="fas fa-toggle-off text-secondary"></i>
                                                                     </button>
                                                                 </form>
                                                             @else
@@ -523,7 +523,7 @@
                                                                     @csrf
                                                                     @method('PUT')
                                                                     <button class="btn btn-link p-0 action-link publish-link" type="submit" title="Unpublish report" onclick="return confirm('Are you sure you want to Unpublish this report and Lock it?')">
-                                                                        <i class="fas fa-toggle-on"></i>
+                                                                        <i class="fas fa-toggle-on text-success"></i>
                                                                     </button>
                                                                 </form>
                                                             @endif
