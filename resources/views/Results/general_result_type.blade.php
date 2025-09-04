@@ -69,7 +69,7 @@
         }
 
         .card-header-custom {
-            padding: 20px;
+            padding: 5px;
             font-weight: 700;
             font-size: 20px;
             display: flex;
@@ -468,7 +468,7 @@
 
                         <!-- Results Table -->
                         <div class="table-container">
-                            <table class="table table-custom">
+                            <table class="table table-custom table-responsive-md">
                                 <thead>
                                     <tr>
                                         <th>Title</th>
