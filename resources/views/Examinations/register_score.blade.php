@@ -58,7 +58,7 @@
         }
 
         .card-body {
-            padding: 5px;
+            padding: 30px;
         }
 
         .btn-back {
@@ -81,12 +81,35 @@
             color: white;
         }
 
-        .form-section {
+        .info-section {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             border-radius: 15px;
             padding: 25px;
             margin-bottom: 25px;
             border: 1px solid #dee2e6;
+        }
+
+        .info-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .info-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+        }
+
+        .info-list li:last-child {
+            border-bottom: none;
+        }
+
+        .info-list strong {
+            min-width: 120px;
+            display: inline-block;
+            color: var(--dark);
         }
 
         .form-label {
@@ -116,32 +139,6 @@
             box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
         }
 
-        .select2-container--default .select2-selection--single {
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            padding: 10px;
-            height: auto;
-            background-color: white;
-        }
-
-        .select2-container--default .select2-selection--single:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
-        }
-
-        .flatpickr-input {
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            padding: 12px 15px;
-            font-size: 16px;
-            background-color: white;
-        }
-
-        .flatpickr-input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
-        }
-
         .invalid-feedback {
             font-weight: 600;
             color: var(--danger);
@@ -159,26 +156,6 @@
             margin-top: 30px;
             padding-top: 20px;
             border-top: 2px solid #e9ecef;
-        }
-
-        .btn-primary-custom {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            border: none;
-            border-radius: 50px;
-            padding: 12px 30px;
-            font-weight: 600;
-            color: white;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary-custom:hover {
-            background: linear-gradient(135deg, #3f43b5 0%, #7a80f9 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(78, 84, 200, 0.3);
-            color: white;
         }
 
         .btn-warning-custom {
@@ -221,13 +198,23 @@
             color: white;
         }
 
-        .info-alert {
-            background: linear-gradient(135deg, rgba(23, 162, 184, 0.15) 0%, rgba(23, 162, 184, 0.25) 100%);
-            border: 1px solid rgba(23, 162, 184, 0.3);
+        .alert-custom {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.15) 0%, rgba(220, 53, 69, 0.25) 100%);
+            border: 1px solid rgba(220, 53, 69, 0.3);
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 25px;
             backdrop-filter: blur(5px);
+        }
+
+        .instruction-text {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.15) 0%, rgba(255, 193, 7, 0.25) 100%);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            font-weight: 600;
         }
 
         .table-container {
@@ -235,7 +222,7 @@
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 10px;
+            margin-bottom: 25px;
         }
 
         .table-custom {
@@ -246,13 +233,13 @@
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             border: none;
-            /* padding: 10px; */
+            padding: 15px;
             font-weight: 600;
             text-align: center;
         }
 
         .table-custom tbody td {
-            /* padding: 10px; */
+            padding: 15px;
             vertical-align: middle;
             border-color: #e9ecef;
         }
@@ -266,7 +253,7 @@
         }
 
         .score-input {
-            width: auto;
+            width: 120px;
             text-align: center;
             border: 2px solid #e9ecef;
             border-radius: 10px;
@@ -284,7 +271,7 @@
             text-align: center;
             border: 2px solid #e9ecef;
             border-radius: 10px;
-            /* padding: 8px 12px; */
+            padding: 8px 12px;
             font-weight: bold;
         }
 
@@ -298,14 +285,11 @@
             z-index: 0;
         }
 
-        .instruction-text {
-            background: linear-gradient(135deg, rgba(255, 193, 7, 0.15) 0%, rgba(255, 193, 7, 0.25) 100%);
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 193, 7, 0.3);
-            font-weight: 600;
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            margin: 20px 0;
+            border: none;
         }
 
         @media (max-width: 768px) {
@@ -314,7 +298,7 @@
             }
 
             .card-body {
-                padding: 5px;
+                padding: 20px;
             }
 
             .header-title {
@@ -322,11 +306,15 @@
             }
 
             .table-responsive {
-                font-size: 14px;
+                font-size: 12px;
             }
 
             .score-input, .grade-input {
                 width: 100%;
+            }
+
+            .info-list strong {
+                min-width: 100px;
             }
         }
 
@@ -336,13 +324,13 @@
 
         @keyframes pulse {
             0% {
-                box-shadow: 0 0 0 0 rgba(78, 84, 200, 0.4);
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4);
             }
             70% {
-                box-shadow: 0 0 0 10px rgba(78, 84, 200, 0);
+                box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
             }
             100% {
-                box-shadow: 0 0 0 0 rgba(78, 84, 200, 0);
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
             }
         }
     </style>
