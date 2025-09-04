@@ -33,7 +33,7 @@
         .card-header-custom {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
-            padding: 15px 20px;
+            padding: 5px 10px;
             position: relative;
             overflow: hidden;
         }
@@ -54,7 +54,7 @@
             margin: 0;
             position: relative;
             z-index: 1;
-            font-size: 20px;
+            font-size: 15px;
         }
 
         .card-body {

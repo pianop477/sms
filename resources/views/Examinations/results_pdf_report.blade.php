@@ -15,7 +15,7 @@
             /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 20px;
+            /* padding: 20px; */
         }
 
         .glass-card {
@@ -24,14 +24,14 @@
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
             overflow: hidden;
-            margin-top: 20px;
+            margin-top: 30px;
             border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         .card-header-custom {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
-            padding: 20px 25px;
+            padding: 5px 10px;
             position: relative;
             overflow: hidden;
         }
