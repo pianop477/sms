@@ -498,7 +498,7 @@
                                             <td class="text-center">{{ $index + 1 }}</td>
                                             <td class="text-capitalize">{{ ucwords(strtolower($student->first_name))}} {{ucwords(strtolower($student->middle_name))}} {{ucwords(strtolower($student->last_name)) }}</td>
                                             <td class="text-center">
-                                                <input type="number" name="scores[{{ $student->id }}]" class="form-control score-input" value="{{ $score }}" min="0" max="{{ $marking_style == 1 ? '50' : '100' }}" required>
+                                                <input type="number" name="scores[{{ $student->id }}]" class="form-control score-input" value="{{ $score }}" min="0" max="{{ $marking_style == 1 ? '50' : '100' }}">
                                             </td>
                                             <td class="text-center">
                                                 <input type="text" class="form-control grade-input" value="{{ $grade }}" disabled style="background-color: {{ $bgColor }}; font-weight: bold;">
