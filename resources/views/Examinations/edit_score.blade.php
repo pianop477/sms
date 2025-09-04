@@ -347,7 +347,7 @@
         }
     </style>
 
-    <div class="container">
+    <div class="">
         <div class="glass-card">
             <div class="card-header-custom">
                 <div class="row align-items-center">
