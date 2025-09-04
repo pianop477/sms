@@ -18,7 +18,7 @@
             /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 20px;
+            /* padding: 20px; */
         }
 
         .glass-card {

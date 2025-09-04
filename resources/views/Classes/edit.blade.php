@@ -30,7 +30,7 @@
         }
 
         .card-body {
-            padding: 30px;
+            padding: 5px;
         }
 
         .header-title {

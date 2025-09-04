@@ -9,7 +9,7 @@
             font-size: 12px;
             color: #333;
             margin: 0;
-            padding: 20px;
+            /* padding: 20px; */
             padding-bottom: 50px; /* Ongeza padding chini kwa footer */
         }
 
