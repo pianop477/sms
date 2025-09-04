@@ -105,7 +105,7 @@
                 <div class="single-table mt-3">
                     <div class="table-responsive">
                         @if ($contracts->isEmpty())
-                            <table class="table table-hover progress-table">
+                            <table class="table table-hover progress-table table-responsive-md">
                                 <thead class="text-capitalize">
                                     <tr class="text-center">
                                         <th>#</th>
