@@ -275,7 +275,8 @@
 
                         </tr>
                         <tr>
-                            <th>Adm.No.</th>
+                            <th>#</th>
+                            <th>Adm.No#.</th>
                             <th style="" class="">sex</th>
                             <th style="">Student Name</th>
                             @foreach ($results->groupBy('course_id')->keys() as $courseId)
@@ -290,6 +291,7 @@
                     <tbody>
                         @foreach ($sortedStudentsResults as $index => $studentResult)
                         <tr>
+                            <td>{{$loop->iteration}}</td>
                             <td style="text-align: center; text-transform:uppercase">{{ $studentResult['admission_number'] }}</td>
                             <td style="text-align: center">{{ $studentResult['gender'][0] }}</td>
                             <td style="text-transform:capitalize">{{ ucwords(strtolower($studentResult['student_name'])) }}</td>
