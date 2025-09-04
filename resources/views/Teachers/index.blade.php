@@ -176,7 +176,7 @@
                         <!-- Teachers Table -->
                         <div class="single-table">
                             <div class="table-responsive">
-                                <table class="table table-hover progress-table table-responsive-md" id="teachersTable">
+                                <table class="table table-hover progress-table table-responsive-md" id="myTable">
                                     <thead>
                                         <tr>
                                             <th scope="col">#</th>
@@ -216,11 +216,13 @@
                                                 </td>
                                                 <td>
                                                     @if ($teacher->role_id == 1)
-                                                        <span class="badge-role bg-danger text-white">{{$teacher->role_name}}</span>
+                                                        <span class="badge bg-danger text-white">{{ucwords(strtolower($teacher->role_name))}}</span>
+                                                    @elseif ($teacher->role_id == 2)
+                                                        <span class="badge bg-success text-white">{{ucwords(strtolower($teacher->role_name))}}</span>
                                                     @elseif ($teacher->role_id == 3)
-                                                        <span class="badge-role bg-info text-white">{{$teacher->role_name}}</span>
+                                                        <span class="badge bg-info text-white">{{ucwords(strtolower($teacher->role_name))}}</span>
                                                     @else
-                                                        <span class="badge-role bg-success text-white">{{$teacher->role_name}}</span>
+                                                        <span class="badge bg-secondary text-white">{{ucwords(strtolower($teacher->role_name))}}</span>
                                                     @endif
                                                 </td>
                                                 <td>{{$teacher->phone}}</td>
