@@ -253,11 +253,11 @@
         }
 
         .score-input {
-            width: 80px;
+            width: 120px;
             text-align: center;
             border: 2px solid #e9ecef;
             border-radius: 10px;
-            padding: 8px 12px;
+            /* padding: 8px 12px; */
             transition: all 0.3s;
         }
 
@@ -306,7 +306,7 @@
             }
 
             .table-responsive {
-                font-size: 14px;
+                font-size: 12px;
             }
 
             .score-input, .grade-input {
@@ -458,7 +458,7 @@
 
                     <div class="table-container">
                         <div class="table-responsive">
-                            <table class="table table-custom">
+                            <table class="table table-custom table-responsive-md">
                                 <thead>
                                     <tr>
                                         <th width="5%">#</th>
