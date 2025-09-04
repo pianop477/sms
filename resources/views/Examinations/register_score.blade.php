@@ -484,8 +484,7 @@
                                                        placeholder="Score"
                                                        value="{{ old('students.'.$loop->index.'.score') }}"
                                                        min="0"
-                                                       max="{{ $marking_style == 1 ? '50' : '100' }}"
-                                                       required>
+                                                       max="{{ $marking_style == 1 ? '50' : '100' }}">
                                             </td>
                                             <td class="text-center">
                                                 <input type="text" disabled
