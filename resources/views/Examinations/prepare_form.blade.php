@@ -54,11 +54,11 @@
             margin: 0;
             position: relative;
             z-index: 1;
-            font-size: 15px;
+            font-size: 24px;
         }
 
         .card-body {
-            padding: 30px;
+            padding: 5px;
         }
 
         .btn-back {
@@ -154,8 +154,8 @@
 
         .action-buttons {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: center;
+            gap: 15px;
             margin-top: 30px;
             padding-top: 20px;
             border-top: 2px solid #e9ecef;
@@ -201,8 +201,8 @@
             color: #856404;
         }
 
-        .btn-danger-custom {
-            background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%);
+        .btn-success-custom {
+            background: linear-gradient(135deg, var(--success) 0%, #20c997 100%);
             border: none;
             border-radius: 50px;
             padding: 12px 25px;
@@ -214,28 +214,78 @@
             gap: 8px;
         }
 
-        .btn-danger-custom:hover {
-            background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%);
+        .btn-success-custom:hover {
+            background: linear-gradient(135deg, #1e7e34 0%, #1c9e75 100%);
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
             color: white;
         }
 
-        .expiry-badge {
-            background: linear-gradient(135deg, var(--warning) 0%, #ffd54f 100%);
-            color: #856404;
-            border-radius: 50px;
-            padding: 10px 20px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .info-alert {
+            background: linear-gradient(135deg, rgba(23, 162, 184, 0.15) 0%, rgba(23, 162, 184, 0.25) 100%);
+            border: 1px solid rgba(23, 162, 184, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(5px);
         }
 
-        .draft-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+        }
+
+        .table-custom {
+            margin-bottom: 0;
+        }
+
+        .table-custom thead th {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            /* padding: 10px; */
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .table-custom tbody td {
+            /* padding: 10px; */
+            vertical-align: middle;
+            border-color: #e9ecef;
+        }
+
+        .table-custom tbody tr:nth-child(even) {
+            background-color: rgba(78, 84, 200, 0.05);
+        }
+
+        .table-custom tbody tr:hover {
+            background-color: rgba(78, 84, 200, 0.1);
+        }
+
+        .score-input {
+            width: auto;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            /* padding: 8px 12px; */
+            transition: all 0.3s;
+        }
+
+        .score-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
+        }
+
+        .grade-input {
+            width: 60px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            /* padding: 8px 12px; */
+            font-weight: bold;
         }
 
         .floating-icons {
@@ -248,23 +298,35 @@
             z-index: 0;
         }
 
+        .instruction-text {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.15) 0%, rgba(255, 193, 7, 0.25) 100%);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            font-weight: 600;
+        }
+
         @media (max-width: 768px) {
             .action-buttons {
                 flex-direction: column;
-                gap: 15px;
-            }
-
-            .draft-actions {
-                flex-direction: column;
-                gap: 10px;
             }
 
             .card-body {
-                padding: 20px;
+                padding: 5px;
             }
 
             .header-title {
-                font-size: 24px;
+                font-size: 20px;
+            }
+
+            .table-responsive {
+                font-size: 14px;
+            }
+
+            .score-input, .grade-input {
+                width: 100%;
             }
         }
 
@@ -284,7 +346,7 @@
             }
         }
     </style>
-    <div class="container">
+    <div class="">
         <div class="glass-card">
             <div class="card-header-custom">
                 <div class="row align-items-center">
