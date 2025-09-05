@@ -437,8 +437,8 @@
                                     <tr>
                                         <th width="5%">#</th>
                                         <th width="45%">Student Name</th>
-                                        <th width="28%">Score</th>
-                                        <th width="22%">Grade</th>
+                                        <th width="30%">Score</th>
+                                        <th width="20%">Grade</th>
                                     </tr>
                                 </thead>
                                 <tbody>
