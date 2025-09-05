@@ -559,6 +559,7 @@ class StudentsController extends Controller
                         'graduated' => true,
                         'graduated_at' => $request->graduation_year,
                         'status' => $request->class_id, // or whatever status value you want
+                        'updated_at' => now()
                     ]);
             } else {
                 // Promote to next class
