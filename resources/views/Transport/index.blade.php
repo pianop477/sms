@@ -194,7 +194,7 @@
             background: linear-gradient(135deg, var(--success) 0%, #20c997 100%);
             color: white;
             border-radius: 50px;
-            padding: 8px 16px;
+            padding: 2px 4px;
             font-weight: 600;
             font-size: 12px;
         }
@@ -203,7 +203,7 @@
             background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%);
             color: white;
             border-radius: 50px;
-            padding: 8px 16px;
+            padding: 2px 4px;
             font-weight: 600;
             font-size: 12px;
         }
@@ -361,7 +361,7 @@
             background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
             color: white;
             border-radius: 50px;
-            padding: 6px 12px;
+            padding: 4px 8px;
             font-weight: 600;
             font-size: 12px;
             display: inline-flex;
@@ -383,7 +383,7 @@
             background: linear-gradient(135deg, var(--info) 0%, #17a2b8 100%);
             color: white;
             border-radius: 50px;
-            padding: 8px 16px;
+            padding: 4px 8px;
             font-weight: 600;
             font-size: 14px;
             display: inline-flex;
