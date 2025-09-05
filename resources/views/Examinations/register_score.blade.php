@@ -58,7 +58,7 @@
         }
 
         .card-body {
-            padding: 30px;
+            padding: 5px;
         }
 
         .btn-back {
@@ -222,7 +222,7 @@
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 25px;
+            margin-bottom: 10px;
         }
 
         .table-custom {
@@ -233,13 +233,13 @@
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             border: none;
-            padding: 15px;
+            /* padding: 15px; */
             font-weight: 600;
             text-align: center;
         }
 
         .table-custom tbody td {
-            padding: 15px;
+            /* padding: 15px; */
             vertical-align: middle;
             border-color: #e9ecef;
         }
@@ -253,7 +253,7 @@
         }
 
         .score-input {
-            width: 120px;
+            width: auto;
             text-align: center;
             border: 2px solid #e9ecef;
             border-radius: 10px;
@@ -271,7 +271,7 @@
             text-align: center;
             border: 2px solid #e9ecef;
             border-radius: 10px;
-            padding: 8px 12px;
+            /* padding: 8px 12px; */
             font-weight: bold;
         }
 
@@ -298,7 +298,7 @@
             }
 
             .card-body {
-                padding: 20px;
+                padding: 5px;
             }
 
             .header-title {
@@ -306,7 +306,7 @@
             }
 
             .table-responsive {
-                font-size: 12px;
+                font-size: 14px;
             }
 
             .score-input, .grade-input {
