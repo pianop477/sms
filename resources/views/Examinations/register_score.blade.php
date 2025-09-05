@@ -463,8 +463,8 @@
                                     <tr>
                                         <th width="5%">#</th>
                                         <th width="45%">Student Name</th>
-                                        <th width="25%">Score</th>
-                                        <th width="25%">Grade</th>
+                                        <th width="28%">Score</th>
+                                        <th width="22%">Grade</th>
                                     </tr>
                                 </thead>
                                 <tbody id="studentsTableBody">
