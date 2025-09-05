@@ -29,13 +29,14 @@ class DeleteGraduatedStudents extends Command
     public function handle()
     {
         try {
-            $sixMonthsAgo = Carbon::now()->subMonth(6);
+            $oneYearAgo = Carbon::now()->subYear();
+            // $sixMonthsAgo = Carbon::now()->subMonth(6);
             $deletedCount = 0;
 
             // Pata wanafunzi waliomaliza zaidi ya mwaka mmoja uliopita
             Student::where('graduated', 1)
                 ->where('status', 0)
-                ->whereDate('updated_at', '<=', $sixMonthsAgo)
+                ->whereDate('updated_at', '<=', $oneYearAgo)
                 ->chunk(50, function ($students) use (&$deletedCount) {
                     foreach ($students as $student) {
                         // Angalia kama mwanafunzi ana picha na ifute
