@@ -361,7 +361,7 @@
                                                     {{ substr($teacher->first_name, 0, 1) }}{{ substr($teacher->last_name, 0, 1) }}
                                                 </div>
                                                 <div>
-                                                    <div class="text-capitalize fw-bold">{{$teacher->first_name}} {{$teacher->last_name}}</div>
+                                                    <div class="text-capitalize fw-bold">{{ucwords(strtolower($teacher->first_name. ' '. $teacher->last_name))}}</div>
                                                     <small class="text-muted">ID: {{$teacher->id}}</small>
                                                 </div>
                                             </div>

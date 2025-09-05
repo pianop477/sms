@@ -375,7 +375,7 @@
                                                 </div>
                                                 <div>
                                                     <div class="text-capitalize fw-bold">
-                                                        {{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}
+                                                        {{ucwords(strtolower($student->first_name. ' '. $student->middle_name. ' '. $student->last_name))}}
                                                     </div>
                                                 </div>
                                             </div>
