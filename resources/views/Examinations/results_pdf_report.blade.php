@@ -62,7 +62,7 @@
             font-weight: 600;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
             background: rgba(0, 0, 0, 0.2);
-            padding: 5px 15px;
+            padding: 2px 7px;
             border-radius: 50px;
             margin-left: 15px;
         }
@@ -232,7 +232,7 @@
                         <h4 class="header-title text-white">
                             <i class="fas fa-file-pdf"></i>
                             Examination Results for
-                            <span class="date-highlight">{{ \Carbon\Carbon::parse($date)->format('d/F/Y') }}</span>
+                            <span class="date-highlight text-sm">{{ \Carbon\Carbon::parse($date)->format('d/M/Y') }}</span>
                         </h4>
                     </div>
                     <div class="col-md-2">
