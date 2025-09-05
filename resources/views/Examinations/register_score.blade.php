@@ -473,7 +473,7 @@
                                             <td class="text-center">{{ $loop->iteration }}</td>
                                             <input type="hidden" name="students[{{ $loop->index }}][student_id]" value="{{ $student->id }}">
                                             <td class="text-capitalize">
-                                                <i class="fas fa-user-graduate me-2 text-primary"></i>
+                                                {{-- <i class="fas fa-user-graduate me-2 text-primary"></i> --}}
                                                 {{ ucwords(strtolower($student->first_name)) }}
                                                 {{ucwords(strtolower($student->middle_name))}}
                                                 {{ucwords(strtolower($student->last_name))}}
