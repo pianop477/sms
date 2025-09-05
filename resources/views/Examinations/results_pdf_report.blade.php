@@ -232,7 +232,7 @@
                         <h4 class="header-title text-white">
                             <i class="fas fa-file-pdf"></i>
                             Examination Results for
-                            <span class="date-highlight">{{ $date }}</span>
+                            <span class="date-highlight">{{ \Carbon\Carbon::parse($date)->format('d/F/Y') }}</span>
                         </h4>
                     </div>
                     <div class="col-md-2">
