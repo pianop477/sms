@@ -257,7 +257,7 @@
             <div class="card-body">
                 <div class="teacher-info">
                     <div class="teacher-name text-uppercase">
-                        <i class="fas fa-user-tie me-2"></i> {{$teachers->first_name}} {{$teachers->last_name}}
+                        <i class="fas fa-user-tie me-2"></i> {{ucwords(strtolower($teachers->first_name. ' '. $teachers->last_name))}}
                     </div>
                     <div class="teacher-role text-capitalize">
                         <i class="fas fa-shield-alt me-2"></i> Current Role: {{$teachers->role_name ?? 'No role assigned'}}

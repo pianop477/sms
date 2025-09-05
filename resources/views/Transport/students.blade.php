@@ -475,7 +475,7 @@
                                                                 {{ substr($student->first_name, 0, 1) }}{{ substr($student->last_name, 0, 1) }}
                                                             </div>
                                                             <div>
-                                                                <div class="fw-bold text-capitalize">{{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}</div>
+                                                                <div class="fw-bold text-capitalize">{{ucwords(strtolower($student->first_name))}} {{ucwords(strtolower($student->middle_name))}} {{ucwords(strtolower($student->last_name))}}</div>
                                                             </div>
                                                         </div>
                                                     </td>

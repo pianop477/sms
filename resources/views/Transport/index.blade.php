@@ -505,7 +505,7 @@
                                                     {{ substr($trans->driver_name, 0, 1) }}
                                                 </div>
                                                 <div>
-                                                    <div class="text-capitalize fw-bold">{{$trans->driver_name}}</div>
+                                                    <div class="text-capitalize fw-bold">{{ucwords(strtolower($trans->driver_name))}}</div>
                                                 </div>
                                             </div>
                                         </td>
