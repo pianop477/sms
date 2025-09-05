@@ -39,7 +39,7 @@
                                 <ul class="submenu">
                                     <li><a href="{{route('Teachers.index')}}"><i class="fa fa-user-tie"></i> Teachers</a></li>
                                     <li><a href="{{route('classes.list')}}"><i class="fa fa-user-graduate"></i> Students</a></li>
-                                    <li><a href="{{route('Parents.index')}}"><i class="fa fa-user-shield"></i> Parents</a></li>
+                                    <li><a href="{{route('Parents.index')}}"><i class="fa fa-user-friends"></i> Parents</a></li>
                                 </ul>
                             </li>
 
@@ -96,7 +96,7 @@
                                 <ul class="submenu">
                                     <li><a href="{{route('Teachers.index')}}"><i class="fa fa-user-tie"></i> Teachers</a></li>
                                     <li><a href="{{route('classes.list')}}"><i class="fa fa-user-graduate"></i> Students</a></li>
-                                    <li><a href="{{route('Parents.index')}}"><i class="fa fa-user-shield"></i> Parents</a></li>
+                                    <li><a href="{{route('Parents.index')}}"><i class="fa fa-user-friends"></i> Parents</a></li>
                                 </ul>
                             </li>
 

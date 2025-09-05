@@ -88,6 +88,12 @@ class TodRosterController extends Controller
     public function destroy($id)
     {
         $roster = TodRoster::findOrFail($id);
+
+        if($roster->status == 'active') {
+            Alert()->toast('Cannot delete an active duty roster.', 'error');
+            return redirect()->route('tod.roster.index');
+        }
+
         $rosterId = $roster->roster_id;
         $allRostersWithSameId = TodRoster::where('roster_id', $rosterId)->get();
 
