@@ -93,7 +93,7 @@
                                 </h2>
                             </div>
                             <div class="bg-white rounded-circle p-3">
-                                <i class="fas fa-user-shield fa-2x text-purple"></i>
+                                <i class="fas fa-user-friends fa-2x text-purple"></i>
                             </div>
                         </div>
                         <div class="mt-3">
