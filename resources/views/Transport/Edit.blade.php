@@ -376,7 +376,7 @@
                                     School Bus Route Description
                                 </label>
                                 <textarea name="routine" class="form-control-custom" id="routine"
-                                          rows="4" cols="20" placeholder="Describe the bus route">{{ old('routine', $transport->routine) }}</textarea>
+                                          rows="4" cols="25" placeholder="Describe the bus route">{{ old('routine', $transport->routine) }}</textarea>
                                 @error('routine')
                                 <div class="text-danger small">{{ $message }}</div>
                                 @enderror
