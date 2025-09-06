@@ -271,7 +271,7 @@
                                 placeholder="Write your message here . . . . ."
                                 required
                                 rows="6"
-                                cols="30"
+                                cols="20"
                                 maxlength="306">{{ old('message_content') }}</textarea>
 
                             <div class="d-flex justify-content-between align-items-center mt-3">
