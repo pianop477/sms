@@ -671,7 +671,7 @@
                                         <i class="fas fa-route text-primary"></i>
                                         Bus Routine Description
                                     </label>
-                                    <textarea name="routine" id="routine" rows="3" cols="25" class="form-control-custom" placeholder="Describe the bus route">{{old('routine')}}</textarea>
+                                    <textarea name="routine" id="routine" rows="3" cols="35" class="form-control-custom" placeholder="Describe the bus route">{{old('routine')}}</textarea>
                                     @error('routine')
                                     <div class="text-danger small">{{ $message }}</div>
                                     @enderror
