@@ -369,7 +369,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
         Route::get('Change-password', [HomeController::class, 'changepassword'])->name('change.password');
         Route::post('Change-password', [HomeController::class, 'storePassword'])->name('change.new.password');
-        Route::get('Persona-details', [HomeController::class, 'showProfile'])->name('show.profile');
+        Route::get('Personal-details', [HomeController::class, 'showProfile'])->name('show.profile');
         Route::put('{user}/Personal-details', [HomeController::class, 'updateProfile'])->name('update.profile');
         Route::get('/student-profile-picture/{student}', [StudentsController::class, 'downloadProfilePicture'])->name('student.profile.picture');
     });

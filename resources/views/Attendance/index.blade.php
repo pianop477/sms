@@ -90,13 +90,13 @@
 @else
     <div class="card mt-4 shadow-sm">
         <div class="card-header bg-info text-white">
-            <strong><i class="fas fa-edit"></i> Fill Attendance for {{ \Carbon\Carbon::parse($selectedDate)->format('d-m-Y') }}</strong>
+            <strong><i class="fas fa-edit"></i> Complete Attendance for {{ \Carbon\Carbon::parse($selectedDate)->format('d-m-Y') }}</strong>
         </div>
         <form id="attendanceForm" action="{{ route('store.attendance', ['student_class' => Hashids::encode($student_class->id)]) }}" method="POST" class="needs-validation" novalidate>
             @csrf
             <input type="hidden" name="attendance_date" value="{{ $selectedDate }}">
             <div class="table-responsive">
-                <table class="table table-hover table-striped align-middle mb-0">
+                <table class="table table-hover table-striped align-middle mb-0 table-responsive-md">
                     <thead>
                         <tr>
                             <th>#</th>

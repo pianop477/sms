@@ -146,6 +146,13 @@
     .char-count.text-danger {
         color: var(--danger) !important;
     }
+     /* Add responsive textarea styling */
+    .message-textarea {
+        width: 100%;
+        min-height: 180px;
+        resize: vertical;
+        box-sizing: border-box;
+    }
 
     @media (max-width: 768px) {
         .header-title {
@@ -159,6 +166,13 @@
         .btn-primary-custom {
             width: 100%;
             justify-content: center;
+        }
+        .checkbox-card {
+            padding: 12px;
+        }
+
+        .form-control-custom {
+            padding: 10px 12px;
         }
     }
 </style>
@@ -267,11 +281,10 @@
                             <textarea
                                 name="message_content"
                                 id="message_content"
-                                class="form-control-custom flex-grow-1"
+                                class="form-control-custom flex-grow-1 message-textarea @error('message_content') is-invalid @enderror"
                                 placeholder="Write your message here . . . . ."
                                 required
                                 rows="6"
-                                cols="35"
                                 maxlength="306">{{ old('message_content') }}</textarea>
 
                             <div class="d-flex justify-content-between align-items-center mt-3">

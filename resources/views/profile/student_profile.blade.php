@@ -152,7 +152,7 @@
         <!-- Header Section -->
         <div class="row mb-4">
             <div class="col-md-10">
-                <h4 class="text-primary fw-bold border-bottom pb-2">STUDENT INFORMATION</h4>
+                <h4 class="text-primary fw-bold border-bottom pb-2">STUDENT'S INFORMATION</h4>
             </div>
             <div class="col-md-2 text-end">
                 <a href="{{route('home')}}" class="btn btn-info btn-action float-right">
@@ -549,7 +549,7 @@
                                     </div>
                                 @else
                                     <div class="table-responsive">
-                                        <table class="table table-hover package-table">
+                                        <table class="table table-hover package-table table-responsive-md">
                                             <thead>
                                                 <tr>
                                                     <th>Title</th>
@@ -565,7 +565,7 @@
                                                 @foreach ($packages as $item)
                                                     <tr class="text-capitalize">
                                                         <td>{{ucwords(strtolower($item->title))}}</td>
-                                                        <td>{{ucwords(strtolower($item->description))}}</td>
+                                                        <td>{{ucwords(strtolower($item->description)) ?? "N/A"}}</td>
                                                         <td>Term {{ucwords(strtolower($item->term))}}</td>
                                                         <td>
                                                             @if ($item->is_active == true)
@@ -607,14 +607,14 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="studentPhotoModalLabel">Student Photo</h5>
-                    <button type="button" class="btn-close btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                    <button type="button" class="btn-close btn btn-danger" data-dismiss="modal" aria-label="Close">Close</button>
                 </div>
                 <div class="modal-body text-center">
                     <h6 class="text-primary mb-3">{{strtoupper($students->first_name .' ' . $students->middle_name. ' '. $students->last_name)}}</h6>
                     <img id="student-photo" src="" alt="Student Photo" class="photo-modal img-fluid">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-close btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
