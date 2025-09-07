@@ -8,38 +8,30 @@
     <style>
         /* Global Styles */
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: DejaVu Sans, Arial, sans-serif;
             margin: 0;
             padding: 0;
             color: #333;
-            font-size: 14px;
-            line-height: 1.4;
+            font-size: 11px;
+            line-height: 1.2;
         }
 
         /* Print Specific Styles */
-        @page {
-            size: A4;
-            margin: 1.5cm;
-            @bottom-center {
-                content: "Page " counter(page) " of " counter(pages);
-                font-size: 10px;
-            }
+         @page {
+            size: A3 landscape;
+            margin: 0.5cm;
         }
 
         @media print {
             body {
                 background-color: white;
-                font-size: 12px;
+                font-size: 11px;
             }
 
             .container {
                 padding: 0;
                 margin: 0;
-            }
-
-            .page-break {
-                page-break-after: always;
-                break-after: page;
+                width: 100%;
             }
 
             .no-print {
@@ -48,10 +40,6 @@
 
             .print-only {
                 display: block;
-            }
-
-            .table {
-                page-break-inside: avoid;
             }
 
             thead {
@@ -67,13 +55,13 @@
         .container {
             width: 100%;
             max-width: 100%;
-            padding: 20px;
+            padding: 15px;
             box-sizing: border-box;
         }
 
         .header-section {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             position: relative;
         }
 
@@ -81,8 +69,8 @@
             position: absolute;
             left: 0;
             top: 0;
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
         }
 
         .logo img {
@@ -98,99 +86,115 @@
         }
 
         .header-text h4 {
-            margin: 5px 0;
-            font-size: 18px;
+            margin: 3px 0;
+            font-size: 16px;
             text-transform: uppercase;
             font-weight: bold;
         }
 
         .header-text h5 {
-            margin: 5px 0;
-            font-size: 16px;
+            margin: 3px 0;
+            font-size: 14px;
             text-transform: uppercase;
         }
 
         /* Summary Section */
         .summary-section {
-            margin: 20px 0;
+            margin: 15px 0;
         }
 
         .summary-header {
             text-align: center;
-            margin: 15px 0;
-            font-size: 16px;
+            margin: 10px 0;
+            font-size: 14px;
             font-weight: bold;
             text-transform: uppercase;
             border-bottom: 2px solid #333;
-            padding-bottom: 5px;
+            padding-bottom: 3px;
         }
 
         .summary-content {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
         }
 
         .course-details {
-            width: 55%;
-            font-size: 13px;
+            width: 48%;
+            font-size: 11px;
         }
 
         .course-details p {
-            margin: 5px 0;
+            margin: 3px 0;
         }
 
         .grade-summary {
-            width: 42%;
+            width: 48%;
         }
 
         .grade-summary p.title {
             text-align: center;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
+            font-size: 11px;
         }
 
         /* Tables */
         .table {
             width: 100%;
             border-collapse: collapse;
-            margin: 15px 0;
-            font-size: 12px;
-            page-break-inside: avoid;
+            margin: 10px 0;
+            font-size: 10px;
         }
 
         .table th {
             background-color: #343a40;
             color: white;
-            padding: 8px;
+            padding: 5px 3px;
             text-align: center;
             border: 1px solid #ddd;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 11px;
+            font-size: 9px;
         }
 
         .table td {
-            padding: 6px;
+            padding: 4px 2px;
             border: 1px solid #ddd;
-            text-align: left;
+            text-align: center;
+            vertical-align: middle;
         }
 
-        .table td.center {
-            text-align: center;
+        .table td.left {
+            text-align: left;
+            padding-left: 5px;
         }
 
         .table tr:nth-child(even) {
             background-color: #f9f9f9;
         }
 
-        /* Footer */
-        @page {
-            margin-top: 8mm;
-            margin-bottom: 12mm; /* Ongeza nafasi ya chini kwa footer */
-            margin-left: 8mm;
-            margin-right: 8mm;
+        /* Attendance Status Symbols */
+        .attendance-present {
+            color: #28a745;
+            font-size: 12px;
+            font-weight: bold;
         }
+
+        .attendance-absent {
+            color: #dc3545;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .attendance-permission {
+            color: #2f9bb9;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* Footer */
         footer {
             position: fixed;
             bottom: 0;
@@ -205,7 +209,7 @@
             z-index: 1000;
         }
         footer .page-number:after {
-            /* content: "Page " counter(page); */
+            content: "Page " counter(page);
         }
         footer .copyright {
             float: left;
@@ -222,13 +226,13 @@
             clear: both;
         }
 
-        .page-number:after {
-            content: "Page " counter(page);
-        }
-
         /* Utility Classes */
         .text-center {
             text-align: center;
+        }
+
+        .text-left {
+            text-align: left;
         }
 
         .text-uppercase {
@@ -247,27 +251,61 @@
             text-decoration: underline;
         }
 
-        .mt-10 {
-            margin-top: 10px;
+        .mt-5 {
+            margin-top: 5px;
         }
 
-        .mb-10 {
-            margin-bottom: 10px;
+        .mb-5 {
+            margin-bottom: 5px;
         }
 
         /* Page Break Control */
-        .attendance-block {
-            page-break-inside: avoid;
-            margin-bottom: 30px;
+        .month-section {
+            margin-bottom: 20px;
         }
 
         .time-duration-header {
             background-color: #f0f0f0;
-            padding: 8px 15px;
+            padding: 6px 10px;
             border-left: 4px solid #343a40;
-            margin: 20px 0 15px 0;
+            margin: 15px 0 10px 0;
             font-weight: bold;
             text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        /* Fixed column widths */
+        .col-number {
+            width: 5px;
+        }
+
+        .col-admission {
+            width: 8px;
+        }
+
+        .col-name {
+            width: 40px;
+            text-align: left !important;
+        }
+
+        .col-gender {
+            width: 5px;
+        }
+
+        .col-date {
+            width: 8px;
+        }
+
+        /* Student summary row */
+        .summary-row {
+            background-color: #e9ecef !important;
+            font-weight: bold;
+        }
+
+        .attendance-rate {
+            text-align: center;
+            font-size: 9px;
+            padding: 2px;
         }
     </style>
 </head>
@@ -280,142 +318,127 @@
             </div>
             <div class="header-text">
                 <h4>{{ Auth::user()->school->school_name }}</h4>
-                <h5>P.O Box {{ Auth::user()->school->postal_address }}, {{ Auth::user()->school->postal_name }}</h5>
+                <h5>{{ Auth::user()->school->postal_address }}, {{ Auth::user()->school->postal_name }}</h5>
                 <h5>Class Attendance Report</h5>
             </div>
         </div>
 
         <!-- Attendance Data -->
         @forelse ($datas as $month => $attendances)
-            @if ($attendances->isEmpty())
-                <div class="alert alert-warning text-center mt-3" role="alert">
-                    <p>There is no attendance record for the selected date.</p>
-                </div>
-            @else
+            @if (!$attendances->isEmpty())
                 @php
-                    // Group attendances by date
-                    $groupedByDate = $attendances->groupBy('attendance_date');
+                    // Get unique dates for this month
+                    $dates = $attendances->unique('attendance_date')->pluck('attendance_date')->sort();
+
+                    // Get unique students for this month
+                    $students = $attendances->unique('studentID');
+
+                    // Get teacher and class details from first record
+                    $teacher = $attendances->first();
+
+                    // Calculate attendance rate for the month
+                    $totalRecords = $attendances->count();
+                    $presentRecords = $attendances->where('attendance_status', 'present')->count();
+                    $attendanceRate = $totalRecords > 0 ? round(($presentRecords / $totalRecords) * 100) : 0;
                 @endphp
 
-                @foreach ($groupedByDate as $date => $records)
-                    @php
-                        // Initialize counters
-                        $malePresent = $maleAbsent = $malePermission = 0;
-                        $femalePresent = $femaleAbsent = $femalePermission = 0;
+                <div class="month-section">
+                    <!-- Time Duration Header -->
+                    <div class="time-duration-header">
+                        Attendance Report for: <strong>{{ \Carbon\Carbon::parse($month)->format('F Y') }}</strong>
+                        | Attendance Rate: <strong>{{ $attendanceRate }}%</strong>
+                    </div>
 
-                        // Get teacher details from the first record of the day
-                        $teacher = $records->first();
-
-                        // Count attendance status by gender
-                        foreach ($records as $record) {
-                            if ($record->gender == 'male') {
-                                if ($record->attendance_status == 'present') $malePresent++;
-                                elseif ($record->attendance_status == 'absent') $maleAbsent++;
-                                elseif ($record->attendance_status == 'permission') $malePermission++;
-                            } elseif ($record->gender == 'female') {
-                                if ($record->attendance_status == 'present') $femalePresent++;
-                                elseif ($record->attendance_status == 'absent') $femaleAbsent++;
-                                elseif ($record->attendance_status == 'permission') $femalePermission++;
-                            }
-                        }
-                    @endphp
-
-                    <div class="attendance-block">
-                        <!-- Time Duration Header -->
-                        @if ($loop->first)
-                            <div class="time-duration-header">
-                                Time Duration: <strong>{{ \Carbon\Carbon::parse($month)->format('F Y') }}</strong>
-                            </div>
-                        @endif
-
-                        <!-- Summary Section -->
-                        <div class="summary-section">
-                            <div class="summary-header">
-                                Attendance Report Summary
+                    <!-- Summary Section -->
+                    <div class="summary-section">
+                        <div class="summary-content">
+                            <div class="course-details">
+                                <p><span class="bold">Class Teacher:</span> {{ ucwords(strtolower($teacher->teacher_firstname . ' '. $teacher->teacher_lastname ))}}</p>
+                                <p><span class="bold">Class:</span> {{ ucwords(strtoupper($teacher->class_name)) }} <span class="text-uppercase">({{ $teacher->class_code }})</span></p>
+                                <p><span class="bold">Stream:</span> {{ $teacher->group }}</p>
+                                <p><span class="bold">Reporting Period:</span> {{\Carbon\Carbon::parse($dates->first())->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($dates->last())->format('d/m/Y') }}</p>
+                                <p><span class="bold">Total Students:</span> {{ $students->count() }}</p>
                             </div>
 
-                            <div class="summary-content">
-                                <div class="course-details">
-                                    <p><span class="bold">Attendance Date:</span> <strong class="underline">{{ \Carbon\Carbon::parse($date)->format('d F Y') }}</strong></p>
-                                    <p><span class="bold">Class Teacher Name:</span> {{ ucwords(strtolower($teacher->teacher_firstname . ' '. $teacher->teacher_lastname ))}}</p>
-                                    <p><span class="bold">Class Name:</span> {{ ucwords(strtoupper($teacher->class_name)) }} <span class="text-uppercase">({{ $teacher->class_code }})</span></p>
-                                    <p><span class="bold">Stream:</span> {{ $teacher->group }}</p>
+                            <div class="grade-summary">
+                                <p class="title">Monthly Attendance Rate</p>
+                                <div style="text-align: center; font-size: 24px; font-weight: bold; color: #28a745;">
+                                    {{ $attendanceRate }}%
                                 </div>
-
-                                <div class="grade-summary">
-                                    <p class="title">Students Attendance Summary</p>
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>Gender</th>
-                                                <th>Present</th>
-                                                <th>Absent</th>
-                                                <th>Permission</th>
-                                                <th>Total</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>Male</td>
-                                                <td class="center">{{ $malePresent }}</td>
-                                                <td class="center">{{ $maleAbsent }}</td>
-                                                <td class="center">{{ $malePermission }}</td>
-                                                <td class="center bold">{{ $sumMale = $malePresent + $maleAbsent + $malePermission }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Female</td>
-                                                <td class="center">{{ $femalePresent }}</td>
-                                                <td class="center">{{ $femaleAbsent }}</td>
-                                                <td class="center">{{ $femalePermission }}</td>
-                                                <td class="center bold">{{ $sumFemale = $femalePresent + $femaleAbsent + $femalePermission }}</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="bold">Total</td>
-                                                <td class="center bold">{{ $malePresent + $femalePresent }}</td>
-                                                <td class="center bold">{{ $maleAbsent + $femaleAbsent }}</td>
-                                                <td class="center bold">{{ $malePermission + $femalePermission }}</td>
-                                                <td class="center bold">{{ $sumMale + $sumFemale }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                <div style="text-align: center; margin-top: 10px;">
+                                    <div style="background-color: #e9ecef; height: 20px; border-radius: 10px; overflow: hidden;">
+                                        <div style="background-color: #28a745; height: 100%; width: {{ $attendanceRate }}%;"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Students Attendance Records -->
-                        <h5 class="summary-header">Students Attendance Records</h5>
-
+                    <!-- Detailed Attendance Table -->
+                    <h5 class="summary-header">Detailed Student Attendance Records</h5>
+                    <div style="overflow-x: auto;">
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th width="5%">#</th>
-                                    <th width="12%" class="center">Adm No</th>
-                                    <th width="38%">Student's Name</th>
-                                    <th width="10%" class="center">Gender</th>
-                                    <th width="15%" class="center">Stream</th>
-                                    <th width="15%" class="center">Status</th>
+                                    <th class="col-number">#</th>
+                                    <th class="col-admission">Admission#</th>
+                                    <th class="col-name">Student's Name</th>
+                                    <th class="col-gender">Gender</th>
+
+                                    <!-- Date Columns -->
+                                    @foreach ($dates as $date)
+                                        <th class="col-date">{{ \Carbon\Carbon::parse($date)->format('d') }}</th>
+                                    @endforeach
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($records as $attendance)
+                                @foreach ($students as $student)
+                                    @php
+                                        $studentAttendances = $attendances->where('studentID', $student->studentID);
+                                    @endphp
+
                                     <tr>
-                                        <td class="center">{{ $loop->iteration }}</td>
-                                        <td class="center text-uppercase">{{ $attendance->admission_number }}</td>
-                                        <td>{{ ucwords(strtolower($attendance->first_name . ' ' . $attendance->middle_name . ' ' . $attendance->last_name)) }}</td>
-                                        <td class="center text-capitalize">{{ ucfirst($attendance->gender[0]) }}</td>
-                                        <td class="center text-capitalize">{{ ucfirst($attendance->class_group) }}</td>
-                                        <td class="center text-capitalize">{{ ucfirst($attendance->attendance_status) }}</td>
+                                        <td class="col-number">{{ $loop->iteration }}</td>
+                                        <td class="col-admission text-uppercase">{{ $student->admission_number }}</td>
+                                        <td class="col-name left">{{ ucwords(strtolower($student->first_name . ' ' . $student->last_name)) }}</td>
+                                        <td class="col-gender text-capitalize">{{ ucfirst($student->gender[0]) }}</td>
+
+                                        <!-- Attendance status for each date -->
+                                        @foreach ($dates as $date)
+                                            @php
+                                                $attendance = $studentAttendances->where('attendance_date', $date)->first();
+                                                $status = $attendance ? $attendance->attendance_status : 'absent';
+
+                                                if ($status === 'present') {
+                                                    $symbol = 'P';
+                                                    $class = 'attendance-present';
+                                                } elseif ($status === 'absent') {
+                                                    $symbol = 'A';
+                                                    $class = 'attendance-absent';
+                                                } elseif ($status === 'permission') {
+                                                    $symbol = '*';
+                                                    $class = 'attendance-permission';
+                                                } else {
+                                                    $symbol = '✗';
+                                                    $class = 'attendance-absent';
+                                                }
+                                            @endphp
+                                            <td class="{{ $class }}">{{ $symbol }}</td>
+                                        @endforeach
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
-
-                        <!-- Add page break after each date except the last one -->
-                        @if (!$loop->last)
-                            <div class="page-break"></div>
-                        @endif
                     </div>
-                @endforeach
+
+                    <!-- Legend -->
+                    <div class="mt-5" style="font-size: 9px;">
+                        <strong>Key:</strong>
+                        <span class="attendance-present">P = Present</span> |
+                        <span class="attendance-absent">A = Absent</span> |
+                        <span class="attendance-permission">* = Permission</span>
+                    </div>
+                </div>
             @endif
         @empty
             <div class="alert alert-warning mt-3 text-center" role="alert">
@@ -433,6 +456,6 @@
         <span class="printed">
         Printed at: {{ now()->format('d-M-Y H:i') }}
         </span>
-  </footer>
+    </footer>
 </body>
 </html>

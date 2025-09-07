@@ -207,10 +207,23 @@
             align-items: center;
             gap: 8px;
         }
+        .message-textarea {
+            width: 100%;
+            min-height: 180px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
 
         @media (max-width: 768px) {
             .card-body {
                 padding: 20px;
+            }
+            .checkbox-card {
+                padding: 12px;
+            }
+
+            .form-control-custom {
+                padding: 10px 12px;
             }
 
             .header-title {
@@ -375,8 +388,8 @@
                                     <i class="fas fa-route text-primary"></i>
                                     School Bus Route Description
                                 </label>
-                                <textarea name="routine" class="form-control-custom" id="routine"
-                                          rows="4" cols="35" placeholder="Describe the bus route">{{ old('routine', $transport->routine) }}</textarea>
+                                <textarea name="routine" class="form-control-custom message-textarea" id="routine"
+                                          rows="4" placeholder="Describe the bus route">{{ old('routine', $transport->routine) }}</textarea>
                                 @error('routine')
                                 <div class="text-danger small">{{ $message }}</div>
                                 @enderror

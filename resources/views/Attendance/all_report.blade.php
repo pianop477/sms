@@ -4,122 +4,206 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>General Class Attendance Report</title>
-    <link rel="stylesheet" href="{{public_path('assets/css/print_layout.css')}}">
+    <title>Monthly Class Attendance Report</title>
     <style>
-       .footer {
-            width: 100%;
-            padding: 10px 20px;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            background-color: #f8f9fa;
-            font-size: 12px;
-            border-top: 1px solid #ddd;
-        }
-
-        .footer-content {
-            display: flex;
-            flex-direction: row; /* Ensure horizontal layout */
-            justify-content: space-between; /* Push items to both ends */
-            align-items: center;
-            width: 100%;
-        }
-
-        .page-number {
-            flex: 1; /* Push printed-on to the far right */
-            text-align: left;
-        }
-
-        .printed-on {
-            text-align: right;
-        }
-
-        .page-number:before {
-            content: "Page " counter(page);
-        }
-
-        /* Inline your Bootstrap CSS styles here */
+        /* Global Styles */
         body {
-            font-family: Arial, sans-serif;
+            font-family: DejaVu Sans, Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f8f9fa;
-            margin-bottom: 40px;
+            color: #333;
+            font-size: 11px;
+            line-height: 1.2;
         }
+
+        /* Print Specific Styles */
+         @page {
+            size: A3 landscape;
+            margin: 0.5cm;
+        }
+
         @media print {
+            body {
+                background-color: white;
+                font-size: 11px;
+            }
+
+            .container {
+                padding: 0;
+                margin: 0;
+                width: 100%;
+            }
+
             .no-print {
                 display: none;
             }
-            h1, h2, h4, h5, h6 {
-                text-transform: uppercase;
-                text-align: center
-            }
+
             .print-only {
                 display: block;
             }
-            .footer {
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-                border-top: 1px solid #ddd;
-                padding-top: 10px;
-            }
+
             thead {
                 display: table-header-group;
-                background-color: gray; /* Adds a gray background to thead */
             }
-            tbody {
-                display: table-row-group;
+
+            tfoot {
+                display: table-footer-group;
             }
-            .table {
-                border: 1px solid black;
-                border-collapse: collapse;
-                width: 100%;
+
+            /* Ensure table breaks properly across pages */
+            table {
+                page-break-inside: auto;
             }
-            .table th,
-            .table td {
-                border: 1px solid black;
+
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
             }
         }
 
+        /* Layout Styles */
+        .container {
+            width: 100%;
+            max-width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 10px;
+            position: relative;
+            border-bottom: 2px solid #343a40;
+            padding-bottom: 8px;
+        }
+
+        .logo {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 50px;
+            height: 50px;
+        }
+
+        .logo img {
+            width: 100%;
+            height: auto;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+        }
+
+        .header-text {
+            margin: 0 auto;
+            width: 80%;
+        }
+
+        .header-text h4 {
+            margin: 2px 0;
+            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .header-text h5 {
+            margin: 2px 0;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        /* Summary Section */
+        .summary-section {
+            margin: 10px 0;
+        }
+
+        .summary-header {
+            text-align: center;
+            margin: 8px 0;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 1px solid #333;
+            padding-bottom: 3px;
+        }
+
+        .summary-content {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .course-details {
+            width: 48%;
+            font-size: 9px;
+        }
+
+        .course-details p {
+            margin: 2px 0;
+        }
+
+        .grade-summary {
+            width: 48%;
+        }
+
+        .grade-summary p.title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 2px;
+            font-size: 9px;
+        }
+
+        /* Tables */
         .table {
             width: 100%;
-            border: 1px solid black;
             border-collapse: collapse;
-            font-size: 12px;
-        }
-
-        .table th, .table td {
-            border: 1px solid #dee2e6;
-            padding: 2px;
-            text-align: left;
-            text-transform: capitalize
+            margin: 8px 0;
+            font-size: 8px;
         }
 
         .table th {
             background-color: #343a40;
-            color: #fff;
+            color: white;
+            padding: 4px 2px;
             text-align: center;
+            border: 1px solid #ddd;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 7px;
         }
 
         .table td {
-            background-color: #fff;
+            padding: 3px 2px;
+            border: 1px solid #ddd;
+            text-align: center;
+            vertical-align: middle;
         }
 
-        .table img {
-            display: block;
-            margin: 0 auto;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+        .table td.left {
+            text-align: left;
+            padding-left: 3px;
         }
-        @page {
-            margin-top: 8mm;
-            margin-bottom: 12mm; /* Ongeza nafasi ya chini kwa footer */
-            margin-left: 8mm;
-            margin-right: 8mm;
+
+        .table tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
+
+        /* Attendance Status Symbols */
+        .attendance-present {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .attendance-absent {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .attendance-permission {
+            color: #2f9bb9;
+            font-weight: bold;
+        }
+
+        /* Footer */
         footer {
             position: fixed;
             bottom: 0;
@@ -134,8 +218,9 @@
             z-index: 1000;
         }
         footer .page-number:after {
-            /* content: "Page " counter(page); */
+            content: "Page " counter(page);
         }
+
         footer .copyright {
             float: left;
             margin-left: 10px;
@@ -151,90 +236,319 @@
             clear: both;
         }
 
+        /* Utility Classes */
+        .text-center {
+            text-align: center;
+        }
 
+        .text-left {
+            text-align: left;
+        }
+
+        .text-uppercase {
+            text-transform: uppercase;
+        }
+
+        .text-capitalize {
+            text-transform: capitalize;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .underline {
+            text-decoration: underline;
+        }
+
+        .mt-3 {
+            margin-top: 3px;
+        }
+
+        .mb-3 {
+            margin-bottom: 3px;
+        }
+
+        /* Page Break Control */
+        .month-section {
+            margin-bottom: 15px;
+            page-break-inside: avoid;
+        }
+
+        .time-duration-header {
+            background-color: #f0f0f0;
+            padding: 5px 8px;
+            border-left: 3px solid #343a40;
+            margin: 10px 0 8px 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 10px;
+        }
+
+        /* Fixed column widths */
+        .col-number {
+            width: 3%;
+        }
+
+        .col-admission {
+            width: 8%;
+        }
+
+        .col-name {
+            width: 20%;
+            text-align: left !important;
+        }
+
+        .col-gender {
+            width: 5%;
+        }
+
+        .col-stream {
+            width: 7%;
+        }
+
+        .col-date {
+            width: 3%;
+            min-width: 20px;
+        }
+
+        .col-total {
+            width: 5%;
+            background-color: #e9ecef;
+            font-weight: bold;
+        }
+
+        /* Student summary row */
+        .summary-row {
+            background-color: #e9ecef !important;
+            font-weight: bold;
+        }
+
+        .attendance-rate {
+            text-align: center;
+            font-size: 8px;
+            padding: 2px;
+        }
+
+        /* Scrollable container for wide tables */
+        .table-container {
+            overflow-x: auto;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        /* Progress bar styles */
+        .progress {
+            height: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #28a745;
+            text-align: center;
+            line-height: 15px;
+            font-size: 8px;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        @if (isset($datas) && $datas->isNotEmpty())
-            <div class="title">
-                <h3>{{_('the united republic of tanzania')}}</h3>
-                <h4>{{_("the president's office - ralg")}}</h4>
-            </div>
+        <!-- Header Section with Logo -->
+        <div class="header-section">
             <div class="logo">
-                <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 100px;">
+                <img src="{{ public_path('assets/img/logo/' . (Auth::user()->school->logo)) }}" alt="School Logo">
             </div>
-            <div class="header">
-                <h3>{{ Auth::user()->school->school_name }}</h3>
-                <h4>{{ Auth::user()->school->postal_address }}</h4>
-                <h4>{{ Auth::user()->school->postal_name }} - {{Auth::user()->school->country}}</h4>
-                <h4>attendance report Month: {{\Carbon\Carbon::parse($attendances->first()->attendance_date)->format('F, Y')}} </h4>
-                <h4>Class: {{$attendances->first()->class_name}}</h4>
+            <div class="header-text">
+                <h4>{{ Auth::user()->school->school_name }}</h4>
+                <h5>{{ Auth::user()->school->postal_address }}, {{ Auth::user()->school->postal_name }}</h5>
+                <h5>Monthly Class Attendance Report</h5>
             </div>
+        </div>
 
-            {{-- looping attendances records --}}
-            @foreach ($datas as $date => $attendances)
-                <div class="date-section">
-                    <div class="summary-header">
-                        <p>attendance summary</p>
+        @if (isset($datas) && $datas->isNotEmpty())
+            @php
+                // Group by month first
+                $monthlyData = [];
+                foreach ($datas as $date => $attendances) {
+                    $monthYear = \Carbon\Carbon::parse($date)->format('Y-m');
+                    if (!isset($monthlyData[$monthYear])) {
+                        $monthlyData[$monthYear] = [];
+                    }
+                    $monthlyData[$monthYear][$date] = $attendances;
+                }
+
+                ksort($monthlyData);
+            @endphp
+
+            @foreach ($monthlyData as $monthYear => $monthAttendances)
+                @php
+                    $monthName = \Carbon\Carbon::parse($monthYear . '-01')->format('F Y');
+                    $datesInMonth = array_keys($monthAttendances);
+                    sort($datesInMonth);
+
+                    // Get all students for this month
+                    $students = [];
+                    foreach ($monthAttendances as $dateAttendances) {
+                        foreach ($dateAttendances as $attendance) {
+                            $studentId = $attendance->student_id;
+                            if (!isset($students[$studentId])) {
+                                $students[$studentId] = [
+                                    'id' => $studentId,
+                                    'admission_number' => $attendance->admission_number,
+                                    'name' => ucwords(strtolower($attendance->first_name . ' ' .
+                                                ($attendance->middle_name ? $attendance->middle_name . ' ' : '') .
+                                                $attendance->last_name)),
+                                    'gender' => $attendance->gender[0] ?? 'U',
+                                    'group' => $attendance->group ?? 'N/A',
+                                    'attendances' => []
+                                ];
+                            }
+                        }
+                    }
+
+                    // Populate attendance data for each student
+                    foreach ($monthAttendances as $date => $dateAttendances) {
+                        foreach ($dateAttendances as $attendance) {
+                            $studentId = $attendance->student_id;
+                            if (isset($students[$studentId])) {
+                                $students[$studentId]['attendances'][$date] = $attendance->attendance_status;
+                            }
+                        }
+                    }
+
+                    // Calculate monthly statistics
+                    $totalRecords = 0;
+                    $presentRecords = 0;
+
+                    foreach ($monthAttendances as $dateAttendances) {
+                        $totalRecords += $dateAttendances->count();
+                        $presentRecords += $dateAttendances->where('attendance_status', 'present')->count();
+                    }
+
+                    $attendanceRate = $totalRecords > 0 ? round(($presentRecords / $totalRecords) * 100) : 0;
+                    $firstRecord = reset($monthAttendances)[0];
+                @endphp
+
+                <div class="month-section">
+                    <!-- Time Duration Header -->
+                    <div class="time-duration-header">
+                        Attendance Report for: <strong>{{ $monthName }}</strong>
+                        | Attendance Rate: <strong>{{ $attendanceRate }}%</strong>
                     </div>
-                    <div class="summary-content">
-                        <p style="border: 1px solid gray; padding:5px; background:rgb(190, 190, 190);">Date: <strong>{{\Carbon\Carbon::parse($date)->format('F d, Y')}}</strong></p>
-                        <table class="table" style="text-align: center">
-                            <tr>
-                                <th>Gender</th>
-                                <th>Present</th>
-                                <th>Absent</th>
-                                <th>Permision</th>
-                                <th>Total</th>
-                            </tr>
-                            <tr>
-                                <td>Male</td>
-                                <td>{{ $maleSummary[$date]['present'] }}</td>
-                                <td>{{ $maleSummary[$date]['absent'] }}</td>
-                                <td>{{ $maleSummary[$date]['permission'] }}</td>
-                                <td>{{ $maleSummary[$date]['present'] + $maleSummary[$date]['absent'] + $maleSummary[$date]['permission'] }}</td>
-                            </tr>
-                            <tr>
-                                <td>Female</td>
-                                <td>{{ $femaleSummary[$date]['present'] }}</td>
-                                <td>{{ $femaleSummary[$date]['absent'] }}</td>
-                                <td>{{ $femaleSummary[$date]['permission'] }}</td>
-                                <td>{{ $femaleSummary[$date]['present'] + $femaleSummary[$date]['absent'] + $femaleSummary[$date]['permission'] }}</td>
-                            </tr>
+
+                    <!-- Summary Section -->
+                    <div class="summary-section">
+                        <div class="summary-content">
+                            <div class="course-details">
+                                <p style="text-transform: capitalize"><span class="bold">Class Teacher:</span> {{ $firstRecord->teacher_firstname ?? 'N/A' }} {{ $firstRecord->teacher_lastname ?? '' }}</p>
+                                <p style="text-transform: uppercase"><span class="bold">Class:</span> {{ $firstRecord->class_name ?? 'N/A' }}</p>
+                                <p style="text-transform: capitalize"><span class="bold">Stream:</span> {{ $firstRecord->group ?? 'All' }}</p>
+                                <p><span class="bold">Reporting Period:</span>
+                                    {{ \Carbon\Carbon::parse($datesInMonth[0])->format('d/m/Y') }} -
+                                    {{ \Carbon\Carbon::parse($datesInMonth[count($datesInMonth)-1])->format('d/m/Y') }}
+                                </p>
+                                <p><span class="bold">Total Students:</span> {{ count($students) }}</p>
+                            </div>
+
+                            <div class="grade-summary">
+                                <p class="title">Monthly Attendance Rate</p>
+                                <div style="text-align: center; font-size: 18px; font-weight: bold; color: #28a745;">
+                                    {{ $attendanceRate }}%
+                                </div>
+                                <div class="progress mt-3">
+                                    <div class="progress-bar" style="width: {{ $attendanceRate }}%;">
+                                        {{ $attendanceRate }}%
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Attendance Table -->
+                    <h5 class="summary-header">Detailed Student Attendance Records - {{ $monthName }}</h5>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th class="col-number">#</th>
+                                    <th class="col-admission">Admission#.</th>
+                                    <th class="col-name">Student's Name</th>
+                                    <th class="col-gender">Gender</th>
+                                    <th class="col-stream">Stream</th>
+                                    <!-- Date Columns -->
+                                    @foreach ($datesInMonth as $date)
+                                        <th class="col-date">{{ \Carbon\Carbon::parse($date)->format('d') }}</th>
+                                    @endforeach
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($students as $index => $student)
+                                    @php
+                                        $presentCount = 0;
+                                        $totalDays = count($datesInMonth);
+                                    @endphp
+                                    <tr>
+                                        <td class="col-number">{{ $index + 1 }}</td>
+                                        <td class="col-admission text-uppercase">{{ $student['admission_number'] }}</td>
+                                        <td class="col-name left">{{ $student['name'] }}</td>
+                                        <td class="col-gender text-capitalize">{{ $student['gender'] }}</td>
+                                        <td class="col-stream text-uppercase">{{ $student['group'] }}</td>
+
+                                        <!-- Attendance status for each date -->
+                                        @foreach ($datesInMonth as $date)
+                                            @php
+                                                $status = $student['attendances'][$date] ?? 'A';
+
+                                                if ($status === 'present') {
+                                                    $symbol = 'P';
+                                                    $class = 'attendance-present';
+                                                    $presentCount++;
+                                                } elseif ($status === 'absent') {
+                                                    $symbol = 'A';
+                                                    $class = 'attendance-absent';
+                                                } elseif ($status === 'permission') {
+                                                    $symbol = '*';
+                                                    $class = 'attendance-permission';
+                                                } else {
+                                                    $symbol = '?';
+                                                    $class = 'attendance-absent';
+                                                }
+                                            @endphp
+                                            <td class="{{ $class }}">{{ $symbol }}</td>
+                                        @endforeach
+                                    </tr>
+                                @endforeach
+                            </tbody>
                         </table>
                     </div>
-                    <h5 style="text-transform:capitalize; text-align:center; font-size:20px;">students attendance records</h5>
-                    <table class="table" style="text-transform: capitalize">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th style="text-align: center">Adm No.</th>
-                                <th>Student Name</th>
-                                <th style="text-align:center" class="text-center">Gender</th>
-                                <th style="text-align:center" class="text-center">Stream</th>
-                                <th style="text-align: center;">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($attendances as $index => $attendance )
-                                <tr>
-                                    <td>{{ $index + 1 }}</td>
-                                    <td style="text-transform: uppercase;">{{$attendance->admission_number }}</td>
-                                    <td>{{ ucwords(strtolower($attendance->first_name . ' ' . $attendance->middle_name . ' ' . $attendance->last_name)) }}</td>
-                                    <td style="text-align:center; text-transform:capitalize">{{ $attendance->gender[0] }}</td>
-                                    <td style="text-align:center; text-transform:capitalize">{{ $attendance->group }}</td>
-                                    <td style="text-transform: capitalize; text-align:center">{{ ucfirst($attendance->attendance_status) }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+
+                    <!-- Legend -->
+                    <div class="mt-3" style="font-size: 8px;">
+                        <strong>Key:</strong>
+                        <span class="attendance-present">P = Present</span> |
+                        <span class="attendance-absent">A = Absent</span> |
+                        <span class="attendance-permission">* = Permission</span>
+                    </div>
                 </div>
+
+                <!-- Add page break if not the last month -->
+                @if (!$loop->last)
+                    <div style="page-break-after: always;"></div>
+                @endif
             @endforeach
         @else
-            <p>No data found!</p>
+            <!-- Display message if no data is available -->
+            <div class="text-center" style="padding: 20px;">
+                <p>No attendance data found for the selected period.</p>
+            </div>
         @endif
     </div>
+
+    <!-- Footer -->
     <footer>
         <span class="copyright">
         &copy; {{ ucwords(strtolower(Auth::user()->school->school_name)) }} – {{ date('Y') }}
@@ -243,6 +557,6 @@
         <span class="printed">
         Printed at: {{ now()->format('d-M-Y H:i') }}
         </span>
-  </footer>
+    </footer>
 </body>
 </html>

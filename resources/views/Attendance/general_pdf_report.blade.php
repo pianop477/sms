@@ -213,7 +213,7 @@
                     </div>
                     <div class="col-md-4 text-end">
                         <a href="{{route('attendance.fill.form')}}" class="btn btn-back float-right">
-                            <i class="fas fa-arrow-circle-left me-1"></i> Back to Generator
+                            <i class="fas fa-arrow-circle-left me-1"></i> Back
                         </a>
                     </div>
                 </div>

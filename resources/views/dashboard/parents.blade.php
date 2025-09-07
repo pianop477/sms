@@ -33,9 +33,9 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h4 class="header-title text-uppercase mb-0">My Children List</h4>
-                        <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target=".bd-example-modal-lg">
+                        {{-- <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target=".bd-example-modal-lg">
                             <i class="fas fa-plus"></i> New Student
-                        </button>
+                        </button> --}}
                         <!-- Student Registration Modal -->
                         <div class="modal fade bd-example-modal-lg">
                             <div class="modal-dialog modal-lg">

@@ -280,7 +280,6 @@
                             <!-- Start Date -->
                             <div class="col-md-6 mb-4 date-input-group">
                                 <label for="start" class="form-label">
-                                    {{-- <i class="fas fa-calendar-start text-primary"></i> --}}
                                     Start Date <span class="required-star">*</span>
                                 </label>
                                 <input type="date" name="start" class="form-control" id="start" required
@@ -297,7 +296,6 @@
                             <!-- End Date -->
                             <div class="col-md-6 mb-4 date-input-group">
                                 <label for="end" class="form-label">
-                                    {{-- <i class="fas fa-calendar-day text-primary"></i> --}}
                                     End Date <span class="required-star">*</span>
                                 </label>
                                 <input type="date" name="end" class="form-control" id="end" required

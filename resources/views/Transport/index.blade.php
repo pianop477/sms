@@ -419,6 +419,12 @@
             margin: 0;
             font-weight: 500;
         }
+        .message-textarea {
+            width: 100%;
+            min-height: 180px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
 
         @media (max-width: 768px) {
             .card-body {
@@ -427,6 +433,13 @@
 
             .header-title {
                 font-size: 20px;
+            }
+            .checkbox-card {
+                padding: 12px;
+            }
+
+            .form-control-custom {
+                padding: 10px 12px;
             }
 
             .table-responsive {
@@ -671,7 +684,7 @@
                                         <i class="fas fa-route text-primary"></i>
                                         Bus Routine Description
                                     </label>
-                                    <textarea name="routine" id="routine" rows="3" cols="35" class="form-control-custom" placeholder="Describe the bus route">{{old('routine')}}</textarea>
+                                    <textarea name="routine" id="routine" rows="3" class="form-control-custom message-textarea" placeholder="Describe the bus route">{{old('routine')}}</textarea>
                                     @error('routine')
                                     <div class="text-danger small">{{ $message }}</div>
                                     @enderror
