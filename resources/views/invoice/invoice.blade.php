@@ -25,7 +25,7 @@
         .dashboard-container {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 4px px;
+            padding: 4px;
         }
 
         .glass-card {
@@ -152,7 +152,7 @@
             background: linear-gradient(135deg, var(--success), #0f9d58);
             border: none;
             border-radius: 16px;
-            padding: 4px 6px;
+            padding: 6px 8px;
             color: white;
             font-weight: 600;
             transition: all 0.4s ease;
@@ -169,7 +169,7 @@
             background: linear-gradient(135deg, var(--info), var(--primary));
             border: none;
             border-radius: 16px;
-            padding: 5px 10px;
+            padding: 10px 15px;
             color: white;
             font-weight: 600;
             transition: all 0.4s ease;
@@ -185,8 +185,8 @@
         .payment-method {
             background: rgba(255, 255, 255, 0.9);
             border-radius: 16px;
-            padding: 1.5rem;
-            margin: 1rem 0;
+            padding: 8px;
+            margin: 4px 0;
             border: 2px solid rgba(67, 97, 238, 0.1);
             transition: all 0.3s ease;
         }
@@ -218,12 +218,12 @@
 
             .invoice-details {
                 margin: -4px 4px 4px 4px;
-                padding: 1.5rem;
+                padding: 6px;
             }
 
             .invoice-table th,
             .invoice-table td {
-                padding: 2px;
+                padding: 4px;
             }
 
             .btn-modern,
@@ -378,7 +378,7 @@
 
                 <!-- Invoice Table -->
                 <div class="invoice-table fade-in">
-                    <table class="table">
+                    <table class="table table-responsive-md">
                         <thead>
                             <tr>
                                 <th class="text-center">#</th>

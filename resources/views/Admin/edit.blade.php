@@ -26,7 +26,7 @@
         .dashboard-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 8px 4px;
         }
 
         .glass-card {
@@ -73,8 +73,8 @@
 
         .nav-pills .nav-link {
             border-radius: 16px;
-            padding: 1rem 1.5rem;
-            margin: 0 0.5rem;
+            padding: 6px 8px;
+            margin: 0 4px;
             transition: all 0.3s ease;
             color: var(--dark);
             font-weight: 600;
@@ -94,7 +94,7 @@
         .form-control {
             border: 2px solid rgba(67, 97, 238, 0.2);
             border-radius: 16px;
-            padding: 1rem 1.25rem;
+            padding: 6px 8px;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
         }
@@ -109,7 +109,7 @@
             background: linear-gradient(135deg, var(--success), #0f9d58);
             border: none;
             border-radius: 20px;
-            padding: 1rem 2rem;
+            padding: 6px 10px;
             color: white;
             font-weight: 600;
             transition: all 0.4s ease;
@@ -126,7 +126,7 @@
             background: linear-gradient(135deg, var(--info), var(--primary));
             border: none;
             border-radius: 16px;
-            padding: 0.75rem 1.5rem;
+            padding: 6px 8px;
             color: white;
             font-weight: 600;
             transition: all 0.3s ease;
@@ -141,7 +141,7 @@
         .info-table {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 0 0.5rem;
+            border-spacing: 0 4px;
         }
 
         .info-table tr {
@@ -157,7 +157,7 @@
 
         .info-table th,
         .info-table td {
-            padding: 1.2rem;
+            padding: 7px;
             border: none;
         }
 
@@ -168,10 +168,10 @@
         }
 
         .badge-modern {
-            padding: 0.6rem 1.2rem;
+            padding: 6px 8px;
             border-radius: 25px;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 12px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
@@ -179,7 +179,7 @@
             background: rgba(255, 255, 255, 0.9);
             border: 1px solid rgba(67, 97, 238, 0.1);
             border-radius: 12px;
-            margin-bottom: 0.5rem;
+            margin-bottom: 6px;
             transition: all 0.3s ease;
         }
 
@@ -190,7 +190,7 @@
 
         @media (max-width: 768px) {
             .dashboard-container {
-                padding: 1rem;
+                padding: 8px;
             }
 
             .profile-avatar {
@@ -199,14 +199,14 @@
             }
 
             .nav-pills .nav-link {
-                padding: 0.75rem 1rem;
-                margin: 0.25rem;
-                font-size: 0.9rem;
+                padding: 6px 18pxrem;
+                margin: 4px;
+                font-size: 12px;
             }
 
             .info-table th,
             .info-table td {
-                padding: 0.8rem;
+                padding: 8px;
             }
         }
 

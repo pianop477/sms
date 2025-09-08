@@ -25,7 +25,7 @@
         .dashboard-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 8px 4px;
         }
 
         .glass-card {
@@ -47,8 +47,8 @@
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             color: white;
             border-radius: 24px;
-            padding: 1rem;
-            margin-bottom: 2rem;
+            padding: 4px;
+            margin-bottom: 8px;
             position: relative;
             overflow: hidden;
         }
@@ -82,17 +82,17 @@
         }
 
         .modern-table th {
-            padding: 1 rem 1rem;
+            padding: 4ppx 4px;
             color: white;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.85rem;
+            font-size: 12px;
             letter-spacing: 0.5px;
             border: none;
         }
 
         .modern-table td {
-            padding: 1.2rem 1rem;
+            padding: 6px 4px
             border-bottom: 1px solid rgba(67, 97, 238, 0.1);
             vertical-align: middle;
             transition: all 0.3s ease;
@@ -114,7 +114,7 @@
             padding: 3px 6px;
             border-radius: 12px;
             border: 1px solid rgba(67, 97, 238, 0.2);
-            font-size: 11px;
+            font-size: 12px;
             color: var(--primary);
             font-weight: 600;
         }
@@ -137,7 +137,7 @@
             background: linear-gradient(135deg, rgba(76, 201, 240, 0.1), rgba(72, 149, 239, 0.1));
             padding: 3px 6px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--info);
         }
@@ -170,20 +170,20 @@
 
         .empty-state {
             text-align: center;
-            padding: 4rem 2rem;
+            padding: 8px 4px;
         }
 
         .empty-icon {
-            font-size: 4rem;
+            font-size: 16px;
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
+            margin-bottom: 1px;
         }
 
         .stats-badge {
             background: rgba(255, 255, 255, 0.2);
-            padding: 0.75rem 1.5rem;
+            padding: 4px 2px ;
             border-radius: 20px;
             color: white;
             font-weight: 600;
@@ -191,25 +191,25 @@
 
         @media (max-width: 768px) {
             .dashboard-container {
-                padding: 1rem;
+                padding: 5px;
             }
 
             .header-section {
-                padding: 1.5rem;
+                padding: 4px;
             }
 
             .modern-table {
-                font-size: 0.9rem;
+                font-size: 11px;
             }
 
             .modern-table th,
             .modern-table td {
-                padding: 0.8rem 0.5rem;
+                padding: 4px 2px;
             }
 
             .ip-address,
             .timestamp {
-                font-size: 12px;
+                font-size: 11px;
                 padding: 2px 0.4px;
             }
 
@@ -257,7 +257,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1rem;
+            margin: 0 auto 8px;
             box-shadow: 0 10px 30px rgba(67, 97, 238, 0.3);
         }
     </style>

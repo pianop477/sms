@@ -25,7 +25,7 @@
         .dashboard-container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 10px 5px;
         }
 
         .glass-card {
@@ -47,8 +47,8 @@
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             color: white;
             border-radius: 24px;
-            padding: 2rem;
-            margin-bottom: 2rem;
+            padding: 8px;
+            margin-bottom: 6px;
             position: relative;
             overflow: hidden;
         }
@@ -75,26 +75,26 @@
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 6px;
         }
 
         .form-label {
             font-weight: 600;
             color: var(--dark);
-            margin-bottom: 0.5rem;
+            margin-bottom: 4px;
             display: flex;
             align-items: center;
         }
 
         .form-label i {
-            margin-right: 0.5rem;
+            margin-right: 4px;
             color: var(--primary);
         }
 
         .form-control {
             border: 2px solid rgba(67, 97, 238, 0.2);
             border-radius: 12px;
-            padding: 0.75rem 1rem;
+            padding: 6px 4px;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
         }
@@ -114,7 +114,7 @@
             background: linear-gradient(135deg, var(--success), #0f9d58);
             border: none;
             border-radius: 16px;
-            padding: 1rem 2rem;
+            padding: 6px 10px;
             color: white;
             font-weight: 600;
             transition: all 0.4s ease;
@@ -130,7 +130,7 @@
         .alert-modern {
             border-radius: 16px;
             border: none;
-            padding: 1.5rem;
+            padding: 6px;
             box-shadow: var(--card-shadow);
             backdrop-filter: blur(10px);
         }
@@ -138,7 +138,7 @@
         .recipient-info {
             background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(58, 12, 163, 0.1));
             border-radius: 16px;
-            padding: 1.5rem;
+            padding: 6px;
             border: 2px solid rgba(67, 97, 238, 0.2);
             margin-bottom: 2rem;
         }
@@ -146,8 +146,8 @@
         .info-item {
             display: flex;
             align-items: center;
-            margin-bottom: 0.5rem;
-            padding: 0.5rem;
+            margin-bottom: 4px;
+            padding: 4px;
             border-radius: 8px;
             transition: all 0.3s ease;
         }
@@ -158,45 +158,45 @@
 
         .info-item i {
             width: 20px;
-            margin-right: 0.75rem;
+            margin-right: 6px;
             color: var(--primary);
         }
 
         .total-calculation {
             background: linear-gradient(135deg, rgba(76, 201, 240, 0.1), rgba(72, 149, 239, 0.1));
             border-radius: 16px;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
+            padding: 8px;
+            margin: 8px 0;
             border: 2px solid rgba(76, 201, 240, 0.2);
         }
 
         .total-amount {
-            font-size: 1.5rem;
+            font-size: 12px;
             font-weight: 700;
             color: var(--primary);
             text-align: center;
-            padding: 1rem;
+            padding: 8px;
             background: rgba(67, 97, 238, 0.1);
             border-radius: 12px;
-            margin-top: 1rem;
+            margin-top: 8px;
         }
 
         @media (max-width: 768px) {
             .dashboard-container {
-                padding: 1rem;
+                padding: 6px;
             }
 
             .header-section {
-                padding: 1.5rem;
+                padding: 6px;
             }
 
             .form-section {
-                padding: 1.5rem;
+                padding: 6px;
             }
 
             .btn-modern {
                 width: 100%;
-                padding: 1rem 1.5rem;
+                padding: 8px 10px;
             }
         }
 
@@ -234,9 +234,9 @@
         .invoice-preview {
             background: rgba(255, 255, 255, 0.9);
             border-radius: 16px;
-            padding: 1.5rem;
+            padding: 10px;
             border: 2px solid rgba(67, 97, 238, 0.1);
-            margin-top: 1.5rem;
+            margin-top: 10px;
             transition: all 0.3s ease;
         }
 

@@ -25,7 +25,7 @@
         .dashboard-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 10px 5px;
         }
 
         .glass-card {
@@ -47,8 +47,8 @@
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             color: white;
             border-radius: 24px;
-            padding: 2rem;
-            margin-bottom: 2rem;
+            padding: 8px;
+            margin-bottom: 8px;
             position: relative;
             overflow: hidden;
         }
@@ -71,30 +71,30 @@
         }
 
         .form-section {
-            padding: 2.5rem;
+            padding: 8px;
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 6px;
         }
 
         .form-label {
             font-weight: 600;
             color: var(--dark);
-            margin-bottom: 0.5rem;
+            margin-bottom: 4px;
             display: flex;
             align-items: center;
         }
 
         .form-label i {
-            margin-right: 0.5rem;
+            margin-right: 4px;
             color: var(--primary);
         }
 
         .form-control {
             border: 2px solid rgba(67, 97, 238, 0.2);
             border-radius: 12px;
-            padding: 0.75rem 1rem;
+            padding: 6px 8px;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
         }
@@ -108,7 +108,7 @@
         .form-select {
             border: 2px solid rgba(67, 97, 238, 0.2);
             border-radius: 12px;
-            padding: 0.75rem 1rem;
+            padding: 6px 8px;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
         }
@@ -122,7 +122,7 @@
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             border: none;
             border-radius: 16px;
-            padding: 1rem 2rem;
+            padding: 5px 10px;
             color: white;
             font-weight: 600;
             transition: all 0.4s ease;
@@ -160,7 +160,7 @@
             background: linear-gradient(135deg, #4cc9f0, #4895ef);
             border: none;
             border-radius: 12px;
-            padding: 0.75rem 1.5rem;
+            padding: 6px 8px;
             color: white;
             font-weight: 600;
             transition: all 0.3s ease;
@@ -185,7 +185,7 @@
         .current-logo {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 5px;
             margin-bottom: 1rem;
         }
 
@@ -199,15 +199,15 @@
 
         @media (max-width: 768px) {
             .dashboard-container {
-                padding: 1rem;
+                padding: 6px;
             }
 
             .header-section {
-                padding: 1.5rem;
+                padding: 4px;
             }
 
             .form-section {
-                padding: 1.5rem;
+                padding: 4px;
             }
 
             .school-logo-preview {

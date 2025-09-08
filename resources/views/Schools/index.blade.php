@@ -25,7 +25,7 @@
         .dashboard-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 8px 4px;
         }
 
         .glass-card {
@@ -47,8 +47,8 @@
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             color: white;
             border-radius: 24px;
-            padding: 2rem;
-            margin-bottom: 2rem;
+            padding: 8px;
+            margin-bottom: 4px;
             position: relative;
             overflow: hidden;
         }
@@ -71,11 +71,11 @@
         }
 
         .form-section {
-            padding: 2.5rem;
+            padding: 8px;
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 6px;
         }
 
         .form-label {
@@ -94,7 +94,7 @@
         .form-control {
             border: 2px solid rgba(67, 97, 238, 0.2);
             border-radius: 12px;
-            padding: 0.75rem 1rem;
+            padding: 6px 8px;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
         }
@@ -108,7 +108,7 @@
         .form-select {
             border: 2px solid rgba(67, 97, 238, 0.2);
             border-radius: 12px;
-            padding: 0.75rem 1rem;
+            padding: 6px 8px;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
         }
@@ -129,7 +129,7 @@
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             border: none;
             border-radius: 16px;
-            padding: 1rem 2rem;
+            padding: 8px 12px;
             color: white;
             font-weight: 600;
             transition: all 0.4s ease;
@@ -158,13 +158,13 @@
             color: white;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.85rem;
+            font-size: 12px;
             letter-spacing: 0.5px;
             border: none;
         }
 
         .modern-table td {
-            padding: 1.2rem 1rem;
+            padding: 8px 6px;
             border-bottom: 1px solid rgba(67, 97, 238, 0.1);
             vertical-align: middle;
             transition: all 0.3s ease;
@@ -196,16 +196,16 @@
         }
 
         .badge-modern {
-            padding: 0.6rem 1.2rem;
+            padding: 6px 10px;
             border-radius: 25px;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 11px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .action-buttons {
             display: flex;
-            gap: 0.5rem;
+            gap: 4px;
             justify-content: center;
         }
 
@@ -218,7 +218,7 @@
             justify-content: center;
             transition: all 0.3s ease;
             border: none;
-            font-size: 0.9rem;
+            font-size: 11px;
         }
 
         .btn-icon:hover {
@@ -247,7 +247,7 @@
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             color: white;
             border-radius: 24px 24px 0 0;
-            padding: 1.5rem;
+            padding: 8px;
             border: none;
         }
 
@@ -256,12 +256,12 @@
         }
 
         .modal-body {
-            padding: 2rem;
+            padding: 8px;
         }
 
         .modal-footer {
             border-radius: 0 0 24px 24px;
-            padding: 1.5rem;
+            padding: 6px;
             border: none;
         }
 
@@ -271,24 +271,24 @@
 
         @media (max-width: 768px) {
             .dashboard-container {
-                padding: 1rem;
+                padding: 6px;
             }
 
             .header-section {
-                padding: 1.5rem;
+                padding: 4px;
             }
 
             .form-section {
-                padding: 1.5rem;
+                padding: 4px;
             }
 
             .modern-table {
-                font-size: 0.9rem;
+                font-size: 11px;
             }
 
             .modern-table th,
             .modern-table td {
-                padding: 0.8rem 0.5rem;
+                padding: 6px 4px;
             }
 
             .action-buttons {
@@ -299,11 +299,11 @@
             .btn-icon {
                 width: 30px;
                 height: 30px;
-                font-size: 0.8rem;
+                font-size: 11px;
             }
 
             .modal-body {
-                padding: 1.5rem;
+                padding: 6px;
             }
         }
 
