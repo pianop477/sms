@@ -26,7 +26,7 @@
         .dashboard-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 8px 6px;
         }
 
         .glass-card {
@@ -48,8 +48,8 @@
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             color: white;
             border-radius: 24px;
-            padding: 2rem;
-            margin-bottom: 2rem;
+            padding: 8px;
+            margin-bottom: 6px;
             position: relative;
             overflow: hidden;
         }
@@ -83,17 +83,17 @@
         }
 
         .modern-table th {
-            padding: 1.2rem 1rem;
+            padding: 6px 7px;
             color: white;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.85rem;
+            font-size: 12px;
             letter-spacing: 0.5px;
             border: none;
         }
 
         .modern-table td {
-            padding: 1.2rem 1rem;
+            padding: 6px 4px;
             border-bottom: 1px solid rgba(67, 97, 238, 0.1);
             vertical-align: middle;
             transition: all 0.3s ease;
@@ -110,10 +110,10 @@
         }
 
         .badge-modern {
-            padding: 0.6rem 1.2rem;
+            padding: 4px 6px;
             border-radius: 25px;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 12px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
@@ -121,7 +121,7 @@
             background: linear-gradient(135deg, var(--danger), #b5179e);
             border: none;
             border-radius: 16px;
-            padding: 0.75rem 1.5rem;
+            padding: 6px 8px;
             color: white;
             font-weight: 600;
             transition: all 0.4s ease;
@@ -152,13 +152,13 @@
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            gap: 4px;
+            margin-bottom: 8px;
         }
 
         .stat-card {
             background: rgba(255, 255, 255, 0.9);
-            padding: 1.5rem;
+            padding: 6px;
             border-radius: 20px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
@@ -172,28 +172,28 @@
 
         .search-section {
             background: rgba(255, 255, 255, 0.9);
-            padding: 1.5rem;
+            padding: 8px;
             border-radius: 20px;
-            margin-bottom: 2rem;
+            margin-bottom: 8px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
         @media (max-width: 768px) {
             .dashboard-container {
-                padding: 1rem;
+                padding: 6px;
             }
 
             .header-section {
-                padding: 1.5rem;
+                padding: 6px;
             }
 
             .modern-table {
-                font-size: 0.9rem;
+                font-size: 0.12px;
             }
 
             .modern-table th,
             .modern-table td {
-                padding: 0.8rem 0.5rem;
+                padding: 6px 6px;
             }
 
             .stats-grid {
@@ -202,7 +202,7 @@
 
             .btn-reset {
                 width: 100%;
-                padding: 0.75rem 1rem;
+                padding: 6px 8px;
             }
         }
 
@@ -245,7 +245,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1rem;
+            margin: 0 auto 4px;
             box-shadow: 0 10px 30px rgba(230, 57, 70, 0.3);
         }
     </style>

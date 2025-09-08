@@ -26,7 +26,7 @@
         .dashboard-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 8px 4px;
         }
 
         .glass-card {
@@ -48,8 +48,8 @@
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             color: white;
             border-radius: 24px;
-            padding: 2rem;
-            margin-bottom: 2rem;
+            padding: 8px;
+            margin-bottom: 8px;
             position: relative;
             overflow: hidden;
         }
@@ -83,17 +83,17 @@
         }
 
         .modern-table th {
-            padding: 1.2rem 1rem;
+            padding: 6px 8px;
             color: white;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.85rem;
+            font-size: 6px;
             letter-spacing: 0.5px;
             border: none;
         }
 
         .modern-table td {
-            padding: 1.2rem 1rem;
+            padding: 6px 4px;
             border-bottom: 1px solid rgba(67, 97, 238, 0.1);
             vertical-align: middle;
             transition: all 0.3s ease;
@@ -110,16 +110,16 @@
         }
 
         .badge-modern {
-            padding: 0.6rem 1.2rem;
+            padding: 4px 8px;
             border-radius: 25px;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 12px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .action-buttons {
             display: flex;
-            gap: 0.5rem;
+            gap: 4px;
             justify-content: center;
         }
 
@@ -132,7 +132,7 @@
             justify-content: center;
             transition: all 0.3s ease;
             border: none;
-            font-size: 1.1rem;
+            font-size: 12px;
         }
 
         .btn-icon:hover {
@@ -144,7 +144,7 @@
             background: linear-gradient(135deg, var(--info), var(--primary));
             border: none;
             border-radius: 16px;
-            padding: 0.75rem 1.5rem;
+            padding: 6px 8px;
             color: white;
             font-weight: 600;
             transition: all 0.4s ease;
@@ -180,7 +180,7 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 12px;
         }
 
         .male-badge {
@@ -203,7 +203,7 @@
         .form-control {
             border: 2px solid rgba(67, 97, 238, 0.2);
             border-radius: 12px;
-            padding: 0.75rem 1rem;
+            padding: 6px 8px;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
         }
@@ -216,20 +216,20 @@
 
         @media (max-width: 768px) {
             .dashboard-container {
-                padding: 1rem;
+                padding: 6px;
             }
 
             .header-section {
-                padding: 1.5rem;
+                padding: 6px;
             }
 
             .modern-table {
-                font-size: 0.9rem;
+                font-size: 12px;
             }
 
             .modern-table th,
             .modern-table td {
-                padding: 0.8rem 0.5rem;
+                padding: 6px 4px;
             }
 
             .action-buttons {
@@ -277,13 +277,13 @@
         .admin-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+            gap: 4px;
+            margin-bottom: 8px;
         }
 
         .stat-card {
             background: rgba(255, 255, 255, 0.9);
-            padding: 1.5rem;
+            padding: 6px;
             border-radius: 20px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);

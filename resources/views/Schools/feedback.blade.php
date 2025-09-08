@@ -25,7 +25,7 @@
         .dashboard-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 8px 6px;
         }
 
         .glass-card {
@@ -46,19 +46,19 @@
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             color: white;
             border-radius: 20px;
-            padding: 2rem;
-            margin-bottom: 2rem;
+            padding: 8px;
+            margin-bottom: 8px;
         }
 
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            gap: 4px;
+            margin-bottom: 8px;
         }
 
         .stat-card {
-            padding: 1.5rem;
+            padding: 6px;
             border-radius: 16px;
             color: white;
             position: relative;
@@ -89,11 +89,11 @@
         .feedback-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 1.5rem;
+            gap: 4px;
         }
 
         .feedback-card {
-            padding: 1.5rem;
+            padding: 6px;
             border-left: 4px solid var(--primary);
             transition: all 0.3s ease;
             cursor: pointer;
@@ -115,7 +115,7 @@
 
         .action-buttons {
             display: flex;
-            gap: 0.5rem;
+            gap: 3px;
         }
 
         .btn-icon {
@@ -135,21 +135,21 @@
 
         .empty-state {
             text-align: center;
-            padding: 4rem 2rem;
+            padding: 8px 6px;
         }
 
         .empty-icon {
-            font-size: 4rem;
+            font-size: 16px;
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
+            margin-bottom: 6px;
         }
 
         .pagination-container {
             display: flex;
             justify-content: center;
-            margin-top: 2rem;
+            margin-top: 5px;
         }
 
         .page-item.active .page-link {
@@ -161,8 +161,8 @@
         .page-link {
             border: none;
             border-radius: 12px;
-            margin: 0 0.25rem;
-            padding: 0.75rem 1.25rem;
+            margin: 0 4px;
+            padding: 4px 6px;
             transition: all 0.3s ease;
         }
 
@@ -172,7 +172,7 @@
         }
 
         .badge {
-            padding: 0.5rem 1rem;
+            padding: 4px 8px;
             border-radius: 25px;
             font-weight: 600;
         }
@@ -187,11 +187,11 @@
 
         @media (max-width: 768px) {
             .dashboard-container {
-                padding: 1rem;
+                padding: 6px;
             }
 
             .header-section {
-                padding: 1.5rem;
+                padding: 6px;
             }
 
             .stats-grid {

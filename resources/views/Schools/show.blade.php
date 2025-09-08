@@ -25,7 +25,7 @@
         .dashboard-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 8px 4rem;
         }
 
         .glass-card {
@@ -47,8 +47,8 @@
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             color: white;
             border-radius: 24px;
-            padding: 2.5rem;
-            margin-bottom: 2.5rem;
+            padding: 10px;
+            margin-bottom: 10px;
             position: relative;
             overflow: hidden;
         }
@@ -73,12 +73,12 @@
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2.5rem;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .stat-card {
-            padding: 2rem;
+            padding: 10px;
             border-radius: 20px;
             color: white;
             position: relative;
@@ -102,7 +102,7 @@
         }
 
         .profile-section {
-            padding: 2.5rem;
+            padding: 10px;
         }
 
         .school-logo {
@@ -136,10 +136,10 @@
         }
 
         .info-item {
-            padding: 1rem;
+            padding: 6px;
             background: rgba(67, 97, 238, 0.05);
             border-radius: 16px;
-            margin-bottom: 1rem;
+            margin-bottom: 6px;
             transition: all 0.3s ease;
             border-left: 4px solid transparent;
         }
@@ -154,7 +154,7 @@
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             border: none;
             border-radius: 16px;
-            padding: 1rem 2rem;
+            padding: 6px 10px;
             color: white;
             font-weight: 600;
             transition: all 0.4s ease;
@@ -168,36 +168,36 @@
         }
 
         .badge-modern {
-            padding: 0.6rem 1.2rem;
+            padding: 4ox 8px;
             border-radius: 25px;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 8px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .divider {
             height: 2px;
             background: linear-gradient(90deg, transparent, rgba(67, 97, 238, 0.3), transparent);
-            margin: 2rem 0;
+            margin: 10px 0;
             border: none;
         }
 
         @media (max-width: 768px) {
             .dashboard-container {
-                padding: 1rem;
+                padding: 6px;
             }
 
             .header-section {
-                padding: 1.5rem;
+                padding: 6px;
             }
 
             .stats-grid {
                 grid-template-columns: 1fr;
-                gap: 1.5rem;
+                gap: 4px;
             }
 
             .profile-section {
-                padding: 1.5rem;
+                padding: 6px;
             }
 
             .school-logo {

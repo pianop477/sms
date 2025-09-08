@@ -25,7 +25,7 @@
         .dashboard-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 8px px;
         }
 
         .glass-card {
@@ -47,8 +47,8 @@
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             color: white;
             border-radius: 24px;
-            padding: 2rem;
-            margin-bottom: 2rem;
+            padding: 8px;
+            margin-bottom: 8px;
             position: relative;
             overflow: hidden;
         }
@@ -71,13 +71,13 @@
         }
 
         .form-section {
-            padding: 2.5rem;
+            padding: 8px;
         }
 
         .sender-card {
             background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(58, 12, 163, 0.1));
             border-radius: 20px;
-            padding: 2rem;
+            padding: 8px;
             border: 2px solid rgba(67, 97, 238, 0.2);
             transition: all 0.3s ease;
         }
@@ -88,29 +88,29 @@
         }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 6px;
         }
 
         .form-label {
             font-weight: 600;
             color: var(--dark);
-            margin-bottom: 0.5rem;
+            margin-bottom: 4px;
             display: flex;
             align-items: center;
         }
 
         .form-label i {
-            margin-right: 0.5rem;
+            margin-right: 4px;
             color: var(--primary);
         }
 
         .form-control {
             border: 2px solid rgba(67, 97, 238, 0.2);
             border-radius: 16px;
-            padding: 1rem 1.25rem;
+            padding: 6px 8px;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
-            font-size: 1rem;
+            font-size: 12px;
         }
 
         .form-control:focus {
@@ -122,7 +122,7 @@
         .form-select {
             border: 2px solid rgba(67, 97, 238, 0.2);
             border-radius: 16px;
-            padding: 1rem 1.25rem;
+            padding: 4px 8px;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
             appearance: none;
@@ -143,8 +143,8 @@
         }
 
         .char-count {
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
+            font-size: 11px;
+            margin-top: 11px;
             font-weight: 600;
             transition: all 0.3s ease;
         }
@@ -168,12 +168,12 @@
             background: linear-gradient(135deg, var(--success), #0f9d58);
             border: none;
             border-radius: 20px;
-            padding: 1.25rem 2.5rem;
+            padding: 6px 9px;
             color: white;
             font-weight: 600;
             transition: all 0.4s ease;
             box-shadow: 0 15px 35px rgba(28, 200, 138, 0.3);
-            font-size: 1.1rem;
+            font-size: 12px;
         }
 
         .btn-modern:hover {
@@ -185,7 +185,7 @@
         .alert-modern {
             border-radius: 16px;
             border: none;
-            padding: 1.5rem;
+            padding: 8px;
             box-shadow: var(--card-shadow);
             backdrop-filter: blur(10px);
         }
@@ -208,9 +208,9 @@
         .message-preview {
             background: rgba(255, 255, 255, 0.9);
             border-radius: 16px;
-            padding: 1.5rem;
+            padding: 6px;
             border: 2px solid rgba(67, 97, 238, 0.1);
-            margin-top: 1rem;
+            margin-top: 6px;
             transition: all 0.3s ease;
         }
 
@@ -221,24 +221,24 @@
 
         @media (max-width: 768px) {
             .dashboard-container {
-                padding: 1rem;
+                padding: 6px;
             }
 
             .header-section {
-                padding: 1.5rem;
+                padding: 6px;
             }
 
             .form-section {
-                padding: 1.5rem;
+                padding: 6px;
             }
 
             .sender-card {
-                padding: 1.5rem;
+                padding: 6px;
             }
 
             .btn-modern {
                 width: 100%;
-                padding: 1rem 2rem;
+                padding: 6px 8px;
             }
         }
 
