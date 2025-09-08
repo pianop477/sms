@@ -201,7 +201,7 @@
             .nav-pills .nav-link {
                 padding: 6px 18pxrem;
                 margin: 4px;
-                font-size: 12px;
+                font-size: 14px;
             }
 
             .info-table th,

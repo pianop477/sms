@@ -86,7 +86,7 @@
             color: white;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 6px;
+            font-size: 14px;
             letter-spacing: 0.5px;
             border: none;
         }
@@ -229,7 +229,7 @@
             }
 
             .modern-table {
-                font-size: 12px;
+                font-size: 14px;
             }
 
             .modern-table th,

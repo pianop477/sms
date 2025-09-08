@@ -110,7 +110,7 @@
             padding: 6px 8px;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
-            font-size: 12px;
+            font-size: 14px;
         }
 
         .form-control:focus {
@@ -143,7 +143,7 @@
         }
 
         .char-count {
-            font-size: 11px;
+            font-size: 12px;
             margin-top: 11px;
             font-weight: 600;
             transition: all 0.3s ease;
@@ -173,7 +173,7 @@
             font-weight: 600;
             transition: all 0.4s ease;
             box-shadow: 0 15px 35px rgba(28, 200, 138, 0.3);
-            font-size: 12px;
+            font-size: 14px;
         }
 
         .btn-modern:hover {
@@ -333,7 +333,7 @@
                         <div class="sender-card">
                             <div class="text-center mb-3">
                                 <div class="sender-avatar-placeholder">
-                                    <i class="fas fa-user-circle sender-avatar" style="font-size: 80px; color: #4361ee;"></i>
+                                    <i class="fas fa-user-circle sender-avatar" style="font-size: 40px; color: #4361ee;"></i>
                                 </div>
                             </div>
                             <h5 class="text-primary mb-3 text-center">

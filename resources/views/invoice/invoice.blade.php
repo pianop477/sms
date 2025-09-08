@@ -265,7 +265,7 @@
         }
 
         .amount-display {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 700;
             color: var(--primary);
             text-align: center;

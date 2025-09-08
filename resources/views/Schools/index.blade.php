@@ -158,7 +158,7 @@
             color: white;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 12px;
+            font-size: 14px;
             letter-spacing: 0.5px;
             border: none;
         }
@@ -199,7 +199,7 @@
             padding: 6px 10px;
             border-radius: 25px;
             font-weight: 600;
-            font-size: 11px;
+            font-size: 12px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
@@ -218,7 +218,7 @@
             justify-content: center;
             transition: all 0.3s ease;
             border: none;
-            font-size: 11px;
+            font-size: 14px;
         }
 
         .btn-icon:hover {
@@ -283,7 +283,7 @@
             }
 
             .modern-table {
-                font-size: 11px;
+                font-size: 14px;
             }
 
             .modern-table th,
@@ -299,7 +299,7 @@
             .btn-icon {
                 width: 30px;
                 height: 30px;
-                font-size: 11px;
+                font-size: 14px;
             }
 
             .modal-body {
