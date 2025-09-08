@@ -26,7 +26,7 @@
         .dashboard-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem 1rem;
+            padding: 8px 6px;
         }
 
         .glass-card {
@@ -48,8 +48,8 @@
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             color: white;
             border-radius: 24px;
-            padding: 2rem;
-            margin-bottom: 2rem;
+            padding: 8px;
+            margin-bottom: 6px;
             position: relative;
             overflow: hidden;
         }
@@ -83,17 +83,17 @@
         }
 
         .modern-table th {
-            padding: 1.2rem 1rem;
+            padding: 6px 7px;
             color: white;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 0.85rem;
+            font-size: 12px;
             letter-spacing: 0.5px;
             border: none;
         }
 
         .modern-table td {
-            padding: 1.2rem 1rem;
+            padding: 6px 4px;
             border-bottom: 1px solid rgba(67, 97, 238, 0.1);
             vertical-align: middle;
             transition: all 0.3s ease;
