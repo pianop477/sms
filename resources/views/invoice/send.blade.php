@@ -171,7 +171,7 @@
         }
 
         .total-amount {
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 700;
             color: var(--primary);
             text-align: center;

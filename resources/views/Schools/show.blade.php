@@ -171,7 +171,7 @@
             padding: 4ox 8px;
             border-radius: 25px;
             font-weight: 600;
-            font-size: 8px;
+            font-size: 12px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 

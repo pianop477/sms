@@ -86,7 +86,7 @@
             color: white;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 12px;
+            font-size: 14px;
             letter-spacing: 0.5px;
             border: none;
         }
@@ -114,7 +114,7 @@
             padding: 3px 6px;
             border-radius: 12px;
             border: 1px solid rgba(67, 97, 238, 0.2);
-            font-size: 12px;
+            font-size: 14px;
             color: var(--primary);
             font-weight: 600;
         }
@@ -137,7 +137,7 @@
             background: linear-gradient(135deg, rgba(76, 201, 240, 0.1), rgba(72, 149, 239, 0.1));
             padding: 3px 6px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 600;
             color: var(--info);
         }
@@ -199,7 +199,7 @@
             }
 
             .modern-table {
-                font-size: 11px;
+                font-size: 14px;
             }
 
             .modern-table th,
@@ -209,7 +209,7 @@
 
             .ip-address,
             .timestamp {
-                font-size: 11px;
+                font-size: 14px;
                 padding: 2px 0.4px;
             }
 

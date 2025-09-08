@@ -87,7 +87,7 @@
             color: white;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 6px;
+            font-size: 14px;
             letter-spacing: 0.5px;
             border: none;
         }
@@ -132,7 +132,7 @@
             justify-content: center;
             transition: all 0.3s ease;
             border: none;
-            font-size: 12px;
+            font-size: 14px;
         }
 
         .btn-icon:hover {
@@ -224,7 +224,7 @@
             }
 
             .modern-table {
-                font-size: 12px;
+                font-size: 14px;
             }
 
             .modern-table th,
