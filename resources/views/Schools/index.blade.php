@@ -94,7 +94,7 @@
         .form-control {
             border: 2px solid rgba(67, 97, 238, 0.2);
             border-radius: 12px;
-            padding: 6px 8px;
+            padding: 10px 14px;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
         }
@@ -108,7 +108,7 @@
         .form-select {
             border: 2px solid rgba(67, 97, 238, 0.2);
             border-radius: 12px;
-            padding: 6px 8px;
+            padding: 10px 14px;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
         }
