@@ -110,10 +110,10 @@
         }
 
         .badge-modern {
-            padding: 0.6rem 1.2rem;
+            padding: 4px 6px;
             border-radius: 25px;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 12px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
@@ -180,20 +180,20 @@
 
         @media (max-width: 768px) {
             .dashboard-container {
-                padding: 1rem;
+                padding: 6px;
             }
 
             .header-section {
-                padding: 1.5rem;
+                padding: 6px;
             }
 
             .modern-table {
-                font-size: 0.9rem;
+                font-size: 12px;
             }
 
             .modern-table th,
             .modern-table td {
-                padding: 0.8rem 0.5rem;
+                padding: 4px 8px;
             }
 
             .stats-grid {
@@ -202,7 +202,7 @@
 
             .btn-reset {
                 width: 100%;
-                padding: 0.75rem 1rem;
+                padding: 0.8px 12px;
             }
         }
 
