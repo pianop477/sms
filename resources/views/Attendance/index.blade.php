@@ -100,9 +100,9 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Admission #</th>
                             <th>Student Name</th>
                             <th class="text-center">Gender</th>
+                            <th class="text-center">Stream</th>
                             <th class="text-center">Attendance Status</th>
                         </tr>
                     </thead>
@@ -116,13 +116,13 @@
                                 <tr>
                                     <input type="hidden" name="student_id[]" value="{{ $student->id }}">
                                     <td>{{ $loop->iteration }}</td>
-                                    <td class="text-uppercase">{{$student->admission_number}}</td>
                                     <td>
                                         <a href="{{ route('class.teacher.student.profile', ['student' => Hashids::encode($student->id)]) }}" class="text-dark font-weight-bold">
                                             {{ ucwords(strtolower($student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name)) }}
                                         </a>
                                     </td>
                                     <td class="text-uppercase text-center">{{ $student->gender[0] }}</td>
+                                    <td class="text-center">{{strtoupper($student->group)}}</td>
                                     <input type="hidden" name="group[{{ $student->id }}]" value="{{ $student->group }}">
                                     <td class="text-center status-radio">
                                         <label><input type="radio" name="attendance_status[{{ $student->id }}]" required value="present"> ✅ Present</label>
@@ -139,7 +139,7 @@
                 </table>
             </div>
             <div class="card-footer text-center">
-                <button type="submit" id="saveButton" class="btn btn-success">
+                <button type="submit" id="saveButton" class="btn btn-success" onclick="return confirm('Are you sure you want to submit? You won’t be able to make changes afterward.')">
                     <i class="fas fa-save"></i> Submit Attendance
                 </button>
             </div>

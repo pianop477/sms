@@ -27,14 +27,20 @@
             {{-- User Profile --}}
             <div class="dropdown d-flex align-items-center justify-content-center justify-content-md-start ms-md-auto">
                 @php
-                    $profileImg = Auth::user()->image
-                                ? 'assets/img/profile/' . Auth::user()->image
-                                : (Auth::user()->gender == 'male'
-                                   ? 'assets/img/profile/avatar.jpg'
-                                   : 'assets/img/profile/avatar-female.jpg');
+                            // Determine the image path
+                            $imageName = Auth()->user()->image;
+                            $imagePath = public_path('assets/img/profile/' . $imageName);
+
+                            // Check if the image exists and is not empty
+                            if (!empty($imageName) && file_exists($imagePath)) {
+                                $avatarImage = asset('assets/img/profile/' . $imageName);
+                            } else {
+                                // Use default avatar based on gender
+                                $avatarImage = asset('assets/img/profile/' . (auth()->user()->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                            }
                 @endphp
 
-                <img src="{{ asset($profileImg) }}"
+                <img src="{{ $avatarImage }}"
                      alt="Profile"
                      class="rounded-circle"
                      style="width:40px; height:40px; object-fit:cover;">

@@ -8,6 +8,7 @@ use App\Models\TodRoster;
 use App\Services\NextSmsService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class updateRostersStatus extends Command
@@ -17,7 +18,7 @@ class updateRostersStatus extends Command
      *
      * @var string
      */
-    protected $signature = 'app:update-rosters-status';
+    protected $signature = 'roster:update-rosters-status';
 
     /**
      * The console command description.
@@ -29,120 +30,108 @@ class updateRostersStatus extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
-        $today = Carbon::now()->format('Y-m-d');
+        $today = Carbon::today();
 
-        // 1. Kukamata roster zote zenye status active
-        $activeRosters = TodRoster::where('status', 'active')->get();
+        // 1. ACTIVE → COMPLETED end_date ikipita
+        $active = TodRoster::where('status', 'active')->get();
+        foreach ($active as $roster) {
+            if ($roster->end_date && $today->gt(Carbon::parse($roster->end_date))) {
+                $roster->status       = 'completed';
+                $roster->is_completed = true;
+                $roster->updated_by   = 'system';
+                $roster->save();
 
-        foreach ($activeRosters as $roster) {
-            // Kuhakikisha end_date sio null
-            if ($roster->end_date) {
-                // Kubadilisha status kuwa completed ikiwa end_date imepita
-                if ($today > $roster->end_date) {
-                    $roster->status = 'completed';
-                    $roster->is_completed = true;
-                    $roster->updated_by = 'system';
-                    $roster->save();
-
-                    $this->info("Roster {$roster->roster_id} imebadilishwa kuwa completed.");
-                    // Log::info("Roster {$roster->roster_id} imebadilishwa kuwa completed.");
-                }
+                $this->info("Roster {$roster->roster_id} imewekwa completed.");
+                Log::info("Roster {$roster->roster_id} imewekwa completed.");
             }
         }
 
-        // 2. Kukamata roster zote zenye status pending
-        $pendingRosters = TodRoster::where('status', 'pending')
-                                    ->whereDate('start_date', '>=', $today)
-                                    ->get();
+        // 2. PENDING → ACTIVE (na SMS ya kuanza)
+        $pending = TodRoster::where('status', 'pending')->get();
+        $grouped = $pending->groupBy('roster_id');
 
-        foreach ($pendingRosters as $roster) {
-            // Kuhakikisha start_date sio null
-            if ($roster->start_date) {
-                // Kubadilisha status kuwa active ikiwa start_date imefika
-                if ($today >= $roster->start_date) {
-                    // Kuhakikisha hakuna roster nyingine active kwa huyo mwalimu
-                    $existingActive = TodRoster::where('teacher_id', $roster->teacher_id)
-                                                ->where('status', 'active')
-                                                ->exists();
+        foreach ($grouped as $rosterId => $records) {
+            foreach ($records as $roster) {
+                if (!$roster->start_date) {
+                    continue;
+                }
 
-                    if (!$existingActive) {
-                        $roster->status = 'active';
+                $start = Carbon::parse($roster->start_date);
+
+                if ($today->greaterThanOrEqualTo($start)) {
+                    // hakikisha hana roster nyingine active
+                    $exists = TodRoster::where('teacher_id', $roster->teacher_id)
+                        ->where('status', 'active')
+                        ->exists();
+
+                    if (!$exists) {
+                        $roster->status     = 'active';
                         $roster->updated_by = 'system';
                         $roster->save();
 
-                        $this->info("Roster {$roster->roster_id} imebadilishwa kuwa active.");
-                        // Log::info("Roster {$roster->roster_id} imebadilishwa kuwa active.");
+                        $this->info("Roster {$roster->roster_id} imewekwa active kwa mwalimu {$roster->teacher_id}.");
+                        Log::info("Roster {$roster->roster_id} imewekwa active kwa mwalimu {$roster->teacher_id}.");
 
-                        // Kutuma SMS kwa mwalimu kuwa zamu yake imeanza
-                        $this->sendRosterStartSms($roster);
-                    }
-                } else {
-                    // Kutuma tahadhari ya zamu inayokaribia (siku 1 kabla)
-                    $daysUntilStart = Carbon::parse($roster->start_date)->diffInDays($today);
-                    if ($daysUntilStart == 1) {
-                        $this->sendRosterReminderSms($roster);
+                        // SMS ya kuanza tu
+                        $this->sendStartSms($roster);
                     }
                 }
             }
         }
 
-        $this->info("Usasishaji wa roster umekamilika.");
+        $this->info('Usasishaji wa roster umekamilika.');
+        return Command::SUCCESS;
     }
 
     /**
-     * Kutuma SMS kwa mwalimu kuwa zamu yake imeanza
+     * SMS ya kuanza kwa mwalimu mmoja
      */
-    protected function sendRosterStartSms(TodRoster $roster)
+    protected function sendStartSms(TodRoster $roster): void
     {
         try {
-            // Kupata namba ya simu ya mwalimu
-            $teacher = Teacher::query()->join('user', 'users.id', 'teaches.user_id')
-                                        ->select('users.*')
-                                        ->find($roster->teacher_id);
+            $teacher = DB::table('teachers')
+                ->join('users', 'users.id', '=', 'teachers.user_id')
+                ->select('teachers.id as teacher_id', 'teachers.school_id', 'users.name', 'users.phone')
+                ->where('teachers.id', $roster->teacher_id)
+                ->first();
 
-            if ($teacher && $teacher->phone) {
-                $phone = $teacher->phone;
-                $message = "Habari {$teacher->user->name}. Zamu yako imeanza leo tarehe {$roster->start_date} na itaisha tarehe {$roster->end_date}. Ninakutakiwa uwajibikaji mwema katika wiki hii!";
-
-                // Tuma SMS hapa
-                $nextSmsService = new NextSmsService();
-                $schoolId = $teacher->school_id;
-                $school = school::findOrFail($schoolId);
-
-                $payload = [
-                    "from" => $school->sender_id,
-                    "to" => $this->formatPhoneNumber($phone),
-                    "text" => $message,
-                    "reference" => $roster->roster_id,
-                ];
-                $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
-
-                $this->info("SMS ya kuanza kwa zamu imetumwa kwa namba: {$phone}");
-                Log::info("SMS ya kuanza kwa zamu imetumwa kwa namba: {$phone}");
+            if (!$teacher || empty($teacher->phone)) {
+                return;
             }
+
+            $phone   = $teacher->phone;
+            $message = "Habari {$teacher->name}. Zamu yako imeanza leo {$roster->start_date} na itaisha {$roster->end_date}. Uwajibikaji mwema!";
+
+            $school         = School::findOrFail($teacher->school_id);
+            $nextSmsService = new NextSmsService();
+
+            $nextSmsService->sendSmsByNext(
+                $school->sender_id,
+                $this->formatPhoneNumber($phone),
+                $message,
+                $roster->roster_id // id ya kumbukumbu
+            );
+
+            $this->info("SMS ya kuanza imetumwa kwa {$phone}");
+            Log::info("SMS ya kuanza imetumwa kwa {$phone}");
         } catch (\Exception $e) {
             Log::error("Hitilafu ya kutuma SMS: " . $e->getMessage());
         }
     }
 
-
-    /**
-     * Kubadilisha namba ya simu kuwa muundo sahihi
-     */
-    private function formatPhoneNumber($phone)
+    private function formatPhoneNumber(string $phone): string
     {
-        // Remove any non-numeric characters
-        $phone = preg_replace('/[^0-9]/', '', $phone);
+        $digits = preg_replace('/\D/', '', $phone);
 
-        // Ensure the number starts with the country code (e.g., 255 for Tanzania)
-        if (strlen($phone) == 9) {
-            $phone = '255' . $phone;
-        } elseif (strlen($phone) == 10 && substr($phone, 0, 1) == '0') {
-            $phone = '255' . substr($phone, 1);
+        if (strlen($digits) === 9) {
+            return '255' . $digits;
+        }
+        if (strlen($digits) === 10 && str_starts_with($digits, '0')) {
+            return '255' . substr($digits, 1);
         }
 
-        return $phone;
+        return $digits;
     }
 }

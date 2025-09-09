@@ -461,7 +461,7 @@
 
                     <div class="mb-3">
                         <label for="headteacher_comment" class="form-label">Headteacher/Academic Comments</label>
-                        <textarea class="form-control" id="headteacher_comment" name="headteacher_comment" rows="3" placeholder="Enter any comments or feedback..." required></textarea>
+                        <textarea class="form-control" id="headteacher_comment" name="headteacher_comment" rows="3" placeholder="Enter comments or feedback..." required></textarea>
                     </div>
 
                     <input type="hidden" name="status" value="approved">

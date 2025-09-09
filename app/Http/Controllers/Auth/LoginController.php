@@ -57,46 +57,54 @@ class LoginController extends Controller
             'password' => 'required|string',
         ]);
 
-        $ip = $request->ip();
-        $key = 'login:attempts:' . strtolower($request->username) . ':' . $ip;
-        $maxAttempts = 3;
-        $decayMinutes = 15;
+        $ip   = $request->ip();
+        $key  = 'login:attempts:' . strtolower($request->username) . ':' . $ip;
+        $maxAttempts  = 3;    // after 3 fails lock
+        $decayMinutes = 15;   // lock window
 
-        // Check for rate limiting BEFORE attempting login
+        // 1. Stop immediately if user is locked out
         if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
             $seconds = RateLimiter::availableIn($key);
-            Alert()->toast('Account locked. Try again in ' . ceil($seconds / 60) . ' minutes.', 'error');
-            return redirect()->back();
+
+            Alert()->toast(
+                'Account locked. Try again in ' . ceil($seconds / 60) . ' minutes.',
+                'error'
+            );
+
+            return back()->withInput($request->only('username'));  // keep what user typed
         }
 
-        $loginType = $this->username();
+        // 2. Attempt login only if not locked
+        $loginType   = $this->username();  // method that returns 'email' or 'phone'
         $credentials = [
             $loginType => $request->username,
             'password' => $request->password,
         ];
 
-        if (Auth::attempt($credentials, $request->remember)) {
-            $request->session()->regenerate();
-
-            // Clear rate limit on successful login
+        if (Auth::attempt($credentials, $request->filled('remember'))) {
+            // success: clear attempts + regenerate session
             RateLimiter::clear($key);
+            $request->session()->regenerate();
             $request->session()->put('last_activity', time());
 
-            Alert()->toast('Hello 🤩 Welcome back to ShuleApp', 'success');
+            Alert()->toast('Hello '. ucwords(strtolower(Auth::user()->first_name. ' '. Auth::user()->last_name))  .' Welcome back!', 'success');
             return redirect()->intended($this->redirectPath());
         }
 
-        // Increment failed attempts only if login failed
+        // 3. Fail: increment the attempts count
         RateLimiter::hit($key, $decayMinutes * 60);
 
-        // Log failed login details in database
+        // optional logging
         DB::table('failed_logins')->insert([
-            'ip' => $ip,
-            'username' => $request->username,
+            'ip'         => $ip,
+            'username'   => $request->username,
             'user_agent' => $request->userAgent(),
-            'attempted_at' => now()
+            'attempted_at' => now(),
         ]);
 
-        return back()->with('error', 'Invalid credentials');
+        // keep username (and password if you insist)
+        return back()->with('error', 'Invalid Username or Password')->withInput($request->only('username', 'password'));
+        // or if you really want password too:
+        // return back()->withInput($request->only('username','password'));
     }
 }
