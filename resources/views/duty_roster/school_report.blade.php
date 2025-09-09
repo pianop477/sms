@@ -349,7 +349,7 @@
         <!-- Header Section -->
         <header class="main-header animate-fadeIn">
             <h5 class="header-title text-white"> Daily School Reports</h5>
-            <p class="header-subtitle text-white">Comprehensive management and analytics for daily school reports</p>
+            <p class="header-subtitle text-white"> Management and analytics for daily school reports</p>
         </header>
 
         <!-- Stats Overview -->
@@ -404,21 +404,18 @@
                 <div class="date-range-form">
                     <form action="" method="GET" target="">
                         <div class="row align-items-end">
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-5 mb-3">
                                 <label class="form-label">Start Date</label>
                                 <input type="date" name="start_date" class="form-control" required>
                             </div>
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-5 mb-3">
                                 <label class="form-label">End Date</label>
                                 <input type="date" name="end_date" class="form-control" required>
                             </div>
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-2 mb-3">
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                     <button type="submit" name="action" value="view" class="btn btn-view">
-                                        <i class="fas fa-eye"></i> View Report
-                                    </button>
-                                    <button type="submit" name="action" value="download" class="btn btn-download">
-                                        <i class="fas fa-download"></i> Download PDF
+                                        <i class="fas fa-search"></i> Find Report
                                     </button>
                                 </div>
                             </div>
@@ -445,7 +442,7 @@
                                     <th>Roster ID#</th>
                                     <th>Attended</th>
                                     <th>Attended Rate</th>
-                                    <th>Created by</th>
+                                    <th>Issued by</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>

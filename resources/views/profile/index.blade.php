@@ -212,7 +212,7 @@
                             @if ($user->usertype == 3)
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="text-muted">Member ID</span>
-                                <span class="text-uppercase fw-bold">{{$user->member_id}}</span>
+                                <span class="text-uppercase fw-bold text-white">{{$user->member_id}}</span>
                             </div>
                             @endif
 
