@@ -361,6 +361,13 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('Delete/package/id/{id}', [PackagesController::class, 'deletePackage'])->name('delete.holiday.package');
         Route::put('Activate/package/id/{id}', [PackagesController::class, 'activatePackage'])->name('activate.holiday.package');
         Route::put('Deactivate/package/id/{id}', [PackagesController::class, 'deactivatePackage'])->name('deactivate.holiday.package');
+
+        //head teacher or academic report access daily report
+        Route::get('Daily-school-report', [TodRosterController::class, 'getSchoolReport'])->name('get.school.report');
+        Route::get('Daily-school-report/date/{date}', [TodRosterController::class, 'reportByDate'])->name('report.by.date');
+        Route::delete('Daily-school-report/{date}/delete', [TodRosterController::class, 'destroyReport'])->name('report.reject');
+        Route::put('Daily-school-report/{id}/update', [TodRosterController::class, 'updateDailyReport'])->name('report.update');
+        Route::get('Daily-school-report/view', [TodRosterController::class, 'viewReport'])->name('report.fetch.preview');
     });
 
     //4. ROUTES ACCESS FOR ALL USERS ========================================================================================================
@@ -466,12 +473,4 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     Route::get('Daily-school-report/create', [TodRosterController::class, 'create'])->name('tod.report.create');
     Route::get('/api/attendance/fetch', [TodRosterController::class, 'fetchAttendance']);
     Route::post('Daily-school-report', [TodRosterController::class, 'store'])->name('tod.report.store');
-
-    //head teacher or academic report access daily report
-    Route::get('Daily-school-report', [TodRosterController::class, 'getSchoolReport'])->name('get.school.report');
-    Route::get('Daily-school-report/date/{date}', [TodRosterController::class, 'reportByDate'])->name('report.by.date');
-    Route::delete('Daily-school-report/{date}/delete', [TodRosterController::class, 'destroyReport'])->name('report.reject');
-    Route::put('Daily-school-report/{id}/update', [TodRosterController::class, 'updateDailyReport'])->name('report.update');
-    Route::get('Daily-school-report/view', [TodRosterController::class, 'viewReport'])->name('report.fetch.preview');
-
 });
