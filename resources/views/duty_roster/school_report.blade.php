@@ -407,11 +407,11 @@
                         <div class="row align-items-end">
                             <div class="col-md-5 mb-3">
                                 <label class="form-label">Start Date</label>
-                                <input type="date" name="start_date" class="form-control" required>
+                                <input type="date" name="start_date" class="form-control" max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" required>
                             </div>
                             <div class="col-md-5 mb-3">
                                 <label class="form-label">End Date</label>
-                                <input type="date" name="end_date" class="form-control" required>
+                                <input type="date" name="end_date" class="form-control" max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" required>
                             </div>
                             <div class="col-md-2 mb-3">
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">

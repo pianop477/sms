@@ -1075,7 +1075,7 @@ class ResultsController extends Controller
 
         }
         catch(\Exception $e){
-            Alert()->error($e->getMessage(), 'error');
+            Alert()->toast($e->getMessage(), 'error');
             return back();
         }
     }

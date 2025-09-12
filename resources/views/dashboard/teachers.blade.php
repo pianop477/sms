@@ -9,36 +9,36 @@
         <div class="row">
             <div class="col-md-12">
                 @if ($contract == null)
-                <div class="alert alert-danger alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                <div class="alert alert-danger alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                     <strong>Contract Status:</strong> Not applied.
                     <a href="{{route('contract.index')}}" class="alert-link">Apply here</a>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 @else
                 @if($contract->status == 'expired')
-                    <div class="alert alert-danger alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                    <div class="alert alert-danger alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                         <strong>Contract Status:</strong> Expired
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @elseif ($contract->status == 'rejected')
-                    <div class="alert alert-secondary alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                    <div class="alert alert-secondary alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                         <strong>Contract Status:</strong> Rejected |
                         <a href="{{route('contract.index')}}" class="alert-link">View details</a>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
-                    <div class="alert alert-warning alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                    <div class="alert alert-warning alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                         <strong>Contract Status:</strong> Expiring soon ({{ $contract->end_date->format('d/m/Y') }})
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @elseif ($contract->status == 'pending')
-                    <div class="alert alert-info alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                    <div class="alert alert-info alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                         <strong>Contract Status:</strong> Pending |
                         <a href="{{route('contract.index')}}" class="alert-link">View details</a>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @else
-                    <div class="alert alert-success alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                    <div class="alert alert-success alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                         <strong>Contract Status:</strong> Active (Expires at: {{ $contract->end_date }}) |
                         <a href="{{route('contract.index')}}" class="alert-link">View contract</a>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -587,36 +587,36 @@
         <div class="row">
             <div class="col-12">
                 @if ($contract == null)
-                <div class="alert alert-danger alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                <div class="alert alert-danger alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                     <strong>Contract Status:</strong> Not applied.
                     <a href="{{route('contract.index')}}" class="alert-link">Apply here</a>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 @else
                 @if($contract->status == 'expired')
-                    <div class="alert alert-danger alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                    <div class="alert alert-danger alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                         <strong>Contract Status:</strong> Expired
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @elseif ($contract->status == 'rejected')
-                    <div class="alert alert-secondary alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                    <div class="alert alert-secondary alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                         <strong>Contract Status:</strong> Rejected |
                         <a href="{{route('contract.index')}}" class="alert-link">View details</a>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
-                    <div class="alert alert-warning alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                    <div class="alert alert-warning alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                         <strong>Contract Status:</strong> Expiring soon ({{ $contract->end_date->format('d/m/Y') }})
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @elseif ($contract->status == 'pending')
-                    <div class="alert alert-info alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                    <div class="alert alert-info alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                         <strong>Contract Status:</strong> Pending |
                         <a href="{{route('contract.index')}}" class="alert-link">View details</a>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @else
-                    <div class="alert alert-success alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                    <div class="alert alert-success alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                         <strong>Contract Status:</strong> Active (Expires at: {{$contract->end_date }}) |
                         <a href="{{route('contract.index')}}" class="alert-link">View contract</a>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -633,13 +633,15 @@
                     $myDuty = \App\Models\TodRoster::where('teacher_id', $teacher->id)->where('status', 'active')->first();
                 @endphp
                 @if ($myDuty)
-                    <div class="alert alert-info alert-dismissible fade show" style="border-right: 3px solid #982d9c;">
-                        <p class="text-right">You are on Duty this week! Please fill out
-                            <strong>
-                                <a href="{{route('tod.report.create')}}" onclick="return confirm('Are you sure?')"><i class="fas fa-edit"></i> Daily Report here</a>
-                            </strong>
-                        </p>
-                    </div>
+                    <a href="{{route('tod.report.create')}}" onclick="return confirm('Are you sure?')">
+                        <div class="alert" style="background: gold; border-left: 5px solid #982d9c;">
+                            <p class="">You are on Duty! Fill
+                                <strong>
+                                    <a href="{{route('tod.report.create')}}" onclick="return confirm('Are you sure?')"><i class="fas fa-edit"></i> Daily Report</a>
+                                </strong>
+                            </p>
+                        </div>
+                    </a>
                 @endif
         </div>
             <div class="row">
@@ -1154,36 +1156,36 @@
 
         {{-- check for class teacher contract --}}
         @if ($contract == null)
-                <div class="alert alert-danger alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                <div class="alert alert-danger alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                     <strong>Contract Status:</strong> Not applied.
                     <a href="{{route('contract.index')}}" class="alert-link">Apply here</a>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 @else
                 @if($contract->status == 'expired')
-                    <div class="alert alert-danger alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                    <div class="alert alert-danger alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                         <strong>Contract Status:</strong> Expired
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @elseif ($contract->status == 'rejected')
-                    <div class="alert alert-secondary alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                    <div class="alert alert-secondary alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                         <strong>Contract Status:</strong> Rejected |
                         <a href="{{route('contract.index')}}" class="alert-link">View details</a>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
-                    <div class="alert alert-warning alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                    <div class="alert alert-warning alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                         <strong>Contract Status:</strong> Expiring soon ({{ $contract->end_date->format('d/m/Y') }})
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @elseif ($contract->status == 'pending')
-                    <div class="alert alert-info alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                    <div class="alert alert-info alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                         <strong>Contract Status:</strong> Pending |
                         <a href="{{route('contract.index')}}" class="alert-link">View details</a>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @else
-                    <div class="alert alert-success alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                    <div class="alert alert-success alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                         <strong>Contract Status:</strong> Active (Expires at: {{$contract->end_date}}) |
                         <a href="{{route('contract.index')}}" class="alert-link">View contract</a>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -1198,13 +1200,15 @@
                     $myDuty = \App\Models\TodRoster::where('teacher_id', $teacher->id)->where('status', 'active')->first();
                 @endphp
                 @if ($myDuty)
-                    <div class="alert alert-info alert-dismissible fade show" style="border-right: 3px solid #982d9c;">
-                        <p class="text-right">You are on Duty this week! Please fill out
-                            <strong>
-                                <a href="{{route('tod.report.create')}}" onclick="return confirm('Are you sure?')"><i class="fas fa-edit"></i> Daily Report here</a>
-                            </strong>
-                        </p>
-                    </div>
+                    <a href="{{route('tod.report.create')}}" onclick="return confirm('Are you sure?')">
+                        <div class="alert" style="background: gold; border-left: 5px solid #982d9c;">
+                            <p class="">You are on Duty! Fill
+                                <strong>
+                                    <a href="{{route('tod.report.create')}}" onclick="return confirm('Are you sure?')"><i class="fas fa-edit"></i> Daily Report</a>
+                                </strong>
+                            </p>
+                        </div>
+                    </a>
                 @endif
         <div class="row">
         <!-- Stats Cards for Class Teacher -->
@@ -1534,36 +1538,36 @@
 
         {{-- check for normal teachers contract --}}
         @if ($contract == null)
-            <div class="alert alert-danger alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+            <div class="alert alert-danger alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                 <strong>Contract Status:</strong> Not applied.
                 <a href="{{route('contract.index')}}" class="alert-link">Apply here</a>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @else
             @if($contract->status == 'expired')
-                <div class="alert alert-danger alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                <div class="alert alert-danger alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                     <strong>Contract Status:</strong> Expired
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @elseif ($contract->status == 'rejected')
-                <div class="alert alert-secondary alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                <div class="alert alert-secondary alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                     <strong>Contract Status:</strong> Rejected |
                     <a href="{{route('contract.index')}}" class="alert-link">View details</a>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
-                <div class="alert alert-warning alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                <div class="alert alert-warning alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                     <strong>Contract Status:</strong> Expiring soon ({{ $contract->end_date->format('d/m/Y') }})
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @elseif ($contract->status == 'pending')
-                <div class="alert alert-info alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                <div class="alert alert-info alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                     <strong>Contract Status:</strong> Pending |
                     <a href="{{route('contract.index')}}" class="alert-link">View details</a>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @else
-                <div class="alert alert-success alert-dismissible fade show" style="border-left: 3px solid #0c68a1;">
+                <div class="alert alert-success alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
                     <strong>Contract Status:</strong> Active (Expires at: {{ $contract->end_date }}) |
                     <a href="{{route('contract.index')}}" class="alert-link">View contract</a>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -1578,13 +1582,15 @@
                     $myDuty = \App\Models\TodRoster::where('teacher_id', $teacher->id)->where('status', 'active')->first();
                 @endphp
                 @if ($myDuty)
-                    <div class="alert alert-info alert-dismissible fade show" style="border-right: 3px solid #982d9c;">
-                        <p class="text-right">You are on Duty this week! Please fill out
-                            <strong>
-                                <a href="{{route('tod.report.create')}}" onclick="return confirm('Are you sure?')"><i class="fas fa-edit"></i> Daily Report here</a>
-                            </strong>
-                        </p>
-                    </div>
+                    <a href="{{route('tod.report.create')}}" onclick="return confirm('Are you sure?')">
+                        <div class="alert" style="background: gold; border-left: 5px solid #982d9c;">
+                            <p class="">You are on Duty! Fill
+                                <strong>
+                                    <a href="{{route('tod.report.create')}}" onclick="return confirm('Are you sure?')"><i class="fas fa-edit"></i> Daily Report</a>
+                                </strong>
+                            </p>
+                        </div>
+                    </a>
                 @endif
         <div class="row">
             <!-- Stats Card for Normal Teacher -->
