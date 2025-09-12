@@ -430,7 +430,7 @@
                                 <tbody id="attendanceTableBody">
                                     <tr>
                                         <td colspan="16" class="text-muted text-center py-4">
-                                            <i class="fas fa-database me-2"></i> No records fetched yet
+                                            <i class="fas fa-database me-2"></i> No attendance records available yet
                                         </td>
                                     </tr>
                                 </tbody>
@@ -528,7 +528,7 @@
                             <button type="reset" class="btn btn-outline-secondary" id="resetFormBtn">
                                 <i class="fas fa-redo-alt me-2"></i> Reset Form
                             </button>
-                            <button type="submit" class="btn btn-success float-right">
+                            <button type="submit" class="btn btn-success float-right" onclick="return confirm('Are you sure you want to submit final report?')">
                                 <i class="fas fa-paper-plane me-2"></i> Submit Final Report
                             </button>
                         </div>
