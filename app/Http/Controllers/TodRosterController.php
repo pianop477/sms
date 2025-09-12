@@ -13,12 +13,12 @@ use App\Models\Teacher;
 use App\Models\TodRoster;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Console\View\Components\Alert;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Vinkla\Hashids\Facades\Hashids;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class TodRosterController extends Controller
 {
@@ -520,46 +520,56 @@ class TodRosterController extends Controller
     {
         $request->validate([
             'start_date' => 'required|date',
-            'end_date' => 'required|date'
+            'end_date'   => 'required|date'
         ]);
 
-        $reportDetails = daily_report_details::query()
-                                        ->join('tod_rosters', 'tod_rosters.id', '=', 'daily_report_details.tod_roster_id')
-                                        ->whereBetween('report_date', [$request->start_date, $request->end_date])
-                                        ->select(
-                                            'tod_rosters.roster_id', 'tod_rosters.teacher_id', 'tod_rosters.start_date',
-                                             'tod_rosters.end_date', 'daily_report_details.*'
-                                        )
-                                        ->where('daily_report_details.status', 'approved')
-                                        ->get();
+        // Pata report zote kwenye date range
+        $reports = daily_report_details::query()
+                    ->join('tod_rosters', 'tod_rosters.id', '=', 'daily_report_details.tod_roster_id')
+                    ->whereBetween('report_date', [$request->start_date, $request->end_date])
+                    ->where('daily_report_details.status', 'approved')
+                    ->select(
+                        'daily_report_details.*',
+                        'tod_rosters.roster_id',
+                        'tod_rosters.teacher_id',
+                        'tod_rosters.start_date',
+                        'tod_rosters.end_date'
+                    )
+                    ->orderBy('report_date', 'ASC')
+                    ->get();
 
-        if($reportDetails->isEmpty()) {
-            return response()->json([
-                'status' => false,
-                'message' => "No records for the selected date range"
-            ], 404);
+        if ($reports->isEmpty()) {
+            Alert::info('Info', 'No records for the selected date range');
+            // Alert()->toast('No records for the selected date range', 'info');
+            return back();
         }
 
-        foreach($reportDetails as $report) {
-            $attReport = daily_report_attendance::query()
-                                            ->join('grades', 'grades.id', '=', 'daily_report_attendances.class_id')
-                                            ->join('daily_report_details', 'daily_report_details.id', '=', 'daily_report_attendances.daily_report_id')
-                                            ->leftJoin('tod_rosters', 'tod_rosters.id', '=', 'daily_report_details.tod_roster_id')
-                                            ->leftJoin('teachers', 'teachers.id', '=', 'tod_rosters.teacher_id')
-                                            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-                                            ->select(
-                                                'daily_report_attendances.*',
-                                                'daily_report_details.*',
-                                                'grades.class_name', 'grades.class_code',
-                                                'teachers.member_id', 'users.first_name', 'users.last_name',
-                                                'tod_rosters.roster_id', 'tod_rosters.teacher_id',
-                                            )
-                                            ->where('daily_report_id', $report->id)
-                                            ->where('tod_roster_id', $report->tod_roster_id)
-                                            ->orderBy('report_date', 'ASC')
-                                            ->get();
-                        return $attReport;
-        }
+        // Group attendance per report_id
+        $reportsWithAttendance = $reports->map(function ($report) {
+            $attendance = daily_report_attendance::query()
+                            ->join('grades', 'grades.id', '=', 'daily_report_attendances.class_id')
+                            ->join('daily_report_details', 'daily_report_details.id', '=', 'daily_report_attendances.daily_report_id')
+                            ->leftJoin('tod_rosters', 'tod_rosters.id', '=', 'daily_report_details.tod_roster_id')
+                            ->leftJoin('teachers', 'teachers.id', '=', 'tod_rosters.teacher_id')
+                            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+                            ->select(
+                                'daily_report_attendances.*',
+                                'grades.class_name', 'grades.class_code',
+                                'tod_rosters.roster_id', 'tod_rosters.teacher_id',
+                                'teachers.member_id', 'users.first_name', 'users.last_name'
+                            )
+                            ->where('daily_report_id', $report->id)
+                            ->orderBy('class_id', 'ASC')
+                            ->get();
+
+            return [
+                'report'     => $report,
+                'attendance' => $attendance,
+            ];
+        });
+
+        return view('duty_roster.general_report', compact('reportsWithAttendance'));
     }
+
 
 }
