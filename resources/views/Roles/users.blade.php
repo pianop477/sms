@@ -270,7 +270,7 @@
                                                     {{ substr($user->first_name, 0, 1) }}{{ substr($user->last_name, 0, 1) }}
                                                 </div>
                                                 <div>
-                                                    <div class="text-capitalize fw-bold">{{ucwords(strotolower($user->first_name . ' '. $user->last_name))}}</div>
+                                                    <div class="text-capitalize fw-bold">{{ucwords(strtolower($user->first_name . ' '. $user->last_name))}}</div>
                                                     <small class="text-muted">{{$user->email ?? 'N/A'}}</small>
                                                 </div>
                                             </div>
