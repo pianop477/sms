@@ -118,7 +118,7 @@
                                     <li><a href="{{route('attendance.fill.form')}}"><i class="fas fa-calendar-check"></i> Attendance Reports</a></li>
                                     <li><a href="{{route('get.school.report')}}"><i class="fas fa-book"></i> Daily School Report</a></li>
                                     <li><a href="{{route('package.byYear')}}"><i class="fas fa-layer-group"></i> Holiday Packages</a></li>
-                                    <li><a href="{{route('graduate.students')}}"><i class="fas fa-graduation-cap"></i> Alumni Reports</a></li>
+                                    <li><a href="{{route('graduate.students.by.year')}}"><i class="fas fa-graduation-cap"></i> Alumni Reports</a></li>
                                 </ul>
                             </li>
 
