@@ -252,6 +252,14 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::post('Generate-attendance-report', [AttendanceController::class, 'generateClassReport'])->name('class.attendance.report');
         Route::get('Deleted-teachers', [TeachersController::class, 'trashedTeachers'])->name('Teachers.trashed');
         Route::get('/api/search-students', [StudentsController::class, 'searchStudent'])->name('api.search.students');
+
+        // daily school report routes
+        Route::get('Daily-school-report', [TodRosterController::class, 'getSchoolReport'])->name('get.school.report');
+        Route::delete('Daily-school-report/{date}/delete', [TodRosterController::class, 'destroyReport'])->name('report.reject');
+        Route::get('Daily-school-report/view', [TodRosterController::class, 'viewReport'])->name('report.fetch.preview');
+
+        // roster management routes
+        Route::get('Teachers-roster', [TodRosterController::class, 'index'])->name('tod.roster.index');
     });
 
     // 2. ROUTE ACCESS FOR EITHER MANAGER OR HEAD TEACHER ONLY ===========================================================================
@@ -363,11 +371,13 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::put('Deactivate/package/id/{id}', [PackagesController::class, 'deactivatePackage'])->name('deactivate.holiday.package');
 
         //head teacher or academic report access daily report
-        Route::get('Daily-school-report', [TodRosterController::class, 'getSchoolReport'])->name('get.school.report');
         Route::get('Daily-school-report/date/{date}', [TodRosterController::class, 'reportByDate'])->name('report.by.date');
-        Route::delete('Daily-school-report/{date}/delete', [TodRosterController::class, 'destroyReport'])->name('report.reject');
         Route::put('Daily-school-report/{id}/update', [TodRosterController::class, 'updateDailyReport'])->name('report.update');
-        Route::get('Daily-school-report/view', [TodRosterController::class, 'viewReport'])->name('report.fetch.preview');
+
+        // roster management routes
+        Route::post('Submit-tod-roster', [TodRosterController::class, 'assignTeachers'])->name('tod.roster.store');
+        Route::delete('Delete-tod-roster/{id}', [TodRosterController::class, 'destroy'])->name('tod.roster.destroy');
+        Route::put('Activate-tod-roster/{id}', [TodRosterController::class, 'activate'])->name('tod.roster.activate');
     });
 
     //4. ROUTES ACCESS FOR ALL USERS ========================================================================================================
@@ -423,7 +433,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     });
 
     // 7. ROUTE ACCESS FOR TEACHER WITH TEACHING SUBJECTS=================================================================================
-    Route::middleware(['CheckUsertype:3', 'CheckRoleType:1,2,3,4'])->group(function() {
+    Route::middleware(['CheckUsertype:3', 'CheckRoleType:1,3,4'])->group(function() {
         // Insert examination score
         Route::get('{id}/Prepare', [ExamController::class, 'prepare'])->name('score.prepare.form');
         Route::post('Examination-result-create', [ExamController::class, 'captureValues'])->name('score.captured.values');
@@ -451,6 +461,11 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::put('{id}/Update-contract-application', [ContractController::class, 'update'])->name('contract.update');
         Route::get('{id}/Delete-contract-application', [ContractController::class, 'destroy'])->name('contract.destroy');
         Route::get('{id}/Download-approved-contract', [ContractController::class, 'downloadContract'])->name('contract.download');
+
+        // daily school report management routes
+        Route::get('Daily-school-report/create', [TodRosterController::class, 'create'])->name('tod.report.create');
+        Route::get('/api/attendance/fetch', [TodRosterController::class, 'fetchAttendance']);
+        Route::post('Daily-school-report', [TodRosterController::class, 'store'])->name('tod.report.store');
     });
 
     // 8. ROUTES ACCESS FOR ERROR PAGE REDIRECTION =======================================================================================
@@ -463,14 +478,4 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Alert()->toast('Goodbyee see you back later 👋', 'success');
         return redirect()->route('login');
     })->name('logout');
-
-    Route::get('Teachers-roster', [TodRosterController::class, 'index'])->name('tod.roster.index');
-    Route::post('Submit-tod-roster', [TodRosterController::class, 'assignTeachers'])->name('tod.roster.store');
-    Route::delete('Delete-tod-roster/{id}', [TodRosterController::class, 'destroy'])->name('tod.roster.destroy');
-    Route::put('Activate-tod-roster/{id}', [TodRosterController::class, 'activate'])->name('tod.roster.activate');
-
-    // teacher to fill their report for the day
-    Route::get('Daily-school-report/create', [TodRosterController::class, 'create'])->name('tod.report.create');
-    Route::get('/api/attendance/fetch', [TodRosterController::class, 'fetchAttendance']);
-    Route::post('Daily-school-report', [TodRosterController::class, 'store'])->name('tod.report.store');
 });
