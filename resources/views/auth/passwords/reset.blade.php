@@ -79,7 +79,7 @@
     }
 
     .form-control {
-      width: 100%;
+      width: 93%;
       padding: 9px 12px;
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.2);

@@ -402,7 +402,8 @@
             </div>
             <div class="card-body">
                 <div class="date-range-form">
-                    <form action="" method="GET" target="">
+                    <form action="{{route('report.fetch.preview')}}" method="GET" target="">
+                        @csrf
                         <div class="row align-items-end">
                             <div class="col-md-5 mb-3">
                                 <label class="form-label">Start Date</label>

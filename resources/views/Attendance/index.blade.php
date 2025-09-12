@@ -102,7 +102,6 @@
                             <th>#</th>
                             <th>Student Name</th>
                             <th class="text-center">Gender</th>
-                            <th class="text-center">Stream</th>
                             <th class="text-center">Attendance Status</th>
                         </tr>
                     </thead>
@@ -122,7 +121,6 @@
                                         </a>
                                     </td>
                                     <td class="text-uppercase text-center">{{ $student->gender[0] }}</td>
-                                    <td class="text-center">{{strtoupper($student->group)}}</td>
                                     <input type="hidden" name="group[{{ $student->id }}]" value="{{ $student->group }}">
                                     <td class="text-center status-radio">
                                         <label><input type="radio" name="attendance_status[{{ $student->id }}]" required value="present"> ✅ Present</label>

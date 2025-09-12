@@ -523,7 +523,43 @@ class TodRosterController extends Controller
             'end_date' => 'required|date'
         ]);
 
+        $reportDetails = daily_report_details::query()
+                                        ->join('tod_rosters', 'tod_rosters.id', '=', 'daily_report_details.tod_roster_id')
+                                        ->whereBetween('report_date', [$request->start_date, $request->end_date])
+                                        ->select(
+                                            'tod_rosters.roster_id', 'tod_rosters.teacher_id', 'tod_rosters.start_date',
+                                             'tod_rosters.end_date', 'daily_report_details.*'
+                                        )
+                                        ->where('daily_report_details.status', 'approved')
+                                        ->get();
 
+        if($reportDetails->isEmpty()) {
+            return response()->json([
+                'status' => false,
+                'message' => "No records for the selected date range"
+            ], 404);
+        }
+
+        foreach($reportDetails as $report) {
+            $attReport = daily_report_attendance::query()
+                                            ->join('grades', 'grades.id', '=', 'daily_report_attendances.class_id')
+                                            ->join('daily_report_details', 'daily_report_details.id', '=', 'daily_report_attendances.daily_report_id')
+                                            ->leftJoin('tod_rosters', 'tod_rosters.id', '=', 'daily_report_details.tod_roster_id')
+                                            ->leftJoin('teachers', 'teachers.id', '=', 'tod_rosters.teacher_id')
+                                            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+                                            ->select(
+                                                'daily_report_attendances.*',
+                                                'daily_report_details.*',
+                                                'grades.class_name', 'grades.class_code',
+                                                'teachers.member_id', 'users.first_name', 'users.last_name',
+                                                'tod_rosters.roster_id', 'tod_rosters.teacher_id',
+                                            )
+                                            ->where('daily_report_id', $report->id)
+                                            ->where('tod_roster_id', $report->tod_roster_id)
+                                            ->orderBy('report_date', 'ASC')
+                                            ->get();
+                        return $attReport;
+        }
     }
 
 }
