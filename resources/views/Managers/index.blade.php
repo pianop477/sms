@@ -337,9 +337,9 @@
 
         <!-- Managers Table -->
         <div class="glass-card fade-in">
-            <div class="card-body p-0">
+            <div class="card-body p-3">
                 <div class="table-responsive">
-                    <table class="modern-table table-responsive-md">
+                    <table class="modern-table table-responsive-md" id="myTable">
                         <thead>
                             <tr>
                                 <th>#</th>

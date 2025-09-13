@@ -328,15 +328,15 @@
             <div class="card-body p-0">
                 <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
                     <h4 class="text-primary mb-0">
-                        <i class="fas fa-user-shield me-2"></i>School Managers
+                        <i class="fas fa-user-shield me-2"></i> School Managers
                     </h4>
-                    <div class="badge bg-primary p-2 rounded-pill">
-                        <i class="fas fa-sync-alt me-2"></i>Real-time
+                    <div class="badge bg-primary p-2 rounded-pill text-white">
+                        <i class="fas fa-sync-alt me-2"></i> Real-time
                     </div>
                 </div>
 
-                <div class="table-responsive">
-                    <table class="modern-table">
+                <div class="table-responsive p-3">
+                    <table class="modern-table table-responsive-md" id="myTable">
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -378,12 +378,12 @@
                                     </td>
                                     <td>
                                         @if ($user->status == 1)
-                                            <span class="badge-modern bg-success">
-                                                <i class="fas fa-check-circle me-1"></i>Active
+                                            <span class="badge-modern bg-success text-white">
+                                                <i class="fas fa-check-circle me-1"></i> Active
                                             </span>
                                         @else
-                                            <span class="badge-modern bg-secondary">
-                                                <i class="fas fa-times-circle me-1"></i>Blocked
+                                            <span class="badge-modern bg-secondary text-white">
+                                                <i class="fas fa-times-circle me-1"></i> Blocked
                                             </span>
                                         @endif
                                     </td>
