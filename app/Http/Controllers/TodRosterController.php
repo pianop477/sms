@@ -539,7 +539,7 @@ class TodRosterController extends Controller
                     ->get();
 
         if ($reports->isEmpty()) {
-            Alert::info('Info', 'No records for the selected date range');
+            Alert::info('Info', 'No records were found for the selected dates');
             // Alert()->toast('No records for the selected date range', 'info');
             return back();
         }
