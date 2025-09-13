@@ -221,9 +221,9 @@
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <h4 class="header-title text-white">
-                            <i class="fas fa-calendar-check me-2"></i> Generate Attendance Report
+                            <i class="fas fa-calendar-check me-2"></i> Attendance Report
                         </h4>
-                        <p class="mb-0 text-white-50"> Generate detailed attendance reports for classes</p>
+                        <p class="mb-0 text-white"> Generate detailed attendance reports for classes</p>
                     </div>
                 </div>
                 <i class="fas fa-chart-bar floating-icons"></i>

@@ -366,7 +366,7 @@
                         <h4 class="header-title text-white">
                             <i class="fas fa-users me-2"></i> Student Transport Management
                         </h4>
-                        <p class="mb-0 text-white-50">Manage student assignments to school buses</p>
+                        <p class="mb-0 text-white">Manage student assignments to school buses</p>
                     </div>
                     <div class="col-md-4 text-end">
                         <a href="{{route('Transportation.index')}}" class="btn btn-primary-custom float-right">

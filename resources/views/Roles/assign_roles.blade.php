@@ -243,7 +243,7 @@
                         <h4 class="header-title text-white">
                             <i class="fas fa-user-cog me-2"></i> Assign User Role
                         </h4>
-                        <p class="mb-0 text-white-50"> Update user roles and permissions</p>
+                        <p class="mb-0 text-white"> Update user roles and permissions</p>
                     </div>
                     <div class="col-md-4 text-end">
                         <a href="{{route('roles.updateRole')}}" class="btn btn-back float-right">

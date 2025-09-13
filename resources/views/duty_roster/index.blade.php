@@ -473,7 +473,7 @@
                     <h4 class="header-title text-white">
                         <i class="fas fa-calendar-check me-2"></i> Duty Roster Management
                     </h4>
-                    <p class="mb-0 text-white-50"> Manage teacher duty assignments and schedules</p>
+                    <p class="mb-0 text-white"> Manage teacher duty assignments and schedules</p>
                 </div>
             </div>
             <i class="fas fa-clipboard-list floating-icons"></i>

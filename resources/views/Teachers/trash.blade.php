@@ -308,7 +308,7 @@
                         <h4 class="header-title text-white">
                             <i class="fas fa-trash-alt me-2"></i> Deleted Teachers Accounts
                         </h4>
-                        <p class="mb-0 text-white-50">Manage deleted teacher accounts and restore access</p>
+                        <p class="mb-0 text-white">Manage deleted teacher accounts and restore access</p>
                     </div>
                     <div class="col-md-4 text-end">
                         <div class="dropdown-container">
@@ -398,11 +398,10 @@
                                                     <li>
                                                         <form action="{{route('update.teacher.status', ['teacher' => Hashids::encode($teacher->id)])}}"
                                                               method="POST"
-                                                              class="d-inline"
-                                                              onsubmit="return confirmAction('Block', '{{$teacher->first_name}}', '{{$teacher->last_name}}')">
+                                                              class="d-inline">
                                                             @csrf
                                                             @method('PUT')
-                                                            <button type="submit" class="action-btn action-btn-danger" title="Block Teacher">
+                                                            <button type="submit" class="action-btn action-btn-danger" onclick="return confirm('Block', '{{$teacher->first_name}}', '{{$teacher->last_name}}')" title="Block Teacher">
                                                                 <i class="fas fa-ban"></i>
                                                             </button>
                                                         </form>
@@ -411,11 +410,10 @@
                                                     <li>
                                                         <form action="{{route('teachers.restore', ['teacher' => Hashids::encode($teacher->id)])}}"
                                                               method="POST"
-                                                              class="d-inline"
-                                                              onsubmit="return confirmAction('Restore', '{{$teacher->first_name}}', '{{$teacher->last_name}}')">
+                                                              class="d-inline">
                                                             @csrf
                                                             @method('PUT')
-                                                            <button type="submit" class="action-btn action-btn-success" title="Restore Teacher">
+                                                            <button type="submit" class="action-btn action-btn-success" onclick="return confirm('Restore', '{{$teacher->first_name}}', '{{$teacher->last_name}}')" title="Restore Teacher">
                                                                 <i class="fas fa-undo"></i>
                                                             </button>
                                                         </form>

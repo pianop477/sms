@@ -240,7 +240,7 @@
                         <h4 class="header-title text-white">
                             <i class="fas fa-users me-2"></i> All System Users
                         </h4>
-                        <p class="mb-0 text-white-50"> Manage user accounts and reset passwords</p>
+                        <p class="mb-0 text-white"> Manage user accounts and reset passwords</p>
                     </div>
                 </div>
                 <i class="fas fa-user-gear floating-icons"></i>

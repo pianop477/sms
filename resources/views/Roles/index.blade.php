@@ -273,7 +273,7 @@
                         <h4 class="header-title text-white">
                             <i class="fas fa-user-shield me-2"></i> Roles & Permissions Management
                         </h4>
-                        <p class="mb-0 text-white-50"> Manage user roles and permissions across the system</p>
+                        <p class="mb-0 text-white"> Manage user roles and permissions across the system</p>
                     </div>
                 </div>
                 <i class="fas fa-lock floating-icons"></i>
