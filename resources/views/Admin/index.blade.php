@@ -359,8 +359,8 @@
                     </button>
                 </div>
 
-                <div class="table-responsive">
-                    <table class="modern-table table-responsive-md">
+                <div class="table-responsive p-3">
+                    <table class="modern-table table-responsive-md" id="myTable">
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -545,10 +545,10 @@
 
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
-                                    <i class="fas fa-times me-2"></i>Close
+                                    <i class="fas fa-times me-2"></i> Close
                                 </button>
                                 <button type="submit" id="saveButton" class="btn btn-success">
-                                    <i class="fas fa-save me-2"></i>Save Admin
+                                    <i class="fas fa-save me-2"></i> Save Admin
                                 </button>
                             </div>
                         </form>

@@ -357,7 +357,7 @@
         </div>
 
         <!-- Registration Form -->
-        <div class="glass-card form-section fade-in">
+        <div class="glass-card form-section fade-in p-3">
             <h4 class="text-primary mb-4">
                 <i class="fas fa-info-circle me-2"></i>School Information
             </h4>
@@ -546,7 +546,7 @@
 
                 <div class="text-center mt-4">
                     <button class="btn btn-modern btn-lg" id="saveButton" type="submit">
-                        <i class="fas fa-plus me-2"></i>Register School
+                        <i class="fas fa-plus me-2"></i> Register School
                     </button>
                 </div>
             </form>
@@ -558,8 +558,8 @@
                 <i class="fas fa-list me-2"></i>Registered Institutions
             </h4>
 
-            <div class="table-responsive">
-                <table class="modern-table table-responsive-md">
+            <div class="table-responsive p-3">
+                <table class="modern-table table-responsive-md" id="myTable">
                     <thead>
                         <tr>
                             <th>#</th>

@@ -268,7 +268,7 @@
             <div class="row align-items-center">
                 <div class="col-md-8">
                     <h1 class="display-5 fw-bold mb-2">🛡️ Security Monitor</h1>
-                    <p class="lead mb-0 opacity-90 text-white">Failed Login Attempts Tracking</p>
+                    <p class="lead mb-0 opacity-90 text-white"> Failed Login Attempts Tracking</p>
                 </div>
                 <div class="col-md-4 text-md-end">
                     <div class="stats-badge">
@@ -322,8 +322,8 @@
                     </button>
                 </div>
 
-                <div class="table-responsive">
-                    <table class="modern-table table-responsive-md">
+                <div class="table-responsive p-3">
+                    <table class="modern-table table-responsive-md" id="myTable">
                         <thead>
                             <tr>
                                 <th>#</th>
