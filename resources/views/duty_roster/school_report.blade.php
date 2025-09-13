@@ -28,11 +28,11 @@
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
-            padding: 20px;
+            /* padding: 20px; */
         }
 
         .dashboard-container {
-            max-width: 1400px;
+            /* max-width: 1400px; */
             margin: 0 auto;
         }
 
