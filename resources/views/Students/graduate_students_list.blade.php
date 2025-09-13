@@ -309,7 +309,7 @@
                         <h4 class="header-title text-white">
                             <i class="fas fa-graduation-cap me-2"></i> Graduate Students Batches
                         </h4>
-                        <p class="mb-0 text-white-50"> View and manage graduation batches</p>
+                        <p class="mb-0 text-white"> Manage graduation batches</p>
                     </div>
                 </div>
                 <i class="fas fa-users-graduate floating-icons"></i>

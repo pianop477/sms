@@ -254,7 +254,7 @@
                         <h4 class="header-title text-white">
                             <i class="fas fa-user-edit me-2"></i> Edit Driver & Bus Information
                         </h4>
-                        <p class="mb-0 text-white-50"> Update driver details and bus information</p>
+                        <p class="mb-0 text-white"> Update driver details and bus information</p>
                     </div>
                     <div class="col-md-4 text-end">
                         <a href="{{route('Transportation.index')}}" class="btn btn-back float-right">

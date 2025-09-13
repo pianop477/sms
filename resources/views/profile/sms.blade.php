@@ -185,7 +185,7 @@
                     <h4 class="header-title text-white">
                         <i class="fas fa-bullhorn me-2"></i> Public Announcement SMS
                     </h4>
-                    <p class="mb-0 text-white-50">Send messages to parents and teachers</p>
+                    <p class="mb-0 text-white">Send messages to parents and teachers</p>
                 </div>
             </div>
             <i class="fas fa-comment-sms floating-icons"></i>

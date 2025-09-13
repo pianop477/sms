@@ -324,7 +324,7 @@
                         <h4 class="header-title text-white">
                             <i class="fas fa-user-graduate me-2"></i> Deleted Student Accounts
                         </h4>
-                        <p class="mb-0 text-white-50"> Manage deleted student accounts and restore access</p>
+                        <p class="mb-0 text-white"> Manage deleted students</p>
                     </div>
                     <div class="col-md-4 text-end">
                         <div class="dropdown-container">

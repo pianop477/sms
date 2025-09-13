@@ -333,7 +333,7 @@
                     <div class="card-header-custom">
                         <div class="row align-items-center">
                             <div class="col-10">
-                                <h4 class="header-title">
+                                <h4 class="header-title text-white">
                                     <i class="fas fa-calendar-alt me-2"></i> Packages by Year
                                 </h4>
                             </div>
@@ -376,7 +376,7 @@
                     <div class="card-header-custom">
                         <div class="row align-items-center">
                             <div class="col-9">
-                                <h4 class="header-title">
+                                <h4 class="header-title text-white">
                                     <i class="fas fa-history me-2"></i> Recent Holiday Packages
                                 </h4>
                             </div>

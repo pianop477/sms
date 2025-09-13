@@ -481,7 +481,7 @@
                         <h4 class="header-title text-white">
                             <i class="fas fa-bus me-2"></i> School Bus Management
                         </h4>
-                        <p class="mb-0 text-white-50">Manage bus routes and driver assignments</p>
+                        <p class="mb-0 text-white">Manage bus routes and driver assignments</p>
                     </div>
                     <div class="col-md-2 text-end">
                         <button type="button" class="btn btn-primary-custom" data-toggle="modal" data-target="#busModal">
