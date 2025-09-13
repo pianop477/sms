@@ -97,7 +97,7 @@
         .billed-to {
             background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(58, 12, 163, 0.1));
             border-radius: 16px;
-            padding: 4px;
+            padding: 2px;
             border: 2px solid rgba(67, 97, 238, 0.2);
         }
 
@@ -152,7 +152,7 @@
             background: linear-gradient(135deg, var(--success), #0f9d58);
             border: none;
             border-radius: 16px;
-            padding: 6px 8px;
+            padding: 10px 15px;
             color: white;
             font-weight: 600;
             transition: all 0.4s ease;
@@ -253,6 +253,75 @@
             }
         }
 
+        @media print {
+
+            @page {
+                margin: 6mm;
+            }
+            .btn-print, .btn-modern {
+                display: none;
+            }
+            .dashboard-container {
+                padding: 0;
+            }
+            body {
+                color: black;
+                font-size: 12px;
+                background: white;
+                font-family: 'Arial', 'Helvetica', 'sans-serif';
+            }
+
+            .invoice-table {
+                color: black;
+                border: none;
+            }
+            .billed-to {
+                color: black;
+                border: none;
+                padding: 1px;
+            }
+
+            .payment-method {
+                border: none;
+                font-size: 11px;
+                color: black;
+            }
+
+            .badge {
+                color: black;
+                font-size: 12px;
+                border: none;
+            }
+
+            .glass-card {
+                font-size: 10px;
+                margin-top: 4px;
+            }
+            .invoice-header {
+                background: none;
+                color: black;
+                text-align: center;
+            }
+            .invoice-details {
+                background: none;
+                color: black;
+                box-shadow: none;
+            }
+            .form-control {
+                border: none;
+                color: black;
+            }
+
+             table {
+                border-collapse: collapse; /* ili borders zishikamane vizuri */
+                width: 100%;
+            }
+            table, th, td {
+                border: 1px solid black; /* border nyeusi ya 1px */
+            }
+
+        }
+
         @keyframes slideInRight {
             from {
                 opacity: 0;
@@ -308,7 +377,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Invoice Details -->
             <div class="invoice-details">
                 <div class="row">
@@ -356,7 +424,7 @@
                 <!-- Service Details -->
                 <div class="row mb-4">
                     <div class="col-12">
-                        <div class="bg-light p-4 rounded-3">
+                        <div class="bg-light p-2 rounded-3">
                             <h5 class="text-primary mb-3">
                                 <i class="fas fa-info-circle me-2"></i>Service Period
                             </h5>
@@ -437,8 +505,6 @@
                         <h4 class="text-primary text-center mb-4">
                             <i class="fas fa-credit-card me-2"></i>Payment Methods
                         </h4>
-                    </div>
-                    <div class="col-md-6">
                         <div class="payment-method">
                             <h5 class="text-primary mb-3">
                                 <i class="fas fa-university me-2"></i>Bank Transfer
@@ -447,8 +513,6 @@
                             <p class="mb-1"><strong>Account Number:</strong> 50510028891</p>
                             <p class="mb-0"><strong>Account Name:</strong> Frank Mathias Masaka</p>
                         </div>
-                    </div>
-                    <div class="col-md-6">
                         <div class="payment-method">
                             <h5 class="text-primary mb-3">
                                 <i class="fas fa-mobile-alt me-2"></i>Mobile Payment
@@ -459,7 +523,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Action Buttons -->
                 <div class="row mt-4">
                     <div class="col-12 text-center">
@@ -476,7 +539,7 @@
     </div>
 
     <!-- Footer -->
-    <div class="glass-card mt-4 p-3 text-center">
+    <div class="glass-card mt-2 p-2 text-center">
         <div class="row">
             <div class="col-md-6 text-start">
                 <small class="text-muted">
@@ -536,22 +599,7 @@
 
     <style>
         @media print {
-            .glass-card {
-                box-shadow: none;
-                border: 1px solid #ddd;
-            }
 
-            .btn-print, .btn-modern {
-                display: none;
-            }
-
-            body {
-                background: white;
-            }
-
-            .dashboard-container {
-                padding: 0;
-            }
         }
     </style>
 @endsection
