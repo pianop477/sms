@@ -553,15 +553,38 @@ class StudentsController extends Controller
             DB::beginTransaction();
 
             if ($request->class_id == 0) {
+                $graduatedStudents = Student::where('class_id', $classes->id)
+                    ->where('school_id', $user->school_id)
+                    ->get();
+
                 $updated = Student::where('class_id', $classes->id)
-                    ->where('school_id', $user->school_id) // Fix typo here
+                    ->where('school_id', $user->school_id)
                     ->update([
                         'graduated' => true,
                         'graduated_at' => $request->graduation_year,
-                        'status' => $request->class_id, // or whatever status value you want
+                        'status' => $request->class_id, // unaweza weka status unayotaka
                         'updated_at' => now()
                     ]);
-            } else {
+
+                // Cheki parents baada ya wanafunzi kugraduate
+                foreach ($graduatedStudents as $student) {
+                    $parentId = $student->parent_id;
+
+                    if ($parentId) {
+                        // angalia kama mzazi huyu bado ana mwanafunzi mwingine hajagraduate
+                        $stillHasStudent = Student::where('parent_id', $parentId)
+                            ->where('school_id', $user->school_id)
+                            ->where('graduated', false) // bado hajagraduate
+                            ->exists();
+
+                        if (!$stillHasStudent) {
+                            Parents::where('id', $parentId)
+                                ->update(['status' => 0]);
+                        }
+                    }
+                }
+            }
+            else {
                 // Promote to next class
                 $updated = Student::where('class_id', $classes->id)
                     ->where('school_id', $user->school_id)
@@ -659,14 +682,37 @@ class StudentsController extends Controller
         try {
             DB::beginTransaction();
 
-            // Update the students who graduated in the specified year
+            // Pata wanafunzi waliokuwa graduated kwa mwaka husika
+            $revertedStudents = Student::where('school_id', $user->school_id)
+                ->whereYear('graduated_at', $year)
+                ->get();
+
+            // Update wanafunzi kuwa active tena
             $updated = Student::where('school_id', $user->school_id)
                 ->whereYear('graduated_at', $year)
                 ->update([
                     'graduated' => false,
                     'graduated_at' => null,
-                    'status' => 1, // Set status to active
+                    'status' => 1, // active tena
+                    'updated_at' => now(),
                 ]);
+
+            // Angalia kila parent kama sasa anapaswa kurudishiwa status = 1
+            foreach ($revertedStudents as $student) {
+                $parentId = $student->parent_id;
+
+                if ($parentId) {
+                    $hasActiveStudent = Student::where('parent_id', $parentId)
+                        ->where('school_id', $user->school_id)
+                        ->where('graduated', false)
+                        ->exists();
+
+                    if ($hasActiveStudent) {
+                        Parents::where('id', $parentId)
+                            ->update(['status' => 1]);
+                    }
+                }
+            }
 
             DB::commit();
 
@@ -679,6 +725,7 @@ class StudentsController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Alert()->toast('An error occurred during the operation', 'error');
+            // Log::error("Revert error: " . $e->getMessage());
         }
 
         return back();
