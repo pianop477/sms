@@ -1245,7 +1245,7 @@ class StudentsController extends Controller
                                             ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
                                             ->select(
                                                 'class_learning_courses.*', 'grades.class_name', 'subjects.course_name', 'subjects.course_code',
-                                                'users.first_name', 'users.last_name', 'users.phone as teacher_phone', 'users.image'
+                                                'users.first_name', 'users.last_name', 'users.phone as teacher_phone', 'users.image', 'users.gender',
                                             )
                                             ->where('class_learning_courses.class_id', $class->id)
                                             ->where('class_learning_courses.school_id', $user->school_id)
@@ -1270,7 +1270,7 @@ class StudentsController extends Controller
                                     ->whereYear('year', date('Y'))
                                     ->orderBy('created_at', 'DESC')
                                     ->orderBy('updated_at', 'DESC')
-                                    ->take(5)
+                                    ->take(6)
                                     ->get();
         $studentPicture = $students->image;
         $imagePath = public_path('assets/img/students/' .$studentPicture);
