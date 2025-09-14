@@ -414,17 +414,20 @@
                                                     <td class="text-uppercase fw-bold">{{ $course->course_code }}</td>
                                                     <td>
                                                         <div class="d-flex align-items-center">
-                                                            @if (!empty($course->image) && file_exists(public_path('assets/img/profile/' . $course->image)))
-                                                                <img src="{{ asset('assets/img/profile/' . $course->image) }}"
+                                                            @php
+                                                                $imageName = $course->image;
+                                                                $imagePath = public_path('assets/img/profile/' . $imageName);
+
+                                                                if (!empty($imageName) && file_exists($imagePath)) {
+                                                                    $avatarImage = asset('assets/img/profile/' . $imageName);
+                                                                } else {
+                                                                    $avatarImage = asset('assets/img/profile/' . ($course->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                                                }
+                                                            @endphp
+                                                                <img src="{{ $avatarImage }}"
                                                                     alt="Teacher"
                                                                     class="rounded-circle me-3"
                                                                     style="width: 40px; height: 40px; object-fit: cover;">
-                                                            @else
-                                                                <div class="rounded-circle bg-secondary d-flex justify-content-center align-items-center me-3"
-                                                                    style="width: 40px; height: 40px;">
-                                                                    <i class="fas fa-user-tie text-white"></i>
-                                                                </div>
-                                                            @endif
                                                             <span class="text-capitalize">{{ ucwords(strtolower($course->first_name. ' '. $course->last_name)) }}</span>
                                                         </div>
                                                     </td>
@@ -452,14 +455,20 @@
                                     <div class="teacher-card">
                                         <div class="row">
                                             <div class="col-md-3 text-center">
-                                                @if ($classTeacher->image == NULL)
-                                                    <i class="fas fa-user-tie text-secondary" style="font-size: 4rem;"></i>
-                                                @else
-                                                    <img src="{{ asset('assets/img/profile/' . $classTeacher->image) }}"
+                                                @php
+                                                    $imageName = $course->image;
+                                                    $imagePath = public_path('assets/img/profile/' . $imageName);
+
+                                                    if (!empty($imageName) && file_exists($imagePath)) {
+                                                        $avatarImage = asset('assets/img/profile/' . $imageName);
+                                                    } else {
+                                                        $avatarImage = asset('assets/img/profile/' . ($course->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                                    }
+                                                @endphp
+                                                    <img src="{{ $avatarImage }}"
                                                         alt="Class Teacher"
                                                         class="img-fluid rounded"
                                                         style="max-width: 100px;">
-                                                @endif
                                             </div>
                                             <div class="col-md-9">
                                                 <div class="row">
@@ -571,7 +580,7 @@
                                                             @if ($item->is_active == true)
                                                                 <span class="badge-status bg-success text-white">Active</span>
                                                             @else
-                                                                <span class="badge-status bg-danger text-white">Inactive</span>
+                                                                <span class="badge-status bg-secondary text-white">Inactive</span>
                                                             @endif
                                                         </td>
                                                         <td>{{$item->release_date ?? 'N/A'}}</td>

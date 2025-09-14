@@ -470,6 +470,4 @@ class RolesController extends Controller
 
         return response()->json(['success' => true]);
     }
-
-
 }
