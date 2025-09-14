@@ -650,7 +650,8 @@ class StudentsController extends Controller
                                     ->where('students.graduated', true)
                                     ->where('students.status', 0)
                                     // ->whereYear('students.graduated_at', $graduationYears)
-                                    ->orderBy('students.first_name')
+                                    ->orderBy('students.gender', 'DESC')
+                                    ->orderBy('students.first_name', 'ASC')
                                     ->get();
 
         return view('Students.graduate_students_list', compact('GraduatedStudents', 'graduationYears'));
@@ -668,7 +669,8 @@ class StudentsController extends Controller
                                     ->where('students.graduated', true)
                                     ->where('students.status', 0)
                                     ->whereYear('students.graduated_at', $year)
-                                    ->orderBy('students.first_name')
+                                    ->orderBy('students.gender', 'DESC')
+                                    ->orderBy('students.first_name', 'ASC')
                                     ->get();
         $pdf = \PDF::loadView('Students.ExportedGraduates', compact('studentExport', 'year'));
         return $pdf->stream('Graduate_students_'.$year.'.pdf');
