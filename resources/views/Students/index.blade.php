@@ -287,7 +287,7 @@
                                                     <a href="{{route('manage.student.profile', ['student' => Hashids::encode($student->id)])}}" class="btn btn-sm btn-info" title="View">
                                                         <i class="ti-eye"></i>
                                                     </a>
-                                                    <a href="{{route('student.delete.permanent', ['student' => Hashids::encode($student->id)])}}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to block {{strtoupper($student->first_name)}} {{strtoupper($student->middle_name)}} {{strtoupper($student->last_name)}}?')" title="Trash">
+                                                    <a href="{{route('student.delete.permanent', ['student' => Hashids::encode($student->id)])}}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to block {{strtoupper($student->first_name)}} {{strtoupper($student->middle_name)}} {{strtoupper($student->last_name)}} Permanently?')" title="Delete">
                                                         <i class="ti-trash"></i>
                                                     </a>
                                                 </div>
