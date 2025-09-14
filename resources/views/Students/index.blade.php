@@ -287,12 +287,9 @@
                                                     <a href="{{route('manage.student.profile', ['student' => Hashids::encode($student->id)])}}" class="btn btn-sm btn-info" title="View">
                                                         <i class="ti-eye"></i>
                                                     </a>
-                                                    <form action="{{route('Students.destroy', ['student' => Hashids::encode($student->id)])}}" method="POST">
-                                                        @csrf
-                                                        <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to block {{strtoupper($student->first_name)}} {{strtoupper($student->middle_name)}} {{strtoupper($student->last_name)}}?')" title="Delete">
-                                                            <i class="ti-trash"></i>
-                                                        </button>
-                                                    </form>
+                                                    <a href="{{route('student.delete.permanent', ['student' => Hashids::encode($student->id)])}}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to block {{strtoupper($student->first_name)}} {{strtoupper($student->middle_name)}} {{strtoupper($student->last_name)}}?')" title="Trash">
+                                                        <i class="ti-trash"></i>
+                                                    </a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -356,7 +353,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title text-uppercase" id="addStudentModalLabel">{{$classId->class_name}} Student Registration</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn btn-danger" data-bs-dismiss="modal" aria-label="Close"> Close</button>
                 </div>
                 <div class="modal-body">
                     <form class="needs-validation" novalidate action="{{route('student.store', ['class' => Hashids::encode($classId->id)])}}" method="POST" enctype="multipart/form-data">
@@ -394,7 +391,7 @@
                                 <select name="parent" id="parentSelect" class="form-select" required>
                                     <option value="">Select Parent</option>
                                     @if ($parents->isEmpty())
-                                        <option value="" disabled class="text-danger">No parents records found</option>
+                                        <option value="" disabled class="text-danger">No parents records were found</option>
                                     @else
                                         @foreach ($parents as $parent)
                                             <option value="{{$parent->id}}">

@@ -114,15 +114,19 @@ class StudentsController extends Controller
 
             DB::beginTransaction();
             try {
-                // Check for existing student records
-                            $existingStudent = Student::whereRaw('LOWER(first_name) = ?', [strtolower($request->fname)])
-                            ->whereRaw('LOWER(middle_name) = ?', [strtolower($request->middle)])
-                            ->whereRaw('LOWER(last_name) = ?', [strtolower($request->lname)])
-                            ->where('school_id', $user->school_id)
-                            ->first();
+                $existingStudent = Student::whereRaw("
+                                    LOWER(TRIM(REPLACE(first_name, '  ', ' '))) = ?
+                                    AND LOWER(TRIM(REPLACE(middle_name, '  ', ' '))) = ?
+                                    AND LOWER(TRIM(REPLACE(last_name, '  ', ' '))) = ?
+                                    AND school_id = ?", [
+                                    strtolower(preg_replace('/\s+/', ' ', trim($request->fname))),
+                                    strtolower(preg_replace('/\s+/', ' ', trim($request->middle))),
+                                    strtolower(preg_replace('/\s+/', ' ', trim($request->lname))),
+                                    $user->school_id
+                                ])->first();
 
                 if ($existingStudent) {
-                Alert()->toast('Student with the same records already exists in our records', 'error');
+                Alert()->toast('Student with the same records already exists', 'error');
                 return back();
                 }
 
@@ -163,6 +167,15 @@ class StudentsController extends Controller
 
                 // Save the new student record
                 $student =  $new_student->save();
+
+                //check parent status after saving
+                $parent = Parents::where('id', $new_student->parent_id)->first();
+                // return $parent;
+
+                 // FIXED: Removed the return statement that was preventing the update
+                if($parent && $parent->status === 0) {
+                    $parent->update(['status' => 1]); // FIXED: Corrected the update syntax
+                }
 
                 DB::commit();
                 if($student) {
@@ -495,7 +508,7 @@ class StudentsController extends Controller
                             ->join('schools', 'schools.id', '=', 'parents.school_id')
                             ->select('parents.id', 'users.first_name', 'users.last_name', 'users.phone')
                             ->where('parents.school_id', '=', $user->school_id)
-                            ->where('parents.status', '=', 1)
+                            ->whereIn('parents.status', [0, 1])
                             ->orderBy('users.first_name', 'ASC')
                             ->get();
         $buses = Transport::where('school_id', '=', $user->school_id)->where('status', '=', 1)->orderBy('bus_no', 'ASC')->get();
@@ -873,6 +886,14 @@ class StudentsController extends Controller
 
             // Save the new student record
             $students->save();
+
+            $parent = Parents::where('id', $students->parent_id)->first();
+
+             // FIXED: Removed the return statement that was preventing the update
+            if($parent && $parent->status === 0) {
+                $parent->update(['status' => 1]); // FIXED: Corrected the update syntax
+            }
+
             DB::commit();
 
             // Return success message
