@@ -596,7 +596,7 @@
                                 <select name="teacher_ids[]" id="teacher_ids" style="text-transform: capitalize" class="form-control select2-multiple text-capitalize" multiple="multiple" required>
                                     @foreach($teachers as $teacher)
                                         <option value="{{ $teacher->id }}" {{ (collect(old('teacher_ids'))->contains($teacher->id)) ? 'selected' : '' }}>
-                                            {{ $teacher->first_name }} {{ $teacher->last_name }}
+                                            {{ ucwords(strtolower($teacher->first_name)) }} {{ ucwords(strtolower($teacher->last_name)) }}
                                         </option>
                                     @endforeach
                                 </select>
