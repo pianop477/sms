@@ -20,7 +20,7 @@
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
+        /* min-height: 100vh; */
         overflow-x: hidden;
     }
 
@@ -593,7 +593,7 @@
                                     <i class="fas fa-chalkboard-teacher text-primary"></i>
                                     Select Teacher(s) <span class="required-star">*</span>
                                 </label>
-                                <select name="teacher_ids[]" id="teacher_ids" class="form-control select2-multiple text-capitalize" multiple="multiple" required>
+                                <select name="teacher_ids[]" id="teacher_ids" style="text-transform: capitalize" class="form-control select2-multiple text-capitalize" multiple="multiple" required>
                                     @foreach($teachers as $teacher)
                                         <option value="{{ $teacher->id }}" {{ (collect(old('teacher_ids'))->contains($teacher->id)) ? 'selected' : '' }}>
                                             {{ $teacher->first_name }} {{ $teacher->last_name }}
