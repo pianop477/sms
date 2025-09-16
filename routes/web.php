@@ -261,9 +261,6 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         // roster management routes
         Route::get('Teachers-roster', [TodRosterController::class, 'index'])->name('tod.roster.index');
 
-        // Manage school bus modification
-        Route::get('{trans}/Transport-Edit', [TransportController::class, 'Edit'])->name('transport.edit');
-        Route::put('{transport}/Update', [TransportController::class, 'UpdateRecords'])->name('transport.update.records');
     });
 
     // 2. ROUTE ACCESS FOR EITHER MANAGER OR HEAD TEACHER ONLY ===========================================================================
@@ -278,13 +275,15 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         //school bus management
         Route::get('{trans}/Student-tranport', [TransportController::class, 'showStudents'])->name('students.transport');
         // Route::resource('Transportation', TransportController::class);
-        Route::get('Transport', [TransportController::class, 'getSchoolBuses'])->name('Transportation.index');
-        Route::post('Register-transport', [TransportController::class, 'registerDrivers'])->name('Transportation.store');
-        Route::put('{trans}/Transport-block', [TransportController::class, 'update'])->name('transport.update');
-        Route::put('{trans}/Transport-unblock', [TransportController::class, 'restore'])->name('transport.restore');
-        Route::get('{trans}/Delete-permanent', [TransportController::class, 'destroy'])->name('transport.remove');
-        Route::get('{trans}/Export-transport', [TransportController::class, 'export'])->name('transport.export');
-        Route::post('Update/transport/batch', [TransportController::class, 'transferStudentBus'])->name('update.transport.batch');
+        Route::get('Transport/index', [TransportController::class, 'getSchoolBuses'])->name('Transportation.index');
+        Route::post('Transport/register', [TransportController::class, 'registerDrivers'])->name('Transportation.store');
+        Route::put('{trans}/Transport/block', [TransportController::class, 'Block'])->name('transport.block');
+        Route::put('{trans}/Transport/unblock', [TransportController::class, 'restore'])->name('transport.restore');
+        Route::get('{trans}/Transport/delete', [TransportController::class, 'destroy'])->name('transport.remove');
+        Route::get('{trans}/Transport/export', [TransportController::class, 'export'])->name('transport.export');
+        Route::get('{trans}/Transport/edit', [TransportController::class, 'Edit'])->name('transport.edit');
+        Route::put('{transport}/Transport/update', [TransportController::class, 'Update'])->name('transport.update');
+        Route::post('Transport/shift/batch', [TransportController::class, 'transferStudentBus'])->name('update.transport.batch');
 
         //roles and permission management
         Route::get('Update-roles', [RolesController::class, 'updateRoles'])->name('roles.updateRole');

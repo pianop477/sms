@@ -563,7 +563,7 @@
                                                         </a>
                                                     </li>
                                                     <li>
-                                                        <form action="{{route('transport.update', ['trans' => Hashids::encode($trans->id)])}}" method="POST" class="d-inline">
+                                                        <form action="{{route('transport.block', ['trans' => Hashids::encode($trans->id)])}}" method="POST" class="d-inline">
                                                             @csrf
                                                             @method('PUT')
                                                             <button type="submit" class="btn btn-danger-custom" onclick="return confirm('Are you sure you want to block this bus route?')">
