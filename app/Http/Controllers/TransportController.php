@@ -185,7 +185,7 @@ class TransportController extends Controller
             'fullname' => 'required|string|max:255',
             'gender' => 'required|string|max:255',
             'phone' => 'required|regex:/^[0-9]{10}$/|unique:transports,phone,'.$trans->phone,
-            'bus_no' => 'required|string|max|255',
+            'bus_no' => 'required|string|max:255',
             'routine' => 'required|string|max:255'
         ], [
             'fullname.required' => 'Driver name is required',
