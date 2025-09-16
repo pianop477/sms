@@ -260,6 +260,10 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
 
         // roster management routes
         Route::get('Teachers-roster', [TodRosterController::class, 'index'])->name('tod.roster.index');
+
+        // Manage school bus modification
+        Route::get('{trans}/Transport-Edit', [TransportController::class, 'Edit'])->name('transport.edit');
+        Route::put('{transport}/Update', [TransportController::class, 'UpdateRecords'])->name('transport.update.records');
     });
 
     // 2. ROUTE ACCESS FOR EITHER MANAGER OR HEAD TEACHER ONLY ===========================================================================
@@ -279,8 +283,6 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::put('{trans}/Transport-block', [TransportController::class, 'update'])->name('transport.update');
         Route::put('{trans}/Transport-unblock', [TransportController::class, 'restore'])->name('transport.restore');
         Route::get('{trans}/Delete-permanent', [TransportController::class, 'destroy'])->name('transport.remove');
-        Route::get('{trans}/Transport-Edit', [TransportController::class, 'Edit'])->name('transport.edit');
-        Route::put('{transport}/Update', [TransportController::class, 'UpdateRecords'])->name('transport.update.records');
         Route::get('{trans}/Export-transport', [TransportController::class, 'export'])->name('transport.export');
         Route::post('Update/transport/batch', [TransportController::class, 'transferStudentBus'])->name('update.transport.batch');
 
