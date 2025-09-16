@@ -184,7 +184,7 @@ class TransportController extends Controller
         $request->validate([
             'fullname' => 'required|string|max:255',
             'gender' => 'required|string|max:255',
-            'phone' => 'required|regex:/^[0-9]{10}$/|unique:transports,phone,'.$trans->phone,
+            'phone' => 'required|regex:/^[0-9]{10}$/|unique:transports,phone,'.$trans->id,
             'bus_no' => 'required|string|max:255',
             'routine' => 'required|string|max:255'
         ], [
