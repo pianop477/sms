@@ -90,7 +90,7 @@ class TransportController extends Controller
         //
     }
 
-    public function update(Request $request, $trans)
+    public function Block(Request $request, $trans)
     {
         //
         $id = Hashids::decode($trans);
@@ -177,7 +177,7 @@ class TransportController extends Controller
         return view('Transport.Edit', ['transport' => $transport, 'buses' => $allBuses]);
     }
 
-    public function UpdateRecords(Request $request, $transport)
+    public function Update(Request $request, $transport)
     {
         $id = Hashids::decode($transport);
         $trans = Transport::findOrFail($id[0]);

@@ -304,7 +304,7 @@
                 </div>
 
                 <!-- Edit Form -->
-                <form class="needs-validation" novalidate action="{{route('transport.update.records', ['transport' => Hashids::encode($transport->id)])}}" method="POST" enctype="multipart/form-data" id="editForm">
+                <form class="needs-validation" novalidate action="{{route('transport.update', ['transport' => Hashids::encode($transport->id)])}}" method="POST" enctype="multipart/form-data" id="editForm">
                     @csrf
                     @method('PUT')
                     <div class="form-section">
