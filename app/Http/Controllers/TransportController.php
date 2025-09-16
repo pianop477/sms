@@ -168,12 +168,13 @@ class TransportController extends Controller
         $id = Hashids::decode($trans);
         $user = Auth::user();
         $transport = Transport::findOrFail($id[0]);
+        $allBuses = Transport::where('school_id', $user->school_id)->orderBy('bus_no')->get();
 
         if($transport->school_id != $user->school_id) {
             Alert()->toast('You are not authorized to perform this action', 'error');
             return back();
         }
-        return view('Transport.Edit', ['transport' => $transport]);
+        return view('Transport.Edit', ['transport' => $transport, 'buses' => $allBuses]);
     }
 
     public function UpdateRecords(Request $request, $transport)
