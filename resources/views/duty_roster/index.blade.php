@@ -40,7 +40,7 @@
         color: white;
         padding: 25px 30px;
         position: relative;
-        overflow-x: hidden;
+        overflow: hidden;
         /* z-index: 100; */
     }
 
