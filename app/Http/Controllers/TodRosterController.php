@@ -109,13 +109,22 @@ class TodRosterController extends Controller
 
     public function activate($id)
     {
-
         try {
             $roster = TodRoster::findOrFail($id);
+
+            // ✅ Check if any roster in the table is already active
+            $alreadyActive = TodRoster::where('status', 'active')->exists();
+
+            if ($alreadyActive) {
+                Alert()->toast('There is active roster, deactivate it first', 'warning');
+                return redirect()->route('tod.roster.index');
+            }
+
+            // ✅ Since no active roster exists, activate all with the same roster_id
             $rosterId = $roster->roster_id;
             $allRostersWithSameId = TodRoster::where('roster_id', $rosterId)->get();
+
             foreach ($allRostersWithSameId as $row) {
-                // Update each roster with the same roster_id
                 $row->status = 'active';
                 $row->updated_by = Auth::user()->first_name . ' ' . Auth::user()->last_name;
                 $row->save();
@@ -128,6 +137,7 @@ class TodRosterController extends Controller
 
         return redirect()->route('tod.roster.index');
     }
+
 
     public function create()
     {
@@ -572,6 +582,5 @@ class TodRosterController extends Controller
 
         return view('duty_roster.general_report', compact('reportsWithAttendance'));
     }
-
 
 }
