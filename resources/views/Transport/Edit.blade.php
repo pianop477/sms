@@ -372,25 +372,9 @@
                                     <i class="fas fa-bus-alt text-primary"></i>
                                     School Bus Number <span class="required-star">*</span>
                                 </label>
-                                <select name="bus_no" id="bus_no" class="form-control-custom" required>
-                                    <option value="{{ $transport->bus_no }}" selected>
-                                        BUS #{{ ucfirst($transport->bus_no) }}
-                                    </option>
-
-                                    @if ($buses->isEmpty())
-                                        <option value="">No Buses were found</option>
-                                    @else
-                                        @foreach ($buses as $bus)
-                                            <option value="{{ $bus->bus_no }}"
-                                                {{ old('bus_no') == $bus->bus_no ? 'selected' : '' }}>
-                                                BUS #{{ $bus->bus_no }}
-                                            </option>
-                                        @endforeach
-                                    @endif
-                                </select>
-
+                                <input type="text" name="bus_no" id="bus_no" class="form-control-custom" value="{{$transport->bus_no}}" required>
                                 <div class="invalid-feedback">
-                                    Please Select bus number
+                                    Please Provide bus number
                                 </div>
                                 @error('bus_no')
                                 <div class="text-danger small">{{ $message }}</div>
