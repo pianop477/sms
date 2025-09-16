@@ -372,7 +372,7 @@
                                         <td>
                                             <div class="student-info">
                                                 <div class="student-avatar text-capitalize">
-                                                    {{ substr($student->first_name, 0, 1) }}{{ substr($student->last_name, 0, 1) }}
+                                                    {{ ucwords(strtolower(substr($student->first_name, 0, 1))) }}{{ ucwords(strtolower(substr($student->last_name, 0, 1))) }}
                                                 </div>
                                                 <div>
                                                     <div class="text-capitalize fw-bold">
