@@ -282,8 +282,8 @@
             <div class="card-body">
                 <div class="table-container">
                     <div class="table-responsive">
-                        <table class="table table-custom table-responsive-md" id="myTable">
-                            <thead class="table-dark">
+                        <table class="table table-custom table-responsive-md">
+                            <thead class="">
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Teacher's Name</th>
