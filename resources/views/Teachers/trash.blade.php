@@ -363,7 +363,7 @@
                                                 </div>
                                                 <div>
                                                     <div class="text-capitalize fw-bold">{{ucwords(strtolower($teacher->first_name. ' '. $teacher->last_name))}}</div>
-                                                    <small class="text-muted">ID: {{$teacher->id}}</small>
+                                                    <small class="text-muted">ID: {{strtoupper($teacher->member_id)}}</small>
                                                 </div>
                                             </div>
                                         </td>

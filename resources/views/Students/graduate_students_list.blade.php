@@ -380,10 +380,10 @@
                                                             <tr>
                                                                 <td>{{ $key+1 }}</td>
                                                                 <td class="text-uppercase">{{ $s->admission_number }}</td>
-                                                                <td class="text-capitalize">{{ $s->first_name }}</td>
-                                                                <td class="text-capitalize">{{ $s->middle_name }}</td>
-                                                                <td class="text-capitalize">{{ $s->last_name }}</td>
-                                                                <td class="text-capitalize">{{ $s->gender }}</td>
+                                                                <td class="text-capitalize">{{ ucwords(strtolower($s->first_name)) }}</td>
+                                                                <td class="text-capitalize">{{ ucwords(strtolower($s->middle_name)) }}</td>
+                                                                <td class="text-capitalize">{{ ucwords(strtolower($s->last_name)) }}</td>
+                                                                <td class="text-capitalize">{{ ucwords(strtolower($s->gender)) }}</td>
                                                                 <td>
                                                                     <span class="badge-success-custom">Graduated</span>
                                                                 </td>

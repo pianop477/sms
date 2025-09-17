@@ -247,8 +247,8 @@
                                  src="{{ $student->image ? public_path('assets/img/students/'.$student->image) : public_path('assets/img/students/student.jpg') }}"
                                  alt="Student Photo">
                         </td>
-                        <td class="text-uppercase text-center">{{ $student->admission_number }}</td>
-                        <td class="text-uppercase text-center">{{ $student->gender }}</td>
+                        <td class="text-uppercase text-center">{{ strtoupper($student->admission_number) }}</td>
+                        <td class="text-uppercase text-center">{{ ucwords(strtolower($student->gender)) }}</td>
                         <td class="text-capitalize">{{ ucwords(strtolower($student->first_name.' '.$student->middle_name.' '.$student->last_name)) }}</td>
                         <td class="text-center">
                             <span class="status-badge status-graduated">GRADUATED</span>
