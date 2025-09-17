@@ -361,7 +361,7 @@ class RolesController extends Controller
                                 ->where('teachers.school_id', Auth::user()->school_id)
                                 ->where('teachers.status', 1)
                                 ->orderBy('users.first_name')
-                                ->paginate(6);
+                                ->paginate();
         $roles = Role::where('role_name', '!=', 'class teacher')->where('role_name', '!=', 'teacher')->orderBy('role_name')->get();
         $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
                                     ->select(
