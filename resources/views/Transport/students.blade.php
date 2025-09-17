@@ -402,7 +402,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="new_bus" class="form-label">
                                     <i class="fas fa-exchange-alt text-primary"></i>
-                                    Transfer Students to New Bus <span class="required-star">*</span>
+                                    Transfer Students routine <span class="required-star">*</span>
                                 </label>
                                 <select name="new_bus" id="new_bus" class="form-control-custom text-capitalize" required>
                                     <option value="">-- Select School Bus --</option>
@@ -493,7 +493,7 @@
                                                     </td>
                                                     <td class="text-uppercase">{{$student->group}}</td>
                                                     <td>{{$student->parent_phone ?? 'N/A'}}</td>
-                                                    <td class="text-capitalize">{{$student->address ?? 'N/A'}}</td>
+                                                    <td class="text-capitalize">{{ucwords(strtolower($student->address)) ?? 'N/A'}}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
