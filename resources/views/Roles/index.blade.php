@@ -300,11 +300,11 @@
                                         <td>
                                             <div class="user-info">
                                                 <div class="user-avatar text-capitalize">
-                                                    {{ substr($user->first_name, 0, 1) }}{{ substr($user->last_name, 0, 1) }}
+                                                    {{ ucwords(strtolower(substr($user->first_name, 0, 1))) }}{{ ucwords(strtolower(substr($user->last_name, 0, 1))) }}
                                                 </div>
                                                 <div>
-                                                    <div class="text-capitalize fw-bold">{{$user->first_name}} {{$user->last_name}}</div>
-                                                    <small class="text-muted">{{$user->email ?? 'No email'}}</small>
+                                                    <div class="text-capitalize fw-bold">{{ucwords(strtolower($user->first_name))}} {{ucwords(strtolower($user->last_name))}}</div>
+                                                    <small class="text-muted">{{strtolower($user->email) ?? 'No email'}}</small>
                                                 </div>
                                             </div>
                                         </td>
