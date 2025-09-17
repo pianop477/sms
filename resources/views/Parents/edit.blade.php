@@ -283,7 +283,7 @@
                                         <div class="student-card">
                                             <p class="mb-1"><strong>Admission Number:</strong> <span class="text-uppercase">{{$student->admission_number}}</span></p>
                                             <p class="mb-1"><strong>Name:</strong>
-                                                <a href="{{route('Students.show', ['student' => Hashids::encode($student->id)])}}" class="text-decoration-none">
+                                                <a href="{{route('manage.student.profile', ['student' => Hashids::encode($student->id)])}}" class="text-decoration-none">
                                                     {{$student->first_name}} {{$student->middle_name}} {{$student->last_name}}
                                                 </a>
                                             </p>
