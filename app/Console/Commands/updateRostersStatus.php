@@ -104,14 +104,21 @@ class updateRostersStatus extends Command
             $phone   = $teacher->phone;
             $message = "Habari {$teacher->name}. Zamu yako imeanza leo {$roster->start_date} na itaisha {$roster->end_date}. Uwajibikaji mwema!";
 
-            $school         = School::findOrFail($teacher->school_id);
+            $school = school::findOrFail($teacher->school_id);
             $nextSmsService = new NextSmsService();
 
-            $nextSmsService->sendSmsByNext(
-                $school->sender_id,
-                $this->formatPhoneNumber($phone),
-                $message,
-                $roster->roster_id // id ya kumbukumbu
+            $payload = [
+                'from' => $school->sender_id,
+                'to' => $this->formatPhoneNumber($phone),
+                'text' => $message,
+                'reference' => $roster->roster_id,
+            ];
+
+            $response = $nextSmsService->sendSmsByNext(
+                $payload['from'],
+                $payload['to'],
+                $payload['text'],
+                $payload['reference'],
             );
 
             $this->info("SMS ya kuanza imetumwa kwa {$phone}");
