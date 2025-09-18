@@ -70,8 +70,8 @@ class TodRosterController extends Controller
                             ->join('teachers', 'teachers.id', '=', 'tod_rosters.teacher_id')
                             ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
                             ->select('tod_rosters.*', 'users.first_name', 'users.last_name', 'users.email', 'teachers.id as teacher_id')
-                            ->orderBy('tod_rosters.start_date', 'ASC')
                             ->orderBy('tod_rosters.updated_at', 'DESC')
+                            ->orderBy('tod_rosters.start_date', 'DESC')
                             ->get()
                             ->groupBy('start_date');
         // return $rosters;
