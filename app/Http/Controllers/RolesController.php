@@ -37,9 +37,7 @@ class RolesController extends Controller
                                     ->where('teachers.status', '=', 1)
                                     ->where('users.status', '=', 1)
                                     ->where('teachers.school_id', '=', Auth::user()->school_id)
-                                    ->where('role_id', '!=', 2)
-                                    ->where('role_id', '!=', 3)
-                                    ->where('role_id', '!=', 4)
+                                    ->whereNotIn('role_id', [2,3,4])
                                     ->orderBy('users.first_name')
                                     ->get();
 
@@ -291,7 +289,7 @@ class RolesController extends Controller
                                     ->where('role_id', '=', 3)
                                     ->exists();
         if($ifTeacherHasRole) {
-            Alert()->toast('Selected teacher has been assigned another role, cannot be a class teacher', 'error');
+            Alert()->toast('Failed to assign this role because has another role', 'error');
             return back();
         }
 
@@ -316,7 +314,7 @@ class RolesController extends Controller
         }
 
         Alert()->toast('Class teacher Changed successfully', 'success');
-        return redirect()->route('Class.Teachers', $class_teacher->class_id);
+        return redirect()->route('Class.Teachers', ['class' => Hashids::encode($class_teacher->class_id)]);
     }
 
     /**
