@@ -508,8 +508,8 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td class="fw-bold text-uppercase">{{ $firstRoster->roster_id }}</td>
-                                        <td>{{ $firstRoster->start_date ?? "N/A" }}</td>
-                                        <td>{{ $firstRoster->end_date ?? "N/A" }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($firstRoster->start_date)->format('d-m-Y') ?? "N/A" }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($firstRoster->end_date)->format('d-m-Y') ?? "N/A" }}</td>
                                         <td class="text-capitalize">{{ $firstRoster->created_by ?? 'N/A' }}</td>
                                         <td>
                                             @if ($firstRoster->status == 'active')
@@ -672,11 +672,11 @@
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <p><strong><i class="fas fa-calendar-start text-primary me-2"></i> Start Date:</strong>
-                            <span class="text-danger">{{ $firstRoster->start_date ?? 'N/A' }}</span></p>
+                            <span class="text-danger">{{ \Carbon\Carbon::parse($firstRoster->start_date)->format('d-m-Y') ?? 'N/A' }}</span></p>
                         </div>
                         <div class="col-md-6">
                             <p><strong><i class="fas fa-calendar-day text-primary me-2"></i> End Date:</strong>
-                            <span class="text-danger">{{ $firstRoster->end_date ?? 'N/A' }}</span></p>
+                            <span class="text-danger">{{ \Carbon\Carbon::parse($firstRoster->end_date)->format('d-m-Y') ?? 'N/A' }}</span></p>
                         </div>
                     </div>
 
