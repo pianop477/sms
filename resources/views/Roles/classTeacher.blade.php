@@ -206,7 +206,7 @@
                         <div class="row">
                             <div class="col-md-12 mb-3">
                                 <label for="teacherSelect" class="form-label">Teacher's Name</label>
-                                <select name="teacher" id="teacherSelect" class="form-control select2" required>
+                                <select name="teacher" id="teacherSelect" class="form-control select2" style="width: 100%;" required>
                                     <option value="">-- Select Class Teacher --</option>
                                     @if ($teachers->isEmpty())
                                         <option value="" class="text-danger" disabled>No teachers found</option>
