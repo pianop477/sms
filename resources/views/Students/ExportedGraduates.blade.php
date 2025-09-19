@@ -248,9 +248,9 @@
                                 $imagePath = public_path('assets/img/students/' . $imageName);
 
                                 if (!empty($imageName) && file_exists($imagePath)) {
-                                    $avatarImage = asset('assets/img/students/' . $imageName);
+                                    $avatarImage = public_path('assets/img/students/' . $imageName);
                                 } else {
-                                    $avatarImage = asset('assets/img/students/student.jpg');
+                                    $avatarImage = public_path('assets/img/students/student.jpg');
                                 }
                             @endphp
                             <img class="student-photo" src="{{ $avatarImage }}" alt="Student Photo">
