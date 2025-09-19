@@ -108,16 +108,29 @@
             font-size: 16px;
             transition: all 0.3s;
             background-color: white;
+            width: 100%;
         }
 
         .form-control-custom:focus {
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
+            outline: none;
         }
 
         .form-control-custom:disabled {
             background-color: #f8f9fa;
             color: #6c757d;
+        }
+
+        select.form-control-custom {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%234e54c8' viewBox='0 0 16 16'%3E%3Cpath d='M8 12L2 6h12L8 12z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+            padding-right: 40px;
         }
 
         .invalid-feedback {
@@ -293,11 +306,11 @@
 
                             <!-- Teacher Selection -->
                             <div class="col-md-6 mb-4">
-                                <label for="teacher" class="form-label">
+                                <label for="teacherSelect" class="form-label">
                                     <i class="fas fa-user-tie text-primary"></i>
                                     Select Teacher <span class="required-star">*</span>
                                 </label>
-                                <select name="teacher" id="teacher" class="form-control-custom text-capitalize" required style="width: 100%;">
+                                <select name="teacher" id="teacherSelect" class="form-control-custom text-capitalize" required>
                                     <option value="{{$classTeacher->teacher_id}}" selected>{{$classTeacher->first_name}} {{$classTeacher->last_name}}</option>
                                     @if ($teachers->isEmpty())
                                         <option value="" class="text-danger" disabled>No teachers found</option>
@@ -331,7 +344,7 @@
         document.addEventListener("DOMContentLoaded", function () {
             const form = document.getElementById("classTeacherForm");
             const submitButton = document.getElementById("saveButton");
-            const teacherSelect = document.getElementById("teacher");
+            const teacherSelect = document.getElementById("teacherSelect");
 
             // Form validation
             (function() {
