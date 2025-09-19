@@ -243,9 +243,17 @@
                     <tr>
                         <td class="text-center">{{ $index + 1 }}</td>
                         <td class="text-center">
-                            <img class="student-photo"
-                                 src="{{ $student->image ? public_path('assets/img/students/'.$student->image) : public_path('assets/img/students/student.jpg') }}"
-                                 alt="Student Photo">
+                            @php
+                                $imageName = $student->image;
+                                $imagePath = public_path('assets/img/students/' . $imageName);
+
+                                if (!empty($imageName) && file_exists($imagePath)) {
+                                    $avatarImage = asset('assets/img/students/' . $imageName);
+                                } else {
+                                    $avatarImage = asset('assets/img/students/student.jpg');
+                                }
+                            @endphp
+                            <img class="student-photo" src="{{ $avatarImage }}" alt="Student Photo">
                         </td>
                         <td class="text-uppercase text-center">{{ strtoupper($student->admission_number) }}</td>
                         <td class="text-uppercase text-center">{{ ucwords(strtolower($student->gender)) }}</td>
