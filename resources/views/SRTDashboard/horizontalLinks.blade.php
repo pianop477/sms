@@ -47,10 +47,10 @@
                             <li>
                                 <a href="javascript:void(0)"><i class="fas fa-university"></i><span>Academic Management</span></a>
                                 <ul class="submenu">
-                                    <li><a href="{{route('Classes.index')}}"><i class="fas fa-chalkboard-teacher"></i> Class Management</a></li>
-                                    <li><a href="{{route('courses.index')}}"><i class="fas fa-book-open"></i> Course Management</a></li>
+                                    <li><a href="{{route('Classes.index')}}"><i class="fas fa-chalkboard-teacher"></i> Manage Classes</a></li>
+                                    <li><a href="{{route('courses.index')}}"><i class="fas fa-book-open"></i> Manage Courses</a></li>
                                     <li><a href="{{route('exams.index')}}"><i class="fas fa-clipboard-list"></i> Assessments</a></li>
-                                    <li><a href="{{route('results.general', ['school' => Hashids::encode(Auth::user()->school_id)])}}"><i class="fas fa-chart-bar"></i> Results</a></li>
+                                    <li><a href="{{route('results.general', ['school' => Hashids::encode(Auth::user()->school_id)])}}"><i class="fas fa-chart-bar"></i> Manage Results</a></li>
                                 </ul>
                             </li>
 
@@ -104,10 +104,10 @@
                             <li>
                                 <a href="javascript:void(0)"><i class="fas fa-university"></i><span>Academic Management</span></a>
                                 <ul class="submenu">
-                                    <li><a href="{{route('Classes.index')}}"><i class="fas fa-chalkboard-teacher"></i> Class Management</a></li>
-                                    <li><a href="{{route('courses.index')}}"><i class="fas fa-book-open"></i> Course Management</a></li>
+                                    <li><a href="{{route('Classes.index')}}"><i class="fas fa-chalkboard-teacher"></i> Manage Classes</a></li>
+                                    <li><a href="{{route('courses.index')}}"><i class="fas fa-book-open"></i> Manage Courses</a></li>
                                     <li><a href="{{route('exams.index')}}"><i class="fas fa-clipboard-list"></i> Assessments</a></li>
-                                    <li><a href="{{route('results.general', ['school' => Hashids::encode(Auth::user()->school_id)])}}"><i class="fas fa-chart-bar"></i> Results</a></li>
+                                    <li><a href="{{route('results.general', ['school' => Hashids::encode(Auth::user()->school_id)])}}"><i class="fas fa-chart-bar"></i> Manage Results</a></li>
                                 </ul>
                             </li>
 
