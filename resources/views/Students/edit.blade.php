@@ -97,6 +97,21 @@
             color: #495057 !important;
         }
 
+        .form-control-custom {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
+        }
+
         .select2-container--default .select2-selection--single .select2-selection__arrow {
             height: 36px !important;
         }
@@ -164,21 +179,21 @@
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label for="fname" class="form-label">First Name</label>
-                                    <input type="text" name="fname" class="form-control text-capitalize" id="fname" value="{{$students->first_name}}" required>
+                                    <input type="text" name="fname" class="form-control-custom text-capitalize" id="fname" value="{{$students->first_name}}" required>
                                     @error('fname')
                                         <div class="text-danger small mt-1">{{$message}}</div>
                                     @enderror
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="middle" class="form-label">Middle Name</label>
-                                    <input type="text" name="middle" class="form-control text-capitalize" id="middle" value="{{$students->middle_name}}" required>
+                                    <input type="text" name="middle" class="form-control-custom text-capitalize" id="middle" value="{{$students->middle_name}}" required>
                                     @error('middle')
                                         <div class="text-danger small mt-1">{{$message}}</div>
                                     @enderror
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="lname" class="form-label">Last Name</label>
-                                    <input type="text" name="lname" class="form-control text-capitalize" id="lname" value="{{$students->last_name}}" required>
+                                    <input type="text" name="lname" class="form-control-custom text-capitalize" id="lname" value="{{$students->last_name}}" required>
                                     @error('lname')
                                         <div class="text-danger small mt-1">{{$message}}</div>
                                     @enderror
@@ -188,7 +203,7 @@
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label for="gender" class="form-label">Gender</label>
-                                    <select name="gender" class="form-control text-capitalize" id="gender" required>
+                                    <select name="gender" class="form-control-custom text-capitalize" id="gender" required>
                                         <option value="{{$students->gender}}" selected>{{ucfirst($students->gender)}}</option>
                                         <option value="male">Male</option>
                                         <option value="female">Female</option>
@@ -199,14 +214,14 @@
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="dob" class="form-label">Date of Birth</label>
-                                    <input type="date" name="dob" class="form-control" id="dob" value="{{$students->dob}}" required min="{{\Carbon\Carbon::now()->subYears(17)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(2)->format('Y-m-d')}}">
+                                    <input type="date" name="dob" class="form-control-custom" id="dob" value="{{$students->dob}}" required min="{{\Carbon\Carbon::now()->subYears(17)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(2)->format('Y-m-d')}}">
                                     @error('dob')
                                         <div class="text-danger small mt-1">{{$message}}</div>
                                     @enderror
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="driver" class="form-label">Bus Number</label>
-                                    <select name="driver" id="driver" class="form-control text-capitalize">
+                                    <select name="driver" id="driver" class="form-control-custom text-capitalize">
                                         <option value="">-- Home Alone --</option>
                                         @if ($students->transport == NULL)
                                             @if ($buses->isEmpty())
@@ -235,7 +250,7 @@
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label for="parentSelect" class="form-label">Parent/Guardian</label>
-                                    <select name="parent" id="parentSelect" class="form-control select2 text-capitalize" required>
+                                    <select name="parent" id="parentSelect" class="form-control-custom select2 text-capitalize" required>
                                         <option value="{{$parents->parent_id}}" selected>{{ucwords(strtolower($parents->first_name))}} {{ucwords(strtolower($parents->last_name))}} - {{$parents->phone}}</option>
                                         @foreach ($allParents as $parent)
                                             <option value="{{$parent->parent_id}}">
@@ -249,7 +264,7 @@
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="class" class="form-label">Class</label>
-                                    <select name="class" id="class" class="form-control text-uppercase" required>
+                                    <select name="class" id="class" class="form-control-custom text-uppercase" required>
                                         <option value="{{$students->class_id}}">{{$students->class_name}}</option>
                                         @if ($classes->isEmpty())
                                             <option value="" class="text-danger">No classes found</option>
@@ -265,7 +280,7 @@
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="group" class="form-label">Stream</label>
-                                    <select name="group" id="group" required class="form-control">
+                                    <select name="group" id="group" required class="form-control-custom">
                                         <option value="{{$students->group}}" selected>Stream {{strtoupper($students->group)}}</option>
                                         <option value="a">Stream A</option>
                                         <option value="b">Stream B</option>
@@ -280,7 +295,7 @@
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label for="image" class="form-label">Profile Photo</label>
-                                    <input type="file" name="image" class="form-control" id="image" accept="image/*">
+                                    <input type="file" name="image" class="form-control-custom" id="image" accept="image/*">
                                     <div class="note-text">Maximum 1MB - Blue background recommended</div>
                                     @error('image')
                                     <div class="text-danger small mt-1">{{$message}}</div>

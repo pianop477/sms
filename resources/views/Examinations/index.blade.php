@@ -140,7 +140,7 @@
                                         <tr>
                                             <th scope="col">#</th>
                                             <th scope="col">Examination Type</th>
-                                            <th scope="col" class="text-center">Symbolic Abbreviation</th>
+                                            <th scope="col" class="text-center">Exam Code#</th>
                                             <th scope="col" class="text-center">Status</th>
                                             <th scope="col" class="text-center">Actions</th>
                                         </tr>
@@ -204,7 +204,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addExamModalLabel">Register Examination or Test</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn btn-danger" data-bs-dismiss="modal" aria-label="Close"> Close</button>
                 </div>
                 <div class="modal-body">
                     <form class="needs-validation" novalidate action="{{route('exams.store')}}" method="POST">

@@ -110,6 +110,20 @@
             color: var(--secondary-color);
             font-weight: 700;
         }
+        .form-control-custom {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
+        }
 
         @media (max-width: 768px) {
             .action-buttons {
@@ -156,7 +170,7 @@
                                         <tr>
                                             <th scope="col">#</th>
                                             <th scope="col">Class Name</th>
-                                            <th scope="col">Class Group</th>
+                                            <th scope="col">Stream</th>
                                             <th scope="col">Teacher Name</th>
                                             <th scope="col" class="text-center">Actions</th>
                                         </tr>
@@ -206,7 +220,7 @@
                         <div class="row">
                             <div class="col-md-12 mb-3">
                                 <label for="teacherSelect" class="form-label">Teacher's Name</label>
-                                <select name="teacher" id="teacherSelect" class="form-control select2" style="width: 100%;" required>
+                                <select name="teacher" id="teacherSelect" class="form-control-custom select2" style="width: 100%;" required>
                                     <option value="">-- Select Class Teacher --</option>
                                     @if ($teachers->isEmpty())
                                         <option value="" class="text-danger" disabled>No teachers found</option>
@@ -226,9 +240,9 @@
 
                         <div class="row">
                             <div class="col-md-12 mb-3">
-                                <label for="groupSelect" class="form-label">Class Group</label>
-                                <select name="group" id="groupSelect" class="form-control" required>
-                                    <option value="">-- Select Class Group --</option>
+                                <label for="groupSelect" class="form-label">Stream</label>
+                                <select name="group" id="groupSelect" class="form-control-custom " required>
+                                    <option value="">-- Select Stream --</option>
                                     <option value="A">Stream A</option>
                                     <option value="B">Stream B</option>
                                     <option value="C">Stream C</option>

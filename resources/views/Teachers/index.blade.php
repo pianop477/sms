@@ -107,6 +107,20 @@
             border-color: var(--primary-color);
             box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
         }
+        .form-control-custom {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
+        }
 
         .dropdown-menu {
             border-radius: 5px;
@@ -293,14 +307,14 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="fname" class="form-label">First Name</label>
-                                <input type="text" required name="fname" class="form-control" id="fname" placeholder="First name" value="{{old('fname')}}">
+                                <input type="text" required name="fname" class="form-control-custom" id="fname" placeholder="First name" value="{{old('fname')}}">
                                 @error('fname')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="lname" class="form-label">Other Names</label>
-                                <input type="text" required name="lname" class="form-control" id="lname" placeholder="Middle & Last name" value="{{old('lname')}}">
+                                <input type="text" required name="lname" class="form-control-custom" id="lname" placeholder="Middle & Last name" value="{{old('lname')}}">
                                 @error('lname')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror
@@ -312,7 +326,7 @@
                                 <label for="email" class="form-label">Email</label>
                                 <div class="input-group">
                                     <span class="input-group-text" id="emailPrefix">@</span>
-                                    <input type="email" name="email" class="form-control" id="email" placeholder="Email ID" value="{{old('email')}}">
+                                    <input type="email" name="email" class="form-control-custom" id="email" placeholder="Email ID" value="{{old('email')}}">
                                 </div>
                                 @error('email')
                                 <div class="text-danger small">{{$message}}</div>
@@ -320,7 +334,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="gender" class="form-label">Gender</label>
-                                <select name="gender" id="gender" class="form-control" required>
+                                <select name="gender" id="gender" class="form-control-custom" required>
                                     <option value="">-- select gender --</option>
                                     <option value="male">Male</option>
                                     <option value="female">Female</option>
@@ -334,14 +348,14 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="phone" class="form-label">Mobile Phone</label>
-                                <input type="text" required name="phone" class="form-control" id="phone" placeholder="Phone Number" value="{{old('phone')}}">
+                                <input type="text" required name="phone" class="form-control-custom" id="phone" placeholder="Phone Number" value="{{old('phone')}}">
                                 @error('phone')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="qualification" class="form-label">Qualification</label>
-                                <select name="qualification" id="qualification" class="form-control" required>
+                                <select name="qualification" id="qualification" class="form-control-custom" required>
                                     <option value="">-- Select Qualification --</option>
                                     <option value="1">Masters</option>
                                     <option value="2">Degree</option>
@@ -357,14 +371,14 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="dob" class="form-label">Date of Birth</label>
-                                <input type="date" required name="dob" class="form-control" id="dob" value="{{old('dob')}}" min="{{\Carbon\Carbon::now()->subYears(60)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(18)->format('Y-m-d')}}">
+                                <input type="date" required name="dob" class="form-control-custom" id="dob" value="{{old('dob')}}" min="{{\Carbon\Carbon::now()->subYears(60)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(18)->format('Y-m-d')}}">
                                 @error('dob')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="joined" class="form-label">Year Joined</label>
-                                <select name="joined" id="joined" class="form-control" required>
+                                <select name="joined" id="joined" class="form-control-custom" required>
                                     <option value="">-- Select Year --</option>
                                     @for ($year = date('Y'); $year >= 2010; $year--)
                                         <option value="{{ $year }}">{{ $year }}</option>
@@ -379,7 +393,7 @@
                         <div class="row">
                             <div class="col-md-12 mb-3">
                                 <label for="street" class="form-label">Street/Village</label>
-                                <input type="text" required name="street" class="form-control" id="street" value="{{old('street')}}" placeholder="Street Address">
+                                <input type="text" required name="street" class="form-control-custom" id="street" value="{{old('street')}}" placeholder="Street Address">
                                 @error('street')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror

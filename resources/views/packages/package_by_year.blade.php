@@ -290,6 +290,7 @@
             border: 2px solid #e9ecef;
             border-radius: 10px;
             padding: 10px 15px;
+            width: 100%;
             font-size: 14px;
             transition: all 0.3s;
         }
@@ -531,7 +532,7 @@
                                 <label for="class" class="form-label">
                                     Class <span class="required-star">*</span>
                                 </label>
-                                <select name="class" id="class" class="form-control text-uppercase" required>
+                                <select name="class" id="class" class="form-control-custom text-uppercase" required>
                                     <option value="">-- Select Class --</option>
                                     @foreach ($classes as $class)
                                         <option value="{{$class->id}}" {{old('class') == $class->id ? 'selected' : ''}}>
@@ -549,7 +550,7 @@
                                 <label for="term" class="form-label">
                                     Term <span class="required-star">*</span>
                                 </label>
-                                <select name="term" id="term" class="form-control form-control-custom" required>
+                                <select name="term" id="term" class="form-control-custom form-control-custom" required>
                                     <option value="">-- Select Term --</option>
                                     <option value="i" {{old('term') == 'i' ? 'selected' : ''}}>Term 1</option>
                                     <option value="ii" {{old('term') == 'ii' ? 'selected' : ''}}>Term 2</option>

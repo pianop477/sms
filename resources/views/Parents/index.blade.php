@@ -101,6 +101,21 @@
             box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
         }
 
+        .form-control-custom {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
+        }
+
         .section-title {
             color: var(--primary-color);
             font-weight: 600;
@@ -284,14 +299,14 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="fname" class="form-label">First Name</label>
-                                    <input type="text" name="fname" class="form-control" value="{{old('fname')}}" required>
+                                    <input type="text" name="fname" class="form-control-custom" value="{{old('fname')}}" required placeholder="First Name">
                                     @error('fname')
                                     <div class="text-danger small">{{$message}}</div>
                                     @enderror
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="lname" class="form-label">Last Name</label>
-                                    <input type="text" name="lname" class="form-control" value="{{old('lname')}}" required>
+                                    <input type="text" name="lname" class="form-control-custom" value="{{old('lname')}}" required placeholder="Last Name">
                                     @error('lname')
                                     <div class="text-danger small">{{$message}}</div>
                                     @enderror
@@ -301,7 +316,7 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="gender" class="form-label">Gender</label>
-                                    <select name="gender" class="form-control" required>
+                                    <select name="gender" class="form-control-custom" required>
                                         <option value="">-- select Parent gender --</option>
                                         <option value="male">Male</option>
                                         <option value="female">Female</option>
@@ -312,7 +327,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="phone" class="form-label">Mobile Phone</label>
-                                    <input type="text" name="phone" class="form-control" value="{{old('phone')}}" required>
+                                    <input type="text" name="phone" class="form-control-custom" value="{{old('phone')}}" required placeholder="07XXXXXXXX">
                                     @error('phone')
                                     <div class="text-danger small">{{$message}}</div>
                                     @enderror
@@ -323,8 +338,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="email" class="form-label">Email Address</label>
                                     <div class="input-group">
-                                        <span class="input-group-text">@</span>
-                                        <input type="email" name="email" class="form-control" value="{{old('email')}}">
+                                        <input type="email" name="email" class="form-control-custom" value="{{old('email')}}" placeholder="Email Address">
                                     </div>
                                     @error('email')
                                     <div class="text-danger small">{{$message}}</div>
@@ -332,7 +346,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="street" class="form-label">Street/Village</label>
-                                    <input type="text" name="street" class="form-control" value="{{old('street')}}" required>
+                                    <input type="text" name="street" class="form-control-custom" value="{{old('street')}}" required placeholder="Street or Village">
                                     @error('street')
                                     <div class="text-danger small">{{$message}}</div>
                                     @enderror
@@ -346,21 +360,21 @@
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label for="student_first_name" class="form-label">First Name</label>
-                                    <input type="text" name="student_first_name" class="form-control" value="{{old('student_first_name')}}" required>
+                                    <input type="text" name="student_first_name" class="form-control-custom" value="{{old('student_first_name')}}" required placeholder="First Name">
                                     @error('student_first_name')
                                     <div class="text-danger small">{{$message}}</div>
                                     @enderror
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="student_middle_name" class="form-label">Middle Name</label>
-                                    <input type="text" name="student_middle_name" class="form-control" value="{{old('student_middle_name')}}" required>
+                                    <input type="text" name="student_middle_name" class="form-control-custom" value="{{old('student_middle_name')}}" required placeholder="Middle Name">
                                     @error('student_middle_name')
                                     <div class="text-danger small">{{$message}}</div>
                                     @enderror
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label for="student_last_name" class="form-label">Last Name</label>
-                                    <input type="text" name="student_last_name" class="form-control" value="{{old('student_last_name')}}" required>
+                                    <input type="text" name="student_last_name" class="form-control-custom" value="{{old('student_last_name')}}" required placeholder="Last Name">
                                     @error('student_last_name')
                                     <div class="text-danger small">{{$message}}</div>
                                     @enderror
@@ -370,8 +384,8 @@
                             <div class="row">
                                 <div class="col-md-3 mb-3">
                                     <label for="student_gender" class="form-label">Student Gender</label>
-                                    <select name="student_gender" class="form-control" required>
-                                        <option value="">-- select gender --</option>
+                                    <select name="student_gender" class="form-control-custom" required>
+                                        <option value="">-- Select gender --</option>
                                         <option value="male">Male</option>
                                         <option value="female">Female</option>
                                     </select>
@@ -381,15 +395,15 @@
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <label for="dob" class="form-label">Date of Birth</label>
-                                    <input type="date" name="dob" class="form-control" value="{{old('dob')}}" required min="{{\Carbon\Carbon::now()->subYears(17)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(3)->format('Y-m-d')}}">
+                                    <input type="date" name="dob" class="form-control-custom" value="{{old('dob')}}" required min="{{\Carbon\Carbon::now()->subYears(17)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(3)->format('Y-m-d')}}" placeholder="Date of Birth">
                                     @error('dob')
                                     <div class="text-danger small">{{$message}}</div>
                                     @enderror
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <label for="class" class="form-label">Student Class</label>
-                                    <select name="class" class="form-control" required>
-                                        <option value="">-- select Student Class --</option>
+                                    <select name="class" class="form-control-custom" required>
+                                        <option value="">-- Select Class --</option>
                                         @if ($classes->isEmpty())
                                             <option value="" disabled class="text-danger">No classes found</option>
                                         @else
@@ -404,7 +418,7 @@
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <label for="group" class="form-label">Class Stream</label>
-                                    <select name="group" class="form-control" required>
+                                    <select name="group" class="form-control-custom" required>
                                         <option value="">--Select Stream--</option>
                                         <option value="a">A</option>
                                         <option value="b">B</option>
@@ -419,8 +433,8 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="bus_no" class="form-label">Student Bus Number</label>
-                                    <select name="bus_no" class="form-control">
-                                        <option value="">-- select Student Bus --</option>
+                                    <select name="bus_no" class="form-control-custom">
+                                        <option value="">-- Select Bus --</option>
                                         @if ($buses->isEmpty())
                                             <option value="" disabled class="text-danger">No buses found</option>
                                         @else
@@ -435,7 +449,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="passport" class="form-label">Student Photo</label>
-                                    <input type="file" name="passport" class="form-control" accept="image/*">
+                                    <input type="file" name="passport" class="form-control-custom" accept="image/*">
                                     <div class="note-text">Maximum 1MB - Blue background recommended</div>
                                     @error('passport')
                                     <div class="text-danger small">{{$message}}</div>
