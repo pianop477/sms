@@ -42,6 +42,14 @@ class TodRosterController extends Controller
             'end_date.after_or_equal' => 'End date must be after or equal to start date.',
         ]);
 
+        // check for existing roster using start date
+        $itExist = TodRoster::where('start_date', $request->start_date)->orWhere('end_date', $request->end_date)->exists();
+
+        if($itExist) {
+            Alert::error('Error', 'The selected start date or end date already exists in the roster');
+            return back();
+        }
+
         $assignments = [];
         $authUser = Auth::user();
         // return $authUser;
