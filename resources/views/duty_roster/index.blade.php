@@ -140,6 +140,7 @@
         border-radius: 10px;
         padding: 12px 15px;
         font-size: 16px;
+        width: 100%;
         transition: all 0.3s;
         background-color: white;
     }
@@ -615,7 +616,8 @@
                                     <i class="fas fa-calendar-start text-primary"></i>
                                     Start Date <span class="required-star">*</span>
                                 </label>
-                                <input type="date" name="start_date" class="form-control-custom" id="start_date" value="{{ old('start_date') }}" required>
+                                <input type="date" name="start_date" min="{{\Carbon\Carbon::now()->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->addYear()->format('Y-m-d')}}"
+                                    class="form-control-custom" id="start_date" value="{{ old('start_date') }}" required>
                                 <div class="invalid-feedback">
                                     Please provide a start date
                                 </div>
@@ -629,7 +631,8 @@
                                     <i class="fas fa-calendar-day text-primary"></i>
                                     End Date <span class="required-star">*</span>
                                 </label>
-                                <input type="date" name="end_date" class="form-control-custom" id="end_date" value="{{ old('end_date') }}" required>
+                                <input type="date" name="end_date" min="{{\Carbon\Carbon::now()->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->addYear()->format('Y-m-d')}}"
+                                    class="form-control-custom" id="end_date" value="{{ old('end_date') }}" required>
                                 <div class="invalid-feedback">
                                     Please provide an end date
                                 </div>
