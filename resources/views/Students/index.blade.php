@@ -138,6 +138,21 @@
             box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25) !important;
         }
 
+        .form-control-custom {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
+        }
+
         @media (max-width: 768px) {
             .action-buttons {
                 flex-direction: column;
@@ -365,22 +380,22 @@
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label for="fname" class="form-label">First Name</label>
-                                <input type="text" class="form-control" id="fname" name="fname" value="{{old('fname')}}" required>
+                                <input type="text" class="form-control-custom" id="fname" name="fname" value="{{old('fname')}}" required placeholder="First Name">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="middle" class="form-label">Middle Name</label>
-                                <input type="text" class="form-control" id="middle" name="middle" value="{{old('middle')}}" required>
+                                <input type="text" class="form-control-custom" id="middle" name="middle" value="{{old('middle')}}" required placeholder="Middle Name">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="lname" class="form-label">Last Name</label>
-                                <input type="text" class="form-control" id="lname" name="lname" value="{{old('lname')}}" required>
+                                <input type="text" class="form-control-custom" id="lname" name="lname" value="{{old('lname')}}" required placeholder="Last Name">
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label for="gender" class="form-label">Gender</label>
-                                <select class="form-select" id="gender" name="gender" required>
+                                <select class="form-select form-control-custom" id="gender" name="gender" required>
                                     <option value="">-- select gender --</option>
                                     <option value="male">Male</option>
                                     <option value="female">Female</option>
@@ -388,11 +403,11 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="dob" class="form-label">Date of Birth</label>
-                                <input type="date" class="form-control" id="dob" name="dob" value="{{old('dob')}}" required min="{{\Carbon\Carbon::now()->subYears(17)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(3)->format('Y-m-d')}}">
+                                <input type="date" class="form-control-custom" id="dob" name="dob" value="{{old('dob')}}" required min="{{\Carbon\Carbon::now()->subYears(17)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(3)->format('Y-m-d')}}" placeholder="Date of Birth">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="parentSelect" class="form-label">Parent/Guardian</label>
-                                <select name="parent" id="parentSelect" class="form-select" required>
+                                <select name="parent" id="parentSelect" class="form-select form-control-custom" required>
                                     <option value="">Select Parent</option>
                                     @if ($parents->isEmpty())
                                         <option value="" disabled class="text-danger">No parents records were found</option>
@@ -410,7 +425,7 @@
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label for="group" class="form-label">Class Group</label>
-                                <select class="form-select" id="group" name="group" required>
+                                <select class="form-select form-control-custom" id="group" name="group" required>
                                     <option value="">--Select Stream--</option>
                                     <option value="a">Stream A</option>
                                     <option value="b">Stream B</option>
@@ -419,7 +434,7 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="bus" class="form-label">Bus Number</label>
-                                <select name="driver" id="bus" class="form-select">
+                                <select name="driver" id="bus" class="form-select form-control-custom">
                                     <option value="">-- select bus number --</option>
                                     @if ($buses->isEmpty())
                                         <option value="" disabled class="text-danger">No school bus records found</option>
@@ -433,7 +448,7 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="image" class="form-label">Photo</label>
-                                <input type="file" class="form-control" id="image" name="image">
+                                <input type="file" class="form-control-custom" id="image" name="image">
                                 <div class="form-text">Optional</div>
                             </div>
                         </div>

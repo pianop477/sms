@@ -205,7 +205,7 @@ class AttendanceController extends Controller
                     ->orderBy('attendances.attendance_date', 'DESC');
 
                 // Paginate the raw data
-                $perPage =5;
+                $perPage = 22;
                 $page = request()->get('page', 1);
                 $rawData = $attendanceQuery->paginate($perPage, ['*'], 'page', $page);
 

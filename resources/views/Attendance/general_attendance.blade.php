@@ -87,6 +87,7 @@
             border-radius: 10px;
             padding: 12px 15px;
             font-size: 16px;
+            width: 100%;
             transition: all 0.3s;
             background-color: white;
         }
@@ -245,7 +246,7 @@
                                     <i class="fas fa-chalkboard text-primary"></i>
                                     Class <span class="required-star">*</span>
                                 </label>
-                                <select name="class" id="class" class="form-control text-uppercase" required>
+                                <select name="class" id="class" class="form-control-custom text-uppercase" required>
                                     <option value="">-- Select Class --</option>
                                     @foreach ($classes as $class)
                                         <option value="{{$class->id}}" {{old('class') == $class->id ? 'selected' : ''}}>
@@ -266,7 +267,7 @@
                                     <i class="fas fa-stream text-primary"></i>
                                     Stream
                                 </label>
-                                <select name="stream" id="stream" class="form-control">
+                                <select name="stream" id="stream" class="form-control-custom">
                                     <option value="all" {{old('stream', 'all') == 'all' ? 'selected' : ''}}>All Streams</option>
                                     <option value="a" {{old('stream') == 'a' ? 'selected' : ''}}>Stream A</option>
                                     <option value="b" {{old('stream') == 'b' ? 'selected' : ''}}>Stream B</option>

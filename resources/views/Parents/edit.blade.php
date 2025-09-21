@@ -129,6 +129,21 @@
             box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
         }
 
+        .form-control-custom {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
+        }
+
         .note-text {
             font-size: 0.8rem;
             color: #6c757d;
@@ -312,14 +327,14 @@
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label class="form-label">First Name</label>
-                                            <input type="text" name="fname" class="form-control" value="{{$parents->first_name}}" required>
+                                            <input type="text" name="fname" class="form-control-custom" value="{{$parents->first_name}}" required>
                                             @error('fname')
                                             <div class="text-danger small">{{$message}}</div>
                                             @enderror
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Last Name</label>
-                                            <input type="text" name="lname" class="form-control" value="{{$parents->last_name}}" required>
+                                            <input type="text" name="lname" class="form-control-custom" value="{{$parents->last_name}}" required>
                                             @error('lname')
                                             <div class="text-danger small">{{$message}}</div>
                                             @enderror
@@ -329,14 +344,14 @@
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label class="form-label">Phone Number</label>
-                                            <input type="text" name="phone" class="form-control" value="{{$parents->phone}}" required>
+                                            <input type="text" name="phone" class="form-control-custom" value="{{$parents->phone}}" required>
                                             @error('phone')
                                             <div class="text-danger small">{{$message}}</div>
                                             @enderror
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label">Email Address</label>
-                                            <input type="email" name="email" class="form-control" value="{{$parents->email}}">
+                                            <input type="email" name="email" class="form-control-custom" value="{{$parents->email}}">
                                             @error('email')
                                             <div class="text-danger small">{{$message}}</div>
                                             @enderror
@@ -346,7 +361,7 @@
                                     <div class="row mb-3">
                                         <div class="col-md-4">
                                             <label class="form-label">Gender</label>
-                                            <select name="gender" class="form-control" required>
+                                            <select name="gender" class="form-control-custom" required>
                                                 <option value="{{$parents->gender}}" selected>{{ucfirst($parents->gender)}}</option>
                                                 <option value="male">Male</option>
                                                 <option value="female">Female</option>
@@ -357,14 +372,14 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Address</label>
-                                            <input type="text" name="street" class="form-control" value="{{$parents->address}}" required>
+                                            <input type="text" name="street" class="form-control-custom" value="{{$parents->address}}" required>
                                             @error('street')
                                             <div class="text-danger small">{{$message}}</div>
                                             @enderror
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">Profile Photo</label>
-                                            <input type="file" name="image" class="form-control" accept="image/*">
+                                            <input type="file" name="image" class="form-control-custom" accept="image/*">
                                             <div class="note-text">Maximum 1MB - Recommended size 300x300 pixels</div>
                                             @error('image')
                                             <div class="text-danger small">{{$message}}</div>

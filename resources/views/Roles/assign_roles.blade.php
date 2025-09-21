@@ -106,6 +106,7 @@
             border: 2px solid #e9ecef;
             border-radius: 10px;
             padding: 12px 15px;
+            width: 100%;
             font-size: 16px;
             transition: all 0.3s;
             background-color: white;

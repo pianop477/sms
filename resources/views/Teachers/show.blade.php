@@ -70,6 +70,21 @@
             box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
         }
 
+        .form-control-custom {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
+        }
+
         .form-section-title {
             color: var(--primary-color);
             font-weight: 600;
@@ -115,14 +130,14 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="fname" class="form-label">First Name</label>
-                                    <input type="text" name="fname" class="form-control" value="{{$teachers->first_name}}" required>
+                                    <input type="text" name="fname" class="form-control-custom" value="{{$teachers->first_name}}" required>
                                     @error('fname')
                                     <div class="text-danger small">{{$message}}</div>
                                     @enderror
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="lname" class="form-label">Last Name</label>
-                                    <input type="text" name="lname" class="form-control" value="{{$teachers->last_name}}" required>
+                                    <label for="lname" class="form-label">Other Names</label>
+                                    <input type="text" name="lname" class="form-control-custom" value="{{$teachers->last_name}}" required>
                                     @error('lname')
                                     <div class="text-danger small">{{$message}}</div>
                                     @enderror
@@ -132,7 +147,7 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="gender" class="form-label">Gender</label>
-                                    <select name="gender" class="form-control" required>
+                                    <select name="gender" class="form-control-custom" required>
                                         <option value="{{$teachers->gender}}" selected>{{ucfirst($teachers->gender)}}</option>
                                         <option value="male">Male</option>
                                         <option value="female">Female</option>
@@ -143,7 +158,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="dob" class="form-label">Date of Birth</label>
-                                    <input type="date" name="dob" class="form-control" value="{{$teachers->dob}}" required min="{{\Carbon\Carbon::now()->subYears(60)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(18)->format('Y-m-d')}}">
+                                    <input type="date" name="dob" class="form-control-custom" value="{{$teachers->dob}}" required min="{{\Carbon\Carbon::now()->subYears(60)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(18)->format('Y-m-d')}}">
                                     @error('dob')
                                     <div class="text-danger small">{{$message}}</div>
                                     @enderror
@@ -157,14 +172,14 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="phone" class="form-label">Phone Number</label>
-                                    <input type="text" name="phone" class="form-control" value="{{$teachers->phone}}" required>
+                                    <input type="text" name="phone" class="form-control-custom" value="{{$teachers->phone}}" required>
                                     @error('phone')
                                     <div class="text-danger small">{{$message}}</div>
                                     @enderror
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="email" class="form-label">Email Address</label>
-                                    <input type="email" name="email" class="form-control" value="{{old('email', $teachers->email)}}">
+                                    <input type="email" name="email" class="form-control-custom" value="{{old('email', $teachers->email)}}">
                                     @error('email')
                                     <div class="text-danger small">{{$message}}</div>
                                     @enderror
@@ -174,7 +189,7 @@
                             <div class="row">
                                 <div class="col-md-12 mb-3">
                                     <label for="street" class="form-label">Street/Village</label>
-                                    <input type="text" name="street" class="form-control" value="{{$teachers->address}}" required>
+                                    <input type="text" name="street" class="form-control-custom" value="{{$teachers->address}}" required>
                                     @error('street')
                                     <div class="text-danger small">{{$message}}</div>
                                     @enderror
@@ -188,7 +203,7 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="qualification" class="form-label">Qualification</label>
-                                    <select name="qualification" class="form-control" required>
+                                    <select name="qualification" class="form-control-custom" required>
                                         <option value="{{$teachers->qualification}}" selected>
                                             @if ($teachers->qualification == 1) Masters
                                             @elseif ($teachers->qualification == 2) Degree
@@ -207,7 +222,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="joined_at" class="form-label">Member Since</label>
-                                    <select name="joined_at" class="form-control" required>
+                                    <select name="joined_at" class="form-control-custom" required>
                                         <option value="{{$teachers->joined}}" selected>{{$teachers->joined}}</option>
                                         @for ($year = date('Y'); $year >= 2000; $year--)
                                             <option value="{{ $year }}">{{ $year }}</option>
@@ -226,7 +241,7 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="image" class="form-label">Passport Size Photo</label>
-                                    <input type="file" name="image" class="form-control" accept="image/*">
+                                    <input type="file" name="image" class="form-control-custom" accept="image/*">
                                     <div class="note-text">Maximum 1MB - Recommended size 300x300 pixels</div>
                                     @error('image')
                                     <div class="text-danger small">{{$message}}</div>
