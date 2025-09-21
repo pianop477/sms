@@ -93,7 +93,7 @@ class updateRostersStatus extends Command
         try {
             $teacher = DB::table('teachers')
                 ->join('users', 'users.id', '=', 'teachers.user_id')
-                ->select('teachers.id as teacher_id', 'teachers.school_id', 'users.name', 'users.phone')
+                ->select('teachers.id as teacher_id', 'teachers.school_id', 'users.first_name', 'users.phone')
                 ->where('teachers.id', $roster->teacher_id)
                 ->first();
 
@@ -102,7 +102,8 @@ class updateRostersStatus extends Command
             }
 
             $phone   = $teacher->phone;
-            $message = "Habari {$teacher->name}. Zamu yako imeanza leo {$roster->start_date} na itaisha {$roster->end_date}. Uwajibikaji mwema!";
+            $message = "Habari {$teacher->first_name}. Ninakutaarifu kuwa utakuwa zamu wiki hii kuanzia {$roster->start_date}
+                        na kumalizika {$roster->end_date}. Ninakutakia uwajibikaji mwema wa zamu hii. Asante!";
 
             $school = school::findOrFail($teacher->school_id);
             $nextSmsService = new NextSmsService();
