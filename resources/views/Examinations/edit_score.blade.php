@@ -107,6 +107,7 @@
             border-radius: 10px;
             padding: 12px 15px;
             font-size: 16px;
+            width: 100%;
             transition: all 0.3s;
             background-color: white;
         }
@@ -355,11 +356,11 @@
                         <h4 class="header- text-white">
                             <i class="fas fa-edit me-2"></i> Edit Results - {{ strtoupper($courseName) }} ({{ strtoupper($className) }})
                         </h4>
-                        <p class="mb-0 text-white-50"> Update examination scores for students</p>
+                        <p class="mb-0 text-white-50 text-white"> Update examination scores for students</p>
                     </div>
                     <div class="col-md-4 text-end">
                         <a href="{{route('home')}}" class="btn btn-back float-right">
-                            <i class="fas fa-arrow-circle-left me-1"></i> Back to Dashboard
+                            <i class="fas fa-arrow-circle-left me-1"></i> Back
                         </a>
                     </div>
                 </div>
@@ -389,7 +390,7 @@
                                     <i class="fas fa-file-alt text-primary"></i>
                                     Examination Type <span class="required-star">*</span>
                                 </label>
-                                <select name="exam_type_id" id="exam_type_id" class="form-control text-capitalize" required>
+                                <select name="exam_type_id" id="exam_type_id" class="form-control-custom text-capitalize" required>
                                     <option value="">-- Select Exam type --</option>
                                     @foreach ($exams as $exam)
                                         <option value="{{ $exam->id }}" {{ $exam->id == $examTypeId ? 'selected' : '' }}>
@@ -408,7 +409,7 @@
                                     <i class="fas fa-calendar-day text-primary"></i>
                                     Exam Date <span class="required-star">*</span>
                                 </label>
-                                <input type="date" name="exam_date" class="form-control" id="exam_date" required
+                                <input type="date" name="exam_date" class="form-control-custom" id="exam_date" required
                                        value="{{ \Carbon\Carbon::parse($examDate)->format('Y-m-d') }}"
                                        min="{{ \Carbon\Carbon::now()->subYears(1)->format('Y-m-d') }}"
                                        max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
