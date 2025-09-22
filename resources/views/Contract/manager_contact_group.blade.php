@@ -146,7 +146,7 @@
                             @foreach ($contractsByYear as $year => $contract )
                                 <a href="{{route('contract.by.months', ['year' => $year])}}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                                     <span><i class="fas fa-angle-right me-2 text-primary"></i> {{$year}}</span>
-                                    <span class="badge bg-primary rounded-pill">{{$contract->count()}}</span>
+                                    <span class="badge bg-primary rounded-pill text-white">{{$contract->count()}}</span>
                                 </a>
                             @endforeach
                         </div>
@@ -227,12 +227,12 @@
                                                                             <div class="card-body">
                                                                                 <div class="row">
                                                                                     <div class="col-md-6">
-                                                                                        <p class="mb-1"><strong>Name:</strong> {{$row->first_name}} {{$row->last_name}}</p>
-                                                                                        <p class="mb-1"><strong>Gender:</strong> {{$row->gender}}</p>
+                                                                                        <p class="mb-1"><strong>Name:</strong> {{ucwords(strtolower($row->first_name))}} {{ucwords(strtolower($row->last_name))}}</p>
+                                                                                        <p class="mb-1"><strong>Gender:</strong> {{ucwords(strtolower($row->gender))}}</p>
                                                                                     </div>
                                                                                     <div class="col-md-6">
                                                                                         <p class="mb-1"><strong>Member ID:</strong> {{strtoupper($row->member_id)}}</p>
-                                                                                        <p class="mb-0"><strong>Contract Type:</strong> {{$row->contract_type}} Contract</p>
+                                                                                        <p class="mb-0"><strong>Contract Type:</strong> {{ucwords(strtolower($row->contract_type))}}</p>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
@@ -261,7 +261,7 @@
                                                                         </div>
                                                                         <div class="col-md-8">
                                                                             <div class="form-group mb-3">
-                                                                                <label for="remark{{$row->id}}" class="form-label">Remarks</label>
+                                                                                <label for="remark{{$row->id}}" class="form-label">Descriptions/Remarks</label>
                                                                                 <textarea name="remark" id="remark{{$row->id}}" cols="30" rows="2" class="form-control form-control-custom" required>{{old('remark')}}</textarea>
                                                                                 @error('remark')
                                                                                     <div class="text-danger">{{$message}}</div>
@@ -302,12 +302,12 @@
                                                                             <div class="card-body">
                                                                                 <div class="row">
                                                                                     <div class="col-md-6">
-                                                                                        <p class="mb-1"><strong>Name:</strong> {{$row->first_name}} {{$row->last_name}}</p>
-                                                                                        <p class="mb-1"><strong>Gender:</strong> {{$row->gender}}</p>
+                                                                                        <p class="mb-1"><strong>Name:</strong> {{ucwords(strtolower($row->first_name))}} {{ucwords(strtolower($row->last_name))}}</p>
+                                                                                        <p class="mb-1"><strong>Gender:</strong> {{ucwords(strtolower($row->gender))}}</p>
                                                                                     </div>
                                                                                     <div class="col-md-6">
                                                                                         <p class="mb-1"><strong>Member ID:</strong> {{strtoupper($row->member_id)}}</p>
-                                                                                        <p class="mb-0"><strong>Contract Type:</strong> {{$row->contract_type}} Contract</p>
+                                                                                        <p class="mb-0"><strong>Contract Type:</strong> {{ucwords(strtolower($row->contract_type))}}</p>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
