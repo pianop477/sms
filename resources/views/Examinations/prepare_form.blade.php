@@ -107,6 +107,7 @@
             border-radius: 10px;
             padding: 12px 15px;
             font-size: 16px;
+            width: 100%;
             transition: all 0.3s;
             background-color: white;
         }
@@ -320,7 +321,7 @@
                                     <i class="fas fa-file-alt text-primary"></i>
                                     Examination Type <span class="required-star">*</span>
                                 </label>
-                                <select name="exam_type" id="exam_type" class="form-control text-capitalize" required>
+                                <select name="exam_type" id="exam_type" class="form-control-custom text-capitalize" required>
                                     <option value="" disabled selected>-- Select Exam type --</option>
                                     @foreach ($exams as $exam)
                                         <option value="{{ $exam->id }}" class="text-capitalize" {{ old('exam_type') == $exam->id ? 'selected' : '' }}>
@@ -342,7 +343,7 @@
                                     <i class="fas fa-calendar-day text-primary"></i>
                                     Upload Date <span class="required-star">*</span>
                                 </label>
-                                <input type="date" name="exam_date" class="form-control" id="exam_date" required
+                                <input type="date" name="exam_date" class="form-control-custom" id="exam_date" required
                                        value="{{ old('exam_date') }}"
                                        min="{{ \Carbon\Carbon::now()->subYears(1)->format('Y-m-d') }}"
                                        max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
@@ -360,7 +361,7 @@
                                     <i class="fas fa-calendar-alt text-primary"></i>
                                     Academic Term <span class="required-star">*</span>
                                 </label>
-                                <select name="term" id="term" class="form-control" required>
+                                <select name="term" id="term" class="form-control-custom" required>
                                     <option value="" disabled selected>-- Select Term --</option>
                                     <option value="i" {{ old('term') == 'i' ? 'selected' : '' }}>Term 1</option>
                                     <option value="ii" {{ old('term') == 'ii' ? 'selected' : '' }}>Term 2</option>
@@ -379,7 +380,7 @@
                                     <i class="fas fa-chart-bar text-primary"></i>
                                     Grading System <span class="required-star">*</span>
                                 </label>
-                                <select name="marking_style" id="marking_style" class="form-control" required>
+                                <select name="marking_style" id="marking_style" class="form-control-custom" required>
                                     <option value="" disabled selected>-- Select Grading System --</option>
                                     <option value="2" {{ old('marking_style') == '2' ? 'selected' : '' }}>Percentage (0-100%)</option>
                                     <option value="1" {{ (old('marking_style') ?: '1') == '1' ? 'selected' : '' }}>Points (0-50)</option>
