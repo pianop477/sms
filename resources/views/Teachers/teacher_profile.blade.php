@@ -184,7 +184,7 @@
                             }
                         @endphp
                         <img src="{{ $avatarImage }}" class="profile-img" alt="Teacher Photo">
-                        <h5 class="profile-name mb-1">{{ucwords(strtolower($teachers->first_name. ' '. $teachers->last_name))}}</h5>
+                        <h5 class="profile-name mb-1" style="color:rgb(206, 177, 8)">{{ucwords(strtolower($teachers->first_name. ' '. $teachers->last_name))}}</h5>
                         <p class="mb-0 text-white text-uppercase">ID #: <strong>{{$teachers->member_id}}</strong></p>
                     </div>
 
