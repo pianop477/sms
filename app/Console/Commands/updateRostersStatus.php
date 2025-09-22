@@ -102,8 +102,7 @@ class updateRostersStatus extends Command
             }
 
             $phone   = $teacher->phone;
-            $message = "Habari {$teacher->first_name}. Ninakutaarifu kuwa utakuwa zamu wiki hii kuanzia {$roster->start_date}
-                        na kumalizika {$roster->end_date}. Ninakutakia uwajibikaji mwema wa zamu hii. Asante!";
+            $message = "Habari {$teacher->first_name}! Utakuwa zamu wiki hii kuanzia ". Carbon::parse($roster->start_date)->format('d/m/Y') . " hadi ". Carbon::parse($roster->end_date)->format('d/m/Y') ."Ninakutakia uwajibikaji mwema.";
 
             $school = school::findOrFail($teacher->school_id);
             $nextSmsService = new NextSmsService();
