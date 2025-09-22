@@ -12,7 +12,7 @@
             margin: 0;
             padding: 0;
             color: #333;
-            font-size: 11px;
+            font-size: 12px;
             line-height: 1.2;
         }
 
@@ -25,7 +25,7 @@
         @media print {
             body {
                 background-color: white;
-                font-size: 11px;
+                font-size: 12px;
             }
 
             .container {
@@ -52,7 +52,7 @@
 
             /* Ensure table breaks properly across pages */
             table {
-                page-break-inside: auto;
+                /* page-break-inside: auto; */
             }
 
             tr {
@@ -134,7 +134,7 @@
 
         .course-details {
             width: 48%;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .course-details p {
@@ -149,7 +149,7 @@
             text-align: center;
             font-weight: bold;
             margin-bottom: 2px;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         /* Tables */
@@ -157,7 +157,7 @@
             width: 100%;
             border-collapse: collapse;
             margin: 8px 0;
-            font-size: 8px;
+            font-size: 12px;
         }
 
         .table th {
@@ -168,7 +168,7 @@
             border: 1px solid #ddd;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 7px;
+            font-size: 12px;
         }
 
         .table td {
@@ -272,7 +272,7 @@
         /* Page Break Control */
         .month-section {
             margin-bottom: 15px;
-            page-break-inside: avoid;
+            /* page-break-inside: avoid; */
         }
 
         .time-duration-header {
@@ -282,7 +282,7 @@
             margin: 10px 0 8px 0;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         /* Fixed column widths */
@@ -326,7 +326,7 @@
 
         .attendance-rate {
             text-align: center;
-            font-size: 8px;
+            font-size: 12px;
             padding: 2px;
         }
 
@@ -365,7 +365,7 @@
             <div class="header-text">
                 <h4>{{ Auth::user()->school->school_name }}</h4>
                 <h5>{{ Auth::user()->school->postal_address }}, {{ Auth::user()->school->postal_name }}</h5>
-                <h5>Monthly Class Attendance Report</h5>
+                <h5>Class Attendance Report</h5>
             </div>
         </div>
 
@@ -446,7 +446,6 @@
                             <div class="course-details">
                                 <p style="text-transform: capitalize"><span class="bold">Class Teacher:</span> {{ $firstRecord->teacher_firstname ?? 'N/A' }} {{ $firstRecord->teacher_lastname ?? '' }}</p>
                                 <p style="text-transform: uppercase"><span class="bold">Class:</span> {{ $firstRecord->class_name ?? 'N/A' }}</p>
-                                <p style="text-transform: capitalize"><span class="bold">Stream:</span> {{ $firstRecord->group ?? 'All' }}</p>
                                 <p><span class="bold">Reporting Period:</span>
                                     {{ \Carbon\Carbon::parse($datesInMonth[0])->format('d/m/Y') }} -
                                     {{ \Carbon\Carbon::parse($datesInMonth[count($datesInMonth)-1])->format('d/m/Y') }}
@@ -455,13 +454,13 @@
                             </div>
 
                             <div class="grade-summary">
-                                <p class="title">Monthly Attendance Rate</p>
+                                <p class="title">Attendance Rate</p>
                                 <div style="text-align: center; font-size: 18px; font-weight: bold; color: #28a745;">
                                     {{ $attendanceRate }}%
                                 </div>
                                 <div class="progress mt-3">
                                     <div class="progress-bar" style="width: {{ $attendanceRate }}%;">
-                                        {{ $attendanceRate }}%
+                                        {{-- {{ $attendanceRate }}% --}}
                                     </div>
                                 </div>
                             </div>
@@ -475,7 +474,6 @@
                             <thead>
                                 <tr>
                                     <th class="col-number">#</th>
-                                    <th class="col-admission">Admission#.</th>
                                     <th class="col-name">Student's Name</th>
                                     <th class="col-gender">Gender</th>
                                     <th class="col-stream">Stream</th>
@@ -492,8 +490,7 @@
                                         $totalDays = count($datesInMonth);
                                     @endphp
                                     <tr>
-                                        <td class="col-number">{{ $index + 1 }}</td>
-                                        <td class="col-admission text-uppercase">{{ $student['admission_number'] }}</td>
+                                        <td class="col-number">{{ $loop->iteration }}</td>
                                         <td class="col-name left">{{ $student['name'] }}</td>
                                         <td class="col-gender text-capitalize">{{ $student['gender'] }}</td>
                                         <td class="col-stream text-uppercase">{{ $student['group'] }}</td>
