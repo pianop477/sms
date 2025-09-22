@@ -187,7 +187,7 @@
                             }
                         @endphp
                         <img src="{{ $avatarImage }}" class="profile-img" alt="User Photo">
-                        <h5 class="profile-name mb-1">{{ucwords(strtolower($user->first_name. ' '. $user->last_name))}}</h5>
+                        <h5 class="profile-name mb-1" style="color:rgb(206, 177, 8)">{{ucwords(strtolower($user->first_name. ' '. $user->last_name))}}</h5>
                         <p class="mb-0 text-white">
                             @if ($user->usertype == 1)
                                 System Administrator
