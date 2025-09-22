@@ -126,7 +126,7 @@
                             <li>
                                 <a href="javascript:void(0)"><i class="fa fa-screwdriver-wrench"></i><span>System Administration</span></a>
                                 <ul class="submenu">
-                                    <li><a href="{{route('roles.updateRole')}}"><i class="ti-unlock"></i> Roles & Permissions</a></li>
+                                    <li><a href="{{route('roles.updateRole')}}"><i class="fas fa-shield"></i> Roles & Permissions</a></li>
                                     <li><a href="{{route('users.lists')}}"><i class="fas fa-key"></i> Password Reset</a></li>
                                     <li><a href="{{route('Teachers.trashed')}}"><i class="fas fa-trash"></i> Recycle Bin</a></li>
                                 </ul>
