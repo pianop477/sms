@@ -85,7 +85,7 @@
     <div class="alert alert-success text-center mt-4">
         <h5 class="mb-2"><i class="fas fa-check-circle"></i> Attendance Submitted</h5>
         <p>Attendance for <strong>{{ \Carbon\Carbon::parse($selectedDate)->format('d-m-Y') }}</strong> has already been submitted.</p>
-        <a href="{{ route('home') }}" class="btn btn-primary btn-sm mt-2"><i class="fas fa-home"></i> Go Home</a>
+        <a href="{{ route('home') }}" class="btn btn-primary btn-sm mt-2"><i class="fas fa-home"></i> Go Back</a>
     </div>
 @else
     <div class="card mt-4 shadow-sm">
