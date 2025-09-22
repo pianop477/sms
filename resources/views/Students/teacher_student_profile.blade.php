@@ -164,7 +164,7 @@
                             }
                         @endphp
                         <img src="{{ $avatarImage }}" class="profile-img" alt="Student Photo">
-                        <h5 class="profile-name mb-1 text-capitalize" style="color:rgb(206, 177, 8)">{{ucwords(strtolower($students->first_name. ' '. $students->middle_name. ' '. $students->last_name))}}</h5>
+                        <h5 class="profile-name mb-1 text-capitalize" style="color: gold;">{{ucwords(strtolower($students->first_name. ' '. $students->middle_name. ' '. $students->last_name))}}</h5>
                         <p class="mb-0 text-uppercase text-white">Admission #: <strong>{{$students->admission_number}}</strong></p>
                     </div>
 
