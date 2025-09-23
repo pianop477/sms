@@ -346,7 +346,7 @@
                                 <input type="date" name="exam_date" class="form-control-custom" id="exam_date" required
                                        value="{{ old('exam_date') }}"
                                        min="{{ \Carbon\Carbon::now()->subYears(1)->format('Y-m-d') }}"
-                                       max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                                       max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" placeholder="YYYY-MM-DD">
                                 <div class="invalid-feedback">
                                     Please provide a valid exam date
                                 </div>
