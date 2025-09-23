@@ -290,10 +290,10 @@
             <div class="card-header-custom">
                 <div class="row align-items-center">
                     <div class="col-md-8">
-                        <h4 class="header-title">
+                        <h4 class="header-title text-white">
                             <i class="fas fa-clipboard-list me-2"></i> Results Submission Form
                         </h4>
-                        <p class="mb-0 text-white-50"> Pre-information section for examination results</p>
+                        <p class="mb-0 text-white"> Pre-information section for examination results</p>
                     </div>
                     <div class="col-md-4 text-end">
                         <a href="{{ route('home') }}" class="btn btn-back float-right">
