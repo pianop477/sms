@@ -444,7 +444,6 @@
                     <div class="summary-section">
                         <div class="summary-content">
                             <div class="course-details">
-                                <p style="text-transform: capitalize"><span class="bold">Class Teacher:</span> {{ $firstRecord->teacher_firstname ?? 'N/A' }} {{ $firstRecord->teacher_lastname ?? '' }}</p>
                                 <p style="text-transform: uppercase"><span class="bold">Class:</span> {{ $firstRecord->class_name ?? 'N/A' }}</p>
                                 <p><span class="bold">Reporting Period:</span>
                                     {{ \Carbon\Carbon::parse($datesInMonth[0])->format('d/m/Y') }} -
