@@ -18,7 +18,7 @@
 
         /* Print Specific Styles */
          @page {
-            size: A3 landscape;
+            size: A4 landscape;
             margin: 0.5cm;
         }
 
