@@ -286,7 +286,7 @@
                                         <td>{{\Carbon\Carbon::parse($students->dob)->format('d-m-Y')}}</td>
                                     </tr>
                                     <tr>
-                                        <th>Registration Date</th>
+                                        <th>Registered on</th>
                                         <td>{{\Carbon\Carbon::parse($students->created_at)->format('d-m-Y')}}</td>
                                     </tr>
                                     <tr>
@@ -343,7 +343,7 @@
                                             <td class="text-capitalize">{{ucwords(strtolower($students->address))}}</td>
                                         </tr>
                                         <tr>
-                                            <th>Registration Date</th>
+                                            <th>Registered on</th>
                                             <td>{{\Carbon\Carbon::parse($students->parent_created_at)->format('d-m-Y')}}</td>
                                         </tr>
                                     @else
@@ -379,7 +379,7 @@
                                             <td class="text-capitalize">{{ucwords(strtolower($students->address))}}</td>
                                         </tr>
                                         <tr>
-                                            <th>Registration Date</th>
+                                            <th>Registered on</th>
                                             <td>{{\Carbon\Carbon::parse($students->parent_created_at)->format('d-m-Y')}}</td>
                                         </tr>
                                     @endif
