@@ -184,11 +184,11 @@
                                             @foreach ($classTeacher as $teacher)
                                                 <tr>
                                                     <td>{{$loop->iteration}}</td>
-                                                    <td class="text-uppercase fw-bold">{{$teacher->class_name}}</td>
+                                                    <td class="text-uppercase fw-bold">{{strtoupper($teacher->class_name)}}</td>
                                                     <td class="">
-                                                        <span class="badge bg-info text-white">Stream {{$teacher->group}}</span>
+                                                        <span class="badge bg-info text-white">Stream {{strtoupper($teacher->group)}}</span>
                                                     </td>
-                                                    <td class="fw-medium text-capitalize">{{$teacher->teacher_first_name}} {{$teacher->teacher_last_name}}</td>
+                                                    <td class="fw-medium text-capitalize">{{ucwords(strtolower($teacher->teacher_first_name))}} {{ucwords(strtolower($teacher->teacher_last_name))}}</td>
                                                     <td>
                                                         <div class="action-buttons">
                                                             <a href="{{route('roles.edit', ['teacher' => Hashids::encode($teacher->id)])}}" class="btn btn-sm btn-secondary" title="Edit">
