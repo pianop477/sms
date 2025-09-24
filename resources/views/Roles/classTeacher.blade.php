@@ -176,7 +176,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @if ($assignedTeachers->isEmpty())
+                                        @if ($classTeacher->isEmpty())
                                             <tr>
                                                 <td colspan="5" class="text-center text-danger">No class teachers assigned yet.</td>
                                             </tr>
