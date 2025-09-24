@@ -25,7 +25,7 @@
         @media print {
             body {
                 background-color: white;
-                font-size: 12px;
+                font-size: 11px;
             }
 
             .container {
@@ -118,7 +118,7 @@
         .summary-header {
             text-align: center;
             margin: 8px 0;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             text-transform: uppercase;
             border-bottom: 1px solid #333;
@@ -149,7 +149,7 @@
             text-align: center;
             font-weight: bold;
             margin-bottom: 2px;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         /* Tables */
@@ -157,7 +157,7 @@
             width: 100%;
             border-collapse: collapse;
             margin: 8px 0;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .table th {
@@ -168,7 +168,7 @@
             border: 1px solid #ddd;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .table td {
