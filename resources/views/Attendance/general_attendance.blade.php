@@ -156,21 +156,6 @@
             z-index: 0;
         }
 
-        .date-input-group {
-            position: relative;
-        }
-
-        .date-input-group::after {
-            content: '\f073';
-            font-family: 'Font Awesome 5 Free';
-            font-weight: 900;
-            position: absolute;
-            right: 15px;
-            top: 42px;
-            color: var(--primary);
-            pointer-events: none;
-        }
-
         @media (max-width: 768px) {
             .card-body {
                 padding: 20px;
@@ -283,7 +268,7 @@
                                 <label for="start" class="form-label">
                                     Start Date <span class="required-star">*</span>
                                 </label>
-                                <input type="date" name="start" class="form-control" id="start" required
+                                <input type="date" name="start" class="form-control-custom" id="start" required
                                        value="{{old('start')}}"
                                        max="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
                                 <div class="invalid-feedback">
@@ -299,7 +284,7 @@
                                 <label for="end" class="form-label">
                                     End Date <span class="required-star">*</span>
                                 </label>
-                                <input type="date" name="end" class="form-control" id="end" required
+                                <input type="date" name="end" class="form-control-custom" id="end" required
                                        value="{{old('end')}}"
                                        max="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
                                 <div class="invalid-feedback">
