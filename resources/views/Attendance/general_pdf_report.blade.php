@@ -209,7 +209,7 @@
                         <h4 class="header-title text-white">
                             <i class="fas fa-file-pdf me-2"></i> Class Attendance Report
                         </h4>
-                        <p class="mb-0 text-white-50"> View and manage attendance reports</p>
+                        <p class="mb-0 text-white"> View and manage attendance reports</p>
                     </div>
                     <div class="col-md-4 text-end">
                         <a href="{{route('attendance.fill.form')}}" class="btn btn-back float-right">
