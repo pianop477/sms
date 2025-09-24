@@ -176,26 +176,32 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($classTeacher as $teacher)
+                                        @if ($assignedTeachers->isEmpty())
                                             <tr>
-                                                <td>{{$loop->iteration}}</td>
-                                                <td class="text-uppercase fw-bold">{{$teacher->class_name}}</td>
-                                                <td class="">
-                                                    <span class="badge bg-info text-white">Stream {{$teacher->group}}</span>
-                                                </td>
-                                                <td class="fw-medium text-capitalize">{{$teacher->teacher_first_name}} {{$teacher->teacher_last_name}}</td>
-                                                <td>
-                                                    <div class="action-buttons">
-                                                        <a href="{{route('roles.edit', ['teacher' => Hashids::encode($teacher->id)])}}" class="btn btn-sm btn-secondary" title="Edit">
-                                                            <i class="ti-pencil"></i>
-                                                        </a>
-                                                        <a href="{{route('roles.destroy', ['teacher' => Hashids::encode($teacher->id)])}}" class="btn btn-sm btn-danger" title="Remove" onclick="return confirm('Are you sure you want to remove {{ strtoupper($teacher->teacher_first_name) }} {{ strtoupper($teacher->teacher_last_name) }} from this class?')">
-                                                            <i class="ti-trash"></i>
-                                                        </a>
-                                                    </div>
-                                                </td>
+                                                <td colspan="5" class="text-center text-danger">No class teachers assigned yet.</td>
                                             </tr>
-                                        @endforeach
+                                        @else
+                                            @foreach ($classTeacher as $teacher)
+                                                <tr>
+                                                    <td>{{$loop->iteration}}</td>
+                                                    <td class="text-uppercase fw-bold">{{$teacher->class_name}}</td>
+                                                    <td class="">
+                                                        <span class="badge bg-info text-white">Stream {{$teacher->group}}</span>
+                                                    </td>
+                                                    <td class="fw-medium text-capitalize">{{$teacher->teacher_first_name}} {{$teacher->teacher_last_name}}</td>
+                                                    <td>
+                                                        <div class="action-buttons">
+                                                            <a href="{{route('roles.edit', ['teacher' => Hashids::encode($teacher->id)])}}" class="btn btn-sm btn-secondary" title="Edit">
+                                                                <i class="ti-pencil"></i>
+                                                            </a>
+                                                            <a href="{{route('roles.destroy', ['teacher' => Hashids::encode($teacher->id)])}}" class="btn btn-sm btn-danger" title="Remove" onclick="return confirm('Are you sure you want to remove {{ strtoupper($teacher->teacher_first_name) }} {{ strtoupper($teacher->teacher_last_name) }} from this class?')">
+                                                                <i class="ti-trash"></i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @endif
                                     </tbody>
                                 </table>
                             </div>
