@@ -445,7 +445,7 @@
                         <div class="summary-content">
                             <div class="course-details">
                                 <p style="text-transform: uppercase"><span class="bold">Class:</span> {{ $firstRecord->class_name ?? 'N/A' }}</p>
-                                <p><span class="bold">Reporting Period:</span>
+                                <p><span class="bold">Report Date:</span>
                                     {{ \Carbon\Carbon::parse($datesInMonth[0])->format('d/m/Y') }} -
                                     {{ \Carbon\Carbon::parse($datesInMonth[count($datesInMonth)-1])->format('d/m/Y') }}
                                 </p>
