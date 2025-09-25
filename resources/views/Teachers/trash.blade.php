@@ -26,7 +26,7 @@
             backdrop-filter: blur(10px);
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            overflow-x: hidden; /* Changed from hidden to visible */
+            overflow-y: visible; /* Changed from hidden to visible */
             margin-top: 30px;
             border: 1px solid rgba(255, 255, 255, 0.5);
             position: relative; /* Added for proper dropdown positioning */
@@ -37,7 +37,7 @@
             color: white;
             padding: 12px 15px;
             position: relative;
-            overflow: hidden; /* Changed from hidden to visible */
+            overflow: visible; /* Changed from hidden to visible */
             z-index: 100; /* Lower than dropdown */
         }
 
