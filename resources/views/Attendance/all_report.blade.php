@@ -12,7 +12,7 @@
             margin: 0;
             padding: 0;
             color: #333;
-            font-size: 12px;
+            font-size: 11px;
             line-height: 1.2;
         }
 
@@ -25,7 +25,7 @@
         @media print {
             body {
                 background-color: white;
-                font-size: 11px;
+                font-size: 10px;
             }
 
             .container {
@@ -99,7 +99,7 @@
 
         .header-text h4 {
             margin: 2px 0;
-            font-size: 14px;
+            font-size: 12px;
             text-transform: uppercase;
             font-weight: bold;
         }
@@ -168,7 +168,7 @@
             border: 1px solid #ddd;
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 11px;
+            font-size: 10px;
         }
 
         .table td {
@@ -467,15 +467,15 @@
                     </div>
 
                     <!-- Detailed Attendance Table -->
-                    <h5 class="summary-header">Detailed Student Attendance Records - {{ $monthName }}</h5>
+                    <h5 class="summary-header">Student Attendance Records - {{ $monthName }}</h5>
                     <div class="table-container">
                         <table class="table">
                             <thead>
                                 <tr>
                                     <th class="col-number">#</th>
                                     <th class="col-name">Student's Name</th>
-                                    <th class="col-gender">Gender</th>
-                                    <th class="col-stream">Stream</th>
+                                    <th class="col-gender">Sex</th>
+                                    <th class="col-stream">Stm</th>
                                     <!-- Date Columns -->
                                     @foreach ($datesInMonth as $date)
                                         <th class="col-date">{{ \Carbon\Carbon::parse($date)->format('d') }}</th>
