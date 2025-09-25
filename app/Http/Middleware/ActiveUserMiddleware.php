@@ -25,8 +25,8 @@ class ActiveUserMiddleware
         }
 
         if(! $user) {
-            Alert::error('Error!', 'Unauthorized user access');
-            return redirect()->route('logout');
+            // Alert::error('Error!', 'Unauthorized user access');
+            return redirect()->route('logout')->with('error', 'Unauthorized user access');
         }
 
         if($user->status == 1) {
@@ -34,8 +34,8 @@ class ActiveUserMiddleware
         }
 
         Auth::logout();
-        Alert::warning('Warning!', 'Account suspended, please contact system administrator');
-        return redirect()->route('login');
+        // Alert::warning('Warning!', 'Account suspended, please contact system administrator');
+        return redirect()->route('login')->with('error', 'Account suspended, please contact system administrator');
 
     }
 }
