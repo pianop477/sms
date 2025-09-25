@@ -35,7 +35,7 @@ class ActiveUserMiddleware
 
         Auth::logout();
         // Alert::warning('Warning!', 'Account suspended, please contact system administrator');
-        return redirect()->route('login')->with('error', 'Account suspended, please contact system administrator');
+        return redirect()->route('login')->with('error', 'Account suspended, please contact Admin');
 
     }
 }
