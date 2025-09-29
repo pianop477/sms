@@ -384,7 +384,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     //4. ROUTES ACCESS FOR ALL USERS ========================================================================================================
     Route::middleware('CheckUsertype:1,2,3,4')->group(function () {
         // Dashboard redirection
-        Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+        Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::get('Change-password', [HomeController::class, 'changepassword'])->name('change.password');
         Route::post('Change-password', [HomeController::class, 'storePassword'])->name('change.new.password');
         Route::get('Personal-details', [HomeController::class, 'showProfile'])->name('show.profile');

@@ -52,7 +52,7 @@ class WebAuthnLoginController extends Controller
 
         return response()->json([
             'success' => true,
-            'redirect' => '/home'
+            'redirect' => route('home'),
         ]);
     }
 }
