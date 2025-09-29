@@ -192,9 +192,9 @@
                                             @foreach ($classCourse as $course)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
-                                                    <td class="text-capitalize fw-medium">{{ $course->course_name }}</td>
-                                                    <td class="text-uppercase fw-bold">{{ $course->course_code }}</td>
-                                                    <td class="text-capitalize">{{ $course->first_name }} {{ $course->last_name }}</td>
+                                                    <td class="text-capitalize fw-medium">{{ ucwords(strtolower($course->course_name)) }}</td>
+                                                    <td class="text-uppercase fw-bold">{{ strtoupper($course->course_code) }}</td>
+                                                    <td class="text-capitalize">{{ ucwords(strtolower($course->first_name ))}} {{ ucwords(strtolower($course->last_name)) }}</td>
                                                     <td>
                                                         @if ($course->status == 1)
                                                             <span class="badge-status bg-success text-white">Active</span>
