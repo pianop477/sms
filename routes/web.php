@@ -72,14 +72,14 @@ Auth::routes();
 Route::get('/login/biometric', [WebAuthnLoginController::class, 'show'])->name('webauthn.login');
 
 // Start WebAuthn login challenge
-Route::post('/login/biometric/options', [WebAuthnLoginController::class, 'options'])->name('webauthn.login.options');
+Route::post('/login/biometric/options', [WebAuthnLoginController::class, 'options'])->name('webauthn.login.options')->middleware('throttle:5,1');
 
 // Verify credential and login
-Route::post('/login/biometric/verify', [WebAuthnLoginController::class, 'verify'])->name('webauthn.login.verify');
+Route::post('/login/biometric/verify', [WebAuthnLoginController::class, 'verify'])->name('webauthn.login.verify')->middleware('throttle:5,1');
 
 
-Route::post('/webauthn/register/options', [WebAuthnRegisterController::class, 'options'])->name('webauthn.register.options');
-Route::post('/webauthn/register/verify', [WebAuthnRegisterController::class, 'register'])->name('webauthn.register.verify');
+Route::post('/webauthn/register/options', [WebAuthnRegisterController::class, 'options'])->name('webauthn.register.options')->middleware('throttle:5,1');
+Route::post('/webauthn/register/verify', [WebAuthnRegisterController::class, 'register'])->name('webauthn.register.verify')->middleware('throttle:5,1');
 
 // ROUTE ACCESS FOR PARENTS REGISTRATION =================================================================================================
     Route::prefix('Register')->group(function () {
