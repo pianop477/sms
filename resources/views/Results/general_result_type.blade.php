@@ -244,6 +244,7 @@
             border-radius: 10px;
             padding: 10px 15px;
             transition: all 0.3s;
+            width: 100%;
         }
 
         .form-control-custom:focus {
