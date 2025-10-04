@@ -131,7 +131,6 @@
     <div class="error-container">
         <div class="error-card">
             <div class="error-header">
-                <div class="logo">SRT<span>Dashboard</span></div>
                 <h1 class="error-code">403</h1>
                 <h2 class="error-title">Access Denied</h2>
             </div>
