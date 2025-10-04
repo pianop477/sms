@@ -471,7 +471,7 @@
                             <table class="table table-custom table-responsive-md">
                                 <thead>
                                     <tr>
-                                        <th>Title</th>
+                                        <th>Result title</th>
                                         <th>Issued at</th>
                                         <th>Issued by</th>
                                         <th class="text-center">Display Mode</th>
@@ -482,7 +482,7 @@
                                     @if ($reports->isEmpty())
                                         <tr>
                                             <td colspan="5" class="text-center text-danger py-4">
-                                                <i class="fas fa-inbox me-2"></i> No compiled results found
+                                                <i class="fas fa-inbox me-2"></i> No compiled results were found
                                             </td>
                                         </tr>
                                     @else
@@ -573,7 +573,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6 mb-3">
                                 <label for="report-type" class="form-label">Report Type:</label>
-                                <select name="exam_type" id="report-type" class="form-control form-control-custom text-capitalize" required>
+                                <select name="exam_type" id="report-type" class="form-control-custom text-capitalize" required>
                                     <option value="">--Select Report Type--</option>
                                     <option value="mid-term">Mid-Term Assessment</option>
                                     <option value="terminal">Terminal Assessment</option>
@@ -584,12 +584,12 @@
 
                             <div class="col-md-6 mb-3" id="custom-input-container" style="display: none;">
                                 <label for="custom-report-type" class="form-label">Custom Report Type</label>
-                                <input type="text" name="custom_exam_type" id="custom-report-type" class="form-control form-control-custom" placeholder="Enter Report Type Name">
+                                <input type="text" name="custom_exam_type" id="custom-report-type" class="form-control-custom" placeholder="Enter Report Type Name">
                             </div>
 
                             <div class="col-md-6 mb-3">
                                 <label for="class-select" class="form-label">Class</label>
-                                <select name="class_id" id="class-select" class="form-control form-control-custom text-uppercase">
+                                <select name="class_id" id="class-select" class="form-control-custom text-uppercase">
                                     <option value="{{$classes->id}}" selected>{{$classes->class_name}}</option>
                                 </select>
                                 @error('class_id')
@@ -601,7 +601,7 @@
 
                             <div class="col-md-6 mb-3">
                                 <label for="term-select" class="form-label">Term</label>
-                                <select name="term" id="term-select" class="form-control form-control-custom text-capitalize" required>
+                                <select name="term" id="term-select" class="form-control-custom text-capitalize" required>
                                     <option value="" selected>--select term--</option>
                                     <option value="i">Term 1</option>
                                     <option value="ii">Term 2</option>
@@ -621,7 +621,7 @@
                                 <p class="text-danger fw-bold"><i class="fas fa-database me-2"></i> Examination Results Data Sets</p>
                                 <hr>
                                 @if ($groupedByMonth->isEmpty())
-                                    <p class="text-danger">No exam results records found</p>
+                                    <p class="text-danger">No results records were found</p>
                                 @else
                                     <div class="checkbox-container">
                                         @foreach ($groupedByMonth as $date => $resultDate)
@@ -644,7 +644,7 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <p class="text-danger fw-bold"><i class="fas fa-chart-pie me-2"></i> Report Aggregation Method</p>
+                                <p class="text-danger fw-bold"><i class="fas fa-chart-pie me-2"></i> Aggregation Mode</p>
                                 <div class="mt-3">
                                     <div class="radio-option">
                                         <div class="form-check">
