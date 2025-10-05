@@ -42,7 +42,8 @@ class CheckUserAgent
             ]);
 
             // Option 1: block completely
-            return abort(403, 'Access denied due to suspicious browser.');
+            // return abort(403, 'Access denied due to suspicious browser.');
+            return to_route('login')->with('error', 'Access denied due to suspicious browser.');
 
             // Option 2: just log and continue
             // return $next($request);
