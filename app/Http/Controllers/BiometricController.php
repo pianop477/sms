@@ -50,12 +50,12 @@ class BiometricController extends Controller
         otps::create([
             'user_id' => $user->id,
             'otp' => Hash::make($otp),
-            'expires_at' => now()->addMinutes(1),
+            'expires_at' => now()->addMinutes(5),
             'used' => false,
         ]);
 
         // Send SMS (mfano NextSmsService)
-        $message = "Your biometric verification OTP is: $otp. Expires in 1 minutes. Do not share this code with anyone.";
+        $message = "Your biometric verification OTP is: $otp. Expires in 5 minutes. Do not share this code with anyone.";
         $nextSmsService = new NextSmsService();
         $response = $nextSmsService->sendSmsByNext(
             "SHULE APP",
