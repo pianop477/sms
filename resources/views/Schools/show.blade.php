@@ -168,7 +168,7 @@
         }
 
         .badge-modern {
-            padding: 4ox 8px;
+            padding: 4px 8px;
             border-radius: 25px;
             font-weight: 600;
             font-size: 12px;
@@ -267,7 +267,7 @@
         <div class="glass-card header-section fade-in">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h3 class="display-4 fw-bold mb-3">🏫 {{$schools->school_name}}</h3>
+                    <h3 class="fw-bold mb-3">🏫 {{$schools->school_name}}</h3>
                     {{-- <p class="lead mb-0 opacity-90">Comprehensive School Management Dashboard</p> --}}
                 </div>
                 <div class="col-md-4 text-md-end">
@@ -312,7 +312,7 @@
                                     </div>
                                     <div>
                                         <small class="text-muted d-block text-capitalize">Address</small>
-                                        <strong>{{$schools->postal_address}} - {{$schools->postal_name}}</strong>
+                                        <strong>{{strtoupper($schools->postal_address)}} - {{ucwords(strtolower($schools->postal_name))}}</strong>
                                     </div>
                                 </div>
                             </div>
@@ -377,7 +377,7 @@
                                 <i class="fas fa-circle me-2 text-primary"></i>
                                 <strong>Status:</strong>
                                 @if ($managers->first()->status == 1)
-                                    <span class="badge-modern bg-success">Active</span>
+                                    <span class="badge-modern bg-success text-white">Active</span>
                                 @else
                                     <span class="badge-modern bg-secondary">Blocked</span>
                                 @endif
