@@ -326,7 +326,7 @@
                                     </div>
                                     <div>
                                         <small class="text-muted d-block">Country</small>
-                                        <strong>{{$schools->country}}</strong>
+                                        <strong>{{ucwords(strtolower($schools->country))}}</strong>
                                     </div>
                                 </div>
                             </div>
@@ -337,8 +337,8 @@
                                         <i class="fas fa-user-tie text-white"></i>
                                     </div>
                                     <div>
-                                        <small class="text-muted d-block text-capitalize">School Manager</small>
-                                        <strong>{{$managers->first()->first_name}} {{$managers->first()->last_name}}</strong>
+                                        <small class="text-muted d-block text-capitalize">School Admin</small>
+                                        <strong>{{ucwords(strtolower($managers->first()->first_name))}} {{ucwords(strtolower($managers->first()->last_name))}}</strong>
                                     </div>
                                 </div>
                             </div>
@@ -361,7 +361,7 @@
                             </div>
                             <div class="info-item text-capitalize">
                                 <i class="fas fa-venus-mars me-2 text-primary"></i>
-                                <strong>Gender:</strong> {{$managers->first()->gender}}
+                                <strong>Gender:</strong> {{strtoupper($managers->first()->gender)}}
                             </div>
                             <div class="info-item">
                                 <i class="fas fa-phone me-2 text-primary"></i>
@@ -371,7 +371,7 @@
                         <div class="col-md-6">
                             <div class="info-item">
                                 <i class="fas fa-envelope me-2 text-primary"></i>
-                                <strong>Email:</strong> {{$managers->first()->email}}
+                                <strong>Email:</strong> {{strtolower($managers->first()->email)}}
                             </div>
                             <div class="info-item">
                                 <i class="fas fa-circle me-2 text-primary"></i>
