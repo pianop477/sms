@@ -255,16 +255,16 @@
 
          @media print {
             @page {
-                margin: 10mm;
-                size: A4;
-            }
+            margin: 10mm;
+            size: A4;
+        }
 
             body {
                 background: white !important;
                 color: black !important;
                 font-size: 12pt;
                 font-family: 'Arial', 'Helvetica', sans-serif;
-                line-height: 1.4;
+                line-height: 1;
             }
 
             .dashboard-container {
@@ -282,13 +282,56 @@
                 padding: 0 !important;
             }
 
+            /* INVOICE HEADER - SINGLE COLUMN */
             .invoice-header {
                 background: #f8f9fa !important;
                 color: black !important;
                 border-radius: 0 !important;
-                padding: 15px !important;
+                padding: 8px !important;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                text-align: center !important;
+            }
+
+            .invoice-header .row {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                width: 100% !important;
+            }
+
+            .invoice-header .col-md-3,
+            .invoice-header .col-md-9 {
+                width: 100% !important;
+                max-width: 100% !important;
+                flex: 0 0 100% !important;
+                text-align: center !important;
+            }
+
+            /* Hide the second column and move all content to first column */
+            .invoice-header .col-md-9 {
+                display: none !important;
+            }
+
+            .invoice-header .col-md-3 {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                text-align: center !important;
+            }
+
+            /* Add invoice details below logo */
+            .invoice-header .col-md-3::after {
+                content: "" !important;
+                display: block !important;
+            }
+
+            .invoice-header .invoice-details-text {
+                display: block !important;
+                margin-top: 10px !important;
             }
 
             .invoice-header::before {
@@ -299,7 +342,7 @@
                 background: white !important;
                 color: black !important;
                 box-shadow: none !important;
-                padding: 15px !important;
+                padding: 8px !important;
                 margin: 0 !important;
             }
 
@@ -307,13 +350,14 @@
                 background: #f8f9fa !important;
                 border: 1px solid #ddd !important;
                 color: black !important;
-                padding: 15px !important;
+                padding: 8px !important;
             }
 
             .invoice-table {
                 border: 1px solid #000 !important;
                 box-shadow: none !important;
                 font-size: 10pt !important;
+                width: 100% !important;
             }
 
             .invoice-table thead {
@@ -340,11 +384,10 @@
             }
 
             .form-control {
-                border: 1px solid #000 !important;
                 background: white !important;
                 color: black !important;
                 padding: 4px !important;
-                font-size: 10pt !important;
+                font-size: 11pt !important;
             }
 
             .btn-print, .btn-modern {
@@ -356,7 +399,7 @@
                 border: 1px solid #ddd !important;
                 color: black !important;
                 padding: 10px !important;
-                margin: 5px 0 !important;
+                margin: 2px 0 !important;
                 page-break-inside: avoid;
             }
 
@@ -379,7 +422,6 @@
             .student-count {
                 background: #e9ecef !important;
                 color: black !important;
-                border: 1px solid #ddd !important;
             }
 
             .text-primary {
@@ -388,7 +430,7 @@
             }
 
             .text-muted {
-                color: #666 !important;
+                color: black !important;
             }
 
             /* Ensure no elements are cut off */
@@ -414,11 +456,11 @@
             /* Improve text readability */
             h4, h5, h6 {
                 color: black !important;
-                margin: 8px 0 !important;
+                margin: 4px 0 !important;
             }
 
             p {
-                margin: 4px 0 !important;
+                margin: 2px 0 !important;
                 color: black !important;
             }
 
@@ -429,6 +471,7 @@
                 padding: 10px !important;
                 background: #f8f9fa !important;
             }
+
             .no-print {
                 display: none !important;
             }
@@ -495,7 +538,7 @@
                     <div class="col-md-6 mb-4">
                         <div class="billed-to">
                             <h4 class="text-primary mb-3">
-                                <i class="fas fa-building me-2"></i>Billed To
+                                <i class="fas fa-building me-2"></i> Billed To
                             </h4>
                             <h5 class="text-uppercase text-primary fw-bold">{{ $schools->school_name }}</h5>
                             <p class="text-capitalize mb-1">
