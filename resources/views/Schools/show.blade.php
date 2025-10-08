@@ -361,7 +361,7 @@
                             </div>
                             <div class="info-item text-capitalize">
                                 <i class="fas fa-venus-mars me-2 text-primary"></i>
-                                <strong>Gender:</strong> {{strtoupper($managers->first()->gender)}}
+                                <strong>Gender:</strong> {{ucwords(strtolower($managers->first()->gender))}}
                             </div>
                             <div class="info-item">
                                 <i class="fas fa-phone me-2 text-primary"></i>
