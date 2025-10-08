@@ -53,7 +53,7 @@ use PHPUnit\Runner\ResultCache\ResultCache;
 |
 */
 
-Route::get('/Welcome', function () {
+Route::get('/welcome', function () {
     return view('welcome');
 })->name('welcome');
 
