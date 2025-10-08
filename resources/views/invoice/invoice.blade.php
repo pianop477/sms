@@ -42,38 +42,66 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
+            gap: 30px;
+        }
+
+        .company-info {
+            flex: 1;
         }
 
         .company-info h1 {
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 8px;
+            color: white;
         }
 
         .company-info .tagline {
             font-size: 1.1rem;
             opacity: 0.9;
             color: white;
+            margin-bottom: 20px;
         }
 
-        .company-info p {
-            margin: 0;
-            line-height: 1.4;
+        .user-details {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .user-details p {
+            margin: 5px 0;
             color: white;
+            font-size: 0.95rem;
         }
 
         .invoice-meta {
-            text-align: right;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.15);
             padding: 20px;
             border-radius: 8px;
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-width: 250px;
         }
 
         .invoice-meta h2 {
             font-size: 1.8rem;
             margin-bottom: 15px;
             font-weight: 600;
+            color: white;
+        }
+
+        .meta-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        .meta-item span:first-child {
+            opacity: 0.9;
         }
 
         .invoice-body {
@@ -89,47 +117,68 @@
 
         .info-card {
             background: var(--light-bg);
-            padding: 20px;
-            border-radius: 8px;
+            padding: 25px;
+            border-radius: 10px;
             border-left: 4px solid var(--accent);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .info-card h3 {
             color: var(--primary);
-            margin-bottom: 15px;
-            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-card h3 i {
+            font-size: 1.2rem;
         }
 
         .info-item {
             display: flex;
-            justify-content: between;
-            margin-bottom: 8px;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
         }
 
         .info-label {
             font-weight: 600;
             color: var(--text);
-            min-width: 120px;
+            min-width: 100px;
         }
 
         .info-value {
             color: var(--text-light);
+            text-align: right;
+            flex: 1;
         }
 
         .service-period {
             background: var(--light-bg);
-            padding: 20px;
-            border-radius: 8px;
+            padding: 25px;
+            border-radius: 10px;
             margin-bottom: 30px;
             border: 1px solid var(--border);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .service-period h3 {
             color: var(--primary);
-            margin-bottom: 15px;
-            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .period-grid {
@@ -138,32 +187,44 @@
             gap: 20px;
         }
 
+        .period-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .period-item:last-child {
+            border-bottom: none;
+        }
+
         .invoice-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 30px;
             background: white;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .invoice-table thead {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
         }
 
         .invoice-table th {
-            padding: 15px 12px;
+            padding: 16px 12px;
             text-align: left;
             font-weight: 600;
             font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            border: none;
         }
 
         .invoice-table td {
-            padding: 15px 12px;
+            padding: 16px 12px;
             border-bottom: 1px solid var(--border);
             vertical-align: middle;
         }
@@ -173,18 +234,21 @@
         }
 
         .amount-input {
-            width: 120px;
-            padding: 8px 12px;
-            border: 1px solid var(--border);
+            width: 140px;
+            padding: 10px 12px;
+            border: 2px solid var(--border);
             border-radius: 6px;
-            font-size: 0.9rem;
+            font-size: 1rem;
             text-align: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
         .amount-input:focus {
             outline: none;
             border-color: var(--accent);
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            transform: translateY(-1px);
         }
 
         .total-row {
@@ -204,48 +268,63 @@
 
         .payment-section h3 {
             color: var(--primary);
-            margin-bottom: 20px;
-            font-size: 1.3rem;
+            margin-bottom: 25px;
+            font-size: 1.4rem;
             font-weight: 600;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .payment-methods {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 25px;
         }
 
         .payment-method {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
+            padding: 25px;
+            border-radius: 10px;
             border: 1px solid var(--border);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .payment-method:hover {
+            transform: translateY(-2px);
         }
 
         .payment-method h4 {
             color: var(--primary);
-            margin-bottom: 15px;
-            font-size: 1.1rem;
+            margin-bottom: 18px;
+            font-size: 1.2rem;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+        }
+
+        .payment-method p {
+            margin-bottom: 8px;
+            color: var(--text-light);
         }
 
         .action-buttons {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
-            padding: 20px;
+            gap: 20px;
+            margin-top: 40px;
+            padding: 25px;
             background: var(--light-bg);
-            border-radius: 8px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
         }
 
         .btn {
-            padding: 12px 24px;
+            padding: 14px 28px;
             border: none;
             border-radius: 8px;
             font-weight: 600;
@@ -253,8 +332,9 @@
             transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             text-decoration: none;
+            font-size: 1rem;
         }
 
         .btn-print {
@@ -265,6 +345,7 @@
         .btn-print:hover {
             background: var(--secondary);
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
         }
 
         .btn-send {
@@ -275,6 +356,7 @@
         .btn-send:hover {
             background: #059669;
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
 
         .invoice-footer {
@@ -301,9 +383,11 @@
             body {
                 background: white !important;
                 color: black !important;
-                font-size: 12pt;
+                font-size: 11pt;
                 font-family: 'Arial', 'Helvetica', sans-serif;
-                line-height: 1.4;
+                line-height: 1.3;
+                margin: 0;
+                padding: 0;
             }
 
             .dashboard-container {
@@ -312,44 +396,63 @@
                 margin: 0 !important;
             }
 
-            .company-info p, {
-                color: black !important;
-            }
-
-            . .company-info .tagline {
-                color: black !important;
-            }
-
             .modern-card {
                 box-shadow: none !important;
                 border: 1px solid #000 !important;
                 border-radius: 0 !important;
                 margin: 0 !important;
+                page-break-inside: avoid;
             }
 
             .invoice-header {
-                background: #f8f9fa !important;
+                background: #f0f0f0 !important;
                 color: black !important;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
                 padding: 20px !important;
+                border-bottom: 2px solid #000 !important;
             }
 
             .header-content {
                 display: flex !important;
                 justify-content: space-between !important;
                 align-items: flex-start !important;
+                gap: 20px !important;
             }
 
             .company-info h1 {
                 color: black !important;
-                font-size: 24pt !important;
+                font-size: 20pt !important;
+                margin-bottom: 5px !important;
+            }
+
+            .company-info .tagline {
+                color: black !important;
+                opacity: 0.8 !important;
+            }
+
+            .user-details {
+                background: #e8e8e8 !important;
+                color: black !important;
+                border: 1px solid #000 !important;
+            }
+
+            .user-details p {
+                color: black !important;
             }
 
             .invoice-meta {
-                background: #e9ecef !important;
+                background: #e8e8e8 !important;
                 color: black !important;
-                padding: 15px !important;
+                border: 1px solid #000 !important;
+            }
+
+            .invoice-meta h2 {
+                color: black !important;
+            }
+
+            .meta-item {
+                color: black !important;
             }
 
             .invoice-body {
@@ -359,68 +462,90 @@
             .info-grid {
                 grid-template-columns: 1fr 1fr !important;
                 gap: 20px !important;
+                margin-bottom: 25px !important;
             }
 
             .info-card {
                 background: #f8f9fa !important;
-                border-left: 4px solid #000 !important;
+                border-left: 3px solid #000 !important;
+                border: 1px solid #000 !important;
+                page-break-inside: avoid;
+            }
+
+            .info-card h3 {
+                color: black !important;
             }
 
             .service-period {
                 background: #f8f9fa !important;
                 border: 1px solid #000 !important;
+                page-break-inside: avoid;
+            }
+
+            .service-period h3 {
+                color: black !important;
             }
 
             .invoice-table {
                 border: 1px solid #000 !important;
+                page-break-inside: avoid;
             }
 
             .invoice-table thead {
-                background: #e9ecef !important;
+                background: #e8e8e8 !important;
                 color: black !important;
             }
 
-            .invoice-table th,
+            .invoice-table th {
+                border: 1px solid #000 !important;
+                padding: 12px 8px !important;
+                background: #e8e8e8 !important;
+            }
+
             .invoice-table td {
                 border: 1px solid #000 !important;
-                padding: 10px 8px !important;
+                padding: 12px 8px !important;
             }
 
             .amount-input {
                 border: 1px solid #000 !important;
                 background: white !important;
+                color: black !important;
+                width: 120px !important;
             }
 
             .payment-methods {
                 grid-template-columns: 1fr 1fr !important;
+                gap: 20px !important;
+                page-break-inside: avoid;
             }
 
             .payment-method {
                 border: 1px solid #000 !important;
                 background: white !important;
+                page-break-inside: avoid;
+            }
+
+            .payment-method h4 {
+                color: black !important;
             }
 
             .action-buttons,
-            .btn {
+            .btn,
+            .no-print {
                 display: none !important;
             }
 
             .invoice-footer {
-                background: #f8f9fa !important;
+                background: #f0f0f0 !important;
                 border-top: 1px solid #000 !important;
+                margin-top: 20px !important;
             }
 
             /* Ensure good print layout */
             .modern-card {
                 page-break-inside: avoid;
-            }
-
-            .invoice-table {
-                page-break-inside: avoid;
-            }
-
-            .payment-section {
-                page-break-inside: avoid;
+                break-inside: avoid;
             }
         }
 
@@ -436,7 +561,8 @@
             }
 
             .invoice-meta {
-                text-align: left;
+                min-width: auto;
+                width: 100%;
             }
 
             .info-grid {
@@ -453,12 +579,22 @@
 
             .action-buttons {
                 flex-direction: column;
+                gap: 15px;
             }
 
             .footer-content {
                 flex-direction: column;
                 gap: 10px;
                 text-align: center;
+            }
+
+            .invoice-table {
+                font-size: 0.9rem;
+            }
+
+            .invoice-table th,
+            .invoice-table td {
+                padding: 12px 8px;
             }
         }
     </style>
@@ -470,22 +606,22 @@
                 <div class="header-content">
                     <div class="company-info">
                         <h1>INVOICE</h1>
-                        <p class="tagline">SHULEAPP - School Management System</p>
-                        <div style="margin-top: 15px; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
-                            <p style="margin: 2px 0;">{{ ucwords(strtolower(Auth::user()->first_name)) }} {{ ucwords(strtolower(Auth::user()->last_name ))}}</p>
-                            <p style="margin: 2px 0;">{{ Auth::user()->email }}</p>
-                            <p style="margin: 2px 0;">{{ Auth::user()->phone }}</p>
+                        <p class="tagline">SHULEAPP - Professional School Management</p>
+                        <div class="user-details">
+                            <p><strong>{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</strong></p>
+                            <p>{{ Auth::user()->email }}</p>
+                            <p>{{ Auth::user()->phone }}</p>
                         </div>
                     </div>
                     <div class="invoice-meta">
                         <h2>INV-{{ \Carbon\Carbon::now()->format('Ymd-His') }}</h2>
-                        <div class="info-item">
-                            <span>Invoice Date: </span>
-                            <strong> {{\Carbon\Carbon::now()->format('d M Y')}}</strong>
+                        <div class="meta-item">
+                            <span>Invoice Date:</span>
+                            <strong>{{\Carbon\Carbon::now()->format('d M Y')}}</strong>
                         </div>
-                        <div class="info-item">
-                            <span>Due Date: </span>
-                            <strong> {{ \Carbon\Carbon::now()->addMonth()->format('d M Y') }}</strong>
+                        <div class="meta-item">
+                            <span>Due Date:</span>
+                            <strong>{{ \Carbon\Carbon::now()->addMonth()->format('d M Y') }}</strong>
                         </div>
                     </div>
                 </div>
@@ -496,37 +632,38 @@
                 <!-- Client and Invoice Info -->
                 <div class="info-grid">
                     <div class="info-card">
-                        <h3>Billed To</h3>
+                        <h3>🏢 Billed To</h3>
                         <div class="info-item">
-                            <strong>{{ ucwords(strtolower($schools->school_name)) }}</strong>
+                            <span class="info-label">School:</span>
+                            <span class="info-value"><strong>{{ $schools->school_name }}</strong></span>
                         </div>
                         <div class="info-item">
-                            <span>Address:</span>
-                            <span>{{ ucwords(strtolower($schools->postal_address)) }} - {{ ucwords(strtolower($schools->postal_name)) }}</span>
+                            <span class="info-label">Address:</span>
+                            <span class="info-value">{{ $schools->postal_address }} - {{ $schools->postal_name }}</span>
                         </div>
                         <div class="info-item">
-                            <span>Country:</span>
-                            <span>{{ ucwords(strtolower($schools->country)) }}</span>
+                            <span class="info-label">Country:</span>
+                            <span class="info-value">{{ $schools->country }}</span>
                         </div>
                         <div class="info-item">
-                            <span>Email:</span>
-                            <span>{{ $managers->first()->email }}</span>
+                            <span class="info-label">Email:</span>
+                            <span class="info-value">{{ $managers->first()->email }}</span>
                         </div>
                     </div>
 
                     <div class="info-card">
-                        <h3>Service Time Duration</h3>
+                        <h3>📅 Service Period</h3>
                         <div class="info-item">
-                            <span>Start Date :</span>
-                            <span>{{ \Carbon\Carbon::parse($schools->service_start_date)->format('d M Y') ?? 'Not set' }}</span>
+                            <span class="info-label">Start Date:</span>
+                            <span class="info-value">{{ \Carbon\Carbon::parse($schools->service_start_date)->format('d M Y') ?? 'Not set' }}</span>
                         </div>
                         <div class="info-item">
-                            <span>End Date: </span>
-                            <span>{{ \Carbon\Carbon::parse($schools->service_end_date)->format('d M Y') ?? 'Not set' }}</span>
+                            <span class="info-label">End Date:</span>
+                            <span class="info-value">{{ \Carbon\Carbon::parse($schools->service_end_date)->format('d M Y') ?? 'Not set' }}</span>
                         </div>
                         <div class="info-item">
-                            <span>Duration: </span>
-                            <span>{{ \Carbon\Carbon::parse($schools->service_start_date)->diffInMonths(\Carbon\Carbon::parse($schools->service_end_date)) }} months</span>
+                            <span class="info-label">Duration:</span>
+                            <span class="info-value">{{ \Carbon\Carbon::parse($schools->service_start_date)->diffInMonths(\Carbon\Carbon::parse($schools->service_end_date)) }} months</span>
                         </div>
                     </div>
                 </div>
@@ -547,7 +684,9 @@
                         <tr>
                             <td>1</td>
                             <td>
-                                <strong>Service Cost for Year - {{ \Carbon\Carbon::now()->format('Y') }}</strong>
+                                <strong>Service Cost for {{ \Carbon\Carbon::now()->format('Y') }}</strong>
+                                <br>
+                                <small style="color: var(--text-light);">Comprehensive school management services</small>
                             </td>
                             <td>
                                 {{ \Carbon\Carbon::parse($schools->service_start_date)->format('d/m/Y') ?? '-' }} -
@@ -580,7 +719,7 @@
 
                 <!-- Payment Methods -->
                 <div class="payment-section">
-                    <h3>Payment Methods</h3>
+                    <h3>💳 Payment Methods</h3>
                     <div class="payment-methods">
                         <div class="payment-method">
                             <h4>🏦 Bank Transfer</h4>
