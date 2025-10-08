@@ -2,22 +2,17 @@
 @section('content')
     <style>
         :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --success: #4cc9f0;
-            --info: #4895ef;
-            --warning: #f72585;
-            --danger: #e63946;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --gradient-start: #4361ee;
-            --gradient-end: #3a0ca3;
-            --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            --hover-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+            --primary: #2c5aa0;
+            --secondary: #1e3a8a;
+            --accent: #3b82f6;
+            --light-bg: #f8fafc;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-light: #64748b;
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f1f5f9;
             font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
             min-height: 100vh;
         }
@@ -25,246 +20,283 @@
         .dashboard-container {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 4px;
+            padding: 20px;
         }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: var(--card-shadow);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        .modern-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             overflow: hidden;
-        }
-
-        .glass-card:hover {
-            box-shadow: var(--hover-shadow);
-            transform: translateY(-5px);
+            border: 1px solid var(--border);
         }
 
         .invoice-header {
-            background: gray;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            border-radius: 24px 24px 0 0;
-            padding: 3px;
+            padding: 30px;
             position: relative;
-            overflow: hidden;
         }
 
-        .invoice-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transform: rotate(45deg);
-            animation: shimmer 3s infinite;
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
         }
 
-        @keyframes shimmer {
-            0% { transform: translateX(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) rotate(45deg); }
+        .company-info h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
 
-        .logo-container {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50px;
-            padding: 5px
-            display: inline-block;
+        .company-info .tagline {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .invoice-meta {
+            text-align: right;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
             backdrop-filter: blur(10px);
         }
 
-        .invoice-logo {
-            width: 100px;
-            height: 100px;
-            object-fit: contain;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        .invoice-meta h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-weight: 600;
         }
 
-        .invoice-details {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 5px;
-            margin: -4px 4px 4px 4px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        .invoice-body {
+            padding: 30px;
         }
 
-        .billed-to {
-            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(58, 12, 163, 0.1));
-            border-radius: 16px;
-            padding: 2px;
-            border: 2px solid rgba(67, 97, 238, 0.2);
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: var(--light-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .info-card h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: between;
+            margin-bottom: 8px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--text);
+            min-width: 120px;
+        }
+
+        .info-value {
+            color: var(--text-light);
+        }
+
+        .service-period {
+            background: var(--light-bg);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .service-period h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .period-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
 
         .invoice-table {
-            border-radius: 16px;
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            background: white;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .invoice-table thead {
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            background: var(--primary);
             color: white;
         }
 
         .invoice-table th {
-            padding: 4px;
+            padding: 15px 12px;
+            text-align: left;
             font-weight: 600;
-            border: none;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .invoice-table td {
-            padding: 4px;
-            border-bottom: 1px solid rgba(67, 97, 238, 0.1);
+            padding: 15px 12px;
+            border-bottom: 1px solid var(--border);
             vertical-align: middle;
         }
 
-        .invoice-table tbody tr {
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
-        }
-
         .invoice-table tbody tr:hover {
-            background: rgba(67, 97, 238, 0.05);
-            transform: translateX(5px);
+            background: #f8fafc;
         }
 
-        .form-control {
-            border: 2px solid rgba(67, 97, 238, 0.2);
-            border-radius: 12px;
-            padding: 5px 3px;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
+        .amount-input {
+            width: 120px;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            text-align: center;
         }
 
-        .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 0.3rem rgba(67, 97, 238, 0.1);
-            transform: translateY(-2px);
+        .amount-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
-        .btn-modern {
-            background: linear-gradient(135deg, var(--success), #0f9d58);
-            border: none;
-            border-radius: 16px;
-            padding: 10px 15px;
-            color: white;
+        .total-row {
+            background: var(--light-bg) !important;
             font-weight: 600;
-            transition: all 0.4s ease;
-            box-shadow: 0 15px 35px rgba(28, 200, 138, 0.3);
-        }
-
-        .btn-modern:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 25px 45px rgba(28, 200, 138, 0.4);
-            color: white;
-        }
-
-        .btn-print {
-            background: linear-gradient(135deg, var(--info), var(--primary));
-            border: none;
-            border-radius: 16px;
-            padding: 10px 15px;
-            color: white;
-            font-weight: 600;
-            transition: all 0.4s ease;
-            box-shadow: 0 15px 35px rgba(67, 97, 238, 0.3);
-        }
-
-        .btn-print:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 25px 45px rgba(67, 97, 238, 0.4);
-            color: white;
-        }
-
-        .payment-method {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 16px;
-            padding: 8px;
-            margin: 4px 0;
-            border: 2px solid rgba(67, 97, 238, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .payment-method:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
         }
 
         .total-amount {
-            background: linear-gradient(135deg, var(--warning), #f77f00);
-            color: white;
-            padding: 4px;
-            border-radius: 16px;
+            font-size: 1.3rem;
+            color: var(--primary);
             font-weight: 700;
-            font-size: 20;
+        }
+
+        .payment-section {
+            margin-top: 40px;
+        }
+
+        .payment-section h3 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(247, 127, 0, 0.3);
         }
 
-        @media (max-width: 768px) {
-            .dashboard-container {
-                padding: 4px;
-            }
-
-            .invoice-header {
-                padding: 5px;
-            }
-
-            .invoice-details {
-                margin: -4px 4px 4px 4px;
-                padding: 6px;
-            }
-
-            .invoice-table th,
-            .invoice-table td {
-                padding: 4px;
-            }
-
-            .btn-modern,
-            .btn-print {
-                width: 100%;
-                margin-bottom: 4px;
-            }
+        .payment-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
 
-        /* Animation classes */
-        .fade-in {
-            animation: fadeInUp 0.8s ease-out;
+        .payment-method {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        .slide-in {
-            animation: slideInRight 0.8s ease-out;
+        .payment-method h4 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            padding: 20px;
+            background: var(--light-bg);
+            border-radius: 8px;
         }
 
-         @media print {
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-print {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-print:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn-send {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-send:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .invoice-footer {
+            background: var(--light-bg);
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* PRINT STYLES */
+        @media print {
             @page {
-            margin: 10mm;
-            size: A4;
-        }
+                margin: 15mm;
+                size: A4;
+            }
 
             body {
                 background: white !important;
                 color: black !important;
                 font-size: 12pt;
                 font-family: 'Arial', 'Helvetica', sans-serif;
-                line-height: 1;
+                line-height: 1.4;
             }
 
             .dashboard-container {
@@ -273,451 +305,318 @@
                 margin: 0 !important;
             }
 
-            .glass-card {
-                background: white !important;
+            .modern-card {
                 box-shadow: none !important;
                 border: 1px solid #000 !important;
                 border-radius: 0 !important;
                 margin: 0 !important;
-                padding: 0 !important;
             }
 
-            /* INVOICE HEADER - SINGLE COLUMN */
             .invoice-header {
                 background: #f8f9fa !important;
                 color: black !important;
-                border-radius: 0 !important;
-                padding: 8px !important;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
+                padding: 20px !important;
+            }
+
+            .header-content {
                 display: flex !important;
-                flex-direction: column !important;
-                align-items: center !important;
-                text-align: center !important;
+                justify-content: space-between !important;
+                align-items: flex-start !important;
             }
 
-            .invoice-header .row {
-                display: flex !important;
-                flex-direction: column !important;
-                align-items: center !important;
-                width: 100% !important;
-            }
-
-            .invoice-header .col-md-3,
-            .invoice-header .col-md-9 {
-                width: 100% !important;
-                /* max-width: 70% !important; */
-                flex: 0 0 100% !important;
-                text-align: end !important;
-            }
-
-            /* Hide the second column and move all content to first column */
-            .invoice-header .col-md-9 {
-                display: none !important;
-            }
-
-            .invoice-header .col-md-3 {
-                display: flex !important;
-                flex-direction: row !important;
-                align-items: center !important;
-                text-align: center !important;
-            }
-
-            /* Add invoice details below logo */
-            .invoice-header .col-md-3::after {
-                content: "" !important;
-                display: block !important;
-            }
-
-            .invoice-header .invoice-details-text {
-                display: block !important;
-                margin-top: 10px !important;
-            }
-
-            .invoice-header::before {
-                display: none !important;
-            }
-
-            .invoice-details {
-                background: white !important;
+            .company-info h1 {
                 color: black !important;
-                box-shadow: none !important;
-                padding: 8px !important;
-                margin: 0 !important;
+                font-size: 24pt !important;
             }
 
-            .billed-to {
+            .invoice-meta {
+                background: #e9ecef !important;
+                color: black !important;
+                padding: 15px !important;
+            }
+
+            .invoice-body {
+                padding: 20px !important;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 20px !important;
+            }
+
+            .info-card {
                 background: #f8f9fa !important;
-                border: 1px solid #ddd !important;
-                color: black !important;
-                padding: 8px !important;
+                border-left: 4px solid #000 !important;
+            }
+
+            .service-period {
+                background: #f8f9fa !important;
+                border: 1px solid #000 !important;
             }
 
             .invoice-table {
                 border: 1px solid #000 !important;
-                box-shadow: none !important;
-                font-size: 10pt !important;
-                width: 100% !important;
             }
 
             .invoice-table thead {
-                background: #f8f9fa !important;
+                background: #e9ecef !important;
                 color: black !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
             }
 
-            .invoice-table th {
-                border-bottom: 2px solid #000 !important;
-                font-weight: bold !important;
-                padding: 8px 4px !important;
-            }
-
+            .invoice-table th,
             .invoice-table td {
-                border-bottom: 1px solid #ddd !important;
-                padding: 6px 4px !important;
+                border: 1px solid #000 !important;
+                padding: 10px 8px !important;
             }
 
-            table, th, td {
-                border: 1px solid black !important;
-                border-collapse: collapse !important;
-            }
-
-            .form-control {
+            .amount-input {
+                border: 1px solid #000 !important;
                 background: white !important;
-                color: black !important;
-                padding: 4px !important;
-                font-size: 11pt !important;
             }
 
-            .btn-print, .btn-modern {
-                display: none !important;
+            .payment-methods {
+                grid-template-columns: 1fr 1fr !important;
             }
 
             .payment-method {
-                background: white !important;
-                border: 1px solid #ddd !important;
-                color: black !important;
-                padding: 10px !important;
-                margin: 2px 0 !important;
-                page-break-inside: avoid;
-            }
-
-            .total-amount {
-                background: #e9ecef !important;
-                color: black !important;
                 border: 1px solid #000 !important;
-                font-weight: bold !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-
-            .amount-display {
                 background: white !important;
-                color: black !important;
-                border: 1px solid #ddd !important;
-                font-weight: bold !important;
             }
 
-            .student-count {
-                background: #e9ecef !important;
-                color: black !important;
+            .action-buttons,
+            .btn {
+                display: none !important;
             }
 
-            .text-primary {
-                color: black !important;
-                font-weight: bold !important;
+            .invoice-footer {
+                background: #f8f9fa !important;
+                border-top: 1px solid #000 !important;
             }
 
-            .text-muted {
-                color: black !important;
-            }
-
-            /* Ensure no elements are cut off */
-            .glass-card {
+            /* Ensure good print layout */
+            .modern-card {
                 page-break-inside: avoid;
-                break-inside: avoid;
             }
 
             .invoice-table {
                 page-break-inside: avoid;
-                break-inside: avoid;
             }
 
-            /* Hide unnecessary elements for print */
-            .logo-container {
-                background: transparent !important;
-            }
-
-            .invoice-logo {
-                border: 1px solid #000 !important;
-            }
-
-            /* Improve text readability */
-            h4, h5, h6 {
-                color: black !important;
-                margin: 4px 0 !important;
-            }
-
-            p {
-                margin: 2px 0 !important;
-                color: black !important;
-            }
-
-            /* Footer styling for print */
-            .glass-card.mt-2 {
-                border-top: 2px solid #000 !important;
-                margin-top: 20px !important;
-                padding: 10px !important;
-                background: #f8f9fa !important;
-            }
-
-            .no-print {
-                display: none !important;
+            .payment-section {
+                page-break-inside: avoid;
             }
         }
 
-        @keyframes slideInRight {
-            from {
-                opacity: 0;
-                transform: translateX(30px);
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 10px;
             }
-            to {
-                opacity: 1;
-                transform: translateX(0);
+
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .invoice-meta {
+                text-align: left;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-methods {
+                grid-template-columns: 1fr;
+            }
+
+            .period-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
             }
         }
-
-        .amount-display {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--primary);
-            text-align: center;
-            padding: 2px;
-            background: rgba(67, 97, 238, 0.1);
-            border-radius: 16px;
-            margin: 2px 0;
-        }
-
-        .student-count {
-            background: linear-gradient(135deg, rgba(76, 201, 240, 0.1), rgba(72, 149, 239, 0.1));
-            padding: 2px 4px;
-            border-radius: 20px;
-            font-weight: 600;
-            color: var(--info);
-        }
-
-        .invoice-header {
-                background: #d9ddec !important;
-                -webkit-print-color-adjust: exact;
-            }
     </style>
 
     <div class="dashboard-container">
-        <!-- Invoice Header -->
-        <div class="glass-card fade-in">
+        <div class="modern-card">
+            <!-- Invoice Header -->
             <div class="invoice-header">
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="logo-container">
-                            <img src="{{ asset('assets/img/logo/logo.png') }}" alt="ShuleApp Logo" class="invoice-logo">
+                <div class="header-content">
+                    <div class="company-info">
+                        <h1>INVOICE</h1>
+                        <p class="tagline">SHULEAPP - Professional School Management</p>
+                        <div style="margin-top: 15px; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
+                            <p style="margin: 2px 0;">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</p>
+                            <p style="margin: 2px 0;">{{ Auth::user()->email }}</p>
+                            <p style="margin: 2px 0;">{{ Auth::user()->phone }}</p>
                         </div>
                     </div>
-                    <div class="col-md-9 text-end">
-                        <h4 class="display-4 fw-bold mb-2 text-dark"> INVOICE</h4>
-                        <p class="lead mb-1 opacity-90 text-dark">SHULEAPP - ADMINISTRATOR</p>
-                        <p class="mb-1 text-capitalize text-dark">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</p>
-                        <p class="mb-1 text-dark">{{ Auth::user()->email }}</p>
-                        <p class="mb-0 text-dark">{{ Auth::user()->phone }}</p>
+                    <div class="invoice-meta">
+                        <h2>INV-{{ \Carbon\Carbon::now()->format('Ymd-His') }}</h2>
+                        <div class="info-item">
+                            <span>Invoice Date:</span>
+                            <strong>{{\Carbon\Carbon::now()->format('d M Y')}}</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>Due Date:</span>
+                            <strong>{{ \Carbon\Carbon::now()->addMonth()->format('d M Y') }}</strong>
+                        </div>
                     </div>
                 </div>
             </div>
-            <!-- Invoice Details -->
-            <div class="invoice-details">
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <div class="billed-to">
-                            <h4 class="text-primary mb-3">
-                                <i class="fas fa-building me-2"></i> Billed To
-                            </h4>
-                            <h5 class="text-uppercase text-primary fw-bold">{{ $schools->school_name }}</h5>
-                            <p class="text-capitalize mb-1">
-                                <i class="fas fa-map-marker-alt me-2"></i>
-                                {{ $schools->postal_address }} - {{ $schools->postal_name }}
-                            </p>
-                            <p class="text-capitalize mb-1">
-                                <i class="fas fa-globe me-2"></i>
-                                {{ $schools->country }}
-                            </p>
-                            <p class="mb-0">
-                                <i class="fas fa-envelope me-2"></i>
-                                {{ $managers->first()->email }}
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <div class="bg-light p-4 rounded-3">
-                            <h4 class="text-primary mb-3">
-                                <i class="fas fa-receipt me-2"></i> Invoice Details
-                            </h4>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="fw-bold">Invoice Date:</span>
-                                <span>{{\Carbon\Carbon::now()->format('d M Y')}}</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="fw-bold">Due Date:</span>
-                                <span>{{ \Carbon\Carbon::now()->addMonth()->format('d M Y') }}</span>
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <span class="fw-bold">Invoice #:</span>
-                                <span>INV-{{ \Carbon\Carbon::now()->format('Ymd-His') }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Service Details -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="bg-light p-2 rounded-3">
-                            <h5 class="text-primary mb-3">
-                                <i class="fas fa-info-circle me-2"></i> Service Duration
-                            </h5>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <p class="mb-1"><strong>Start Date:</strong>
-                                        {{ \Carbon\Carbon::parse($schools->service_start_date)->format('d M Y') ?? 'Not set' }}
-                                    </p>
-                                </div>
-                                <div class="col-md-6">
-                                    <p class="mb-1"><strong>End Date:</strong>
-                                        {{ \Carbon\Carbon::parse($schools->service_end_date)->format('d M Y') ?? 'Not set' }}
-                                    </p>
-                                </div>
-                            </div>
+            <!-- Invoice Body -->
+            <div class="invoice-body">
+                <!-- Client and Invoice Info -->
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3>Billed To</h3>
+                        <div class="info-item">
+                            <strong>{{ $schools->school_name }}</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>Address:</span>
+                            <span>{{ $schools->postal_address }} - {{ $schools->postal_name }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span>Country:</span>
+                            <span>{{ $schools->country }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span>Email:</span>
+                            <span>{{ $managers->first()->email }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>Service Period</h3>
+                        <div class="info-item">
+                            <span>Start Date:</span>
+                            <span>{{ \Carbon\Carbon::parse($schools->service_start_date)->format('d M Y') ?? 'Not set' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span>End Date:</span>
+                            <span>{{ \Carbon\Carbon::parse($schools->service_end_date)->format('d M Y') ?? 'Not set' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span>Duration:</span>
+                            <span>{{ \Carbon\Carbon::parse($schools->service_start_date)->diffInMonths(\Carbon\Carbon::parse($schools->service_end_date)) }} months</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Invoice Table -->
-                <div class="invoice-table fade-in">
-                    <table class="table table-responsive-md">
-                        <thead>
-                            <tr>
-                                <th class="text-center">#</th>
-                                <th class="text-left">Description</th>
-                                <th class="text-left">Time Duration</th>
-                                <th class="text-center">No. of Students</th>
-                                <th class="text-center">Unit Cost (TZS)</th>
-                                <th class="text-center">Total (TZS)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="slide-in">
-                                <td class="text-center fw-bold">1</td>
-                                <td class="text-left">
-                                    {{-- <i class="fas fa-cogs me-2 text-primary"></i> --}}
-                                    Service Cost for {{ \Carbon\Carbon::now()->format('Y') }}
-                                </td>
-                                <td class="text-left">
-                                    <span class="badge bg-primary text-white">
-                                        {{ \Carbon\Carbon::parse($schools->service_start_date)->format('d/m/Y') ?? '-' }} -
-                                        {{ \Carbon\Carbon::parse($schools->service_end_date)->format('d/m/Y') ?? '-' }}
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <span class="student-count">
-                                        {{-- <i class="fas fa-users me-1"></i> --}}
-                                        {{ count($students) }}
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <input type="number" id="unit_cost" class="form-control text-center"
-                                           placeholder="Enter Amount" min="0" value=""
-                                           oninput="calculateTotal()">
-                                </td>
-                                <td class="text-center fw-bold amount-display" id="total_cost">
-                                    0
-                                </td>
-                            </tr>
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="5" class="text-end fw-bold fs-5"> Total Balance:</td>
-                                <td class="text-center">
-                                    <div class="total-amount" id="total_balance">
-                                        TZS 0
-                                    </div>
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Description</th>
+                            <th>Time Duration</th>
+                            <th>No. of Students</th>
+                            <th>Unit Cost (TZS)</th>
+                            <th>Total (TZS)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>
+                                <strong>Service Cost for {{ \Carbon\Carbon::now()->format('Y') }}</strong>
+                                <br>
+                                <small style="color: var(--text-light);">Comprehensive school management services</small>
+                            </td>
+                            <td>
+                                {{ \Carbon\Carbon::parse($schools->service_start_date)->format('d/m/Y') ?? '-' }} -
+                                {{ \Carbon\Carbon::parse($schools->service_end_date)->format('d/m/Y') ?? '-' }}
+                            </td>
+                            <td style="text-align: center;">
+                                <strong>{{ count($students) }}</strong>
+                            </td>
+                            <td style="text-align: center;">
+                                <input type="number" id="unit_cost" class="amount-input"
+                                       placeholder="0" min="0" value=""
+                                       oninput="calculateTotal()">
+                            </td>
+                            <td style="text-align: center;" class="total-amount" id="total_cost">
+                                0
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="5" style="text-align: right; padding-right: 20px;">
+                                <strong>TOTAL AMOUNT:</strong>
+                            </td>
+                            <td style="text-align: center;" class="total-amount" id="total_balance">
+                                TZS 0
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
 
                 <!-- Payment Methods -->
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <h4 class="text-primary text-center mb-4">
-                            <i class="fas fa-credit-card me-2"></i> Payment Methods
-                        </h4>
+                <div class="payment-section">
+                    <h3>Payment Methods</h3>
+                    <div class="payment-methods">
                         <div class="payment-method">
-                            <h5 class="text-primary mb-3">
-                                <i class="fas fa-university me-2"></i> Bank Transfer
-                            </h5>
-                            <p class="mb-1"><strong>Bank:</strong> NMB Bank</p>
-                            <p class="mb-1"><strong>Account Number:</strong> 50510028891</p>
-                            <p class="mb-0"><strong>Account Name:</strong> Frank Mathias Masaka</p>
+                            <h4>🏦 Bank Transfer</h4>
+                            <p><strong>Bank:</strong> NMB Bank</p>
+                            <p><strong>Account Number:</strong> 50510028891</p>
+                            <p><strong>Account Name:</strong> Frank Mathias Masaka</p>
                         </div>
                         <div class="payment-method">
-                            <h5 class="text-primary mb-3">
-                                <i class="fas fa-mobile-alt me-2"></i> Mobile Payment
-                            </h5>
-                            <p class="mb-1"><strong>Provider:</strong> Tigo Pesa</p>
-                            <p class="mb-1"><strong>Merchant Number:</strong> 15966786</p>
-                            <p class="mb-0"><strong>Merchant Name:</strong> Piano Shop</p>
+                            <h4>📱 Mobile Payment</h4>
+                            <p><strong>Provider:</strong> Tigo Pesa</p>
+                            <p><strong>Merchant Number:</strong> 15966786</p>
+                            <p><strong>Merchant Name:</strong> Piano Shop</p>
                         </div>
                     </div>
                 </div>
-                <!-- Action Buttons -->
-                <div class="row mt-4">
-                    <div class="col-12 text-center">
-                        <button class="btn-print me-3 no-print" onclick="scrollToTopAndPrint(); return false;">
-                            <i class="fas fa-print me-2"></i> Print Invoice
-                        </button>
-                        <a href="{{ route('admin.send.invoice', ['school' => Hashids::encode($schools->id)]) }}" class="btn-modern no-print">
-                            <i class="fas fa-paper-plane me-2"></i> Send Invoice
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Footer -->
-    <div class="glass-card mt-2 p-2 text-center">
-        <div class="row">
-            <div class="col-md-6 text-start">
-                <small class="text-muted">
-                    <i class="fas fa-user me-1"></i>Printed by: {{ Auth::user()->email }}
-                </small>
+                <!-- Action Buttons -->
+                <div class="action-buttons no-print">
+                    <button class="btn btn-print" onclick="scrollToTopAndPrint()">
+                        🖨️ Print Invoice
+                    </button>
+                    <a href="{{ route('admin.send.invoice', ['school' => Hashids::encode($schools->id)]) }}" class="btn btn-send">
+                        ✉️ Send Invoice
+                    </a>
+                </div>
             </div>
-            <div class="col-md-6 text-end">
-                <small class="text-muted">
-                    <i class="fas fa-clock me-1"></i>Printed on: {{ \Carbon\Carbon::now()->format('d M Y H:i:s') }}
-                </small>
+
+            <!-- Footer -->
+            <div class="invoice-footer">
+                <div class="footer-content">
+                    <div>
+                        <strong>Printed by:</strong> {{ Auth::user()->email }}
+                    </div>
+                    <div>
+                        <strong>Printed on:</strong> {{ \Carbon\Carbon::now()->format('d M Y H:i:s') }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         function calculateTotal() {
-            let unitCost = parseFloat($("#unit_cost").val()) || 0;
+            let unitCost = parseFloat(document.getElementById("unit_cost").value) || 0;
             let totalStudents = {{ count($students) }};
             let total = unitCost * totalStudents;
 
-            // Format numbers with commas
-            $("#total_cost").text(total.toLocaleString());
-            $("#total_balance").html(`TZS ${total.toLocaleString()}`);
+            document.getElementById("total_cost").textContent = total.toLocaleString();
+            document.getElementById("total_balance").textContent = 'TZS ' + total.toLocaleString();
         }
 
         function scrollToTopAndPrint() {
@@ -727,34 +626,9 @@
             }, 500);
         }
 
-        // Add GSAP animations if available
-        if (typeof gsap !== 'undefined') {
-            gsap.from('.fade-in', {
-                duration: 1,
-                y: 30,
-                opacity: 0,
-                stagger: 0.2,
-                ease: "power3.out"
-            });
-
-            gsap.from('.slide-in', {
-                duration: 0.8,
-                x: 50,
-                opacity: 0,
-                stagger: 0.1,
-                ease: "power2.out"
-            });
-        }
-
         // Auto-focus on unit cost input
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('unit_cost').focus();
         });
     </script>
-
-    <style>
-        @media print {
-
-        }
-    </style>
 @endsection
