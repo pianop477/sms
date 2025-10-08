@@ -47,16 +47,38 @@
 
         .company-info {
             flex: 1;
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
         }
 
-        .company-info h1 {
+        .logo-container {
+            flex-shrink: 0;
+        }
+
+        .invoice-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .company-details {
+            flex: 1;
+        }
+
+        .company-details h1 {
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 8px;
             color: white;
         }
 
-        .company-info .tagline {
+        .company-details .tagline {
             font-size: 1.1rem;
             opacity: 0.9;
             color: white;
@@ -420,13 +442,27 @@
                 gap: 20px !important;
             }
 
-            .company-info h1 {
+            .company-info {
+                display: flex !important;
+                align-items: flex-start !important;
+                gap: 15px !important;
+            }
+
+            .invoice-logo {
+                background: white !important;
+                border: 1px solid #000 !important;
+                box-shadow: none !important;
+                width: 60px !important;
+                height: 60px !important;
+            }
+
+            .company-details h1 {
                 color: black !important;
                 font-size: 20pt !important;
                 margin-bottom: 5px !important;
             }
 
-            .company-info .tagline {
+            .company-details .tagline {
                 color: black !important;
                 opacity: 0.8 !important;
             }
@@ -560,6 +596,16 @@
                 gap: 20px;
             }
 
+            .company-info {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .invoice-logo {
+                align-self: center;
+            }
+
             .invoice-meta {
                 min-width: auto;
                 width: 100%;
@@ -605,12 +651,17 @@
             <div class="invoice-header">
                 <div class="header-content">
                     <div class="company-info">
-                        <h1>INVOICE</h1>
-                        <p class="tagline">SHULEAPP - Professional School Management</p>
-                        <div class="user-details">
-                            <p><strong>{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</strong></p>
-                            <p>{{ Auth::user()->email }}</p>
-                            <p>{{ Auth::user()->phone }}</p>
+                        <div class="logo-container">
+                            <img src="{{ asset('assets/img/logo/logo.png') }}" alt="ShuleApp Logo" class="invoice-logo">
+                        </div>
+                        <div class="company-details">
+                            <h1>INVOICE</h1>
+                            <p class="tagline">SHULEAPP - School Management System</p>
+                            <div class="user-details">
+                                <p><strong>{{ ucwords(strtolower(Auth::user()->first_name)) }} {{ ucwords(strtolower(Auth::user()->last_name)) }}</strong></p>
+                                <p>{{ Auth::user()->email }}</p>
+                                <p>{{ Auth::user()->phone }}</p>
+                            </div>
                         </div>
                     </div>
                     <div class="invoice-meta">
@@ -635,15 +686,15 @@
                         <h3>🏢 Billed To</h3>
                         <div class="info-item">
                             <span class="info-label">School:</span>
-                            <span class="info-value"><strong>{{ $schools->school_name }}</strong></span>
+                            <span class="info-value"><strong>{{ ucwords(strtolower($schools->school_name)) }}</strong></span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Address:</span>
-                            <span class="info-value">{{ $schools->postal_address }} - {{ $schools->postal_name }}</span>
+                            <span class="info-value">{{ ucwords(strtolower($schools->postal_address)) }} - {{ ucwords(strtolower($schools->postal_name)) }}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Country:</span>
-                            <span class="info-value">{{ $schools->country }}</span>
+                            <span class="info-value">{{ ucwords(strtolower($schools->country)) }}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Email:</span>
@@ -686,7 +737,7 @@
                             <td>
                                 <strong>Service Cost for {{ \Carbon\Carbon::now()->format('Y') }}</strong>
                                 <br>
-                                <small style="color: var(--text-light);">Comprehensive school management services</small>
+                                {{-- <small style="color: var(--text-light);">Comprehensive school management services</small> --}}
                             </td>
                             <td>
                                 {{ \Carbon\Carbon::parse($schools->service_start_date)->format('d/m/Y') ?? '-' }} -
