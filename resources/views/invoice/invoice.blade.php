@@ -449,11 +449,11 @@
             }
 
             .invoice-logo {
-                background: white !important;
+                /* background: white !important; */
                 border: 1px solid #000 !important;
                 box-shadow: none !important;
-                width: 60px !important;
-                height: 60px !important;
+                width: 80px !important;
+                height: 80px !important;
             }
 
             .company-details h1 {
