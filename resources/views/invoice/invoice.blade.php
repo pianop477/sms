@@ -455,9 +455,9 @@
                 <div class="header-content">
                     <div class="company-info">
                         <h1>INVOICE</h1>
-                        <p class="tagline">SHULEAPP - Professional School Management</p>
-                        <div style="margin-top: 15px; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px;">
-                            <p style="margin: 2px 0;">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</p>
+                        <p class="tagline">SHULEAPP - School Management System</p>
+                        <div style="margin-top: 15px; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px; color:white">
+                            <p style="margin: 2px 0;">{{ ucwords(strtolower(Auth::user()->first_name)) }} {{ ucwords(strtolower(Auth::user()->last_name ))}}</p>
                             <p style="margin: 2px 0;">{{ Auth::user()->email }}</p>
                             <p style="margin: 2px 0;">{{ Auth::user()->phone }}</p>
                         </div>
@@ -465,12 +465,12 @@
                     <div class="invoice-meta">
                         <h2>INV-{{ \Carbon\Carbon::now()->format('Ymd-His') }}</h2>
                         <div class="info-item">
-                            <span>Invoice Date:</span>
-                            <strong>{{\Carbon\Carbon::now()->format('d M Y')}}</strong>
+                            <span>Invoice Date: </span>
+                            <strong> {{\Carbon\Carbon::now()->format('d M Y')}}</strong>
                         </div>
                         <div class="info-item">
-                            <span>Due Date:</span>
-                            <strong>{{ \Carbon\Carbon::now()->addMonth()->format('d M Y') }}</strong>
+                            <span>Due Date: </span>
+                            <strong> {{ \Carbon\Carbon::now()->addMonth()->format('d M Y') }}</strong>
                         </div>
                     </div>
                 </div>
@@ -483,15 +483,15 @@
                     <div class="info-card">
                         <h3>Billed To</h3>
                         <div class="info-item">
-                            <strong>{{ $schools->school_name }}</strong>
+                            <strong>{{ ucwords(strtolower($schools->school_name)) }}</strong>
                         </div>
                         <div class="info-item">
                             <span>Address:</span>
-                            <span>{{ $schools->postal_address }} - {{ $schools->postal_name }}</span>
+                            <span>{{ ucwords(strtolower($schools->postal_address)) }} - {{ ucwords(strtolower($schools->postal_name)) }}</span>
                         </div>
                         <div class="info-item">
                             <span>Country:</span>
-                            <span>{{ $schools->country }}</span>
+                            <span>{{ ucwords(strtolower($schools->country)) }}</span>
                         </div>
                         <div class="info-item">
                             <span>Email:</span>
@@ -500,17 +500,17 @@
                     </div>
 
                     <div class="info-card">
-                        <h3>Service Period</h3>
+                        <h3>Service Time Duration</h3>
                         <div class="info-item">
-                            <span>Start Date:</span>
+                            <span>Start Date :</span>
                             <span>{{ \Carbon\Carbon::parse($schools->service_start_date)->format('d M Y') ?? 'Not set' }}</span>
                         </div>
                         <div class="info-item">
-                            <span>End Date:</span>
+                            <span>End Date: </span>
                             <span>{{ \Carbon\Carbon::parse($schools->service_end_date)->format('d M Y') ?? 'Not set' }}</span>
                         </div>
                         <div class="info-item">
-                            <span>Duration:</span>
+                            <span>Duration: </span>
                             <span>{{ \Carbon\Carbon::parse($schools->service_start_date)->diffInMonths(\Carbon\Carbon::parse($schools->service_end_date)) }} months</span>
                         </div>
                     </div>
@@ -532,9 +532,7 @@
                         <tr>
                             <td>1</td>
                             <td>
-                                <strong>Service Cost for {{ \Carbon\Carbon::now()->format('Y') }}</strong>
-                                <br>
-                                <small style="color: var(--text-light);">Comprehensive school management services</small>
+                                <strong>Service Cost for Year - {{ \Carbon\Carbon::now()->format('Y') }}</strong>
                             </td>
                             <td>
                                 {{ \Carbon\Carbon::parse($schools->service_start_date)->format('d/m/Y') ?? '-' }} -
