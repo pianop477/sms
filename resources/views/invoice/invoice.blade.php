@@ -305,10 +305,10 @@
 
             .invoice-header .col-md-3,
             .invoice-header .col-md-9 {
-                width: 30% !important;
-                max-width: 70% !important;
+                width: 100% !important;
+                /* max-width: 70% !important; */
                 flex: 0 0 100% !important;
-                text-align: center !important;
+                text-align: end !important;
             }
 
             /* Hide the second column and move all content to first column */
@@ -318,7 +318,7 @@
 
             .invoice-header .col-md-3 {
                 display: flex !important;
-                flex-direction: column !important;
+                flex-direction: row !important;
                 align-items: center !important;
                 text-align: center !important;
             }
