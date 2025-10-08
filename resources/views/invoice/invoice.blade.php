@@ -305,8 +305,8 @@
 
             .invoice-header .col-md-3,
             .invoice-header .col-md-9 {
-                width: 100% !important;
-                max-width: 100% !important;
+                width: 30% !important;
+                max-width: 70% !important;
                 flex: 0 0 100% !important;
                 text-align: center !important;
             }
@@ -517,14 +517,14 @@
         <!-- Invoice Header -->
         <div class="glass-card fade-in">
             <div class="invoice-header">
-                <div class="row align-items-center">
+                <div class="row">
                     <div class="col-md-3">
                         <div class="logo-container">
                             <img src="{{ asset('assets/img/logo/logo.png') }}" alt="ShuleApp Logo" class="invoice-logo">
                         </div>
                     </div>
                     <div class="col-md-9 text-end">
-                        <h4 class="display-4 fw-bold mb-2 text-dark">INVOICE</h4>
+                        <h4 class="display-4 fw-bold mb-2 text-dark"> INVOICE</h4>
                         <p class="lead mb-1 opacity-90 text-dark">SHULEAPP - ADMINISTRATOR</p>
                         <p class="mb-1 text-capitalize text-dark">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</p>
                         <p class="mb-1 text-dark">{{ Auth::user()->email }}</p>
@@ -558,7 +558,7 @@
                     <div class="col-md-6 mb-4">
                         <div class="bg-light p-4 rounded-3">
                             <h4 class="text-primary mb-3">
-                                <i class="fas fa-receipt me-2"></i>Invoice Details
+                                <i class="fas fa-receipt me-2"></i> Invoice Details
                             </h4>
                             <div class="d-flex justify-content-between mb-2">
                                 <span class="fw-bold">Invoice Date:</span>
@@ -581,7 +581,7 @@
                     <div class="col-12">
                         <div class="bg-light p-2 rounded-3">
                             <h5 class="text-primary mb-3">
-                                <i class="fas fa-info-circle me-2"></i>Service Period
+                                <i class="fas fa-info-circle me-2"></i> Service Duration
                             </h5>
                             <div class="row">
                                 <div class="col-md-6">
@@ -643,7 +643,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="5" class="text-end fw-bold fs-5">Total Balance:</td>
+                                <td colspan="5" class="text-end fw-bold fs-5"> Total Balance:</td>
                                 <td class="text-center">
                                     <div class="total-amount" id="total_balance">
                                         TZS 0
@@ -658,11 +658,11 @@
                 <div class="row mt-4">
                     <div class="col-12">
                         <h4 class="text-primary text-center mb-4">
-                            <i class="fas fa-credit-card me-2"></i>Payment Methods
+                            <i class="fas fa-credit-card me-2"></i> Payment Methods
                         </h4>
                         <div class="payment-method">
                             <h5 class="text-primary mb-3">
-                                <i class="fas fa-university me-2"></i>Bank Transfer
+                                <i class="fas fa-university me-2"></i> Bank Transfer
                             </h5>
                             <p class="mb-1"><strong>Bank:</strong> NMB Bank</p>
                             <p class="mb-1"><strong>Account Number:</strong> 50510028891</p>
@@ -670,7 +670,7 @@
                         </div>
                         <div class="payment-method">
                             <h5 class="text-primary mb-3">
-                                <i class="fas fa-mobile-alt me-2"></i>Mobile Payment
+                                <i class="fas fa-mobile-alt me-2"></i> Mobile Payment
                             </h5>
                             <p class="mb-1"><strong>Provider:</strong> Tigo Pesa</p>
                             <p class="mb-1"><strong>Merchant Number:</strong> 15966786</p>
@@ -682,10 +682,10 @@
                 <div class="row mt-4">
                     <div class="col-12 text-center">
                         <button class="btn-print me-3 no-print" onclick="scrollToTopAndPrint(); return false;">
-                            <i class="fas fa-print me-2"></i>Print Invoice
+                            <i class="fas fa-print me-2"></i> Print Invoice
                         </button>
                         <a href="{{ route('admin.send.invoice', ['school' => Hashids::encode($schools->id)]) }}" class="btn-modern no-print">
-                            <i class="fas fa-paper-plane me-2"></i>Send Invoice
+                            <i class="fas fa-paper-plane me-2"></i> Send Invoice
                         </a>
                     </div>
                 </div>
