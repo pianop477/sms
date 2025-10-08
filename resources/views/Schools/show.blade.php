@@ -267,7 +267,7 @@
         <div class="glass-card header-section fade-in">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h1 class="display-4 fw-bold mb-3">🏫 {{$schools->school_name}}</h1>
+                    <h3 class="display-4 fw-bold mb-3">🏫 {{$schools->school_name}}</h3>
                     {{-- <p class="lead mb-0 opacity-90">Comprehensive School Management Dashboard</p> --}}
                 </div>
                 <div class="col-md-4 text-md-end">
