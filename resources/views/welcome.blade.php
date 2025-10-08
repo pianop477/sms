@@ -158,7 +158,11 @@
 
   <!-- Footer -->
   <footer class="bg-gray-800 text-gray-400 py-8 text-center">
-    <p>©{{date('Y')}} ShuleApp. Haki Zote Zimehifadhiwa.</p>
+        @php
+            $startYear = 2025;
+            $currentYear = date('Y');
+        @endphp
+    <p>©{{ $startYear == $currentYear ? $startYear : $startYear . ' - ' . $currentYear }} ShuleApp. Haki Zote Zimehifadhiwa.</p>
   </footer>
 
   @include('sweetalert::alert')
