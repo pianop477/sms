@@ -253,73 +253,185 @@
             }
         }
 
-        @media print {
-
+         @media print {
             @page {
-                margin: 6mm;
+                margin: 10mm;
+                size: A4;
             }
-            .btn-print, .btn-modern {
-                display: none;
-            }
-            .dashboard-container {
-                padding: 0;
-            }
+
             body {
-                color: black;
-                font-size: 12px;
-                background: white;
-                font-family: 'Arial', 'Helvetica', 'sans-serif';
+                background: white !important;
+                color: black !important;
+                font-size: 12pt;
+                font-family: 'Arial', 'Helvetica', sans-serif;
+                line-height: 1.4;
             }
 
-            .invoice-table {
-                color: black;
-                border: none;
-            }
-            .billed-to {
-                color: black;
-                border: none;
-                padding: 1px;
-            }
-
-            .payment-method {
-                border: none;
-                font-size: 11px;
-                color: black;
-            }
-
-            .badge {
-                color: black;
-                font-size: 12px;
-                border: none;
+            .dashboard-container {
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
             }
 
             .glass-card {
-                font-size: 10px;
-                margin-top: 4px;
+                background: white !important;
+                box-shadow: none !important;
+                border: 1px solid #000 !important;
+                border-radius: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
+
             .invoice-header {
-                background: none;
-                color: black;
-                text-align: center;
+                background: #f8f9fa !important;
+                color: black !important;
+                border-radius: 0 !important;
+                padding: 15px !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
+
+            .invoice-header::before {
+                display: none !important;
+            }
+
             .invoice-details {
-                background: none;
-                color: black;
-                box-shadow: none;
-            }
-            .form-control {
-                border: none;
-                color: black;
+                background: white !important;
+                color: black !important;
+                box-shadow: none !important;
+                padding: 15px !important;
+                margin: 0 !important;
             }
 
-             table {
-                border-collapse: collapse; /* ili borders zishikamane vizuri */
-                width: 100%;
+            .billed-to {
+                background: #f8f9fa !important;
+                border: 1px solid #ddd !important;
+                color: black !important;
+                padding: 15px !important;
             }
+
+            .invoice-table {
+                border: 1px solid #000 !important;
+                box-shadow: none !important;
+                font-size: 10pt !important;
+            }
+
+            .invoice-table thead {
+                background: #f8f9fa !important;
+                color: black !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .invoice-table th {
+                border-bottom: 2px solid #000 !important;
+                font-weight: bold !important;
+                padding: 8px 4px !important;
+            }
+
+            .invoice-table td {
+                border-bottom: 1px solid #ddd !important;
+                padding: 6px 4px !important;
+            }
+
             table, th, td {
-                border: 1px solid black; /* border nyeusi ya 1px */
+                border: 1px solid black !important;
+                border-collapse: collapse !important;
             }
 
+            .form-control {
+                border: 1px solid #000 !important;
+                background: white !important;
+                color: black !important;
+                padding: 4px !important;
+                font-size: 10pt !important;
+            }
+
+            .btn-print, .btn-modern {
+                display: none !important;
+            }
+
+            .payment-method {
+                background: white !important;
+                border: 1px solid #ddd !important;
+                color: black !important;
+                padding: 10px !important;
+                margin: 5px 0 !important;
+                page-break-inside: avoid;
+            }
+
+            .total-amount {
+                background: #e9ecef !important;
+                color: black !important;
+                border: 1px solid #000 !important;
+                font-weight: bold !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .amount-display {
+                background: white !important;
+                color: black !important;
+                border: 1px solid #ddd !important;
+                font-weight: bold !important;
+            }
+
+            .student-count {
+                background: #e9ecef !important;
+                color: black !important;
+                border: 1px solid #ddd !important;
+            }
+
+            .text-primary {
+                color: black !important;
+                font-weight: bold !important;
+            }
+
+            .text-muted {
+                color: #666 !important;
+            }
+
+            /* Ensure no elements are cut off */
+            .glass-card {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            .invoice-table {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            /* Hide unnecessary elements for print */
+            .logo-container {
+                background: transparent !important;
+            }
+
+            .invoice-logo {
+                border: 1px solid #000 !important;
+            }
+
+            /* Improve text readability */
+            h4, h5, h6 {
+                color: black !important;
+                margin: 8px 0 !important;
+            }
+
+            p {
+                margin: 4px 0 !important;
+                color: black !important;
+            }
+
+            /* Footer styling for print */
+            .glass-card.mt-2 {
+                border-top: 2px solid #000 !important;
+                margin-top: 20px !important;
+                padding: 10px !important;
+                background: #f8f9fa !important;
+            }
+            .no-print {
+                display: none !important;
+            }
         }
 
         @keyframes slideInRight {
@@ -472,7 +584,7 @@
                                 </td>
                                 <td class="text-center">
                                     <span class="student-count">
-                                        <i class="fas fa-users me-1"></i>
+                                        {{-- <i class="fas fa-users me-1"></i> --}}
                                         {{ count($students) }}
                                     </span>
                                 </td>
@@ -526,10 +638,10 @@
                 <!-- Action Buttons -->
                 <div class="row mt-4">
                     <div class="col-12 text-center">
-                        <button class="btn-print me-3" onclick="scrollToTopAndPrint(); return false;">
+                        <button class="btn-print me-3 no-print" onclick="scrollToTopAndPrint(); return false;">
                             <i class="fas fa-print me-2"></i>Print Invoice
                         </button>
-                        <a href="{{ route('admin.send.invoice', ['school' => Hashids::encode($schools->id)]) }}" class="btn-modern">
+                        <a href="{{ route('admin.send.invoice', ['school' => Hashids::encode($schools->id)]) }}" class="btn-modern no-print">
                             <i class="fas fa-paper-plane me-2"></i>Send Invoice
                         </a>
                     </div>
