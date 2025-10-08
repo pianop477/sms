@@ -455,11 +455,11 @@
                 <div class="header-content">
                     <div class="company-info">
                         <h1>INVOICE</h1>
-                        <p class="tagline">SHULEAPP - School Management System</p>
+                        <p class="tagline text-white">SHULEAPP - School Management System</p>
                         <div style="margin-top: 15px; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 6px; color:white">
-                            <p style="margin: 2px 0;">{{ ucwords(strtolower(Auth::user()->first_name)) }} {{ ucwords(strtolower(Auth::user()->last_name ))}}</p>
-                            <p style="margin: 2px 0;">{{ Auth::user()->email }}</p>
-                            <p style="margin: 2px 0;">{{ Auth::user()->phone }}</p>
+                            <p style="margin: 2px 0; color:white">{{ ucwords(strtolower(Auth::user()->first_name)) }} {{ ucwords(strtolower(Auth::user()->last_name ))}}</p>
+                            <p style="margin: 2px 0; color:white"">{{ Auth::user()->email }}</p>
+                            <p style="margin: 2px 0; color:white"">{{ Auth::user()->phone }}</p>
                         </div>
                     </div>
                     <div class="invoice-meta">
