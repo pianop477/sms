@@ -53,6 +53,13 @@
         .company-info .tagline {
             font-size: 1.1rem;
             opacity: 0.9;
+            color: white;
+        }
+
+        .company-info p {
+            margin: 0;
+            line-height: 1.4;
+            color: white;
         }
 
         .invoice-meta {
@@ -303,6 +310,14 @@
                 max-width: 100% !important;
                 padding: 0 !important;
                 margin: 0 !important;
+            }
+
+            .company-info p, {
+                color: black !important;
+            }
+
+            . .company-info .tagline {
+                color: black !important;
             }
 
             .modern-card {
