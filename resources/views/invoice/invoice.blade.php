@@ -57,8 +57,8 @@
         }
 
         .invoice-logo {
-            width: 80px;
-            height: 80px;
+            max-width: 120px;
+            height: 100px;
             object-fit: contain;
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.9);
@@ -452,8 +452,8 @@
                 /* background: white !important; */
                 border: 1px solid #000 !important;
                 box-shadow: none !important;
-                width: 80px !important;
-                height: 80px !important;
+                max-width: 120px !important;
+                height: 100px !important;
             }
 
             .company-details h1 {
