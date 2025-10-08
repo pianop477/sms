@@ -450,8 +450,8 @@
                         <thead>
                             <tr>
                                 <th class="text-center">#</th>
-                                <th class="text-left">Service Description</th>
-                                <th class="text-left">Service Period</th>
+                                <th class="text-left">Description</th>
+                                <th class="text-left">Time Duration</th>
                                 <th class="text-center">No. of Students</th>
                                 <th class="text-center">Unit Cost (TZS)</th>
                                 <th class="text-center">Total (TZS)</th>
@@ -461,8 +461,8 @@
                             <tr class="slide-in">
                                 <td class="text-center fw-bold">1</td>
                                 <td class="text-left">
-                                    <i class="fas fa-cogs me-2 text-primary"></i>
-                                    System Running Cost for {{ \Carbon\Carbon::now()->format('Y') }}
+                                    {{-- <i class="fas fa-cogs me-2 text-primary"></i> --}}
+                                    Service Cost for {{ \Carbon\Carbon::now()->format('Y') }}
                                 </td>
                                 <td class="text-left">
                                     <span class="badge bg-primary text-white">
