@@ -303,6 +303,7 @@
                 max-width: 100% !important;
                 padding: 0 !important;
                 margin: 0 !important;
+                color: black !important;
             }
 
             .modern-card {
@@ -324,6 +325,7 @@
                 display: flex !important;
                 justify-content: space-between !important;
                 align-items: flex-start !important;
+                color: black !important;
             }
 
             .company-info h1 {
