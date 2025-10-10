@@ -287,33 +287,33 @@
 
         /* Fixed column widths */
         .col-number {
-            width: 3%;
+            width: auto;
         }
 
         .col-admission {
-            width: 8%;
+            width: auto;
         }
 
         .col-name {
-            width: 20%;
+            width: auto;
             text-align: left !important;
         }
 
         .col-gender {
-            width: 5%;
+            width: auto;
         }
 
         .col-stream {
-            width: 7%;
+            width: auto;
         }
 
         .col-date {
-            width: 3%;
+            width: auto;
             min-width: 20px;
         }
 
         .col-total {
-            width: 5%;
+            width: auto;
             background-color: #e9ecef;
             font-weight: bold;
         }
