@@ -1206,6 +1206,14 @@ class StudentsController extends Controller
             return back();
         }
 
+        if($student->image) {
+            $filePath = public_path('assets/img/students/'. $student->image);
+
+            if(file_exists($filePath)) {
+                unlink($filePath);
+            }
+        }
+
         $student->delete();
         Alert()->toast('Student has been deleted permanently', 'success');
         return back();

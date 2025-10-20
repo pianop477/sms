@@ -325,7 +325,6 @@
                             <div class="col-md-6 mb-3">
                                 <label for="email" class="form-label">Email</label>
                                 <div class="input-group">
-                                    <span class="input-group-text" id="emailPrefix">@</span>
                                     <input type="email" name="email" class="form-control-custom" id="email" placeholder="Email ID" value="{{old('email')}}">
                                 </div>
                                 @error('email')

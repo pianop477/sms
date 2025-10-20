@@ -25,7 +25,7 @@ class ManagerOrTeacher
         }
 
         if (
-            $user->usertype == 2 ||
+            $user->usertype == 2 || $user->usertype == 5 ||
             ($user->teacher && $user->teacher->role_id == 2)
         ) {
             return $next($request);

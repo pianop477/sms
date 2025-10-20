@@ -30,7 +30,7 @@ class ForcePasswordChange
 
         // Check kama anatumia default password (mfano: shule2025)
         if (Hash::check('shule2025', Auth::user()->password)) {
-            Alert::warning('Warning', 'Default password is no longer allowed, Please change it now!');
+            // Alert::warning('Warning', 'Default password is no longer allowed, Please change it now!');
             return to_route('change.password');
         }
 

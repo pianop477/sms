@@ -20,7 +20,7 @@ class sharedAccessMiddleware
 
         if ($user) {
             if (
-                $user->usertype == 2 ||
+                $user->usertype == 2 || $user->usertype == 5 ||
                 ($user->teacher && in_array($user->teacher->role_id, [2, 3]))
             ) {
                 return $next($request);

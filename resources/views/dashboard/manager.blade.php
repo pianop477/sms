@@ -1,612 +1,691 @@
 @extends('SRTDashboard.frame')
 
 @section('content')
-<div class="col-lg-12">
-    <div class="row">
-        @php
-            use App\Models\Student;
-            use Illuminate\Support\Facades\Auth;
-
-            $maleStudents = Student::where('gender', 'male')
-                                    ->where('status', 1)
-                                    ->where('school_id', Auth::user()->school_id)
-                                    ->count();
-
-            $femaleStudents = Student::where('gender', 'female')
-                                    ->where('status', 1)
-                                    ->where('school_id', Auth::user()->school_id)
-                                    ->count();
-        @endphp
-
-        <div class="col-md-4 mt-3 mb-3">
-            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #e176a6 0%, #d04a88 100%);">
-                <a href="{{route('Teachers.index')}}" class="text-decoration-none">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Teachers</h6>
-                                <h2 class="text-white mb-0">
-                                    @if (count($teachers) > 99) 100+ @else {{count($teachers)}} @endif
-                                </h2>
-                            </div>
-                            <div class="bg-white rounded-circle p-3">
-                                <i class="fas fa-user-tie fa-2x text-pink"></i>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <span class="text-white small d-flex align-items-center">
-                                View All <i class="fas fa-arrow-right ms-2"></i>
-                            </span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="col-md-4 mt-3 mb-3">
-            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #c84fe0 0%, #9c27b0 100%);">
-                <a href="{{route('Parents.index')}}" class="text-decoration-none">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Parents</h6>
-                                <h2 class="text-white mb-0">
-                                    @if (count($parents) > 1999) 2000+ @else {{count($parents)}} @endif
-                                </h2>
-                            </div>
-                            <div class="bg-white rounded-circle p-3">
-                                <i class="fas fa-user-friends fa-2x text-purple"></i>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <span class="text-white small d-flex align-items-center">
-                                View All <i class="fas fa-arrow-right ms-2"></i>
-                            </span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="col-md-4 mt-3 mb-3">
-            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #098ddf 0%, #0568a8 100%);">
-                <a href="{{route('classes.list')}}" class="text-decoration-none">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Students</h6>
-                                <h2 class="text-white mb-0">
-                                    @if (count($students) > 1999) 2000+ @else {{count($students)}} @endif
-                                </h2>
-                            </div>
-                            <div class="bg-white rounded-circle p-3">
-                                <i class="fas fa-user-graduate fa-2x text-info"></i>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <span class="text-white small d-flex align-items-center">
-                                View All <i class="fas fa-arrow-right ms-2"></i>
-                            </span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="col-lg-12">
-    <div class="row">
-        <div class="col-md-4 mt-3 mb-3">
-            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #9fbc71 0%, #689f38 100%);">
-                <a href="{{route('courses.index')}}" class="text-decoration-none">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Open Courses</h6>
-                                <h2 class="text-white mb-0">
-                                    @if (count($subjects) > 49) 50+ @else {{count($subjects)}} @endif
-                                </h2>
-                            </div>
-                            <div class="bg-white rounded-circle p-3">
-                                <i class="ti-book fa-2x text-success"></i>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <span class="text-white small d-flex align-items-center">
-                                View All <i class="fas fa-arrow-right ms-2"></i>
-                            </span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="col-md-4 mt-3 mb-3">
-            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #bf950a 0%, #ff9800 100%);">
-                <a href="{{route('Classes.index')}}" class="text-decoration-none">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>Classes</h6>
-                                <h2 class="text-white mb-0">
-                                    @if (count($classes) > 49) 50+ @else {{count($classes)}} @endif
-                                </h2>
-                            </div>
-                            <div class="bg-white rounded-circle p-3">
-                                <i class="ti-blackboard fa-2x text-dark"></i>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <span class="text-white small d-flex align-items-center">
-                                View All <i class="fas fa-arrow-right ms-2"></i>
-                            </span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="col-md-4 mt-3 mb-3">
-            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #329688 0%, #00796b 100%);">
-                <a href="{{route('Transportation.index')}}" class="text-decoration-none">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i>School Buses</h6>
-                                <h2 class="text-white mb-0">
-                                    @if (count($buses) > 49) 50+ @else {{count($buses)}} @endif
-                                </h2>
-                            </div>
-                            <div class="bg-white rounded-circle p-3">
-                                <i class="fas fa-bus fa-2x text-teal"></i>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <span class="text-white small d-flex align-items-center">
-                                View All <i class="fas fa-arrow-right ms-2"></i>
-                            </span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-<hr class="dark horizontal py-0">
-<div class="col-lg-12">
-    <div class="row">
-        <div class="col-md-6 mt-2 mb-3">
-            <div class="card">
-                <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
-                <div id="studentChart" style="width: 100%; height: 400px;"></div>
-                <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        // Initialize ECharts instance
-                        var chartDom = document.getElementById('studentChart');
-                        var myChart = echarts.init(chartDom);
-
-                        // Prepare data
-                        var chartData = @json($chartData); // Assuming $chartData contains raw data from the backend
-
-                        // Group data by class
-                        var groupedData = {};
-                        chartData.forEach(item => {
-                            var classCode = item.category.split(' (')[0];
-                            var gender = item.category.includes('Male') ? 'Male' : 'Female';
-                            if (!groupedData[classCode]) {
-                                groupedData[classCode] = { Male: 0, Female: 0 };
-                            }
-                            groupedData[classCode][gender] = item.value;
-                        });
-
-                        // Extract x-axis labels and series data
-                        var classCodes = Object.keys(groupedData);
-                        var maleData = classCodes.map(classCode => groupedData[classCode].Male);
-                        var femaleData = classCodes.map(classCode => groupedData[classCode].Female);
-
-                        // Chart options
-                        var option = {
-                            title: {
-                                text: 'Student Registration',
-                                left: 'center'
-                            },
-                            tooltip: {
-                                trigger: 'axis',
-                                axisPointer: {
-                                    type: 'shadow'
-                                }
-                            },
-                            legend: {
-                                bottom: 10,
-                                data: ['Male', 'Female']
-                            },
-                            grid: {
-                                left: '3%',
-                                right: '4%',
-                                bottom: '3%',
-                                containLabel: true
-                            },
-                            xAxis: {
-                                type: 'category',
-                                data: classCodes, // Unique class codes
-                                axisLabel: {
-                                    rotate: 45
-                                }
-                            },
-                            yAxis: {
-                                type: 'value'
-                            },
-                            series: [
-                                {
-                                    name: 'Male',
-                                    type: 'bar',
-                                    stack: 'total',
-                                    label: {
-                                        show: true
-                                    },
-                                    data: maleData // Male data per class
-                                },
-                                {
-                                    name: 'Female',
-                                    type: 'bar',
-                                    stack: 'total',
-                                    label: {
-                                        show: true
-                                    },
-                                    data: femaleData // Female data per class
-                                }
-                            ]
-                        };
-
-                        // Set options and render the chart
-                        myChart.setOption(option);
-                    });
-                </script>
-            </div>
-        </div>
-        <div class="col-md-6 mt-2 mb-3">
-            <div class="card">
-                <div id="qualificationChart" style="width: 100%; height: 400px;"></div>
-
-                <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
-                <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
-                <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
-                <script>
-                    am5.ready(function() {
-                        // Create root element
-                        var root = am5.Root.new("qualificationChart");
-
-                        // Set themes
-                        root.setThemes([am5themes_Animated.new(root)]);
-
-                        // Create chart
-                        var chart = root.container.children.push(
-                            am5percent.PieChart.new(root, {
-                                layout: root.verticalLayout
-                            })
-                        );
-
-                        // Add chart title
-                        chart.children.unshift(
-                            am5.Label.new(root, {
-                                text: "Qualifications",
-                                fontSize: 20,
-                                fontWeight: "bold",
-                                textAlign: "center",
-                                x: am5.percent(50),
-                                centerX: am5.percent(50)
-                            })
-                        );
-
-                        // Create series
-                        var series = chart.series.push(
-                            am5percent.PieSeries.new(root, {
-                                valueField: "value",
-                                categoryField: "category"
-                            })
-                        );
-
-                        // Add data
-                        series.data.setAll([
-                            { category: "Masters", value: {{ $qualificationData['masters'] }} },
-                            { category: "Degree", value: {{ $qualificationData['bachelor'] }} },
-                            { category: "Diploma", value: {{ $qualificationData['diploma'] }} },
-                            { category: "Certificate", value: {{ $qualificationData['certificate'] }} }
-                        ]);
-
-                        // Add legend
-                        chart.children.push(am5.Legend.new(root, {}));
-
-                        // Animate chart
-                        series.appear(1000, 100);
-                    });
-                </script>
-            </div>
-        </div>
-    </div>
-</div>
-<hr class="dark horizontal py-0">
-<div class="col-lg-12">
-    <div class="row">
-        <div class="col-md-4 mt-2 mb-3">
-            <div class="card">
-                <div class="card-title mt-2 border-bottom">
-                    <h6 class="text-center">Students Registration</h6>
-                </div>
-                <table class="table table-sm table-hover table-responsive-sm table-bordered table-sm" style="background: #e3d39e">
-                    @if ($studentsByClass->isEmpty())
-                    <thead>
-                        <tr>
-                            <th>Class</th>
-                            <th>Number of Students</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="2" class="text-center">No records Available</td>
-                        </tr>
-                    </tbody>
-                    @else
-                    <thead>
-                        <tr class="text-center">
-                            <th>Class</th>
-                            @foreach ($studentsByClass as $class)
-                                <th class="text-uppercase">{{$class->class_code}}</th>
-                            @endforeach
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="text-center">
-                            <td>Students</td>
-                            @foreach ($studentsByClass as $class )
-                                <td>{{$class->student_count}}</td>
-                            @endforeach
-                        </tr>
-                    </tbody>
-                    @endif
-                </table>
-                <hr class="dark horizontal py-0">
-                <div class="card-title border-bottom mt-2">
-                    <h6 class="text-center mt-2">Teachers Registration</h6>
-                </div>
-                <table class="table table-sm table-responsive-sm table-bordered table-hover" style="background: #e4abcf;">
-                    <thead>
-                        <tr class="text-center">
-                            <th>Gender</th>
-                            <th>Number of Teachers</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if ($teacherByGender->isEmpty())
-                        <tr>
-                            <td colspan="2" class="text-center">No records Available</td>
-                        </tr>
-                        @else
-                            @foreach ($teacherByGender as $teacher)
-                            <tr class="text-center">
-                                <td>{{ ucfirst($teacher->gender) }}</td>
-                                <td>{{ $teacher->teacher_count }}</td>
-                            </tr>
-                        @endforeach
-                        @endif
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col-md-4 mt-2 mb-3">
-            <div class="card">
-                <div class="card-title mt-2 border-bottom">
-                    <h6 class="text-center">Students Registration</h6>
-                </div>
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-                <div style="width: 280px; height: 280px; margin: 0 auto;">
-                    <canvas id="genderChart"></canvas>
-                </div>
-                <script>
-                    const totalMaleStudents = @json($totalMaleStudents);
-                    const totalFemaleStudents = @json($totalFemaleStudents);
-
-                    const ctx = document.getElementById('genderChart').getContext('2d');
-                    const genderChart = new Chart(ctx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: ['Boys', 'Girls'],
-                            datasets: [{
-                                label: 'Student Registration',
-                                data: [totalMaleStudents, totalFemaleStudents],
-                                backgroundColor: [
-                                    'rgba(54, 162, 235, 0.7)', // Blue
-                                    'rgba(255, 99, 132, 0.7)'  // Red
-                                ],
-                                borderColor: [
-                                    'rgba(54, 162, 235, 1)',
-                                    'rgba(255, 99, 132, 1)'
-                                ],
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    position: 'top',
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            const label = context.label || '';
-                                            const value = context.raw || 0;
-                                            return `${label}: ${value}`;
-                                        }
-                                    }
-                                },
-                                datalabels: {
-                                    color: '#fff', // Label text color
-                                    formatter: (value, ctx) => {
-                                        return value; // Display the raw value
-                                    },
-                                    font: {
-                                        weight: 'bold',
-                                        size: 12
-                                    },
-                                    anchor: 'center', // Position inside the curve
-                                    align: 'center'
-                                }
-                            }
-                        },
-                        plugins: [ChartDataLabels] // Register the plugin
-                    });
-                </script>
-            </div>
-        </div>
-        <div class="col-lg-4 mt-2 mb-3">
-            <div class="card">
-                <div class="card-title mt-2 border-bottom">
-                    <h6 class="text-center">Today's Attendance: {{\Carbon\Carbon::parse($today)->format('d-m-Y')}}</h6>
-                </div>
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-                <div style="width: 280px; height: 280px; margin: 0 auto;">
-                    @if ($attendanceCounts['present'] > 0 || $attendanceCounts['absent'] > 0 || $attendanceCounts['permission'] > 0)
-                        <canvas id="attendanceChart" width="400" height="400"></canvas>
-                    @else
-                        <p class="text-center mt-5 text-danger">No records available.</p>
-                    @endif
-
-                </div>
-                <script>
-                    (function() {
-                        // Check if attendance data exists
-                        const attendanceData = @json($attendanceCounts);
-
-                        // Ensure data exists and at least one value is greater than zero
-                        const hasData = attendanceData.present > 0 || attendanceData.absent > 0 || attendanceData.permission > 0;
-
-                        // Find the canvas element
-                        const ctxAttendance = document.getElementById('attendanceChart');
-
-                        if (ctxAttendance && hasData) { // Only proceed if canvas and data are valid
-                            const attendanceChart = new Chart(ctxAttendance.getContext('2d'), {
-                                type: 'doughnut',
-                                data: {
-                                    labels: ['Present', 'Absent', 'Permission'],
-                                    datasets: [{
-                                        label: 'Today\'s Attendance',
-                                        data: [attendanceData.present, attendanceData.absent, attendanceData.permission],
-                                        backgroundColor: [
-                                            'rgba(75, 192, 192, 0.7)', // Green for Present
-                                            'rgba(255, 99, 132, 0.7)', // Red for Absent
-                                            'rgba(255, 206, 86, 0.7)'  // Yellow for Permission
-                                        ],
-                                        borderColor: [
-                                            'rgba(75, 192, 192, 1)',
-                                            'rgba(255, 99, 132, 1)',
-                                            'rgba(255, 206, 86, 1)'
-                                        ],
-                                        borderWidth: 1
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        legend: {
-                                            position: 'top',
-                                        },
-                                        tooltip: {
-                                            callbacks: {
-                                                label: function(context) {
-                                                    const label = context.label || '';
-                                                    const value = context.raw || 0;
-                                                    return `${label}: ${value}`;
-                                                }
-                                            }
-                                        },
-                                        datalabels: {
-                                            color: '#fff',
-                                            formatter: (value, ctxAttendance) => {
-                                                return value;
-                                            },
-                                            font: {
-                                                weight: 'bold',
-                                                size: 12
-                                            },
-                                            anchor: 'center',
-                                            align: 'center'
-                                        }
-                                    }
-                                },
-                                plugins: [ChartDataLabels] // Register the plugin
-                            });
-                        } else if (!hasData) {
-                            // Optional: Display a message if no attendance data
-                            document.getElementById('attendance-container').innerHTML = `
-                                <p class="text-center text-muted">No attendance records found for today.</p>`;
-                        }
-                    })();
-
-                     // Authorization check
-                    @if (Auth::user()->usertype != 2)
-                        window.location.href = '/error-page';
-                    @endif
-                </script>
-            </div>
-        </div>
-    </div>
-</div>
 <style>
-    .card-hover {
+    :root {
+        --primary-color: #4e73df;
+        --secondary-color: #6f42c1;
+        --success-color: #1cc88a;
+        --info-color: #36b9cc;
+        --warning-color: #f6c23e;
+        --danger-color: #e74a3b;
+        --light-color: #f8f9fc;
+        --dark-color: #5a5c69;
+    }
+
+    body {
+        background-color: #f8f9fc;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
+
+    .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 0.5rem 1.5rem 0 rgba(58, 59, 69, 0.1);
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.75rem 2rem 0 rgba(58, 59, 69, 0.15);
+    }
+
+    /* Statistics Cards Styling */
+    .stat-card {
+        border-radius: 15px;
+        border: none;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        min-height: 140px;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,0.175);
+    }
+
+    .stat-card .card-body {
+        position: relative;
+        z-index: 2;
+        padding: 1.5rem;
+    }
+
+    .stat-card .card-icon {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        opacity: 0.2;
+        font-size: 4rem;
         transition: all 0.3s ease;
     }
-    .card-hover:hover {
+
+    .stat-card:hover .card-icon {
+        opacity: 0.3;
+        transform: scale(1.1);
+    }
+
+    .stat-card .card-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+        opacity: 0.9;
+    }
+
+    .stat-card .card-value {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 0;
+    }
+
+    /* Gradient Backgrounds for Cards */
+    .bg-teacher {
+        background: linear-gradient(135deg, #e176a6 0%, #d04a88 100%);
+    }
+
+    .bg-parent {
+        background: linear-gradient(135deg, #c84fe0 0%, #9c27b0 100%);
+    }
+
+    .bg-student {
+        background: linear-gradient(135deg, #098ddf 0%, #0568a8 100%);
+    }
+
+    .bg-course {
+        background: linear-gradient(135deg, #9fbc71 0%, #689f38 100%);
+    }
+
+    .bg-class {
+        background: linear-gradient(135deg, #bf950a 0%, #ff9800 100%);
+    }
+
+    .bg-bus {
+        background: linear-gradient(135deg, #329688 0%, #00796b 100%);
+    }
+
+    /* Chart Container Styles */
+    .chart-container {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 0.5rem 1.5rem rgba(58, 59, 69, 0.1);
+        border: none;
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chart-container:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        box-shadow: 0 0.75rem 2rem rgba(58, 59, 69, 0.15);
     }
-    .bg-success-lighten {
-        background-color: rgba(40, 167, 69, 0.1);
+
+    .chart-wrapper {
+        flex: 1;
+        min-height: 300px;
+        position: relative;
+        width: 100%;
     }
-    .bg-warning-lighten {
-        background-color: rgba(255, 193, 7, 0.1);
+
+    .chart-wrapper canvas,
+    .chart-wrapper .chart-canvas {
+        width: 100% !important;
+        height: 100% !important;
     }
-    .bg-secondary-lighten {
-        background-color: rgba(108, 117, 125, 0.1);
+
+    .chart-header {
+        border-bottom: 2px solid #f8f9fc;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
     }
-    .table-centered td, .table-centered th {
+
+    .chart-title {
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 5px;
+        font-size: 1.1rem;
+    }
+
+    .chart-subtitle {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+
+    /* Table Styles */
+    .dashboard-table {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+    }
+
+    .dashboard-table thead {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #2e59d9 100%);
+        color: white;
+    }
+
+    .dashboard-table th {
+        padding: 15px 12px;
+        font-weight: 700;
         vertical-align: middle;
+        border: none;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
+
+    .dashboard-table td {
+        padding: 12px 10px;
+        vertical-align: middle;
+        border-bottom: 1px solid #e3e6f0;
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+
+    /* Responsive Design */
     @media (max-width: 768px) {
-        .table-responsive {
-            border: 0;
+        .stat-card .card-value {
+            font-size: 1.5rem;
         }
-        .table-responsive thead {
-            display: none;
+
+        .stat-card .card-icon {
+            font-size: 2.5rem;
         }
-        .table-responsive tr {
-            display: block;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .table-responsive td {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            text-align: right;
-            padding-left: 50%;
-            position: relative;
-            border-bottom: 1px solid #f1f1f1;
-        }
-        .table-responsive td::before {
-            content: attr(data-label);
-            position: absolute;
-            left: 15px;
-            font-weight: bold;
-            text-align: left;
-        }
-        .btn-group {
-            display: flex;
-            gap: 5px;
+
+        .chart-wrapper {
+            min-height: 250px;
         }
     }
 </style>
 
-@endsection
+<div class="py-4">
+    <div class="row">
+        <!-- Quick Stats Summary -->
+        <div class="col-lg-12 mb-4">
+            <div class="row">
+                <!-- Teachers Card -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <a href="{{route('Teachers.index')}}" class="text-decoration-none">
+                        <div class="stat-card bg-teacher text-white">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="card-title">Teachers</div>
+                                        <div class="card-value">
+                                            @if (count($teachers) > 99) 100+ @else {{count($teachers)}} @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-user-tie card-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
 
+                <!-- Parents Card -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <a href="{{route('Parents.index')}}" class="text-decoration-none">
+                        <div class="stat-card bg-parent text-white">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="card-title">Parents</div>
+                                        <div class="card-value">
+                                            @if (count($parents) > 1999) 2000+ @else {{count($parents)}} @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-user-friends card-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Students Card -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <a href="{{route('classes.list')}}" class="text-decoration-none">
+                        <div class="stat-card bg-student text-white">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="card-title">Students</div>
+                                        <div class="card-value">
+                                            @if (count($students) > 1999) 2000+ @else {{count($students)}} @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-user-graduate card-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Courses Card -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <a href="{{route('courses.index')}}" class="text-decoration-none">
+                        <div class="stat-card bg-course text-white">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="card-title">Open Courses</div>
+                                        <div class="card-value">
+                                            @if (count($subjects) > 49) 50+ @else {{count($subjects)}} @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="ti-book card-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Classes Card -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <a href="{{route('Classes.index')}}" class="text-decoration-none">
+                        <div class="stat-card bg-class text-white">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="card-title">Classes</div>
+                                        <div class="card-value">
+                                            @if (count($classes) > 49) 50+ @else {{count($classes)}} @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="ti-blackboard card-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- School Buses Card -->
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <a href="{{route('Transportation.index')}}" class="text-decoration-none">
+                        <div class="stat-card bg-bus text-white">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="card-title">School Buses</div>
+                                        <div class="card-value">
+                                            @if (count($buses) > 49) 50+ @else {{count($buses)}} @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-bus card-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Charts Section -->
+        <div class="col-lg-12 mb-4">
+            <div class="row">
+                <!-- Student Registration Chart -->
+                <div class="col-xl-8 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-chart-bar me-2"></i> Student Registration by Class & Gender
+                            </h5>
+                            <p class="chart-subtitle">Distribution of students across classes</p>
+                        </div>
+                        <div class="chart-wrapper">
+                            <div id="studentChart" class="chart-canvas"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teacher Qualifications Chart -->
+                <div class="col-xl-4 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-chart-pie me-2"></i> Teacher Qualifications
+                            </h5>
+                            <p class="chart-subtitle">Educational background overview</p>
+                        </div>
+                        <div class="chart-wrapper">
+                            <div id="qualificationChart" class="chart-canvas"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Analytics Section -->
+        <div class="col-lg-12 mb-4">
+            <div class="row">
+                <!-- Gender Distribution -->
+                <div class="col-xl-4 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-venus-mars me-2"></i> Student Gender Distribution
+                            </h5>
+                            <p class="chart-subtitle">Male vs Female students ratio</p>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="genderChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Today's Attendance -->
+                <div class="col-xl-4 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-calendar-check me-2"></i> Today's Attendance
+                            </h5>
+                            <p class="chart-subtitle">{{\Carbon\Carbon::parse($today)->format('d-m-Y')}}</p>
+                        </div>
+                        <div class="chart-wrapper">
+                            @if ($attendanceCounts['present'] > 0 || $attendanceCounts['absent'] > 0 || $attendanceCounts['permission'] > 0)
+                                <canvas id="attendanceChart"></canvas>
+                            @else
+                                <div class="d-flex align-items-center justify-content-center h-100">
+                                    <p class="text-muted text-center">No attendance records for today</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats Tables -->
+                <div class="col-xl-4 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-table me-2"></i> Quick Overview
+                            </h5>
+                            <p class="chart-subtitle">Registration statistics</p>
+                        </div>
+                        <div class="row">
+                            <!-- Students by Class -->
+                            <div class="col-12 mb-3">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body p-3">
+                                        <h6 class="card-title text-center mb-3 text-primary">Students by Class</h6>
+                                        @if ($studentsByClass->isEmpty())
+                                            <p class="text-center text-muted mb-0">No records available</p>
+                                        @else
+                                            <div class="table-responsive">
+                                                <table class="table table-sm dashboard-table mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Class</th>
+                                                            <th class="text-end">Count</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($studentsByClass as $class)
+                                                        <tr>
+                                                            <td class="fw-semibold">{{$class->class_code}}</td>
+                                                            <td class="text-end">{{$class->student_count}}</td>
+                                                        </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Teachers by Gender -->
+                            <div class="col-12">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body p-3">
+                                        <h6 class="card-title text-center mb-3 text-primary">Teachers by Gender</h6>
+                                        @if ($teacherByGender->isEmpty())
+                                            <p class="text-center text-muted mb-0">No records available</p>
+                                        @else
+                                            <div class="table-responsive">
+                                                <table class="table table-sm dashboard-table mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Gender</th>
+                                                            <th class="text-end">Count</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($teacherByGender as $teacher)
+                                                        <tr>
+                                                            <td class="fw-semibold text-capitalize">{{$teacher->gender}}</td>
+                                                            <td class="text-end">{{$teacher->teacher_count}}</td>
+                                                        </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Student Registration Chart (ECharts)
+        var chartDom = document.getElementById('studentChart');
+        if (chartDom) {
+            var myChart = echarts.init(chartDom);
+            var chartData = @json($chartData);
+
+            var groupedData = {};
+            chartData.forEach(item => {
+                var classCode = item.category.split(' (')[0];
+                var gender = item.category.includes('Male') ? 'Male' : 'Female';
+                if (!groupedData[classCode]) {
+                    groupedData[classCode] = { Male: 0, Female: 0 };
+                }
+                groupedData[classCode][gender] = item.value;
+            });
+
+            var classCodes = Object.keys(groupedData);
+            var maleData = classCodes.map(classCode => groupedData[classCode].Male);
+            var femaleData = classCodes.map(classCode => groupedData[classCode].Female);
+
+            var option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' }
+                },
+                legend: {
+                    data: ['Male', 'Female'],
+                    bottom: 10
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: classCodes,
+                    axisLabel: { rotate: 45 }
+                },
+                yAxis: { type: 'value' },
+                series: [
+                    {
+                        name: 'Male',
+                        type: 'bar',
+                        stack: 'total',
+                        emphasis: { focus: 'series' },
+                        data: maleData
+                    },
+                    {
+                        name: 'Female',
+                        type: 'bar',
+                        stack: 'total',
+                        emphasis: { focus: 'series' },
+                        data: femaleData
+                    }
+                ]
+            };
+            myChart.setOption(option);
+        }
+
+        // Teacher Qualifications Chart (amCharts)
+        if (document.getElementById('qualificationChart')) {
+            am5.ready(function() {
+                var root = am5.Root.new("qualificationChart");
+                root.setThemes([am5themes_Animated.new(root)]);
+
+                var chart = root.container.children.push(
+                    am5percent.PieChart.new(root, { layout: root.verticalLayout })
+                );
+
+                var series = chart.series.push(
+                    am5percent.PieSeries.new(root, {
+                        valueField: "value",
+                        categoryField: "category"
+                    })
+                );
+
+                series.data.setAll([
+                    { category: "Masters", value: {{ $qualificationData['masters'] }} },
+                    { category: "Degree", value: {{ $qualificationData['bachelor'] }} },
+                    { category: "Diploma", value: {{ $qualificationData['diploma'] }} },
+                    { category: "Certificate", value: {{ $qualificationData['certificate'] }} }
+                ]);
+
+                chart.children.push(am5.Legend.new(root, {}));
+                series.appear(1000, 100);
+            });
+        }
+
+        // Gender Distribution Chart
+        const genderCtx = document.getElementById('genderChart');
+        if (genderCtx) {
+            const totalMaleStudents = @json($totalMaleStudents);
+            const totalFemaleStudents = @json($totalFemaleStudents);
+
+            new Chart(genderCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Male Students', 'Female Students'],
+                    datasets: [{
+                        data: [totalMaleStudents, totalFemaleStudents],
+                        backgroundColor: ['#4e73df', '#e74a3b'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+
+        // Attendance Chart
+        const attendanceCtx = document.getElementById('attendanceChart');
+        if (attendanceCtx) {
+            const attendanceData = @json($attendanceCounts);
+            const hasData = attendanceData.present > 0 || attendanceData.absent > 0 || attendanceData.permission > 0;
+
+            if (hasData) {
+                new Chart(attendanceCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Present', 'Absent', 'Permission'],
+                        datasets: [{
+                            data: [attendanceData.present, attendanceData.absent, attendanceData.permission],
+                            backgroundColor: ['#1cc88a', '#e74a3b', '#f6c23e'],
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                        return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '60%'
+                    }
+                });
+            }
+        }
+
+        // Authorization check
+        @if (Auth::user()->usertype != 2)
+            window.location.href = '/error-page';
+        @endif
+    });
+</script>
+@endsection

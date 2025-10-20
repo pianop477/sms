@@ -635,5 +635,4 @@ class TeachersController extends Controller
         return ['clean' => true, 'message' => 'Development mode - scan bypassed'];
     }
 
-
 }

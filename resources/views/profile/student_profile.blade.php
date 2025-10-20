@@ -265,7 +265,7 @@
                             @endif
                             <li class="nav-item flex-fill text-center">
                                 <a class="nav-link" href="#package" data-bs-toggle="tab">
-                                    <i class="fas fa-layer-group me-1"></i> Packages
+                                    <i class="fas fa-file-archive-o me-1"></i> Packages
                                 </a>
                             </li>
                         </ul>
@@ -388,7 +388,7 @@
 
                             <!-- Subjects Tab -->
                             <div class="tab-pane fade" id="subjects">
-                                <h5 class="mb-4"><i class="ti-book me-2"></i> Subject Teachers for: <span class="text-uppercase">{{$class->class_name}}</span></h5>
+                                <h5 class="mb-4"><i class="ti-book me-2"></i> Subject Teachers for: <span class="text-uppercase">{{strtoupper($class->class_name)}}</span></h5>
 
                                 <div class="table-responsive">
                                     <table class="table table-hover">
@@ -549,7 +549,7 @@
 
                             <!-- Packages Tab -->
                             <div class="tab-pane fade" id="package">
-                                <h5 class="mb-4"><i class="fas fa-layer-group me-2"></i> Holiday Package for <span class="text-uppercase">{{$class->class_name}}</span></h5>
+                                <h5 class="mb-4"><i class="fas fa-file-archive-o me-2"></i> Holiday Package for <span class="text-uppercase">{{strtoupper($class->class_name)}}</span></h5>
 
                                 @if ($packages->isEmpty())
                                     <div class="alert alert-warning text-center py-4">
@@ -587,11 +587,11 @@
                                                         <td>{{$item->due_date ?? 'N/A'}}</td>
                                                         <td>
                                                             @if ($item->is_active == true)
-                                                            <a href="{{route('student.holiday.package', ['id' => Hashids::encode($item->id), 'preview' => true])}}" target="_blank" class="btn btn-sm btn-success" onclick="return confirm('Are you sure you want to download this package?')">
+                                                            <a href="{{route('student.holiday.package', ['id' => Hashids::encode($item->id), 'preview' => true])}}" target="_blank" class="btn btn-sm btn-success btn-xs" onclick="return confirm('Are you sure you want to download this package?')">
                                                                 <i class="fas fa-download me-1"></i> Download
                                                             </a>
                                                             @else
-                                                            <button class="btn btn-sm btn-danger disabled">
+                                                            <button class="btn btn-sm btn-danger disabled btn-xs">
                                                                 <i class="fas fa-lock me-1"></i> Locked
                                                             </button>
                                                             @endif

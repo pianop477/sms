@@ -195,8 +195,10 @@
                                 School Administrator
                             @elseif($user->usertype == 3)
                                 Teacher
-                            @else
+                            @elseif ($user->usertype == 4)
                                 Parent
+                            @else
+                                Accountant
                             @endif
                         </p>
                     </div>
@@ -219,17 +221,19 @@
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="text-muted">Role</span>
                                 @if ($user->usertype == 1 || $user->usertype == 2)
-                                    <span class="badge-status bg-primary text-white">Admin</span>
+                                    <span class="" style="font-weight: bold">Admin</span>
                                 @elseif ($user->usertype == 3)
-                                    <span class="badge-status bg-primary text-white text-capitalize">{{$user->role_name}}</span>
+                                    <span class="text-capitalize" style="font-weight: bold">{{$user->role_name}}</span>
+                                @elseif ($user->usertype == 4)
+                                    <span class="" style="font-weight: bold">Parent</span>
                                 @else
-                                    <span class="badge-status bg-primary text-white">Parent</span>
+                                   <span class="" style="font-weight: bold">Accountant</span>
                                 @endif
                             </div>
 
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="text-muted">Gender</span>
-                                <span class="text-capitalize fw-bold">{{$user->gender}}</span>
+                                <span class="text-capitalize fw-bold" style="font-weight: bold">{{$user->gender}}</span>
                             </div>
 
                             <div class="d-flex justify-content-between align-items-center mb-2">

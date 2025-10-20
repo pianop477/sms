@@ -1,1705 +1,1508 @@
 @extends('SRTDashboard.frame')
+
 @section('content')
-<div class="col-lg-12">
-    {{-- first argument======================================================== --}}
-    @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 2)
-        {{-- school head teacher panel start here --}}
-
-        {{-- display contract status for head teacher --}}
-        <div class="row">
-            <div class="col-md-12">
-                @if ($contract == null)
-                <div class="alert alert-danger alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                    <strong>Contract Status:</strong> Not applied.
-                    <a href="{{route('contract.index')}}" class="alert-link">Apply here</a>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                @else
-                @if($contract->status == 'expired')
-                    <div class="alert alert-danger alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                        <strong>Contract Status:</strong> Expired
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @elseif ($contract->status == 'rejected')
-                    <div class="alert alert-secondary alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                        <strong>Contract Status:</strong> Rejected |
-                        <a href="{{route('contract.index')}}" class="alert-link">View details</a>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
-                    <div class="alert alert-warning alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                        <strong>Contract Status:</strong> Expiring soon ({{ $contract->end_date->format('d/m/Y') }})
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @elseif ($contract->status == 'pending')
-                    <div class="alert alert-info alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                        <strong>Contract Status:</strong> Pending |
-                        <a href="{{route('contract.index')}}" class="alert-link">View details</a>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @else
-                    <div class="alert alert-success alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                        <strong>Contract Status:</strong> Active (Expires at: {{ $contract->end_date }}) |
-                        <a href="{{route('contract.index')}}" class="alert-link">View contract</a>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
-            @endif
-            </div>
-        </div>
-            <div class="row">
-            <!-- Stats Cards -->
-            <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #e176a6 0%, #d04a88 100%);">
-                    <a href="{{route('Teachers.index')}}" class="text-decoration-none">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Teachers</h6>
-                                    <h2 class="text-white mb-0">
-                                        @if (count($teachers) > 99) 100+ @else {{count($teachers)}} @endif
-                                    </h2>
-                                </div>
-                                <div class="bg-white rounded-circle p-3">
-                                    <i class="fas fa-user-tie fa-2x text-pink"></i>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <span class="text-white small d-flex align-items-center">
-                                    View All <i class="fas fa-arrow-right ms-2"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #c84fe0 0%, #9c27b0 100%);">
-                    <a href="{{route('Parents.index')}}" class="text-decoration-none">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Parents</h6>
-                                    <h2 class="text-white mb-0">
-                                        @if (count($parents) > 1999) 2000+ @else {{count($parents)}} @endif
-                                    </h2>
-                                </div>
-                                <div class="bg-white rounded-circle p-3">
-                                    <i class="fas fa-user-friends fa-2x text-purple"></i>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <span class="text-white small d-flex align-items-center">
-                                    View All <i class="fas fa-arrow-right ms-2"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #098ddf 0%, #0568a8 100%);">
-                    <a href="{{route('classes.list')}}" class="text-decoration-none">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Students</h6>
-                                    <h2 class="text-white mb-0">
-                                        @if (count($students) > 1999) 2000+ @else {{count($students)}} @endif
-                                    </h2>
-                                </div>
-                                <div class="bg-white rounded-circle p-3">
-                                    <i class="fas fa-user-graduate fa-2x text-info"></i>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <span class="text-white small d-flex align-items-center">
-                                    View All <i class="fas fa-arrow-right ms-2"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Second Row of Cards -->
-            <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #9fbc71 0%, #689f38 100%);">
-                    <a href="{{route('courses.index')}}" class="text-decoration-none">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Open Courses</h6>
-                                    <h2 class="text-white mb-0">
-                                        @if (count($subjects) > 49) 50+ @else {{count($subjects)}} @endif
-                                    </h2>
-                                </div>
-                                <div class="bg-white rounded-circle p-3">
-                                    <i class="ti-book fa-2x text-success"></i>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <span class="text-white small d-flex align-items-center">
-                                    View All <i class="fas fa-arrow-right ms-2"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #bf950a 0%, #ff9800 100%);">
-                    <a href="{{route('Classes.index')}}" class="text-decoration-none">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Classes</h6>
-                                    <h2 class="text-white mb-0">
-                                        @if (count($classes) > 49) 50+ @else {{count($classes)}} @endif
-                                    </h2>
-                                </div>
-                                <div class="bg-white rounded-circle p-3">
-                                    <i class="ti-blackboard fa-2x text-dark"></i>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <span class="text-white small d-flex align-items-center">
-                                    View All <i class="fas fa-arrow-right ms-2"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #329688 0%, #00796b 100%);">
-                    <a href="{{route('Transportation.index')}}" class="text-decoration-none">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> School Buses</h6>
-                                    <h2 class="text-white mb-0">
-                                        @if (count($buses) > 49) 50+ @else {{count($buses)}} @endif
-                                    </h2>
-                                </div>
-                                <div class="bg-white rounded-circle p-3">
-                                    <i class="fas fa-bus fa-2x text-teal"></i>
-                                </div>
-                            </div>
-                            <div class="mt-3">
-                                <span class="text-white small d-flex align-items-center">
-                                    View All <i class="fas fa-arrow-right ms-2"></i>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <hr class="dark horizontal py-0">
-        <div class="col-lg-12">
-            <div class="row">
-                <div class="col-md-6 mt-2 mb-3">
-                    <div class="card">
-                        <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
-                        <div id="studentChart" style="width: 100%; height: 400px;"></div>
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function () {
-                                // Initialize ECharts instance
-                                var chartDom = document.getElementById('studentChart');
-                                var myChart = echarts.init(chartDom);
-
-                                // Prepare data
-                                var chartData = @json($chartData); // Assuming $chartData contains raw data from the backend
-
-                                // Group data by class
-                                var groupedData = {};
-                                chartData.forEach(item => {
-                                    var classCode = item.category.split(' (')[0];
-                                    var gender = item.category.includes('Male') ? 'Male' : 'Female';
-                                    if (!groupedData[classCode]) {
-                                        groupedData[classCode] = { Male: 0, Female: 0 };
-                                    }
-                                    groupedData[classCode][gender] = item.value;
-                                });
-
-                                // Extract x-axis labels and series data
-                                var classCodes = Object.keys(groupedData);
-                                var maleData = classCodes.map(classCode => groupedData[classCode].Male);
-                                var femaleData = classCodes.map(classCode => groupedData[classCode].Female);
-
-                                // Chart options
-                                var option = {
-                                    title: {
-                                        text: 'Student Registration',
-                                        left: 'center'
-                                    },
-                                    tooltip: {
-                                        trigger: 'axis',
-                                        axisPointer: {
-                                            type: 'shadow'
-                                        }
-                                    },
-                                    legend: {
-                                        bottom: 10,
-                                        data: ['Male', 'Female']
-                                    },
-                                    grid: {
-                                        left: '3%',
-                                        right: '4%',
-                                        bottom: '3%',
-                                        containLabel: true
-                                    },
-                                    xAxis: {
-                                        type: 'category',
-                                        data: classCodes, // Unique class codes
-                                        axisLabel: {
-                                            rotate: 45
-                                        }
-                                    },
-                                    yAxis: {
-                                        type: 'value'
-                                    },
-                                    series: [
-                                        {
-                                            name: 'Male',
-                                            type: 'bar',
-                                            stack: 'total',
-                                            label: {
-                                                show: true
-                                            },
-                                            data: maleData // Male data per class
-                                        },
-                                        {
-                                            name: 'Female',
-                                            type: 'bar',
-                                            stack: 'total',
-                                            label: {
-                                                show: true
-                                            },
-                                            data: femaleData // Female data per class
-                                        }
-                                    ]
-                                };
-
-                                // Set options and render the chart
-                                myChart.setOption(option);
-                            });
-                        </script>
-                    </div>
-                </div>
-                <div class="col-md-6 mt-2 mb-3">
-                    <div class="card">
-                        <div id="qualificationChart" style="width: 100%; height: 400px;"></div>
-                        <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
-                        <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
-                        <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
-                        <script>
-                            am5.ready(function() {
-                                // Create root element
-                                var root = am5.Root.new("qualificationChart");
-
-                                // Set themes
-                                root.setThemes([am5themes_Animated.new(root)]);
-
-                                // Create chart
-                                var chart = root.container.children.push(
-                                    am5percent.PieChart.new(root, {
-                                        layout: root.verticalLayout
-                                    })
-                                );
-
-                                // Add chart title
-                                chart.children.unshift(
-                                    am5.Label.new(root, {
-                                        text: "Qualifications",
-                                        fontSize: 20,
-                                        fontWeight: "bold",
-                                        textAlign: "center",
-                                        x: am5.percent(50),
-                                        centerX: am5.percent(50)
-                                    })
-                                );
-
-                                // Create series
-                                var series = chart.series.push(
-                                    am5percent.PieSeries.new(root, {
-                                        valueField: "value",
-                                        categoryField: "category"
-                                    })
-                                );
-
-                                // Add data
-                                series.data.setAll([
-                                    { category: "Masters", value: {{ $qualificationData['masters'] }} },
-                                    { category: "Degree", value: {{ $qualificationData['bachelor'] }} },
-                                    { category: "Diploma", value: {{ $qualificationData['diploma'] }} },
-                                    { category: "Certificate", value: {{ $qualificationData['certificate'] }} }
-                                ]);
-
-                                // Add legend
-                                chart.children.push(am5.Legend.new(root, {}));
-
-                                // Animate chart
-                                series.appear(1000, 100);
-                            });
-                        </script>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <hr class="dark horizontal py-0">
-        <div class="col-lg-12">
-            <div class="row">
-                <div class="col-md-4 mt-2 mb-3">
-                    <div class="card">
-                        <div class="card-title mt-2 border-bottom">
-                            <h6 class="text-center">Students Registration</h6>
-                        </div>
-                        <table class="table table-sm table-hover table-responsive-sm table-bordered table-sm" style="background: #e3d39e">
-                            @if ($studentsByClass->isEmpty())
-                            <thead>
-                                <tr>
-                                    <th>Class</th>
-                                    <th>Students</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td colspan="2" class="text-center">No records Available</td>
-                                </tr>
-                            </tbody>
-                            @else
-                            <thead>
-                                <tr class="text-center">
-                                    <th>Class</th>
-                                    @foreach ($studentsByClass as $class)
-                                        <th class="text-uppercase">{{$class->class_code}}</th>
-                                    @endforeach
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="text-center">
-                                    <td>Students</td>
-                                    @foreach ($studentsByClass as $class )
-                                        <td>{{$class->student_count}}</td>
-                                    @endforeach
-                                </tr>
-                            </tbody>
-                            @endif
-                        </table>
-                        <hr class="dark horizontal py-0">
-                        <div class="card-title">
-                            <h6 class="text-center mt-2">Teachers Registration</h6>
-                        </div>
-                        <table class="table table-sm table-responsive-sm table-bordered table-hover" style="background: #e4abcf;">
-                            <thead>
-                                <tr class="text-center">
-                                    <th>Gender</th>
-                                    <th>Number of Teachers</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if ($teacherByGender->isEmpty())
-                                <tr>
-                                    <td colspan="2" class="text-center">No records Available</td>
-                                </tr>
-                                @else
-                                    @foreach ($teacherByGender as $teacher)
-                                    <tr class="text-center">
-                                        <td>{{ ucfirst($teacher->gender) }}</td>
-                                        <td>{{ $teacher->teacher_count }}</td>
-                                    </tr>
-                                @endforeach
-                                @endif
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="col-md-4 mt-2 mb-3">
-                    <div class="card">
-                        <div class="card-title mt-2 border-bottom">
-                            <h6 class="text-center">Students Registration</h6>
-                        </div>
-                        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-                        <div style="width: 280px; height: 280px; margin: 0 auto;">
-                            <canvas id="genderChart"></canvas>
-                        </div>
-                        <script>
-                            const totalMaleStudents = @json($totalMaleStudents);
-                            const totalFemaleStudents = @json($totalFemaleStudents);
-
-                            const ctxGender = document.getElementById('genderChart').getContext('2d');
-                            const genderChart = new Chart(ctxGender, {
-                                type: 'doughnut',
-                                data: {
-                                    labels: ['Boys', 'Girls'],
-                                    datasets: [{
-                                        label: 'Students Enrollment',
-                                        data: [totalMaleStudents, totalFemaleStudents],
-                                        backgroundColor: [
-                                            'rgba(54, 162, 235, 0.7)', // Blue
-                                            'rgba(255, 99, 132, 0.7)'  // Red
-                                        ],
-                                        borderColor: [
-                                            'rgba(54, 162, 235, 1)',
-                                            'rgba(255, 99, 132, 1)'
-                                        ],
-                                        borderWidth: 1
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        legend: {
-                                            position: 'top',
-                                        },
-                                        tooltip: {
-                                            callbacks: {
-                                                label: function(context) {
-                                                    const label = context.label || '';
-                                                    const value = context.raw || 0;
-                                                    return `${label}: ${value}`;
-                                                }
-                                            }
-                                        },
-                                        datalabels: {
-                                            color: '#fff', // Label text color
-                                            formatter: (value, ctxGender) => {
-                                                return value; // Display the raw value
-                                            },
-                                            font: {
-                                                weight: 'bold',
-                                                size: 12
-                                            },
-                                            anchor: 'center', // Position inside the curve
-                                            align: 'center'
-                                        }
-                                    }
-                                },
-                                plugins: [ChartDataLabels] // Register the plugin
-                            });
-                        </script>
-                    </div>
-                </div>
-                <div class="col-lg-4 mt-2 mb-3">
-                    <div class="card">
-                        <div class="card-title mt-2 border-bottom">
-                            <h6 class="text-center">Today's Attendance: {{\Carbon\Carbon::parse($today)->format('d-m-Y')}}</h6>
-                        </div>
-                        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-                        <div style="width: 280px; height: 280px; margin: 0 auto;">
-                            @if ($attendanceCounts['present'] > 0 || $attendanceCounts['absent'] > 0 || $attendanceCounts['permission'] > 0)
-                                <canvas id="attendanceChart" width="400" height="400"></canvas>
-                            @else
-                                <p class="text-center mt-5 text-danger">No attendance records for today.</p>
-                            @endif
-
-                        </div>
-                        <script>
-                            (function() {
-                                // Check if attendance data exists
-                                const attendanceData = @json($attendanceCounts);
-
-                                // Ensure data exists and at least one value is greater than zero
-                                const hasData = attendanceData.present > 0 || attendanceData.absent > 0 || attendanceData.permission > 0;
-
-                                // Find the canvas element
-                                const ctxAttendance = document.getElementById('attendanceChart');
-
-                                if (ctxAttendance && hasData) { // Only proceed if canvas and data are valid
-                                    const attendanceChart = new Chart(ctxAttendance.getContext('2d'), {
-                                        type: 'doughnut',
-                                        data: {
-                                            labels: ['Present', 'Absent', 'Permission'],
-                                            datasets: [{
-                                                label: 'Today\'s Attendance',
-                                                data: [attendanceData.present, attendanceData.absent, attendanceData.permission],
-                                                backgroundColor: [
-                                                    'rgba(75, 192, 192, 0.7)', // Green for Present
-                                                    'rgba(255, 99, 132, 0.7)', // Red for Absent
-                                                    'rgba(255, 206, 86, 0.7)'  // Yellow for Permission
-                                                ],
-                                                borderColor: [
-                                                    'rgba(75, 192, 192, 1)',
-                                                    'rgba(255, 99, 132, 1)',
-                                                    'rgba(255, 206, 86, 1)'
-                                                ],
-                                                borderWidth: 1
-                                            }]
-                                        },
-                                        options: {
-                                            responsive: true,
-                                            maintainAspectRatio: false,
-                                            plugins: {
-                                                legend: {
-                                                    position: 'top',
-                                                },
-                                                tooltip: {
-                                                    callbacks: {
-                                                        label: function(context) {
-                                                            const label = context.label || '';
-                                                            const value = context.raw || 0;
-                                                            return `${label}: ${value}`;
-                                                        }
-                                                    }
-                                                },
-                                                datalabels: {
-                                                    color: '#fff',
-                                                    formatter: (value, ctxAttendance) => {
-                                                        return value;
-                                                    },
-                                                    font: {
-                                                        weight: 'bold',
-                                                        size: 12
-                                                    },
-                                                    anchor: 'center',
-                                                    align: 'center'
-                                                }
-                                            }
-                                        },
-                                        plugins: [ChartDataLabels] // Register the plugin
-                                    });
-                                } else if (!hasData) {
-                                    // Optional: Display a message if no attendance data
-                                    document.getElementById('attendance-container').innerHTML = `
-                                        <p class="text-center text-muted">No attendance records found for today.</p>`;
-                                }
-                            })();
-                        </script>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {{-- school head teacher panel end here --}}
-        {{-- first argument end here ============================================= --}}
-    @elseif (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 3)
-        {{-- second argument start here =========================================== --}}
-        {{-- academic teacher panel start here =================== --}}
-
-        {{-- check for academic contract  --}}
-        <div class="row">
-            <div class="col-12">
-                @if ($contract == null)
-                <div class="alert alert-danger alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                    <strong>Contract Status:</strong> Not applied.
-                    <a href="{{route('contract.index')}}" class="alert-link">Apply here</a>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                @else
-                @if($contract->status == 'expired')
-                    <div class="alert alert-danger alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                        <strong>Contract Status:</strong> Expired
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @elseif ($contract->status == 'rejected')
-                    <div class="alert alert-secondary alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                        <strong>Contract Status:</strong> Rejected |
-                        <a href="{{route('contract.index')}}" class="alert-link">View details</a>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
-                    <div class="alert alert-warning alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                        <strong>Contract Status:</strong> Expiring soon ({{ $contract->end_date->format('d/m/Y') }})
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @elseif ($contract->status == 'pending')
-                    <div class="alert alert-info alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                        <strong>Contract Status:</strong> Pending |
-                        <a href="{{route('contract.index')}}" class="alert-link">View details</a>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @else
-                    <div class="alert alert-success alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                        <strong>Contract Status:</strong> Active (Expires at: {{$contract->end_date }}) |
-                        <a href="{{route('contract.index')}}" class="alert-link">View contract</a>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
-            @endif
-            </div>
-            {{-- show tod roster details --}}
-                @php
-                    // Get today's date
-                    $today = \Carbon\Carbon::now()->format('Y-m-d');
-                    $user = auth()->user();
-                    $teacher = \App\Models\Teacher::where('user_id', $user->id)->first();
-                    $myDuty = \App\Models\TodRoster::where('teacher_id', $teacher->id)->where('status', 'active')->first();
-                @endphp
-                @if ($myDuty)
-                    <a href="{{route('tod.report.create')}}" onclick="return confirm('Are you sure?')">
-                        <div class="alert" style="background: gold; border-left: 5px solid #982d9c;">
-                            <p class="">You are on Duty! Fill
-                                <strong>
-                                    <a href="{{route('tod.report.create')}}" onclick="return confirm('Are you sure?')"><i class="fas fa-edit"></i> Daily Report</a>
-                                </strong>
-                            </p>
-                        </div>
-                    </a>
-                @endif
-        </div>
-            <div class="row">
-        <!-- Stats Cards for Academic Teacher -->
-        <div class="col-md-4 mb-4">
-            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #e176a6 0%, #d04a88 100%);">
-                <a href="{{route('Teachers.index')}}" class="text-decoration-none">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Teachers</h6>
-                                <h2 class="text-white mb-0">
-                                    @if (count($teachers) > 99) 100+ @else {{count($teachers)}} @endif
-                                </h2>
-                            </div>
-                            <div class="bg-white rounded-circle p-3">
-                                <i class="fas fa-user-tie fa-2x text-pink"></i>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <span class="text-white small d-flex align-items-center">
-                                View All <i class="fas fa-arrow-right ms-2"></i>
-                            </span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #098ddf 0%, #0568a8 100%);">
-                <a href="{{route('classes.list')}}" class="text-decoration-none">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Students</h6>
-                                <h2 class="text-white mb-0">
-                                    @if(count($students) > 1999) 2000+ @else {{count($students)}} @endif
-                                </h2>
-                            </div>
-                            <div class="bg-white rounded-circle p-3">
-                                <i class="fas fa-user-graduate fa-2x text-info"></i>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <span class="text-white small d-flex align-items-center">
-                                View All <i class="fas fa-arrow-right ms-2"></i>
-                            </span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #9fbc71 0%, #689f38 100%);">
-                <a href="{{route('courses.index')}}" class="text-decoration-none">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Open Courses</h6>
-                                <h2 class="text-white mb-0">
-                                    @if (count($subjects) > 49) 50+ @else {{count($subjects)}} @endif
-                                </h2>
-                            </div>
-                            <div class="bg-white rounded-circle p-3">
-                                <i class="ti-book fa-2x text-success"></i>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <span class="text-white small d-flex align-items-center">
-                                View All <i class="fas fa-arrow-right ms-2"></i>
-                            </span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-
-        <!-- Second Row for Academic Teacher -->
-        <div class="col-md-4 mb-4">
-            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #bf950a 0%, #ff9800 100%);">
-                <a href="{{route('Classes.index')}}" class="text-decoration-none">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Classes</h6>
-                                <h2 class="text-white mb-0">
-                                    @if (count($classes) > 49) 50+ @else {{count($classes)}} @endif
-                                </h2>
-                            </div>
-                            <div class="bg-white rounded-circle p-3">
-                                <i class="ti-blackboard fa-2x text-dark"></i>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <span class="text-white small d-flex align-items-center">
-                                View All <i class="fas fa-arrow-right ms-2"></i>
-                            </span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #b14fbe 0%, #8e24aa 100%);">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> My Courses</h6>
-                            <h2 class="text-white mb-0">
-                                {{ $courses->where('status', 1)->count() }}
-                            </h2>
-                        </div>
-                        <div class="bg-white rounded-circle p-3">
-                            <i class="ti-book fa-2x text-purple"></i>
-                        </div>
-                    </div>
-                    <div class="mt-3">
-                        <span class="text-white small d-flex align-items-center">
-                            View All <i class="fas fa-arrow-right ms-2"></i>
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-        <hr class="dark horizontal py-0">
-        {{-- academic panel end here =========================================== --}}
-        {{-- academic teacher its courses records start here ====================== --}}
-        <div class="row">
-            <div class="col-md-6 mt-0 mb-3">
-                <div class="card">
-                    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
-                    <div id="studentChart" style="width: 100%; height: 400px;"></div>
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function () {
-                            // Initialize ECharts instance
-                            var chartDom = document.getElementById('studentChart');
-                            var myChart = echarts.init(chartDom);
-
-                            // Prepare data
-                            var chartData = @json($chartData); // Assuming $chartData contains raw data from the backend
-
-                            // Group data by class
-                            var groupedData = {};
-                            chartData.forEach(item => {
-                                var classCode = item.category.split(' (')[0];
-                                var gender = item.category.includes('Male') ? 'Male' : 'Female';
-                                if (!groupedData[classCode]) {
-                                    groupedData[classCode] = { Male: 0, Female: 0 };
-                                }
-                                groupedData[classCode][gender] = item.value;
-                            });
-
-                            // Extract x-axis labels and series data
-                            var classCodes = Object.keys(groupedData);
-                            var maleData = classCodes.map(classCode => groupedData[classCode].Male);
-                            var femaleData = classCodes.map(classCode => groupedData[classCode].Female);
-
-                            // Chart options
-                            var option = {
-                                title: {
-                                    text: 'Student Registration',
-                                    left: 'center'
-                                },
-                                tooltip: {
-                                    trigger: 'axis',
-                                    axisPointer: {
-                                        type: 'shadow'
-                                    }
-                                },
-                                legend: {
-                                    bottom: 10,
-                                    data: ['Male', 'Female']
-                                },
-                                grid: {
-                                    left: '3%',
-                                    right: '4%',
-                                    bottom: '3%',
-                                    containLabel: true
-                                },
-                                xAxis: {
-                                    type: 'category',
-                                    data: classCodes, // Unique class codes
-                                    axisLabel: {
-                                        rotate: 45
-                                    }
-                                },
-                                yAxis: {
-                                    type: 'value'
-                                },
-                                series: [
-                                    {
-                                        name: 'Male',
-                                        type: 'bar',
-                                        stack: 'total',
-                                        label: {
-                                            show: true
-                                        },
-                                        data: maleData // Male data per class
-                                    },
-                                    {
-                                        name: 'Female',
-                                        type: 'bar',
-                                        stack: 'total',
-                                        label: {
-                                            show: true
-                                        },
-                                        data: femaleData // Female data per class
-                                    }
-                                ]
-                            };
-
-                            // Set options and render the chart
-                            myChart.setOption(option);
-                        });
-                    </script>
-                </div>
-            </div>
-            <div class="col-lg-6 mt-0">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-10"><h4 class="header-title text-capitalize text-center">my teaching subjects</h4></div>
-                        </div>
-                        <div class="table-responsive-md">
-                            <table class="table table-hover text-center" id="">
-                                <thead>
-                                    <tr class="text-capitalize">
-                                        <th>Subject</th>
-                                        <th>Class</th>
-                                        <th class="text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if ($courses->isEmpty())
-                                        <tr>
-                                            <td colspan="5">
-                                                <div class="alert alert-warning text-center">
-                                                    No any subject assigned for you
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        @else
-                                        @foreach ($courses as $course )
-                                        <tr>
-                                            <td class="text-capitalize">
-                                                {{ucwords(strtolower($course->course_name))}}
-                                            </td>
-                                            <td class="text-uppercase">{{strtoupper($course->class_code)}}</td>
-                                            <td>
-                                                @if ($course->status == 1)
-                                                <ul class="d-flex justify-content-center">
-                                                    <div class="btn-group" role="group">
-                                                        <button id="btnGroupDrop" type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            Manage
-                                                        </button>
-                                                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                                            {{-- <a class="dropdown-item" href="{{route('under.construction.page')}}"><i class="ti-pencil-alt"></i> Score</a> --}}
-                                                            <a class="dropdown-item" href="{{route('score.prepare.form', ['id' => Hashids::encode($course->id)])}}"><i class="ti-pencil-alt"></i> Score</a>
-                                                            <a class="dropdown-item" href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}"><i class="ti-file"></i> Results</a>
-                                                        </div>
-                                                    </div>
-                                                </ul>
-                                                @else
-                                                    <span class="badge bg-danger text-white">{{_('Blocked')}}</span>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                    @endif
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <hr class="dark horizontal py-0">
-        <div class="col-lg-12">
-            <div class="row">
-                <div class="col-md-4 mt-2 mb-3">
-                    <div class="card">
-                        <div class="card-title mt-2 border-bottom">
-                            <h6 class="text-center">Students Registration</h6>
-                        </div>
-                        <table class="table table-sm table-hover table-responsive-sm table-bordered table-sm" style="background: #e3d39e">
-                            @if ($studentsByClass->isEmpty())
-                            <thead>
-                                <tr>
-                                    <th>Class</th>
-                                    <th>Students</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td colspan="2" class="text-center">No records Available</td>
-                                </tr>
-                            </tbody>
-                            @else
-                            <thead>
-                                <tr class="text-center">
-                                    <th>Class</th>
-                                    @foreach ($studentsByClass as $class)
-                                        <th class="text-uppercase">{{$class->class_code}}</th>
-                                    @endforeach
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="text-center">
-                                    <td>Students</td>
-                                    @foreach ($studentsByClass as $class )
-                                        <td>{{$class->student_count}}</td>
-                                    @endforeach
-                                </tr>
-                            </tbody>
-                            @endif
-                        </table>
-                        <hr class="dark horizontal py-0">
-                        <div class="card-title border-bottom mt-2">
-                            <h6 class="text-center mt-2">Teachers Registration</h6>
-                        </div>
-                        <table class="table table-sm table-responsive-sm table-bordered table-hover" style="background: #e4abcf;">
-                            <thead>
-                                <tr class="text-center">
-                                    <th>Gender</th>
-                                    <th>Number of Teachers</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if ($teacherByGender->isEmpty())
-                                <tr>
-                                    <td colspan="2" class="text-center">No records Available</td>
-                                </tr>
-                                @else
-                                    @foreach ($teacherByGender as $teacher)
-                                    <tr class="text-center">
-                                        <td>{{ ucfirst($teacher->gender) }}</td>
-                                        <td>{{ $teacher->teacher_count }}</td>
-                                    </tr>
-                                @endforeach
-                                @endif
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="col-md-4 mt-2 mb-3">
-                    <div class="card">
-                        <div class="card-title mt-2 border-bottom">
-                            <h6 class="text-center">Students Enrollment</h6>
-                        </div>
-                        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-                        <div style="width: 280px; height: 280px; margin: 0 auto;">
-                            <canvas id="genderChart"></canvas>
-                        </div>
-                        <script>
-                            const totalMaleStudents = @json($totalMaleStudents);
-                            const totalFemaleStudents = @json($totalFemaleStudents);
-
-                            const ctxGender = document.getElementById('genderChart').getContext('2d');
-                            const genderChart = new Chart(ctxGender, {
-                                type: 'doughnut',
-                                data: {
-                                    labels: ['Boys', 'Girls'],
-                                    datasets: [{
-                                        label: 'Student Enrollment',
-                                        data: [totalMaleStudents, totalFemaleStudents],
-                                        backgroundColor: [
-                                            'rgba(54, 162, 235, 0.7)', // Blue
-                                            'rgba(255, 99, 132, 0.7)'  // Red
-                                        ],
-                                        borderColor: [
-                                            'rgba(54, 162, 235, 1)',
-                                            'rgba(255, 99, 132, 1)'
-                                        ],
-                                        borderWidth: 1
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        legend: {
-                                            position: 'top',
-                                        },
-                                        tooltip: {
-                                            callbacks: {
-                                                label: function(context) {
-                                                    const label = context.label || '';
-                                                    const value = context.raw || 0;
-                                                    return `${label}: ${value}`;
-                                                }
-                                            }
-                                        },
-                                        datalabels: {
-                                            color: '#fff', // Label text color
-                                            formatter: (value, ctxGender) => {
-                                                return value; // Display the raw value
-                                            },
-                                            font: {
-                                                weight: 'bold',
-                                                size: 12
-                                            },
-                                            anchor: 'center', // Position inside the curve
-                                            align: 'center'
-                                        }
-                                    }
-                                },
-                                plugins: [ChartDataLabels] // Register the plugin
-                            });
-                        </script>
-                    </div>
-                </div>
-                <div class="col-lg-4 mt-2 mb-3">
-                    <div class="card">
-                        <div class="card-title mt-2 border-bottom">
-                            <h6 class="text-center">Today's Attendance: {{\Carbon\Carbon::parse($today)->format('d-m-Y')}}</h6>
-                        </div>
-                        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-                        <div style="width: 280px; height: 280px; margin: 0 auto;">
-                            @if ($attendanceCounts['present'] > 0 || $attendanceCounts['absent'] > 0 || $attendanceCounts['permission'] > 0)
-                                <canvas id="attendanceChart" width="400" height="400"></canvas>
-                            @else
-                                <p class="text-center mt-5 text-danger">No records available.</p>
-                            @endif
-
-                        </div>
-                        <script>
-                            (function() {
-                                // Check if attendance data exists
-                                const attendanceData = @json($attendanceCounts);
-
-                                // Ensure data exists and at least one value is greater than zero
-                                const hasData = attendanceData.present > 0 || attendanceData.absent > 0 || attendanceData.permission > 0;
-
-                                // Find the canvas element
-                                const ctxAttendance = document.getElementById('attendanceChart');
-
-                                if (ctxAttendance && hasData) { // Only proceed if canvas and data are valid
-                                    const attendanceChart = new Chart(ctxAttendance.getContext('2d'), {
-                                        type: 'doughnut',
-                                        data: {
-                                            labels: ['Present', 'Absent', 'Permission'],
-                                            datasets: [{
-                                                label: 'Today\'s Attendance',
-                                                data: [attendanceData.present, attendanceData.absent, attendanceData.permission],
-                                                backgroundColor: [
-                                                    'rgba(75, 192, 192, 0.7)', // Green for Present
-                                                    'rgba(255, 99, 132, 0.7)', // Red for Absent
-                                                    'rgba(255, 206, 86, 0.7)'  // Yellow for Permission
-                                                ],
-                                                borderColor: [
-                                                    'rgba(75, 192, 192, 1)',
-                                                    'rgba(255, 99, 132, 1)',
-                                                    'rgba(255, 206, 86, 1)'
-                                                ],
-                                                borderWidth: 1
-                                            }]
-                                        },
-                                        options: {
-                                            responsive: true,
-                                            maintainAspectRatio: false,
-                                            plugins: {
-                                                legend: {
-                                                    position: 'top',
-                                                },
-                                                tooltip: {
-                                                    callbacks: {
-                                                        label: function(context) {
-                                                            const label = context.label || '';
-                                                            const value = context.raw || 0;
-                                                            return `${label}: ${value}`;
-                                                        }
-                                                    }
-                                                },
-                                                datalabels: {
-                                                    color: '#fff',
-                                                    formatter: (value, ctxAttendance) => {
-                                                        return value;
-                                                    },
-                                                    font: {
-                                                        weight: 'bold',
-                                                        size: 12
-                                                    },
-                                                    anchor: 'center',
-                                                    align: 'center'
-                                                }
-                                            }
-                                        },
-                                        plugins: [ChartDataLabels] // Register the plugin
-                                    });
-                                } else if (!hasData) {
-                                    // Optional: Display a message if no attendance data
-                                    document.getElementById('attendance-container').innerHTML = `
-                                        <p class="text-center text-muted">No attendance records found for today.</p>`;
-                                }
-                            })();
-                        </script>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {{-- academic teacher courses records end here============================= --}}
-        {{-- end of second argument ==================================================== --}}
-    @elseif (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 4)
-        {{-- third argument ============================================================ --}}
-        {{-- class teacher panel start here ======================================= --}}
-
-        {{-- check for class teacher contract --}}
-        @if ($contract == null)
-                <div class="alert alert-danger alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                    <strong>Contract Status:</strong> Not applied.
-                    <a href="{{route('contract.index')}}" class="alert-link">Apply here</a>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                @else
-                @if($contract->status == 'expired')
-                    <div class="alert alert-danger alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                        <strong>Contract Status:</strong> Expired
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @elseif ($contract->status == 'rejected')
-                    <div class="alert alert-secondary alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                        <strong>Contract Status:</strong> Rejected |
-                        <a href="{{route('contract.index')}}" class="alert-link">View details</a>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
-                    <div class="alert alert-warning alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                        <strong>Contract Status:</strong> Expiring soon ({{ $contract->end_date->format('d/m/Y') }})
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @elseif ($contract->status == 'pending')
-                    <div class="alert alert-info alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                        <strong>Contract Status:</strong> Pending |
-                        <a href="{{route('contract.index')}}" class="alert-link">View details</a>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @else
-                    <div class="alert alert-success alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                        <strong>Contract Status:</strong> Active (Expires at: {{$contract->end_date}}) |
-                        <a href="{{route('contract.index')}}" class="alert-link">View contract</a>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
-            @endif
-                @php
-                    // Get today's date
-                    $today = \Carbon\Carbon::now()->format('Y-m-d');
-                    $user = auth()->user();
-                    $teacher = \App\Models\Teacher::where('user_id', $user->id)->first();
-                    $myDuty = \App\Models\TodRoster::where('teacher_id', $teacher->id)->where('status', 'active')->first();
-                @endphp
-                @if ($myDuty)
-                    <a href="{{route('tod.report.create')}}" onclick="return confirm('Are you sure?')">
-                        <div class="alert" style="background: gold; border-left: 5px solid #982d9c;">
-                            <p class="">You are on Duty! Fill
-                                <strong>
-                                    <a href="{{route('tod.report.create')}}" onclick="return confirm('Are you sure?')"><i class="fas fa-edit"></i> Daily Report</a>
-                                </strong>
-                            </p>
-                        </div>
-                    </a>
-                @endif
-        <div class="row">
-        <!-- Stats Cards for Class Teacher -->
-        <div class="col-md-4 mb-4">
-            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #098ddf 0%, #0568a8 100%);">
-                <a href="{{ route('get.student.list', ['class' => Hashids::encode($myClass->first()->id)]) }}" class="text-decoration-none">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> My Attendance</h6>
-                                <h2 class="text-white mb-0">{{ $myClass->count() }}</h2>
-                            </div>
-                            <div class="bg-white rounded-circle p-3">
-                                <i class="fas fa-user-check fa-2x text-info"></i>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <span class="text-white small d-flex align-items-center">
-                                View All <i class="fas fa-arrow-right ms-2"></i>
-                            </span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #c84fe0 0%, #9c27b0 100%);">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> Students</h6>
-                            @foreach ($classData as $data )
-                            <h2 class="text-white mb-0">{{$data['maleCount'] + $data['femaleCount']}}</h2>
-                            @endforeach
-                        </div>
-                        <div class="bg-white rounded-circle p-3">
-                            <i class="fas fa-users fa-2x text-purple"></i>
-                        </div>
-                    </div>
-                    <div class="mt-3">
-                        <span class="text-white small d-flex align-items-center">
-                            View All <i class="fas fa-arrow-right ms-2"></i>
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-4">
-            <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #bf950a 0%, #ff9800 100%);">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> My Courses</h6>
-                            <h2 class="text-white mb-0">
-                                {{$courses->where('status', 1)->count()}}
-                            </h2>
-                        </div>
-                        <div class="bg-white rounded-circle p-3">
-                            <i class="ti-book fa-2x text-dark"></i>
-                        </div>
-                    </div>
-                    <div class="mt-3">
-                        <span class="text-white small d-flex align-items-center">
-                            View All <i class="fas fa-arrow-right ms-2"></i>
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-        <div class="row">
-                <div class="col-lg-6 mt-0">
-                    <div class="card">
-                        <div class="card-body">
-                            <h4 class="header-title text-center text-capitalize"> My Attendance Class</h4>
-                            <div class="table-responsive-md">
-                                <table class="table table-hover text-center">
-                                    <thead>
-                                        <tr class="text-capitalize">
-                                            <th>Class</th>
-                                            <th>Stream</th>
-                                            <th class="">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($myClass as $class)
-                                            <tr class="">
-                                                <td class="text-uppercase">
-                                                    <a href="{{ route('get.student.list', ['class' => Hashids::encode($class->id)]) }}">{{ $class->class_name }}</a>
-                                                </td>
-                                                <td class="text-uppercase text-center">{{ $class->group }}</td>
-                                                <td>
-                                                    <ul class="d-flex justify-content-center">
-                                                        <li class="">
-                                                            <a href="{{ route('attendance.get.form', ['class' => Hashids::encode($class->id)]) }}" class="btn btn-info p-1">
-                                                                <i class="ti-settings"> REPORT</i>
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {{-- another table lies here --}}
-            <div class="col-lg-6 mt-0">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-10"><h4 class="header-title text-center text-capitalize">my teaching subjects</h4></div>
-                        </div>
-                        <div class="table-responsive-md">
-                            <table class="table table-hover text-center" id="">
-                                <thead>
-                                    <tr class="text-capitalize">
-                                        <th>Subject</th>
-                                        <th>Class</th>
-                                        <th class="text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if ($courses->isEmpty())
-                                        <tr>
-                                            <td colspan="5">
-                                                <div class="alert alert-warning text-center">
-                                                    No any subject assigned for you
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        @else
-                                        @foreach ($courses as $course )
-                                        <tr>
-                                            <td class="text-capitalize">
-                                                {{ucwords(strtolower($course->course_name))}}
-                                            </td>
-                                            <td class="text-uppercase">{{strtoupper($course->class_code)}}</td>
-                                            <td>
-                                                @if ($course->status == 1)
-                                                <ul class="d-flex justify-content-center">
-                                                    <div class="btn-group" role="group">
-                                                        <button id="btnGroupDrop" type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            Manage
-                                                        </button>
-                                                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                                            {{-- <a class="dropdown-item" href="{{route('under.construction.page')}}"><i class="ti-pencil-alt"></i> Score</a> --}}
-                                                            <a class="dropdown-item" href="{{route('score.prepare.form', ['id' => Hashids::encode($course->id)])}}"><i class="ti-pencil-alt"></i> Score</a>
-                                                            <a class="dropdown-item" href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}"><i class="ti-file"></i> Results</a>
-                                                        </div>
-                                                    </div>
-                                                </ul>
-                                                @elseif ($course->status == 0)
-                                                    <span class="badge bg-danger text-white">{{_('Blocked')}}</span>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                    @endif
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 mt-1">
-                <div class="card">
-                    <div class="card-title mt-1 border-bottom">
-                        <h6 class="text-center">Students Enrollment</h6>
-                    </div>
-                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-                    <div style="width: 280px; height: 280px; margin: 0 auto;">
-                        <canvas id="genderDistributionChart"></canvas>
-                    </div>
-                    <script>
-                        // Use Laravel Blade syntax to pass data dynamically to JavaScript
-                        const maleCount = @json($data['maleCount']);
-                        const femaleCount = @json($data['femaleCount']);
-
-                        const ctxGender = document.getElementById('genderDistributionChart').getContext('2d');
-                        const genderDistributionChart = new Chart(ctxGender, {
-                            type: 'doughnut',
-                            data: {
-                                labels: ['Boys', 'Girls'],
-                                datasets: [{
-                                    label: 'Students Enrollment',
-                                    data: [maleCount, femaleCount], // Use the passed data
-                                    backgroundColor: [
-                                        'rgba(54, 162, 235, 0.7)', // Blue
-                                        'rgba(255, 99, 132, 0.7)'  // Red
-                                    ],
-                                    borderColor: [
-                                        'rgba(54, 162, 235, 1)',
-                                        'rgba(255, 99, 132, 1)'
-                                    ],
-                                    borderWidth: 1
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: {
-                                        position: 'top',
-                                    },
-                                    tooltip: {
-                                        callbacks: {
-                                            label: function(context) {
-                                                const label = context.label || '';
-                                                const value = context.raw || 0;
-                                                return `${label}: ${value}`;
-                                            }
-                                        }
-                                    },
-                                    datalabels: {
-                                        color: '#fff',
-                                        formatter: (value, ctxGender) => {
-                                            return value; // Display raw value
-                                        },
-                                        font: {
-                                            weight: 'bold',
-                                            size: 12
-                                        },
-                                        anchor: 'center', // Position inside the curve
-                                        align: 'center'
-                                    }
-                                }
-                            },
-                            plugins: [ChartDataLabels] // Register the plugin
-                        });
-                    </script>
-                </div>
-            </div>
-            <div class="col-lg-6 mt-1">
-                <div class="card">
-                    <div class="card-title mt-1 border-bottom">
-                        <h6 class="text-center">Today's Attendance: {{\Carbon\Carbon::today()->format('d-m-Y')}}</h6>
-                        {{-- <p class="text-center font-style-italic">Today is: {{\Carbon\Carbon::today()->format('d-m-Y')}}</p> --}}
-                    </div>
-                       @if (!empty($attendanceCount) && is_array($attendanceCount))
-                            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                            <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
-                            <div style="width: 300px; height: 260px; margin: 0 auto;">
-                                <canvas id="attendanceChart"></canvas>
-                            </div>
-                            <script>
-                                const attendanceData = @json($attendanceCount);
-
-                                if (attendanceData && attendanceData.male && attendanceData.female) {
-                                    const ctx = document.getElementById('attendanceChart').getContext('2d');
-
-                                    const malePresent = attendanceData.male.present || 0;
-                                    const femalePresent = attendanceData.female.present || 0;
-                                    const maleAbsent = attendanceData.male.absent || 0;
-                                    const femaleAbsent = attendanceData.female.absent || 0;
-                                    const malePermission = attendanceData.male.permission || 0;
-                                    const femalePermission = attendanceData.female.permission || 0;
-
-                                    const totalPresent = malePresent + femalePresent;
-                                    const totalAbsent = maleAbsent + femaleAbsent;
-                                    const totalPermission = malePermission + femalePermission;
-
-                                    const attendanceChart = new Chart(ctx, {
-                                        type: 'doughnut',
-                                        data: {
-                                            labels: [
-                                                `Pres (B: ${malePresent}, G: ${femalePresent})`,
-                                                `Abs (B: ${maleAbsent}, G: ${femaleAbsent})`,
-                                                `Perm (B: ${malePermission}, G: ${femalePermission})`
-                                            ],
-                                            datasets: [{
-                                                label: 'Total Attendance',
-                                                data: [totalPresent, totalAbsent, totalPermission],
-                                                backgroundColor: [
-                                                    'rgba(75, 192, 192, 0.6)',
-                                                    'rgba(255, 159, 64, 0.6)',
-                                                    'rgba(255, 99, 132, 0.7)'
-                                                ],
-                                                borderColor: [
-                                                    'rgba(75, 192, 192, 1)',
-                                                    'rgba(255, 159, 64, 1)',
-                                                    'rgba(255, 99, 132, 0.7)'
-                                                ],
-                                                borderWidth: 1
-                                            }]
-                                        },
-                                        options: {
-                                            responsive: true,
-                                            plugins: {
-                                                legend: {
-                                                    position: 'top'
-                                                },
-                                                datalabels: {
-                                                    color: '#000',
-                                                    font: {
-                                                        weight: 'bold',
-                                                        size: 12
-                                                    },
-                                                    formatter: function(value, context) {
-                                                        return `${context.chart.data.labels[context.dataIndex]} = ${value}`;
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        plugins: [ChartDataLabels]
-                                    });
-                                }
-                            </script>
-                        @else
-                            <p class="text-center mt-5 text-danger">No attendance records available.</p>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-        <hr>
-        {{-- class teacher panel end here ========================================= --}}
-        {{-- end of third argument ====================================================== --}}
-    @else
-        {{-- fourth argument start here ================================================ --}}
-        {{-- normal teacher panel start here ========================================== --}}
-
-        {{-- check for normal teachers contract --}}
-        @if ($contract == null)
-            <div class="alert alert-danger alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                <strong>Contract Status:</strong> Not applied.
-                <a href="{{route('contract.index')}}" class="alert-link">Apply here</a>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @else
-            @if($contract->status == 'expired')
-                <div class="alert alert-danger alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                    <strong>Contract Status:</strong> Expired
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @elseif ($contract->status == 'rejected')
-                <div class="alert alert-secondary alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                    <strong>Contract Status:</strong> Rejected |
-                    <a href="{{route('contract.index')}}" class="alert-link">View details</a>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
-                <div class="alert alert-warning alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                    <strong>Contract Status:</strong> Expiring soon ({{ $contract->end_date->format('d/m/Y') }})
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @elseif ($contract->status == 'pending')
-                <div class="alert alert-info alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                    <strong>Contract Status:</strong> Pending |
-                    <a href="{{route('contract.index')}}" class="alert-link">View details</a>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @else
-                <div class="alert alert-success alert-dismissible fade show" style="border-left: 5px solid #0c68a1;">
-                    <strong>Contract Status:</strong> Active (Expires at: {{ $contract->end_date }}) |
-                    <a href="{{route('contract.index')}}" class="alert-link">View contract</a>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
-        @endif
-                @php
-                    // Get today's date
-                    $today = \Carbon\Carbon::now()->format('Y-m-d');
-                    $user = auth()->user();
-                    $teacher = \App\Models\Teacher::where('user_id', $user->id)->first();
-                    $myDuty = \App\Models\TodRoster::where('teacher_id', $teacher->id)->where('status', 'active')->first();
-                @endphp
-                @if ($myDuty)
-                    <a href="{{route('tod.report.create')}}" onclick="return confirm('Are you sure?')">
-                        <div class="alert" style="background: gold; border-left: 5px solid #982d9c;">
-                            <p class="">You are on Duty! Fill
-                                <strong>
-                                    <a href="{{route('tod.report.create')}}" onclick="return confirm('Are you sure?')"><i class="fas fa-edit"></i> Daily Report</a>
-                                </strong>
-                            </p>
-                        </div>
-                    </a>
-                @endif
-        <div class="row">
-            <!-- Stats Card for Normal Teacher -->
-            <div class="col-md-4 mb-4">
-                <div class="card border-0 shadow-sm rounded-lg card-hover" style="background: linear-gradient(135deg, #bf950a 0%, #ff9800 100%);">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-white text-uppercase small opacity-75"><i class=""></i> My Courses</h6>
-                                <h2 class="text-white mb-0">
-                                    {{$courses->where('status', 1)->count()}}
-                                </h2>
-                            </div>
-                            <div class="bg-white rounded-circle p-3">
-                                <i class="ti-book fa-2x text-dark"></i>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                        <span class="text-white small d-flex align-items-center">
-                            View All <i class="fas fa-arrow-right ms-2"></i>
-                        </span>
-                    </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-8 mt-0">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-10"><h4 class="header-title text-center text-capitalize">my teaching subjects</h4></div>
-                        </div>
-                        <div class="table-responsive-md">
-                            <table class="table table-hover text-center" id="">
-                                <thead>
-                                    <tr class="text-capitalize">
-                                        <th>Subject</th>
-                                        <th>Class</th>
-                                        <th class="text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if ($courses->isEmpty())
-                                        <tr>
-                                            <td colspan="5">
-                                                <div class="alert alert-warning text-center">
-                                                    No any subject assigned for you!
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        @else
-                                        @foreach ($courses as $course )
-                                        <tr>
-                                            <td class="text-capitalize">
-                                                {{ucwords(strtolower($course->course_name))}}
-                                            </td>
-                                            <td class="text-uppercase">{{strtoupper($course->class_code)}}</td>
-                                            <td>
-                                                @if ($course->status == 1)
-                                                <ul class="d-flex justify-content-center">
-                                                    <div class="btn-group" role="group">
-                                                        <button id="btnGroupDrop" type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            Manage
-                                                        </button>
-                                                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                                            {{-- <a class="dropdown-item" href="{{route('under.construction.page')}}"><i class="ti-pencil-alt"></i> Score</a> --}}
-                                                            <a class="dropdown-item" href="{{route('score.prepare.form', ['id' => Hashids::encode($course->id)])}}"><i class="ti-pencil-alt"></i> Score</a>
-                                                            <a class="dropdown-item" href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}"><i class="ti-file"></i> Results</a>
-                                                        </div>
-                                                    </div>
-                                                </ul>
-                                                @else
-                                                    <span class="badge bg-danger text-white">{{_('Blocked')}}</span>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                    @endif
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <hr>
-    {{-- normal teacher panel end here ============================================ --}}
-    @endif
-    {{-- end of argument end here ================================================== --}}
-</div>
 <style>
-    .card-hover {
+    :root {
+        --primary-color: #4e73df;
+        --secondary-color: #6f42c1;
+        --success-color: #1cc88a;
+        --info-color: #36b9cc;
+        --warning-color: #f6c23e;
+        --danger-color: #e74a3b;
+        --light-color: #f8f9fc;
+        --dark-color: #5a5c69;
+    }
+
+    body {
+        background-color: #f8f9fc;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
+
+    .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 0.5rem 1.5rem 0 rgba(58, 59, 69, 0.1);
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.75rem 2rem 0 rgba(58, 59, 69, 0.15);
+    }
+
+    .header-title {
+        color: var(--primary-color);
+        font-weight: 800;
+        border-bottom: 3px solid var(--primary-color);
+        padding-bottom: 15px;
+        margin-bottom: 25px;
+        font-size: 1.75rem;
+    }
+
+    /* Statistics Cards Styling */
+    .stat-card {
+        border-radius: 15px;
+        border: none;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        min-height: 140px;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,0.175);
+    }
+
+    .stat-card .card-body {
+        position: relative;
+        z-index: 2;
+        padding: 1.5rem;
+    }
+
+    .stat-card .card-icon {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        opacity: 0.2;
+        font-size: 4rem;
         transition: all 0.3s ease;
     }
-    .card-hover:hover {
+
+    .stat-card:hover .card-icon {
+        opacity: 0.3;
+        transform: scale(1.1);
+    }
+
+    .stat-card .card-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+        opacity: 0.9;
+    }
+
+    .stat-card .card-value {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 0;
+    }
+
+    /* Gradient Backgrounds for Cards */
+    .bg-teacher {
+        background: linear-gradient(135deg, #e176a6 0%, #d04a88 100%);
+    }
+
+    .bg-parent {
+        background: linear-gradient(135deg, #c84fe0 0%, #9c27b0 100%);
+    }
+
+    .bg-student {
+        background: linear-gradient(135deg, #098ddf 0%, #0568a8 100%);
+    }
+
+    .bg-course {
+        background: linear-gradient(135deg, #9fbc71 0%, #689f38 100%);
+    }
+
+    .bg-class {
+        background: linear-gradient(135deg, #bf950a 0%, #ff9800 100%);
+    }
+
+    .bg-bus {
+        background: linear-gradient(135deg, #329688 0%, #00796b 100%);
+    }
+
+    .bg-my-courses {
+        background: linear-gradient(135deg, #b14fbe 0%, #8e24aa 100%);
+    }
+
+    .bg-attendance {
+        background: linear-gradient(135deg, #098ddf 0%, #0568a8 100%);
+    }
+
+    /* Chart Container Styles */
+    .chart-container {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 0.5rem 1.5rem rgba(58, 59, 69, 0.1);
+        border: none;
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chart-container:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        box-shadow: 0 0.75rem 2rem rgba(58, 59, 69, 0.15);
     }
-    .bg-success-lighten {
-        background-color: rgba(40, 167, 69, 0.1);
+
+    .chart-wrapper {
+        flex: 1;
+        min-height: 300px;
+        position: relative;
+        width: 100%;
     }
-    .bg-warning-lighten {
-        background-color: rgba(255, 193, 7, 0.1);
+
+    .chart-wrapper canvas,
+    .chart-wrapper .chart-canvas {
+        width: 100% !important;
+        height: 100% !important;
     }
-    .bg-secondary-lighten {
-        background-color: rgba(108, 117, 125, 0.1);
+
+    .chart-header {
+        border-bottom: 2px solid #f8f9fc;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
     }
-    .table-centered td, .table-centered th {
+
+    .chart-title {
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 5px;
+        font-size: 1.1rem;
+    }
+
+    .chart-subtitle {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+
+    /* Table Styles */
+    .table-responsive {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+    }
+
+    .progress-table {
+        background-color: white;
+        border: none;
+    }
+
+    .progress-table thead {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #2e59d9 100%);
+        color: white;
+    }
+
+    .progress-table th {
+        padding: 18px 12px;
+        font-weight: 700;
         vertical-align: middle;
+        border: none;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
+
+    .progress-table td {
+        padding: 15px 12px;
+        vertical-align: middle;
+        border-bottom: 1px solid #e3e6f0;
+        transition: all 0.3s ease;
+    }
+
+    .progress-table tbody tr:hover td {
+        background-color: #f8f9fc;
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+    }
+
+    .action-buttons a, .action-buttons button {
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .action-buttons a:hover, .action-buttons button:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Alert Styles */
+    .alert-custom {
+        border-radius: 10px;
+        border: none;
+        border-left: 5px solid;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .action-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .stat-card .card-value {
+            font-size: 1.5rem;
+        }
+
+        .stat-card .card-icon {
+            font-size: 2.5rem;
+        }
+
+        .chart-wrapper {
+            min-height: 250px;
+        }
+    }
+    .chart-container .dropdown-menu {
+        position: fixed !important;
+        z-index: 1060 !important;
+    }
+
+    /* Ensure table doesn't clip dropdowns */
+    .table-responsive {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+    }
+</style>
+
+<div class="py-4">
+    <!-- Contract Status Alert -->
+    @if (Auth::user()->usertype == 3)
+    <div class="row mb-4">
+        <div class="col-12">
+            @if ($contract == null)
+            <div class="alert alert-danger alert-custom alert-dismissible fade show">
+                <strong><i class="fas fa-exclamation-triangle me-2"></i> Contract Status:</strong> Not applied.
+                <a href="{{route('contract.index')}}" class="alert-link fw-bold">Apply here</a>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            @else
+                @if($contract->status == 'expired')
+                    <div class="alert alert-danger alert-custom alert-dismissible fade show">
+                        <strong><i class="fas fa-times-circle me-2"></i> Contract Status:</strong> Expired
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @elseif ($contract->status == 'rejected')
+                    <div class="alert alert-secondary alert-custom alert-dismissible fade show">
+                        <strong><i class="fas fa-times me-2"></i> Contract Status:</strong> Rejected |
+                        <a href="{{route('contract.index')}}" class="alert-link fw-bold">View details</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
+                    <div class="alert alert-warning alert-custom alert-dismissible fade show">
+                        <strong><i class="fas fa-exclamation-circle me-2"></i> Contract Status:</strong> Expiring soon ({{ \Carbon\Carbon::parse($contract->end_date)->format('d/m/Y') }})
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @elseif ($contract->status == 'pending')
+                    <div class="alert alert-info alert-custom alert-dismissible fade show">
+                        <strong><i class="fas fa-clock me-2"></i> Contract Status:</strong> Pending |
+                        <a href="{{route('contract.index')}}" class="alert-link fw-bold">View details</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @else
+                    <div class="alert alert-success alert-custom alert-dismissible fade show">
+                        <strong><i class="fas fa-check-circle me-2"></i> Contract Status:</strong> Active (Expires: {{ \Carbon\Carbon::parse($contract->end_date)->format('d/m/Y') }}) |
+                        <a href="{{route('contract.index')}}" class="alert-link fw-bold">View contract</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+            @endif
+
+            <!-- TOD Duty Alert -->
+            @php
+                $today = \Carbon\Carbon::now()->format('Y-m-d');
+                $user = auth()->user();
+                $teacher = \App\Models\Teacher::where('user_id', $user->id)->first();
+                $myDuty = \App\Models\TodRoster::where('teacher_id', $teacher->id)->where('status', 'active')->first();
+            @endphp
+            @if ($myDuty)
+                <div class="alert alert-warning alert-custom" style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-left-color: #ffc107;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong><i class="fas fa-bell me-2"></i> You are on Duty Today!</strong>
+                            Fill out the daily report to document today's activities.
+                        </div>
+                        <a href="{{route('tod.report.create')}}" class="btn btn-warning btn-sm" onclick="return confirm('Are you sure you want to fill the daily report?')">
+                            <i class="fas fa-edit me-1"></i> Fill Daily Report
+                        </a>
+                    </div>
+                </div>
+            @endif
+        </div>
+    </div>
+    @endif
+
+    <!-- Head Teacher Dashboard -->
+    @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 2)
+    <div class="row">
+        <!-- Stats Cards for Head Teacher -->
+        <div class="col-lg-12 mb-4">
+            <div class="row">
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <a href="{{route('Teachers.index')}}" class="text-decoration-none">
+                        <div class="stat-card bg-teacher text-white">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="card-title">Teachers</div>
+                                        <div class="card-value">
+                                            @if (count($teachers) > 99) 100+ @else {{count($teachers)}} @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-user-tie card-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <a href="{{route('Parents.index')}}" class="text-decoration-none">
+                        <div class="stat-card bg-parent text-white">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="card-title">Parents</div>
+                                        <div class="card-value">
+                                            @if (count($parents) > 1999) 2000+ @else {{count($parents)}} @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-user-friends card-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <a href="{{route('classes.list')}}" class="text-decoration-none">
+                        <div class="stat-card bg-student text-white">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="card-title">Students</div>
+                                        <div class="card-value">
+                                            @if (count($students) > 1999) 2000+ @else {{count($students)}} @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-user-graduate card-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <a href="{{route('courses.index')}}" class="text-decoration-none">
+                        <div class="stat-card bg-course text-white">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="card-title">Open Courses</div>
+                                        <div class="card-value">
+                                            @if (count($subjects) > 49) 50+ @else {{count($subjects)}} @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="ti-book card-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <a href="{{route('Classes.index')}}" class="text-decoration-none">
+                        <div class="stat-card bg-class text-white">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="card-title">Classes</div>
+                                        <div class="card-value">
+                                            @if (count($classes) > 49) 50+ @else {{count($classes)}} @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="ti-blackboard card-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <a href="{{route('Transportation.index')}}" class="text-decoration-none">
+                        <div class="stat-card bg-bus text-white">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="card-title">School Buses</div>
+                                        <div class="card-value">
+                                            @if (count($buses) > 49) 50+ @else {{count($buses)}} @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-bus card-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="col-lg-12 mb-4">
+            <div class="row">
+                <div class="col-xl-8 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-chart-bar me-2"></i> Student Registration by Class & Gender
+                            </h5>
+                            <p class="chart-subtitle">Distribution of students across classes</p>
+                        </div>
+                        <div class="chart-wrapper">
+                            <div id="studentChart" class="chart-canvas"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-chart-pie me-2"></i> Teacher Qualifications
+                            </h5>
+                            <p class="chart-subtitle">Educational background overview</p>
+                        </div>
+                        <div class="chart-wrapper">
+                            <div id="qualificationChart" class="chart-canvas"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Analytics -->
+        <div class="col-lg-12 mb-4">
+            <div class="row">
+                <div class="col-xl-4 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-venus-mars me-2"></i> Student Gender Distribution
+                            </h5>
+                            <p class="chart-subtitle">Male vs Female students ratio</p>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="genderChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-calendar-check me-2"></i> Today's Attendance
+                            </h5>
+                            <p class="chart-subtitle">{{\Carbon\Carbon::parse($today)->format('d-m-Y')}}</p>
+                        </div>
+                        <div class="chart-wrapper">
+                            @if ($attendanceCounts['present'] > 0 || $attendanceCounts['absent'] > 0 || $attendanceCounts['permission'] > 0)
+                                <canvas id="attendanceChart"></canvas>
+                            @else
+                                <div class="d-flex align-items-center justify-content-center h-100">
+                                    <p class="text-muted text-center">No attendance records for today</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats Tables -->
+                <div class="col-xl-4 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-table me-2"></i> Quick Overview
+                            </h5>
+                            <p class="chart-subtitle">Registration statistics</p>
+                        </div>
+                        <div class="row">
+                            <!-- Students by Class -->
+                            <div class="col-12 mb-3">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body p-3">
+                                        <h6 class="card-title text-center mb-3 text-primary">Students by Class</h6>
+                                        @if ($studentsByClass->isEmpty())
+                                            <p class="text-center text-muted mb-0">No records available</p>
+                                        @else
+                                            <div class="table-responsive">
+                                                <table class="table table-sm dashboard-table mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Class</th>
+                                                            <th class="text-end">Count</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($studentsByClass as $class)
+                                                        <tr>
+                                                            <td class="fw-semibold text-uppercase">{{$class->class_code}}</td>
+                                                            <td class="text-end">{{$class->student_count}}</td>
+                                                        </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Teachers by Gender -->
+                            <div class="col-12">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body p-3">
+                                        <h6 class="card-title text-center mb-3 text-primary">Teachers by Gender</h6>
+                                        @if ($teacherByGender->isEmpty())
+                                            <p class="text-center text-muted mb-0">No records available</p>
+                                        @else
+                                            <div class="table-responsive">
+                                                <table class="table table-sm dashboard-table mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Gender</th>
+                                                            <th class="text-end">Count</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($teacherByGender as $teacher)
+                                                        <tr>
+                                                            <td class="fw-semibold text-capitalize">{{$teacher->gender}}</td>
+                                                            <td class="text-end">{{$teacher->teacher_count}}</td>
+                                                        </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Academic Teacher Dashboard -->
+    @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 3)
+    <div class="row">
+        <!-- Stats Cards for Academic Teacher -->
+        <div class="col-lg-12 mb-4">
+            <div class="row">
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <a href="{{route('Teachers.index')}}" class="text-decoration-none">
+                        <div class="stat-card bg-teacher text-white">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="card-title">Teachers</div>
+                                        <div class="card-value">
+                                            @if (count($teachers) > 99) 100+ @else {{count($teachers)}} @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-user-tie card-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <a href="{{route('classes.list')}}" class="text-decoration-none">
+                        <div class="stat-card bg-student text-white">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="card-title">Students</div>
+                                        <div class="card-value">
+                                            @if(count($students) > 1999) 2000+ @else {{count($students)}} @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-user-graduate card-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <a href="{{route('courses.index')}}" class="text-decoration-none">
+                        <div class="stat-card bg-course text-white">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="card-title">Open Courses</div>
+                                        <div class="card-value">
+                                            @if (count($subjects) > 49) 50+ @else {{count($subjects)}} @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="ti-book card-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <a href="{{route('Classes.index')}}" class="text-decoration-none">
+                        <div class="stat-card bg-class text-white">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="card-title">Classes</div>
+                                        <div class="card-value">
+                                            @if (count($classes) > 49) 50+ @else {{count($classes)}} @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="ti-blackboard card-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="stat-card bg-my-courses text-white">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="card-title">My Courses</div>
+                                    <div class="card-value">
+                                        {{ $courses->where('status', 1)->count() }}
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="ti-book card-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teaching Subjects and Charts -->
+        <div class="col-lg-12 mb-4">
+            <div class="row">
+                <div class="col-xl-6 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-chart-bar me-2"></i> Student Registration
+                            </h5>
+                            <p class="chart-subtitle">Distribution by class and gender</p>
+                        </div>
+                        <div class="chart-wrapper">
+                            <div id="studentChart" class="chart-canvas"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-book me-2"></i> My Teaching Subjects
+                            </h5>
+                            <p class="chart-subtitle">Assigned courses and classes</p>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover progress-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Subject</th>
+                                        <th>Class</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($courses as $course)
+                                    <tr>
+                                        <td class="fw-semibold text-capitalize">{{ ucwords(strtolower($course->course_name)) }}</td>
+                                        <td class="fw-bold text-info text-uppercase">{{ $course->class_code }}</td>
+                                        <td class="text-center">
+                                            @if ($course->status == 1)
+                                            <div class="dropdown">
+                                                <button class="btn btn-success btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                    <i class="fas fa-cog me-1"></i> Manage
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                        <a class="dropdown-item" href="{{route('score.prepare.form', ['id' => Hashids::encode($course->id)])}}">
+                                                            <i class="ti-pencil-alt me-2"></i> Enter Scores
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}">
+                                                            <i class="ti-file me-2"></i> View Results
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            @else
+                                                <span class="badge bg-danger">Blocked</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center py-4 text-muted">
+                                            <i class="fas fa-book fa-2x mb-3 d-block opacity-50"></i>
+                                            No subjects assigned to you
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Additional Analytics -->
+        <div class="col-lg-12 mb-4">
+            <div class="row">
+                <div class="col-xl-4 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-venus-mars me-2"></i> Student Gender Distribution
+                            </h5>
+                            <p class="chart-subtitle">Male vs Female students ratio</p>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="genderChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-calendar-check me-2"></i> Today's Attendance
+                            </h5>
+                            <p class="chart-subtitle">{{\Carbon\Carbon::parse($today)->format('d-m-Y')}}</p>
+                        </div>
+                        <div class="chart-wrapper">
+                            @if ($attendanceCounts['present'] > 0 || $attendanceCounts['absent'] > 0 || $attendanceCounts['permission'] > 0)
+                                <canvas id="attendanceChart"></canvas>
+                            @else
+                                <div class="d-flex align-items-center justify-content-center h-100">
+                                    <p class="text-muted text-center">No attendance records for today</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats Tables -->
+                <div class="col-xl-4 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-table me-2"></i> Quick Overview
+                            </h5>
+                            <p class="chart-subtitle">Registration statistics</p>
+                        </div>
+                        <div class="row">
+                            <!-- Students by Class -->
+                            <div class="col-12 mb-3">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body p-3">
+                                        <h6 class="card-title text-center mb-3 text-primary">Students by Class</h6>
+                                        @if ($studentsByClass->isEmpty())
+                                            <p class="text-center text-muted mb-0">No records available</p>
+                                        @else
+                                            <div class="table-responsive">
+                                                <table class="table table-sm dashboard-table mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Class</th>
+                                                            <th class="text-end">Count</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($studentsByClass as $class)
+                                                        <tr>
+                                                            <td class="fw-semibold text-uppercase">{{$class->class_code}}</td>
+                                                            <td class="text-end">{{$class->student_count}}</td>
+                                                        </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Teachers by Gender -->
+                            <div class="col-12">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body p-3">
+                                        <h6 class="card-title text-center mb-3 text-primary">Teachers by Gender</h6>
+                                        @if ($teacherByGender->isEmpty())
+                                            <p class="text-center text-muted mb-0">No records available</p>
+                                        @else
+                                            <div class="table-responsive">
+                                                <table class="table table-sm dashboard-table mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Gender</th>
+                                                            <th class="text-end">Count</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($teacherByGender as $teacher)
+                                                        <tr>
+                                                            <td class="fw-semibold text-capitalize">{{$teacher->gender}}</td>
+                                                            <td class="text-end">{{$teacher->teacher_count}}</td>
+                                                        </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Class Teacher Dashboard -->
+    @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 4)
+    <div class="row">
+        <!-- Stats Cards for Class Teacher -->
+        <div class="col-lg-12 mb-4">
+            <div class="row">
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <a href="{{ route('get.student.list', ['class' => Hashids::encode($myClass->first()->id)]) }}" class="text-decoration-none">
+                        <div class="stat-card bg-attendance text-white">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="card-title">My Classes</div>
+                                        <div class="card-value">{{ $myClass->count() }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-user-check card-icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="stat-card bg-student text-white">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="card-title">Students</div>
+                                    @foreach ($classData as $data)
+                                    <div class="card-value">{{$data['maleCount'] + $data['femaleCount']}}</div>
+                                    @endforeach
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-users card-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="stat-card bg-my-courses text-white">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="card-title">My Courses</div>
+                                    <div class="card-value">{{$courses->where('status', 1)->count()}}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="ti-book card-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Class and Course Information -->
+        <div class="col-lg-12 mb-4">
+            <div class="row">
+                <div class="col-xl-6 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-users me-2"></i> My Attendance Classes
+                            </h5>
+                            <p class="chart-subtitle">Classes assigned for attendance management</p>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover progress-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Class</th>
+                                        <th>Stream</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($myClass as $class)
+                                    <tr>
+                                        <td class="fw-bold text-uppercase">{{ $class->class_name }}</td>
+                                        <td class="text-center text-uppercase">{{ $class->group }}</td>
+                                        <td class="text-center">
+                                            <a href="{{ route('attendance.get.form', ['class' => Hashids::encode($class->id)]) }}"
+                                               class="btn btn-info btn-sm"
+                                               data-bs-toggle="tooltip"
+                                               title="Take Attendance">
+                                                <i class="ti-settings me-1"></i> Report
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-book me-2"></i> My Teaching Subjects
+                            </h5>
+                            <p class="chart-subtitle">Assigned courses and classes</p>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover progress-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Subject</th>
+                                        <th>Class</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($courses as $course)
+                                    <tr>
+                                        <td class="fw-semibold text-capitalize">{{ ucwords(strtolower($course->course_name)) }}</td>
+                                        <td class="fw-bold text-info text-uppercase">{{ $course->class_code }}</td>
+                                        <td class="text-center">
+                                            @if ($course->status == 1)
+                                            <div class="dropdown">
+                                                <button class="btn btn-success btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                    <i class="fas fa-cog me-1"></i> Manage
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                        <a class="dropdown-item" href="{{route('score.prepare.form', ['id' => Hashids::encode($course->id)])}}">
+                                                            <i class="ti-pencil-alt me-2"></i> Enter Scores
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}">
+                                                            <i class="ti-file me-2"></i> View Results
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            @else
+                                                <span class="badge bg-danger">Blocked</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center py-4 text-muted">
+                                            <i class="fas fa-book fa-2x mb-3 d-block opacity-50"></i>
+                                            No subjects assigned to you
+                                        </td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts for Class Teacher -->
+        <div class="col-lg-12 mb-4">
+            <div class="row">
+                <div class="col-xl-6 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-venus-mars me-2"></i> Student Gender Distribution
+                            </h5>
+                            <p class="chart-subtitle">Male vs Female students in your class</p>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="genderDistributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-calendar-check me-2"></i> Today's Attendance
+                            </h5>
+                            <p class="chart-subtitle">{{\Carbon\Carbon::today()->format('d-m-Y')}}</p>
+                        </div>
+                        <div class="chart-wrapper">
+                            @if (!empty($attendanceCount) && is_array($attendanceCount))
+                                <canvas id="attendanceChart"></canvas>
+                            @else
+                                <div class="d-flex align-items-center justify-content-center h-100">
+                                    <p class="text-muted text-center">No attendance records for today</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Normal Teacher Dashboard -->
+    @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id != 2 && Auth::user()->teacher->role_id != 3 && Auth::user()->teacher->role_id != 4)
+    <div class="row">
+        <!-- Stats Cards for Normal Teacher -->
+        <div class="col-lg-12 mb-4">
+            <div class="row">
+                <div class="col-xl-4 col-md-6 mb-4">
+                    <div class="stat-card bg-my-courses text-white">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="card-title">My Courses</div>
+                                    <div class="card-value">{{$courses->where('status', 1)->count()}}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="ti-book card-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teaching Subjects -->
+        <div class="col-lg-12 mb-4">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h5 class="chart-title">
+                        <i class="fas fa-book me-2"></i> My Teaching Subjects
+                    </h5>
+                    <p class="chart-subtitle">Assigned courses and classes</p>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover progress-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Class</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($courses as $course)
+                            <tr>
+                                <td class="fw-semibold text-capitalize">{{ ucwords(strtolower($course->course_name)) }}</td>
+                                <td class="fw-bold text-info text-uppercase">{{ $course->class_code }}</td>
+                                <td class="text-center">
+                                    @if ($course->status == 1)
+                                    <div class="dropdown">
+                                        <button class="btn btn-success btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                            <i class="fas fa-cog me-1"></i> Manage
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item" href="{{route('score.prepare.form', ['id' => Hashids::encode($course->id)])}}">
+                                                    <i class="ti-pencil-alt me-2"></i> Enter Scores
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}">
+                                                    <i class="ti-file me-2"></i> View Results
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    @else
+                                        <span class="badge bg-danger">Blocked</span>
+                                    @endif
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-muted">
+                                    <i class="fas fa-book fa-2x mb-3 d-block opacity-50"></i>
+                                    No subjects assigned to you
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+</div>
+
+<!-- JavaScript Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Student Registration Chart (ECharts) - For Head Teacher and Academic Teacher
+        const studentChartDom = document.getElementById('studentChart');
+        if (studentChartDom) {
+            const myChart = echarts.init(studentChartDom);
+            const chartData = @json($chartData);
+
+            const groupedData = {};
+            chartData.forEach(item => {
+                const classCode = item.category.split(' (')[0];
+                const gender = item.category.includes('Male') ? 'Male' : 'Female';
+                if (!groupedData[classCode]) {
+                    groupedData[classCode] = { Male: 0, Female: 0 };
+                }
+                groupedData[classCode][gender] = item.value;
+            });
+
+            const classCodes = Object.keys(groupedData);
+            const maleData = classCodes.map(classCode => groupedData[classCode].Male);
+            const femaleData = classCodes.map(classCode => groupedData[classCode].Female);
+
+            const option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' }
+                },
+                legend: {
+                    data: ['Male', 'Female'],
+                    bottom: 10
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: classCodes,
+                    axisLabel: { rotate: 45 }
+                },
+                yAxis: { type: 'value' },
+                series: [
+                    {
+                        name: 'Male',
+                        type: 'bar',
+                        stack: 'total',
+                        emphasis: { focus: 'series' },
+                        data: maleData,
+                        itemStyle: { color: '#4e73df' }
+                    },
+                    {
+                        name: 'Female',
+                        type: 'bar',
+                        stack: 'total',
+                        emphasis: { focus: 'series' },
+                        data: femaleData,
+                        itemStyle: { color: '#e74a3b' }
+                    }
+                ]
+            };
+            myChart.setOption(option);
+        }
+
+        // Teacher Qualifications Chart (amCharts) - For Head Teacher
+        const qualificationChartDom = document.getElementById('qualificationChart');
+        if (qualificationChartDom) {
+            am5.ready(function() {
+                const root = am5.Root.new("qualificationChart");
+                root.setThemes([am5themes_Animated.new(root)]);
+
+                const chart = root.container.children.push(
+                    am5percent.PieChart.new(root, { layout: root.verticalLayout })
+                );
+
+                const series = chart.series.push(
+                    am5percent.PieSeries.new(root, {
+                        valueField: "value",
+                        categoryField: "category"
+                    })
+                );
+
+                series.data.setAll([
+                    { category: "Masters", value: {{ $qualificationData['masters'] }} },
+                    { category: "Degree", value: {{ $qualificationData['bachelor'] }} },
+                    { category: "Diploma", value: {{ $qualificationData['diploma'] }} },
+                    { category: "Certificate", value: {{ $qualificationData['certificate'] }} }
+                ]);
+
+                chart.children.push(am5.Legend.new(root, {}));
+                series.appear(1000, 100);
+            });
+        }
+
+        // Gender Distribution Chart - For Head Teacher and Academic Teacher
+        const genderCtx = document.getElementById('genderChart');
+        if (genderCtx) {
+            const totalMaleStudents = @json($totalMaleStudents);
+            const totalFemaleStudents = @json($totalFemaleStudents);
+
+            new Chart(genderCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Male Students', 'Female Students'],
+                    datasets: [{
+                        data: [totalMaleStudents, totalFemaleStudents],
+                        backgroundColor: ['#4e73df', '#e74a3b'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+
+        // Attendance Chart - For Head Teacher and Academic Teacher
+        const attendanceCtx = document.getElementById('attendanceChart');
+        if (attendanceCtx) {
+            const attendanceData = @json($attendanceCounts);
+            const hasData = attendanceData.present > 0 || attendanceData.absent > 0 || attendanceData.permission > 0;
+
+            if (hasData) {
+                new Chart(attendanceCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Present', 'Absent', 'Permission'],
+                        datasets: [{
+                            data: [attendanceData.present, attendanceData.absent, attendanceData.permission],
+                            backgroundColor: ['#1cc88a', '#e74a3b', '#f6c23e'],
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                        return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '60%'
+                    }
+                });
+            }
+        }
+
+        // Gender Distribution Chart - For Class Teacher
+        const genderDistributionCtx = document.getElementById('genderDistributionChart');
+        if (genderDistributionCtx) {
+            const maleCount = @json($data['maleCount'] ?? 0);
+            const femaleCount = @json($data['femaleCount'] ?? 0);
+
+            new Chart(genderDistributionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Male Students', 'Female Students'],
+                    datasets: [{
+                        data: [maleCount, femaleCount],
+                        backgroundColor: ['#4e73df', '#e74a3b'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+
+        // Attendance Chart - For Class Teacher
+        const classAttendanceCtx = document.getElementById('attendanceChart');
+        if (classAttendanceCtx) {
+            const attendanceData = @json($attendanceCount ?? []);
+
+            if (attendanceData && attendanceData.male && attendanceData.female) {
+                const malePresent = attendanceData.male.present || 0;
+                const femalePresent = attendanceData.female.present || 0;
+                const maleAbsent = attendanceData.male.absent || 0;
+                const femaleAbsent = attendanceData.female.absent || 0;
+                const malePermission = attendanceData.male.permission || 0;
+                const femalePermission = attendanceData.female.permission || 0;
+
+                const totalPresent = malePresent + femalePresent;
+                const totalAbsent = maleAbsent + femaleAbsent;
+                const totalPermission = malePermission + femalePermission;
+
+                new Chart(classAttendanceCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Present', 'Absent', 'Permission'],
+                        datasets: [{
+                            data: [totalPresent, totalAbsent, totalPermission],
+                            backgroundColor: ['#1cc88a', '#e74a3b', '#f6c23e'],
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                        return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '60%'
+                    }
+                });
+            }
+        }
+    });
+</script>
+
+<style>
     @media (max-width: 768px) {
         .table-responsive {
             border: 0;
@@ -1715,25 +1518,26 @@
         }
         .table-responsive td {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            text-align: right;
-            padding-left: 50%;
+            text-align: center;
+            padding: 10px 15px;
             position: relative;
             border-bottom: 1px solid #f1f1f1;
+            width: 100%;
         }
         .table-responsive td::before {
-            content: attr(data-label);
-            position: absolute;
-            left: 15px;
-            font-weight: bold;
-            text-align: left;
+            display: none;
         }
         .btn-group {
             display: flex;
             gap: 5px;
+            justify-content: center;
+            width: 100%;
+        }
+        .table-responsive td.text-center {
+            justify-content: center;
         }
     }
 </style>
 @endsection
-

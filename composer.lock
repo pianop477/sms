@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5345e01d8fe0c6eba4fd9ae463932be1",
+    "content-hash": "6683a3ebc6a3ffe8f9e34b9cd5fb9055",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2167,13 +2167,13 @@
             },
             "type": "library",
             "extra": {
-                "branch-alias": {
-                    "dev-master": "3.x-dev"
-                },
                 "laravel": {
                     "providers": [
                         "Laravel\\Sanctum\\SanctumServiceProvider"
                     ]
+                },
+                "branch-alias": {
+                    "dev-master": "3.x-dev"
                 }
             },
             "autoload": {

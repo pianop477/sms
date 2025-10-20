@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -87,7 +89,34 @@ class LoginController extends Controller
             $request->session()->regenerate();
             $request->session()->put('last_activity', time());
 
-            Alert()->toast('Hello '. ucwords(strtolower(Auth::user()->first_name. ' '. Auth::user()->last_name))  .' Welcome back!', 'success');
+            $user = Auth::user();
+
+            if($user->usertype == 5) {
+                // Request token from ShuleApp-Finance
+                try {
+                    $response = Http::post(env('SHULEAPP_FINANCE_API_BASE_URL') . '/auth/token', [
+                        'client_key' => env('SHULEAPP_CLIENT_KEY'),
+                        'client_secret' => env('SHULEAPP_CLIENT_SECRET'),
+                    ]);
+
+                    if ($response->successful()) {
+                        $tokenData = $response->json();
+
+                        session([
+                            'finance_api_token' => $tokenData['token'],
+                            'finance_token_expires_at' => now()->addSeconds($tokenData['expires_in']),
+                        ]);
+                    } else {
+                        // Log::error('Failed to fetch finance API token', ['response' => $response->body()]);
+                        Alert()->toast($response->status(), 'error');
+                    }
+                } catch (\Throwable $e) {
+                    // Log::error('Error connecting to finance API for token', ['error' => $e->getMessage()]);
+                    Alert()->toast('Connection not established from the server', 'info');
+                }
+            }
+
+            Alert()->toast('Hello '. ucwords(strtolower(Auth::user()->first_name))  .' Welcome back!', 'success');
             return redirect()->intended($this->redirectPath());
         }
 
@@ -104,7 +133,6 @@ class LoginController extends Controller
 
         // keep username (and password if you insist)
         return back()->with('error', 'Invalid Username or Password')->withInput($request->only('username', 'password'));
-        // or if you really want password too:
-        // return back()->withInput($request->only('username','password'));
+
     }
 }

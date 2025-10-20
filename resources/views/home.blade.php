@@ -7,10 +7,12 @@
         @include('dashboard.teachers')
     @elseif (Auth::user()->usertype == 4)
         @include('dashboard.parents')
+    @elseif (Auth::user()->usertype == 5)
+        @include('dashboard.accountants')
     @else
-        @include('error.unauthorized')  <!-- You can create an unauthorized page -->
+        @include('Error.403')  <!-- You can create an unauthorized page -->
     @endif
 @else
-    @include('auth.login')  <!-- Ensure that user is logged in -->
+    @include('auth.login')  <!-- Ensure that user logged in -->
 @endif
 

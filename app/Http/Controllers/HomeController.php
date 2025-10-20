@@ -22,6 +22,7 @@ use Laravel\Ui\Presets\React;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\Password;
 
 class HomeController extends Controller
@@ -348,6 +349,50 @@ class HomeController extends Controller
                 //end of summary -----------------
                 return view('home', compact('courses', 'contract', 'attendanceCounts', 'attendanceCount', 'today', 'myClass', 'teacherByGender', 'classes', 'teachers', 'students', 'classes', 'subjects', 'studentsByClass',
                             'parents', 'buses', 'totalMaleStudents', 'chartData', 'totalFemaleStudents', 'classData', 'qualificationData'));
+            }
+
+            elseif ($user->usertype == 5) {
+
+                $categories = [];
+                $daily = 0;
+                $monthly = 0;
+                $yearly = 0;
+                $recent = [];
+
+                $token = session('finance_api_token');
+
+                try {
+                    $response = Http::withToken($token)->get(env('SHULEAPP_FINANCE_API_BASE_URL') . '/accountant-dashboard', [
+                        'school_id' => $user->school_id,
+                    ]);
+
+                    if ($response->successful()) {
+                        $data = $response->json();
+                        $categories = $data['categories'] ?? [];
+                        $daily = $data['daily_expenses'] ?? 0;
+                        $monthly = $data['monthly_expenses'] ?? 0;
+                        $yearly = $data['yearly_expenses'] ?? 0;
+                        $recent = $data['recent_expenses'] ?? [];
+                    } else {
+
+                        Alert()->toast('Failed to get accountant dashboard details', 'error');
+                        Log::error('Error'. $response->status());
+                    }
+                } catch (\Throwable $e) {
+                    // Tuma ujumbe wa kirafiki badala ya 500
+                    Alert()->toast($e->getMessage() ?? 'Connection not established from the server', 'info');
+                }
+
+                $students = Student::where('school_id', $user->school_id)
+                                    ->where('status', 1)
+                                    ->get();
+
+                return view('home', compact('categories', 'daily', 'monthly', 'yearly', 'recent', 'students'));
+            }
+
+            else {
+                Auth::logout();
+                return redirect()->route('login')->with('error', 'You do not have access to the system. Contact System Administrator');
             }
 
         }
