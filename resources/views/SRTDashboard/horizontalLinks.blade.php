@@ -97,6 +97,7 @@
                                     <li><a href="{{route('Teachers.index')}}"><i class="fa fa-user-tie"></i> Teachers</a></li>
                                     <li><a href="{{route('classes.list')}}"><i class="fa fa-user-graduate"></i> Students</a></li>
                                     <li><a href="{{route('Parents.index')}}"><i class="fa fa-user-friends"></i> Parents</a></li>
+                                    <li><a href="{{route('Accountants.index')}}"><i class="fa fa-users-line"></i> Accountants</a></li>
                                 </ul>
                             </li>
 
@@ -155,6 +156,41 @@
                         @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 1 || Auth::user()->usertype ==3 && Auth::user()->teacher->role_id == 4)
                             <li>
                                 <a href="{{route('contract.index')}}"><i class="fas fa-briefcase"></i><span> Manage Contracts</span></a>
+                            </li>
+                        @endif
+                        {{-- Accountant Links --}}
+                        @if (Auth::user()->usertype == 5)
+                            {{-- Community --}}
+                            <li>
+                                <li>
+                                    <a href="{{route('classes.list')}}"><i class="fas fa-user-graduate"></i><span>Students</span></a>
+                                </li>
+                            </li>
+
+                            {{-- Academic Management --}}
+                            <li>
+                                <a href="javascript:void(0)"><i class="fas fa-money-bill-trend-up"></i><span>Expenses & Transactions</span></a>
+                                <ul class="submenu">
+                                    <li><a href="{{route('expenses.index')}}"><i class="fas fa-layer-group"></i> Categories</a></li>
+                                    <li><a href="{{route('expenditure.index')}}"><i class="fas fa-money-check-dollar"></i> Daily Transactions</a></li>
+                                </ul>
+                            </li>
+
+                            {{-- Reports & Analytics --}}
+                            <li>
+                                <a href="javascript:void(0)"><i class="fas fa-chart-pie"></i><span>Reports & Analytics</span></a>
+                                <ul class="submenu">
+                                    <li><a href="{{route('expenditure.all.transactions')}}"><i class="fas fa-file-archive-o"></i> Reports</a></li>
+                                    {{-- <li><a href=""><i class="fas fa-book"></i> Daily School Report</a></li> --}}
+                                </ul>
+                            </li>
+
+                            {{-- Services --}}
+                            <li>
+                                <a href="javascript:void(0)"><i class="fas fa-handshake-alt"></i><span>Services</span></a>
+                                <ul class="submenu">
+                                    <li><a href="{{route('Transportation.index')}}"><i class="fa fa-bus-alt"></i> Transport</a></li>
+                                </ul>
                             </li>
                         @endif
                     </ul>

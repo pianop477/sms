@@ -1,6 +1,7 @@
 <?php
 use App\Exports\StudentsExport;
 use App\Exports\TeachersExport;
+use App\Http\Controllers\AccountantsController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\BiometricController;
@@ -10,6 +11,8 @@ use App\Http\Controllers\ClassesController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\ExpenditureController;
+use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\GeneratedReportController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ManagerController;
@@ -311,6 +314,15 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::put('{id}/Reject-contract', [ContractController::class, 'rejectContract'])->name('contract.rejection');
         Route::get('year/{year}/Contracts-group', [ContractController::class, 'contractByMonths'])->name('contract.by.months');
         Route::get('year/{year}/month/{month}/All-approved-contract', [ContractController::class, 'getAllApprovedContract'])->name('contract.approved.all');
+
+        //accountants routes management
+        Route::get('Accountants', [AccountantsController::class, 'index'])->name('Accountants.index');
+        Route::post('Accountants-registration', [AccountantsController::class, 'registerAccountants'])->name('Accountants.store');
+        Route::put('Accountants/block/{id}', [AccountantsController::class, 'blockAccountants'])->name('Accountants.block');
+        Route::put('Accountants/unblock/{id}', [AccountantsController::class, 'unBlockAccountants'])->name('Accountants.unblock');
+        Route::get('Accountants/profilee/{id}', [AccountantsController::class, 'accountantProfile'])->name('Accountants.profile');
+        Route::put('Accountants/update/{id}', [AccountantsController::class, 'updateAccountants'])->name('Accountants.update');
+        Route::delete('Accountants/delete/{id}', [AccountantsController::class, 'deleteAccountants'])->name('Accountants.delete');
     });
 
     //3. ROUTE ACCESS FOR EITHER HEAD TEACHER OR ACADEMIC ONLY ============================================================================
@@ -382,7 +394,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     });
 
     //4. ROUTES ACCESS FOR ALL USERS ========================================================================================================
-    Route::middleware('CheckUsertype:1,2,3,4')->group(function () {
+    Route::middleware('CheckUsertype:1,2,3,4,5')->group(function () {
         // Dashboard redirection
         Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::get('Change-password', [HomeController::class, 'changepassword'])->name('change.password');
@@ -479,4 +491,21 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Alert()->toast('Goodbyee see you back later 👋', 'success');
         return redirect()->route('login');
     })->name('logout');
+
+    //10. ROUTE ACCESS FOR ACCOUNTANT USER GROUP =======================================================================================
+    Route::middleware('AccountantMiddleware')->group(function () {
+        //manage categories
+        Route::get('/Expenses-categories', [ExpenseCategoryController::class, 'index'])->name('expenses.index');
+        Route::post('/Expenses-categories', [ExpenseCategoryController::class, 'store'])->name('expenses.store');
+        Route::delete('/Expenses-categories/{expenseCategory}', [ExpenseCategoryController::class, 'destroy'])->name('expenses.destroy');
+        Route::get('Expenses-categories/{category}', [ExpenseCategoryController::class, 'Edit'])->name('expense.edit');
+        Route::put('Expenses-categories/{category}', [ExpenseCategoryController::class, 'Update'])->name('expense.update');
+
+        //manage expenditures
+        Route::get('/daily-expenses', [ExpenditureController::class, 'index'])->name('expenditure.index');
+        Route::post('/daily-expenses', [ExpenditureController::class, 'store'])->name('expenditure.store');
+        Route::put('/daily-expenses/{bill}', [ExpenditureController::class, 'cancelBill'])->name('expenditure.cancel.bill');
+        Route::delete('/daily-expenses/{bill}', [ExpenditureController::class, 'deleteInactiveBill'])->name('expenditure.delete.bill');
+        Route::get('/Transactions', [ExpenditureController::class, 'allTractions'])->name('expenditure.all.transactions');
+    });
 });
