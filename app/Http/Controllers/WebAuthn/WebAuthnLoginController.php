@@ -56,34 +56,39 @@ class WebAuthnLoginController extends Controller
         // Authenticate user into the app
         auth()->login($user);
 
-        // Generate Finance API token (same logic as normal login)
-        try {
-            $response = Http::post(env('SHULEAPP_FINANCE_API_BASE_URL') . '/auth/token', [
-                'client_key' => env('SHULEAPP_CLIENT_ID'),
-                'client_secret' => env('SHULEAPP_CLIENT_SECRET'),
-            ]);
-
-            if ($response->successful()) {
-                $tokenData = $response->json();
-
-                session([
-                    'finance_api_token' => $tokenData['token'],
-                    'finance_token_expires_at' => now()->addSeconds($tokenData['expires_in']),
+        // Only proceed with Finance API token if usertype == 5
+        if ($user->usertype == 5) {
+            try {
+                $response = Http::post(env('SHULEAPP_FINANCE_API_BASE_URL') . '/auth/token', [
+                    'client_key' => env('SHULEAPP_CLIENT_KEY'),
+                    'client_secret' => env('SHULEAPP_CLIENT_SECRET'),
                 ]);
-            } else {
-                Log::error('Failed to obtain Finance API token during biometric login', [
-                    'status' => $response->status(),
-                    'message' => $response->body(),
+
+                if ($response->successful()) {
+                    $tokenData = $response->json();
+
+                    session([
+                        'finance_api_token' => $tokenData['token'],
+                        'finance_token_expires_at' => now()->addSeconds($tokenData['expires_in']),
+                    ]);
+                } else {
+                    Log::error('Failed to obtain Finance API token during biometric login', [
+                        'status' => $response->status(),
+                        'message' => $response->body(),
+                    ]);
+                }
+            } catch (Exception $e) {
+                Log::error('Error fetching Finance API token during biometric login', [
+                    'message' => $e->getMessage()
                 ]);
+                return response()->json([
+                    'status' => false,
+                    'message' => $e->getMessage()
+                ], 400);
             }
-        } catch (Exception $e) {
-            Log::error('Error fetching Finance API token during biometric login', [
-                'message' => $e->getMessage()
-            ]);
-            return response()->json([
-                'status' => false,
-                'message' => $e->getMessage()
-            ], 400);
+        } else {
+            // Optional: log or notify that usertype != 5 is skipping API token
+            Log::info("Biometric login: usertype {$user->usertype} skipping Finance API token");
         }
 
         return response()->json([
@@ -91,4 +96,5 @@ class WebAuthnLoginController extends Controller
             'redirect' => route('home'),
         ], 200);
     }
+
 }
