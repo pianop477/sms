@@ -180,8 +180,7 @@
                             <li>
                                 <a href="javascript:void(0)"><i class="fas fa-chart-pie"></i><span>Reports & Analytics</span></a>
                                 <ul class="submenu">
-                                    <li><a href="{{route('expenditure.all.transactions')}}"><i class="fas fa-file-archive-o"></i> Reports</a></li>
-                                    {{-- <li><a href=""><i class="fas fa-book"></i> Daily School Report</a></li> --}}
+                                    <li><a href="{{route('expenditure.all.transactions')}}"><i class="fas fa-file-archive-o"></i> All Transactions</a></li>
                                 </ul>
                             </li>
 
