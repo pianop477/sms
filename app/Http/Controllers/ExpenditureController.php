@@ -197,101 +197,101 @@ class ExpenditureController extends Controller
     }
 
     public function exportCustomReport(Request $request)
-{
-    // dd($request->all());
-    $validated = $request->validate([
-        'start_date' => 'required|date|date_format:Y-m-d',
-        'end_date' => 'required|date|date_format:Y-m-d|after_or_equal:start_date',
-        'status' => 'nullable|string',
-        'category' => 'nullable|integer',
-        'payment_mode' => 'nullable|string',
-        'export_format' => 'required|string|in:pdf,excel,csv,word',
-    ]);
-
-    $user = Auth::user();
-    $school_id = $user->school_id;
-    $start_date = $request->input('start_date');
-    $end_date = $request->input('end_date');
-    $status = $request->input('status');
-    $category = $request->input('category');
-    $payment_mode = $request->input('payment_mode');
-    $export_format = $request->input('export_format');
-
-    try {
-        $response = Http::withToken(session('finance_api_token'))->get(config('app.finance_api_base_url'). '/generate-custom-report', [
-            'school_id' => $school_id,
-            'start_date' => $start_date,
-            'end_date' => $end_date,
-            'status' => $status,
-            'category' => $category,
-            'payment_mode' => $payment_mode,
+    {
+        // dd($request->all());
+        $validated = $request->validate([
+            'start_date' => 'required|date|date_format:Y-m-d',
+            'end_date' => 'required|date|date_format:Y-m-d|after_or_equal:start_date',
+            'status' => 'nullable|string',
+            'category' => 'nullable|integer',
+            'payment_mode' => 'nullable|string',
+            'export_format' => 'required|string|in:pdf,excel,csv,word',
         ]);
 
-        if($response->successful()) {
-            $data = $response->json();
+        $user = Auth::user();
+        $school_id = $user->school_id;
+        $start_date = $request->input('start_date');
+        $end_date = $request->input('end_date');
+        $status = $request->input('status');
+        $category = $request->input('category');
+        $payment_mode = $request->input('payment_mode');
+        $export_format = $request->input('export_format');
 
-            // Check if transactions exist
-            if (empty($data['transactions'])) {
-                if ($request->ajax()) {
-                    return response()->json([
-                        'error' => 'No transactions found for the selected criteria.'
-                    ], 404);
-                }
-                Alert()->toast('No transactions found for the selected criteria', 'info');
-                return back();
-            }
+        try {
+            $response = Http::withToken(session('finance_api_token'))->get(config('app.finance_api_base_url'). '/generate-custom-report', [
+                'school_id' => $school_id,
+                'start_date' => $start_date,
+                'end_date' => $end_date,
+                'status' => $status,
+                'category' => $category,
+                'payment_mode' => $payment_mode,
+            ]);
 
-            $transactions = $data['transactions'];
-            $total_amount = collect($transactions)->sum('amount');
+            if($response->successful()) {
+                $data = $response->json();
 
-            // Use default filename for all export formats
-            // $filename = 'transaction_report';
-
-            switch ($export_format) {
-                case 'pdf':
-                    return $this->generatePDF($transactions, $start_date, $end_date, $school_id, $total_amount);
-                case 'excel':
-                    return $this->generateExcel($transactions, $total_amount, $start_date, $end_date, $school_id);
-                case 'csv':
-                    return $this->generateCSV($transactions, $total_amount, $school_id, $start_date, $end_date);
-                case 'word':
-                    return $this->generateWord($transactions, $total_amount, $school_id, $start_date, $end_date);
-                default:
+                // Check if transactions exist
+                if (empty($data['transactions'])) {
                     if ($request->ajax()) {
                         return response()->json([
-                            'error' => 'Invalid export format selected.'
-                        ], 422);
+                            'error' => 'No transactions found for the selected criteria.'
+                        ], 404);
                     }
-                    Alert()->toast('Invalid export format selected', 'error');
+                    Alert()->toast('No transactions found for the selected criteria', 'info');
                     return back();
+                }
+
+                $transactions = $data['transactions'];
+                $total_amount = collect($transactions)->sum('amount');
+
+                // Use default filename for all export formats
+                // $filename = 'transaction_report';
+
+                switch ($export_format) {
+                    case 'pdf':
+                        return $this->generatePDF($transactions, $start_date, $end_date, $school_id, $total_amount);
+                    case 'excel':
+                        return $this->generateExcel($transactions, $total_amount, $start_date, $end_date, $school_id);
+                    case 'csv':
+                        return $this->generateCSV($transactions, $total_amount, $school_id, $start_date, $end_date);
+                    case 'word':
+                        return $this->generateWord($transactions, $total_amount, $school_id, $start_date, $end_date);
+                    default:
+                        if ($request->ajax()) {
+                            return response()->json([
+                                'error' => 'Invalid export format selected.'
+                            ], 422);
+                        }
+                        Alert()->toast('Invalid export format selected', 'error');
+                        return back();
+                }
             }
-        }
-        else {
-            $errorMessage = 'Failed to export transactions report. API Error: ' . $response->status();
+            else {
+                $errorMessage = 'Failed to export transactions report. API Error: ' . $response->status();
+
+                if ($request->ajax()) {
+                    return response()->json([
+                        'error' => $errorMessage
+                    ], $response->status());
+                }
+
+                Alert()->toast($errorMessage, 'error');
+                Log::error("Error code ". $response->status());
+                return back();
+            }
+        } catch (Throwable $e) {
+            $errorMessage = $e->getMessage() ?? "Connection not established from the server";
 
             if ($request->ajax()) {
                 return response()->json([
                     'error' => $errorMessage
-                ], $response->status());
+                ], 500);
             }
 
-            Alert()->toast($errorMessage, 'error');
-            Log::error("Error code ". $response->status());
+            Alert()->toast($errorMessage, "info");
             return back();
         }
-    } catch (Throwable $e) {
-        $errorMessage = $e->getMessage() ?? "Connection not established from the server";
-
-        if ($request->ajax()) {
-            return response()->json([
-                'error' => $errorMessage
-            ], 500);
-        }
-
-        Alert()->toast($errorMessage, "info");
-        return back();
     }
-}
 
     protected function generatePDF($transactions, $start_date, $end_date, $school_id, $total_amount)
     {
@@ -671,142 +671,120 @@ class ExpenditureController extends Controller
         return response()->download($temp_file, $filename)->deleteFileAfterSend(true);
     }
 
-    protected function generateWord($transactions, $total_amount, $school_id, $start_date, $end_date)
+    protected function generateWord($transactions, $total_amount, $school_id, $start_date, $end_date, $filename = 'transaction_report')
     {
-        $school = school::find($school_id);
+        try {
+            $school = school::find($school_id);
 
-        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+            // Create simple PHPWord instance
+            $phpWord = new \PhpOffice\PhpWord\PhpWord();
 
-        // Add font styles
-        $phpWord->addTitleStyle(1, ['bold' => true, 'size' => 16, 'color' => '2C3E50'], ['alignment' => 'center']);
-        $phpWord->addTitleStyle(2, ['bold' => true, 'size' => 14, 'color' => '2C3E50'], ['alignment' => 'center']);
+            // Set basic document properties
+            $phpWord->getDocInfo()->setCreator($school->school_name)
+                    ->setCompany($school->school_name)
+                    ->setTitle('Transactions Report')
+                    ->setDescription('Generated financial transactions report');
 
-        $section = $phpWord->addSection([
-            'marginTop' => 600,
-            'marginBottom' => 600,
-            'marginLeft' => 600,
-            'marginRight' => 600,
-        ]);
+            // Add simple section
+            $section = $phpWord->addSection();
 
-        // ===== HEADER SECTION =====
-        // School Logo
-        if ($school->logo && file_exists(public_path('assets/img/logo/' . $school->logo))) {
-            try {
-                $section->addImage(
-                    public_path('assets/img/logo/' . $school->logo),
-                    [
-                        'width' => 60,
-                        'height' => 60,
-                        'alignment' => 'center'
-                    ]
-                );
-            } catch (\Exception $e) {
-                // Continue without logo if there's an error
-            }
-        }
-
-        // School Information
-        $section->addTitle(strtoupper($school->school_name), 1);
-        $section->addText(
-            ucwords(strtolower($school->postal_address)) . ', ' .
-            ucwords(strtolower($school->postal_name)) . ' - ' .
-            ucwords(strtolower($school->country)),
-            ['size' => 11, 'color' => '7F8C8D'],
-            ['alignment' => 'center']
-        );
-
-        $section->addTextBreak(1);
-
-        // Report Title
-        $section->addTitle('FINANCIAL TRANSACTIONS REPORT', 2);
-
-        // Report Period
-        $section->addText(
-            "Reporting Period: " . \Carbon\Carbon::parse($start_date)->format('d M Y') . " - " . \Carbon\Carbon::parse($end_date)->format('d M Y'),
-            ['italic' => true, 'size' => 11, 'color' => '7F8C8D'],
-            ['alignment' => 'center']
-        );
-
-        $section->addText(
-            "Generated: " . \Carbon\Carbon::now()->format('d M Y H:i'),
-            ['size' => 10, 'color' => '95A5A6'],
-            ['alignment' => 'center']
-        );
-
-        $section->addTextBreak(1);
-
-        // ===== TABLE HEADER =====
-        $styleTable = [
-            'borderSize' => 6,
-            'borderColor' => '999999',
-            'cellMargin' => 80,
-        ];
-        $phpWord->addTableStyle('TransactionsTable', $styleTable);
-
-        $table = $section->addTable('TransactionsTable');
-
-        // Table Header
-        $headers = ['#', 'Date', 'Reference No.', 'Category', 'Description', 'Amount', 'Status', 'Payment Mode'];
-        $table->addRow();
-        foreach ($headers as $header) {
-            $table->addCell(1500)->addText($header, ['bold' => true, 'size' => 10]);
-        }
-
-        // ===== TABLE DATA =====
-        foreach ($transactions as $index => $t) {
-            $table->addRow();
-            $table->addCell(800)->addText(($index + 1), ['size' => 9]);
-            $table->addCell(1500)->addText(
-                isset($t['transaction_date']) ? \Carbon\Carbon::parse($t['transaction_date'])->format('d-m-Y') :
-                    (isset($t['expense_date']) ? \Carbon\Carbon::parse($t['expense_date'])->format('d-m-Y') : ''),
-                ['size' => 9]
+            // ===== SIMPLE HEADER =====
+            $section->addText(
+                strtoupper($school->school_name),
+                ['bold' => true, 'size' => 16, 'name' => 'Arial'],
+                ['alignment' => 'center']
             );
-            $table->addCell(1800)->addText(strtoupper($t['reference_number'] ?? ''), ['bold' => true, 'size' => 9]);
-            $table->addCell(1500)->addText(ucwords(strtolower($t['expense_type'] ?? '')), ['size' => 9]);
-            $table->addCell(3000)->addText(ucwords(strtolower($t['description'] ?? '')), ['size' => 9]);
-            $table->addCell(1500)->addText(number_format($t['amount'] ?? 0, 2), ['size' => 9]);
 
-            // Status with color coding
-            $status = strtolower($t['status'] ?? '');
-            $statusColor = '000000'; // default black
+            $section->addText(
+                'Transactions Report',
+                ['bold' => true, 'size' => 14, 'name' => 'Arial'],
+                ['alignment' => 'center']
+            );
 
-            if (in_array($status, ['completed', 'success', 'active', 'approved'])) {
-                $statusColor = '27AE60'; // green
-            } elseif (in_array($status, ['pending', 'processing'])) {
-                $statusColor = 'F39C12'; // orange
-            } elseif (in_array($status, ['failed', 'cancelled', 'rejected'])) {
-                $statusColor = 'E74C3C'; // red
+            $section->addText(
+                'Period: ' . \Carbon\Carbon::parse($start_date)->format('d M Y') . ' to ' . \Carbon\Carbon::parse($end_date)->format('d M Y'),
+                ['size' => 11, 'name' => 'Arial'],
+                ['alignment' => 'center']
+            );
+
+            $section->addText(
+                'Generated: ' . \Carbon\Carbon::now()->format('d M Y H:i'),
+                ['size' => 10, 'name' => 'Arial'],
+                ['alignment' => 'center']
+            );
+
+            $section->addTextBreak(2);
+
+            // ===== SIMPLE TABLE =====
+            $table = $section->addTable([
+                'borderSize' => 6,
+                'borderColor' => '000000',
+            ]);
+
+            // Table headers
+            $headers = ['#', 'Date', 'Reference', 'Category', 'Description', 'Amount', 'Status', 'Payment Mode'];
+            $table->addRow();
+            foreach ($headers as $header) {
+                $table->addCell(1500)->addText($header, ['bold' => true, 'name' => 'Arial']);
             }
 
-            $table->addCell(1200)->addText(ucwords($status), ['bold' => true, 'color' => $statusColor, 'size' => 9]);
-            $table->addCell(1500)->addText(ucwords(strtolower($t['payment_mode'] ?? '')), ['size' => 9]);
+            // Table data
+            foreach ($transactions as $index => $transaction) {
+                $table->addRow();
+                $table->addCell(500)->addText($index + 1, null, ['name' => 'Arial']);
+
+                $date = isset($transaction['transaction_date']) ?
+                    \Carbon\Carbon::parse($transaction['transaction_date'])->format('d-m-Y') :
+                    (isset($transaction['expense_date']) ?
+                    \Carbon\Carbon::parse($transaction['expense_date'])->format('d-m-Y') : 'N/A');
+                $table->addCell(1200)->addText($date, null, ['name' => 'Arial']);
+
+                $table->addCell(1500)->addText($transaction['reference_number'] ?? 'N/A', null, ['name' => 'Arial']);
+                $table->addCell(1500)->addText($transaction['expense_type'] ?? 'N/A', null, ['name' => 'Arial']);
+                $table->addCell(1500)->addText($transaction['description'] ?? 'N/A', null, ['name' => 'Arial']);
+                $table->addCell(1600)->addText(number_format($transaction['amount'] ?? 0, 2), null, ['name' => 'Arial']);
+                $table->addCell(1000)->addText($transaction['status'] ?? 'N/A', null, ['name' => 'Arial']);
+                $table->addCell(1000)->addText($transaction['payment_mode'] ?? 'N/A', null, ['name' => 'Arial']);
+            }
+
+            // Total row
+            $table->addRow();
+            $table->addCell(500)->addText('');
+            $table->addCell(1200)->addText('');
+            $table->addCell(1500)->addText('');
+            $table->addCell(1500)->addText('');
+            $table->addCell(1600)->addText('TOTAL:', ['bold' => true, 'name' => 'Arial']);
+            $table->addCell(1200)->addText(number_format($total_amount, 2), ['bold' => true, 'name' => 'Arial']);
+            $table->addCell(1500)->addText('');
+            $table->addCell(1000)->addText('');
+
+            $section->addTextBreak(2);
+            $section->addText(
+                'Computer Generated Report - ' . $school->school_name,
+                ['italic' => true, 'size' => 9, 'name' => 'Arial'],
+                ['alignment' => 'center']
+            );
+
+            // ===== SAVE FILE =====
+            $filename = $filename . '.docx';
+            $tempFile = tempnam(sys_get_temp_dir(), 'word_') . '.docx';
+
+            // Use Word2007 writer
+            $writer = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
+            $writer->save($tempFile);
+
+            // Verify file
+            if (!file_exists($tempFile) || filesize($tempFile) === 0) {
+                throw new \Exception('Generated Word file is empty or corrupted');
+            }
+
+            // \Log::info('Word file generated successfully: ' . $tempFile . ' Size: ' . filesize($tempFile));
+
+            return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
+
+        } catch (\Exception $e) {
+            // \Log::error('Word generation error: ' . $e->getMessage());
+            throw new \Exception('Failed to generate Word document: ' . $e->getMessage());
         }
-
-        // ===== TOTAL ROW =====
-        $table->addRow();
-        $table->addCell(800)->addText('');
-        $table->addCell(1500)->addText('');
-        $table->addCell(1800)->addText('');
-        $table->addCell(1500)->addText('');
-        $table->addCell(3000)->addText('GRAND TOTAL:', ['bold' => true, 'size' => 10]);
-        $table->addCell(1500)->addText(number_format($total_amount, 2), ['bold' => true, 'size' => 10]);
-        $table->addCell(1200)->addText('');
-        $table->addCell(1500)->addText('');
-
-        // ===== FOOTER =====
-        $section->addTextBreak(2);
-        $section->addText(
-            strtoupper($school->school_name) . " | Computer Generated Financial Report | Confidential & Proprietary",
-            ['italic' => true, 'size' => 8, 'color' => '7F8C8D'],
-            ['alignment' => 'center']
-        );
-
-        // ===== SAVE & DOWNLOAD =====
-        $filename = 'financial_transactions_report_' . date('Y_m_d_His') . '.docx';
-        $tempFile = tempnam(sys_get_temp_dir(), $filename);
-        $writer = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
-        $writer->save($tempFile);
-
-        return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
     }
 }

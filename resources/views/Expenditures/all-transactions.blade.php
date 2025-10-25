@@ -675,7 +675,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="start_date" class="form-label">Start Date <i class="text-danger">*</i></label>
                                 <div class="date-input-group">
-                                    <input type="date" name="start_date" required id="start_date" class="form-control form-control-custom">
+                                    <input type="date" name="start_date" required id="start_date" class="form-control form-control-custom" min="{{\Carbon\Carbon::now()->subYears(1)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
                                 </div>
                                 <span class="text-danger error-message" id="start_date_error"></span>
                             </div>
@@ -684,7 +684,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="end_date" class="form-label">End Date <i class="text-danger">*</i></label>
                                 <div class="date-input-group">
-                                    <input type="date" name="end_date" required id="end_date" class="form-control form-control-custom">
+                                    <input type="date" name="end_date" required id="end_date" class="form-control form-control-custom" min="{{\Carbon\Carbon::now()->subYears(1)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
                                 </div>
                                 <span class="text-danger error-message" id="end_date_error"></span>
                             </div>
@@ -693,7 +693,7 @@
                         <div class="row">
                             <!-- Start Date -->
                             <div class="col-md-6 mb-3">
-                                <label for="category" class="form-label">Transaction Category</label>
+                                <label for="category" class="form-label">Category</label>
                                 <select name="category" id="category" class="form-select form-control-custom">
                                     <option value="">--Select Category--</option>
                                     @if (!empty($categories))
