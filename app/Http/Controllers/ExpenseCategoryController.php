@@ -21,7 +21,7 @@ class ExpenseCategoryController extends Controller
         $categories = [];
         $token = session('finance_api_token');
         try {
-            $response = Http::withToken($token)->get(env('SHULEAPP_FINANCE_API_BASE_URL'). '/expense-categories', [
+            $response = Http::withToken($token)->get(config('app.finance_api_base_url'). '/expense-categories', [
                 'school_id' => $user->school_id,
             ]);
 
@@ -57,7 +57,7 @@ class ExpenseCategoryController extends Controller
 
         // dd($request->all());
         try {
-            Log::info($response = Http::withToken(session('finance_api_token'))->post(env('SHULEAPP_FINANCE_API_BASE_URL'). '/expense-categories', [
+            Log::info($response = Http::withToken(session('finance_api_token'))->post(config('app.finance_api_base_url'). '/expense-categories', [
                 'school_id' => $user->school_id,
                 'expense_type' => $request->name,
                 'expense_description' => $request->description,
@@ -86,7 +86,7 @@ class ExpenseCategoryController extends Controller
         $user = Auth::user();
 
         try {
-            $response = Http::withToken(session('finance_api_token'))->delete(env('SHULEAPP_FINANCE_API_BASE_URL'). '/expense-categories/' . $decode[0], [
+            $response = Http::withToken(session('finance_api_token'))->delete(config('app.finance_api_base_url'). '/expense-categories/' . $decode[0], [
                 'school_id' => $user->school_id,
             ]);
 
@@ -111,7 +111,7 @@ class ExpenseCategoryController extends Controller
         $user = Auth::user();
 
         try {
-            $response = Http::withToken(session('finance_api_token'))->get(env('SHULEAPP_FINANCE_API_BASE_URL'). '/expense-categories/' .$decode[0], [
+            $response = Http::withToken(session('finance_api_token'))->get(config('app.finance_api_base_url'). '/expense-categories/' .$decode[0], [
                 'school_id' => $user->school_id,
             ]);
 
@@ -142,7 +142,7 @@ class ExpenseCategoryController extends Controller
         ]);
 
         try {
-            $response = Http::withToken(session('finance_api_token'))->put(env('SHULEAPP_FINANCE_API_BASE_URL'). '/expense-categories/'. $decode[0], [
+            $response = Http::withToken(session('finance_api_token'))->put(config('app.finance_api_base_url'). '/expense-categories/'. $decode[0], [
                 'school_id' => $user->school_id,
                 'expense_type' => $request->name,
                 'expense_description' => $request->description

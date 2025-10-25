@@ -301,10 +301,9 @@
                                                                             <i class="fas fa-history me-2"></i> Timeline
                                                                         </button>
                                                                     </li>
-                                                                    <li class="nav-item" role="presentation">
-                                                                        <button class="nav-link" id="timeline-tab{{$row['reference_number']}}" data-bs-toggle="tab"
-                                                                                data-bs-target="#attachment{{$row['reference_number']}}" type="button" role="tab">
-                                                                            <i class="fas fa-history me-2"></i> Attachment
+                                                                        <button class="nav-link" id="attachment-table{{$row['reference_number']}}" data-bs-toggle="tab"
+                                                                            data-bs-target="#attachment{{$row['reference_number']}}" type="button" role="tab">
+                                                                            <i class="fas fa-paperclip me-2"></i> Attachments
                                                                         </button>
                                                                     </li>
                                                                 </ul>
@@ -430,32 +429,42 @@
                                                                     <div class="tab-pane fade" id="attachment{{$row['reference_number']}}" role="tabpanel">
                                                                         <div class="timeline">
                                                                             @if(isset($row['attachment']))
-                                                                            <div class="timeline-item">
-                                                                                <div class="timeline-marker bg-success"></div>
-                                                                                <div class="timeline-content">
-                                                                                    <h6 class="fw-bold">Transaction Bill Receipt</h6>
-                                                                                    @if(isset($expense['attachment_url']) && $expense['attachment_url'])
-                                                                                        @php
-                                                                                            $extension = pathinfo($expense['attachment'], PATHINFO_EXTENSION);
-                                                                                            $isImage = in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'pdf']);
-                                                                                        @endphp
+                                                                                <div class="timeline-item">
+                                                                                    <div class="timeline-marker bg-success"></div>
+                                                                                    <div class="timeline-content">
+                                                                                        <h6 class="fw-bold">Transaction Bill Receipt</h6>
 
-                                                                                        @if($isImage)
-                                                                                            <!-- Display Image -->
-                                                                                            <a href="{{ $expense['attachment_url'] }}" target="_blank">
-                                                                                                <img src="{{ $expense['attachment_url'] }}" alt="Receipt" style="max-width: 100px; max-height: 100px;">
-                                                                                            </a>
+                                                                                        @if(!empty($row['attachment_url']))
+                                                                                            @php
+                                                                                                $extension = strtolower(pathinfo($row['attachment'], PATHINFO_EXTENSION));
+                                                                                                $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif']);
+                                                                                            @endphp
+
+                                                                                            @if($isImage)
+                                                                                                <!-- Display Image -->
+                                                                                                <a href="{{ $row['attachment_url'] }}" target="_blank">
+                                                                                                    <img src="{{ $row['attachment_url'] }}"
+                                                                                                        alt="Receipt"
+                                                                                                        style="max-width: 100px; max-height: 100px; border-radius: 5px;">
+                                                                                                </a>
+                                                                                            @elseif($extension === 'pdf')
+                                                                                                <!-- Display PDF -->
+                                                                                                <a href="{{ $row['attachment_url'] }}" target="_blank" class="btn btn-sm btn-primary">
+                                                                                                    <i class="fas fa-file-pdf"></i> View PDF Receipt
+                                                                                                </a>
+                                                                                            @else
+                                                                                                <!-- Other file types -->
+                                                                                                <a href="{{ $row['attachment_url'] }}" target="_blank" class="btn btn-sm btn-secondary">
+                                                                                                    <i class="fas fa-file"></i> View File
+                                                                                                </a>
+                                                                                            @endif
                                                                                         @else
-                                                                                            <!-- Display PDF or other files -->
-                                                                                            <a href="{{ $expense['attachment_url'] }}" target="_blank" class="btn btn-sm btn-primary">
-                                                                                                <i class="fas fa-file-pdf"></i> View Receipt
-                                                                                            </a>
+                                                                                            <span class="text-muted">No attachment</span>
                                                                                         @endif
-                                                                                    @else
-                                                                                        <span class="text-muted">No attachment</span>
-                                                                                    @endif
+                                                                                    </div>
                                                                                 </div>
-                                                                            </div>
+                                                                                @else
+                                                                                    <span class="text-muted">No attachment</span>
                                                                             @endif
                                                                         </div>
                                                                     </div>

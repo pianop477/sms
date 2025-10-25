@@ -361,8 +361,9 @@ class HomeController extends Controller
 
                 $token = session('finance_api_token');
 
+                // dd($token);
                 try {
-                    $response = Http::withToken($token)->get(env('SHULEAPP_FINANCE_API_BASE_URL') . '/accountant-dashboard', [
+                    $response = Http::withToken($token)->get(config('app.finance_api_base_url') . '/accountant-dashboard', [
                         'school_id' => $user->school_id,
                     ]);
 
@@ -444,11 +445,11 @@ class HomeController extends Controller
 
     }
 
-        public function showProfile()
-        {
-            $user = Auth::user();
+    public function showProfile()
+    {
+        $user = Auth::user();
 
-           $userAccount = User::query()
+        $userAccount = User::query()
                         ->leftJoin('teachers', 'users.id', '=', 'teachers.user_id')
                         ->leftJoin('parents', 'users.id', '=', 'parents.user_id')
                         ->leftJoin('roles', 'roles.id', '=', 'teachers.role_id')
@@ -456,14 +457,14 @@ class HomeController extends Controller
                             'users.*',
                             'teachers.user_id as teacher_id',
                             'teachers.address as teacher_address',
-                            'teachers.member_id',
+                            'teachers.member_id', 'teachers.qualification',
                             'parents.address as parent_address',
                             'roles.role_name'
                         )
                         ->findOrFail($user->id);
 
-            return view('profile.index', ['user' => $userAccount]);
-        }
+        return view('profile.index', ['user' => $userAccount]);
+    }
 
 
     public function updateProfile(Request $request, $user)

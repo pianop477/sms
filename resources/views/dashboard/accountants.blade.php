@@ -230,11 +230,11 @@
                     <div class="card-body text-white">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-uppercase small font-weight-bold">Expense Categories</div>
-                                <div class="h3 mb-0 font-weight-bold">{{count($categories)}}</div>
+                                <div class="text-uppercase small font-weight-bold">Students</div>
+                                <div class="h3 mb-0 font-weight-bold">{{count($students)}}</div>
                             </div>
                             <div class="col-auto">
-                                <i class="fas fa-layer-group card-icon"></i>
+                                <i class="fas fa-user-graduate card-icon"></i>
                             </div>
                         </div>
                     </div>
@@ -369,11 +369,32 @@
     <div class="col-12 mt-4">
         <div class="card shadow-sm">
             <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="header-title mb-0">Recent Transactions</h4>
-                    <a href="{{route('expenditure.all.transactions')}}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-list me-1"></i> All Transactions
-                    </a>
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <h4 class="header-title mb-0">Recent Transactions</h4>
+                    </div>
+                    {{-- <div class="col-md-3">
+                        <form method="GET" action="">
+                            <label for="" class="">Filter</label>
+                            <select name="timeframe" class="form-select" onchange="this.form.submit()">
+                                <option value="7" {{ request('timeframe') == 7 ? 'selected' : '' }}>Last 7 Days</option>
+                                <option value="30" {{ request('timeframe') == 30 ? 'selected' : '' }}>Last 30 Days</option>
+                                <option value="90" {{ request('timeframe') == 90 ? 'selected' : '' }}>Last 90 Days</option>
+                                <option value="180" {{ request('timeframe') == 180 ? 'selected' : '' }}>Last 180 Days</option>
+                                <option value="365" {{ request('timeframe') == 365 ? 'selected' : '' }}>Last 365 Days</option>
+                            </select>
+                        </form>
+                    </div> --}}
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-info btn-action btn-sm" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
+                            <i class="fas fa-plus me-1"></i> New Transaction
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <a href="{{route('expenditure.all.transactions')}}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-list me-1"></i> All Transactions
+                        </a>
+                    </div>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover progress-table table-centered mb-0" id="recentTransactionsTable">
@@ -551,6 +572,12 @@
                                         <i class="fas fa-history me-2"></i> Timeline
                                     </button>
                                 </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="attachment-table{{$row['reference_number']}}" data-bs-toggle="tab"
+                                        data-bs-target="#attachment{{$row['reference_number']}}" type="button" role="tab">
+                                        <i class="fas fa-paperclip me-2"></i> Attachments
+                                    </button>
+                                </li>
                             </ul>
 
                             <!-- Tabs Content -->
@@ -661,6 +688,49 @@
                                         @endif
                                     </div>
                                 </div>
+                                <!-- attachment Tab -->
+                                <div class="tab-pane fade" id="attachment{{$row['reference_number']}}" role="tabpanel">
+                                    <div class="timeline">
+                                        @if(isset($row['attachment']))
+                                            <div class="timeline-item">
+                                                <div class="timeline-marker bg-success"></div>
+                                                <div class="timeline-content">
+                                                    <h6 class="fw-bold">Transaction Bill Receipt</h6>
+
+                                                        @if(!empty($row['attachment_url']))
+                                                            @php
+                                                                $extension = strtolower(pathinfo($row['attachment'], PATHINFO_EXTENSION));
+                                                                $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif']);
+                                                            @endphp
+
+                                                            @if($isImage)
+                                                                <!-- Display Image -->
+                                                                <a href="{{ $row['attachment_url'] }}" target="_blank">
+                                                                    <img src="{{ $row['attachment_url'] }}"
+                                                                        alt="Receipt"
+                                                                        style="max-width: 100px; max-height: 100px; border-radius: 5px;">
+                                                                </a>
+                                                            @elseif($extension === 'pdf')
+                                                                <!-- Display PDF -->
+                                                                <a href="{{ $row['attachment_url'] }}" target="_blank" class="btn btn-sm btn-primary">
+                                                                    <i class="fas fa-file-pdf"></i> View PDF Receipt
+                                                                </a>
+                                                            @else
+                                                                <!-- Other file types -->
+                                                                <a href="{{ $row['attachment_url'] }}" target="_blank" class="btn btn-sm btn-secondary">
+                                                                    <i class="fas fa-file"></i> View File
+                                                                </a>
+                                                            @endif
+                                                        @else
+                                                            <span class="text-muted">No attachment</span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                @else
+                                                <span class="text-muted">No attachment</span>
+                                            @endif
+                                        </div>
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -722,6 +792,91 @@
             </div>
         @endforeach
     @endif
+    {{-- register new transactions modal --}}
+    <div class="modal fade" id="addTeacherModal" tabindex="-1" aria-labelledby="addTeacherModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTeacherModalLabel"><i class="fas fa-exchange-alt"></i> Manage new Transactions and Bills</h5>
+                    <button type="button" class="btn-close btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                </div>
+                <div class="modal-body">
+                    <form class="needs-validation" novalidate action="{{route('expenditure.store')}}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="gender" class="form-label">Date</label>
+                                <input type="date" name="date" class="form-control-custom" id="date" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+                                @error('date')
+                                <div class="text-danger small">{{$message}}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="category" class="form-label">Categories</label>
+                                <select name="category" id="category" class="form-control-custom">
+                                    <option value="">--Select category--</option>
+                                    @if(empty($categories))
+                                        <option value="">{{"No categories were found"}}</option>
+                                    @else
+                                        @foreach ($categories as $row )
+                                            <option value="{{$row['id']}}">{{ucwords(strtolower($row['expense_type']))}}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                @error('category')
+                                <div class="text-danger small">{{$message}}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="description" class="form-label">Service description</label>
+                                <textarea type="text" required name="description" class="form-control-custom" id="description" placeholder="Enter service description e.g. umeme" value="{{old('description')}}"></textarea>
+                                @error('description')
+                                <div class="text-danger small">{{$message}}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Amount (in. TZS)</label>
+                                <div class="input-group">
+                                    <input type="number" name="amount" class="form-control-custom" step="0.01" min="0" placeholder="0.00" value="{{old('amount')}}">
+                                </div>
+                                @error('amount')
+                                <div class="text-danger small">{{$message}}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Payment Mode</label>
+                                <select name="payment" id="payment" class="form-control-custom">
+                                    <option value="cash" selected>Cash</option>
+                                    <option value="mobile_money">Mobile Payment</option>
+                                    <option value="bank">Bank Transfer</option>
+                                    {{-- <option value="other">Others</option> --}}
+                                </select>
+                                @error('phone')
+                                <div class="text-danger small">{{$message}}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="street" class="form-label">Receipt Attachment <span class="text-muted">(optional)</span></label>
+                                <input type="file" name="attachment" class="form-control-custom" id="attachment" value="{{old('attachment')}}">
+                                @error('attachment')
+                                <div class="text-danger small">{{$message}}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" id="saveButton" class="btn btn-success">Save Transaction</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

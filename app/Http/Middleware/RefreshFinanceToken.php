@@ -21,9 +21,9 @@ class RefreshFinanceToken
 
         if ($token && now()->diffInMinutes($expiresAt, false) < 5) {
             // Refresh token if less than 5 minutes remaining
-            $response = Http::post(env('SHULEAPP_FINANCE_API_BASE_URL') . '/auth/token', [
-                'client_key' => env('SHULEAPP_CLIENT_KEY'),
-                'client_secret' => env('SHULEAPP_CLIENT_SECRET'),
+            $response = Http::post(config('app.finance_api_base_url') . '/auth/token', [
+                'client_key' => config('app.finance_api_client_key'),
+                'client_secret' => config('app.finance_api_client_secret'),
             ]);
 
             if ($response->successful()) {

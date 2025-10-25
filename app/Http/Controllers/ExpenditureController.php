@@ -3,10 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\school;
+use Dompdf\Dompdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use PhpOffice\PhpWord\PhpWord;
 use Throwable;
 use Vinkla\Hashids\Facades\Hashids;
 
@@ -18,7 +23,7 @@ class ExpenditureController extends Controller
         $user = Auth::user();
 
         try {
-            $response = Http::withToken(session('finance_api_token'))->get(env('SHULEAPP_FINANCE_API_BASE_URL'). '/daily-expense', [
+            $response = Http::withToken(session('finance_api_token'))->get(config('app.finance_api_base_url'). '/daily-expense', [
                 'school_id' => $user->school_id,
             ]);
 
@@ -73,7 +78,7 @@ class ExpenditureController extends Controller
             // sasa tuma request
             Log::info(
                 $response = $http->post(
-                env('SHULEAPP_FINANCE_API_BASE_URL') . '/daily-expense',
+                config('app.finance_api_base_url') . '/daily-expense',
                 [
                     'school_code' => $school->abbriv_code,
                     'school_id' => $school->id,
@@ -111,7 +116,7 @@ class ExpenditureController extends Controller
         ]);
 
         try {
-            $response = Http::withToken(session('finance_api_token'))->put(env('SHULEAPP_FINANCE_API_BASE_URL').'/daily-expense/'.$decoded[0], [
+            $response = Http::withToken(session('finance_api_token'))->put(config('app.finance_api_base_url').'/daily-expense/'.$decoded[0], [
                 'cancel_reason' => $request->cancel_reason,
             ]);
 
@@ -141,7 +146,7 @@ class ExpenditureController extends Controller
         try {
 
             $response = Http::withToken(session('finance_api_token'))
-                        ->delete(env('SHULEAPP_FINANCE_API_BASE_URL'). '/daily-expense/'.$decoded[0]);
+                        ->delete(config('app.finance_api_base_url'). '/daily-expense/'.$decoded[0]);
 
             if($response->successful()) {
                 Alert()->toast('Transaction has been deleted successfully', 'success');
@@ -169,7 +174,7 @@ class ExpenditureController extends Controller
 
         try {
 
-            $response = Http::withToken(session('finance_api_token'))->get(env('SHULEAPP_FINANCE_API_BASE_URL'). '/all-transactions', [
+            $response = Http::withToken(session('finance_api_token'))->get(config('app.finance_api_base_url'). '/all-transactions', [
                 'school_id' => $school_id,
             ]);
 
@@ -177,7 +182,8 @@ class ExpenditureController extends Controller
                 $data = $response->json();
                 $transactions = $data['transactions'];
                 $categories = $data['categories'];
-                return view('Expenditures.all-transactions', compact('transactions'));
+                // Log::info('Transactions data: '. print_r($categories, true));
+                return view('Expenditures.all-transactions', compact('transactions', 'categories'));
             }
             else {
                 Alert()->toast('Failed to get transactions records', 'error');
@@ -188,6 +194,619 @@ class ExpenditureController extends Controller
             Alert()->toast($e->getMessage() ?? "Connection not established from the server", "info");
             return back();
         }
+    }
 
+    public function exportCustomReport(Request $request)
+{
+    // dd($request->all());
+    $validated = $request->validate([
+        'start_date' => 'required|date|date_format:Y-m-d',
+        'end_date' => 'required|date|date_format:Y-m-d|after_or_equal:start_date',
+        'status' => 'nullable|string',
+        'category' => 'nullable|integer',
+        'payment_mode' => 'nullable|string',
+        'export_format' => 'required|string|in:pdf,excel,csv,word',
+    ]);
+
+    $user = Auth::user();
+    $school_id = $user->school_id;
+    $start_date = $request->input('start_date');
+    $end_date = $request->input('end_date');
+    $status = $request->input('status');
+    $category = $request->input('category');
+    $payment_mode = $request->input('payment_mode');
+    $export_format = $request->input('export_format');
+
+    try {
+        $response = Http::withToken(session('finance_api_token'))->get(config('app.finance_api_base_url'). '/generate-custom-report', [
+            'school_id' => $school_id,
+            'start_date' => $start_date,
+            'end_date' => $end_date,
+            'status' => $status,
+            'category' => $category,
+            'payment_mode' => $payment_mode,
+        ]);
+
+        if($response->successful()) {
+            $data = $response->json();
+
+            // Check if transactions exist
+            if (empty($data['transactions'])) {
+                if ($request->ajax()) {
+                    return response()->json([
+                        'error' => 'No transactions found for the selected criteria.'
+                    ], 404);
+                }
+                Alert()->toast('No transactions found for the selected criteria', 'info');
+                return back();
+            }
+
+            $transactions = $data['transactions'];
+            $total_amount = collect($transactions)->sum('amount');
+
+            // Use default filename for all export formats
+            // $filename = 'transaction_report';
+
+            switch ($export_format) {
+                case 'pdf':
+                    return $this->generatePDF($transactions, $start_date, $end_date, $school_id, $total_amount);
+                case 'excel':
+                    return $this->generateExcel($transactions, $total_amount, $start_date, $end_date, $school_id);
+                case 'csv':
+                    return $this->generateCSV($transactions, $total_amount, $school_id, $start_date, $end_date);
+                case 'word':
+                    return $this->generateWord($transactions, $total_amount, $school_id, $start_date, $end_date);
+                default:
+                    if ($request->ajax()) {
+                        return response()->json([
+                            'error' => 'Invalid export format selected.'
+                        ], 422);
+                    }
+                    Alert()->toast('Invalid export format selected', 'error');
+                    return back();
+            }
+        }
+        else {
+            $errorMessage = 'Failed to export transactions report. API Error: ' . $response->status();
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'error' => $errorMessage
+                ], $response->status());
+            }
+
+            Alert()->toast($errorMessage, 'error');
+            Log::error("Error code ". $response->status());
+            return back();
+        }
+    } catch (Throwable $e) {
+        $errorMessage = $e->getMessage() ?? "Connection not established from the server";
+
+        if ($request->ajax()) {
+            return response()->json([
+                'error' => $errorMessage
+            ], 500);
+        }
+
+        Alert()->toast($errorMessage, "info");
+        return back();
+    }
+}
+
+    protected function generatePDF($transactions, $start_date, $end_date, $school_id, $total_amount)
+    {
+        $school = school::find($school_id);
+        $pdf = new Dompdf();
+        $html = view('Expenditures.transaction_pdf', compact('transactions', 'start_date', 'end_date', 'school', 'total_amount'))->render();
+
+        $pdf->loadHtml($html);
+        $pdf->setPaper('A4', 'portrait');
+        $pdf->render();
+
+        // Hii itastream PDF kwenye browser badala ya kudownload
+        return $pdf->stream('transactions_report.pdf', ['Attachment' => true]);
+    }
+
+
+    protected function generateExcel($transactions, $total_amount, $start_date, $end_date, $school_id)
+    {
+        $school = school::find($school_id);
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Financial Report');
+
+        // =========================
+        //  PROFESSIONAL HEADER SECTION
+        // =========================
+
+        // School Logo (if available) - Row 1
+        $logoRow = 1;
+        if ($school->logo && file_exists(public_path('assets/img/logo/' . $school->logo))) {
+            try {
+                $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+                $drawing->setName('Logo');
+                $drawing->setDescription('Logo');
+                $drawing->setPath(public_path('assets/img/logo/' . $school->logo));
+                $drawing->setHeight(60);
+                $drawing->setCoordinates('A1');
+                $drawing->setWorksheet($sheet);
+                $logoRow = 2; // Adjust row if logo is added
+            } catch (\Exception $e) {
+                // Logo failed to load, continue without it
+                $logoRow = 1;
+            }
+        }
+
+        // School Name - Row 2
+        $sheet->mergeCells('A'.$logoRow.':H'.$logoRow);
+        $sheet->setCellValue('A'.$logoRow, strtoupper($school->school_name));
+        $sheet->getStyle('A'.$logoRow)->applyFromArray([
+            'font' => ['bold' => true, 'size' => 16, 'color' => ['rgb' => '2C3E50']],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+        ]);
+
+        // School Address - Row 3
+        $addressRow = $logoRow + 1;
+        $sheet->mergeCells('A'.$addressRow.':H'.$addressRow);
+        $sheet->setCellValue('A'.$addressRow, ucwords(strtolower($school->postal_address)) . ', ' . ucwords(strtolower($school->postal_name)) . ' - ' . ucwords(strtolower($school->country)));
+        $sheet->getStyle('A'.$addressRow)->applyFromArray([
+            'font' => ['size' => 11, 'color' => ['rgb' => '7F8C8D']],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+        ]);
+
+        // Report Title - Row 4
+        $titleRow = $addressRow + 1;
+        $sheet->mergeCells('A'.$titleRow.':H'.$titleRow);
+        $sheet->setCellValue('A'.$titleRow, "FINANCIAL TRANSACTIONS REPORT");
+        $sheet->getStyle('A'.$titleRow)->applyFromArray([
+            'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '2C3E50']],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+        ]);
+
+        // Report Period - Row 5
+        $periodRow = $titleRow + 1;
+        $sheet->mergeCells('A'.$periodRow.':H'.$periodRow);
+        $sheet->setCellValue('A'.$periodRow, "Reporting Period: " . \Carbon\Carbon::parse($start_date)->format('d M Y') . " - " . \Carbon\Carbon::parse($end_date)->format('d M Y'));
+        $sheet->getStyle('A'.$periodRow)->applyFromArray([
+            'font' => ['italic' => true, 'size' => 11, 'color' => ['rgb' => '7F8C8D']],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+        ]);
+
+        // Report Summary - Row 6
+        $summaryRow = $periodRow + 1;
+        $sheet->mergeCells('A'.$summaryRow.':H'.$summaryRow);
+        $sheet->setCellValue('A'.$summaryRow, "Total Transactions: " . count($transactions) . " | Generated: " . \Carbon\Carbon::now()->format('d M Y H:i'));
+        $sheet->getStyle('A'.$summaryRow)->applyFromArray([
+            'font' => ['size' => 10, 'color' => ['rgb' => '2C3E50']],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'F8F9FA']
+            ],
+            'borders' => [
+                'bottom' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM, 'color' => ['rgb' => '3498DB']],
+            ],
+        ]);
+
+        // Add spacing
+        $startRow = $summaryRow + 2;
+
+        // =========================
+        //  PROFESSIONAL TABLE HEADER
+        // =========================
+        $headers = ['#', 'Date', 'Reference No.', 'Category', 'Description', 'Amount', 'Status', 'Payment Mode'];
+        $sheet->fromArray($headers, null, 'A' . $startRow, true);
+
+        $headerRow = $startRow;
+        $dataStartRow = $headerRow + 1;
+
+        // Professional header styling
+        $sheet->getStyle("A{$headerRow}:H{$headerRow}")->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'size' => 11,
+                'color' => ['rgb' => 'FFFFFF']
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '34495E']
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['rgb' => '2C3E50']
+                ]
+            ],
+        ]);
+
+        // =========================
+        //  DATA ROWS WITH PROFESSIONAL STYLING
+        // =========================
+        $dataArray = [];
+        foreach ($transactions as $index => $transaction) {
+            $dataArray[] = [
+                $index + 1, // Row number
+                isset($transaction['transaction_date']) ? \Carbon\Carbon::parse($transaction['transaction_date'])->format('d-m-Y') :
+                    (isset($transaction['expense_date']) ? \Carbon\Carbon::parse($transaction['expense_date'])->format('d-m-Y') : ''),
+                strtoupper($transaction['reference_number'] ?? ''),
+                $transaction['expense_type'] ?? 'N/A',
+                $transaction['description'] ?? '',
+                $transaction['amount'] ?? 0,
+                $transaction['status'] ?? '',
+                $transaction['payment_mode'] ?? '',
+            ];
+        }
+
+        if (!empty($dataArray)) {
+            $sheet->fromArray($dataArray, null, 'A' . $dataStartRow, true);
+        }
+
+        // Apply professional styling to data rows
+        $lastDataRow = $dataStartRow + count($dataArray) - 1;
+
+        if ($lastDataRow >= $dataStartRow) {
+            // Alternate row colors for better readability
+            for ($row = $dataStartRow; $row <= $lastDataRow; $row++) {
+                $fillColor = $row % 2 == 0 ? 'FFFFFF' : 'F8F9FA';
+                $sheet->getStyle("A{$row}:H{$row}")->applyFromArray([
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'startColor' => ['rgb' => $fillColor]
+                    ],
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['rgb' => 'DDDDDD']
+                        ]
+                    ]
+                ]);
+            }
+
+            // Format specific columns
+            $sheet->getStyle("A{$dataStartRow}:A{$lastDataRow}")->applyFromArray([
+                'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER]
+            ]);
+
+            $sheet->getStyle("B{$dataStartRow}:B{$lastDataRow}")->applyFromArray([
+                'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER]
+            ]);
+
+            $sheet->getStyle("F{$dataStartRow}:F{$lastDataRow}")->applyFromArray([
+                'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT],
+                'numberFormat' => ['formatCode' => '#,##0.00']
+            ]);
+
+            $sheet->getStyle("G{$dataStartRow}:G{$lastDataRow}")->applyFromArray([
+                'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER]
+            ]);
+
+            // Color code status column
+            for ($row = $dataStartRow; $row <= $lastDataRow; $row++) {
+                $status = $sheet->getCell("G{$row}")->getValue();
+                $status = strtolower(trim($status ?? ''));
+                $statusColor = '000000'; // default black
+
+                if (in_array($status, ['completed', 'success', 'active', 'approved'])) {
+                    $statusColor = '27AE60'; // green
+                } elseif (in_array($status, ['pending', 'processing'])) {
+                    $statusColor = 'F39C12'; // orange
+                } elseif (in_array($status, ['failed', 'cancelled', 'rejected'])) {
+                    $statusColor = 'E74C3C'; // red
+                }
+
+                $sheet->getStyle("G{$row}")->applyFromArray([
+                    'font' => ['bold' => true, 'color' => ['rgb' => $statusColor]]
+                ]);
+            }
+        } else {
+            $lastDataRow = $dataStartRow - 1; // No data rows
+        }
+
+        // =========================
+        //  PROFESSIONAL TOTAL ROW
+        // =========================
+        $totalRow = $lastDataRow + 1;
+        $sheet->mergeCells("A{$totalRow}:E{$totalRow}");
+        $sheet->setCellValue("A{$totalRow}", "GRAND TOTAL");
+        $sheet->setCellValue("F{$totalRow}", $total_amount);
+        $sheet->setCellValue("G{$totalRow}", "End of Report");
+        $sheet->mergeCells("G{$totalRow}:H{$totalRow}");
+
+        $sheet->getStyle("A{$totalRow}:H{$totalRow}")->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'size' => 12,
+                'color' => ['rgb' => 'FFFFFF']
+            ],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '2C3E50']
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM,
+                    'color' => ['rgb' => '2C3E50']
+                ]
+            ],
+        ]);
+
+        $sheet->getStyle("F{$totalRow}")->applyFromArray([
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT],
+            'numberFormat' => ['formatCode' => '#,##0.00']
+        ]);
+
+        // =========================
+        //  PROFESSIONAL FOOTER
+        // =========================
+        $footerRow = $totalRow + 2;
+        $sheet->mergeCells("A{$footerRow}:H{$footerRow}");
+        $sheet->setCellValue("A{$footerRow}",
+            strtoupper($school->school_name) . " | " .
+            "Computer Generated Financial Report | " .
+            "Confidential & Proprietary | " .
+            "Generated on " . \Carbon\Carbon::now()->format('F d, Y \\a\\t H:i:s')
+        );
+        $sheet->getStyle("A{$footerRow}")->applyFromArray([
+            'font' => ['italic' => true, 'size' => 9, 'color' => ['rgb' => '7F8C8D']],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+        ]);
+
+        // =========================
+        //  FORMATTING & COLUMN WIDTHS
+        // =========================
+
+        // Set specific column widths for better layout
+        $sheet->getColumnDimension('A')->setWidth(6);  // #
+        $sheet->getColumnDimension('B')->setWidth(12); // Date
+        $sheet->getColumnDimension('C')->setWidth(16); // Reference
+        $sheet->getColumnDimension('D')->setWidth(15); // Category
+        $sheet->getColumnDimension('E')->setWidth(30); // Description
+        $sheet->getColumnDimension('F')->setWidth(15); // Amount
+        $sheet->getColumnDimension('G')->setWidth(12); // Status
+        $sheet->getColumnDimension('H')->setWidth(15); // Payment Mode
+
+        // Format amount column
+        if ($lastDataRow >= $dataStartRow) {
+            $sheet->getStyle("F{$dataStartRow}:F{$lastDataRow}")
+                ->getNumberFormat()
+                ->setFormatCode('#,##0.00');
+        }
+
+        // Freeze panes for easy scrolling
+        $sheet->freezePane('A' . $dataStartRow);
+
+        // =========================
+        //  OUTPUT FILE
+        // =========================
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $filename = 'financial_transactions_report_' . date('Y_m_d_His') . '.xlsx';
+        $temp_file = tempnam(sys_get_temp_dir(), $filename);
+        $writer->save($temp_file);
+
+        return response()->download($temp_file, $filename)->deleteFileAfterSend(true);
+    }
+
+    protected function generateCSV($transactions, $total_amount, $school_id, $start_date, $end_date)
+    {
+        $school = school::find($school_id);
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Transactions Report');
+
+        $row = 1;
+
+        // Report header (school info)
+        $sheet->setCellValue("A{$row}", strtoupper($school->school_name)); $row++;
+        $sheet->setCellValue("A{$row}", ucwords(strtolower($school->postal_address)). ', '. ucwords(strtolower($school->postal_name)). '-'. ucwords(strtolower($school->country))); $row++;
+        $sheet->setCellValue("A{$row}", "FINANCIAL TRANSACTIONS REPORT"); $row++;
+        $sheet->setCellValue("A{$row}", "From: " . \Carbon\Carbon::parse($start_date)->format('d M Y') . " To: " . \Carbon\Carbon::parse($end_date)->format('d M Y')); $row++;
+        $sheet->setCellValue("A{$row}", "Generated: " . \Carbon\Carbon::now()->format('d M Y H:i')); $row += 2; // space
+
+        // Column headers
+        $headers = ['#', 'Date', 'Reference No.', 'Category', 'Description', 'Amount', 'Status', 'Payment Mode'];
+        $sheet->fromArray($headers, null, "A{$row}");
+
+        // Style headers
+        $sheet->getStyle("A{$row}:H{$row}")->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'F0F0F0']
+            ]
+        ]);
+
+        $row++;
+
+        // Data rows
+        foreach ($transactions as $index => $t) {
+            $sheet->fromArray([
+                $index + 1,
+                isset($t['transaction_date']) ? \Carbon\Carbon::parse($t['transaction_date'])->format('d-m-Y') :
+                    (isset($t['expense_date']) ? \Carbon\Carbon::parse($t['expense_date'])->format('d-m-Y') : ''),
+                strtoupper($t['reference_number'] ?? ''),
+                ucwords(strtolower($t['expense_type'] ?? '')),
+                ucwords(strtolower($t['description'] ?? '')),
+                $t['amount'] ?? 0,
+                ucwords(strtolower($t['status'] ?? '')),
+                ucwords(strtolower($t['payment_mode'] ?? '')),
+            ], null, "A{$row}");
+            $row++;
+        }
+
+        // Total amount row
+        $sheet->setCellValue("E{$row}", "GRAND TOTAL:");
+        $sheet->setCellValue("F{$row}", $total_amount);
+        $sheet->getStyle("E{$row}:F{$row}")->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'E8E8E8']
+            ]
+        ]);
+
+        // Auto-size columns for better CSV output
+        foreach(range('A','H') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        // Save CSV
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Csv($spreadsheet);
+        $writer->setDelimiter(',');
+        $writer->setEnclosure('"');
+        $writer->setLineEnding("\r\n");
+        $writer->setSheetIndex(0);
+
+        $filename = 'financial_transactions_report_' . date('Y_m_d_His') . '.csv';
+        $temp_file = tempnam(sys_get_temp_dir(), $filename);
+        $writer->save($temp_file);
+
+        return response()->download($temp_file, $filename)->deleteFileAfterSend(true);
+    }
+
+    protected function generateWord($transactions, $total_amount, $school_id, $start_date, $end_date)
+    {
+        $school = school::find($school_id);
+
+        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+
+        // Add font styles
+        $phpWord->addTitleStyle(1, ['bold' => true, 'size' => 16, 'color' => '2C3E50'], ['alignment' => 'center']);
+        $phpWord->addTitleStyle(2, ['bold' => true, 'size' => 14, 'color' => '2C3E50'], ['alignment' => 'center']);
+
+        $section = $phpWord->addSection([
+            'marginTop' => 600,
+            'marginBottom' => 600,
+            'marginLeft' => 600,
+            'marginRight' => 600,
+        ]);
+
+        // ===== HEADER SECTION =====
+        // School Logo
+        if ($school->logo && file_exists(public_path('assets/img/logo/' . $school->logo))) {
+            try {
+                $section->addImage(
+                    public_path('assets/img/logo/' . $school->logo),
+                    [
+                        'width' => 60,
+                        'height' => 60,
+                        'alignment' => 'center'
+                    ]
+                );
+            } catch (\Exception $e) {
+                // Continue without logo if there's an error
+            }
+        }
+
+        // School Information
+        $section->addTitle(strtoupper($school->school_name), 1);
+        $section->addText(
+            ucwords(strtolower($school->postal_address)) . ', ' .
+            ucwords(strtolower($school->postal_name)) . ' - ' .
+            ucwords(strtolower($school->country)),
+            ['size' => 11, 'color' => '7F8C8D'],
+            ['alignment' => 'center']
+        );
+
+        $section->addTextBreak(1);
+
+        // Report Title
+        $section->addTitle('FINANCIAL TRANSACTIONS REPORT', 2);
+
+        // Report Period
+        $section->addText(
+            "Reporting Period: " . \Carbon\Carbon::parse($start_date)->format('d M Y') . " - " . \Carbon\Carbon::parse($end_date)->format('d M Y'),
+            ['italic' => true, 'size' => 11, 'color' => '7F8C8D'],
+            ['alignment' => 'center']
+        );
+
+        $section->addText(
+            "Generated: " . \Carbon\Carbon::now()->format('d M Y H:i'),
+            ['size' => 10, 'color' => '95A5A6'],
+            ['alignment' => 'center']
+        );
+
+        $section->addTextBreak(1);
+
+        // ===== TABLE HEADER =====
+        $styleTable = [
+            'borderSize' => 6,
+            'borderColor' => '999999',
+            'cellMargin' => 80,
+        ];
+        $phpWord->addTableStyle('TransactionsTable', $styleTable);
+
+        $table = $section->addTable('TransactionsTable');
+
+        // Table Header
+        $headers = ['#', 'Date', 'Reference No.', 'Category', 'Description', 'Amount', 'Status', 'Payment Mode'];
+        $table->addRow();
+        foreach ($headers as $header) {
+            $table->addCell(1500)->addText($header, ['bold' => true, 'size' => 10]);
+        }
+
+        // ===== TABLE DATA =====
+        foreach ($transactions as $index => $t) {
+            $table->addRow();
+            $table->addCell(800)->addText(($index + 1), ['size' => 9]);
+            $table->addCell(1500)->addText(
+                isset($t['transaction_date']) ? \Carbon\Carbon::parse($t['transaction_date'])->format('d-m-Y') :
+                    (isset($t['expense_date']) ? \Carbon\Carbon::parse($t['expense_date'])->format('d-m-Y') : ''),
+                ['size' => 9]
+            );
+            $table->addCell(1800)->addText(strtoupper($t['reference_number'] ?? ''), ['bold' => true, 'size' => 9]);
+            $table->addCell(1500)->addText(ucwords(strtolower($t['expense_type'] ?? '')), ['size' => 9]);
+            $table->addCell(3000)->addText(ucwords(strtolower($t['description'] ?? '')), ['size' => 9]);
+            $table->addCell(1500)->addText(number_format($t['amount'] ?? 0, 2), ['size' => 9]);
+
+            // Status with color coding
+            $status = strtolower($t['status'] ?? '');
+            $statusColor = '000000'; // default black
+
+            if (in_array($status, ['completed', 'success', 'active', 'approved'])) {
+                $statusColor = '27AE60'; // green
+            } elseif (in_array($status, ['pending', 'processing'])) {
+                $statusColor = 'F39C12'; // orange
+            } elseif (in_array($status, ['failed', 'cancelled', 'rejected'])) {
+                $statusColor = 'E74C3C'; // red
+            }
+
+            $table->addCell(1200)->addText(ucwords($status), ['bold' => true, 'color' => $statusColor, 'size' => 9]);
+            $table->addCell(1500)->addText(ucwords(strtolower($t['payment_mode'] ?? '')), ['size' => 9]);
+        }
+
+        // ===== TOTAL ROW =====
+        $table->addRow();
+        $table->addCell(800)->addText('');
+        $table->addCell(1500)->addText('');
+        $table->addCell(1800)->addText('');
+        $table->addCell(1500)->addText('');
+        $table->addCell(3000)->addText('GRAND TOTAL:', ['bold' => true, 'size' => 10]);
+        $table->addCell(1500)->addText(number_format($total_amount, 2), ['bold' => true, 'size' => 10]);
+        $table->addCell(1200)->addText('');
+        $table->addCell(1500)->addText('');
+
+        // ===== FOOTER =====
+        $section->addTextBreak(2);
+        $section->addText(
+            strtoupper($school->school_name) . " | Computer Generated Financial Report | Confidential & Proprietary",
+            ['italic' => true, 'size' => 8, 'color' => '7F8C8D'],
+            ['alignment' => 'center']
+        );
+
+        // ===== SAVE & DOWNLOAD =====
+        $filename = 'financial_transactions_report_' . date('Y_m_d_His') . '.docx';
+        $tempFile = tempnam(sys_get_temp_dir(), $filename);
+        $writer = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
+        $writer->save($tempFile);
+
+        return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
     }
 }

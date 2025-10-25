@@ -8,16 +8,29 @@
     document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll("form").forEach(form => {
             form.addEventListener("submit", function (event) {
+                // Skip kama form ina attribute ya data-no-preloader
+                if (form.hasAttribute('data-no-preloader')) {
+                    return;
+                }
+
+                // Skip kama form inatumia method ya AJAX
+                const submitter = event.submitter;
+                if (submitter && submitter.hasAttribute('data-ajax')) {
+                    return;
+                }
+
                 // Angalia kama form imepita validation
                 if (!form.checkValidity()) {
-                    event.preventDefault(); // Acha submission ikiwa validation haijakamilika
-                    form.reportValidity(); // Onyesha errors za validation
+                    event.preventDefault();
+                    form.reportValidity();
                     return;
                 }
 
                 // Onyesha preloader kama validation imekamilika
                 let preloader = document.getElementById("mypreloader");
-                preloader.style.display = "flex";
+                if (preloader) {
+                    preloader.style.display = "flex";
+                }
             });
         });
     });

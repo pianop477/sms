@@ -219,5 +219,9 @@ return [
 
     ])->toArray(),
 
+    // custom finance api base url
+    'finance_api_base_url' => env('SHULEAPP_FINANCE_API_BASE_URL', 'http://localhost'),
 
+    'finance_api_client_key' => env('SHULEAPP_CLIENT_KEY', 'shuleapp_client_001'),
+    'finance_api_client_secret' => env('SHULEAPP_CLIENT_SECRET', 'shuleapp_secret_key_2025'),
 ];

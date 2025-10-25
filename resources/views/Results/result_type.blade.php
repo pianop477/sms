@@ -343,7 +343,7 @@
                         @foreach ($paginated as $item)
                             <div class="exam-card {{ $item['type'] === 'exam' ? 'single' : 'combined' }}">
                                 <span class="exam-badge">
-                                    {{ $item['type'] === 'exam' ? 'Single' : 'Combined' }}
+                                    {{ $item['type'] === 'exam' ? 'Single Assessment' : 'Continous Assessment' }}
                                 </span>
                                 <div class="exam-icon">
                                     <i class="{{ $item['type'] === 'exam' ? 'fas fa-file-alt' : 'fas fa-file-pdf' }}"></i>

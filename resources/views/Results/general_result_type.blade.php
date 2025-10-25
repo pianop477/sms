@@ -413,7 +413,7 @@
             <div class="col-lg-5 col-md-6 mb-4">
                 <div class="card-section gold-border">
                     <div class="card-header-custom gold-header">
-                        <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i> Single Results Reports</h5>
+                        <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i> Examination Results Reports</h5>
                         <a href="{{route('results.classesByYear', ['school' => Hashids::encode($schools->id), 'year'=>$year])}}" class="btn btn-info btn-xs text-white">
                             <i class="fas fa-arrow-circle-left me-1"></i> Back
                         </a>
@@ -446,9 +446,9 @@
             <div class="col-lg-7 col-md-6 mb-4">
                 <div class="card-section teal-border">
                     <div class="card-header-custom teal-header">
-                        <h5 class="mb-0"><i class="fas fa-copy me-2"></i> Compiled Results Reports</h5>
+                        <h5 class="mb-0"><i class="fas fa-copy me-2"></i> Continuous Assessment Results</h5>
                         <button type="button" class="btn btn-compile" data-bs-toggle="modal" data-bs-target="#compileModal">
-                            <i class="fas fa-plus me-1"></i> Compile Results
+                            <i class="fas fa-gears me-1"></i> Generate CA
                         </button>
                     </div>
                     <div class="card-body-custom">
@@ -483,7 +483,7 @@
                                     @if ($reports->isEmpty())
                                         <tr>
                                             <td colspan="5" class="text-center text-danger py-4">
-                                                <i class="fas fa-inbox me-2"></i> No compiled results were found
+                                                <i class="fas fa-inbox me-2"></i> No CA results were found
                                             </td>
                                         </tr>
                                     @else
@@ -565,7 +565,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-cogs me-2"></i> Combine Results Data Set</h5>
+                    <h5 class="modal-title"><i class="fas fa-cogs me-2"></i> Generate Continous Assessment</h5>
                     <button type="button" class="btn-close btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Close</button>
                 </div>
                 <form class="needs-validation" novalidate action="{{route('submit.compiled.results', ['school' => Hashids::encode($schools->id), 'year' => $year, 'class' => Hashids::encode($classes->id)])}}" method="POST" enctype="multipart/form-data">
@@ -620,6 +620,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <p class="text-danger fw-bold"><i class="fas fa-database me-2"></i> Examination Results Data Sets</p>
+                                <small><span class="text-mute">Select results you want to include in your CA report</span></small>
                                 <hr>
                                 @if ($groupedByMonth->isEmpty())
                                     <p class="text-danger">No results records were found</p>
@@ -645,7 +646,8 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <p class="text-danger fw-bold"><i class="fas fa-chart-pie me-2"></i> Aggregation Mode</p>
+                                <p class="text-danger fw-bold"><i class="fas fa-chart-pie me-2"></i> Grading system</p>
+                                <small><span class="text-mute">Select grading system for your report to display</span></small>
                                 <div class="mt-3">
                                     <div class="radio-option">
                                         <div class="form-check">
@@ -681,7 +683,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to generate compiled results?')">
-                            <i class="fas fa-cog me-2"></i> Generate Report
+                            <i class="fas fa-cog me-2"></i> Generate
                         </button>
                     </div>
                 </form>

@@ -506,6 +506,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::post('/daily-expenses', [ExpenditureController::class, 'store'])->name('expenditure.store');
         Route::put('/daily-expenses/{bill}', [ExpenditureController::class, 'cancelBill'])->name('expenditure.cancel.bill');
         Route::delete('/daily-expenses/{bill}', [ExpenditureController::class, 'deleteInactiveBill'])->name('expenditure.delete.bill');
-        Route::get('/Transactions', [ExpenditureController::class, 'allTractions'])->name('expenditure.all.transactions');
+        Route::get('/Transactions/all', [ExpenditureController::class, 'allTractions'])->name('expenditure.all.transactions');
+        Route::post('/Export-custom-report', [ExpenditureController::class, 'exportCustomReport'])->name('expenditure.export.custom.report');
     });
 });

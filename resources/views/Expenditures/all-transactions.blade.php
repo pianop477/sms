@@ -395,6 +395,23 @@
             color: #0d6efd;
             font-weight: 600;
         }
+        .error-message {
+            font-size: 0.875rem;
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* Loading animation improvements */
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        /* Success message styling */
+        .alert-success {
+            border-radius: 10px;
+            border: none;
+        }
     </style>
 
     <div class="py-4">
@@ -406,7 +423,7 @@
                         <div class="row mb-4 align-items-center">
                             <div class="col-md-8">
                                 <h4 class="header-title">
-                                    <i class="fas fa-receipt me-3"></i> All Bill Transactions
+                                    <i class="fas fa-receipt me-3"></i> All Transactions Bills
                                 </h4>
                                 <p class="text-muted mb-0">Overview Financial Transactions</p>
                             </div>
@@ -641,11 +658,11 @@
             <div class="modal-content">
                 <div class="modal-header bg-success text-white">
                     <h5 class="modal-title" id="exportReportModalLabel">
-                        <i class="fas fa-file-export me-2"></i> Generate Custom Report
+                        <i class="fas fa-file-export me-2"></i> Generate Transactions Bills Report
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close text-danger"></i></button>
                 </div>
-                <form id="exportReportForm" action="" method="POST" class="report-form">
+                <form id="exportReportForm" class="report-form">
                     @csrf
                     <div class="modal-body">
                         <div class="alert alert-info border-0">
@@ -656,18 +673,20 @@
                         <div class="row">
                             <!-- Category Filter -->
                             <div class="col-md-6 mb-3">
-                                <label for="start_date" class="form-label">Start Date <i class="text-danger">*</i></label></label>
+                                <label for="start_date" class="form-label">Start Date <i class="text-danger">*</i></label>
                                 <div class="date-input-group">
                                     <input type="date" name="start_date" required id="start_date" class="form-control form-control-custom">
                                 </div>
+                                <span class="text-danger error-message" id="start_date_error"></span>
                             </div>
 
                             <!-- End Date -->
                             <div class="col-md-6 mb-3">
-                                <label for="end_date" class="form-label">End Date <i class="text-danger">*</i></label></label>
+                                <label for="end_date" class="form-label">End Date <i class="text-danger">*</i></label>
                                 <div class="date-input-group">
                                     <input type="date" name="end_date" required id="end_date" class="form-control form-control-custom">
                                 </div>
+                                <span class="text-danger error-message" id="end_date_error"></span>
                             </div>
                         </div>
 
@@ -676,25 +695,27 @@
                             <div class="col-md-6 mb-3">
                                 <label for="category" class="form-label">Transaction Category</label>
                                 <select name="category" id="category" class="form-select form-control-custom">
-                                    <option value="">All</option>
+                                    <option value="">--Select Category--</option>
                                     @if (!empty($categories))
-                                        @foreach ($categories as $row)
-                                            <option value="{{ $row['id'] }}">{{ ucwords(strtolower($row['expense_type'])) }}</option>
+                                        @foreach ($categories as $category)
+                                            <option value="{{ $category['id'] }}">{{ ucwords(strtolower($category['expense_type'])) }}</option>
                                         @endforeach
                                     @else
                                         <option value="" disabled>No categories available</option>
                                     @endif
                                 </select>
+                                <span class="text-danger error-message" id="category_error"></span>
                             </div>
                             <!-- Status Filter -->
                             <div class="col-md-6 mb-3">
                                 <label for="status" class="form-label">Status</label>
                                 <select name="status" id="status" class="form-select form-control-custom">
-                                    <option value="">All</option>
+                                    <option value="">--Select Status--</option>
                                     <option value="active">Active</option>
                                     <option value="cancelled">Cancelled</option>
                                     <option value="pending">Pending</option>
                                 </select>
+                                <span class="text-danger error-message" id="status_error"></span>
                             </div>
                         </div>
 
@@ -703,11 +724,12 @@
                             <div class="col-md-6 mb-3">
                                 <label for="payment_mode" class="form-label">Payment Mode</label>
                                 <select name="payment_mode" id="payment_mode" class="form-select form-control-custom">
-                                    <option value="">All</option>
+                                    <option value="">--Select payment--</option>
                                     <option value="cash">Cash</option>
                                     <option value="mobile_money">Mobile Money</option>
                                     <option value="bank">Bank Transfer</option>
                                 </select>
+                                <span class="text-danger error-message" id="payment_mode_error"></span>
                             </div>
 
                             <!-- Export Format -->
@@ -717,20 +739,10 @@
                                     <option value="">--Select Format--</option>
                                     <option value="pdf">PDF</option>
                                     <option value="excel">Excel</option>
+                                    <option value="word">Word</option>
                                     <option value="csv">CSV</option>
                                 </select>
-                            </div>
-                        </div>
-
-                        <!-- Additional Options -->
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="checkbox" name="include_summary" id="include_summary" checked>
-                                    <label class="form-check-label" for="include_summary">
-                                        Include summary statistics
-                                    </label>
-                                </div>
+                                <span class="text-danger error-message" id="export_format_error"></span>
                             </div>
                         </div>
                     </div>
@@ -739,7 +751,7 @@
                             <i class="fas fa-times me-2"></i> Cancel
                         </button>
                         <button type="submit" class="btn btn-success" id="generateReportBtn">
-                            <i class="fas fa-download me-2"></i> Export
+                            <i class="fas fa-download me-2"></i> Generate Report
                         </button>
                     </div>
                 </form>
@@ -800,6 +812,12 @@
                                         <button class="nav-link" id="timeline-tab{{$row['reference_number']}}" data-bs-toggle="tab"
                                                 data-bs-target="#timeline{{$row['reference_number']}}" type="button" role="tab">
                                             <i class="fas fa-history me-2"></i> Timeline
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="attachment-table{{$row['reference_number']}}" data-bs-toggle="tab"
+                                            data-bs-target="#attachment{{$row['reference_number']}}" type="button" role="tab">
+                                            <i class="fas fa-paperclip me-2"></i> Attachments
                                         </button>
                                     </li>
                                 </ul>
@@ -912,6 +930,49 @@
                                             @endif
                                         </div>
                                     </div>
+                                    <!-- attachment Tab -->
+                                    <div class="tab-pane fade" id="attachment{{$row['reference_number']}}" role="tabpanel">
+                                        <div class="timeline">
+                                            @if(isset($row['attachment']))
+                                                <div class="timeline-item">
+                                                    <div class="timeline-marker bg-success"></div>
+                                                    <div class="timeline-content">
+                                                        <h6 class="fw-bold">Transaction Bill Receipt</h6>
+
+                                                            @if(!empty($row['attachment_url']))
+                                                                @php
+                                                                    $extension = strtolower(pathinfo($row['attachment'], PATHINFO_EXTENSION));
+                                                                    $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif']);
+                                                                @endphp
+
+                                                                @if($isImage)
+                                                                    <!-- Display Image -->
+                                                                    <a href="{{ $row['attachment_url'] }}" target="_blank">
+                                                                        <img src="{{ $row['attachment_url'] }}"
+                                                                            alt="Receipt"
+                                                                            style="max-width: 100px; max-height: 100px; border-radius: 5px;">
+                                                                    </a>
+                                                                @elseif($extension === 'pdf')
+                                                                    <!-- Display PDF -->
+                                                                    <a href="{{ $row['attachment_url'] }}" target="_blank" class="btn btn-sm btn-primary">
+                                                                        <i class="fas fa-file-pdf"></i> View PDF Receipt
+                                                                    </a>
+                                                                @else
+                                                                    <!-- Other file types -->
+                                                                    <a href="{{ $row['attachment_url'] }}" target="_blank" class="btn btn-sm btn-secondary">
+                                                                        <i class="fas fa-file"></i> View File
+                                                                    </a>
+                                                                @endif
+                                                            @else
+                                                                <span class="text-muted">No attachment</span>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                    @else
+                                                        <span class="text-muted">No attachment</span>
+                                                @endif
+                                            </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -976,71 +1037,180 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Initialize DataTable if needed
-            // if (document.getElementById('myTable')) {
-            //     $('#myTable').DataTable();
-            // }
-
             // Export Report Form Handling
             const exportForm = document.getElementById('exportReportForm');
             const generateBtn = document.getElementById('generateReportBtn');
 
             if (exportForm && generateBtn) {
                 exportForm.addEventListener('submit', function(e) {
-                    // Show loading state
-                    generateBtn.disabled = true;
-                    generateBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Generating...';
+                    e.preventDefault();
 
-                    // Form validation
+                    // Prevent the global preloader from showing
+                    e.stopImmediatePropagation();
+
+                    // Clear previous errors
+                    clearErrors();
+
+                    // Validate dates
                     const startDate = document.getElementById('start_date').value;
                     const endDate = document.getElementById('end_date').value;
+                    const exportFormat = document.getElementById('export_format').value;
 
-                    if (startDate && endDate && startDate > endDate) {
-                        e.preventDefault();
-                        alert('Start date cannot be after end date.');
-                        generateBtn.disabled = false;
-                        generateBtn.innerHTML = '<i class="fas fa-download me-2"></i> Generate Report';
+                    if (!startDate || !endDate || !exportFormat) {
+                        showError('Please fill all required fields');
                         return;
                     }
 
-                    // Form will submit normally if validation passes
+                    if (startDate > endDate) {
+                        showError('start_date', 'Start date cannot be after end date.');
+                        return;
+                    }
+
+                    // Show loading state
+                    const originalText = generateBtn.innerHTML;
+                    generateBtn.disabled = true;
+                    generateBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Generating...';
+
+                    // Prepare form data
+                    const formData = new FormData(this);
+
+                    // Send AJAX request
+                    fetch('{{ route("expenditure.export.custom.report") }}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            // If response is not OK, check if it's a validation error
+                            if (response.status === 422) {
+                                return response.json().then(data => {
+                                    throw new Error(data.message || 'Validation failed');
+                                });
+                            }
+                            throw new Error('Network response was not ok');
+                        }
+
+                        // Check content type to see if it's a file or JSON error
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('application/json')) {
+                            return response.json().then(data => {
+                                if (data.error) {
+                                    throw new Error(data.error);
+                                }
+                                return response.blob();
+                            });
+                        }
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        // Check if blob is actually an error message
+                        if (blob instanceof Blob) {
+                            // Create blob URL
+                            const url = window.URL.createObjectURL(blob);
+
+                            // Open in new tab
+                            const newTab = window.open(url, '_blank');
+
+                            // Focus on new tab
+                            if (newTab) {
+                                newTab.focus();
+                            } else {
+                                // Fallback: download if popup blocked
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `transactions_report.${exportFormat}`;
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                            }
+
+                            // Clean up
+                            setTimeout(() => window.URL.revokeObjectURL(url), 100);
+
+                            // RESET FORM FIELDS ONLY (without closing modal)
+                            exportForm.reset();
+                            clearErrors();
+                        }
+
+                        // Reset button state
+                        resetButtonState(generateBtn, originalText);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+
+                        // Show error message in modal without opening new tab
+                        showErrorInModal(error.message || 'An error occurred while generating the report. Please try again.');
+                        resetButtonState(generateBtn, originalText);
+                    });
                 });
 
-                // Reset form when modal is closed
+                // Reset form when modal is closed manually by user
                 const exportModal = document.getElementById('exportReportModal');
                 if (exportModal) {
                     exportModal.addEventListener('hidden.bs.modal', function () {
                         exportForm.reset();
-                        generateBtn.disabled = false;
-                        generateBtn.innerHTML = '<i class="fas fa-download me-2"></i> Generate Report';
+                        clearErrors();
+                        resetButtonState(generateBtn, '<i class="fas fa-download me-2"></i> Generate Report');
+
+                        // Clear any error alerts
+                        const existingAlert = document.getElementById('exportErrorAlert');
+                        if (existingAlert) {
+                            existingAlert.remove();
+                        }
                     });
                 }
             }
 
-            // Set default date range (last 30 days)
-            const today = new Date();
-            const thirtyDaysAgo = new Date();
-            thirtyDaysAgo.setDate(today.getDate() - 30);
-
-            // document.getElementById('start_date').value = thirtyDaysAgo.toISOString().split('T')[0];
-            // document.getElementById('end_date').value = today.toISOString().split('T')[0];
-
-            // Add loading animation to buttons
-            const buttons = document.querySelectorAll('button[type="submit"]');
-            buttons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    if (this.type === 'submit') {
-                        const originalText = this.innerHTML;
-                        this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Processing...';
-                        this.disabled = true;
-
-                        setTimeout(() => {
-                            this.innerHTML = originalText;
-                            this.disabled = false;
-                        }, 2000);
-                    }
+            // Helper functions
+            function clearErrors() {
+                document.querySelectorAll('.error-message').forEach(el => {
+                    el.textContent = '';
                 });
-            });
+            }
+
+            function showError(field, message) {
+                if (typeof field === 'object') {
+                    // Global error
+                    alert(message);
+                } else {
+                    // Field-specific error
+                    const errorElement = document.getElementById(`${field}_error`);
+                    if (errorElement) {
+                        errorElement.textContent = message;
+                    }
+                }
+            }
+
+            function showErrorInModal(message) {
+                // Remove any existing error alerts
+                const existingAlert = document.getElementById('exportErrorAlert');
+                if (existingAlert) {
+                    existingAlert.remove();
+                }
+
+                // Create error alert
+                const errorAlert = document.createElement('div');
+                errorAlert.id = 'exportErrorAlert';
+                errorAlert.className = 'alert alert-danger alert-dismissible fade show mt-3';
+                errorAlert.innerHTML = `
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+
+                // Insert after the form
+                const modalBody = document.querySelector('#exportReportModal .modal-body');
+                modalBody.appendChild(errorAlert);
+            }
+
+            function resetButtonState(button, originalText) {
+                button.disabled = false;
+                button.innerHTML = originalText;
+            }
 
             // Initialize Bootstrap tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))

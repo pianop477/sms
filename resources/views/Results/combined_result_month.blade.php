@@ -347,7 +347,7 @@
                     <div class="col-md-10">
                         <h4 class="header-title">
                             <i class="fas fa-file-alt me-2"></i>
-                            Students Generated Report - <span class="report-highlight"> {{$reports->title}}</span>
+                            Candidates List (CA Report) for - <span class="report-highlight"> {{$reports->title}}</span>
                             (<span class="class-highlight text-uppercase">{{$myReportData->first()->class_code}}</span>) -
                             <span class="year-highlight">{{$year}}</span>
                         </h4>

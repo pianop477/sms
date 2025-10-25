@@ -214,7 +214,7 @@
                             @if ($user->usertype == 3)
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="text-muted">Member ID</span>
-                                <span class="text-uppercase fw-bold text-white">{{$user->member_id}}</span>
+                                <span class="text-uppercase fw-bold">{{$user->member_id}}</span>
                             </div>
                             @endif
 
@@ -272,6 +272,22 @@
                             <div class="tab-pane fade show active" id="profile">
                                 <h5 class="mb-4"><i class="fas fa-info-circle me-2"></i> Account Information</h5>
                                 <table class="info-table">
+                                    @if ($user->usertype == 3)
+                                        <tr>
+                                            <th><i class="fas fa-award me-2"></i> Qualification</th>
+                                            @if ($user->qualification == 1)
+                                                <td><span class="badge bg-success text-white">Masters Degree</span></td>
+                                            @elseif ($user->qualification == 2)
+                                                <td><span class="badge bg-primary text-white">Bachelor Degree</span></td>
+                                            @elseif ($user->qualification == 3)
+                                                <td><span class="badge bg-info text-white">Diploma</span></td>
+                                            @elseif ($user->qualification == 4)
+                                                <td><span class="badge bg-secondary text-white">Certificate</span></td>
+                                            @else
+                                                <td><span class="text-muted">N/A</span></td>
+                                            @endif
+                                        </tr>
+                                    @endif
                                     <tr>
                                         <th><i class="fas fa-phone me-2"></i> Phone</th>
                                         <td>
@@ -284,7 +300,7 @@
                                         <th><i class="fas fa-envelope me-2"></i> Email</th>
                                         <td>
                                             @if ($user->email == NULL)
-                                                <span class="text-muted">Not provided</span>
+                                                <span class="text-muted">N/A</span>
                                             @else
                                                 <a href="mailto:{{$user->email}}" class="text-decoration-none">
                                                     {{$user->email}}
@@ -293,7 +309,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th>Registration Date</th>
+                                        <th><i class="fas fa-calendar-alt"></i> Registration Date</th>
                                         <td>
                                             @if ($user->created_at == Null)
                                                 Unknown
