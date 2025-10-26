@@ -146,7 +146,43 @@
     .char-count.text-danger {
         color: var(--danger) !important;
     }
-     /* Add responsive textarea styling */
+
+    /* Multiple select styling */
+    .multiple-select {
+        height: 8px;
+        min-height: 120px;
+        width: 100%;
+    }
+
+    .multiple-select option {
+        padding: 8px 12px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .multiple-select option:checked {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+    }
+
+    .selected-classes {
+        margin-top: 10px;
+        padding: 10px;
+        background: rgba(78, 84, 200, 0.05);
+        border-radius: 8px;
+        border-left: 4px solid var(--primary);
+    }
+
+    .selected-classes h6 {
+        font-size: 12px;
+        color: var(--primary);
+        margin-bottom: 5px;
+    }
+
+    .selected-classes-list {
+        font-size: 11px;
+        color: #666;
+    }
+
     .message-textarea {
         width: 100%;
         min-height: 180px;
@@ -216,19 +252,29 @@
                         <div class="checkbox-card border-danger">
                             <div class="d-flex align-items-center mb-3">
                                 <i class="fas fa-users-class text-danger fs-4 me-3"></i>
-                                <h6 class="mb-0 text-danger">Send to Individual Class</h6>
+                                <h6 class="mb-0 text-danger">Send to Individual/Multiple Classes</h6>
                             </div>
-                            <select name="class" style="width: 100%" id="classSelect" class="form-control-custom text-uppercase @error('class') is-invalid @enderror">
-                                <option value="">-- Select class --</option>
+
+                            <select name="classes[]" multiple id="classSelect" class="form-control-custom text-uppercase multiple-select @error('classes') is-invalid @enderror" size="5">
                                 @forelse ($classes as $class)
-                                    <option value="{{ $class->id }}" {{ old('class') == $class->id ? 'selected' : '' }}>
+                                    <option value="{{ $class->id }}" {{ in_array($class->id, old('classes', [])) ? 'selected' : '' }}>
                                         {{ $class->class_name }}
                                     </option>
                                 @empty
                                     <option disabled class="text-danger">No classes found</option>
                                 @endforelse
                             </select>
-                            @error('class')
+
+                            <div class="selected-classes mt-3" id="selectedClasses" style="display: none;">
+                                <h6><i class="fas fa-check-circle me-1 text-success"></i> Selected Classes:</h6>
+                                <div class="selected-classes-list" id="selectedClassesList"></div>
+                            </div>
+
+                            <small class="text-muted mt-2 d-block">
+                                <i class="fas fa-info-circle me-1"></i> Hold Ctrl/Cmd to select multiple classes
+                            </small>
+
+                            @error('classes')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
@@ -320,14 +366,17 @@
         const textarea = document.getElementById("message_content");
         const charCount = document.getElementById("charCount");
         const maxChars = 306;
+        const classSelect = document.getElementById("classSelect");
+        const selectedClassesDiv = document.getElementById("selectedClasses");
+        const selectedClassesList = document.getElementById("selectedClassesList");
 
         // Initial display
         charCount.textContent = maxChars;
 
+        // Character count for message
         textarea.addEventListener("input", function () {
             let currentLength = textarea.value.length;
 
-            // If over limit, trim the value
             if (currentLength > maxChars) {
                 textarea.value = textarea.value.substring(0, maxChars);
                 currentLength = maxChars;
@@ -335,10 +384,27 @@
 
             const remaining = maxChars - currentLength;
             charCount.textContent = remaining;
-
-            // Add red text warning when remaining is less than 50
             charCount.classList.toggle("text-danger", remaining < 50);
         });
+
+        // Update selected classes display
+        function updateSelectedClasses() {
+            const selectedOptions = Array.from(classSelect.selectedOptions);
+
+            if (selectedOptions.length > 0) {
+                selectedClassesList.innerHTML = selectedOptions.map(option =>
+                    `<span class="badge bg-primary text-white text-uppercase me-1 mb-1">${option.text}</span>`
+                ).join('');
+                selectedClassesDiv.style.display = 'block';
+            } else {
+                selectedClassesDiv.style.display = 'none';
+            }
+        }
+
+        classSelect.addEventListener("change", updateSelectedClasses);
+
+        // Initialize selected classes display
+        updateSelectedClasses();
 
         // Form Submission Handler
         const form = document.querySelector(".needs-validation");
@@ -350,7 +416,6 @@
                 event.stopPropagation();
                 form.classList.add("was-validated");
 
-                // Scroll to first invalid field
                 const invalidElements = form.querySelectorAll(':invalid');
                 if (invalidElements.length > 0) {
                     invalidElements[0].scrollIntoView({
@@ -362,15 +427,15 @@
             }
 
             // Check if at least one recipient is selected
-            const classSelected = document.getElementById('classSelect').value !== '';
+            const classesSelected = Array.from(classSelect.selectedOptions).length > 0;
             const sendToAll = document.getElementById('sendToAll').checked;
             const withTransport = document.getElementById('withTransport').checked;
             const withoutTransport = document.getElementById('withoutTransport').checked;
             const sendToTeachers = document.getElementById('sendToTeachers').checked;
 
-            if (!classSelected && !sendToAll && !withTransport && !withoutTransport && !sendToTeachers) {
+            if (!classesSelected && !sendToAll && !withTransport && !withoutTransport && !sendToTeachers) {
                 event.preventDefault();
-                alert('Please select at least one recipient group.');
+                alert('Please select at least one recipient group or class.');
                 return;
             }
 
@@ -388,16 +453,19 @@
 
         // Prevent multiple checkbox selections that might conflict
         const sendToAll = document.getElementById('sendToAll');
-        const classSelect = document.getElementById('classSelect');
 
         sendToAll.addEventListener('change', function() {
             if (this.checked) {
-                classSelect.value = '';
+                // Unselect all classes when "Send to All" is checked
+                Array.from(classSelect.options).forEach(option => {
+                    option.selected = false;
+                });
+                updateSelectedClasses();
             }
         });
 
         classSelect.addEventListener('change', function() {
-            if (this.value !== '') {
+            if (Array.from(this.selectedOptions).length > 0) {
                 sendToAll.checked = false;
             }
         });

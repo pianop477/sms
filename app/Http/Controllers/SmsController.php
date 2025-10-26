@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Grade;
+use App\Models\notifications;
 use App\Models\school;
 use App\Models\Student;
 use App\Models\Teacher;
@@ -148,32 +149,58 @@ class SmsController extends Controller
     {
         $user = Auth::user();
 
-        //fetch school details
+        // Fetch school details
         $school = school::findOrFail($user->school_id);
 
+        // Validation rules for multiple classes
         $validator = Validator::make($request->all(), [
-            'class' => 'nullable|integer|exists:grades,id',
-                        Rule::requiredIf(function () use ($request) {
-                            return $request->send_to_all == 0 &&
-                                $request->send_with_transport == 0 &&
-                                $request->send_without_transport == 0 &&
-                                $request->send_to_teachers == 0;
-                        }),
-            'message_content' => 'required|string',
-        ]);
-        $this->validate($request, [
-            'class' => 'nullable|required_if:send_to_all,0|integer|exists:grades,id',
-            'message_content' => 'required|string',
+            'classes' => 'nullable|array',
+            'classes.*' => 'integer|exists:grades,id',
+            'message_content' => 'required|string|max:306',
+            'send_to_all' => 'sometimes|boolean',
+            'send_with_transport' => 'sometimes|boolean',
+            'send_without_transport' => 'sometimes|boolean',
+            'send_to_teachers' => 'sometimes|boolean',
         ], [
-            'class.required_if' => 'Please select a class or check "Send to All"',
+            'classes.array' => 'Classes must be an array',
+            'classes.*.integer' => 'Each class must be a valid integer',
+            'classes.*.exists' => 'Selected class does not exist',
             'message_content.required' => 'Message content is required',
+            'message_content.max' => 'Message cannot exceed 306 characters',
         ]);
+
+        // Custom validation - at least one recipient option must be selected
+        $validator->after(function ($validator) use ($request) {
+            $classesSelected = !empty($request->classes);
+            $sendToAll = $request->has('send_to_all');
+            $withTransport = $request->has('send_with_transport');
+            $withoutTransport = $request->has('send_without_transport');
+            $sendToTeachers = $request->has('send_to_teachers');
+
+            if (!$classesSelected && !$sendToAll && !$withTransport && !$withoutTransport && !$sendToTeachers) {
+                $validator->errors()->add(
+                    'recipients',
+                    'Please select at least one recipient group or class.'
+                );
+            }
+        });
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
 
         $sendToAllClasses = $request->has('send_to_all');
         $sendwithTransport = $request->has('send_with_transport');
         $sendWithoutTransport = $request->has('send_without_transport');
         $sendToTeachers = $request->has('send_to_teachers');
+        $selectedClasses = $request->input('classes', []);
 
+        // Initialize variables for notification
+        $recipientType = null;
+        $recipientId = null;
+        $data = collect();
+
+        // Build query based on selection and determine recipient type
         if ($sendToAllClasses) {
             // Fetch students and parents for all classes
             $data = Student::query()
@@ -184,6 +211,9 @@ class SmsController extends Controller
                 ->where('students.school_id', $user->school_id)
                 ->where('students.graduated', 0)
                 ->get();
+
+            $recipientType = 'parents';
+            $recipientId = 4; // User type ID for parents
         }
         elseif ($sendwithTransport) {
             $data = Student::query()
@@ -195,6 +225,9 @@ class SmsController extends Controller
                 ->where('students.transport_id', '!=', null)
                 ->where('students.school_id', $user->school_id)
                 ->get();
+
+            $recipientType = 'parents';
+            $recipientId = 4; // User type ID for parents
         }
         elseif ($sendWithoutTransport) {
             $data = Student::query()
@@ -206,6 +239,9 @@ class SmsController extends Controller
                 ->where('students.transport_id', null)
                 ->where('students.school_id', $user->school_id)
                 ->get();
+
+            $recipientType = 'parents';
+            $recipientId = 4; // User type ID for parents
         }
         elseif ($sendToTeachers) {
             $data = Teacher::query()
@@ -214,59 +250,94 @@ class SmsController extends Controller
                 ->where('teachers.status', 1)
                 ->where('teachers.school_id', $user->school_id)
                 ->get();
+
+            $recipientType = 'teachers';
+            $recipientId = 3; // User type ID for teachers
         }
-         else {
-            // Fetch students and parents for the selected class
+        elseif (!empty($selectedClasses)) {
+            // Fetch students and parents for the selected multiple classes
             $data = Student::query()
                 ->join('parents', 'parents.id', '=', 'students.parent_id')
                 ->leftJoin('users', 'users.id', '=', 'parents.user_id')
                 ->select('users.phone', 'students.*')
                 ->where('students.graduated', 0)
                 ->where('students.status', 1)
-                ->where('students.class_id', $request->class)
+                ->whereIn('students.class_id', $selectedClasses)
                 ->where('students.school_id', $user->school_id)
                 ->get();
+
+            $recipientType = 'parents';
+            $recipientId = 4; // User type ID for parents
+        }
+        else {
+            Alert()->toast('No recipient selection made', 'error');
+            return back()->withInput();
         }
 
-        // Check if any students were found
+        // Check if any recipients were found
         if ($data->isEmpty()) {
-            // return response()->json(['error' => 'No phone numbers found for this class'], 400);
-            Alert()->toast('No phone numbers found for this class', 'error');
-            return back();
+            Alert()->toast('No phone numbers found for the selected criteria', 'error');
+            return back()->withInput();
         }
 
-        //prepare payload
+        // Prepare payload
         $nextSmsService = new NextSmsService();
         $sender = $school->sender_id ?? 'SHULE APP';
-        $dest = [];
         $reference = uniqid();
 
-        // Ondoa namba zinazojirudia kwa kutumia unique()
-        $uniquePhones = $data->pluck('phone')->map(function ($phone) {
-            return $this->formatPhoneNumber($phone); // Hakikisha namba zina format sahihi
-        })->unique()->values()->all(); // Hakikisha ni array safi
+        // Get unique phone numbers and count
+        $uniquePhones = $data->pluck('phone')
+            ->filter() // Remove empty values
+            ->map(function ($phone) {
+                return $this->formatPhoneNumber($phone);
+            })
+            ->unique()
+            ->values()
+            ->all();
 
-        // Tengeneza payload katika format inayofaa
+        $recipientCount = count($uniquePhones);
+
+        // Check if we have phone numbers
+        if ($recipientCount === 0) {
+            Alert()->toast('No valid phone numbers found', 'error');
+            return back()->withInput();
+        }
+
         $payload = [
             "from" => $sender,
-            "to" => $uniquePhones, // Array ya strings badala ya array ya arrays
-            "text" => $request->message_content, // Ujumbe wa SMS
+            "to" => $uniquePhones,
+            "text" => $request->message_content,
             "reference" => $reference
         ];
 
         try {
+            // Send SMS
 
-           // Tuma SMS
             $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
-            // Log::info('Payload:', $payload);
-            Alert()->toast('Message Sent Successfully', 'success');
-            return redirect()->back();
-        }
-        catch(Exception $e) {
-            Alert()->toast($e->getMessage(), 'error');
-            return back();
-        }
 
+            // Log the SMS sending for audit
+            // \Log::info('SMS sent successfully', [
+            //     'school_id' => $user->school_id,
+            //     'recipient_count' => $recipientCount,
+            //     'classes_selected' => $selectedClasses,
+            //     'send_to_all' => $sendToAllClasses,
+            //     'notification_id' => $notification->id,
+            //     'message_length' => strlen($request->message_content)
+            // ]);
+
+            Alert()->toast('Message Sent Successfully to ' . $recipientCount . ' recipients', 'success');
+            return redirect()->back();
+
+        } catch(Exception $e) {
+            // \Log::error('SMS sending failed', [
+            //     'error' => $e->getMessage(),
+            //     'school_id' => $user->school_id,
+            //     'recipient_count' => $recipientCount
+            // ]);
+
+            Alert()->toast('Failed to send SMS: ' . $e->getMessage(), 'error');
+            return back()->withInput();
+        }
     }
 
     /**
