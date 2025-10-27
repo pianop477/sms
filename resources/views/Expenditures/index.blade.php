@@ -197,7 +197,7 @@
                                                     <td>{{$loop->iteration}}</td>
                                                     <td class="">{{strtoupper($row['reference_number'])}}</td>
                                                     <td>{{ucwords(strtolower($row['expense_type'] ?? 'N/A'))}}</td>
-                                                    <td title="{{ $row['expense_description'] }}">{{\Str::limit($row['description'] ?? N/A, 60)}}</td>
+                                                    <td title="{{ $row['description'] }}">{{\Str::limit($row['description'] ?? N/A, 50)}}</td>
                                                     <td class="text-center">{{number_format($row['amount'])}}</td>
                                                     <td class="" style="font-weight: bold">
                                                         @if ($row['payment_mode'] == 'cash')
