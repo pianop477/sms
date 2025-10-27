@@ -636,7 +636,7 @@
                                     <option value="bank">Bank Transfer</option>
                                     {{-- <option value="other">Others</option> --}}
                                 </select>
-                                @error('phone')
+                                @error('payment')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror
                             </div>
