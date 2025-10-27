@@ -102,7 +102,7 @@ class LoginController extends Controller
 
                     if ($response->successful()) {
                         $tokenData = $response->json();
-                        Log::info('Finance API token fetched successfully', ['token_data' => $tokenData]);
+                        // Log::info('Finance API token fetched successfully', ['token_data' => $tokenData]);
                         session([
                             'finance_api_token' => $tokenData['token'],
                             'finance_token_expires_at' => now()->addSeconds($tokenData['expires_in']),
