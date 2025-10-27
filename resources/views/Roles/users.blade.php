@@ -280,6 +280,10 @@
                                                 <span class="badge-info-custom">
                                                     <i class="fas fa-chalkboard-teacher me-1"></i> Teacher
                                                 </span>
+                                            @elseif ($user->usertype == 5)
+                                                <span class="badge-success-custom">
+                                                    <i class="fas fa-user-tie me-1"></i> Accountant
+                                                </span>
                                             @else
                                                 <span class="badge-primary-custom">
                                                     <i class="fas fa-user-friends me-1"></i> Parent

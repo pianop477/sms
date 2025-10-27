@@ -147,7 +147,8 @@ class RolesController extends Controller
         $users = User::where('school_id', $schoolId)
                     ->where(function ($query) {
                         $query->where('usertype', 3)
-                            ->orWhere('usertype', 4);
+                            ->orWhere('usertype', 4)
+                            ->orWhere('usertype', 5);
                     })
                     ->orderBy('first_name')
                     ->get();
