@@ -215,7 +215,7 @@
                         </div>
                         <div class="col-md-6 mb-4">
                             <label for="validationCustom02" class="form-label">Description</label>
-                            <textarea type="text" name="description" class="form-control form-control-custom" id="validationCustom02" placeholder="Description" value="{{ $category['expense_description']}}"></textarea>
+                            <textarea type="text" name="description" class="form-control form-control-custom" id="validationCustom02" placeholder="Description">{{ $category['expense_description']}}</textarea>
                             @error('description')
                             <div class="invalid-feedback">
                                 <span class="text-danger">{{$message}}</span>
