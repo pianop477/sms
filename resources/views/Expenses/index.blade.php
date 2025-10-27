@@ -152,7 +152,7 @@
                                             <tr>
                                                 <td>{{$loop->iteration}}</td>
                                                 <td class="fw-medium">{{ucwords(strtolower($row['expense_type']))}}</td>
-                                                <td class="fw-bold">{{ucwords(strtolower($row['expense_description'] ?? "N/A"))}}</td>
+                                                <td class="fw-bold" title="{{ $row['expense_description'] }}">{{ \Str::limit($row['expense_description'] ?? 'N/A', 60) }}</td>
                                                 <td>
                                                     <ul class="d-flex justify-content-center">
                                                         <li class="mr-3">
