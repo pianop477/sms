@@ -54,7 +54,7 @@ class AccountantsController extends Controller
                 'gender' => $request->gender,
                 'usertype' => $request->input('usertype', 5),
                 'school_id' => Auth::user()->school_id,
-                'password' => Hash::make($request->input('password', 'shule@2025')),
+                'password' => Hash::make($request->input('password', 'shule2025')),
             ]);
 
             // send SMS using nextSMS API ***********************************************
