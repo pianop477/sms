@@ -70,8 +70,8 @@ class AccountantsController extends Controller
                     'reference' => uniqid(),
                 ];
 
-                // $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
-                Log::info('SMS sent to Accountant: '. $payload['to']);
+                $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+                // Log::info('SMS sent to Accountant: '. $payload['to']);
             // ****************************************************************************
 
             Alert::toast('Accountant registered successfully', 'success');
