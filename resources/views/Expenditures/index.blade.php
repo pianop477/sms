@@ -587,7 +587,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="gender" class="form-label">Date</label>
-                                <input type="date" name="date" class="form-control-custom" id="date" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+                                <input type="date" name="date" min="{{\Carbon\Carbon::now()->subWeek(2)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}" class="form-control-custom" id="date" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
                                 @error('date')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror
