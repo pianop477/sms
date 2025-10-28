@@ -202,12 +202,8 @@
     /* Responsive Design */
     @media (max-width: 768px) {
         .action-buttons {
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
-        }
-
-        .table-responsive {
-            overflow-x: auto;
         }
 
         .stat-card .card-value {
@@ -1391,31 +1387,6 @@
     }
 
     @media (max-width: 768px) {
-        .table-responsive {
-            border: 0;
-        }
-        .table-responsive thead {
-            display: none;
-        }
-        .table-responsive tr {
-            display: block;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .table-responsive td {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 10px 15px;
-            position: relative;
-            border-bottom: 1px solid #f1f1f1;
-            width: 100%;
-        }
-        .table-responsive td::before {
-            display: none;
-        }
         .btn-group {
             display: flex;
             gap: 5px;
