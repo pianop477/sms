@@ -806,14 +806,14 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="gender" class="form-label">Date</label>
-                                <input type="date" name="date" class="form-control-custom" min="{{\Carbon\Carbon::now()->subWeek(2)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}" id="date" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+                                <input type="date" name="date" class="form-control-custom" min="{{\Carbon\Carbon::now()->subMonth(1)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}" id="date" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
                                 @error('date')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="category" class="form-label">Categories</label>
-                                <select name="category" id="category" class="form-control-custom">
+                                <select name="category" id="category" class="form-control-custom" required>
                                     <option value="">--Select category--</option>
                                     @if(empty($categories))
                                         <option value="">{{"No categories were found"}}</option>
