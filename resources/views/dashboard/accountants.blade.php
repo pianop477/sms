@@ -393,7 +393,7 @@
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-hover progress-table table-centered mb-0" id="recentTransactionsTable">
+                    <table class="table table-hover progress-table table-centered mb-0 table-responsive-md" id="recentTransactionsTable">
                         <thead>
                             <tr>
                                 <th>#</th>
