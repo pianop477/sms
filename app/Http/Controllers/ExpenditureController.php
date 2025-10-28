@@ -76,8 +76,7 @@ class ExpenditureController extends Controller
             }
 
             // sasa tuma request
-            Log::info(
-                $response = $http->post(
+            $response = $http->post(
                 config('app.finance_api_base_url') . '/daily-expense',
                 [
                     'school_code' => $school->abbriv_code,
@@ -89,8 +88,7 @@ class ExpenditureController extends Controller
                     'expense_date' => $request->date,
                     'payment_mode' => $request->payment,
                 ]
-            )
-        );
+            );
 
             if ($response->successful()) {
                 Alert()->toast('Transaction has been saved successfully', 'success');
