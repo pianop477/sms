@@ -970,11 +970,30 @@
         // Show spinner on normal login
         if (loginForm) {
             loginForm.addEventListener('submit', function() {
-                loginBtn.innerHTML = '<span class="spinner"></span> Signing In...';
+                loginBtn.innerHTML = '<span class="spinner"></span> Authenticating...';
                 loginBtn.disabled = true;
             });
         }
     });
+
+    // reload page on every 5 minutes
+    function simpleLoginPageReload() {
+        const currentUrl = window.location.href;
+
+        // Hakikisha tuna-refresh tu kama tupo kwenye ukurasa wa login
+        if (currentUrl.includes('/login')) {
+            setInterval(() => {
+                console.log('Auto-refreshing login page...');
+                window.location.reload();
+                if (typeof showToast === 'function') {
+                    showToast('Login is required', 'info');
+                }
+            }, 5 * 60 * 1000); // 5 minutes
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', simpleLoginPageReload);
+
   </script>
 
   @include('sweetalert::alert')
