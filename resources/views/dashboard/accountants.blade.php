@@ -226,7 +226,7 @@
                     <div class="card-body text-white">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-uppercase small font-weight-bold">Students</div>
+                                <div class="text-uppercase small font-weight-bold">Students Enrolled</div>
                                 <div class="h3 mb-0 font-weight-bold">{{count($students)}}</div>
                             </div>
                             <div class="col-auto">
@@ -243,7 +243,7 @@
                     <div class="card-body text-white">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-uppercase small font-weight-bold">Daily Transactions</div>
+                                <div class="text-uppercase small font-weight-bold">Today Transactions</div>
                                 <div class="h3 mb-0 font-weight-bold">{{number_format($daily)}}</div>
                             </div>
                             <div class="col-auto">
@@ -260,7 +260,7 @@
                     <div class="card-body text-white">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-uppercase small font-weight-bold">Monthly Transactions</div>
+                                <div class="text-uppercase small font-weight-bold">This Month</div>
                                 <div class="h3 mb-0 font-weight-bold">{{number_format($monthly)}}</div>
                             </div>
                             <div class="col-auto">
@@ -277,7 +277,7 @@
                     <div class="card-body text-white">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-uppercase small font-weight-bold">Yearly Transactions</div>
+                                <div class="text-uppercase small font-weight-bold">This Year</div>
                                 <div class="h3 mb-0 font-weight-bold">{{number_format($yearly)}}</div>
                             </div>
                             <div class="col-auto">
