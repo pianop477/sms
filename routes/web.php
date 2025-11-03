@@ -493,7 +493,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     })->name('logout');
 
     //10. ROUTE ACCESS FOR ACCOUNTANT USER GROUP =======================================================================================
-    Route::middleware('AccountantMiddleware')->group(function () {
+    Route::middleware(['Accountant', 'apiTokenSession'])->group(function () {
         //manage categories
         Route::get('/Expenses-categories', [ExpenseCategoryController::class, 'index'])->name('expenses.index');
         Route::post('/Expenses-categories', [ExpenseCategoryController::class, 'store'])->name('expenses.store');

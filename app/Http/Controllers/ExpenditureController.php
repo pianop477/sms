@@ -32,10 +32,7 @@ class ExpenditureController extends Controller
                 $expenses = $data['expenses'];
                 $categories = $data['categories'];
             } else {
-                return response()->json([
-                    'status' => false,
-                    'body' => $response->body(),
-                ], 400);
+                Alert()->toast($response['message'] ?? 'Failed to fetch transaction records', 'error');
             }
         } catch (Throwable $e) {
             Alert()->toast($e->getMessage() ?? 'Connection not established from the server', 'info');
@@ -93,8 +90,8 @@ class ExpenditureController extends Controller
             if ($response->successful()) {
                 Alert()->toast('Transaction has been saved successfully', 'success');
             } else {
-                Alert()->toast('Failed to save transaction', 'error');
-                Log::error('Finance API error: ' . $response->body());
+                Alert()->toast($response['message'] ?? 'Failed to register transactions', 'error');
+                // Log::error('Finance API error: ' . $response->body());
             }
         } catch (Throwable $e) {
             Alert()->toast($e->getMessage() ?? 'Connection not established from the server', 'error');
@@ -123,8 +120,8 @@ class ExpenditureController extends Controller
             }
 
             else {
-                Alert()->toast('Failed to cancel transaction bill', 'error');
-                Log::error("Error body: ". $response->status());
+                Alert()->toast($response['message'] ?? 'Failed to cancel transaction', 'error');
+                // Log::error("Error body: ". $response->status());
             }
 
         } catch (Throwable $e) {
@@ -150,8 +147,8 @@ class ExpenditureController extends Controller
                 Alert()->toast('Transaction has been deleted successfully', 'success');
             }
             else {
-                Alert()->toast('Failed to delete transaction record', 'error');
-                Log::error("error found ". $response->status());
+                Alert()->toast($response['message'] ?? 'Failed to delete transaction', 'error');
+                // Log::error("error found ". $response->status());
             }
         } catch(Throwable $e) {
             Alert()->toast($e->getMessage() ?? 'Connection not established from the server', 'info');
@@ -184,7 +181,7 @@ class ExpenditureController extends Controller
                 return view('Expenditures.all-transactions', compact('transactions', 'categories'));
             }
             else {
-                Alert()->toast('Failed to get transactions records', 'error');
+                Alert()->toast($response['message'] ?? 'Failed to fetch transactions records', 'error');
                 Log::error("Error code ". $response->status());
                 return back();
             }
@@ -265,7 +262,7 @@ class ExpenditureController extends Controller
                 }
             }
             else {
-                $errorMessage = 'Failed to export transactions report. API Error: ' . $response->status();
+                $errorMessage = 'Failed to export transactions report. API Error: ' . $response['message'];
 
                 if ($request->ajax()) {
                     return response()->json([

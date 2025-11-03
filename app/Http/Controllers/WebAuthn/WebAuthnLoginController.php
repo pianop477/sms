@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\WebAuthnCredential;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Laragear\WebAuthn\Http\Requests\AssertedRequest;
@@ -72,15 +73,17 @@ class WebAuthnLoginController extends Controller
                         'finance_token_expires_at' => now()->addSeconds($tokenData['expires_in']),
                     ]);
                 } else {
-                    Log::error('Failed to obtain Finance API token during biometric login', [
-                        'status' => $response->status(),
-                        'message' => $response->body(),
-                    ]);
+                    Auth::logout();
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Failed to genereate token, please try again!',
+                        'redirect' => route('login')
+                    ], 401);
                 }
             } catch (Exception $e) {
-                Log::error('Error fetching Finance API token during biometric login', [
-                    'message' => $e->getMessage()
-                ]);
+                // Log::error('Error fetching Finance API token during biometric login', [
+                //     'message' => $e->getMessage()
+                // ]);
                 return response()->json([
                     'status' => false,
                     'message' => $e->getMessage()
@@ -88,7 +91,7 @@ class WebAuthnLoginController extends Controller
             }
         } else {
             // Optional: log or notify that usertype != 5 is skipping API token
-            Log::info("Biometric login: usertype {$user->usertype} skipping Finance API token");
+            // Log::info("Biometric login: usertype {$user->usertype} skipping Finance API token");
         }
 
         return response()->json([

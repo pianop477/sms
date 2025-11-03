@@ -26,7 +26,7 @@ class ActiveUserMiddleware
 
         if(! $user) {
             // Alert::error('Error!', 'Unauthorized user access');
-            return redirect()->route('logout')->with('error', 'Unauthorized user access');
+            return redirect()->route('login')->with('error', 'Unauthorized user access');
         }
 
         if($user->status == 1) {

@@ -425,7 +425,7 @@
                                 <h4 class="header-title">
                                     <i class="fas fa-receipt me-3"></i> All Transactions Bills
                                 </h4>
-                                <p class="text-muted mb-0">Overview Financial Transactions</p>
+                                <p class="text-muted mb-0">Overview Financial Transactions <span class="text-primary" style="font-weight: bold">(This Month - {{\Carbon\Carbon::now()->format('F')}})</span></p>
                             </div>
                             <div class="col-md-4 text-end">
                                 <div class="d-flex gap-2 justify-content-end">
@@ -526,7 +526,7 @@
                         <div class="row">
                             <div class="col-12 text-end mb-3">
                                 <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#exportReportModal">
-                                    <i class="fas fa-file-export me-2"></i> Export Report
+                                    <i class="fas fa-file-export me-2"></i> Export Transactions Report
                                 </button>
                             </div>
                         </div>
@@ -552,7 +552,7 @@
                                             <tr>
                                                 <td class="text-center text-danger py-4" colspan="9">
                                                     <i class="fas fa-exclamation-triangle fa-2x mb-3 d-block"></i>
-                                                    No transaction records were found for {{\Carbon\Carbon::now()->format('d-m-Y')}}!
+                                                    No transaction records were found for {{\Carbon\Carbon::now()->format('F')}}!
                                                 </td>
                                             </tr>
                                         @else

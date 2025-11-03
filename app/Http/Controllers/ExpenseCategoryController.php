@@ -30,8 +30,8 @@ class ExpenseCategoryController extends Controller
                 $categories = $data['categories'];
             } else {
                 // logger()->error('Failed to fetch expense categories', ['status' => $response->status()]);
-                Alert()->toast("Failed to fetch expenses categories", 'error');
-                Log::error("Error code: ". $response->status());
+                Alert()->toast($response['message'] ?? 'Failed to fetch categories', 'error');
+                // Log::error("Error code: ". $response->status());
             }
         }
         catch (\Throwable $e) {
@@ -57,11 +57,11 @@ class ExpenseCategoryController extends Controller
 
         // dd($request->all());
         try {
-            Log::info($response = Http::withToken(session('finance_api_token'))->post(config('app.finance_api_base_url'). '/expense-categories', [
+            $response = Http::withToken(session('finance_api_token'))->post(config('app.finance_api_base_url'). '/expense-categories', [
                 'school_id' => $user->school_id,
                 'expense_type' => $request->name,
                 'expense_description' => $request->description,
-            ]));
+            ]);
 
             // dd($response['expense_description']);
 
@@ -70,8 +70,8 @@ class ExpenseCategoryController extends Controller
                 return back();
             } else {
                 // logger()->error('Failed to add expense category', ['status' => $response->status()]);
-                Alert()->toast("Failed to register expense category", 'error');
-                Log::error('Error code: '. $response->status());
+                Alert()->toast($response['message'] ?? 'Failed to register expense category', 'error');
+                // Log::error('Error code: '. $response->status());
                 return back();
             }
         } catch (\Throwable $e) {
@@ -95,8 +95,8 @@ class ExpenseCategoryController extends Controller
                 return back();
             } else {
                 // logger()->error('Failed to delete expense category', ['status' => $response->status()]);
-                Alert()->toast('Failed to delete expense category', 'error');
-                Log::error("Error code ". $response->status());
+                Alert()->toast($response['message'] ?? 'Failed to delete expense category', 'error');
+                // Log::error("Error code ". $response->status());
                 return back();
             }
         } catch (\Throwable $e) {
@@ -119,8 +119,8 @@ class ExpenseCategoryController extends Controller
                 $data = $response->json();
                 $category = $data['category'];
             } else {
-                Alert()->toast('Expense category not found', 'error');
-                Log::error("Error ". $response->status());
+                Alert()->toast($response['message'] ?? 'Expense category not found', 'error');
+                // Log::error("Error ". $response->status());
 
                 return back();
             }
@@ -153,8 +153,8 @@ class ExpenseCategoryController extends Controller
                 Alert()->toast('Category type updated successfully', 'success');
                 return to_route('expenses.index');
             } else {
-                Alert()->toast('Failed to update expense category', 'error');
-                Log::error('Error'. $response->status());
+                Alert()->toast($response['message'] ?? 'Failed to update expense category', 'error');
+                // Log::error('Error'. $response->status());
             }
         } catch (Throwable $e) {
             Alert()->toast($e->getMessage() ?? 'Connection not established from the server', 'info');

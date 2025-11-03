@@ -67,8 +67,6 @@ class Kernel extends HttpKernel
         'signed' => \App\Http\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
-        'checkSessionTimeout' => \App\Http\Middleware\checkSessionTimeout::class,
-        'AccountantMiddleware' => \App\Http\Middleware\AccountantMiddleware::class,
     ];
 
     protected $routeMiddleware = [
@@ -80,5 +78,8 @@ class Kernel extends HttpKernel
         'block.ip' => \App\Http\Middleware\BlockSuspiciousIP::class,
         'user.agent' => \App\Http\Middleware\CheckUserAgent::class,
         'manager.head.academic' => \App\Http\Middleware\sharedAccessMiddleware::class,
+        'Accountant' => \App\Http\Middleware\AccountantMiddleware::class,
+        'checkSessionTimeout' => \App\Http\Middleware\checkSessionTimeout::class,
+        'apiTokenSession' => \App\http\Middleware\checkApiTokenSession::class,
     ];
 }

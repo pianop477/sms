@@ -374,10 +374,11 @@ class HomeController extends Controller
                         $monthly = $data['monthly_expenses'] ?? 0;
                         $yearly = $data['yearly_expenses'] ?? 0;
                         $recent = $data['recent_expenses'] ?? [];
+                        $last7DaysExpenses = $data['last_7_days_expenses'] ?? [];
                     } else {
 
-                        Alert()->toast('Failed to get accountant dashboard details', 'error');
-                        Log::error('Error'. $response->status());
+                        Alert()->toast($response['message'], 'error');
+                        // Log::error('Error'. $response['message']);
                     }
                 } catch (\Throwable $e) {
                     // Tuma ujumbe wa kirafiki badala ya 500
@@ -388,7 +389,7 @@ class HomeController extends Controller
                                     ->where('status', 1)
                                     ->get();
 
-                return view('home', compact('categories', 'daily', 'monthly', 'yearly', 'recent', 'students'));
+                return view('home', compact('categories', 'daily', 'monthly', 'yearly', 'recent', 'students', 'last7DaysExpenses'));
             }
 
             else {

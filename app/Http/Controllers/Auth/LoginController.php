@@ -92,8 +92,6 @@ class LoginController extends Controller
             $user = Auth::user();
 
             if($user->usertype == 5) {
-                // Request token from ShuleApp-Finance
-                // dd(env('SHULEAPP_CLIENT_KEY'). ' '. env('SHULEAPP_CLIENT_SECRET'));
                 try {
                     $response = Http::post(config('app.finance_api_base_url') . '/auth/token', [
                         'client_key' => config('app.finance_api_client_key'),
@@ -109,12 +107,12 @@ class LoginController extends Controller
                         ]);
                         // dd(session()->all());
                     } else {
-                        // Log::error('Failed to fetch finance API token', ['response' => $response->body()]);
-                        Alert()->toast($response->status(), 'error');
+                        Auth::logout();
+                        return redirect()->route('login')->with('error', 'Failed to generate token, Please try again!');
                     }
                 } catch (\Throwable $e) {
-                    // Log::error('Error connecting to finance API for token', ['error' => $e->getMessage()]);
-                    Alert()->toast('Connection not established from the server', 'info');
+                    Auth::logout();
+                    return redirect()->route('login')->with('error', 'Failed to connect to the server!');
                 }
             }
 

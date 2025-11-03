@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class AccountantMiddleware
+class checkApiTokenSession
 {
     /**
      * Handle an incoming request.
@@ -17,14 +17,13 @@ class AccountantMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if(Auth::check()) {
-            $user = Auth::user();
-
-            if($user->usertype == 5) {
-                return $next($request);
+            if(! session('finance_api_token')) {
+                Auth::logout();
+                return redirect()->route('login')->with('error', 'Unauthorized client request');
             }
-            return to_route('error.page');
-        }
 
+            return $next($request);
+        }
         return redirect()->route('login')->with('error', 'Unauthorized user access');
     }
 }

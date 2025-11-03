@@ -369,18 +369,6 @@
                     <div class="col-md-8">
                         <h4 class="header-title mb-0">Recent Transactions</h4>
                     </div>
-                    {{-- <div class="col-md-3">
-                        <form method="GET" action="">
-                            <label for="" class="">Filter</label>
-                            <select name="timeframe" class="form-select" onchange="this.form.submit()">
-                                <option value="7" {{ request('timeframe') == 7 ? 'selected' : '' }}>Last 7 Days</option>
-                                <option value="30" {{ request('timeframe') == 30 ? 'selected' : '' }}>Last 30 Days</option>
-                                <option value="90" {{ request('timeframe') == 90 ? 'selected' : '' }}>Last 90 Days</option>
-                                <option value="180" {{ request('timeframe') == 180 ? 'selected' : '' }}>Last 180 Days</option>
-                                <option value="365" {{ request('timeframe') == 365 ? 'selected' : '' }}>Last 365 Days</option>
-                            </select>
-                        </form>
-                    </div> --}}
                     <div class="col-md-2">
                         <button type="button" class="btn btn-info btn-action btn-sm" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
                             <i class="fas fa-plus me-1"></i> New Transaction
@@ -1108,28 +1096,25 @@
         });
 
         // Data preparation functions
+        // Data preparation functions - REPLACE THIS FUNCTION ONLY
         function prepareRecentTransactionsData() {
-            @if (!empty($recent))
-                const recentData = @json($recent);
+            @if (!empty($last7DaysExpenses))
+                // Create array for last 7 days
                 const last7Days = [];
 
-                // Group by date for last 7 days
                 for (let i = 6; i >= 0; i--) {
                     const date = new Date();
                     date.setDate(date.getDate() - i);
                     const dateStr = date.toISOString().split('T')[0];
 
-                    const dayTransactions = recentData.filter(transaction => {
-                        const transactionDate = transaction.expense_date ? transaction.expense_date.split(' ')[0] :
-                                              (transaction.created_at ? transaction.created_at.split(' ')[0] : '');
-                        return transactionDate === dateStr;
-                    });
-
-                    const dayTotal = dayTransactions.reduce((sum, transaction) => sum + parseFloat(transaction.amount), 0);
+                    // Find expense for this date from API data
+                    const dayExpense = @json($last7DaysExpenses).find(expense =>
+                        expense.expense_date === dateStr
+                    );
 
                     last7Days.push({
                         label: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                        amount: dayTotal
+                        amount: dayExpense ? parseFloat(dayExpense.total_amount) : 0
                     });
                 }
 

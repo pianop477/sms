@@ -1,6 +1,6 @@
 <div class="container">
     <div class="row align-items-center">
-        <div class="col-lg-12 d-none d-lg-block">
+        <div class="col-lg-11 d-none d-lg-block">
             <div class="horizontal-menu">
                 <nav>
                     <ul id="nav_menu">
@@ -196,7 +196,17 @@
                 </nav>
             </div>
         </div>
-
+        <!-- nav and search button -->
+        <div class="col-lg-1 clearfix">
+            <div class="">
+                <form action="{{route('logout')}}" method="POST">
+                    @csrf
+                    <button class="btn btn-danger btn-xs" style="font-weight: bold" onclick="return confirm('Are you sure you want to sign out?')">
+                        <i class="fas fa-power-off"></i> Sign out
+                    </button>
+                </form>
+            </div>
+        </div>
         <!-- mobile_menu -->
         <div class="col-12 d-block d-lg-none">
             <div id="mobile_menu"></div>

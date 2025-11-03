@@ -14,12 +14,12 @@
 
                 <img src="{{ asset($logoPath) }}"
                      alt="Logo"
-                     class="rounded-circle me-2"
+                     class="rounded-circle me-2 mr-2"
                      style="width:50px; height:50px; object-fit:cover;">
 
                 <a href="{{ route('home') }}"
                    class="navbar-brand fw-bold text-capitalize"
-                   style="font-size: 22px; color:darkblue;">
+                   style="font-weight: bold; font-style:italic; font-size: 26px; color:darkblue; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif">
                     {{ $schoolName }}
                 </a>
             </div>
@@ -60,7 +60,7 @@
                     <li>
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
-                            <button type="submit" class="dropdown-item"><i class="ti-power-off me-2"></i> Sign Out</button>
+                            <button type="submit" onclick="return confirm('Are you sure you want to sign out?')" class="dropdown-item"><i class="ti-power-off me-2"></i> Sign out</button>
                         </form>
                     </li>
                 </ul>
