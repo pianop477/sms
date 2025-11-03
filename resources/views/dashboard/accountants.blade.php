@@ -789,14 +789,14 @@
                         @csrf
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="gender" class="form-label">Date</label>
-                                <input type="date" name="date" class="form-control-custom" min="{{\Carbon\Carbon::now()->subMonth(1)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}" id="date" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+                                <label for="gender" class="form-label">Transaction Date</label>
+                                <input type="date" name="date" class="form-control-custom" min="{{\Carbon\Carbon::now()->subYears(1)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}" id="date" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
                                 @error('date')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="category" class="form-label">Categories</label>
+                                <label for="category" class="form-label">Transaction Category</label>
                                 <select name="category" id="category" class="form-control-custom" required>
                                     <option value="">--Select category--</option>
                                     @if(empty($categories))
@@ -814,7 +814,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="description" class="form-label">Service description</label>
+                                <label for="description" class="form-label">Description</label>
                                 <textarea type="text" required name="description" class="form-control-custom" id="description" placeholder="Enter service description e.g. umeme" value="{{old('description')}}"></textarea>
                                 @error('description')
                                 <div class="text-danger small">{{$message}}</div>
