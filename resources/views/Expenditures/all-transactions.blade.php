@@ -739,7 +739,7 @@
                                     <option value="">--Select Format--</option>
                                     <option value="pdf">PDF</option>
                                     <option value="excel">Excel</option>
-                                    <option value="word">Word</option>
+                                    {{-- <option value="word">Word</option> --}}
                                     <option value="csv">CSV</option>
                                 </select>
                                 <span class="text-danger error-message" id="export_format_error"></span>
