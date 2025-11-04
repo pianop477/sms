@@ -201,7 +201,7 @@
             <div class="">
                 <form action="{{route('logout')}}" method="POST">
                     @csrf
-                    <button class="btn btn-danger btn-xs" style="font-weight: bold" onclick="return confirm('Are you sure you want to sign out?')">
+                    <button class="btn btn-danger btn-xs sign-out-btn" onclick="return confirm('Are you sure you want to sign out?')">
                         <i class="fas fa-power-off"></i> Sign out
                     </button>
                 </form>
@@ -213,3 +213,11 @@
         </div>
     </div>
 </div>
+<style>
+    .sign-out-btn {
+        font-weight: bold;
+        background: darkred;
+        color: white;
+        border-radius: 8px;
+    }
+</style>

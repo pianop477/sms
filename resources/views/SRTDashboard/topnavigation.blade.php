@@ -60,7 +60,7 @@
                     <li>
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
-                            <button type="submit" onclick="return confirm('Are you sure you want to sign out?')" class="dropdown-item"><i class="ti-power-off me-2"></i> Sign out</button>
+                            <button type="submit" onclick="return confirm('Are you sure you want to sign out?')" class="dropdown-item sign-out-btn"><i class="ti-power-off me-2"></i> Sign out</button>
                         </form>
                     </li>
                 </ul>
@@ -68,3 +68,16 @@
         </div>
     </div>
 </div>
+<style>
+    .sign-out-btn {
+        font-weight: bold;
+        background: darkred;
+        color: white;
+        border-radius: 8px;
+    }
+
+    .sign-out-btn:hover {
+        background: red;
+        color: white;
+    }
+</style>

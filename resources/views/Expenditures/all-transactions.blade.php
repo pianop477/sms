@@ -737,10 +737,10 @@
                                 <label for="export_format" class="form-label">Export Format <i class="text-danger">*</i></label>
                                 <select name="export_format" required id="export_format" class="form-select form-control-custom" required>
                                     <option value="">--Select Format--</option>
-                                    <option value="pdf">PDF</option>
-                                    <option value="excel">Excel</option>
+                                    <option value="pdf"><i class="fas fa-file-pdf"></i> pdf</option>
+                                    <option value="excel"><i class="fas fa-file-excel"></i> Excel</option>
                                     {{-- <option value="word">Word</option> --}}
-                                    <option value="csv">CSV</option>
+                                    <option value="csv"><i class="fas fa-file-csv"></i> csv</option>
                                 </select>
                                 <span class="text-danger error-message" id="export_format_error"></span>
                             </div>
