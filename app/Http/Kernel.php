@@ -80,6 +80,6 @@ class Kernel extends HttpKernel
         'manager.head.academic' => \App\Http\Middleware\sharedAccessMiddleware::class,
         'Accountant' => \App\Http\Middleware\AccountantMiddleware::class,
         'checkSessionTimeout' => \App\Http\Middleware\checkSessionTimeout::class,
-        'apiTokenSession' => \App\http\Middleware\checkApiTokenSession::class,
+        'apiSessionToken' => \App\http\Middleware\ApiSessionTokenMiddleware::class,
     ];
 }

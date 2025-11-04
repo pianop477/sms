@@ -487,13 +487,23 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
 
     // 9. ROUTES ACCESS FOR LOGOUT AND REDIRECTION =======================================================================================
     Route::post('Logout', function () {
+        // Delete finance session token only if it exists
+        if (session()->has('finance_api_token')) {
+            session()->forget('finance_api_token');
+        }
+
         Auth::logout();
-        Alert()->toast('Goodbyee see you back later 👋', 'success');
+
+        // (Optional but recommended in production security)
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+
+        Alert()->toast('Goodbye! See you back later 👋', 'success');
         return redirect()->route('login');
     })->name('logout');
 
     //10. ROUTE ACCESS FOR ACCOUNTANT USER GROUP =======================================================================================
-    Route::middleware('apiTokenSession')->group(function () {
+    Route::middleware(['Accountant', 'apiSessionToken'])->group(function () {
         //manage categories
         Route::get('/Expenses-categories', [ExpenseCategoryController::class, 'index'])->name('expenses.index');
         Route::post('/Expenses-categories', [ExpenseCategoryController::class, 'store'])->name('expenses.store');
