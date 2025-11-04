@@ -1099,7 +1099,6 @@
         // Data preparation functions - REPLACE THIS FUNCTION ONLY
         function prepareRecentTransactionsData() {
             @if (!empty($last7DaysExpenses))
-                // Create array for last 7 days
                 const last7Days = [];
 
                 for (let i = 6; i >= 0; i--) {
@@ -1107,7 +1106,7 @@
                     date.setDate(date.getDate() - i);
                     const dateStr = date.toISOString().split('T')[0];
 
-                    // Find expense for this date from API data
+                    // HII SEHEMU INABAKI Sawa Sawa!
                     const dayExpense = @json($last7DaysExpenses).find(expense =>
                         expense.expense_date === dateStr
                     );
