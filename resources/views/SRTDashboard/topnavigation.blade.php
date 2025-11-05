@@ -19,7 +19,7 @@
 
                 <a href="{{ route('home') }}"
                    class="navbar-brand fw-bold text-capitalize"
-                   style="font-weight: bold; font-style:italic; font-size: 26px; color:darkblue; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif">
+                   style="font-weight: bold; font-style:italic; font-size: 23px; color:darkblue; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif">
                     {{ $schoolName }}
                 </a>
             </div>
