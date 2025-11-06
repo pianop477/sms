@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Events\PasswordResetEvent;
 use App\Models\class_learning_courses;
 use App\Models\Class_teacher;
+use App\Models\other_staffs;
 use App\Models\school;
 use App\Models\Teacher;
+use App\Models\Transport;
 use App\Models\User;
 use App\Services\BeemSmsService;
 use App\Services\NextSmsService;
@@ -213,25 +215,6 @@ class TeachersController extends Controller
         }
 
         return $phone;
-    }
-
-    // prepare unique member id for teacher ***********************************************************
-    protected function getMemberId ()
-    {
-
-        $user = Auth::user();
-        $schoolData = school::find($user->school_id);
-        do {
-            // Generate a random 4-digit number between 1 and 9999
-            $memberIdNumber = str_pad(mt_rand(1, 999), 4, '0', STR_PAD_LEFT);
-
-            // Check if this admission number already exists
-        } while (Teacher::where('member_id', $memberIdNumber)
-                        ->where('school_id', $user->school_id)
-                        ->where('status', 1)
-                        ->exists());
-
-        return $schoolData->abbriv_code.'-'.$memberIdNumber; // Return the unique admission number
     }
 
     /**
@@ -633,6 +616,27 @@ class TeachersController extends Controller
 
         // For local development, just mock a successful scan
         return ['clean' => true, 'message' => 'Development mode - scan bypassed'];
+    }
+
+    // prepare unique member id for teacher ***********************************************************
+    protected function getMemberId()
+    {
+        $user = Auth::user();
+        $schoolData = school::find($user->school_id);
+
+        do {
+            // Tengeneza namba ya ID ya staff (4 digits)
+            $staffIdNumber = str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+            $fullStaffId = $schoolData->abbriv_code . '-' . $staffIdNumber;
+
+            // Check kama ID ipo kwenye tables zote
+            $existsInOtherStaffs = other_staffs::where('staff_id', $fullStaffId)->exists();
+            $existsInDrivers     = Transport::where('staff_id', $fullStaffId)->exists();
+            $existsInTeachers    = Teacher::where('member_id', $fullStaffId)->exists();
+
+        } while ($existsInOtherStaffs || $existsInDrivers || $existsInTeachers);
+
+        return $fullStaffId;
     }
 
 }

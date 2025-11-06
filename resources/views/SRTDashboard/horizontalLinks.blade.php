@@ -137,6 +137,7 @@
                             <li>
                                 <a href="javascript:void(0)"><i class="fa fa-file-archive"></i><span>Staff & HR</span></a>
                                 <ul class="submenu">
+                                    <li><a href="{{route('OtherStaffs.index')}}"><i class="fas fa-user-group"></i> Other Staffs</a></li>
                                     <li><a href="{{route('tod.roster.index')}}"><i class="fas fa-file"></i> Duty Rosters</a></li>
                                     <li><a href="{{route('contract.management')}}"><i class="fas fa-briefcase"></i> Manage Contracts</a></li>
                                 </ul>

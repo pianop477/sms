@@ -39,7 +39,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\ForcePasswordChange::class,
-            \App\Http\Middleware\RefreshFinanceToken::class,
+            // \App\Http\Middleware\RefreshFinanceToken::class,
         ],
 
         'api' => [
@@ -81,5 +81,6 @@ class Kernel extends HttpKernel
         'Accountant' => \App\Http\Middleware\AccountantMiddleware::class,
         'checkSessionTimeout' => \App\Http\Middleware\checkSessionTimeout::class,
         'apiSessionToken' => \App\Http\Middleware\ApiSessionTokenMiddleware::class,
+        'refresh.token' => \App\Http\Middleware\RefreshFinanceToken::class,
     ];
 }

@@ -41,6 +41,8 @@ use App\Models\Student;
 use App\Models\Transport;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpParser\Builder\ClassConst;
@@ -493,23 +495,36 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
 
     // 9. ROUTES ACCESS FOR LOGOUT AND REDIRECTION =======================================================================================
     Route::post('Logout', function () {
-        // Delete finance session token only if it exists
-        if (session()->has('finance_api_token')) {
-            session()->forget('finance_api_token');
+
+        // 1. Invalidate JWT token kwenye shuleapp-finance
+        if (Session::has('finance_api_token')) {
+            try {
+                Http::withToken(Session::get('finance_api_token'))
+                    ->post(config('app.finance_api_base_url') . '/auth/logout');
+            } catch (\Throwable $e) {
+                // Connection failed? ignore, lakini log it for debugging
+                Log::warning('Failed to invalidate finance token on logout: '.$e->getMessage());
+            }
+
+            // 2. Delete session variable
+            Session::forget(['finance_api_token', 'finance_token_expires_at']);
         }
 
+        // 3. Laravel Auth logout
         Auth::logout();
 
-        // (Optional but recommended in production security)
+        // 4. Session security cleanup
         request()->session()->invalidate();
         request()->session()->regenerateToken();
 
+        // 5. User feedback
         Alert()->toast('Goodbye! See you back later 👋', 'success');
+
         return redirect()->route('login');
     })->name('logout');
 
     //10. ROUTE ACCESS FOR ACCOUNTANT USER GROUP =======================================================================================
-    Route::middleware('Accountant')->group(function () {
+    Route::middleware(['Accountant', 'refresh.token'])->group(function () {
         //manage categories
         Route::get('/Expenses-categories', [ExpenseCategoryController::class, 'index'])->name('expenses.index');
         Route::post('/Expenses-categories', [ExpenseCategoryController::class, 'store'])->name('expenses.store');
