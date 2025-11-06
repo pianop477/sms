@@ -3,6 +3,11 @@
 /public/build
 /public/hot
 /public/storage
+/public/assets
+/public/attendances
+/public/exam_results
+/public/reports
+/public/Transactions
 /storage/*.key
 /vendor
 .env
