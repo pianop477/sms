@@ -94,24 +94,23 @@ class LoginController extends Controller
             if ($user->usertype == 5) {
                 try {
                     $response = Http::post(config('app.finance_api_base_url') . '/auth/token', [
-                        'client_key'    => config('app.finance_api_client_key'),
+                        'client_key' => config('app.finance_api_client_key'),
                         'client_secret' => config('app.finance_api_client_secret'),
                     ]);
 
-                    if ($response->successful()) {
-                        $tokenData = $response->json();
-
-                        session([
-                            'finance_api_token'        => $tokenData['token'],
-                            'finance_token_expires_at' => now()->addSeconds($tokenData['expires_in']),
-                        ]);
+                    if ($response->successful() || $response->failed()) {
+                        // $tokenData = $response->json();
+                        // session([
+                        //     'finance_api_token' => $tokenData['token'],
+                        //     'finance_token_expires_at' => now()->addSeconds($tokenData['expires_in']),
+                        // ]);
                     } else {
                         Auth::logout();
-                        return redirect()->route('login')->with('error', 'Failed to generate token, Please try again!');
+                        return redirect()->route('login')->with('error', $response['message']);
                     }
                 } catch (\Throwable $e) {
                     Auth::logout();
-                    return redirect()->route('login')->with('error', 'Failed to connect to the server!');
+                    return redirect()->route('login')->with('error', 'Failed to connect to server');
                 }
             }
 
