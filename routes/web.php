@@ -16,6 +16,7 @@ use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\GeneratedReportController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ManagerController;
+use App\Http\Controllers\OtherStaffsController;
 use App\Http\Controllers\PackagesController;
 use App\Http\Controllers\ParentsController;
 use App\Http\Controllers\PdfGeneratorController;
@@ -323,6 +324,11 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('Accountants/profilee/{id}', [AccountantsController::class, 'accountantProfile'])->name('Accountants.profile');
         Route::put('Accountants/update/{id}', [AccountantsController::class, 'updateAccountants'])->name('Accountants.update');
         Route::delete('Accountants/delete/{id}', [AccountantsController::class, 'deleteAccountants'])->name('Accountants.delete');
+
+        // other staff management
+        Route::get('/Staffs', [OtherStaffsController::class, 'index'])->name('OtherStaffs.index');
+        Route::post('/Staffs', [OtherStaffsController::class, 'addStaffInformation'])->name('OtherStaffs.store');
+        Route::get('/Staffs/profile/type/{type}/{id}', [OtherStaffsController::class, 'staffProfile'])->name('OtherStaffs.profile');
     });
 
     //3. ROUTE ACCESS FOR EITHER HEAD TEACHER OR ACADEMIC ONLY ============================================================================
@@ -503,7 +509,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     })->name('logout');
 
     //10. ROUTE ACCESS FOR ACCOUNTANT USER GROUP =======================================================================================
-    Route::middleware(['Accountant', 'apiSessionToken'])->group(function () {
+    Route::middleware('Accountant')->group(function () {
         //manage categories
         Route::get('/Expenses-categories', [ExpenseCategoryController::class, 'index'])->name('expenses.index');
         Route::post('/Expenses-categories', [ExpenseCategoryController::class, 'store'])->name('expenses.store');
