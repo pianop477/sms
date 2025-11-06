@@ -358,6 +358,7 @@ class HomeController extends Controller
                 $monthly = 0;
                 $yearly = 0;
                 $recent = [];
+                $last7DaysExpenses = [];
 
                 $token = session('finance_api_token');
 
@@ -378,7 +379,7 @@ class HomeController extends Controller
                     } else {
 
                         Alert()->toast($response['message'], 'error');
-                        // Log::error('Error'. $response['message']);
+                        return back();
                     }
                 } catch (\Throwable $e) {
                     // Tuma ujumbe wa kirafiki badala ya 500
@@ -438,6 +439,9 @@ class HomeController extends Controller
                     Alert()->toast('Password Updated successfully', 'success');
                     // Auth::logout();
                     return to_route('home');
+                } else {
+                    Alert()->toast('Failed to change password', 'error');
+                    return back();
                 }
         } catch (\Exception $e) {
             Alert::error('Errors', $e->getMessage());
