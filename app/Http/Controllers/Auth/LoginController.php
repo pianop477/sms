@@ -113,11 +113,14 @@ class LoginController extends Controller
                             session([
                                 'finance_api_token' => $tokenData['token'],
                                 'finance_token_expires_at' => now()->addSeconds($expiresIn),
+                                'finance_refresh_attempted' => false,
                             ]);
 
                             Log::info("Finance API token acquired for user: {$user->id}");
                         } else {
-                            throw new \Exception($tokenData['message'] ?? 'Invalid response from finance API');
+                            Auth::logout();
+                            return to_route('login')->with('error', $response['message'] ?? 'Invalid response from finance API');
+                            // throw new \Exception($tokenData['message'] ?? 'Invalid response from finance API');
                         }
                     } else {
                         // throw new \Exception('Finance API request failed with status: ' . $response->status());
