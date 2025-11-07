@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use RealRashid\SweetAlert\Facades\Alert;
+use Throwable;
 
 class LoginController extends Controller
 {
@@ -93,24 +94,41 @@ class LoginController extends Controller
 
             if ($user->usertype == 5) {
                 try {
-                    $response = Http::post(config('app.finance_api_base_url') . '/auth/token', [
-                        'client_key' => config('app.finance_api_client_key'),
-                        'client_secret' => config('app.finance_api_client_secret'),
-                    ]);
+                    $response = Http::timeout(30)
+                        ->retry(3, 100)
+                        ->post(config('app.finance_api_base_url') . '/auth/token', [
+                            'client_key' => config('app.finance_api_client_key'),
+                            'client_secret' => config('app.finance_api_client_secret'),
+                        ]);
 
-                    if ($response->successful() || $response->failed()) {
-                        // $tokenData = $response->json();
-                        // session([
-                        //     'finance_api_token' => $tokenData['token'],
-                        //     'finance_token_expires_at' => now()->addSeconds($tokenData['expires_in']),
-                        // ]);
+                    if ($response->successful()) {
+                        $tokenData = $response->json();
+
+                        if (isset($tokenData['status']) && $tokenData['status'] === true) {
+
+                            $expiresIn = is_numeric($tokenData['expires_in'] ?? null)
+                                        ? (int) $tokenData['expires_in']
+                                        : 3600;
+
+                            session([
+                                'finance_api_token' => $tokenData['token'],
+                                'finance_token_expires_at' => now()->addSeconds($expiresIn),
+                            ]);
+
+                            Log::info("Finance API token acquired for user: {$user->id}");
+                        } else {
+                            throw new \Exception($tokenData['message'] ?? 'Invalid response from finance API');
+                        }
                     } else {
+                        // throw new \Exception('Finance API request failed with status: ' . $response->status());
                         Auth::logout();
-                        return redirect()->route('login')->with('error', $response['message']);
+                        Log::error("Finance API request failed with status: " . $response['message']);
+                        return to_route('login')->with('error', $response['message'] ?? 'Failed to generate token, please try again');
                     }
                 } catch (\Throwable $e) {
+                    Log::error("Finance API connection failed: {$e->getMessage()}");
                     Auth::logout();
-                    return redirect()->route('login')->with('error', 'Failed to connect to server');
+                    return redirect()->route('login')->with('error', $e->getMessage() ?? 'Unable to connect to finance service');
                 }
             }
 

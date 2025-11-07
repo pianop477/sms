@@ -495,36 +495,35 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
 
     // 9. ROUTES ACCESS FOR LOGOUT AND REDIRECTION =======================================================================================
     Route::post('Logout', function () {
-
-        // 1. Invalidate JWT token kwenye shuleapp-finance
+        // 1. Invalidate finance API token if exists
         if (Session::has('finance_api_token')) {
             try {
                 Http::withToken(Session::get('finance_api_token'))
                     ->post(config('app.finance_api_base_url') . '/auth/logout');
             } catch (\Throwable $e) {
-                // Connection failed? ignore, lakini log it for debugging
-                Log::warning('Failed to invalidate finance token on logout: '.$e->getMessage());
+                Log::warning('Finance API logout failed: ' . $e->getMessage());
             }
 
-            // 2. Delete session variable
+            // Clear token session
             Session::forget(['finance_api_token', 'finance_token_expires_at']);
         }
 
-        // 3. Laravel Auth logout
+        // 2. Logout from main system
         Auth::logout();
 
-        // 4. Session security cleanup
+        // 3. Session cleanup — protect from session fixation
         request()->session()->invalidate();
         request()->session()->regenerateToken();
 
-        // 5. User feedback
+        // 4. Feedback
         Alert()->toast('Goodbye! See you back later 👋', 'success');
 
         return redirect()->route('login');
     })->name('logout');
 
+
     //10. ROUTE ACCESS FOR ACCOUNTANT USER GROUP =======================================================================================
-    Route::middleware(['Accountant', 'refresh.token'])->group(function () {
+    Route::middleware(['Accountant', 'apiSessionToken'])->group(function () {
         //manage categories
         Route::get('/Expenses-categories', [ExpenseCategoryController::class, 'index'])->name('expenses.index');
         Route::post('/Expenses-categories', [ExpenseCategoryController::class, 'store'])->name('expenses.store');
@@ -539,5 +538,10 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::delete('/daily-expenses/{bill}', [ExpenditureController::class, 'deleteInactiveBill'])->name('expenditure.delete.bill');
         Route::get('/Transactions/all', [ExpenditureController::class, 'allTractions'])->name('expenditure.all.transactions');
         Route::post('/Export-custom-report', [ExpenditureController::class, 'exportCustomReport'])->name('expenditure.export.custom.report');
+        Route::get('/expenditure/get-transaction/{id}', [ExpenditureController::class, 'getTransaction'])
+                ->name('expenditure.get.transaction');
+        // Route to update transaction via AJAX
+        Route::post('/expenditure/update-transaction/{id}', [ExpenditureController::class, 'updateTransaction'])
+                ->name('expenditure.update.transaction');
     });
 });
