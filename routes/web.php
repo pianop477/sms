@@ -39,6 +39,7 @@ use App\Models\Examination_result;
 use App\Models\Parents;
 use App\Models\Student;
 use App\Models\Transport;
+use App\Services\FinanceTokenService;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -402,7 +403,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     });
 
     //4. ROUTES ACCESS FOR ALL USERS ========================================================================================================
-    Route::middleware('CheckUsertype:1,2,3,4,5')->group(function () {
+    Route::middleware(['CheckUsertype:1,2,3,4,5', 'condtional.api.token'])->group(function () {
         // Dashboard redirection
         Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::get('Change-password', [HomeController::class, 'changepassword'])->name('change.password');
@@ -498,20 +499,26 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         // 1. Invalidate finance API token if exists
         if (Session::has('finance_api_token')) {
             try {
-                Http::withToken(Session::get('finance_api_token'))
-                    ->post(config('app.finance_api_base_url') . '/auth/logout');
+                $tokenService = new FinanceTokenService();
+                $token = $tokenService->getCurrentToken();
+
+                if ($token) {
+                    Http::timeout(5)
+                        ->withToken($token)
+                        ->post(config('app.finance_api_base_url') . '/auth/logout');
+                }
             } catch (\Throwable $e) {
                 Log::warning('Finance API logout failed: ' . $e->getMessage());
             }
 
             // Clear token session
-            Session::forget(['finance_api_token', 'finance_token_expires_at']);
+            Session::forget(['finance_api_token', 'finance_token_expires_at', 'finance_refresh_attempted']);
         }
 
         // 2. Logout from main system
         Auth::logout();
 
-        // 3. Session cleanup — protect from session fixation
+        // 3. Session cleanup
         request()->session()->invalidate();
         request()->session()->regenerateToken();
 
@@ -543,5 +550,6 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         // Route to update transaction via AJAX
         Route::post('/expenditure/update-transaction/{id}', [ExpenditureController::class, 'updateTransaction'])
                 ->name('expenditure.update.transaction');
+        Route::get('/Transaction/previous', [ExpenditureController::class, 'allPreviousTransactions'])->name('expenditure.previous.transactions');
     });
 });

@@ -364,9 +364,10 @@ class HomeController extends Controller
 
                 // dd($token);
                 try {
-                    $response = Http::withToken($token)->get(config('app.finance_api_base_url') . '/accountant-dashboard', [
-                        'school_id' => $user->school_id,
-                    ]);
+                    $response = Http::withToken(session('finance_api_token'))
+                                    ->get(config('app.finance_api_base_url'). '/accountant-dashboard', [
+                                    'school_id' => $user->school_id,
+                                ]);
 
                     if ($response->successful()) {
                         $data = $response->json();
@@ -376,14 +377,18 @@ class HomeController extends Controller
                         $yearly = $data['yearly_expenses'] ?? 0;
                         $recent = $data['recent_expenses'] ?? [];
                         $last7DaysExpenses = $data['last_7_days_expenses'] ?? [];
-                    } else {
 
-                        Alert()->toast($response['message'], 'error');
+                        // Continue with your logic here...
+
+                    } else {
+                        $errorData = $response->json();
+                        Alert()->toast($errorData['message'] ?? 'Request failed', 'error');
                         return back();
                     }
                 } catch (\Throwable $e) {
-                    // Tuma ujumbe wa kirafiki badala ya 500
-                    Alert()->toast($e->getMessage() ?? 'Connection not established from the server', 'info');
+                    Log::error("Dashboard API error: " . $e->getMessage());
+                    Alert()->toast('Unable to connect to finance service', 'error');
+                    return to_route('home');
                 }
 
                 $students = Student::where('school_id', $user->school_id)

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\FinanceTokenService;
 use App\Services\BeemSmsService;
 use App\Services\NextSmsService;
 use Illuminate\Support\Facades\URL;
@@ -21,6 +22,10 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(NextSmsService::class, function($app) {
             return new NextSmsService();
+        });
+
+        $this->app->singleton(FinanceTokenService::class, function ($app) {
+            return new FinanceTokenService();
         });
     }
 

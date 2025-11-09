@@ -81,5 +81,6 @@ class Kernel extends HttpKernel
         'Accountant' => \App\Http\Middleware\AccountantMiddleware::class,
         'checkSessionTimeout' => \App\Http\Middleware\checkSessionTimeout::class,
         'apiSessionToken' => \App\Http\Middleware\ApiSessionTokenMiddleware::class,
+        'condtional.api.token' => \App\Http\Middleware\ConditionalApiSessionToken::class,
     ];
 }

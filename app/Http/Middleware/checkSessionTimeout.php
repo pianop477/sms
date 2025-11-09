@@ -42,7 +42,7 @@ class checkSessionTimeout
                 $request->session()->regenerateToken();
 
                 return redirect()->route('login')
-                    ->with('error', 'Session expired. Please login.');
+                    ->with('error', 'Session has expired. Please login.');
             }
 
             // 4. Update last_activity for non-background requests
