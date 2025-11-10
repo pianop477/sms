@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\other_staffs;
+use App\Models\school;
 use App\Models\Student;
+use App\Models\Teacher;
 use App\Models\Transport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -65,6 +68,7 @@ class TransportController extends Controller
             }
 
             $schoolBus = Transport::create([
+                'staff_id' => $this->getStaffId(),
                 'driver_name' => $request->fullname,
                 'gender' => $request->gender,
                 'phone' => $request->phone,
@@ -286,5 +290,25 @@ class TransportController extends Controller
             Alert()->toast($e->getMessage(), 'error');
             return back();
        }
+    }
+
+    protected function getStaffId()
+    {
+        $user = Auth::user();
+        $schoolData = school::find($user->school_id);
+
+        do {
+            // Tengeneza namba ya ID ya staff (4 digits)
+            $staffIdNumber = str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+            $fullStaffId = $schoolData->abbriv_code . '-' . $staffIdNumber;
+
+            // Check kama ID ipo kwenye tables zote
+            $existsInOtherStaffs = other_staffs::where('staff_id', $fullStaffId)->exists();
+            $existsInDrivers     = Transport::where('staff_id', $fullStaffId)->exists();
+            $existsInTeachers    = Teacher::where('member_id', $fullStaffId)->exists();
+
+        } while ($existsInOtherStaffs || $existsInDrivers || $existsInTeachers);
+
+        return $fullStaffId;
     }
 }
