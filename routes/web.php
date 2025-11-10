@@ -403,7 +403,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     });
 
     //4. ROUTES ACCESS FOR ALL USERS ========================================================================================================
-    Route::middleware(['CheckUsertype:1,2,3,4,5', 'condtional.api.token'])->group(function () {
+    Route::middleware(['CheckUsertype:1,2,3,4,5', 'conditional.api.token'])->group(function () {
         // Dashboard redirection
         Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::get('Change-password', [HomeController::class, 'changepassword'])->name('change.password');
@@ -548,7 +548,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('/expenditure/get-transaction/{id}', [ExpenditureController::class, 'getTransaction'])
                 ->name('expenditure.get.transaction');
         // Route to update transaction via AJAX
-        Route::post('/expenditure/update-transaction/{id}', [ExpenditureController::class, 'updateTransaction'])
+        Route::put('/expenditure/update-transaction/{transactionId}', [ExpenditureController::class, 'updateTransaction'])
                 ->name('expenditure.update.transaction');
         Route::get('/Transaction/previous', [ExpenditureController::class, 'allPreviousTransactions'])->name('expenditure.previous.transactions');
     });
