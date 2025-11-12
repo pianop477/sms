@@ -17,7 +17,7 @@ return new class extends Migration
             $table->date('date_of_birth')->nullable();
             $table->string('email')->unique()->nullable();
             $table->string('street_address')->nullable();
-            $table->enum('job_title', ['cooks', 'matron', 'patron', 'cleaner', 'security guard', 'driver', 'other'])->default('college');
+            $table->enum('job_title', ['cooks', 'matron', 'patron', 'cleaner', 'security guard', 'driver', 'other'])->default('driver');
             $table->year('joining_year')->nullable();
             $table->enum('educational_level', ['university', 'college', 'high_school', 'secondary', 'primary', 'other'])->default('other');
             $table->string('profile_image')->nullable();
