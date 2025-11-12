@@ -423,13 +423,13 @@
                         <div class="row mb-4 align-items-center">
                             <div class="col-md-8">
                                 <h4 class="header-title">
-                                    <i class="fas fa-receipt me-3"></i> This Month Transactions Bills
+                                    <i class="fas fa-receipt me-3"></i> All Billed Transactions
                                 </h4>
-                                <p class="text-muted mb-0">Overview Financial Transactions <span class="text-primary" style="font-weight: bold">(This Month - {{\Carbon\Carbon::now()->format('F')}})</span></p>
+                                <p class="text-muted mb-0">Overview Financial Transactions</p>
                             </div>
                             <div class="col-md-4 text-end">
                                 <div class="d-flex gap-2 justify-content-end">
-                                    <a href="{{route('home')}}" class="btn btn-back">
+                                    <a href="{{route('expenditure.all.transactions')}}" class="btn btn-back">
                                         <i class="fas fa-arrow-circle-left me-2"></i>
                                         Back
                                     </a>
@@ -439,12 +439,12 @@
 
                         {{-- Bill Statistics --}}
                         <div class="row mb-5">
-                            <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="col-xl-4 col-md-6 mb-4">
                                 <div class="stat-card bg-success-custom text-white">
                                     <div class="card-body">
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
-                                                <div class="card-title">Total Active Bills</div>
+                                                <div class="card-title">Total Active Amount</div>
                                                 @php
                                                     $totalActiveBills = collect($transactions)->where('status', 'active')->sum('amount');
                                                 @endphp
@@ -457,38 +457,12 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="col-xl-3 col-md-6 mb-4">
-                                <div class="stat-card bg-primary-custom text-white">
-                                    <div class="card-body">
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col mr-2">
-                                                <div class="card-title">This Month Bills</div>
-                                                @php
-                                                    $thisMonth = \Carbon\Carbon::now()->month;
-                                                    $totalMonthBills = collect($transactions)
-                                                                    ->where('status', 'active')
-                                                                    ->filter(function($item) use ($thisMonth) {
-                                                                        return \Carbon\Carbon::parse($item['created_at'])->month == $thisMonth;
-                                                                    })
-                                                                    ->sum('amount');
-                                                @endphp
-                                                <div class="card-value">{{number_format($totalMonthBills) ?? 0}}</div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <i class="fas fa-calendar-alt card-icon"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="col-xl-4 col-md-6 mb-4">
                                 <div class="stat-card bg-danger-custom text-white">
                                     <div class="card-body">
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
-                                                <div class="card-title">Cancelled Amount</div>
+                                                <div class="card-title">Total Cancelled Amount</div>
                                                 @php
                                                     $totalCancelledBills = collect($transactions)->where('status', 'cancelled')->sum('amount');
                                                 @endphp
@@ -502,7 +476,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-xl-3 col-md-6 mb-4">
+                            <div class="col-xl-4 col-md-6 mb-4">
                                 <div class="stat-card bg-warning-custom text-white">
                                     <div class="card-body">
                                         <div class="row no-gutters align-items-center">
@@ -523,20 +497,7 @@
                         </div>
                         <hr>
                         {{-- End of Bill Statistics --}}
-                        <div class="row">
-                            <div class="col-6 mb-3">
-                                <div class="col-12 text-end mb-3">
-                                    <button class="btn btn-export" data-bs-toggle="modal" data-bs-target="#exportReportModal">
-                                        <i class="fas fa-file-export me-2"></i> Export Transactions
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="col-6 mb-3">
-                                <a href="{{route('expenditure.previous.transactions')}}" class="btn btn-info float-right">
-                                    <i class="fas fa-list me-2"></i> All Transactions
-                                </a>
-                            </div>
-                        </div>
+
                         <!-- Transactions Table -->
                         <div class="single-table">
                             <div class="table-responsive">
@@ -559,7 +520,7 @@
                                             <tr>
                                                 <td class="text-center text-danger py-4" colspan="9">
                                                     <i class="fas fa-exclamation-triangle fa-2x mb-3 d-block"></i>
-                                                    No transaction records were found for {{\Carbon\Carbon::now()->format('F')}}!
+                                                    No transaction records were found!
                                                 </td>
                                             </tr>
                                         @else
@@ -641,7 +602,7 @@
                                                                     <i class="fas fa-ban"></i>
                                                                 </a>
                                                             @else
-                                                                <a href="#" title="View Bill" data-bs-toggle="modal" class="btn btn-sm btn-outline-info" data-bs-target="#viewModal{{$row['reference_number']}}">
+                                                                <a href="#" title="View Bill" data-bs-toggle="modal" class="btn btn-sm btn-outline-primary" data-bs-target="#viewModal{{$row['reference_number']}}">
                                                                     <i class="fas fa-eye"></i>
                                                                 </a>
                                                                 <form action="{{route('expenditure.delete.bill', ['bill' => Hashids::encode($row['id'])])}}" method="POST" class="d-inline">
@@ -666,114 +627,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Export Report Modal -->
-    <div class="modal fade" id="exportReportModal" tabindex="-1" aria-labelledby="exportReportModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="exportReportModalLabel">
-                        <i class="fas fa-file-export me-2"></i> Generate Transactions Bills Report
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close text-danger"></i></button>
-                </div>
-                <form id="exportReportForm" class="report-form">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="alert alert-info border-0">
-                            <i class="fas fa-info-circle me-2"></i>
-                            Customize your report by applying filters below.
-                        </div>
-
-                        <div class="row">
-                            <!-- Category Filter -->
-                            <div class="col-md-6 mb-3">
-                                <label for="start_date" class="form-label">Start Date <i class="text-danger">*</i></label>
-                                <div class="date-input-group">
-                                    <input type="date" name="start_date" required id="start_date" class="form-control form-control-custom" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
-                                </div>
-                                <span class="text-danger error-message" id="start_date_error"></span>
-                            </div>
-
-                            <!-- End Date -->
-                            <div class="col-md-6 mb-3">
-                                <label for="end_date" class="form-label">End Date <i class="text-danger">*</i></label>
-                                <div class="date-input-group">
-                                    <input type="date" name="end_date" required id="end_date" class="form-control form-control-custom" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
-                                </div>
-                                <span class="text-danger error-message" id="end_date_error"></span>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <!-- Start Date -->
-                            <div class="col-md-6 mb-3">
-                                <label for="category" class="form-label">Category</label>
-                                <select name="category" id="category" class="form-select form-control-custom">
-                                    <option value="">--Select Category--</option>
-                                    @if (!empty($categories))
-                                        @foreach ($categories as $category)
-                                            <option value="{{ $category['id'] }}">{{ ucwords(strtolower($category['expense_type'])) }}</option>
-                                        @endforeach
-                                    @else
-                                        <option value="" disabled>No categories available</option>
-                                    @endif
-                                </select>
-                                <span class="text-danger error-message" id="category_error"></span>
-                            </div>
-                            <!-- Status Filter -->
-                            <div class="col-md-6 mb-3">
-                                <label for="status" class="form-label">Status</label>
-                                <select name="status" id="status" class="form-select form-control-custom">
-                                    <option value="">--Select Status--</option>
-                                    <option value="active">Active</option>
-                                    <option value="cancelled">Cancelled</option>
-                                    <option value="pending">Pending</option>
-                                </select>
-                                <span class="text-danger error-message" id="status_error"></span>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <!-- Payment Mode -->
-                            <div class="col-md-6 mb-3">
-                                <label for="payment_mode" class="form-label">Payment Mode</label>
-                                <select name="payment_mode" id="payment_mode" class="form-select form-control-custom">
-                                    <option value="">--Select payment--</option>
-                                    <option value="cash">Cash</option>
-                                    <option value="mobile_money">Mobile Money</option>
-                                    <option value="bank">Bank Transfer</option>
-                                </select>
-                                <span class="text-danger error-message" id="payment_mode_error"></span>
-                            </div>
-
-                            <!-- Export Format -->
-                            <div class="col-md-6 mb-3">
-                                <label for="export_format" class="form-label">Export Format <i class="text-danger">*</i></label>
-                                <select name="export_format" required id="export_format" class="form-select form-control-custom" required>
-                                    <option value="">--Select Format--</option>
-                                    <option value="pdf"><i class="fas fa-file-pdf"></i> pdf</option>
-                                    <option value="excel"><i class="fas fa-file-excel"></i> Excel</option>
-                                    {{-- <option value="word">Word</option> --}}
-                                    <option value="csv"><i class="fas fa-file-csv"></i> csv</option>
-                                </select>
-                                <span class="text-danger error-message" id="export_format_error"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <i class="fas fa-times me-2"></i> Cancel
-                        </button>
-                        <button type="submit" class="btn btn-success" id="generateReportBtn">
-                            <i class="fas fa-download me-2"></i> Generate Report
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     {{-- edit transaction modal --}}
     <div class="modal fade" id="editTransactionModal" tabindex="-1" aria-labelledby="editTransactionModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -895,9 +748,6 @@
             </div>
         </div>
     </div>
-
-        <!-- Existing Modals Section - Placed OUTSIDE the table -->
-        <!-- Modals Section - Placed OUTSIDE the table -->
         @if (!empty($transactions))
             @foreach ($transactions as $row)
                 <!-- View Modal -->

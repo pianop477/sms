@@ -782,4 +782,145 @@ class ExpenditureController extends Controller
             throw new \Exception('Failed to generate Word document: ' . $e->getMessage());
         }
     }
+
+    public function getTransaction($id, Request $request)
+    {
+        $user = Auth::user();
+
+        try {
+            $response = Http::withToken(session('finance_api_token'))->get(
+                config('app.finance_api_base_url'). '/daily-expense/' . $id,
+                ['school_id' => $user->school_id]
+            );
+
+            if ($response->successful()) {
+                $data = $response->json();
+
+                if (!empty($data)) {
+                    $transaction = $data['expense'];
+                    $categories = $data['categories'];
+
+                    return response()->json([
+                        'success' => true,
+                        'transaction' => $transaction,
+                        'categories' => $categories
+                    ]);
+                }
+
+                return response()->json([
+                    'success' => false,
+                    'error' => 'No transactions were found'
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Failed to fetch transaction data'
+            ], $response->status());
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage() ?? 'Failed to fetch transaction details',
+            ], 500);
+        }
+    }
+
+
+    public function updateTransaction ($transactionId, Request $request)
+    {
+        $validated = $request->validate([
+            'category' => 'required|integer',
+            'date' => 'required|date|date_format:Y-m-d',
+            'amount' => 'required|numeric',
+            'description' => 'required|string|max:500',
+            'payment' => 'required|string',
+            'attachment' => ['nullable', 'file', 'mimetypes:application/pdf,image/jpeg,image/png'],
+        ]);
+
+        $user = Auth::user();
+
+        try {
+            $http = Http::withToken(session('finance_api_token'));
+
+            // kama kuna attachment, tumia attach
+            if ($request->hasFile('attachment')) {
+                $file = $request->file('attachment');
+                $http = $http->attach(
+                    'attachment',
+                    fopen($file->getRealPath(), 'r'),
+                    $file->getClientOriginalName()
+                );
+            }
+
+            // sasa tuma request
+            $response = $http->put(
+                config('app.finance_api_base_url') . '/daily-expense/update/'. $transactionId,
+                [
+                    'school_id' => $user->school_id,
+                    'user_id' => $user->id,
+                    'category_id' => $request->category,
+                    'description' => $request->description,
+                    'amount' => $request->amount,
+                    'expense_date' => $request->date,
+                    'payment_mode' => $request->payment,
+                    'status' => $request->status,
+                ]
+            );
+
+            if ($response->successful()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Transaction updated successfully',
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => $response->json()['message'] ?? 'Failed to update transaction'
+                ], $response->status());
+            }
+        } catch (Throwable $e) {
+            // Alert()->toast($e->getMessage() ?? 'Connection not established from the server', 'error');
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    public function all()
+    {
+        $user = Auth::user();
+        $school_id = $user->school_id;
+
+        if(! $school_id) {
+            Alert()->toast('Invalid or missing required parameter');
+            return back();
+        }
+
+        try {
+
+            $response = Http::withToken(session('finance_api_token'))->get(config('app.finance_api_base_url'). '/other/transactions', [
+                'school_id' => $school_id,
+            ]);
+
+            if($response->successful()) {
+                $data = $response->json();
+                $transactions = $data['transactions'];
+                $categories = $data['categories'];
+                // Log::info('Transactions data: '. print_r($categories, true));
+                return view('Expenditures.previous_transactions', compact('transactions', 'categories'));
+            }
+            else {
+                Alert()->toast($response['message'] ?? 'Failed to fetch transactions records', 'error');
+                Log::error("Error code ". $response->status());
+                return back();
+            }
+        } catch (Throwable $e) {
+            Alert()->toast($e->getMessage() ?? "Connection not established from the server", "info");
+            return back();
+        }
+    }
+
 }

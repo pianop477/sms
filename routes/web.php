@@ -550,6 +550,6 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         // Route to update transaction via AJAX
         Route::put('/expenditure/update-transaction/{transactionId}', [ExpenditureController::class, 'updateTransaction'])
                 ->name('expenditure.update.transaction');
-        Route::get('/Transaction/previous', [ExpenditureController::class, 'allPreviousTransactions'])->name('expenditure.previous.transactions');
+        Route::get('/All/billed/transactions', [ExpenditureController::class, 'all'])->name('expenditure.previous.transactions');
     });
 });

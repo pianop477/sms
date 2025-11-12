@@ -1,6 +1,8 @@
 @extends('SRTDashboard.frame')
 
 @section('content')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <style>
     :root {
         --primary-color: #4e73df;
@@ -375,8 +377,8 @@
                         </button>
                     </div>
                     <div class="col-md-2">
-                        <a href="{{route('expenditure.all.transactions')}}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-list me-1"></i> All Transactions
+                        <a href="{{route('expenditure.all.transactions')}}" class="btn btn-primary btn-sm float-right">
+                            <i class="fas fa-list me-1"></i> View All
                         </a>
                     </div>
                 </div>
@@ -427,17 +429,17 @@
                                         </td>
                                         <td class="text-center">
                                             @if ($row['status'] == 'active')
-                                                <span class="status-badge bg-success text-white">
+                                                <span class="badge bg-success text-white">
                                                     <i class="fas fa-check-circle me-1"></i>
                                                     {{ucwords($row['status'])}}
                                                 </span>
                                             @elseif ($row['status'] == 'pending')
-                                                <span class="status-badge bg-warning text-white">
+                                                <span class="badge bg-warning text-white">
                                                     <i class="fas fa-clock me-1"></i>
                                                     {{ucwords($row['status'])}}
                                                 </span>
                                             @else
-                                                <span class="status-badge bg-danger text-white">
+                                                <span class="badge bg-danger text-white">
                                                     <i class="fas fa-times-circle me-1"></i>
                                                     {{ucwords($row['status'])}}
                                                 </span>
@@ -457,7 +459,7 @@
                                                 <span class="text-muted">N/A</span>
                                             @else
                                                 <div class="d-flex align-items-center">
-                                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 35px; height: 35px;">
+                                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-1" style="width: 35px; height: 35px;">
                                                         <span class="text-white fw-bold small">
                                                             {{ strtoupper(substr($user->first_name, 0, 1)) }}{{ strtoupper(substr($user->last_name, 0, 1)) }}
                                                         </span>
@@ -470,21 +472,29 @@
                                         </td>
                                         <td>
                                             <div class="action-buttons">
+                                                <button type="button"
+                                                    class="btn btn-xs btn-outline-primary edit-transaction-btn"
+                                                    title="Edit Bill"
+                                                    data-transaction-id="{{$row['id']}}"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editTransactionModal">
+                                                <i class="fas fa-pencil"></i>
+                                                </button>
                                                 @if ($row['status'] == 'active')
-                                                    <a href="#" title="View Bill" data-bs-toggle="modal" class="btn btn-sm btn-primary" data-bs-target="#viewModal{{$row['reference_number']}}">
+                                                    <a href="#" title="View Bill" data-bs-toggle="modal" class="btn btn-sm btn-outline-info" data-bs-target="#viewModal{{$row['reference_number']}}">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
-                                                    <a href="#" title="Cancel Bill" data-bs-toggle="modal" class="btn btn-sm btn-warning" data-bs-target="#cancelModal{{$row['reference_number']}}">
+                                                    <a href="#" title="Cancel Bill" data-bs-toggle="modal" class="btn btn-sm btn-outline-warning" data-bs-target="#cancelModal{{$row['reference_number']}}">
                                                         <i class="fas fa-ban"></i>
                                                     </a>
                                                 @else
-                                                    <a href="#" title="View Bill" data-bs-toggle="modal" class="btn btn-sm btn-primary" data-bs-target="#viewModal{{$row['reference_number']}}">
+                                                    <a href="#" title="View Bill" data-bs-toggle="modal" class="btn btn-sm btn-outline-info" data-bs-target="#viewModal{{$row['reference_number']}}">
                                                         <i class="fas fa-eye"></i>
                                                     </a>
                                                     <form action="{{route('expenditure.delete.bill', ['bill' => Hashids::encode($row['id'])])}}" method="POST" class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button class="btn btn-sm btn-danger" type="submit" title="Delete Bill" onclick="return confirm('Are you sure you want to delete this transaction?')">
+                                                        <button class="btn btn-sm btn-outline-danger" type="submit" title="Delete Bill" onclick="return confirm('Are you sure you want to delete this transaction?')">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </form>
@@ -862,6 +872,127 @@
         </div>
     </div>
 
+    {{-- edit transaction modal --}}
+    <div class="modal fade" id="editTransactionModal" tabindex="-1" aria-labelledby="editTransactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="editTransactionModalLabel">
+                        <i class="fas fa-pencil me-2"></i>
+                        Edit Transaction - <span id="modalReferenceNumber" class="text-uppercase fw-bold"></span>
+                    </h5>
+                    <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editTransactionForm" class="needs-validation" novalidate method="POST" enctype="multipart/form-data" data-no-preloader>
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" id="editTransactionId" name="transaction_id">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editDate" class="form-label">Transaction Date <span class="text-danger">*</span></label>
+                                <input type="date" name="date" class="form-control-custom"
+                                    id="editDate"
+                                    min="{{\Carbon\Carbon::now()->subYears(1)->format('Y-m-d')}}"
+                                    max="{{\Carbon\Carbon::now()->format('Y-m-d')}}"
+                                    required>
+                                <div class="invalid-feedback">Please select a valid date</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editCategory" class="form-label">Transaction Category <span class="text-danger">*</span></label>
+                                <select name="category" id="editCategory" class="form-control-custom" required>
+                                    <option value="">--Select category--</option>
+                                    @if(empty($categories))
+                                        <option value="">No categories found</option>
+                                    @else
+                                        @foreach ($categories as $category)
+                                            <option value="{{$category['id']}}">{{ucwords(strtolower($category['expense_type']))}}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                <div class="invalid-feedback">Please select a category</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="editDescription" class="form-label">Description <span class="text-danger">*</span></label>
+                                <textarea name="description" class="form-control-custom"
+                                        id="editDescription"
+                                        rows="3"
+                                        placeholder="Enter transaction description"
+                                        required></textarea>
+                                <div class="invalid-feedback">Please enter a description</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="editAmount" class="form-label">Amount (in TZS) <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">TZS</span>
+                                    <input type="number" name="amount" class="form-control-custom"
+                                        id="editAmount"
+                                        step="0.01"
+                                        min="0"
+                                        placeholder="0.00"
+                                        required>
+                                </div>
+                                <div class="invalid-feedback">Please enter a valid amount</div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="editPayment" class="form-label">Payment Mode <span class="text-danger">*</span></label>
+                                <select name="payment" id="editPayment" class="form-control-custom" required>
+                                    <option value="cash">Cash</option>
+                                    <option value="mobile_money">Mobile Payment</option>
+                                    <option value="bank">Bank Transfer</option>
+                                </select>
+                                <div class="invalid-feedback">Please select payment mode</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="editStatus" class="form-label">Transaction Status <span class="text-danger"></span></label>
+                                <select name="status" id="editStatus" class="form-control-custom" required>
+                                    <option value="active">Active</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                                <div class="invalid-feedback">Please select payment mode</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="editAttachment" class="form-label">
+                                    Receipt Attachment
+                                    <span class="text-muted small">(optional - leave empty to keep current)</span>
+                                </label>
+                                <input type="file" name="attachment" class="form-control-custom"
+                                    id="editAttachment"
+                                    accept=".jpg,.jpeg,.png,.pdf,.doc,.docx">
+                                <div class="form-text">Max file size: 5MB. Allowed: JPG, PNG, PDF, DOC</div>
+                            </div>
+                        </div>
+
+                        <!-- Current Attachment Preview -->
+                        <div class="row" id="currentAttachmentSection" style="display: none;">
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Current Attachment:</label>
+                                <div id="currentAttachmentPreview" class="border rounded p-3 bg-light">
+                                    <!-- Attachment preview will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-2"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-success" id="updateTransactionBtn">
+                                <i class="fas fa-save me-2"></i> Update Transaction
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -1355,6 +1486,220 @@
             }
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const editButtons = document.querySelectorAll('.edit-transaction-btn');
+        const editModal = document.getElementById('editTransactionModal');
+        const editForm = document.getElementById('editTransactionForm');
+        const modalTitle = document.getElementById('modalReferenceNumber');
+
+        // Handle edit button clicks
+        editButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const transactionId = this.getAttribute('data-transaction-id');
+                loadTransactionData(transactionId);
+            });
+        });
+
+        // Load transaction data via AJAX
+        function loadTransactionData(transactionId) {
+            const updateBtn = document.getElementById('updateTransactionBtn');
+            updateBtn.disabled = true;
+            updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Loading...';
+
+            fetch(`/expenditure/get-transaction/${transactionId}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status || data.success) {
+                        populateEditForm(data.transaction);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Failed to load transaction data',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 5000,
+                            timerProgressBar: true
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to load transaction data',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 5000,
+                        timerProgressBar: true
+                    });
+                })
+                .finally(() => {
+                    updateBtn.disabled = false;
+                    updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update Transaction';
+                });
+        }
+
+        // Populate form with transaction data
+        function populateEditForm(transaction) {
+            modalTitle.textContent = transaction.reference_number;
+            document.getElementById('editTransactionId').value = transaction.id;
+            document.getElementById('editDate').value = transaction.expense_date;
+            document.getElementById('editCategory').value = transaction.expense_type_id || transaction.category_id;
+            document.getElementById('editDescription').value = transaction.description || '';
+            document.getElementById('editAmount').value = transaction.amount || '';
+            document.getElementById('editPayment').value = transaction.payment_mode || 'cash';
+            document.getElementById('editStatus').value = transaction.status || 'active';
+
+            const attachmentSection = document.getElementById('currentAttachmentSection');
+            const attachmentPreview = document.getElementById('currentAttachmentPreview');
+
+            if (transaction.attachment_url && transaction.attachment) {
+                const extension = transaction.attachment.split('.').pop().toLowerCase();
+                const isImage = ['jpg', 'jpeg', 'png', 'gif'].includes(extension);
+                const isPDF = extension === 'pdf';
+
+                let previewHtml = '';
+                if (isImage) {
+                    previewHtml = `
+                        <div class="d-flex align-items-center">
+                            <img src="${transaction.attachment_url}"
+                                alt="Current receipt"
+                                style="max-width: 100px; max-height: 100px; border-radius: 5px;"
+                                class="me-3">
+                            <div>
+                                <strong>Current Attachment:</strong><br>
+                                <a href="${transaction.attachment_url}" target="_blank" class="btn btn-sm btn-outline-primary mt-1">
+                                    <i class="fas fa-eye me-1"></i> View
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                } else if (isPDF) {
+                    previewHtml = `
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-file-pdf text-danger fa-3x me-3"></i>
+                            <div>
+                                <strong>Current Attachment:</strong><br>
+                                <a href="${transaction.attachment_url}" target="_blank" class="btn btn-sm btn-outline-primary mt-1">
+                                    <i class="fas fa-eye me-1"></i> View PDF
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    previewHtml = `
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-file text-secondary fa-3x me-3"></i>
+                            <div>
+                                <strong>Current Attachment:</strong><br>
+                                <a href="${transaction.attachment_url}" target="_blank" class="btn btn-sm btn-outline-primary mt-1">
+                                    <i class="fas fa-download me-1"></i> Download
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                attachmentPreview.innerHTML = previewHtml;
+                attachmentSection.style.display = 'block';
+            } else {
+                attachmentSection.style.display = 'none';
+            }
+        }
+
+        // Handle update form submission
+        editForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            if (!editForm.checkValidity()) {
+                editForm.reportValidity();
+                return;
+            }
+
+            const updateBtn = document.getElementById('updateTransactionBtn');
+            updateBtn.disabled = true;
+            updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Updating...';
+
+            const formData = new FormData(editForm);
+            const transactionId = document.getElementById('editTransactionId').value;
+
+            fetch(`/expenditure/update-transaction/${transactionId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network error');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === true) {
+                        // Show success message with SweetAlert
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: data.message || 'Transaction updated successfully',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                        }).then(() => {
+                            editForm.reset();
+
+                            // reload full window
+                            window.location.reload();
+                        });
+
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'Failed to update transaction',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 5000,
+                            timerProgressBar: true
+                        });
+                        updateBtn.disabled = false;
+                        updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update Transaction';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Something went wrong while updating',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 5000,
+                        timerProgressBar: true
+                    });
+                    updateBtn.disabled = false;
+                    updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update Transaction';
+                });
+        });
+
+        // Reset form when modal is hidden
+        editModal.addEventListener('hidden.bs.modal', function () {
+            editForm.reset();
+            document.getElementById('currentAttachmentSection').style.display = 'none';
+        });
+    });
+
     // Authorization check
     @if (Auth::user()->usertype != 5)
         window.location.href = '/error-page';
