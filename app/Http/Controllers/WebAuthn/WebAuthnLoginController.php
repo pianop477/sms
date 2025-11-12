@@ -5,11 +5,14 @@ namespace App\Http\Controllers\WebAuthn;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\WebAuthnCredential;
+use App\Services\FinanceTokenService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Laragear\WebAuthn\Http\Requests\AssertedRequest;
 use Laragear\WebAuthn\Http\Requests\AssertionRequest;
 
@@ -60,30 +63,23 @@ class WebAuthnLoginController extends Controller
         // Only proceed with Finance API token if usertype == 5
         if ($user->usertype == 5) {
             try {
-                $response = Http::post(config('app.finance_api_base_url') . '/auth/token', [
-                    'client_key' => config('app.finance_api_client_key'),
-                    'client_secret' => config('app.finance_api_client_secret'),
-                ]);
+                $tokenService = new FinanceTokenService();
 
-                if ($response->successful()) {
-                    $tokenData = $response->json();
+                $debugUrl = $tokenService->debugConnection();
 
-                    session([
-                        'finance_api_token' => $tokenData['token'],
-                        'finance_token_expires_at' => now()->addSeconds($tokenData['expires_in']),
-                    ]);
-                } else {
+                 $token = $tokenService->ensureValidToken();
+
+                if (!$token) {
+                    $sessionId = Session::getId();
+                    DB::table('sessions')->where('id', $sessionId)->delete();
                     Auth::logout();
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Failed to genereate token, please try again!',
-                        'redirect' => route('login')
-                    ], 401);
+                    Session::invalidate();
+                    Log::error("Finance token acquisition failed for user: {$user->id}");
+                    return to_route('login')->with('error', 'Unable to connect to finance service. Please try again.');
                 }
+
+                Log::info("Finance API token acquired for user: {$user->id}");
             } catch (Exception $e) {
-                // Log::error('Error fetching Finance API token during biometric login', [
-                //     'message' => $e->getMessage()
-                // ]);
                 return response()->json([
                     'status' => false,
                     'message' => $e->getMessage()
