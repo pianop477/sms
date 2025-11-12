@@ -15,7 +15,17 @@ class Transport extends Model
         'phone',
         'bus_no',
         'routine',
-        'school_id'
+        'school_id',
+        'staff_id',
+        'email',
+        'job_title',
+        'educational_level',
+        'street_address',
+        'usertype',
+        'status',
+        'date_of_birth',
+        'joining_year',
+        'profile_image'
     ];
 
     protected $guarded = ['id', 'created_at', 'updated_at'];

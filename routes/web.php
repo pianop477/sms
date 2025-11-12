@@ -214,6 +214,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('{student}/Show-Students', [StudentsController::class, 'showRecords'])->name('Students.show');
         Route::get('Edit-student/{students}', [StudentsController::class, 'modify'])->name('students.modify');
         Route::put('{students}/Update-student', [StudentsController::class, 'updateRecords'])->name('students.update.records');
+        Route::get('/students/export/excel/{class}', [StudentsController::class, 'exportExcel'])->name('students.export.excel');
 
         // classes and students management
         Route::get('Classes-list', [ClassesController::class, 'showAllClasses'])->name('Classes.index');
@@ -332,6 +333,11 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('/Staffs', [OtherStaffsController::class, 'index'])->name('OtherStaffs.index');
         Route::post('/Staffs', [OtherStaffsController::class, 'addStaffInformation'])->name('OtherStaffs.store');
         Route::get('/Staffs/profile/type/{type}/{id}', [OtherStaffsController::class, 'staffProfile'])->name('OtherStaffs.profile');
+        Route::put('Staffs/profile/update/type/{type}/{id}', [OtherStaffsController::class, 'updateStaffProfile'])->name('OtherStaffs.update');
+        Route::put('/Staff/block/status/type/{type}/{id}', [OtherStaffsController::class, 'blockStatus'])->name('block.other.staffs');
+        Route::put('/Staff/unblock/status/type/{type}/{id}', [OtherStaffsController::class, 'unblockStatus'])->name('unblock.other.staffs');
+        Route::delete('Staff/remove/staff/type/{type}/{id}', [OtherStaffsController::class, 'removeStaff'])->name('remove.other.staffs');
+        Route::get('/Staff/export/format/{format}', [OtherStaffsController::class, 'exportStaffReport'])->name('export.other.staffs');
     });
 
     //3. ROUTE ACCESS FOR EITHER HEAD TEACHER OR ACADEMIC ONLY ============================================================================

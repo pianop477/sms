@@ -299,7 +299,6 @@
                                     <i class="fas fa-bus me-2 text-success"></i> Parents with Transport Students
                                 </label>
                             </div>
-
                             <div class="form-check mb-3 p-2 rounded" style="background: rgba(78, 84, 200, 0.05);">
                                 <input class="form-check-input" type="checkbox" name="send_without_transport" id="withoutTransport" value="1" {{ old('send_without_transport') ? 'checked' : '' }}>
                                 <label class="form-check-label" for="withoutTransport">
@@ -310,7 +309,21 @@
                             <div class="form-check p-2 rounded" style="background: rgba(78, 84, 200, 0.05);">
                                 <input class="form-check-input" type="checkbox" name="send_to_teachers" id="sendToTeachers" value="1" {{ old('send_to_teachers') ? 'checked' : '' }}>
                                 <label class="form-check-label" for="sendToTeachers">
-                                    <i class="fas fa-chalkboard-teacher me-2 text-info"></i> All Teachers
+                                    <i class="fas fa-chalkboard-teacher me-2 text-info"></i> All Teaching Staffs
+                                </label>
+                            </div>
+
+                            <div class="form-check p-2 rounded" style="background: rgba(78, 84, 200, 0.05);">
+                                <input class="form-check-input" type="checkbox" name="send_to_other_staff" id="sendToOtherStaff" value="1" {{ old('send_to_other_staff') ? 'checked' : '' }}>
+                                <label class="form-check-label" for="sendToTeachers">
+                                    <i class="fas fa-user-tie me-2 text-secondary"></i> All Non-Teaching Staffs
+                                </label>
+                            </div>
+
+                            <div class="form-check p-2 rounded" style="background: rgba(78, 84, 200, 0.05);">
+                                <input class="form-check-input" type="checkbox" name="send_to_drivers" id="SendToDrivers" value="1" {{ old('send_to_drivers') ? 'checked' : '' }}>
+                                <label class="form-check-label" for="sendToTeachers">
+                                    <i class="fas fa-drivers-license me-2 text-danger"></i> All Drivers Only
                                 </label>
                             </div>
                         </div>
@@ -366,25 +379,24 @@
         const textarea = document.getElementById("message_content");
         const charCount = document.getElementById("charCount");
         const maxChars = 306;
-        const classSelect = document.getElementById("classSelect");
-        const selectedClassesDiv = document.getElementById("selectedClasses");
-        const selectedClassesList = document.getElementById("selectedClassesList");
 
-        // Initial display
-        charCount.textContent = maxChars;
+        // On initial load, show how many characters are currently typed (default 0)
+        charCount.textContent = textarea.value.length;
 
         // Character count for message
         textarea.addEventListener("input", function () {
-            let currentLength = textarea.value.length;
+            const currentLength = textarea.value.length;
 
+            // Optional limit (if you still want to restrict typing beyond max)
             if (currentLength > maxChars) {
                 textarea.value = textarea.value.substring(0, maxChars);
-                currentLength = maxChars;
             }
 
-            const remaining = maxChars - currentLength;
-            charCount.textContent = remaining;
-            charCount.classList.toggle("text-danger", remaining < 50);
+            // Display characters typed so far
+            charCount.textContent = currentLength;
+
+            // Optional styling: make red if approaching limit
+            charCount.classList.toggle("text-danger", currentLength >= maxChars - 10);
         });
 
         // Update selected classes display
@@ -432,8 +444,10 @@
             const withTransport = document.getElementById('withTransport').checked;
             const withoutTransport = document.getElementById('withoutTransport').checked;
             const sendToTeachers = document.getElementById('sendToTeachers').checked;
+            const sendToOtherStaff = document.getElementById('sendToOtherStaff').checked;
+            const sendToDrivers = document.getElementById('SendToDrivers').checked;
 
-            if (!classesSelected && !sendToAll && !withTransport && !withoutTransport && !sendToTeachers) {
+            if (!classesSelected && !sendToAll && !withTransport && !withoutTransport && !sendToTeachers && ! sendToOtherStaff && ! sendToDrivers) {
                 event.preventDefault();
                 alert('Please select at least one recipient group or class.');
                 return;

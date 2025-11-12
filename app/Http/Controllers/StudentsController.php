@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\StudentsExport;
 use App\Models\class_learning_courses;
 use App\Models\Class_teacher;
 use App\Models\Grade;
@@ -19,6 +20,8 @@ use Illuminate\Support\Facades\Http;
 use Psy\Command\WhereamiCommand;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
+use StudentsExport as GlobalStudentsExport;
 use Vinkla\Hashids\Facades\Hashids;
 
 class StudentsController extends Controller
@@ -779,6 +782,26 @@ class StudentsController extends Controller
             $fileName = "Students List.pdf";
         }
         return $pdf->stream($fileName);
+    }
+
+    // export Excel
+    public function exportExcel($class)
+    {
+        $decoded_class = Hashids::decode($class);
+
+        if (empty($decoded_class)) {
+            Alert()->toast('Invalid class ID', 'error');
+            return back();
+        }
+
+        $classId = $decoded_class[0];
+
+        // Pata class name safely
+        $className = \App\Models\Grade::where('id', $classId)->value('class_name');
+
+        $fileName = ($className ?? 'Class') . '-Students-List.xlsx';
+
+        return Excel::download(new StudentsExport($classId), $fileName);
     }
 
     // get information for parent to register him or herself ************************************************

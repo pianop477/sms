@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Grade;
 use App\Models\notifications;
+use App\Models\other_staffs;
 use App\Models\school;
 use App\Models\Student;
 use App\Models\Teacher;
+use App\Models\Transport;
 use App\Services\BeemSmsService;
 use App\Services\NextSmsService;
 use Exception;
@@ -161,6 +163,8 @@ class SmsController extends Controller
             'send_with_transport' => 'sometimes|boolean',
             'send_without_transport' => 'sometimes|boolean',
             'send_to_teachers' => 'sometimes|boolean',
+            'send_to_other_staff' => 'sometimes|boolean',
+            'send_to_drivers' => 'sometimes|boolean',
         ], [
             'classes.array' => 'Classes must be an array',
             'classes.*.integer' => 'Each class must be a valid integer',
@@ -176,8 +180,10 @@ class SmsController extends Controller
             $withTransport = $request->has('send_with_transport');
             $withoutTransport = $request->has('send_without_transport');
             $sendToTeachers = $request->has('send_to_teachers');
+            $sendToOtherStaff = $request->has('send_to_other_staff');
+            $sendToDrivers = $request->has('send_to_drivers');
 
-            if (!$classesSelected && !$sendToAll && !$withTransport && !$withoutTransport && !$sendToTeachers) {
+            if (!$classesSelected && !$sendToAll && !$withTransport && !$withoutTransport && !$sendToTeachers && ! $sendToOtherStaff && ! $sendToDrivers) {
                 $validator->errors()->add(
                     'recipients',
                     'Please select at least one recipient group or class.'
@@ -194,6 +200,8 @@ class SmsController extends Controller
         $sendWithoutTransport = $request->has('send_without_transport');
         $sendToTeachers = $request->has('send_to_teachers');
         $selectedClasses = $request->input('classes', []);
+        $selectedStaffs = $request->has('send_to_other_staff');
+        $selectedDrivers = $request->has('send_to_drivers');
 
         // Initialize variables for notification
         $recipientType = null;
@@ -269,6 +277,20 @@ class SmsController extends Controller
             $recipientType = 'parents';
             $recipientId = 4; // User type ID for parents
         }
+        elseif($selectedStaffs) {
+            $drivers = Transport::all();
+            $others = other_staffs::all();
+            $data = $drivers->concat($others);
+
+            $recipientType = 'Other_staffs';
+            $recipientId = 6;
+        }
+        elseif($selectedDrivers) {
+            $data = Transport::where('school_id', $user->school_id)->get();
+
+            $recipientType = 'Drivers';
+            $recipientType = 7;
+        }
         else {
             Alert()->toast('No recipient selection made', 'error');
             return back()->withInput();
@@ -316,24 +338,24 @@ class SmsController extends Controller
             $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
             // Log the SMS sending for audit
-            // \Log::info('SMS sent successfully', [
-            //     'school_id' => $user->school_id,
-            //     'recipient_count' => $recipientCount,
-            //     'classes_selected' => $selectedClasses,
-            //     'send_to_all' => $sendToAllClasses,
-            //     'notification_id' => $notification->id,
-            //     'message_length' => strlen($request->message_content)
-            // ]);
+            Log::info('SMS sent successfully', [
+                'school_id' => $user->school_id,
+                'recipient_count' => $recipientCount,
+                'classes_selected' => $selectedClasses,
+                'send_to_all' => $sendToAllClasses,
+                // 'notification_id' => $notification->id,
+                'message_length' => strlen($request->message_content)
+            ]);
 
             Alert()->toast('Message Sent Successfully to ' . $recipientCount . ' recipients', 'success');
             return redirect()->back();
 
         } catch(Exception $e) {
-            // \Log::error('SMS sending failed', [
-            //     'error' => $e->getMessage(),
-            //     'school_id' => $user->school_id,
-            //     'recipient_count' => $recipientCount
-            // ]);
+            Log::error('SMS sending failed', [
+                'error' => $e->getMessage(),
+                'school_id' => $user->school_id,
+                'recipient_count' => $recipientCount
+            ]);
 
             Alert()->toast('Failed to send SMS: ' . $e->getMessage(), 'error');
             return back()->withInput();

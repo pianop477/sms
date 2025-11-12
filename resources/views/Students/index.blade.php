@@ -180,9 +180,23 @@
                                     <button type="button" class="btn btn-info btn-xs mr-1" data-bs-toggle="modal" data-bs-target="#promoteModal">
                                         <i class="fas fa-exchange-alt me-1"></i> Promote
                                     </button>
-                                    <a href="{{route('export.student.pdf', ['class' => Hashids::encode($classId->id)])}}" target="_blank" class="btn btn-primary btn-xs mr-1">
-                                        <i class="fas fa-cloud-arrow-down me-1"></i> Export
-                                    </a>
+                                    <div class="dropdown">
+                                        <button class="btn btn-primary btn-xs btn-action dropdown-toggle mr-1" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-cloud-arrow-down me-1"></i> Export
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                                            <li>
+                                                <a class="dropdown-item" href="{{route('students.export.excel', ['class' => Hashids::encode($classId->id)])}}">
+                                                    <i class="fas fa-file-excel me-1 text-success"></i> Excel
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="{{route('export.student.pdf', ['class' => Hashids::encode($classId->id)])}}" target="_blank">
+                                                    <i class="fas fa-file-pdf me-1 text-danger"></i> PDF
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
                                     @endif
                                     <a href="{{route('classes.list', ['class' => Hashids::encode($classId->id)])}}" class="btn btn-secondary btn-xs mr-1">
                                         <i class="fas fa-arrow-circle-left me-1"></i> Back
@@ -199,7 +213,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="d-flex align-items-center">
-                                        <i class="fas fa-users fa-2x me-3"></i>
+                                        <i class="fas fa-users fa-2x me-3 mr-2"></i>
                                         <div>
                                             <h6 class="mb-0"> Total Students</h6>
                                             <h3 class="mb-0"> {{ $students->count() }}</h3>
@@ -208,7 +222,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="d-flex align-items-center">
-                                        <i class="fas fa-male fa-2x me-3"></i>
+                                        <i class="fas fa-male fa-2x me-3 mr-2"></i>
                                         <div>
                                             <h6 class="mb-0"> Boys</h6>
                                             <h3 class="mb-0"> {{ $students->filter(fn($s) => strtolower($s->gender) === 'male')->count() }}</h3>
@@ -217,7 +231,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="d-flex align-items-center">
-                                        <i class="fas fa-female fa-2x me-3"></i>
+                                        <i class="fas fa-female fa-2x me-3 mr-2"></i>
                                         <div>
                                             <h6 class="mb-0"> Girls</h6>
                                             <h3 class="mb-0"> {{ $students->filter(fn($s)=> strtolower($s->gender) === 'female')->count() }}</h3>
