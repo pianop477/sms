@@ -889,7 +889,7 @@ class ExpenditureController extends Controller
     }
 
 
-    public function all()
+    public function groupedTransactions ()
     {
         $user = Auth::user();
         $school_id = $user->school_id;
@@ -901,7 +901,39 @@ class ExpenditureController extends Controller
 
         try {
 
-            $response = Http::withToken(session('finance_api_token'))->get(config('app.finance_api_base_url'). '/other/transactions', [
+            $response = Http::withToken(session('finance_api_token'))->get(config('app.finance_api_base_url'). '/other/transactions/grouped', [
+                'school_id' => $school_id,
+            ]);
+
+            if($response->successful()) {
+                $data = $response->json();
+                $groupedData = $data['data'];
+                // Log::info('Transactions data: '. print_r($categories, true));
+                return view('Expenditures.grouped_expense', compact('groupedData'));
+            }
+            else {
+                Alert()->toast($response['message'] ?? 'Failed to fetch transactions records', 'error');
+                Log::error("Error code ". $response->status());
+                return back();
+            }
+        } catch (Throwable $e) {
+            Alert()->toast($e->getMessage() ?? "Connection not established from the server", "info");
+            return back();
+        }
+    }
+    public function all($year)
+    {
+        $user = Auth::user();
+        $school_id = $user->school_id;
+
+        if(! $school_id) {
+            Alert()->toast('Invalid or missing required parameter');
+            return back();
+        }
+
+        try {
+
+            $response = Http::withToken(session('finance_api_token'))->get(config('app.finance_api_base_url'). '/other/transactions/year/'. $year, [
                 'school_id' => $school_id,
             ]);
 

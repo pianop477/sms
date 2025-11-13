@@ -429,7 +429,7 @@
                             </div>
                             <div class="col-md-4 text-end">
                                 <div class="d-flex gap-2 justify-content-end">
-                                    <a href="{{route('expenditure.all.transactions')}}" class="btn btn-back">
+                                    <a href="{{route('expenditure.grouped.transactions')}}" class="btn btn-back">
                                         <i class="fas fa-arrow-circle-left me-2"></i>
                                         Back
                                     </a>

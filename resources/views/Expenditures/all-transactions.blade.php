@@ -532,7 +532,7 @@
                                 </div>
                             </div>
                             <div class="col-6 mb-3">
-                                <a href="{{route('expenditure.previous.transactions')}}" class="btn btn-info float-right">
+                                <a href="{{route('expenditure.grouped.transactions')}}" class="btn btn-info float-right">
                                     <i class="fas fa-list me-2"></i> All Transactions
                                 </a>
                             </div>

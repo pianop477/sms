@@ -551,11 +551,9 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::delete('/daily-expenses/{bill}', [ExpenditureController::class, 'deleteInactiveBill'])->name('expenditure.delete.bill');
         Route::get('/Transactions/all', [ExpenditureController::class, 'allTractions'])->name('expenditure.all.transactions');
         Route::post('/Export-custom-report', [ExpenditureController::class, 'exportCustomReport'])->name('expenditure.export.custom.report');
-        Route::get('/expenditure/get-transaction/{id}', [ExpenditureController::class, 'getTransaction'])
-                ->name('expenditure.get.transaction');
-        // Route to update transaction via AJAX
-        Route::put('/expenditure/update-transaction/{transactionId}', [ExpenditureController::class, 'updateTransaction'])
-                ->name('expenditure.update.transaction');
-        Route::get('/All/billed/transactions', [ExpenditureController::class, 'all'])->name('expenditure.previous.transactions');
+        Route::get('/expenditure/get-transaction/{id}', [ExpenditureController::class, 'getTransaction'])->name('expenditure.get.transaction');
+        Route::put('/expenditure/update-transaction/{transactionId}', [ExpenditureController::class, 'updateTransaction'])->name('expenditure.update.transaction');
+        Route::get('/All/billed/transactions/year/{year}', [ExpenditureController::class, 'all'])->name('expenditure.previous.transactions');
+        Route::get('/All/grouped/transactions', [ExpenditureController::class, 'groupedTransactions'])->name('expenditure.grouped.transactions');
     });
 });
