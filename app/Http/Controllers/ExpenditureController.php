@@ -943,7 +943,7 @@ class ExpenditureController extends Controller
                 $categories = $data['categories'];
                 $year = $data['year'];
                 // Log::info('Transactions data: '. print_r($categories, true));
-                return view('Expenditures.previous_transactions', compact('transactions', 'categories'));
+                return view('Expenditures.previous_transactions', compact('transactions', 'categories', 'year'));
             }
             else {
                 Alert()->toast($response['message'] ?? 'Failed to fetch transactions records', 'error');
