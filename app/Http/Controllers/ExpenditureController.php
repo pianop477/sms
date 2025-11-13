@@ -941,6 +941,7 @@ class ExpenditureController extends Controller
                 $data = $response->json();
                 $transactions = $data['transactions'];
                 $categories = $data['categories'];
+                $year = $data['year'];
                 // Log::info('Transactions data: '. print_r($categories, true));
                 return view('Expenditures.previous_transactions', compact('transactions', 'categories'));
             }
