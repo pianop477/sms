@@ -60,44 +60,44 @@ use PHPUnit\Runner\ResultCache\ResultCache;
 |
 */
 
-Route::get('/welcome', function () {
-    return view('welcome');
-})->name('welcome');
+    Route::get('/welcome', function () {
+        return view('welcome');
+    })->name('welcome');
 
-Route::get('/check-session', function () {
-    return response()->json(['active' => auth()->check()]);
-});
+    Route::get('/check-session', function () {
+        return response()->json(['active' => auth()->check()]);
+    });
 
-// Throttle login route - max 5 attempts per 1 minute
-Route::post('login', [LoginController::class, 'login'])
-            ->middleware('throttle:3,1')
-            ->name('login');
+    // Throttle login route - max 5 attempts per 1 minute
+    Route::post('login', [LoginController::class, 'login'])
+                ->middleware('throttle:3,1')
+                ->name('login');
 
-Auth::routes();
+    Auth::routes();
 
-// Show biometric login page
-Route::get('/login/biometric', [WebAuthnLoginController::class, 'show'])->name('webauthn.login');
+    // Show biometric login page
+    Route::get('/login/biometric', [WebAuthnLoginController::class, 'show'])->name('webauthn.login');
 
-// Start WebAuthn login challenge
-Route::post('/login/biometric/options', [WebAuthnLoginController::class, 'options'])->name('webauthn.login.options')->middleware('throttle:5,1');
+    // Start WebAuthn login challenge
+    Route::post('/login/biometric/options', [WebAuthnLoginController::class, 'options'])->name('webauthn.login.options')->middleware('throttle:5,1');
 
-// Verify credential and login
-Route::post('/login/biometric/verify', [WebAuthnLoginController::class, 'verify'])->name('webauthn.login.verify')->middleware('throttle:5,1');
+    // Verify credential and login
+    Route::post('/login/biometric/verify', [WebAuthnLoginController::class, 'verify'])->name('webauthn.login.verify')->middleware('throttle:5,1');
 
 
-Route::post('/webauthn/register/options', [WebAuthnRegisterController::class, 'options'])->name('webauthn.register.options')->middleware('throttle:5,1');
-Route::post('/webauthn/register/verify', [WebAuthnRegisterController::class, 'register'])->name('webauthn.register.verify')->middleware('throttle:5,1');
+    Route::post('/webauthn/register/options', [WebAuthnRegisterController::class, 'options'])->name('webauthn.register.options')->middleware('throttle:5,1');
+    Route::post('/webauthn/register/verify', [WebAuthnRegisterController::class, 'register'])->name('webauthn.register.verify')->middleware('throttle:5,1');
 
-// ROUTE ACCESS FOR PARENTS REGISTRATION =================================================================================================
+    // ROUTE ACCESS FOR PARENTS REGISTRATION =================================================================================================
     Route::prefix('Register')->group(function () {
         Route::get('Parents', [UsersController::class, 'index'])->name('users.form');
         Route::post('Parents', [UsersController::class, 'create'])->name('users.create');
     });
 
-// ROUTES ACCESS FOR USERS TO SEND FEEDBACK TO THE SYSTEM AND GET SUPPORT ================================================================
+    // ROUTES ACCESS FOR USERS TO SEND FEEDBACK TO THE SYSTEM AND GET SUPPORT ================================================================
     Route::post('/Feedback', [SendMessageController::class, 'store'])->name('send.feedback.message');
 
-//ROUTES ACCESS TO SCAN AND VERIFY QR CODE FOR CONTRACTS =========================================================
+    //ROUTES ACCESS TO SCAN AND VERIFY QR CODE FOR CONTRACTS =========================================================
     Route::get('/contracts/verify/{token}', [ContractController::class, 'verify'])->name('contracts.verify');
 
     // Biometric OTP Routes
@@ -115,7 +115,6 @@ Route::post('/webauthn/register/verify', [WebAuthnRegisterController::class, 're
 
 // MIDDLEWARE FILTERING STARTS HERE **************************************************************************************
 Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 'block.ip', 'user.agent')->group(function () {
-
     /*
         =======================MPANGILIO WA ROUTES ZOTE UKO HAPA KULINGANA NA MAHITAJI YA MFUMO NA=========================================
         =================================AINA YA USER, PERMISSION NA ROLE YAKE KATIKA MFUMO================================================
@@ -533,7 +532,6 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
 
         return redirect()->route('login');
     })->name('logout');
-
 
     //10. ROUTE ACCESS FOR ACCOUNTANT USER GROUP =======================================================================================
     Route::middleware(['Accountant', 'apiSessionToken'])->group(function () {
