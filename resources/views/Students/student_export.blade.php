@@ -133,7 +133,7 @@
         <div class="school-info">
             <h4>{{ Auth::user()->school->school_name }}</h4>
             <h5>{{ strtoupper(Auth::user()->school->postal_address) }} - {{ strtoupper(Auth::user()->school->postal_name) }}</h5>
-            <h5>{{ ucwords(strtolower($students->first()->class_name)) ?? 'CLASS' }} Students List</h5>
+            <h5>{{ strtoupper($students->first()->class_name) ?? 'CLASS' }} Students List</h5>
         </div>
     </div>
 
