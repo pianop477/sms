@@ -26,14 +26,28 @@ class OtherStaffsController extends Controller
 
     public function index()
     {
-
         $drivers = Transport::all();
         $otherStaffs = other_staffs::all();
 
-        $combinedStaffs = $otherStaffs->concat($drivers)->sortBy('first_name');
+        // Normalize name key for every record
+        $normalizedDrivers = $drivers->map(function ($driver) {
+            $driver->full_name = $driver->driver_name;   // from Transport model
+            return $driver;
+        });
+
+        $normalizedStaffs = $otherStaffs->map(function ($staff) {
+            $staff->full_name = $staff->first_name;      // from OtherStaffs model
+            return $staff;
+        });
+
+        // Combine
+        $combinedStaffs = $normalizedStaffs
+                            ->concat($normalizedDrivers)
+                            ->sortBy('full_name');
 
         return view('OtherStaffs.index', compact('combinedStaffs'));
     }
+
 
     public function addStaffInformation (Request $request)
     {
