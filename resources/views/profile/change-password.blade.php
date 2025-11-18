@@ -88,7 +88,7 @@
             let input = document.getElementById(this.getAttribute("data-target"));
             if (input.type === "password") {
                 input.type = "text";
-                this.innerHTML = '<i class="ti-eye-slash"></i>';
+                this.innerHTML = '<i class="fas fa-eye-slash"></i>';
             } else {
                 input.type = "password";
                 this.innerHTML = '<i class="ti-eye"></i>';

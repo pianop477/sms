@@ -171,6 +171,20 @@
         color: white;
         border-radius: 0;
     }
+     .form-control-custom {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
+        }
 
     .form-control:focus, .form-select:focus {
         border-color: var(--primary-color);
@@ -223,11 +237,11 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h4 class="header-title mb-0">
-                            <i class="fas fa-child me-2"></i> My Children List
+                            <i class="fas fa-child me-2"></i> Children List
                         </h4>
                         <!-- Student Registration Modal Trigger -->
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentRegistrationModal">
-                            <i class="fas fa-plus me-1"></i> Register New Child
+                            <i class="fas fa-plus me-1"></i> New Child
                         </button>
                     </div>
 
@@ -297,7 +311,7 @@
                 <h5 class="modal-title text-white" id="studentRegistrationModalLabel">
                     <i class="fas fa-user-graduate me-2"></i> Student Registration Form
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-info border-0">
@@ -312,21 +326,21 @@
                     <div class="row mb-3">
                         <div class="col-md-4">
                             <label for="firstName" class="form-label fw-semibold">First Name</label>
-                            <input type="text" name="fname" class="form-control form-control-lg" id="firstName" value="{{ old('fname') }}" required>
+                            <input type="text" name="fname" class="form-control-custom" id="firstName" value="{{ old('fname') }}" required>
                             @error('fname')
                                 <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-4">
                             <label for="middleName" class="form-label fw-semibold">Middle Name</label>
-                            <input type="text" name="middle" class="form-control form-control-lg" id="middleName" value="{{ old('middle') }}" required>
+                            <input type="text" name="middle" class="form-control-custom" id="middleName" value="{{ old('middle') }}" required>
                             @error('middle')
                                 <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-4">
                             <label for="lastName" class="form-label fw-semibold">Last Name</label>
-                            <input type="text" name="lname" class="form-control form-control-lg" id="lastName" value="{{ old('lname') }}" required>
+                            <input type="text" name="lname" class="form-control-custom" id="lastName" value="{{ old('lname') }}" required>
                             @error('lname')
                                 <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
@@ -337,7 +351,7 @@
                     <div class="row mb-3">
                         <div class="col-md-4">
                             <label for="gender" class="form-label fw-semibold">Gender</label>
-                            <select name="gender" id="gender" class="form-select form-control-lg" required>
+                            <select name="gender" id="gender" class="form-control-custom" required>
                                 <option value="">-- Select Gender --</option>
                                 <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male</option>
                                 <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
@@ -348,7 +362,7 @@
                         </div>
                         <div class="col-md-4">
                             <label for="dob" class="form-label fw-semibold">Date of Birth</label>
-                            <input type="date" name="dob" class="form-control form-control-lg" id="dob"
+                            <input type="date" name="dob" class="form-control-custom" id="dob"
                                 value="{{ old('dob') }}"
                                 min="{{ \Carbon\Carbon::now()->subYears(17)->format('Y-m-d') }}"
                                 max="{{ \Carbon\Carbon::now()->subYears(2)->format('Y-m-d') }}"
@@ -359,7 +373,7 @@
                         </div>
                         <div class="col-md-4">
                             <label for="grade" class="form-label fw-semibold">Class</label>
-                            <select name="grade" id="grade" class="form-select form-control-lg text-uppercase" required>
+                            <select name="grade" id="grade" class="form-control-custom text-uppercase" required>
                                 <option value="">-- Select Class --</option>
                                 @forelse ($classes as $class)
                                     <option value="{{ $class->id }}" {{ old('grade') == $class->id ? 'selected' : '' }}>
@@ -379,7 +393,7 @@
                     <div class="row mb-4">
                         <div class="col-md-4">
                             <label for="stream" class="form-label fw-semibold">Stream</label>
-                            <select name="group" id="stream" class="form-select form-control-lg" required>
+                            <select name="group" id="stream" class="form-control-custom" required>
                                 <option value="">-- Select Stream --</option>
                                 <option value="a" {{ old('group') == 'a' ? 'selected' : '' }}>Stream A</option>
                                 <option value="b" {{ old('group') == 'b' ? 'selected' : '' }}>Stream B</option>
@@ -393,7 +407,7 @@
                             <label for="busNumber" class="form-label fw-semibold">
                                 School Bus <small class="text-muted">(optional)</small>
                             </label>
-                            <select name="driver" id="busNumber" class="form-select form-control-lg">
+                            <select name="driver" id="busNumber" class="form-control-custom">
                                 <option value="">-- Select School Bus --</option>
                                 @forelse ($buses as $bus)
                                     <option value="{{ $bus->id }}" {{ old('driver') == $bus->id ? 'selected' : '' }}>
@@ -411,7 +425,7 @@
                             <label for="studentPhoto" class="form-label fw-semibold">
                                 Photo <small class="text-muted">(optional)</small>
                             </label>
-                            <input type="file" name="image" class="form-control form-control-lg" id="studentPhoto" accept="image/*">
+                            <input type="file" name="image" class="form-control-custom" id="studentPhoto" accept="image/*">
                             @error('image')
                                 <div class="text-danger small mt-1">{{ $message }}</div>
                             @enderror
@@ -421,7 +435,7 @@
                     <div class="modal-footer border-0 pt-4">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" id="saveButton" class="btn btn-success">
-                            <span id="submitText">Register Child</span>
+                            <span id="submitText">Submit</span>
                             <span id="submitSpinner" class="spinner-border spinner-border-sm d-none ms-2" role="status"></span>
                         </button>
                     </div>
