@@ -23,7 +23,6 @@ class temporary_results extends Model
     'exam_date',
     'expiry_date',
     'expiry_notified'
-
     ];
 
     protected $guarded = ['id', 'updated_at', 'created_at'];
