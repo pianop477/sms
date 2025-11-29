@@ -22,6 +22,7 @@ class temporary_results extends Model
     'status',
     'exam_date',
     'expiry_date',
+    'expiry_notified'
 
     ];
 
