@@ -78,6 +78,11 @@ class UpdateExpiredContract extends Command
                      $payload['text'],
                      $payload['reference']
                  );
+                 if(!$response['success']) {
+                    throw new \Exception($response['error']);
+                    // Alert()->toast('SMS failed: '.$response['error'], 'error');
+                    // return back();
+                }
 
                 //  Log::info("Contract expired for Teacher ID: {$teacher->id}, User: {$user->first_name}");
              }

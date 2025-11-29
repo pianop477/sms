@@ -121,6 +121,10 @@ class updateRostersStatus extends Command
                 $payload['reference'],
             );
 
+            if(!$response['success']) {
+                throw new \Exception($response['error']);
+            }
+
             $this->info("SMS ya kuanza imetumwa kwa {$phone}");
             Log::info("SMS ya kuanza imetumwa kwa {$phone}");
         } catch (\Exception $e) {
