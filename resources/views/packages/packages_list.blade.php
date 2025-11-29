@@ -298,7 +298,7 @@
                         <h4 class="header-title text-white">
                             <i class="fas fa-list-alt me-2"></i> Holiday Packages List
                         </h4>
-                        <p class="mb-0 text-white-50"> Manage holiday packages for selected class and year</p>
+                        <p class="mb-0 text-white"> Manage holiday packages for selected class and year</p>
                     </div>
                     <div class="col-md-4 text-end">
                         <a href="{{route('package.byClass', ['year' => $year])}}" class="btn btn-back float-right">

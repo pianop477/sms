@@ -213,7 +213,7 @@
                         <h4 class="header-title text-white">
                             <i class="fas fa-chalkboard me-2"></i> Holiday Packages by Class
                         </h4>
-                        <p class="mb-0 text-white-50"> Select a class to view available packages</p>
+                        <p class="mb-0 text-white"> Select a class to view available packages</p>
                     </div>
                     <div class="col-md-4 text-end">
                         <a href="{{route('package.byYear')}}" class="btn btn-back float-right">

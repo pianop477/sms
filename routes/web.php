@@ -4,6 +4,7 @@ use App\Exports\TeachersExport;
 use App\Http\Controllers\AccountantsController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\BillsController;
 use App\Http\Controllers\BiometricController;
 use App\Http\Controllers\CertificateGeneratorController;
 use App\Http\Controllers\CertificateTemplateController;
@@ -24,6 +25,7 @@ use App\Http\Controllers\ResultsController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SchoolsController;
 use App\Http\Controllers\SendMessageController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SmsController;
 use App\Http\Controllers\StudentsController;
 use App\Http\Controllers\SubjectsController;
@@ -268,16 +270,16 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         // roster management routes
         Route::get('Teachers-roster', [TodRosterController::class, 'index'])->name('tod.roster.index');
 
+        //password reset--------------------
+        Route::get('Password-Reset', [RolesController::class, 'userPassword'])->name('users.lists');
+        // users management & permission
+        Route::put('{user}/Reset', [RolesController::class, 'resetPassword'])->name('users.reset.password');
     });
 
     // 2. ROUTE ACCESS FOR EITHER MANAGER OR HEAD TEACHER ONLY ===========================================================================
     Route::middleware(['ManagerOrTeacher'])->group(function(){
         //teachers panel management =======================================================================
         Route::put('{teacher}/Delete-teacher', [TeachersController::class, 'deleteTeacher'])->name('Teachers.remove');
-
-        // users management & permission
-        Route::get('Password-Reset', [RolesController::class, 'userPassword'])->name('users.lists');
-        Route::put('{user}/Reset', [RolesController::class, 'resetPassword'])->name('users.reset.password');
 
         //school bus management
         Route::get('{trans}/Student-tranport', [TransportController::class, 'showStudents'])->name('students.transport');
@@ -553,5 +555,28 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::put('/expenditure/update-transaction/{transactionId}', [ExpenditureController::class, 'updateTransaction'])->name('expenditure.update.transaction');
         Route::get('/All/billed/transactions/year/{year}', [ExpenditureController::class, 'all'])->name('expenditure.previous.transactions');
         Route::get('/All/grouped/transactions', [ExpenditureController::class, 'groupedTransactions'])->name('expenditure.grouped.transactions');
+
+        //manage payments
+        Route::get('/Services', [ServiceController::class, 'index'])->name('services.index');
+        Route::get('/Services/{id}', [ServiceController::class, 'editService'])->name('services.edit');
+        Route::put('/Service/update/{serviceId}', [ServiceController::class, 'updateService'])->name('services.update');
+        Route::post('/Services', [ServiceController::class, 'storeService'])->name('services.store');
+        Route::put('/Services/block/{id}', [ServiceController::class, 'blockService'])->name('services.block');
+        Route::delete('/Services/{id}', [ServiceController::class, 'deleteService'])->name('services.delete');
+
+        // schools fees management
+        Route::get('/Bills', [BillsController::class, 'index'])->name('bills.index');
+        Route::post('/Bills', [BillsController::class, 'store'])->name('bills.store');
+        Route::get('/Fees/Transactions', [BillsController::class, 'feesPayment'])->name('bills.transactions');
+        Route::get('/get-student-fees/{studentId}', [BillsController::class, 'getStudentFees'])->name('get.student.fees');
+        Route::post('/Transactions/payment', [BillsController::class, 'recordPayment'])->name('payment.store');
+        Route::get('/Transaction/report', [BillsController::class, 'paymentReport'])->name('payment.report');
+        Route::get('/Bills/view/{bill}', [BillsController::class, 'viewBill'])->name('bills.view');
+        Route::put('/Bills/cancel/{bill}', [BillsController::class, 'cancelBill'])->name('bills.cancel');
+        Route::post('/Bills/resend/bill/{bill}', [BillsController::class, 'resendBill'])->name('bills.resend');
+        Route::delete('/Bills/delete/bill/{bill}', [BillsController::class, 'deleteInactiveBill'])->name('bills.delete');
+        Route::get('/Bills/edit/bill/{bill}', [BillsController::class, 'editBill'])->name('bills.edit');
+        Route::put('/Bills/update/bill/{bill}', [BillsController::class, 'updateBill'])->name('bills.update');
+        Route::post('/Bills/export/bill', [BillsController::class, 'exportBill'])->name('bills.export');
     });
 });

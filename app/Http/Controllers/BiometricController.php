@@ -64,6 +64,11 @@ class BiometricController extends Controller
             'otp-'.uniqid()
         );
 
+        if(!$response['success']) {
+            Alert()->toast('SMS failed: '.$response['error'], 'error');
+            return back();
+        }
+
         $beemSmsService = new BeemSmsService();
         $sender = "shuleApp";
         $recipient_id = 1;

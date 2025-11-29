@@ -338,14 +338,19 @@ class SmsController extends Controller
             $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
             // Log the SMS sending for audit
-            Log::info('SMS sent successfully', [
-                'school_id' => $user->school_id,
-                'recipient_count' => $recipientCount,
-                'classes_selected' => $selectedClasses,
-                'send_to_all' => $sendToAllClasses,
-                // 'notification_id' => $notification->id,
-                'message_length' => strlen($request->message_content)
-            ]);
+            // Log::info('SMS sent successfully', [
+            //     'school_id' => $user->school_id,
+            //     'recipient_count' => $recipientCount,
+            //     'classes_selected' => $selectedClasses,
+            //     'send_to_all' => $sendToAllClasses,
+            //     // 'notification_id' => $notification->id,
+            //     'message_length' => strlen($request->message_content)
+            // ]);
+
+            if(!$response['success']) {
+                Alert()->toast('SMS failed: '.$response['error'], 'error');
+                return back();
+            }
 
             Alert()->toast('Message Sent Successfully to ' . $recipientCount . ' recipients', 'success');
             return redirect()->back();

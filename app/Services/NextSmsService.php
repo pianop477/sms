@@ -28,8 +28,6 @@ class NextSmsService
                 'reference' => $reference,
             ];
 
-            // Log::info($postData);
-
             $response = Http::withHeaders([
                 'Authorization' => 'Basic ' . base64_encode($this->apiUsername . ':' . $this->apiPassword),
                 'Content-Type' => 'application/json',
@@ -37,14 +35,23 @@ class NextSmsService
             ])->post($url, $postData);
 
             if($response->failed()) {
-                throw new Exception($response->body());
+                return [
+                    'success' => false,
+                    'error' => $response->body()
+                ];
             }
 
-            return $response->json();
+            return [
+                'success' => true,
+                'data' => $response->json()
+            ];
         }
         catch (Exception $e) {
-            // Handle exceptions
-            throw new Exception($e->getMessage());
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
         }
     }
+
 }

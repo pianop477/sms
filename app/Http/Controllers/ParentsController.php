@@ -209,6 +209,11 @@ class ParentsController extends Controller
 
                 $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
+                if(!$response['success']) {
+                    Alert()->toast('SMS failed: '.$response['error'], 'error');
+                    return back();
+                }
+
                 $beemSmsService = new BeemSmsService();
                 $senderId = $school->sender_id ?? 'shuleApp';
                 $Code_id = 1;

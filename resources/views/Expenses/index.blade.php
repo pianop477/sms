@@ -121,7 +121,7 @@
                         <!-- Header Section -->
                         <div class="row mb-4">
                             <div class="col-md-10">
-                                <h4 class="header-title">Expenses Catogies</h4>
+                                <h4 class="header-title">Expenses Categories</h4>
                             </div>
                             <div class="col-md-2 text-end">
                                 <button type="button" class="btn btn-primary btn-action float-right" data-bs-toggle="modal" data-bs-target="#addExamModal">

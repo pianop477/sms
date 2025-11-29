@@ -32,7 +32,7 @@ class ExpenditureController extends Controller
                 $expenses = $data['expenses'];
                 $categories = $data['categories'];
             } else {
-                Alert()->toast($response['message'] ?? 'Failed to fetch transaction records', 'error');
+                Alert()->toast($response['message'] ?? 'Failed to fetch expense bills records', 'error');
             }
         } catch (Throwable $e) {
             Alert()->toast($e->getMessage() ?? 'Connection not established from the server', 'info');
@@ -88,9 +88,9 @@ class ExpenditureController extends Controller
             );
 
             if ($response->successful()) {
-                Alert()->toast('Transaction has been saved successfully', 'success');
+                Alert()->toast('Bills has been saved successfully', 'success');
             } else {
-                Alert()->toast($response['message'] ?? 'Failed to register transactions', 'error');
+                Alert()->toast($response['message'] ?? 'Failed to register bill', 'error');
                 // Log::error('Finance API error: ' . $response->body());
             }
         } catch (Throwable $e) {
@@ -116,11 +116,11 @@ class ExpenditureController extends Controller
             ]);
 
             if($response->successful()) {
-                Alert()->toast('Transaction bill has been cancelled successfully', 'success');
+                Alert()->toast('Bill has been cancelled successfully', 'success');
             }
 
             else {
-                Alert()->toast($response['message'] ?? 'Failed to cancel transaction', 'error');
+                Alert()->toast($response['message'] ?? 'Failed to cancel bill', 'error');
                 // Log::error("Error body: ". $response->status());
             }
 
@@ -144,10 +144,10 @@ class ExpenditureController extends Controller
                         ->delete(config('app.finance_api_base_url'). '/daily-expense/'.$decoded[0]);
 
             if($response->successful()) {
-                Alert()->toast('Transaction has been deleted successfully', 'success');
+                Alert()->toast('Bill has been deleted successfully', 'success');
             }
             else {
-                Alert()->toast($response['message'] ?? 'Failed to delete transaction', 'error');
+                Alert()->toast($response['message'] ?? 'Failed to delete Bill', 'error');
                 // Log::error("error found ". $response->status());
             }
         } catch(Throwable $e) {
@@ -181,7 +181,7 @@ class ExpenditureController extends Controller
                 return view('Expenditures.all-transactions', compact('transactions', 'categories'));
             }
             else {
-                Alert()->toast($response['message'] ?? 'Failed to fetch transactions records', 'error');
+                Alert()->toast($response['message'] ?? 'Failed to fetch bills records', 'error');
                 Log::error("Error code ". $response->status());
                 return back();
             }
@@ -229,10 +229,10 @@ class ExpenditureController extends Controller
                 if (empty($data['transactions'])) {
                     if ($request->ajax()) {
                         return response()->json([
-                            'error' => 'No transactions found for the selected criteria.'
+                            'error' => 'No bills found for the selected criteria.'
                         ], 404);
                     }
-                    Alert()->toast('No transactions found for the selected criteria', 'info');
+                    Alert()->toast('No bills found for the selected criteria', 'info');
                     return back();
                 }
 
@@ -262,7 +262,7 @@ class ExpenditureController extends Controller
                 }
             }
             else {
-                $errorMessage = 'Failed to export transactions report. API Error: ' . $response['message'];
+                $errorMessage = 'Failed to export bills report. API Error: ' . $response['message'];
 
                 if ($request->ajax()) {
                     return response()->json([
@@ -299,7 +299,7 @@ class ExpenditureController extends Controller
         $pdf->render();
 
         // Hii itastream PDF kwenye browser badala ya kudownload
-        return $pdf->stream('transactions_report.pdf', ['Attachment' => true]);
+        return $pdf->stream('bills_report.pdf', ['Attachment' => true]);
     }
 
 
@@ -352,7 +352,7 @@ class ExpenditureController extends Controller
         // Report Title - Row 4
         $titleRow = $addressRow + 1;
         $sheet->mergeCells('A'.$titleRow.':H'.$titleRow);
-        $sheet->setCellValue('A'.$titleRow, "FINANCIAL TRANSACTIONS REPORT");
+        $sheet->setCellValue('A'.$titleRow, "FINANCIAL EXPENSE REPORT");
         $sheet->getStyle('A'.$titleRow)->applyFromArray([
             'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '2C3E50']],
             'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
@@ -370,7 +370,7 @@ class ExpenditureController extends Controller
         // Report Summary - Row 6
         $summaryRow = $periodRow + 1;
         $sheet->mergeCells('A'.$summaryRow.':H'.$summaryRow);
-        $sheet->setCellValue('A'.$summaryRow, "Total Transactions: " . count($transactions) . " | Generated: " . \Carbon\Carbon::now()->format('d M Y H:i'));
+        $sheet->setCellValue('A'.$summaryRow, "Total Expenses Bills Count: " . count($transactions) . " | Generated at: " . \Carbon\Carbon::now()->format('d M Y H:i'));
         $sheet->getStyle('A'.$summaryRow)->applyFromArray([
             'font' => ['size' => 10, 'color' => ['rgb' => '2C3E50']],
             'fill' => [
@@ -581,7 +581,7 @@ class ExpenditureController extends Controller
         //  OUTPUT FILE
         // =========================
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $filename = 'financial_transactions_report_' . date('Y_m_d_His') . '.xlsx';
+        $filename = 'financial_bill_report_' . date('Y_m_d_His') . '.xlsx';
         $temp_file = tempnam(sys_get_temp_dir(), $filename);
         $writer->save($temp_file);
 
@@ -594,14 +594,14 @@ class ExpenditureController extends Controller
 
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Transactions Report');
+        $sheet->setTitle('Expense Bills Report');
 
         $row = 1;
 
         // Report header (school info)
         $sheet->setCellValue("A{$row}", strtoupper($school->school_name)); $row++;
         $sheet->setCellValue("A{$row}", ucwords(strtolower($school->postal_address)). ', '. ucwords(strtolower($school->postal_name)). '-'. ucwords(strtolower($school->country))); $row++;
-        $sheet->setCellValue("A{$row}", "FINANCIAL TRANSACTIONS REPORT"); $row++;
+        $sheet->setCellValue("A{$row}", "FINANCIAL EXPENSE REPORT"); $row++;
         $sheet->setCellValue("A{$row}", "From: " . \Carbon\Carbon::parse($start_date)->format('d M Y') . " To: " . \Carbon\Carbon::parse($end_date)->format('d M Y')); $row++;
         $sheet->setCellValue("A{$row}", "Generated: " . \Carbon\Carbon::now()->format('d M Y H:i')); $row += 2; // space
 
@@ -659,7 +659,7 @@ class ExpenditureController extends Controller
         $writer->setLineEnding("\r\n");
         $writer->setSheetIndex(0);
 
-        $filename = 'financial_transactions_report_' . date('Y_m_d_His') . '.csv';
+        $filename = 'financial_bills_report_' . date('Y_m_d_His') . '.csv';
         $temp_file = tempnam(sys_get_temp_dir(), $filename);
         $writer->save($temp_file);
 
@@ -677,8 +677,8 @@ class ExpenditureController extends Controller
             // Set basic document properties
             $phpWord->getDocInfo()->setCreator($school->school_name)
                     ->setCompany($school->school_name)
-                    ->setTitle('Transactions Report')
-                    ->setDescription('Generated financial transactions report');
+                    ->setTitle('Expense Bills Report')
+                    ->setDescription('Generated financial Expense report');
 
             // Add simple section
             $section = $phpWord->addSection();
@@ -691,7 +691,7 @@ class ExpenditureController extends Controller
             );
 
             $section->addText(
-                'Transactions Report',
+                'Expense Report',
                 ['bold' => true, 'size' => 14, 'name' => 'Arial'],
                 ['alignment' => 'center']
             );
@@ -809,19 +809,19 @@ class ExpenditureController extends Controller
 
                 return response()->json([
                     'success' => false,
-                    'error' => 'No transactions were found'
+                    'error' => 'No expense bills were found'
                 ]);
             }
 
             return response()->json([
                 'success' => false,
-                'error' => 'Failed to fetch transaction data'
+                'error' => 'Failed to fetch expense bills data'
             ], $response->status());
 
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'error' => $e->getMessage() ?? 'Failed to fetch transaction details',
+                'error' => $e->getMessage() ?? 'Failed to fetch expense bills details',
             ], 500);
         }
     }
@@ -871,12 +871,12 @@ class ExpenditureController extends Controller
             if ($response->successful()) {
                 return response()->json([
                     'status' => true,
-                    'message' => 'Transaction updated successfully',
+                    'message' => 'Expense bill updated successfully',
                 ], 200);
             } else {
                 return response()->json([
                     'status' => false,
-                    'message' => $response->json()['message'] ?? 'Failed to update transaction'
+                    'message' => $response->json()['message'] ?? 'Failed to update expense bill'
                 ], $response->status());
             }
         } catch (Throwable $e) {
@@ -912,7 +912,7 @@ class ExpenditureController extends Controller
                 return view('Expenditures.grouped_expense', compact('groupedData'));
             }
             else {
-                Alert()->toast($response['message'] ?? 'Failed to fetch transactions records', 'error');
+                Alert()->toast($response['message'] ?? 'Failed to fetch bills records', 'error');
                 Log::error("Error code ". $response->status());
                 return back();
             }
@@ -946,7 +946,7 @@ class ExpenditureController extends Controller
                 return view('Expenditures.previous_transactions', compact('transactions', 'categories', 'year'));
             }
             else {
-                Alert()->toast($response['message'] ?? 'Failed to fetch transactions records', 'error');
+                Alert()->toast($response['message'] ?? 'Failed to fetch bills records', 'error');
                 Log::error("Error code ". $response->status());
                 return back();
             }

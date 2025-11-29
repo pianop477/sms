@@ -25,7 +25,7 @@
         backdrop-filter: blur(10px);
         border-radius: 20px;
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-        overflow: visible;
+        overflow-x: hidden;
         margin-top: 30px;
         border: 1px solid rgba(255, 255, 255, 0.5);
         position: relative;
@@ -348,7 +348,7 @@
 
                             <div class="d-flex justify-content-between align-items-center mt-3">
                                 <small class="text-muted">
-                                    <span class="char-count" id="charCount">306</span> characters remaining
+                                    <span class="char-count" id="charCount">306</span> Typed characters
                                 </small>
                                 <small class="text-danger fw-bold">
                                     <i class="fas fa-info-circle me-1"></i> Max 2 SMS
@@ -364,7 +364,7 @@
 
                 <!-- Submit Button -->
                 <div class="d-flex justify-content-center mt-4">
-                    <button class="btn btn-primary-custom" id="saveButton" type="submit">
+                    <button class="btn btn-primary-custom" id="saveButton" type="submit" onclick="return confirm('Are you sure you want send message?')">
                         <i class="fas fa-paper-plane me-2"></i> Send SMS
                     </button>
                 </div>

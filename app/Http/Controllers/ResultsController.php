@@ -953,6 +953,11 @@ class ResultsController extends Controller
                         $payload['text'],
                         $payload['reference']
                     );
+
+                    if(!$response['success']) {
+                        Alert()->toast('SMS failed: '.$response['error'], 'error');
+                        return back();
+                    }
                 }
 
                 // Log::info("Send SMS: ". $payload['text']);
@@ -1476,6 +1481,11 @@ class ResultsController extends Controller
             // Log::info("Sending sms to ". $messageContent);
 
             $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+
+            if(!$response['success']) {
+                Alert()->toast('SMS failed: '.$response['error'], 'error');
+                return back();
+            }
             // return $response;
             Alert()->toast('Results SMS has been Re-sent successfully', 'success');
             return redirect()->back();
@@ -1966,6 +1976,11 @@ class ResultsController extends Controller
                     uniqid()
                 );
 
+                if(!$response['success']) {
+                    Alert()->toast('SMS failed: '.$response['error'], 'error');
+                    return back();
+                }
+
                 // Log::info("Sending SMS to {$formattedPhone}: {$message}");
                 Alert()->toast('Results SMS has been Re-sent successfully', 'success');
                 return to_route('students.combined.report', [
@@ -2365,6 +2380,11 @@ class ResultsController extends Controller
 
                 // Log::info("Sending SMS to {$phoneNumber}: {$message}");
                 $response = $nextSmsService->sendSmsByNext($sender, $phoneNumber, $message, uniqid());
+
+                if(!$response['success']) {
+                    Alert()->toast('SMS failed: '.$response['error'], 'error');
+                    return back();
+                }
             }
 
             Alert()->toast('Report has been published and sent to parents successfully!', 'success');

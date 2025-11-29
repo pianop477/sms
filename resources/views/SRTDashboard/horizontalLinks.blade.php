@@ -1,6 +1,6 @@
 <div class="container">
     <div class="row align-items-center">
-        <div class="col-lg-11 d-none d-lg-block">
+        <div class="col-lg-12 d-none d-lg-block">
             <div class="horizontal-menu">
                 <nav>
                     <ul id="nav_menu">
@@ -76,9 +76,11 @@
 
                             {{-- System Administration --}}
                             <li>
-                                <a href="javascript:void(0)"><i class="fa fa-screwdriver-wrench"></i><span>System Administration</span></a>
+                                <a href="javascript:void(0)"><i class="fa fa-screwdriver-wrench"></i><span>Advanced Settings</span></a>
                                 <ul class="submenu">
                                     <li><a href="{{route('Teachers.trashed')}}"><i class="fas fa-trash"></i> Recycle Bin</a></li>
+                                    <li><a href="{{route('users.lists')}}"><i class="fas fa-key"></i> Password Reset</a></li>
+
                                 </ul>
                             </li>
 
@@ -125,7 +127,7 @@
 
                             {{-- System Administration --}}
                             <li>
-                                <a href="javascript:void(0)"><i class="fa fa-screwdriver-wrench"></i><span>System Administration</span></a>
+                                <a href="javascript:void(0)"><i class="fa fa-screwdriver-wrench"></i><span>Advanced Settings</span></a>
                                 <ul class="submenu">
                                     <li><a href="{{route('roles.updateRole')}}"><i class="fas fa-shield"></i> Roles & Permissions</a></li>
                                     <li><a href="{{route('users.lists')}}"><i class="fas fa-key"></i> Password Reset</a></li>
@@ -170,26 +172,39 @@
 
                             {{-- Academic Management --}}
                             <li>
-                                <a href="javascript:void(0)"><i class="fas fa-money-bill-trend-up"></i><span>Expenses & Transactions</span></a>
+                                <a href="javascript:void(0)"><i class="fas fa-money-bill-trend-up"></i><span>Category & Expenses</span></a>
                                 <ul class="submenu">
                                     <li><a href="{{route('expenses.index')}}"><i class="fas fa-layer-group"></i> Categories</a></li>
-                                    <li><a href="{{route('expenditure.index')}}"><i class="fas fa-money-check-dollar"></i> Daily Transactions</a></li>
+                                    <li><a href="{{route('expenditure.index')}}"><i class="fas fa-money-check-dollar"></i> Expenses</a></li>
                                 </ul>
+                            </li>
+                            {{-- fess & bills --}}
+                            <li>
+                                <a href="javascript:void(0)"><i class="fas fa-money-bills"></i><span>Bills & Payment</span></a>
+                                <ul class="submenu">
+                                    <li>
+                                        <a href="{{route('bills.index')}}"><i class="fas fa-money-bill-1"></i><span> Bills</span></a>
+                                    </li>
+                                    <li>
+                                        <a href="{{route('bills.transactions')}}"><i class="fas fa-hand-holding-dollar"></i><span> Payments</span></a>
+                                    </li>
+                                </ul>
+                            </li>
+                            {{-- batch --}}
+                            <li>
+                                <a href=""><i class="fas fa-briefcase"></i><span> Batches</span></a>
+                            </li>
+                            {{-- Services --}}
+                            <li>
+                                <a href="{{route('services.index')}}"><i class="fas fa-wrench"></i><span>Services</span></a>
                             </li>
 
                             {{-- Reports & Analytics --}}
                             <li>
                                 <a href="javascript:void(0)"><i class="fas fa-chart-pie"></i><span>Reports & Analytics</span></a>
                                 <ul class="submenu">
-                                    <li><a href="{{route('expenditure.all.transactions')}}"><i class="fas fa-file-archive-o"></i> All Transactions</a></li>
-                                </ul>
-                            </li>
-
-                            {{-- Services --}}
-                            <li>
-                                <a href="javascript:void(0)"><i class="fas fa-handshake-alt"></i><span>Services</span></a>
-                                <ul class="submenu">
-                                    <li><a href="{{route('Transportation.index')}}"><i class="fa fa-bus-alt"></i> Transport</a></li>
+                                    <li><a href="{{route('expenditure.all.transactions')}}"><i class="fas fa-money-bill-transfer"></i> Expenses</a></li>
+                                    <li><a href="{{route('payment.report')}}"><i class="fas fa-file-archive-o"></i> School Fees</a></li>
                                 </ul>
                             </li>
                         @endif
@@ -199,14 +214,14 @@
         </div>
         <!-- nav and search button -->
         <div class="col-lg-1 clearfix">
-            <div class="">
+            {{-- <div class="">
                 <form action="{{route('logout')}}" method="POST">
                     @csrf
                     <button class="btn btn-danger btn-xs sign-out-btn" onclick="return confirm('Are you sure you want to sign out?')">
                         <i class="fas fa-power-off"></i> Sign out
                     </button>
                 </form>
-            </div>
+            </div> --}}
         </div>
         <!-- mobile_menu -->
         <div class="col-12 d-block d-lg-none">

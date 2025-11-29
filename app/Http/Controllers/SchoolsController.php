@@ -159,6 +159,11 @@ class SchoolsController extends Controller
             ];
             $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
+            if(!$response['success']) {
+                Alert()->toast('SMS failed: '.$response['error'], 'error');
+                return back();
+            }
+
             // send sms  by Beem API
             //prepare send sms payload to send via Beem API *************************************
             $beemSmsService = new BeemSmsService();
@@ -433,6 +438,11 @@ class SchoolsController extends Controller
 
             $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
+            if(!$response['success']) {
+                Alert()->toast('SMS failed: '.$response['error'], 'error');
+                return back();
+            }
+
             //delete feedback after reply;
             $textId = $request->text_id;
             // return $textId;
@@ -490,6 +500,11 @@ class SchoolsController extends Controller
             // Log::info($payload['text']);
 
             $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+
+            if(!$response['success']) {
+                Alert()->toast('SMS failed: '.$response['error'], 'error');
+                return back();
+            }
 
             Alert()->toast('Invoice Bill sent successfully', 'success');
             return redirect()->route('admin.generate.invoice', ['school' => Hashids::encode($school_id[0])]);

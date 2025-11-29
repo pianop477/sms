@@ -234,6 +234,11 @@ class UsersController extends Controller
 
         $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
+        if(!$response['success']) {
+            Alert()->toast('SMS failed: '.$response['error'], 'error');
+            return back();
+        }
+
         Alert()->toast('User admin saved successfully', 'success');
         return back();
 

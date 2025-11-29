@@ -362,7 +362,7 @@
             <div class="stat-card animate-fadeIn delay-2">
                 <i class="fas fa-users stat-icon"></i>
                 <div class="stat-value">{{ $totalRegistered }}</div>
-                <div class="stat-title">Students Registered</div>
+                <div class="stat-title">Registered  Students</div>
             </div>
             <div class="stat-card animate-fadeIn delay-3">
                 <i class="fas fa-user-check stat-icon"></i>
@@ -370,19 +370,19 @@
                     $allAttended = $reportSummary->sum('present_boys') + $reportSummary->sum('present_girls')
                 @endphp
                 <div class="stat-value">{{  $allAttended}}</div>
-                <div class="stat-title">Students Attended</div>
+                <div class="stat-title">Attended Students</div>
             </div>
 
             <div class="stat-card animate-fadeIn delay-4">
                 <i class="fas fa-user-xmark stat-icon"></i>
                 <div class="stat-value">{{ $reportSummary->sum('absent_boys') + $reportSummary->sum('absent_girls') }}</div>
-                <div class="stat-title">Students Absentees</div>
+                <div class="stat-title">Absentees Students</div>
             </div>
 
             <div class="stat-card animate-fadeIn delay-5">
                 <i class="fas fa-user-shield stat-icon"></i>
                 <div class="stat-value">{{ $reportSummary->sum('permission_boys') + $reportSummary->sum('permission_girls') }}</div>
-                <div class="stat-title">Students Permitted</div>
+                <div class="stat-title">Permitted Students</div>
             </div>
 
             <div class="stat-card animate-fadeIn delay-6">
@@ -391,7 +391,7 @@
                     $attendanceRate = $totalRegistered > 0 ? round(($allAttended / $totalRegistered) * 100, 1) : 0;
                 @endphp
                 <div class="stat-value">{{ $attendanceRate }}%</div>
-                <div class="stat-title">Students Attended Rate</div>
+                <div class="stat-title">Students Attendance Rate</div>
             </div>
         </div>
 
@@ -406,17 +406,17 @@
                         @csrf
                         <div class="row align-items-end">
                             <div class="col-md-5 mb-3">
-                                <label class="form-label">Start Date</label>
+                                <label class="form-label">From Date</label>
                                 <input type="date" name="start_date" class="form-control" max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" required>
                             </div>
                             <div class="col-md-5 mb-3">
-                                <label class="form-label">End Date</label>
+                                <label class="form-label">To Date</label>
                                 <input type="date" name="end_date" class="form-control" max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" required>
                             </div>
                             <div class="col-md-2 mb-3">
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                     <button type="submit" name="action" value="view" class="btn btn-view">
-                                        <i class="fas fa-search"></i> Find Report
+                                        <i class="fas fa-search"></i> Search Report
                                     </button>
                                 </div>
                             </div>
@@ -504,8 +504,7 @@
                 @else
                     <div class="empty-state">
                         <i class="fas fa-clipboard-check empty-icon"></i>
-                        <h3>No Pending Reports</h3>
-                        <p class="text-muted">All reports have been processed successfully</p>
+                        <h3>No Pending Reports were Found</h3>
                     </div>
                 @endif
             </div>
