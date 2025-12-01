@@ -231,7 +231,9 @@ class paymentBatchController extends Controller
     public function exportFile()
     {
         if (!Storage::exists('templates/sample bill file.xlsx')) {
-            abort(404, 'File not found.');
+            // abort(404, 'File not found.');
+            Alert()->toast('No file found, please try again', 'error');
+            return back();
         }
         return Storage::download('templates/sample bill file.xlsx');
     }
