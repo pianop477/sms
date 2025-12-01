@@ -71,6 +71,11 @@ class AccountantsController extends Controller
                 ];
 
                 $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+
+                if(!$response['success']) {
+                    Alert()->toast('SMS failed: '.$response['error'], 'error');
+                    return back();
+                }
                 // Log::info('SMS sent to Accountant: '. $payload['to']);
             // ****************************************************************************
 

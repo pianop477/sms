@@ -159,12 +159,12 @@
                         <!-- Header Section -->
                         <div class="row mb-4">
                             <div class="col-md-10">
-                                <h4 class="header-title">registered Transactions on - {{\Carbon\Carbon::now()->format('d-m-Y')}}</h4>
+                                <h4 class="header-title">registered Expense Bills on - {{\Carbon\Carbon::now()->format('d-m-Y')}}</h4>
                             </div>
                             <div class="col-md-2">
                                 <div class="d-flex justify-content-end gap-2 flex-wrap">
                                     <button type="button" class="btn btn-info btn-action" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
-                                        <i class="fas fa-exchange-alt me-1"></i> New Transaction
+                                        <i class="fas fa-plus-circle me-1"></i> New Bill
                                     </button>
                                 </div>
                             </div>
@@ -189,7 +189,7 @@
                                     <tbody>
                                         @if (empty($expenses))
                                             <tr>
-                                                <td class="text-center text-danger" colspan="9">No transaction records were found for {{\Carbon\Carbon::now()->format('d-m-Y')}}!</td>
+                                                <td class="text-center text-danger" colspan="9">No expense records were found for {{\Carbon\Carbon::now()->format('d-m-Y')}}!</td>
                                             </tr>
                                         @else
                                             @foreach ($expenses as $row)
@@ -248,7 +248,7 @@
                                                                     <form action="{{route('expenditure.delete.bill', ['bill' => Hashids::encode($row['id'])])}}">
                                                                         @csrf
                                                                         @method('DELETE')
-                                                                        <button class="btn btn btn-xs btn-outline-danger" title="Delete bill" type="submit" onclick="return confirm('Are you sure you want to delete this transaction?')">
+                                                                        <button class="btn btn btn-xs btn-outline-danger" title="Delete bill" type="submit" onclick="return confirm('Are you sure you want to delete this bill?')">
                                                                             <i class="fas fa-trash"></i>
                                                                         </button>
                                                                     </form>
@@ -264,7 +264,7 @@
                                                         <div class="modal-content">
                                                             <div class="modal-header bg-primary text-white">
                                                                 <h5 class="modal-title" id="viewModalLabel{{$row['reference_number']}}">
-                                                                    <i class="fas fa-receipt me-2"></i> Transaction Details
+                                                                    <i class="fas fa-receipt me-2"></i> Expense Details
                                                                 </h5>
                                                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close text-danger"></i></button>
                                                             </div>
@@ -389,7 +389,7 @@
                                                                                 </p>
                                                                             </div>
                                                                             <div class="col-md-6 mb-3">
-                                                                                <label class="form-label text-muted small mb-1">Transaction Type</label>
+                                                                                <label class="form-label text-muted small mb-1">Bill Type</label>
                                                                                 <p class="fw-semibold">
                                                                                     <span class="badge bg-info fs-6 text-white">Expense</span>
                                                                                 </p>
@@ -404,7 +404,7 @@
                                                                             <div class="timeline-item">
                                                                                 <div class="timeline-marker bg-success"></div>
                                                                                 <div class="timeline-content">
-                                                                                    <h6 class="fw-bold">Transaction Created</h6>
+                                                                                    <h6 class="fw-bold">Expense Created</h6>
                                                                                     <p class="text-muted small mb-0" style="font-weight: bold">{{\Carbon\Carbon::parse($row['expense_date'])->format('d-m-Y')}}</p>
                                                                                 </div>
                                                                             </div>
@@ -414,7 +414,7 @@
                                                                             <div class="timeline-item">
                                                                                 <div class="timeline-marker bg-primary"></div>
                                                                                 <div class="timeline-content">
-                                                                                    <h6 class="fw-bold">Transaction Updated</h6>
+                                                                                    <h6 class="fw-bold">Expense Updated</h6>
                                                                                     <p class="text-muted small mb-0" style="font-weight: bold">{{\Carbon\Carbon::parse($row['updated_at'])->format('d-m-Y')}}</p>
                                                                                 </div>
                                                                             </div>
@@ -424,7 +424,7 @@
                                                                             <div class="timeline-item">
                                                                                 <div class="timeline-marker bg-danger"></div>
                                                                                 <div class="timeline-content">
-                                                                                    <h6 class="fw-bold">Transaction Cancelled</h6>
+                                                                                    <h6 class="fw-bold">Expense Cancelled</h6>
                                                                                     <p class="text-muted small mb-0" style="font-weight: bold">{{\Carbon\Carbon::parse($row['updated_at'])->format('d-m-Y')}}</p>
                                                                                     @if(isset($row['cancel_reason']))
                                                                                     <p style="font-weight: bold">Reason: <span class="small text-danger">{{$row['cancel_reason']}}</span></p>
@@ -440,7 +440,7 @@
                                                                                 <div class="timeline-item">
                                                                                     <div class="timeline-marker bg-success"></div>
                                                                                     <div class="timeline-content">
-                                                                                        <h6 class="fw-bold">Transaction Bill Receipt</h6>
+                                                                                        <h6 class="fw-bold">Expense Bill Receipt</h6>
 
                                                                                         @if(!empty($row['attachment_url']))
                                                                                             @php
@@ -484,7 +484,7 @@
                                                                 </button>
                                                                 @if($row['status'] == 'active')
                                                                 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{$row['reference_number']}}">
-                                                                    <i class="fas fa-ban me-2"></i> Cancel Transaction
+                                                                    <i class="fas fa-ban me-2"></i> Cancel
                                                                 </button>
                                                                 @endif
                                                             </div>
@@ -533,7 +533,7 @@
                                                         <div class="modal-content">
                                                             <div class="modal-header">
                                                                 <h5 class="modal-title" id="cancelModalLabel{{$row['reference_number']}}">
-                                                                    Cancel Transaction - {{strtoupper($row['reference_number'])}}
+                                                                    Cancel Expense - {{strtoupper($row['reference_number'])}}
                                                                 </h5>
                                                                 <button type="button" class="btn btn-close btn-link" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close text-white"></i></button>
                                                             </div>
@@ -554,7 +554,7 @@
                                                                     </div>
                                                                     <div class="mb-3">
                                                                         <small class="text-muted">
-                                                                            <strong>Transaction Details:</strong><br>
+                                                                            <strong>Expense Details:</strong><br>
                                                                             Reference: {{strtoupper($row['reference_number'])}}<br>
                                                                             Amount: {{number_format($row['amount'])}}<br>
                                                                             Category: {{ucwords(strtolower($row['expense_type'] ?? 'N/A'))}}
@@ -563,7 +563,7 @@
                                                                 </div>
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                                    <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to cancel this transaction?')"> Cancel Transaction</button>
+                                                                    <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to cancel this bill?')"> Cancel</button>
                                                                 </div>
                                                             </form>
                                                         </div>
@@ -586,7 +586,7 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addTeacherModalLabel"><i class="fas fa-coins"></i> Manage new Transactions and Bills</h5>
+                    <h5 class="modal-title" id="addTeacherModalLabel"><i class="fas fa-coins"></i> Manage new Expenses and Bills</h5>
                     <button type="button" class="btn-close btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Close</button>
                 </div>
                 <div class="modal-body">
@@ -594,14 +594,14 @@
                         @csrf
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="gender" class="form-label">Transaction Date</label>
+                                <label for="gender" class="form-label">Date</label>
                                 <input type="date" name="date" min="{{\Carbon\Carbon::now()->subYears(1)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}" class="form-control-custom" id="date" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
                                 @error('date')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="category" class="form-label">Transaction Category</label>
+                                <label for="category" class="form-label"> Expense Category</label>
                                 <select name="category" id="category" class="form-control-custom" required>
                                     <option value="">--Select category--</option>
                                     @if(empty($categories))
@@ -659,7 +659,7 @@
 
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" id="saveButton" class="btn btn-success">Save Transaction</button>
+                            <button type="submit" id="saveButton" class="btn btn-success">Save</button>
                         </div>
                     </form>
                 </div>
@@ -673,7 +673,7 @@
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="editTransactionModalLabel">
                         <i class="fas fa-pencil me-2"></i>
-                        Edit Transaction - <span id="modalReferenceNumber" class="text-uppercase fw-bold"></span>
+                        Edit Expense - <span id="modalReferenceNumber" class="text-uppercase fw-bold"></span>
                     </h5>
                     <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
                 </div>
@@ -685,7 +685,7 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="editDate" class="form-label">Transaction Date <span class="text-danger">*</span></label>
+                                <label for="editDate" class="form-label">Date <span class="text-danger">*</span></label>
                                 <input type="date" name="date" class="form-control-custom"
                                     id="editDate"
                                     min="{{\Carbon\Carbon::now()->subYears(1)->format('Y-m-d')}}"
@@ -694,7 +694,7 @@
                                 <div class="invalid-feedback">Please select a valid date</div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="editCategory" class="form-label">Transaction Category <span class="text-danger">*</span></label>
+                                <label for="editCategory" class="form-label">Category <span class="text-danger">*</span></label>
                                 <select name="category" id="editCategory" class="form-control-custom" required>
                                     <option value="">--Select category--</option>
                                     @if(empty($categories))
@@ -745,7 +745,7 @@
                                 <div class="invalid-feedback">Please select payment mode</div>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label for="editStatus" class="form-label">Transaction Status <span class="text-danger"></span></label>
+                                <label for="editStatus" class="form-label">Expense Status <span class="text-danger"></span></label>
                                 <select name="status" id="editStatus" class="form-control-custom" required>
                                     <option value="active">Active</option>
                                     <option value="cancelled">Cancelled</option>
@@ -779,7 +779,7 @@
                                 <i class="fas fa-times me-2"></i> Cancel
                             </button>
                             <button type="submit" class="btn btn-success" id="updateTransactionBtn">
-                                <i class="fas fa-save me-2"></i> Update Transaction
+                                <i class="fas fa-save me-2"></i> Update
                             </button>
                         </div>
                     </form>
@@ -804,7 +804,7 @@
                 if (!form.checkValidity()) {
                     form.classList.add("was-validated");
                     submitButton.disabled = false;
-                    submitButton.innerHTML = "Save Transaction";
+                    submitButton.innerHTML = "Save";
                     return;
                 }
 
@@ -846,7 +846,7 @@
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
-                                text: data.message || 'Failed to load transaction data',
+                                text: data.message || 'Failed to load expense data',
                                 toast: true,
                                 position: 'top-end',
                                 showConfirmButton: false,
@@ -860,7 +860,7 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'Failed to load transaction data',
+                            text: 'Failed to load expense data',
                             toast: true,
                             position: 'top-end',
                             showConfirmButton: false,
@@ -870,7 +870,7 @@
                     })
                     .finally(() => {
                         updateBtn.disabled = false;
-                        updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update Transaction';
+                        updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update';
                     });
             }
 
@@ -975,7 +975,7 @@
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Success',
-                                text: data.message || 'Transaction updated successfully',
+                                text: data.message || 'Expense Bill updated successfully',
                                 toast: true,
                                 position: 'top-end',
                                 showConfirmButton: false,
@@ -992,7 +992,7 @@
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
-                                text: data.message || 'Failed to update transaction',
+                                text: data.message || 'Failed to update expense bill',
                                 toast: true,
                                 position: 'top-end',
                                 showConfirmButton: false,
@@ -1000,7 +1000,7 @@
                                 timerProgressBar: true
                             });
                             updateBtn.disabled = false;
-                            updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update Transaction';
+                            updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update';
                         }
                     })
                     .catch(error => {
@@ -1016,7 +1016,7 @@
                             timerProgressBar: true
                         });
                         updateBtn.disabled = false;
-                        updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update Transaction';
+                        updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update';
                     });
             });
 

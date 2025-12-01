@@ -1,17 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Expense bills Report - {{ $school->school_name }}</title>
+    <title>Bills Report - {{ $school->school_name }}</title>
     <style>
-        /* PDF-optimized professional styling */
         @page {
             margin: 1cm;
-            size: A4 portrait;
+            size: A4 landscape;
         }
 
         body {
             font-family: 'DejaVu Sans', 'Helvetica', Arial, sans-serif;
-            font-size: 11px;
+            font-size: 10px;
             line-height: 1.3;
             color: #2c3e50;
             margin: 0;
@@ -20,7 +19,6 @@
             print-color-adjust: exact;
         }
 
-        /* Header with improved layout */
         .header {
             border-bottom: 3px solid #3498db;
             padding-bottom: 12px;
@@ -70,13 +68,12 @@
         }
 
         .school-address {
-            font-size: 10px;
+            font-size: 9px;
             color: #7f8c8d;
             margin-bottom: 2px;
             line-height: 1.2;
         }
 
-        /* Report Title Section */
         .report-title {
             text-align: center;
             margin: 15px 0 12px 0;
@@ -99,22 +96,20 @@
             font-weight: 600;
         }
 
-        /* Report Summary */
         .report-summary {
             background: #f8f9fa;
             padding: 8px 12px;
             border-radius: 4px;
             border-left: 4px solid #3498db;
             margin-bottom: 12px;
-            font-size: 10px;
+            font-size: 9px;
         }
 
-        /* Enhanced Table Styles - FIXED */
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 10px 0 5px 0;
-            font-size: 9px;
+            font-size: 8px;
             page-break-inside: auto;
         }
 
@@ -135,7 +130,7 @@
             text-align: left;
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 8px;
+            font-size: 7px;
             letter-spacing: 0.3px;
         }
 
@@ -149,38 +144,54 @@
             background-color: #f8f9fa;
         }
 
-        /* Enhanced Status styling */
-        .status-completed {
+        .status-fullpaid {
             color: #27ae60;
             font-weight: 700;
             background: #d5f4e6;
             padding: 2px 6px;
             border-radius: 3px;
-            font-size: 8px;
+            font-size: 7px;
             display: inline-block;
         }
 
-        .status-pending {
-            color: #f39c12;
-            font-weight: 700;
-            background: #fef5e7;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 8px;
-            display: inline-block;
-        }
-
-        .status-failed {
+        .status-expired {
             color: #e74c3c;
             font-weight: 700;
             background: #fdeaea;
             padding: 2px 6px;
             border-radius: 3px;
-            font-size: 8px;
+            font-size: 7px;
             display: inline-block;
         }
 
-        /* Amount styling */
+        .status-cancelled {
+            color: #f39c12;
+            font-weight: 700;
+            background: #fef5e7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 7px;
+            display: inline-block;
+        }
+        .status-active {
+            color: #2980b9;
+            font-weight: 700;
+            background: #e8f4fd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 7px;
+            display: inline-block;
+        }
+        .status-overpaid {
+            color: #8e44ad;
+            font-weight: 700;
+            background: #f3e8fd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 7px;
+            display: inline-block;
+        }
+
         .amount {
             text-align: right;
             font-family: 'DejaVu Sans Mono', 'Courier New', monospace;
@@ -199,7 +210,6 @@
             font-weight: 700;
         }
 
-        /* Summary row with enhanced styling - FIXED */
         .summary-row {
             background: #2c3e50 !important;
             color: white !important;
@@ -212,12 +222,8 @@
             color: white !important;
         }
 
-        /* Professional Footer */
         .report-footer {
             margin-top: 20px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
             padding-top: 10px;
             border-top: 2px solid #bdc3c7;
             font-size: 8px;
@@ -225,38 +231,31 @@
             text-align: center;
         }
 
-        .footer-content {
-            max-width: 100%;
-            margin: 0 auto;
-        }
-
-        /* Page break handling */
-        .page-break {
-            page-break-after: always;
-        }
-
         .avoid-break {
             page-break-inside: avoid;
         }
 
-        /* Column width optimizations */
-        .col-number { width: 4%; }
-        .col-date { width: 9%; }
-        .col-reference { width: 11%; }
-        .col-category { width: 11%; }
-        .col-description { width: 24%; }
-        .col-amount { width: 11%; }
-        .col-status { width: 9%; }
-        .col-payment { width: 11%; }
+        /* Column widths for bills report */
+        .col-number { width: 3%; }
+        .col-control { width: 8%; }
+        .col-student { width: 12%; }
+        .col-level { width: 6%; }
+        .col-year { width: 6%; }
+        .col-billed { width: 8%; }
+        .col-paid { width: 8%; }
+        .col-balance { width: 8%; }
+        .col-status { width: 6%; }
+        .col-issued { width: 8%; }
+        .col-expires { width: 8%; }
+        .col-service { width: 10%; }
     </style>
 </head>
 <body>
-    <!-- Header Section with improved layout -->
+    <!-- Header Section -->
     <div class="header">
         <div class="logo-container">
             @php
                 $logoBase64 = null;
-
                 if (!empty($school->logo)) {
                     $logoFile = public_path('assets/img/logo/' . $school->logo);
                     if (file_exists($logoFile)) {
@@ -285,7 +284,7 @@
 
     <!-- Report Title -->
     <div class="report-title">
-        <h1>EXPENSE BILL REPORT</h1>
+        <h1>BILLS REPORT</h1>
         <div class="report-period">
             Reporting Period: {{ \Carbon\Carbon::parse($start_date)->format('d M Y') }} - {{ \Carbon\Carbon::parse($end_date)->format('d M Y') }}
         </div>
@@ -294,61 +293,78 @@
     <!-- Report Summary -->
     <div class="report-summary">
         <strong>Report Overview:</strong>
-        Total Bills: {{ count($transactions) }}
+        Total Bills: {{ count($bills) }} |
+        Total Billed: {{ number_format($total_billed) }} |
+        Total Paid: {{ number_format($total_paid) }} |
+        Total Balance: {{ number_format($total_balance) }}
     </div>
 
-    <!-- Transactions Table with optimized column widths -->
+    <!-- Bills Table -->
     <table>
         <thead>
             <tr>
                 <th class="col-number">#</th>
-                <th class="col-date">Date</th>
-                <th class="col-reference">Reference No.</th>
-                <th class="col-category">Category</th>
-                <th class="col-description">Description</th>
-                <th class="col-amount text-right">Amount</th>
+                <th class="col-control">Control #</th>
+                <th class="col-student">Student Name</th>
+                <th class="col-level">Level</th>
+                <th class="col-year">Year</th>
+                <th class="col-service">Service</th>
+                <th class="col-billed text-right">Billed Amount</th>
+                <th class="col-paid text-right">Paid Amount</th>
+                <th class="col-balance text-right">Balance</th>
                 <th class="col-status">Status</th>
-                <th class="col-payment">Payment Mode</th>
+                <th class="col-issued">Issued At</th>
+                <th class="col-expires">Expires At</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($transactions as $t)
+            @foreach($bills as $bill)
                 <tr class="avoid-break">
                     <td class="text-center col-number">{{ $loop->iteration }}</td>
-                    <td class="col-date">{{ \Carbon\Carbon::parse($t['transaction_date'])->format('d-m-Y') }}</td>
-                    <td class="col-reference">{{ strtoupper($t['reference_number']) }}</td>
-                    <td class="col-category">{{ ucwords(strtolower($t['expense_type'])) ?? 'N/A' }}</td>
-                    <td class="col-description">{{ $t['description'] }}</td>
-                    <td class="amount col-amount">{{ number_format($t['amount'], 2) }}</td>
+                    <td class="col-control">{{ strtoupper($bill['control_number']) }}</td>
+                    <td class="col-student">{{ $bill['student_name'] }}</td>
+                    <td class="col-level">{{ $bill['level'] }}</td>
+                    <td class="col-year">{{ $bill['academic_year'] }}</td>
+                    <td class="col-service">{{ $bill['service_name'] }}</td>
+                    <td class="amount col-billed">{{ number_format($bill['billed_amount']) }}</td>
+                    <td class="amount col-paid">{{ number_format($bill['paid_amount']) }}</td>
+                    <td class="amount col-balance">{{ number_format($bill['balance']) }}</td>
                     <td class="col-status">
-                        @php
-                            $statusText = strtolower($t['status']);
-                            if (in_array($statusText, ['completed', 'success', 'active', 'approved'])) {
-                                $statusClass = 'status-completed';
-                            } elseif (in_array($statusText, ['pending', 'processing'])) {
-                                $statusClass = 'status-pending';
-                            } elseif (in_array($statusText, ['failed', 'cancelled', 'rejected'])) {
-                                $statusClass = 'status-failed';
-                            } else {
-                                $statusClass = 'status-pending';
-                            }
-                        @endphp
-                        <span class="{{ $statusClass }}">{{ ucfirst($t['status']) }}</span>
+                        @if ($bill['status'] == 'active')
+                            <span class="status-active">{{ strtoupper($bill['status']) }}</span>
+                        @elseif ($bill['status'] == 'cancelled')
+                            <span class="status-cancelled">{{ strtoupper($bill['status']) }}</span>
+                        @elseif ($bill['status'] == 'expired')
+                            <span class="status-expired">{{ strtoupper($bill['status']) }}</span>
+                        @elseif ($bill['status'] == 'full paid')
+                            <span class="status-fullpaid">{{ strtoupper($bill['status']) }}</span>
+                        @else
+                            <span class="status-overpaid">{{ strtoupper($bill['status']) }}</span>
+                        @endif
                     </td>
-                    <td class="col-payment">{{ $t['payment_mode'] }}</td>
+                    <td class="col-issued">{{ \Carbon\Carbon::parse($bill['issued_at'])->format('d-m-Y') }}</td>
+                    <td class="col-expires">
+                        @if ($bill['expires_at'])
+                            {{ \Carbon\Carbon::parse($bill['expires_at'])->format('d-m-Y') }}
+                        @else
+                            N/A
+                        @endif
+                    </td>
                 </tr>
             @endforeach
 
-            <!-- Enhanced Total Row - FIXED -->
+            <!-- Summary Row -->
             <tr class="summary-row">
-                <td colspan="5" class="text-right text-bold">GRAND TOTAL:</td>
-                <td class="amount text-bold">{{ number_format($total_amount, 2) }}</td>
-                <td colspan="2" class="text-center">End of Report</td>
+                <td colspan="6" class="text-right text-bold">GRAND TOTALS:</td>
+                <td class="amount text-bold">{{ number_format($total_billed) }}</td>
+                <td class="amount text-bold">{{ number_format($total_paid) }}</td>
+                <td class="amount text-bold">{{ number_format($total_balance) }}</td>
+                <td colspan="3" class="text-center">End of Report</td>
             </tr>
         </tbody>
     </table>
 
-    <!-- Professional Footer -->
+    <!-- Footer -->
     <div class="report-footer">
         <div class="footer-content">
             <strong>&copy;{{ ucwords(strtolower($school->school_name)) }}</strong> |

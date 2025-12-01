@@ -20,6 +20,7 @@ use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\OtherStaffsController;
 use App\Http\Controllers\PackagesController;
 use App\Http\Controllers\ParentsController;
+use App\Http\Controllers\paymentBatchController;
 use App\Http\Controllers\PdfGeneratorController;
 use App\Http\Controllers\ResultsController;
 use App\Http\Controllers\RolesController;
@@ -446,6 +447,9 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
 
         //parent download holiday package
         Route::get('/download/package/id/{id}', [PackagesController::class, 'parentDownloadPackage'])->name('student.holiday.package');
+
+        // view payment history
+        Route::get('Payment-history/student/{studentId}', [BillsController::class, 'parentPaymentHistory'])->name('student.payment.history');
     });
 
     // 6. ROUTE ACCESS FOR CLASS TEACHER ONLY ============================================================================================
@@ -578,5 +582,13 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('/Bills/edit/bill/{bill}', [BillsController::class, 'editBill'])->name('bills.edit');
         Route::put('/Bills/update/bill/{bill}', [BillsController::class, 'updateBill'])->name('bills.update');
         Route::post('/Bills/export/bill', [BillsController::class, 'exportBill'])->name('bills.export');
+
+        //manage payment batches
+        Route::get('/Batches', [paymentBatchController::class, 'index'])->name('batches.index');
+        Route::post('/batch/preview', [paymentBatchController::class, 'preview'])->name('batch.preview');
+        Route::get('Export-templates', [paymentBatchController::class, 'exportFile'])->name('template.export');
+        Route::post('/Batches/upload', [paymentBatchController::class, 'store'])->name('batch.store');
+        Route::delete('/Batches/delete/{batch}', [paymentBatchController::class, 'deleteBatch'])->name('batch.delete');
+        Route::get('/Batches/download/batch/{batch}', [paymentBatchController::class, 'downloadBatch'])->name('batch.download');
     });
 });

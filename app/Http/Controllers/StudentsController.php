@@ -1290,6 +1290,7 @@ class StudentsController extends Controller
             Alert()->toast('No class details was found', 'error');
             return back();
         }
+
         $class_course = class_learning_courses::query()
                                             ->join('subjects', 'subjects.id', '=', 'class_learning_courses.course_id')
                                             ->join('grades', 'grades.id', '=', 'class_learning_courses.class_id')
@@ -1324,9 +1325,61 @@ class StudentsController extends Controller
                                     ->orderBy('updated_at', 'DESC')
                                     ->take(6)
                                     ->get();
+
+        // =========================
+        // PAYMENT INFORMATION SECTION
+        // =========================
+        $currentYear = date('Y');
+        $selectedYear = request('year', $currentYear);
+
+        // Get bills and payments for this student
+        $paymentQuery = DB::table('school_fees')
+            ->leftJoin('payment_services', 'payment_services.id', '=', 'school_fees.service_id')
+            ->leftJoin('school_fees_payments', 'school_fees.id', '=', 'school_fees_payments.student_fee_id')
+            ->select(
+                'school_fees.id as bill_id',
+                'school_fees.control_number',
+                'school_fees.academic_year',
+                'school_fees.amount as billed_amount',
+                'school_fees.due_date',
+                'school_fees.status as bill_status',
+                'school_fees.created_at as bill_created_at',
+                'payment_services.service_name',
+                'school_fees_payments.id as payment_id',
+                'school_fees_payments.amount as paid_amount',
+                'school_fees_payments.approved_at as payment_date',
+                'school_fees_payments.payment_mode',
+                DB::raw('CASE
+                    WHEN school_fees_payments.id IS NULL THEN "invoice"
+                    ELSE "payment"
+                END as record_type')
+            )
+            ->where('school_fees.student_id', $students->id)
+            ->where('school_fees.school_id', $user->school_id);
+
+        // Apply year filter if selected
+        if ($selectedYear) {
+            $paymentQuery->where('school_fees.academic_year', 'LIKE', "%{$selectedYear}%");
+        } else {
+            // Default to current year
+            $paymentQuery->where('school_fees.academic_year', 'LIKE', "%{$currentYear}%");
+        }
+
+        $paymentRecords = $paymentQuery->orderBy('school_fees.created_at', 'DESC')
+                                    ->orderBy('school_fees_payments.approved_at', 'ASC')
+                                    ->get();
+
+        // Calculate totals
+        $totalBilled = $paymentRecords->where('record_type', 'invoice')->sum('billed_amount');
+        $totalPaid = $paymentRecords->where('record_type', 'payment')->sum('paid_amount');
+        $totalBalance = $totalBilled - $totalPaid;
+
         $studentPicture = $students->image;
         $imagePath = public_path('assets/img/students/' .$studentPicture);
-        return view('profile.student_profile', compact('students', 'myClassTeacher', 'class_course', 'class', 'packages', 'imagePath'));
+
+        return view('profile.student_profile', compact(
+            'students', 'myClassTeacher', 'class_course', 'class', 'packages', 'imagePath',
+        ));
     }
 
     public function downloadProfilePicture($student)

@@ -240,11 +240,18 @@
                             <i class="fas fa-child me-2"></i> Children List
                         </h4>
                         <!-- Student Registration Modal Trigger -->
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentRegistrationModal">
+                        {{-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentRegistrationModal">
                             <i class="fas fa-plus me-1"></i> New Child
-                        </button>
+                        </button> --}}
                     </div>
-
+                    <style>
+                        .btn-action {
+                            background-color: #cccccc;
+                            border: 1px solid #ced4da;
+                            color: #212529;
+                            font-weight: bold
+                        }
+                    </style>
                     <!-- Children Table -->
                     <div class="table-responsive">
                         <table class="table table-hover progress-table mb-0">
@@ -276,7 +283,7 @@
                                     <td class="fw-bold text-info">{{ strtoupper($student->class_code) }}</td>
                                     <td class="text-center">
                                         <a href="{{ route('students.profile', ['student' => Hashids::encode($student->id)]) }}"
-                                           class="btn btn-sm btn-success"
+                                           class="btn btn-action btn-xs"
                                            data-bs-toggle="tooltip"
                                            title="Manage Child Profile">
                                            <i class="fas fa-cog me-1"></i> Manage
@@ -289,7 +296,7 @@
                                         <div class="text-muted">
                                             <i class="fas fa-child fa-3x mb-3 d-block opacity-50"></i>
                                             <h5>No Children Registered</h5>
-                                            <p class="mb-0">Register your first child to get started</p>
+                                            <p class="mb-0">Contact Admin to get started</p>
                                         </div>
                                     </td>
                                 </tr>

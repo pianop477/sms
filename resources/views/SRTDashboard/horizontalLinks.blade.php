@@ -175,7 +175,7 @@
                                 <a href="javascript:void(0)"><i class="fas fa-money-bill-trend-up"></i><span>Category & Expenses</span></a>
                                 <ul class="submenu">
                                     <li><a href="{{route('expenses.index')}}"><i class="fas fa-layer-group"></i> Categories</a></li>
-                                    <li><a href="{{route('expenditure.index')}}"><i class="fas fa-money-check-dollar"></i> Expenses</a></li>
+                                    <li><a href="{{route('expenditure.index')}}"><i class="fas fa-sack-dollar"></i> Expenses</a></li>
                                 </ul>
                             </li>
                             {{-- fess & bills --}}
@@ -186,13 +186,13 @@
                                         <a href="{{route('bills.index')}}"><i class="fas fa-money-bill-1"></i><span> Bills</span></a>
                                     </li>
                                     <li>
-                                        <a href="{{route('bills.transactions')}}"><i class="fas fa-hand-holding-dollar"></i><span> Payments</span></a>
+                                        <a href="{{route('bills.transactions')}}"><i class="fas fa-credit-card-alt"></i><span> Payments</span></a>
                                     </li>
                                 </ul>
                             </li>
                             {{-- batch --}}
                             <li>
-                                <a href=""><i class="fas fa-briefcase"></i><span> Batches</span></a>
+                                <a href="{{route('batches.index')}}"><i class="fas fa-briefcase"></i><span> Batches</span></a>
                             </li>
                             {{-- Services --}}
                             <li>
@@ -203,8 +203,8 @@
                             <li>
                                 <a href="javascript:void(0)"><i class="fas fa-chart-pie"></i><span>Reports & Analytics</span></a>
                                 <ul class="submenu">
-                                    <li><a href="{{route('expenditure.all.transactions')}}"><i class="fas fa-money-bill-transfer"></i> Expenses</a></li>
-                                    <li><a href="{{route('payment.report')}}"><i class="fas fa-file-archive-o"></i> School Fees</a></li>
+                                    <li><a href="{{route('expenditure.all.transactions')}}"><i class="fas fa-sack-dollar"></i> Expenses</a></li>
+                                    <li><a href="{{route('payment.report')}}"><i class="fas fa-money-check-dollar"></i> School Fees</a></li>
                                 </ul>
                             </li>
                         @endif

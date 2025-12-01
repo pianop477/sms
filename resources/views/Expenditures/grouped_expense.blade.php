@@ -293,7 +293,7 @@
                     <div class="col-md-10">
                         <h4 class="header-title">
                             <i class="fas fa-chart-line me-2"></i>
-                            TRANSACTIONS REPORT
+                            BILL REPORT
                         </h4>
                     </div>
                     <div class="col-md-2">
@@ -307,7 +307,7 @@
             <div class="card-body">
                 <!-- Student Information -->
                 <div class="text-center mb-4">
-                    <p class="instruction-text"><i class="fas fa-mouse-pointer me-2"></i> Select Year of Study - To view Transactions</p>
+                    <p class="instruction-text"><i class="fas fa-mouse-pointer me-2"></i> Select Year of Study - To view Bills</p>
                 </div>
 
                 @if (empty($groupedData))
@@ -324,9 +324,9 @@
                                 <div class="year-icon">
                                     <i class="fas fa-calendar-star"></i>
                                 </div>
-                                <h5>{{ $year }} Transactions Bills</h5>
+                                <h5>{{ $year }} Expense Bills</h5>
                                 <a href="{{route('expenditure.previous.transactions', ['year' => $year])}}" class="btn-view pulse-animation">
-                                    <i class="fas fa-eye me-2"></i> View Transactions
+                                    <i class="fas fa-eye me-2"></i> View Bills
                                 </a>
                             </div>
                         @endforeach

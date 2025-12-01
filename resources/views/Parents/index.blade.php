@@ -1,9 +1,6 @@
 @extends('SRTDashboard.frame')
 
 @section('content')
-<!DOCTYPE html>
-<html lang="en">
-<head>
     <style>
         :root {
             --primary-color: #4e73df;
@@ -468,8 +465,6 @@
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // Handle form submissions with loading states

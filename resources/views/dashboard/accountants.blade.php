@@ -1,8 +1,6 @@
 @extends('SRTDashboard.frame')
 
 @section('content')
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <style>
     :root {
         --primary-color: #4e73df;
@@ -245,7 +243,7 @@
                     <div class="card-body text-white">
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
-                                <div class="text-uppercase small font-weight-bold">Today Transactions</div>
+                                <div class="text-uppercase small font-weight-bold">Today Expenses</div>
                                 <div class="h3 mb-0 font-weight-bold">{{number_format($daily)}}</div>
                             </div>
                             <div class="col-auto">
@@ -301,9 +299,9 @@
                 <div class="chart-container">
                     <div class="chart-header">
                         <h5 class="chart-title">
-                            <i class="fas fa-chart-bar me-2"></i> Recent Transactions Trend
+                            <i class="fas fa-chart-bar me-2"></i> Recent Expense Bills Trend
                         </h5>
-                        <p class="chart-subtitle">Last 7 days transaction</p>
+                        <p class="chart-subtitle">Last 7 days Expenses bills</p>
                     </div>
                     <div class="chart-wrapper">
                         <canvas id="recentTransactionsChart"></canvas>
@@ -316,9 +314,9 @@
                 <div class="chart-container">
                     <div class="chart-header">
                         <h5 class="chart-title">
-                            <i class="fas fa-chart-pie me-2"></i> Transaction Status Distribution
+                            <i class="fas fa-chart-pie me-2"></i> Expenses Status Distribution
                         </h5>
-                        <p class="chart-subtitle">Current transaction status overview</p>
+                        <p class="chart-subtitle">Current Expenses status overview</p>
                     </div>
                     <div class="chart-wrapper">
                         <canvas id="statusDistributionChart"></canvas>
@@ -353,7 +351,7 @@
                         <h5 class="chart-title">
                             <i class="fas fa-credit-card me-2"></i> Payment Methods
                         </h5>
-                        <p class="chart-subtitle">Transaction distribution by payment type</p>
+                        <p class="chart-subtitle">Expense distribution by payment type</p>
                     </div>
                     <div class="chart-wrapper">
                         <canvas id="paymentMethodChart"></canvas>
@@ -369,11 +367,11 @@
             <div class="card-body">
                 <div class="row mb-3">
                     <div class="col-md-8">
-                        <h4 class="header-title mb-0">Recent Transactions</h4>
+                        <h4 class="header-title mb-0">Recent Expense Bills</h4>
                     </div>
                     <div class="col-md-2">
                         <button type="button" class="btn btn-info btn-action btn-sm" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
-                            <i class="fas fa-plus me-1"></i> New Transaction
+                            <i class="fas fa-plus me-1"></i> New Bill
                         </button>
                     </div>
                     <div class="col-md-2">
@@ -402,7 +400,7 @@
                                 <tr>
                                     <td colspan="9" class="text-center text-danger py-4">
                                         <i class="fas fa-exclamation-triangle fa-2x mb-3 d-block"></i>
-                                        No recent transactions found!
+                                        No recent Expense bills were found!
                                     </td>
                                 </tr>
                             @else
@@ -494,7 +492,7 @@
                                                     <form action="{{route('expenditure.delete.bill', ['bill' => Hashids::encode($row['id'])])}}" method="POST" class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button class="btn btn-sm btn-outline-danger" type="submit" title="Delete Bill" onclick="return confirm('Are you sure you want to delete this transaction?')">
+                                                        <button class="btn btn-sm btn-outline-danger" type="submit" title="Delete Bill" onclick="return confirm('Are you sure you want to delete this bill?')">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </form>
@@ -521,7 +519,7 @@
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">
                             <h5 class="modal-title" id="viewModalLabel{{$row['reference_number']}}">
-                                <i class="fas fa-receipt me-2"></i> Transaction Details
+                                <i class="fas fa-receipt me-2"></i> Expense Details
                             </h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close text-danger"></i></button>
                         </div>
@@ -637,7 +635,7 @@
                                             </p>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label text-muted small mb-1">Transaction Type</label>
+                                            <label class="form-label text-muted small mb-1">Bill Type</label>
                                             <p class="fw-semibold">
                                                 <span class="badge bg-info fs-6 text-white">Expense</span>
                                             </p>
@@ -652,7 +650,7 @@
                                         <div class="timeline-item">
                                             <div class="timeline-marker bg-success"></div>
                                             <div class="timeline-content">
-                                                <h6 class="fw-bold">Transaction Created</h6>
+                                                <h6 class="fw-bold">Bill Created</h6>
                                                 <p class="text-muted small mb-0">{{\Carbon\Carbon::parse($row['created_at'])->format('M d, Y h:i A')}}</p>
                                             </div>
                                         </div>
@@ -662,7 +660,7 @@
                                         <div class="timeline-item">
                                             <div class="timeline-marker bg-primary"></div>
                                             <div class="timeline-content">
-                                                <h6 class="fw-bold">Transaction Updated</h6>
+                                                <h6 class="fw-bold">Bill Updated</h6>
                                                 <p class="text-muted small mb-0">{{\Carbon\Carbon::parse($row['updated_at'])->format('M d, Y h:i A')}}</p>
                                             </div>
                                         </div>
@@ -672,7 +670,7 @@
                                         <div class="timeline-item">
                                             <div class="timeline-marker bg-danger"></div>
                                             <div class="timeline-content">
-                                                <h6 class="fw-bold">Transaction Cancelled</h6>
+                                                <h6 class="fw-bold">Bill Cancelled</h6>
                                                 <p class="text-muted small mb-0">{{\Carbon\Carbon::parse($row['updated_at'])->format('M d, Y h:i A')}}</p>
                                                 @if(isset($row['cancel_reason']))
                                                 <p>Reason: <span class="small text-danger">{{$row['cancel_reason']}}</span></p>
@@ -689,7 +687,7 @@
                                             <div class="timeline-item">
                                                 <div class="timeline-marker bg-success"></div>
                                                 <div class="timeline-content">
-                                                    <h6 class="fw-bold">Transaction Bill Receipt</h6>
+                                                    <h6 class="fw-bold">Bill Receipt</h6>
 
                                                         @if(!empty($row['attachment_url']))
                                                             @php
@@ -733,7 +731,7 @@
                             </button>
                             @if($row['status'] == 'active')
                             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{$row['reference_number']}}">
-                                <i class="fas fa-ban me-2"></i> Cancel Transaction
+                                <i class="fas fa-ban me-2"></i> Cancel
                             </button>
                             @endif
                         </div>
@@ -747,7 +745,7 @@
                     <div class="modal-content">
                         <div class="modal-header bg-primary text-white">
                             <h5 class="modal-title" id="cancelModalLabel{{$row['reference_number']}}">
-                                Cancel Transaction - {{strtoupper($row['reference_number'])}}
+                                Cancel Bill - {{strtoupper($row['reference_number'])}}
                             </h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close text-danger"></i></button>
                         </div>
@@ -767,7 +765,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <small class="text-muted">
-                                        <strong>Transaction Details:</strong><br>
+                                        <strong>Bill Details:</strong><br>
                                         Reference: {{strtoupper($row['reference_number'])}}<br>
                                         Amount: {{number_format($row['amount'])}}<br>
                                         Category: {{ucwords(strtolower($row['expense_type'] ?? 'N/A'))}}
@@ -776,8 +774,8 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this transaction?')">
-                                    <i class="fas fa-ban me-2"></i> Cancel Transaction
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this Bill?')">
+                                    <i class="fas fa-ban me-2"></i> Cancel
                                 </button>
                             </div>
                         </form>
@@ -791,22 +789,22 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addTeacherModalLabel"><i class="fas fa-exchange-alt"></i> Manage new Transactions and Bills</h5>
-                    <button type="button" class="btn-close btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                    <h5 class="modal-title" id="addTeacherModalLabel"><i class="fas fa-exchange-alt"></i> Manage new Expenses and Bills</h5>
+                    <button type="button" class="btn-close btn btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
                 </div>
                 <div class="modal-body">
                     <form class="needs-validation" novalidate action="{{route('expenditure.store')}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="gender" class="form-label">Transaction Date</label>
+                                <label for="gender" class="form-label">Date</label>
                                 <input type="date" name="date" class="form-control-custom" min="{{\Carbon\Carbon::now()->subYears(1)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->format('Y-m-d')}}" id="date" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
                                 @error('date')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="category" class="form-label">Transaction Category</label>
+                                <label for="category" class="form-label">Category</label>
                                 <select name="category" id="category" class="form-control-custom" required>
                                     <option value="">--Select category--</option>
                                     @if(empty($categories))
@@ -864,7 +862,7 @@
 
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" id="saveButton" class="btn btn-success">Save Transaction</button>
+                            <button type="submit" id="saveButton" class="btn btn-success">Save</button>
                         </div>
                     </form>
                 </div>
@@ -879,7 +877,7 @@
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="editTransactionModalLabel">
                         <i class="fas fa-pencil me-2"></i>
-                        Edit Transaction - <span id="modalReferenceNumber" class="text-uppercase fw-bold"></span>
+                        Edit expense Bill - <span id="modalReferenceNumber" class="text-uppercase fw-bold"></span>
                     </h5>
                     <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
                 </div>
@@ -891,7 +889,7 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="editDate" class="form-label">Transaction Date <span class="text-danger">*</span></label>
+                                <label for="editDate" class="form-label">Date <span class="text-danger">*</span></label>
                                 <input type="date" name="date" class="form-control-custom"
                                     id="editDate"
                                     min="{{\Carbon\Carbon::now()->subYears(1)->format('Y-m-d')}}"
@@ -900,7 +898,7 @@
                                 <div class="invalid-feedback">Please select a valid date</div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="editCategory" class="form-label">Transaction Category <span class="text-danger">*</span></label>
+                                <label for="editCategory" class="form-label">Category <span class="text-danger">*</span></label>
                                 <select name="category" id="editCategory" class="form-control-custom" required>
                                     <option value="">--Select category--</option>
                                     @if(empty($categories))
@@ -951,7 +949,7 @@
                                 <div class="invalid-feedback">Please select payment mode</div>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label for="editStatus" class="form-label">Transaction Status <span class="text-danger"></span></label>
+                                <label for="editStatus" class="form-label">Status <span class="text-danger"></span></label>
                                 <select name="status" id="editStatus" class="form-control-custom" required>
                                     <option value="active">Active</option>
                                     <option value="cancelled">Cancelled</option>
@@ -985,7 +983,7 @@
                                 <i class="fas fa-times me-2"></i> Cancel
                             </button>
                             <button type="submit" class="btn btn-success" id="updateTransactionBtn">
-                                <i class="fas fa-save me-2"></i> Update Transaction
+                                <i class="fas fa-save me-2"></i> Update
                             </button>
                         </div>
                     </form>
@@ -1002,7 +1000,7 @@
             $('#recentTransactionsTable').DataTable({
                 "language": {
                     "search": "<i class='fas fa-search'></i>",
-                    "searchPlaceholder": "Search transactions...",
+                    "searchPlaceholder": "Search...",
                     "lengthMenu": "Show _MENU_ entries",
                     "info": "Showing _START_ to _END_ of _TOTAL_ entries",
                     "paginate": {
@@ -1037,7 +1035,7 @@
             data: {
                 labels: chartData.recentTransactions.labels,
                 datasets: [{
-                    label: 'Transaction Amount (TZS)',
+                    label: 'Bills Amount (TZS)',
                     data: chartData.recentTransactions.data,
                     borderColor: '#4e73df',
                     backgroundColor: 'rgba(78, 115, 223, 0.1)',
@@ -1519,7 +1517,7 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: data.message || 'Failed to load transaction data',
+                            text: data.message || 'Failed to load bills data',
                             toast: true,
                             position: 'top-end',
                             showConfirmButton: false,
@@ -1533,7 +1531,7 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Failed to load transaction data',
+                        text: 'Failed to load Bills data',
                         toast: true,
                         position: 'top-end',
                         showConfirmButton: false,
@@ -1543,7 +1541,7 @@
                 })
                 .finally(() => {
                     updateBtn.disabled = false;
-                    updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update Transaction';
+                    updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update';
                 });
         }
 
@@ -1648,7 +1646,7 @@
                         Swal.fire({
                             icon: 'success',
                             title: 'Success',
-                            text: data.message || 'Transaction updated successfully',
+                            text: data.message || 'Expense bill updated successfully',
                             toast: true,
                             position: 'top-end',
                             showConfirmButton: false,
@@ -1665,7 +1663,7 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: data.message || 'Failed to update transaction',
+                            text: data.message || 'Failed to update bill',
                             toast: true,
                             position: 'top-end',
                             showConfirmButton: false,
@@ -1673,7 +1671,7 @@
                             timerProgressBar: true
                         });
                         updateBtn.disabled = false;
-                        updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update Transaction';
+                        updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update';
                     }
                 })
                 .catch(error => {
@@ -1689,7 +1687,7 @@
                         timerProgressBar: true
                     });
                     updateBtn.disabled = false;
-                    updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update Transaction';
+                    updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update';
                 });
         });
 

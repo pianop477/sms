@@ -152,10 +152,10 @@
         <!-- Header Section -->
         <div class="row mb-4">
             <div class="col-md-10">
-                <h4 class="text-primary fw-bold border-bottom pb-2">STUDENT'S INFORMATION</h4>
+                <h4 class="text-primary fw-bold border-bottom pb-2">Student Profile</h4>
             </div>
             <div class="col-md-2 text-end">
-                <a href="{{route('home')}}" class="btn btn-info btn-action float-right">
+                <a href="{{route('home')}}" class="btn btn-secondary btn-action float-right">
                     <i class="fas fa-arrow-circle-left me-1"></i> Back
                 </a>
             </div>
@@ -177,7 +177,7 @@
                             }
                         @endphp
                         <img src="{{ $avatarImage }}" class="profile-img" alt="Student Photo">
-                        <h5 class="profile-name mb-1">{{ucwords(strtolower($students->first_name. ' '. $students->middle_name. ' '. $students->last_name))}}</h5>
+                        <h5 class="profile-name mb-1" style="color:gold;">{{ucwords(strtolower($students->first_name. ' '. $students->middle_name. ' '. $students->last_name))}}</h5>
                         <p class="mb-0 text-white text-uppercase">Admission #: <strong>{{$students->admission_number}}</strong></p>
                     </div>
 
@@ -233,12 +233,12 @@
                         <ul class="nav nav-pills flex-column flex-lg-row">
                             <li class="nav-item flex-fill text-center">
                                 <a class="nav-link active" href="#student" data-bs-toggle="tab">
-                                    <i class="fas fa-user-graduate me-1"></i> Student
+                                    <i class="fas fa-user-graduate me-1"></i> Profile
                                 </a>
                             </li>
                             <li class="nav-item flex-fill text-center">
                                 <a class="nav-link" href="#parents" data-bs-toggle="tab">
-                                    <i class="fas fa-user-shield me-1"></i> Parents
+                                    <i class="fas fa-user-shield me-1"></i> Parent
                                 </a>
                             </li>
                             <li class="nav-item flex-fill text-center">
@@ -266,6 +266,11 @@
                             <li class="nav-item flex-fill text-center">
                                 <a class="nav-link" href="#package" data-bs-toggle="tab">
                                     <i class="fas fa-file-archive-o me-1"></i> Packages
+                                </a>
+                            </li>
+                            <li class="nav-item flex-fill text-center">
+                                <a class="nav-link" href="#payment" data-bs-toggle="tab">
+                                    <i class="fas fa-credit-card me-1"></i> Payment
                                 </a>
                             </li>
                         </ul>
@@ -308,7 +313,7 @@
 
                             <!-- Parents Information Tab -->
                             <div class="tab-pane fade" id="parents">
-                                <h5 class="mb-4"><i class="fas fa-users me-2"></i> Parents/Guardian Details</h5>
+                                <h5 class="mb-4"><i class="fas fa-users me-2"></i> Parent/Guardian Details</h5>
                                 <table class="info-table">
                                     @if ($students->parent_gender == 'male')
                                         <tr>
@@ -388,10 +393,10 @@
 
                             <!-- Subjects Tab -->
                             <div class="tab-pane fade" id="subjects">
-                                <h5 class="mb-4"><i class="ti-book me-2"></i> Subject Teachers for: <span class="text-uppercase">{{strtoupper($class->class_name)}}</span></h5>
+                                <h5 class="mb-4"><i class="ti-book me-2"></i> Subjects Enrolled </span></h5>
 
                                 <div class="table-responsive">
-                                    <table class="table table-hover">
+                                    <table class="table table-hover table-responsive-md table-bordered">
                                         <thead class="table-light">
                                             <tr>
                                                 <th>#</th>
@@ -415,7 +420,7 @@
                                                     <td>
                                                         <div class="d-flex align-items-center">
                                                             @php
-                                                                $imageName = $course->image;
+                                                                $imageName = $course->image ?? '';
                                                                 $imagePath = public_path('assets/img/profile/' . $imageName);
 
                                                                 if (!empty($imageName) && file_exists($imagePath)) {
@@ -445,7 +450,7 @@
 
                                 <hr>
 
-                                <h6 class="mb-3"><i class="fas fa-chalkboard-teacher me-2"></i> Class Teacher</h6>
+                                <h6 class="mb-3"><i class="fas fa-chalkboard-teacher me-2"></i> Assigned Class Teacher</h6>
                                 @if ($myClassTeacher->isEmpty())
                                     <div class="alert alert-warning text-center">
                                         No class teacher assigned!
@@ -456,13 +461,13 @@
                                         <div class="row">
                                             <div class="col-md-3 text-center">
                                                 @php
-                                                    $imageName = $course->image;
+                                                    $imageName = $classTeacher->image ?? '';
                                                     $imagePath = public_path('assets/img/profile/' . $imageName);
 
                                                     if (!empty($imageName) && file_exists($imagePath)) {
                                                         $avatarImage = asset('assets/img/profile/' . $imageName);
                                                     } else {
-                                                        $avatarImage = asset('assets/img/profile/' . ($course->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                                        $avatarImage = asset('assets/img/profile/' . ($classTeacher->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
                                                     }
                                                 @endphp
                                                     <img src="{{ $avatarImage }}"
@@ -482,7 +487,8 @@
                                                                 {{ $classTeacher->phone }}
                                                             </a>
                                                         </p>
-                                                        <p class="mb-0 text-uppercase"><strong>Class:</strong> {{ $classTeacher->class_name }} - {{ $classTeacher->group }}</p>
+                                                        <p class="mb-0 text-uppercase"><strong>Class:</strong> {{ $classTeacher->class_name }}</p>
+                                                        <p class="mb-0 text-uppercase"><strong>Stream: </strong> {{ $classTeacher->group }}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -602,6 +608,15 @@
                                         </table>
                                     </div>
                                 @endif
+                            </div>
+
+                            <!-- Payment Tab -->
+                            <div class="tab-pane fade" id="payment">
+                                <h5 class="mb-4"><i class="fas fa-credit-card me-2"></i> Payment Information</h5>
+                                <div class="text-center py-4">
+                                    <a href="{{route('student.payment.history', ['studentId' => Hashids::encode($students->id)])}}" class="btn btn-primary btn-action">
+                                        <i class="fas fa-history me-2"></i> View Payment History
+                                    </a>
                             </div>
                         </div>
                     </div>
