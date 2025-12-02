@@ -247,7 +247,7 @@
                             <div class="row align-items-end">
                                 <div class="col-md-3">
                                     <label class="form-label">Transfer Student Stream</label>
-                                    <select name="new_stream" class="form-select text-capitalize" required>
+                                    <select name="new_stream" class="form-select text-capitalize">
                                         <option value="">-- Select Stream --</option>
                                         <option value="A">Stream A</option>
                                         <option value="B">Stream B</option>
