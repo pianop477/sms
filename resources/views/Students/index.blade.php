@@ -207,7 +207,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <!-- Student Info Summary -->
                         <div class="student-info-card">
                             <div class="row">
@@ -242,95 +241,123 @@
                         </div>
 
                         <!-- Batch Update Form -->
-                        <form action="{{ route('students.batchUpdateStream') }}" novalidate class="needs-validation mb-4" method="POST">
+                        <form id="batchForm" action="{{ route('students.batchUpdateStream') }}" method="POST" class="needs-validation mb-4">
                             @csrf
                             <div class="row align-items-end">
                                 <div class="col-md-3">
                                     <label class="form-label">Transfer Student Stream</label>
-                                    <select name="new_stream" class="form-select text-capitalize">
+                                    <select name="new_stream" class="form-select text-capitalize" required>
                                         <option value="">-- Select Stream --</option>
                                         <option value="A">Stream A</option>
                                         <option value="B">Stream B</option>
                                         <option value="C">Stream C</option>
                                     </select>
                                 </div>
+
                                 <div class="col-md-3">
-                                    <button type="submit" class="btn btn-warning btn-xs text-capitalize" onclick="return confirm('Are you sure you want to move selected students to a new stream?')">
+                                    <button type="submit" class="btn btn-warning btn-xs text-capitalize"
+                                        onclick="return confirm('Are you sure you want to move selected students to a new stream?')">
                                         <i class="fas fa-random me-1"></i> Shift Stream
                                     </button>
                                 </div>
                             </div>
 
-                            <!-- Students Table -->
-                            <div class="table-responsive mt-4">
+                            <!-- Checkboxes only — NO delete buttons here -->
+                            <div class="mt-3">
+                                @foreach ($students as $student)
+                                    <input type="checkbox" name="student[]" value="{{ $student->id }}" style="display:none;">
+                                @endforeach
+                            </div>
+                        </form>
+                        <div class="table-responsive mt-4">
                                 <table class="table table-hover progress-table table-responsive-md" id="myTable">
                                     <thead>
                                         <tr>
-                                            <th scope="col" class="text-center"><input type="checkbox" id="selectAll"> All</th>
-                                            <th scope="col" class="text-center">Adm #</th>
-                                            <th scope="col">Student</th>
-                                            <th scope="col">Middle Name</th>
-                                            <th scope="col">Surname</th>
-                                            <th scope="col" class="text-center">Gender</th>
-                                            <th scope="col" class="text-center">Stream</th>
-                                            <th scope="col">Date of Birth</th>
-                                            <th scope="col" class="text-center">Actions</th>
+                                            <th class="text-center"><input type="checkbox" id="selectAll"> All</th>
+                                            <th class="text-center">Adm #</th>
+                                            <th>Student</th>
+                                            <th>Middle Name</th>
+                                            <th>Surname</th>
+                                            <th class="text-center">Gender</th>
+                                            <th class="text-center">Stream</th>
+                                            <th>Date of Birth</th>
+                                            <th class="text-center">Actions</th>
                                         </tr>
                                     </thead>
+
                                     <tbody>
                                         @foreach ($students as $student)
                                         <tr>
                                             <td class="text-center">
-                                                <input type="checkbox" name="student[]" value="{{$student->id}}">
+                                                <input type="checkbox" form="batchForm" name="student[]" value="{{ $student->id }}">
                                             </td>
-                                            <td class="text-uppercase text-center fw-bold">{{$student->admission_number}}</td>
+                                            <td class="text-center fw-bold text-uppercase">{{ $student->admission_number }}</td>
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     @php
                                                         $imageName = $student->image;
                                                         $imagePath = public_path('assets/img/students/' . $imageName);
 
-                                                        if (!empty($imageName) && file_exists($imagePath)) {
-                                                            $avatarImage = asset('assets/img/students/' . $imageName);
-                                                        } else {
-                                                            $avatarImage = asset('assets/img/students/student.jpg');
-                                                        }
+                                                        $avatarImage = (!empty($imageName) && file_exists($imagePath))
+                                                                        ? asset('assets/img/students/' . $imageName)
+                                                                        : asset('assets/img/students/student.jpg');
                                                     @endphp
-                                                    <img src="{{ $avatarImage }}" alt="Student Avatar" class="student-avatar">
-                                                    <span class="text-capitalize">{{ucwords(strtolower($student->first_name))}}</span>
+
+                                                    <img src="{{ $avatarImage }}" class="student-avatar" alt="Student Avatar">
+                                                    <span class="text-capitalize">{{ ucwords(strtolower($student->first_name)) }}</span>
                                                 </div>
                                             </td>
-                                            <td class="text-capitalize">{{ucwords(strtolower($student->middle_name))}}</td>
-                                            <td class="text-capitalize">{{ucwords(strtolower($student->last_name))}}</td>
-                                            <td class="text-center text-capitalize">
-                                                <span class="badge bg-info text-white">{{$student->gender[0]}}</span>
-                                            </td>
+
+                                            <td class="text-capitalize">{{ ucwords(strtolower($student->middle_name)) }}</td>
+                                            <td class="text-capitalize">{{ ucwords(strtolower($student->last_name)) }}</td>
+
                                             <td class="text-center">
-                                                <span class="badge badge-stream badge-stream-{{strtoupper($student->group)}}">{{strtoupper($student->group)}}</span>
+                                                <span class="badge bg-info text-white">{{ $student->gender[0] }}</span>
                                             </td>
-                                            <td>{{\Carbon\Carbon::parse($student->dob)->format('M d, Y')}}</td>
-                                            <td>
+
+                                            <td class="text-center">
+                                                <span class="badge badge-stream badge-stream-{{ strtoupper($student->group) }}">
+                                                    {{ strtoupper($student->group) }}
+                                                </span>
+                                            </td>
+
+                                            <td>{{ \Carbon\Carbon::parse($student->dob)->format('M d, Y') }}</td>
+
+                                            <td class="text-center">
+                                                <!-- ========================= -->
+                                                <!-- ACTION BUTTONS (DELETE OUTSIDE PARENT FORM) -->
+                                                <!-- ========================= -->
                                                 <div class="action-buttons">
-                                                    <a href="{{route('students.modify', ['students' => Hashids::encode($student->id)])}}" class="btn btn-sm btn-primary" title="Edit">
+
+                                                    <a href="{{ route('students.modify', ['students' => Hashids::encode($student->id)]) }}"
+                                                        class="btn btn-sm btn-primary" title="Edit">
                                                         <i class="ti-pencil"></i>
                                                     </a>
-                                                    <a href="{{route('manage.student.profile', ['student' => Hashids::encode($student->id)])}}" class="btn btn-sm btn-info" title="View">
+
+                                                    <a href="{{ route('manage.student.profile', ['student' => Hashids::encode($student->id)]) }}"
+                                                        class="btn btn-sm btn-info" title="View">
                                                         <i class="ti-eye"></i>
                                                     </a>
-                                                    <form method="POST" action="{{route('Students.destroy', ['student' => Hashids::encode($student->id)])}}">
+
+                                                    <!-- DELETE FORM OUTSIDE BATCH FORM -->
+                                                    <form method="POST"
+                                                        action="{{ route('Students.destroy', ['student' => Hashids::encode($student->id)]) }}"
+                                                        style="display:inline;">
                                                         @csrf
-                                                        <button class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to block {{strtoupper($student->first_name)}} {{strtoupper($student->middle_name)}} {{strtoupper($student->last_name)}} Permanently?')" title="Delete">
+                                                        <button class="btn btn-danger btn-sm"
+                                                            onclick="return confirm('Are you sure you want to delete {{ strtoupper($student->first_name) }} {{ strtoupper($student->middle_name) }} {{ strtoupper($student->last_name) }} permanently?')"
+                                                            title="Delete">
                                                             <i class="ti-trash"></i>
                                                         </button>
                                                     </form>
                                                 </div>
                                             </td>
+
                                         </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>

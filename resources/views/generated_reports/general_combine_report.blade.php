@@ -56,9 +56,7 @@
             border-bottom: 2px solid gray;
             margin-top: 5px;
         }
-        @page {
-            margin: 8mm;
-        }
+
         .logo {
             position: absolute;
             width: 70px;
@@ -150,19 +148,19 @@
                 text-transform: uppercase;
             }
         @page {
-            margin-top: 8mm;
-            margin-bottom: 8mm; /* Ongeza nafasi ya chini kwa footer */
-            margin-left: 10mm;
-            margin-right: 10mm;
+            margin-top: 6mm;
+            margin-bottom: 6mm; /* Ongeza nafasi ya chini kwa footer */
+            margin-left: 6mm;
+            margin-right: 6mm;
         }
         footer {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 8mm; /*urefu wa footer*/
+            height: 4mm; /*urefu wa footer*/
             font-size: 10px;
-            padding-top: 8px;
+            /* padding-top: 3px; */
             border-top: 1px solid #ddd;
             text-align: center;
             background-color: white;
