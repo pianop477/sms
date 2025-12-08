@@ -296,11 +296,11 @@
                                                 <div class="d-flex align-items-center">
                                                     @php
                                                         $imageName = $student->image;
-                                                        $imagePath = public_path('assets/img/students/' . $imageName);
+                                                        $imagePath = storage_path('app/public/students/' . $imageName);
 
                                                         $avatarImage = (!empty($imageName) && file_exists($imagePath))
-                                                                        ? asset('assets/img/students/' . $imageName)
-                                                                        : asset('assets/img/students/student.jpg');
+                                                                        ? asset('storage/students/' . $imageName)
+                                                                        : asset('storage/students/student.jpg');
                                                     @endphp
 
                                                     <img src="{{ $avatarImage }}" class="student-avatar" alt="Student Avatar">

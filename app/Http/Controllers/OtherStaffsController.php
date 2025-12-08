@@ -123,19 +123,11 @@ class OtherStaffsController extends Controller
 
             $profile_img = '';
             if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $imageFile = time() . '.' . $image->getClientOriginalExtension();
-                $imagePath = public_path('assets/img/profile');
+                // Create unique logo name
+                $imageFile = time() . '_' . uniqid() . '.' . $request->image->getClientOriginalExtension();
 
-                // Ensure the directory exists
-                if (!file_exists($imagePath)) {
-                    mkdir($imagePath, 0775, true);
-                }
-
-                // Move the file
-                $image->move($imagePath, $imageFile);
-
-                // Set the image file name on the student record
+                // Store in storage/app/public/logo
+                $request->image->storeAs('profile', $imageFile, 'public');
                 $profile_image = $imageFile;
             }
 
@@ -399,12 +391,12 @@ class OtherStaffsController extends Controller
         //  SCHOOL LOGO
         // =========================
         $logoRow = 1;
-        if ($school->logo && file_exists(public_path('assets/img/logo/' . $school->logo))) {
+        if ($school->logo && file_exists(storage_path('app/public/logo/' . $school->logo))) {
             try {
                 $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
                 $drawing->setName('Logo');
                 $drawing->setDescription('Logo');
-                $drawing->setPath(public_path('assets/img/logo/' . $school->logo));
+                $drawing->setPath(storage_path('app/public/logo/' . $school->logo));
                 $drawing->setHeight(60);
                 $drawing->setCoordinates('A1');
                 $drawing->setWorksheet($sheet);
@@ -642,23 +634,22 @@ class OtherStaffsController extends Controller
 
     private function handleProfileImageUpload($image, $oldImage = null)
     {
-        $imagePath = public_path('assets/img/profile');
-        if (!file_exists($imagePath)) {
-            mkdir($imagePath, 0775, true);
-        }
+        $directory = 'profile'; // inside storage/app/public/profile
+        $imageFile = time() . '_'. uniqid() . '.' . $image->getClientOriginalExtension();
 
-        $fileName = time() . '.' . $image->getClientOriginalExtension();
-
-        // Delete old image if not default
+        // Delete old image if it is not one of the default ones
         if ($oldImage && !in_array($oldImage, ['avatar.jpg', 'female-avatar.jpg'])) {
-            $oldPath = $imagePath . '/' . $oldImage;
+            $oldPath = storage_path("app/public/{$directory}/{$oldImage}");
             if (file_exists($oldPath)) {
                 unlink($oldPath);
             }
         }
 
-        $image->move($imagePath, $fileName);
-        return $fileName;
+        // Store new image
+        $image->storeAs($directory, $imageFile, 'public');
+
+        return $imageFile;
     }
+
 
 }

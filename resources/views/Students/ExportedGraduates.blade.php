@@ -245,12 +245,12 @@
                         <td class="text-center">
                             @php
                                 $imageName = $student->image;
-                                $imagePath = public_path('assets/img/students/' . $imageName);
+                                $imagePath = storage_path('app/public/students/' . $imageName);
 
                                 if (!empty($imageName) && file_exists($imagePath)) {
-                                    $avatarImage = public_path('assets/img/students/' . $imageName);
+                                    $avatarImage = public_path('stirage/students/' . $imageName);
                                 } else {
-                                    $avatarImage = public_path('assets/img/students/student.jpg');
+                                    $avatarImage = public_path('storage/students/student.jpg');
                                 }
                             @endphp
                             <img class="student-photo" src="{{ $avatarImage }}" alt="Student Photo">

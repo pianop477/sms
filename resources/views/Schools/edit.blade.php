@@ -273,7 +273,7 @@
 
                 <!-- Current Logo Display -->
                 <div class="current-logo mb-4">
-                    <img src="{{ asset('assets/img/logo/' . $schools->logo) }}"
+                    <img src="{{ asset('storage/logo/' . $schools->logo) }}"
                          alt="{{ $schools->school_name }} Logo"
                          class="school-logo-preview">
                     <div>

@@ -652,7 +652,7 @@
                 <div class="header-content">
                     <div class="company-info">
                         <div class="logo-container">
-                            <img src="{{ asset('assets/img/logo/logo.png') }}" alt="ShuleApp Logo" class="invoice-logo">
+                            <img src="{{ asset('storage/logo/logo.png') }}" alt="ShuleApp Logo" class="invoice-logo">
                         </div>
                         <div class="company-details">
                             <h1>INVOICE</h1>

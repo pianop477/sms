@@ -142,7 +142,7 @@
 <table class="header">
     <tr>
         <td width="15%">
-            <img src="{{ public_path('assets/img/logo/' . $schoolInfo->logo) }}" alt="Logo" width="80">
+            <img src="{{ storage_path('app/public/logo/' . $schoolInfo->logo) }}" alt="Logo" width="80">
         </td>
         <td width="70%" class="school-info">
             <h3 style="margin:0; padding:0;">THE UNITED REPUBLIC OF TANZANIA</h3>
@@ -154,17 +154,17 @@
             @php
                 // Determine the image path
                 $imageName = $students->image;
-                $imagePath = public_path('assets/img/students/' . $imageName);
+                $imagePath = storage_path('app/public/students/' . $imageName);
 
                 // Check if the image exists and is not empty
                 if (!empty($imageName) && file_exists($imagePath)) {
-                    $avatarImage = public_path('assets/img/students/' . $imageName);
+                    $avatarImage = storage_path('app/public/students/' . $imageName);
                 } else {
                 // Use default avatar based on gender
-                    $avatarImage = public_path('assets/img/students/' . ($students->gender == 'male' ? 'student.jpg' : 'student.jpg'));
+                    $avatarImage = storage_path('app/public/students/' . ($students->gender == 'male' ? 'student.jpg' : 'student.jpg'));
                 }
             @endphp
-            <img src="{{ $avatarImage }}" alt="" width="80" class="rounded-circle" style="border-radius: 10px">
+            <img src="{{ $avatarImage }}" alt="" width="80" class="rounded-circle" style="border-radius: 50px">
         </td>
     </tr>
 </table>
@@ -172,7 +172,7 @@
     <tr>
         <td>
             <h5 style="margin:5px 0; padding:0;">STUDENT'S ACADEMIC REPORT</h5>
-            <h5 style="margin:0; padding:0;"> {{ $reports->title }} Report - {{ \Carbon\Carbon::parse($reports->created_at)->format('d/m/Y') }}</h5>
+            <h5 style="margin:0; padding:0;"> {{ $reports->title }} Assessment Report - {{ \Carbon\Carbon::parse($reports->created_at)->format('d/m/Y') }}</h5>
         </td>
     </tr>
 </table>
@@ -219,7 +219,7 @@
                 <tr>
                     <td class="subject-name" style="text-transform: capitalize">{{ ucwords(strtolower($subject['subjectName'])) }} <span class="" style="text-transform: uppercase">({{ ucwords(strtoupper($subject['subjectCode'])) }})</span></td>
                     <td class="teacher-name">{{ucwords(strtolower($subject['teacher']))}}</td>
-                     @foreach($examHeaders as $exam)
+                    @foreach($examHeaders as $exam)
                         <td class="exam-score text-center">{{ $subject['examScores'][$exam['abbr'].'_'.$exam['date']] ?? 'X' }}</td>
                     @endforeach
                     <td>{{ $subject['total'] }}</td>
@@ -257,16 +257,18 @@
                     </td>
                 </tr>
             @endforeach
-
+            <tr class="summary-row">
+                <td colspan="{{ count($examHeaders) + 7 }}" style="background: rgb(187, 163, 56)"></td>
+            </tr>
             <tr class="summary-row">
                 <td>Exam Averages</td>
                 <td></td>
                 @foreach ($examHeaders as $exam)
                     <td class="text-center font-weight-bold">
-                        {{ number_format($examAverages[$exam['abbr'].'_'.$exam['date']] ?? 0, 2) }}
+                        {{ number_format($examAverages[$exam['abbr'].'_'.$exam['date']] ?? 0, 1) }}
                     </td>
                 @endforeach
-                <td>{{ number_format($sumOfAverages, 2) }}</td>
+                <td></td>
                 <td>{{ number_format($studentGeneralAverage, 2) }}</td>
                 <td></td>
                 <td></td>
@@ -314,8 +316,7 @@
                     @endif
                 </td>
                 <td></td>
-                <td></td>
-                <td></td>
+                <td colspan="2">Total Marks: <strong>{{ number_format($totalScoreForStudent, 2) }}</strong></td>
             </tr>
 
             <tr class="summary-row">
@@ -324,7 +325,7 @@
 
             <tr class="summary-row">
                 <td colspan="2">
-                    General Average: <strong>{{ number_format($studentGeneralAverage, 3) }}</strong>
+                    General Average: <strong>{{ number_format($studentGeneralAverage, 3) }}</strong><br>
                 </td>
                 <td colspan="2" class="text-center">
                     Grade: <strong>
@@ -344,7 +345,7 @@
                     </strong>
                 </td>
                 <td colspan="3">
-                    Position: <strong style="text-decoration:underline">{{ $generalPosition }}</strong> out of <strong style="text-decoration:underline">{{ $totalStudents }}</strong>
+                    Position: <strong style="text-decoration:underline">{{ $generalPosition }}</strong> out of <strong style="text-decoration:underline">{{ $totalStudents }}</strong><br>
                 </td>
                 <td colspan="{{count($examHeaders)}}" class="text-center">
                     General Remarks:
@@ -381,7 +382,7 @@
         <table class="report-table" style="margin-top: 20px;">
             <tbody>
                 <tr>
-                    <td colspan="7" style="background: rgb(187, 163, 56); font-size: 12px"><strong>Exam Codes Key</strong></td>
+                    <td colspan="7" style="background: rgb(187, 163, 56); font-size: 12px"><strong>Examinations codes Key</strong></td>
                 </tr>
                 <tr>
                     <th colspan="3">Exam Code</th>
@@ -639,6 +640,23 @@
         </tbody>
     </table>
 @endif
+    <div style="
+        position: fixed;
+        bottom: 8mm;
+        left: 0;
+        right: 0;
+        text-align: center;
+    ">
+        <img
+            src="data:image/png;base64,{{ $qrPng }}"
+            width="120"
+            alt="Report Verification QR"
+        >
+        <div style="font-size:10px; margin-top:0; font-style: italic;">
+            Scan to verify
+        </div>
+    </div>
+
 
     <footer>
         <span class="copyright">

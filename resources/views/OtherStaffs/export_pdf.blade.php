@@ -258,7 +258,7 @@
                 $logoBase64 = null;
 
                 if (!empty($school->logo)) {
-                    $logoFile = public_path('assets/img/logo/' . $school->logo);
+                    $logoFile = storage_path('app/public/logo/' . $school->logo);
                     if (file_exists($logoFile)) {
                         $type = pathinfo($logoFile, PATHINFO_EXTENSION);
                         $data = file_get_contents($logoFile);

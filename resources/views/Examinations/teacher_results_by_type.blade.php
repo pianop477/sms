@@ -135,7 +135,7 @@
 </head>
 <body>
     <div class="header">
-        <img src="{{ public_path('assets/img/logo/' . Auth::user()->school->logo) }}" alt="logo">
+        <img src="{{ storage_path('app/public/logo/' . Auth::user()->school->logo) }}" alt="logo">
         <h3>THE UNITED REPUBLIC OF TANZANIA</h3>
         <h4>THE PRESIDENT'S OFFICE - RALG</h4>
         <h4>{{ Auth::user()->school->school_name }} - {{ Auth::user()->school->postal_address }}, {{ Auth::user()->school->postal_name }}</h4>

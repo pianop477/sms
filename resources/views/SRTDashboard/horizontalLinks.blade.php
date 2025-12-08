@@ -15,7 +15,7 @@
                                 <a href="{{route('register.manager')}}"><i class="fa fa-users"></i><span> Administrators</span></a>
                             </li>
                             <li class="mega-menu">
-                                <a href="{{route('Schools.index')}}"><i class="fas fa-university"></i> <span>School Management</span></a>
+                                <a href="{{route('Schools.index')}}"><i class="fas fa-university"></i> <span>Schools</span></a>
                             </li>
                             <li>
                                 <a href="{{route('admin.reset.password')}}"><i class="ti-key"></i><span>Password Reset</span></a>
@@ -45,7 +45,7 @@
 
                             {{-- Academic Management --}}
                             <li>
-                                <a href="javascript:void(0)"><i class="fas fa-university"></i><span>Academic Management</span></a>
+                                <a href="javascript:void(0)"><i class="fas fa-university"></i><span>Academics</span></a>
                                 <ul class="submenu">
                                     <li><a href="{{route('Classes.index')}}"><i class="fas fa-chalkboard-teacher"></i> Manage Classes</a></li>
                                     <li><a href="{{route('courses.index')}}"><i class="fas fa-book-open"></i> Manage Courses</a></li>
@@ -105,7 +105,7 @@
 
                             {{-- Academic Management --}}
                             <li>
-                                <a href="javascript:void(0)"><i class="fas fa-university"></i><span>Academic Management</span></a>
+                                <a href="javascript:void(0)"><i class="fas fa-university"></i><span>Academics</span></a>
                                 <ul class="submenu">
                                     <li><a href="{{route('Classes.index')}}"><i class="fas fa-chalkboard-teacher"></i> Manage Classes</a></li>
                                     <li><a href="{{route('courses.index')}}"><i class="fas fa-book-open"></i> Manage Courses</a></li>
@@ -139,7 +139,7 @@
                             <li>
                                 <a href="javascript:void(0)"><i class="fa fa-file-archive"></i><span>Staff & HR</span></a>
                                 <ul class="submenu">
-                                    <li><a href="{{route('OtherStaffs.index')}}"><i class="fas fa-user-group"></i> Other Staffs</a></li>
+                                    <li><a href="{{route('OtherStaffs.index')}}"><i class="fas fa-user-group"></i> Staffs</a></li>
                                     <li><a href="{{route('tod.roster.index')}}"><i class="fas fa-file"></i> Duty Rosters</a></li>
                                     <li><a href="{{route('contract.management')}}"><i class="fas fa-briefcase"></i> Manage Contracts</a></li>
                                 </ul>
@@ -149,7 +149,7 @@
                             <li>
                                 <a href="javascript:void(0)"><i class="fas fa-handshake-alt"></i><span>Services</span></a>
                                 <ul class="submenu">
-                                    <li><a href="{{route('Transportation.index')}}"><i class="fa fa-bus-alt"></i> Transport Services</a></li>
+                                    <li><a href="{{route('Transportation.index')}}"><i class="fa fa-bus-alt"></i> Transport</a></li>
                                     <li><a href="{{route('sms.form')}}"><i class="ti-announcement"></i> Announcements</a></li>
                                 </ul>
                             </li>
@@ -158,7 +158,7 @@
                         {{-- Contract Requests (Other roles) --}}
                         @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 1 || Auth::user()->usertype ==3 && Auth::user()->teacher->role_id == 4)
                             <li>
-                                <a href="{{route('contract.index')}}"><i class="fas fa-briefcase"></i><span> Manage Contracts</span></a>
+                                <a href="{{route('contract.index')}}"><i class="fas fa-briefcase"></i><span> Contracts Management</span></a>
                             </li>
                         @endif
                         {{-- Accountant Links --}}

@@ -882,12 +882,12 @@ class BillsController extends Controller
 
         // School Logo (if available) - Row 1
         $logoRow = 1;
-        if ($school->logo && file_exists(public_path('assets/img/logo/' . $school->logo))) {
+        if ($school->logo && file_exists(storage_path('app/public/logo/' . $school->logo))) {
             try {
                 $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
                 $drawing->setName('Logo');
                 $drawing->setDescription('Logo');
-                $drawing->setPath(public_path('assets/img/logo/' . $school->logo));
+                $drawing->setPath(storage_path('app/public/logo/' . $school->logo));
                 $drawing->setHeight(60);
                 $drawing->setCoordinates('A1');
                 $drawing->setWorksheet($sheet);

@@ -6,7 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="author" content="Piano">
     <meta name="description" content="ShuleApp is a digital platform for School Management System">
-    <link rel="shortcut icon" type="image/png" href="{{asset('assets/img/favicon/favicon.ico')}}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/favicon/favicon.ico') }}">
+    <link rel="icon" type="image/png" href="{{asset('assets/images/favicon/favicon-16x16.png')}}">
     <link rel="stylesheet" href="{{asset('assets/css/bootstrap.min.css')}}">
     <link rel="stylesheet" href="{{asset('assets/css/font-awesome.min.css')}}">
     <link rel="stylesheet" href="{{asset('assets/css/themify-icons.css')}}">
@@ -14,7 +15,6 @@
     <link rel="stylesheet" href="{{asset('assets/css/owl.carousel.min.css')}}">
     <link rel="stylesheet" href="{{asset('assets/fontawesome-free-6.5.2-web/css/all.min.css')}}">
     <link rel="stylesheet" href="{{asset('assets/css/slicknav.min.css')}}">
-    <link rel="icon" type="image/png" href="{{asset('assets/img/favicon/favicon-16x16.png')}}">
     <!-- amchart css -->
     <link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
     <!-- others css -->

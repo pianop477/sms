@@ -134,7 +134,7 @@
         <div class="col-md-8">
             <h4 class="text-primary fw-bold border-bottom pb-2">
                 <i class="fas fa-credit-card me-2"></i>
-                Payment History for {{ ucwords(strtolower($students->first_name . ' ' . $students->last_name)) }}
+                Payment History for <span style="text-decoration:underline"><strong>{{ ucwords(strtolower($students->first_name . ' ' . $students->last_name)) }}</strong></span>
             </h4>
         </div>
         <div class="col-md-4 text-md-end align-self-center">
@@ -146,7 +146,7 @@
 
     <!-- Summary Cards -->
     <div class="row mb-4">
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="card summary-card border-left-primary">
                 <div class="card-body">
                     <div class="row align-items-center">
@@ -165,7 +165,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="card summary-card border-left-success">
                 <div class="card-body">
                     <div class="row align-items-center">
@@ -184,7 +184,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="card summary-card border-left-{{ $totalBalance > 0 ? 'warning' : 'info' }}">
                 <div class="card-body">
                     <div class="row align-items-center">
@@ -203,7 +203,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        {{-- <div class="col-md-3">
             <div class="card summary-card border-left-secondary">
                 <div class="card-body">
                     <div class="row align-items-center">
@@ -221,7 +221,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
 
     <div class="row">

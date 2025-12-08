@@ -86,7 +86,8 @@ use PHPUnit\Runner\ResultCache\ResultCache;
 
     // Verify credential and login
     Route::post('/login/biometric/verify', [WebAuthnLoginController::class, 'verify'])->name('webauthn.login.verify')->middleware('throttle:5,1');
-
+    // QR Code Verification Routes
+    Route::get('/verify-report', [ResultsController::class, 'verify'])->name('report.verify');
 
     Route::post('/webauthn/register/options', [WebAuthnRegisterController::class, 'options'])->name('webauthn.register.options')->middleware('throttle:5,1');
     Route::post('/webauthn/register/verify', [WebAuthnRegisterController::class, 'register'])->name('webauthn.register.verify')->middleware('throttle:5,1');

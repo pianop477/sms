@@ -7,12 +7,13 @@
                     $schoolName = Auth::user()->school && Auth::user()->school->school_name
                                 ? Auth::user()->school->school_name
                                 : 'ShuleApp - Admin';
+
                     $logoPath = Auth::user()->school && Auth::user()->school->logo
-                                ? 'assets/img/logo/' . Auth::user()->school->logo
-                                : 'assets/img/logo/logo.png';
+                                ? url('storage/logo/' . Auth::user()->school->logo)
+                                : url('storage/logo/logo.png');
                 @endphp
 
-                <img src="{{ asset($logoPath) }}"
+                <img src="{{ $logoPath }}"
                      alt="Logo"
                      class="rounded-circle me-2 mr-2"
                      style="width:50px; height:50px; object-fit:cover;">
@@ -27,22 +28,25 @@
             {{-- User Profile --}}
             <div class="dropdown d-flex align-items-center justify-content-center justify-content-md-start ms-md-auto">
                 @php
-                            // Determine the image path
-                            $imageName = Auth()->user()->image;
-                            $imagePath = public_path('assets/img/profile/' . $imageName);
+                    $imageName = Auth()->user()->image;
 
-                            // Check if the image exists and is not empty
-                            if (!empty($imageName) && file_exists($imagePath)) {
-                                $avatarImage = asset('assets/img/profile/' . $imageName);
-                            } else {
-                                // Use default avatar based on gender
-                                $avatarImage = asset('assets/img/profile/' . (auth()->user()->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
-                            }
+                    $filePath = storage_path('app/public/profile/' . $imageName);
+                    // echo $filePath;
+
+                    if ($imageName && file_exists($filePath)) {
+                        $avatarImage = asset('storage/profile/' . $imageName);
+                    } else {
+                        $default = auth()->user()->gender == 'male'
+                                    ? 'avatar.jpg'
+                                    : 'avatar-female.jpg';
+
+                        $avatarImage = asset('storage/profile/' . $default);
+                    }
                 @endphp
 
                 <img src="{{ $avatarImage }}"
                      alt="Profile"
-                     class="rounded-circle"
+                     class="rounded-circle mr-3"
                      style="width:40px; height:40px; object-fit:cover;">
 
                 <a class="dropdown-toggle text-decoration-none ms-2 fw-semibold text-dark"

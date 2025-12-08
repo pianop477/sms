@@ -34,7 +34,7 @@
             border-radius: 24px;
             border: 1px solid rgba(255, 255, 255, 0.3);
             box-shadow: var(--card-shadow);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            /* transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); */
             overflow: hidden;
         }
 
@@ -583,7 +583,7 @@
                                 <td class="text-uppercase">{{ $school->abbriv_code }}</td>
                                 <td class="text-uppercase">{{ $school->school_reg_no }}</td>
                                 <td class="text-center">
-                                    <img src="{{ asset('assets/img/logo/' . $school->logo) }}"
+                                    <img src="{{ asset('storage/logo/' . $school->logo) }}"
                                          alt="{{ $school->school_name }}"
                                          class="school-logo">
                                 </td>

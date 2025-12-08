@@ -29,7 +29,7 @@ class deleteOldReports extends Command
     {
         //
         // Path to the 'exam_results' folder
-        $folderPath = public_path('reports');
+        $folderPath = storage_path('reports');
 
         // Check if the folder exists
         if (!File::exists($folderPath)) {

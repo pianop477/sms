@@ -196,6 +196,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
         Vinkla\Hashids\HashidsServiceProvider::class,
+        SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
 
 
 
@@ -216,6 +217,7 @@ return [
 
         'PDF' => Barryvdh\DomPDF\Facade::class,
         'Hashids' => Vinkla\Hashids\Facades\Hashids::class,
+        'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
 
     ])->toArray(),
 

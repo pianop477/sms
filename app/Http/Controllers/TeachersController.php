@@ -21,6 +21,7 @@ use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\PDF as PDF;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Vinkla\Hashids\Facades\Hashids;
 
 class TeachersController extends Controller
@@ -373,20 +374,17 @@ class TeachersController extends Controller
             // Handle image upload
             if ($request->hasFile('image')) {
                 // Log::info('Image upload detected');
-                $image = $request->file('image');
-                $imageName = time() . '.' . $image->getClientOriginalExtension();
-                $imagePath = public_path('assets/img/profile');
-
-                //check for existing file before update new
-                if(!empty($user->image)) {
-                    $existingImagePath = public_path('assets/img/profile/' . $user->image);
-                    if (file_exists($existingImagePath)) {
-                        unlink($existingImagePath);
-                    }
+                if ($user->image && Storage::disk('public')->exists('profile/'.$user->image)) {
+                    Storage::disk('public')->delete('profile/'.$user->image);
                 }
 
-                $image->move($imagePath, $imageName);
-                $user->image = $imageName;
+                // Create unique logo name
+                $imageFile = time() . '_' . uniqid() . '.' . $request->image->getClientOriginalExtension();
+
+                // Store in storage/app/public/logo
+                $request->image->storeAs('profile', $imageFile, 'public');
+
+                $user->image = $imageFile;
             }
 
             // Save user

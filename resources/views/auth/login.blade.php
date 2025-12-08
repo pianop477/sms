@@ -330,15 +330,40 @@
         color: #f87171;
         text-decoration: underline;
     }
+    /* Brand Section - Compact */
+    .brand-section {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .logo {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.75rem;
+      box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+    }
+
+    .logo i {
+      font-size: 1.6rem;
+      color: white;
+    }
   </style>
 </head>
 <body>
-  <div class="login-card">
-    <div class="login-header">
-      <h1 class="login-title">Welcome to ShuleApp</h1>
-      <p class="login-subtitle">Sign in to continue</p>
+    <div class="brand-section">
+      {{-- <div class="logo">
+        <i class="fas fa-graduation-cap"></i>
+      </div> --}}
+      <h1 class="brand-title">ShuleApp</h1>
+      <p class="brand-subtitle">Welcome back, please sign in</p>
     </div>
-
+  <div class="login-card">
     @if(session('error'))
       <div style="background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 6px; border-left: 3px solid #ef4444; margin-bottom: 16px; font-size: 13px;">
         <i class="fas fa-exclamation-circle" style="margin-right: 6px;"></i>

@@ -192,14 +192,14 @@
                         @php
                             // Determine the image path
                             $imageName = $staff->profile_image;
-                            $imagePath = public_path('assets/img/profile/' . $imageName);
+                            $imagePath = storage_path('app/public/profile/' . $imageName);
 
                             // Check if the image exists and is not empty
                             if (!empty($imageName) && file_exists($imagePath)) {
-                                $avatarImage = asset('assets/img/profile/' . $imageName);
+                                $avatarImage = asset('storage/profile/' . $imageName);
                             } else {
                                 // Use default avatar based on gender
-                                $avatarImage = asset('assets/img/profile/' . ($staff->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                $avatarImage = asset('storage/profile/' . ($staff->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
                             }
                         @endphp
                         <img src="{{ $avatarImage }}" class="profile-img" alt="Teacher Photo">
@@ -380,7 +380,7 @@
                                         <div class="col-md-4 mb-3">
                                             <div class="form-group">
                                                 <label for="email">Date of Birth</label>
-                                                <input type="date" required name="dob" class="form-control-custom" value="{{old('dob', $staff->date_of_birth)}}">
+                                                <input type="date" required name="dob" class="form-control-custom" value="value="{{ old('dob', optional($staff->date_of_birth)->format('Y-m-d')) }}"">
                                                 @error('dob')
                                                     <span class="text-danger">{{$message}}</span>
                                                 @enderror

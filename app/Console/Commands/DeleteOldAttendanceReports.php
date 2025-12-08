@@ -29,7 +29,7 @@ class DeleteOldAttendanceReports extends Command
     {
         //
         // Path to the 'attendances' folder
-        $folderPath = public_path('attendances');
+        $folderPath = storage_path('attendances');
 
         // Check if the folder exists
         if (!File::exists($folderPath)) {

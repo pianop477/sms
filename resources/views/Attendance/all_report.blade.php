@@ -360,7 +360,7 @@
         <!-- Header Section with Logo -->
         <div class="header-section">
             <div class="logo">
-                <img src="{{ public_path('assets/img/logo/' . (Auth::user()->school->logo)) }}" alt="School Logo">
+                <img src="{{ storage_path('app/public/logo/' . (Auth::user()->school->logo)) }}" alt="School Logo">
             </div>
             <div class="header-text">
                 <h4>{{ Auth::user()->school->school_name }}</h4>

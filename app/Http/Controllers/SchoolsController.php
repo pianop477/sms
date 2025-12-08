@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use RealRashid\SweetAlert\Facades\Alert;
 use Vinkla\Hashids\Facades\Hashids;
 
@@ -112,22 +113,24 @@ class SchoolsController extends Controller
             $school->postal_name = $request->postal_name;
             $school->status = 2;
             $school->country = $request->country;
-            if ($request->hasFile('logo')) {
-                $image = $request->file('logo');
-                $imageFile = time() . '.' . $image->getClientOriginalExtension();
-                $imagePath = public_path('assets/img/logo');
 
-                // Ensure the directory exists
-                if (!file_exists($imagePath)) {
-                    mkdir($imagePath, 0775, true);
+            if ($request->hasFile('logo')) {
+
+                // Delete old logo if it exists
+                if ($school->logo && Storage::disk('public')->exists('logo/'.$school->logo)) {
+                    Storage::disk('public')->delete('logo/'.$school->logo);
                 }
 
-                // Move the file
-                $image->move($imagePath, $imageFile);
+                // Create unique logo name
+                $imageFile = time() . '_' . uniqid() . '.' . $request->logo->getClientOriginalExtension();
 
-                // Set the image file name on the student record
+                // Store in storage/app/public/logo
+                $request->logo->storeAs('logo', $imageFile, 'public');
+
+                // Save filename in DB
                 $school->logo = $imageFile;
             }
+
             $school->save();
 
             //store managers information
@@ -299,28 +302,24 @@ class SchoolsController extends Controller
         $schools->postal_name = $request->postal_name;
         $schools->sender_id = $request->sender_name;
         $schools->country = $request->country;
+
         if ($request->hasFile('logo')) {
-            $image = $request->file('logo');
-            $imageFile = time() . '.' . $image->getClientOriginalExtension();
-            $imagePath = public_path('assets/img/logo');
 
-            // Ensure the directory exists
-            if (!file_exists($imagePath)) {
-                mkdir($imagePath, 0775, true);
+            // Delete old logo if it exists
+            if ($school->logo && Storage::disk('public')->exists('logo/'.$school->logo)) {
+                Storage::disk('public')->delete('logo/'.$school->logo);
             }
 
-            // Check if the existing file exists and delete it
-            $existingFile = $imagePath . '/' . $schools->logo;
-            if (file_exists($existingFile)) {
-                unlink($existingFile);
-            }
+            // Create unique logo name
+            $imageFile = time() . '_' . uniqid() . '.' . $request->logo->getClientOriginalExtension();
 
-            // Move the new file
-            $image->move($imagePath, $imageFile);
+            // Store in storage/app/public/logo
+            $request->logo->storeAs('logo', $imageFile, 'public');
 
-            // Set the image file name on the school record
-            $schools->logo = $imageFile;
+            // Save filename in DB
+            $school->logo = $imageFile;
         }
+
         $schools->save();
         Alert()->toast('School information updated successfully', 'success');
         return redirect()->route('home');
@@ -339,7 +338,7 @@ class SchoolsController extends Controller
             Alert()->toast('This school is not found', 'error');
             return back();
         }
-        $logoPath = public_path('assets/img/logo');
+        $logoPath = storage_path('app/public/logo');
         $existingFile = $logoPath . '/' . $schools->logo;
         if(file_exists($existingFile)) {
             unlink($existingFile);

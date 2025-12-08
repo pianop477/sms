@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
 use App\Exports\ResultsExport;
 use App\Models\compiled_results;
 use App\Models\Examination;
@@ -27,6 +29,8 @@ use RealRashid\SweetAlert\Facades\Alert as FacadesAlert;
 use RealRashid\SweetAlert\Facades\Alert;
 use Vinkla\Hashids\Facades\Hashids;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Crypt;
+use Endroid\QrCode\Builder\Builder;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ResultsController extends Controller
@@ -485,7 +489,7 @@ class ResultsController extends Controller
                                                 ->select('generated_reports.*', 'users.first_name', 'users.last_name')
                                                 ->where('generated_reports.school_id', $schools->id)
                                                 ->where('generated_reports.class_id', $classes->id)
-                                                ->orderBy('generated_reports.title')
+                                                ->orderBy('generated_reports.created_at', 'desc')
                                                 ->paginate(5);
 
                 return view('Results.general_result_type', compact('schools', 'reports', 'groupedByMonth', 'compiledGroupByExam', 'year', 'exams', 'classes', 'groupedByExamType'));
@@ -1324,9 +1328,43 @@ class ResultsController extends Controller
             $result->courseRank = $ranks[$studentId->id] ?? null;
 
         }
+        // Generate QR payload with summary
+        $verificationData = [
+            'student_name' => trim($studentId->first_name.' '.$studentId->middle_name.' '.$studentId->last_name),
+            'admission_number' => $studentId->admission_number,
+            'class' => $results->first()->class_name,
+            'report_type' => $results->first()->exam_type . ' Assessment',
+            'term' => $results->first()->Exam_term,
+            'school' => $results->first()->school_name,
+            'report_date' => \Carbon\Carbon::parse($date)->format('Y-m-d'),
+            'report_id' => sha1($studentId->id.$exam_id[0].$class_id[0].$date),
+            'issued_at' => now()->timestamp,
+
+            // 🔹 Add these summary fields
+            'total_score' => $totalScore,
+            'average_score' => round($averageScore, 2),
+            'student_rank' => $studentRank,
+            'total_students' => $rankings->count(),
+        ];
+
+
+        // Sign and encrypt
+        $verificationData['signature'] = hash_hmac('sha256', json_encode($verificationData), config('app.key'));
+        $encryptedPayload = Crypt::encryptString(json_encode($verificationData));
+
+        $verificationUrl = route('report.verify', ['payload' => $encryptedPayload]);
+
+        $resultQr = Builder::create()
+            ->writer(new PngWriter())
+            ->data($verificationUrl)
+            ->size(140)
+            ->margin(4)
+            ->build();
+
+        $qrPng = base64_encode($resultQr->getString());
 
         // Pass the calculated data to the view
-        $pdf = \PDF::loadView('Results.parent_results', compact('results', 'year', 'date', 'examType', 'studentId', 'student', 'month', 'totalScore', 'averageScore', 'studentRank', 'rankings'));
+        $pdf = \PDF::loadView('Results.parent_results', compact('results', 'year', 'date', 'examType', 'studentId', 'student', 'month', 'totalScore', 'averageScore', 'studentRank', 'rankings', 'qrPng'));
 
         return $pdf->stream($results->first()->first_name .' Results '.$month. ' '. $year. '.pdf');
     }
@@ -1963,7 +2001,7 @@ class ResultsController extends Controller
                 ."Mtihani wa ". strtoupper($reports->title)."\n"
                 ."wa Tar. {$reportDate} ni:\n"
                 . $subjectResultsText
-                . "Jumla: {$studentAverageTotal}, Wastani: ".number_format($studentAverage)."\n"
+                . "Jumla: {$studentAverageTotal}, Wastani: ".number_format($studentAverage, 1)."\n"
                 . "Nafasi ya {$position} kati ya {$totalStudents}.\n"
                 . "Pakua ripoti hapa {$link}.";
 
@@ -1991,7 +2029,7 @@ class ResultsController extends Controller
                 ]);
 
             } catch (\Exception $e) {
-                Log::error("Failed to send SMS: " . $e->getMessage());
+                // Log::error("Failed to send SMS: " . $e->getMessage());
                 Alert()->toast('Failed to send SMS: ' . $e->getMessage(), 'error');
                 return redirect()->back();
             }
@@ -2042,7 +2080,7 @@ class ResultsController extends Controller
 
         $classResultsGrouped = $results->groupBy('subjectId');
 
-         // Badilisha uundaji wa examHeaders kuwa kwa kila mtihani tofauti
+        // Badilisha uundaji wa examHeaders kuwa kwa kila mtihani tofauti
         $examHeaders = $results->map(function($item) {
             return [
                 'abbr' => $item->symbolic_abbr,
@@ -2050,11 +2088,15 @@ class ResultsController extends Controller
                 'display' => $item->symbolic_abbr . ' ' . \Carbon\Carbon::parse($item->exam_date)->format('d M Y')
             ];
         })->unique(function($item) {
-            return $item['abbr'].$item['date']; // Unique kwa mchanganyiko wa abbreviation na tarehe
+            return $item['abbr'].$item['date'];
         })->values();
 
         $finalData = [];
         $combineOption = $reports->combine_option ?? 'individual';
+
+        // Vigezo vya kuweka jumla za mwanafunzi
+        $studentTotalMarks = 0;
+        $subjectCount = 0;
 
         foreach ($classResultsGrouped as $subjectId => $subjectResults) {
             $subjectName = $subjectResults->first()->course_name;
@@ -2111,34 +2153,98 @@ class ResultsController extends Controller
                 $average = $filtered->count() > 0 ? $filtered->avg() : 0;
             }
 
-            $allScores = Examination_result::where('course_id', $subjectId)
-                        ->where('class_id', $classId)
-                        ->where('school_id', $schoolId)
-                        ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                        ->get()
-                        ->groupBy('student_id')
-                        ->map(function ($scores) {
-                            return $scores->sum('score'); // Daima tumia jumla kwa rank
-                        })
-                        ->sortDesc()
-                        ->values();
+            // Ongeza kwa jumla za mwanafunzi
+            $studentTotalMarks += $average;
+            $subjectCount++;
 
-            $position = $allScores->search($total) + 1;
+            $finalData[] = [
+                'subjectName' => $subjectName,
+                'teacher' => $teacher,
+                'subjectCode' => $subjectCode,
+                'examScores' => $examScores,
+                'total' => $total,
+                'average' => round($average, 2), // Rounded to 1 decimal place
+                'position' => 0 // Placeholder, itabakiweka baada ya rank calculation
+            ];
 
-            $finalData[] = compact('subjectName', 'teacher', 'subjectCode', 'examScores', 'total', 'average', 'position');
         }
+
+        // **Sasa hesabu position ya kila somo**
+        foreach ($finalData as &$subject) {
+            $allStudentSubjectAverages = [];
+
+            // Pata wanafunzi wote na averages zao kwenye somo hili
+            $subjectId = DB::table('subjects')
+                ->where('course_name', $subject['subjectName'])
+                ->where('course_code', $subject['subjectCode'])
+                ->value('id');
+
+            if ($subjectId) {
+                // Get all students' averages for this subject
+                $subjectResultsAll = DB::table('examination_results')
+                    ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+                    ->where('examination_results.course_id', $subjectId)
+                    ->where('examination_results.class_id', $classId)
+                    ->where('examination_results.school_id', $schoolId)
+                    ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                    ->select('examination_results.*', 'subjects.course_name')
+                    ->get()
+                    ->groupBy('student_id');
+
+                foreach ($subjectResultsAll as $student_id => $studentResults) {
+                    // Calculate average for each student using the same combine option
+                    if ($combineOption == 'individual') {
+                        $avg = $studentResults->avg('score') ?? 0;
+                    } elseif ($combineOption == 'sum') {
+                        $avg = $studentResults->count() > 0 ? $studentResults->sum('score') / $studentResults->count() : 0;
+                    } elseif ($combineOption == 'average') {
+                        $avg = $studentResults->avg('score') ?? 0;
+                    }
+
+                    $allStudentSubjectAverages[$student_id] = round($avg, 2);
+                }
+
+                // Sort in descending order and assign positions with tie handling
+                arsort($allStudentSubjectAverages);
+                $positions = [];
+                $position = 1;
+                $previousAverage = null;
+                $sameRankCount = 0;
+
+                foreach ($allStudentSubjectAverages as $std_id => $avg) {
+                    if ($previousAverage !== null && $avg < $previousAverage) {
+                        $position += $sameRankCount;
+                        $sameRankCount = 1;
+                    } else {
+                        $sameRankCount++;
+                    }
+
+                    $positions[$std_id] = $position;
+                    $previousAverage = $avg;
+                }
+
+                // Set the position for this student
+                $subject['position'] = $positions[$studentId] ?? '-';
+            }
+        }
+        unset($subject);
 
         $students = $results->first();
         $schoolInfo = $results->first();
-        // return $schoolInfo;
+
+        // **Calculate Student General Average** (jumla ya average za masomo / idadi ya masomo)
+        $studentGeneralAverage = $subjectCount > 0 ? round($studentTotalMarks / $subjectCount, 2) : 0;
+
+        // **Total Marks** (jumla ya average za masomo yote - zilizokaa rounded)
+        $totalScoreForStudent = round($studentTotalMarks, 2);
 
         // =================== EXAM HEADERS WITH DATES ===================
         $examHeadersWithDates = $results
             ->mapWithKeys(function ($item) {
                 return [$item->symbolic_abbr => $item->exam_date];
-            })->unique()->toBase(); // toBase() to allow ->values()
+            })->unique()->toBase();
 
-       // =================== EXAM AVERAGE PER EXAM DATE ===================
+        // =================== EXAM AVERAGE PER EXAM DATE ===================
         $examAverages = [];
         foreach ($examHeaders as $exam) {
             $totalPerExam = 0;
@@ -2154,55 +2260,72 @@ class ResultsController extends Controller
                 }
             }
 
-            $examAverages[$abbr.'_'.$date] = $countPerExam > 0 ? number_format($totalPerExam / $countPerExam, 2) : 0;
+            $examAverages[$abbr.'_'.$date] = $countPerExam > 0 ? round($totalPerExam / $countPerExam, 2) : 0;
         }
 
-        // =================== GENERAL AVERAGE ===================
-        $sumOfAverages = array_sum($examAverages);
-        $validScores = $results->filter(function($item) {
-            return !is_null($item->score);
-        });
+        // =================== GENERAL POSITION (USING TOTAL MARKS WITH 1 DECIMAL) ===================
+        // Pata average za wanafunzi wote kwa kutumia logic ile ile
+        $allStudentAverages = [];
 
-        $studentGeneralAverage = $validScores->count() > 0
-            ? number_format($validScores->avg('score'), 2)
-            : 0;
-
-        $totalScoreForStudent = $validScores->sum('score');
-
-        // =================== GENERAL POSITION (WITH PROPER TIE RANKING) ===================
-        $studentId = $results->first()->student_id ?? null;
-
-       // Pata alama za wanafunzi wote waliopo kwenye report hiyo
-        $allStudentScores = Examination_result::where('class_id', $classId)
+        // Pata wanafunzi wote waliopo kwenye class
+        $allStudents = DB::table('students')
+            ->where('class_id', $classId)
             ->where('school_id', $schoolId)
-            ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-            ->get()
-            ->groupBy('student_id')
-            ->map(function ($results) {
-                return $results->sum('score');
-            });
+            ->pluck('id');
 
-        // Pangilia kwa kushuka (descending)
-        $sortedScores = $allStudentScores->sortDesc();
+        foreach ($allStudents as $stdId) {
+            // Pata results za mwanafunzi huyu
+            $studentResults = DB::table('examination_results')
+                ->where('student_id', $stdId)
+                ->where('class_id', $classId)
+                ->where('school_id', $schoolId)
+                ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                ->get()
+                ->groupBy('course_id');
 
-        // Tumia tie-aware ranking
-        $ranked = [];
-        $rank = 1;
-        $position = 1;
-        $previousScore = null;
+            $studentTotalAvg = 0;
+            $studentSubjectCount = 0;
 
-        foreach ($sortedScores as $student_id => $score) {
-            if ($previousScore !== null && $score < $previousScore) {
-                $rank = $position;
+            foreach ($studentResults as $courseId => $subjectResults) {
+                // Calculate average for each subject using the same combine option
+                if ($combineOption == 'individual') {
+                    $subjectAvg = $subjectResults->avg('score') ?? 0;
+                } elseif ($combineOption == 'sum') {
+                    $subjectAvg = $subjectResults->count() > 0 ? $subjectResults->sum('score') / $subjectResults->count() : 0;
+                } elseif ($combineOption == 'average') {
+                    $subjectAvg = $subjectResults->avg('score') ?? 0;
+                }
+
+                $studentTotalAvg += round($subjectAvg, 1);
+                $studentSubjectCount++;
             }
-            $ranked[$student_id] = $rank;
-            $previousScore = $score;
-            $position++;
+
+            // Calculate student's general average (total of subject averages)
+            $allStudentAverages[$stdId] = $studentSubjectCount > 0 ? round($studentTotalAvg, 2) : 0;
         }
 
-        // Pata nafasi ya mwanafunzi anayehusika
-        $generalPosition = $ranked[$studentId] ?? '-';
-        $totalStudents = count($ranked);
+        // Sort in descending order and assign positions with tie handling
+        arsort($allStudentAverages);
+        $generalRanked = [];
+        $rank = 1;
+        $currentPosition = 1;
+        $previousAverage = null;
+        $sameRankCount = 0;
+
+        foreach ($allStudentAverages as $std_id => $avg) {
+            if ($previousAverage !== null && $avg < $previousAverage) {
+                $rank += $sameRankCount;
+                $sameRankCount = 1;
+            } else {
+                $sameRankCount++;
+            }
+
+            $generalRanked[$std_id] = $rank;
+            $previousAverage = $avg;
+        }
+
+        $generalPosition = $generalRanked[$studentId] ?? '-';
+        $totalStudents = count($generalRanked);
 
         // =================== EXAM SPECIFICATIONS ===================
         $examSpecifications = $results
@@ -2219,6 +2342,53 @@ class ResultsController extends Controller
             ->values()
             ->keyBy('abbr'); // We key by abbreviation for easy lookup
 
+        $verificationData = [
+            'student_name' => trim(
+                $students->first_name.' '.$students->middle_name.' '.$students->last_name
+            ),
+            'admission_number' => $students->admission_number,
+            'class' => $students->class_name,
+            'report_type' => $reports->title,
+            'term' => $reports->term,
+            'school' => $schoolInfo->school_name,
+            'report_date' => $reports->created_at->format('Y-m-d'),
+            'report_id' => $reports->id,
+            'issued_at' => now()->timestamp,
+
+            // ================== SUMMARY INFO ==================
+            'total_score' => $totalScoreForStudent ?? 0,
+            'average_score' => $studentGeneralAverage ?? 0,
+            'student_rank' => $generalPosition ?? '-',
+            'total_students' => $totalStudents ?? 0,
+        ];
+
+        $verificationData['signature'] = hash_hmac(
+            'sha256',
+            json_encode($verificationData),
+            config('app.key')
+        );
+
+
+        $encryptedPayload = Crypt::encryptString(
+            json_encode($verificationData)
+        );
+
+        $verificationUrl = route('report.verify', [
+            'payload' => $encryptedPayload
+        ]);
+
+
+        $result = Builder::create()
+            ->writer(new PngWriter())
+            ->data($verificationUrl)
+            ->size(150)
+            ->margin(5)
+            ->build();
+
+
+        $qrPng = base64_encode($result->getString());
+
+
         $pdf = \PDF::loadView('generated_reports.compiled_report', compact(
             'finalData',
             'examHeaders',
@@ -2226,29 +2396,25 @@ class ResultsController extends Controller
             'examHeadersWithDates',
             'results',
             'examAverages',
-            'sumOfAverages',
             'year',
             'generalPosition',
             'totalStudents',
             'students',
             'reports',
             'schoolInfo', 'examSpecifications',
-            'school', 'report', 'class',  'totalScoreForStudent'
+            'school', 'report', 'class',  'totalScoreForStudent',
+            'subjectCount', 'reportId', 'classId', 'qrPng'
         ));
-        // return $pdf->stream('compiled_report.pdf'); // au ->download() kama unataka ipakuliwe
-        $timestamp = Carbon::now()->timestamp;
-        $fileName = "report_{$timestamp}.pdf"; // Filename format: student_result_<admission_number>_<timestamp>.pdf
-        $folderPath = public_path('reports'); // Folder path in public directory
 
-        // Make sure the directory exists
+        $timestamp = Carbon::now()->timestamp;
+        $fileName = "report_{$timestamp}.pdf";
+        $folderPath = public_path('reports');
+
         if (!File::exists($folderPath)) {
             File::makeDirectory($folderPath, 0755, true);
         }
 
-        // Save the PDF to the 'reports' folder
         $pdf->save($folderPath . '/' . $fileName);
-
-        // Generate the URL for accessing the saved PDF
         $fileUrl = asset('reports/' . $fileName);
 
         return view('generated_reports.pdf_report', compact('fileUrl', 'year', 'reports', 'class', 'school', 'report', 'students', 'studentId', 'schoolId', 'classId', 'reportId'));
@@ -2352,7 +2518,7 @@ class ResultsController extends Controller
                     'parent_id' => $student['parent_id'],
                     'student_name' => strtoupper($student['first_name'] . ' '. $student['last_name']),
                     'position' => $positionText,
-                    'total_score' => number_format($student['total_score']),
+                    'total_score' => number_format($student['total_score'], 1),
                     'total_average' => number_format($student['total_average']), // 2 decimal places like PDF
                     'subject_results' => $subjectResultsText
                 ];
@@ -2982,6 +3148,43 @@ class ResultsController extends Controller
             return redirect()
                 ->route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])
                 ->with('error', 'Error deleting report');
+        }
+    }
+
+    public function verify(Request $request)
+    {
+        try {
+            $payload = json_decode(
+                Crypt::decryptString($request->payload),
+                true
+            );
+
+            $signature = $payload['signature'];
+            unset($payload['signature']);
+
+            $expectedSignature = hash_hmac(
+                'sha256',
+                json_encode($payload),
+                config('app.key')
+            );
+
+            if (!hash_equals($expectedSignature, $signature)) {
+                return view('generated_reports.verification', [
+                    'valid' => false,
+                    'message' => 'Invalid or tampered report'
+                ]);
+            }
+
+            return view('generated_reports.verification', [
+                'valid' => true,
+                'data' => $payload
+            ]);
+
+        } catch (\Exception $e) {
+            return view('generated_reports.verification', [
+                'valid' => false,
+                'message' => 'Invalid or expired QR code'
+            ]);
         }
     }
 

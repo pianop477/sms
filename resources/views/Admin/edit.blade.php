@@ -255,7 +255,7 @@
                     <p class="lead mb-0 opacity-90 text-white">Manage administrator account information</p>
                 </div>
                 <div class="col-md-2 text-end">
-                    <a href="#" class="btn btn-back">
+                    <a href="{{route('admin.accounts')}}" class="btn btn-back">
                         <i class="fas fa-arrow-left me-2"></i>Back
                     </a>
                 </div>
@@ -267,15 +267,20 @@
             <div class="col-md-4 mb-4">
                 <div class="glass-card profile-card text-center p-4">
                     <div class="mb-4">
-                        @if ($user->image == Null)
-                            @if ($user->gender == 'male')
-                                <img src="{{ asset('assets/img/profile/avatar.jpg') }}" alt="Profile" class="profile-avatar">
-                            @else
-                                <img src="{{ asset('assets/img/profile/avatar-female.jpg') }}" alt="Profile" class="profile-avatar">
-                            @endif
-                        @else
-                            <img src="{{ asset('assets/img/profile/'. $user->image) }}" alt="Profile" class="profile-avatar">
-                        @endif
+                        @php
+                            // Determine the image path
+                            $imageName = $user->image;
+                            $imagePath = storage_path('app/public/profile/' . $imageName);
+
+                            // Check if the image exists and is not empty
+                            if (!empty($imageName) && file_exists($imagePath)) {
+                                $avatarImage = asset('storage/profile/' . $imageName);
+                            } else {
+                                // Use default avatar based on gender
+                                $avatarImage = asset('storage/profile/' . ($user->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                            }
+                        @endphp
+                        <img src="{{ $avatarImage }}" class="profile-avatar" alt="User Photo">
                     </div>
 
                     <h3 class="text-primary mb-2">
@@ -287,16 +292,16 @@
                         <div class="list-group-item">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="fw-bold">Gender</span>
-                                <span class="text-capitalize badge-modern bg-info">{{ $user->gender }}</span>
+                                <span class="text-capitalize badge-modern bg-info text-white">{{ $user->gender }}</span>
                             </div>
                         </div>
                         <div class="list-group-item">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="fw-bold">Status</span>
                                 @if ($user->status === 1)
-                                    <span class="badge-modern bg-success">Active</span>
+                                    <span class="badge-modern bg-success text-white">Active</span>
                                 @else
-                                    <span class="badge-modern bg-secondary">Inactive</span>
+                                    <span class="badge-modern bg-secondary text-white">Inactive</span>
                                 @endif
                             </div>
                         </div>
@@ -349,7 +354,7 @@
                                             </tr>
                                             <tr class="slide-in" style="animation-delay: 0.3s;">
                                                 <th><i class="fas fa-id-card me-2 text-primary"></i>User ID</th>
-                                                <td class="text-muted">#{{ $user->id }}</td>
+                                                <td class="text-muted">Undefined</td>
                                             </tr>
                                         </tbody>
                                     </table>

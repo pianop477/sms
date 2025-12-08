@@ -192,12 +192,12 @@
                                                     <div class="d-flex align-items-center">
                                                         @php
                                                             $imageName = $row->image;
-                                                            $imagePath = public_path('assets/img/profile/' . $imageName);
+                                                            $imagePath = storage_path('app/public/profile/' . $imageName);
 
                                                             if (!empty($imageName) && file_exists($imagePath)) {
-                                                                $avatarImage = asset('assets/img/profile/' . $imageName);
+                                                                $avatarImage = asset('storage/profile/' . $imageName);
                                                             } else {
-                                                                $avatarImage = asset('assets/img/profile/' . ($row->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                                                $avatarImage = asset('storage/profile/' . ($row->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
                                                             }
                                                         @endphp
                                                         <img src="{{ $avatarImage }}" alt="Teacher Avatar" class="teacher-avatar">

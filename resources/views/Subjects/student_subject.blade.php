@@ -45,8 +45,8 @@
                                             <td class="text-capitalize">{{ ucwords(strtolower($course->course_name)) }}</td>
                                             <td class="text-uppercase">{{ $course->course_code }}</td>
                                             <td class="d-flex align-items-center">
-                                                @if (!empty($course->image) && file_exists(public_path('assets/img/profile/' . $course->image)))
-                                                    <img src="{{ asset('assets/img/profile/' . $course->image) }}"
+                                                @if (!empty($course->image) && file_exists(storage_path('app/public/profile/' . $course->image)))
+                                                    <img src="{{ asset('storage/profile/' . $course->image) }}"
                                                          alt="Profile Picture"
                                                          class="rounded-circle"
                                                          style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px;">

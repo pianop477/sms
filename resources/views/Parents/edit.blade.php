@@ -203,15 +203,15 @@
                         <div>
                             @if ($parents->image == Null)
                                 @if ($parents->gender == 'male')
-                                    <img src="{{asset('assets/img/profile/avatar.jpg')}}" alt="Parent Avatar" class="profile-img">
+                                    <img src="{{asset('storage/profile/avatar.jpg')}}" alt="Parent Avatar" class="profile-img">
                                 @else
-                                    <img src="{{asset('assets/img/profile/avatar-female.jpg')}}" alt="Parent Avatar" class="profile-img">
+                                    <img src="{{asset('storage/profile/avatar-female.jpg')}}" alt="Parent Avatar" class="profile-img">
                                 @endif
                             @else
-                                <img src="{{asset('assets/img/profile/'. $parents->image)}}" alt="Parent Avatar" class="profile-img">
+                                <img src="{{asset('storage/profile/'. $parents->image)}}" alt="Parent Avatar" class="profile-img">
                             @endif
                         </div>
-                        <h4 class="profile-name mb-1">{{ucwords(strtolower($parents->first_name. ' '. $parents->last_name))}}</h4>
+                        <h4 class="profile-name mb-1" style="color:gold">{{ucwords(strtolower($parents->first_name. ' '. $parents->last_name))}}</h4>
                         <p class="mb-0 text-white">Parent/Guardian</p>
                     </div>
 
@@ -290,7 +290,7 @@
 
                             <!-- Students Tab -->
                             <div class="tab-pane fade" id="students">
-                                <h5 class="mb-4"><i class="fas fa-user-graduate me-2"></i> Students Information</h5>
+                                <h5 class="mb-4"><i class="fas fa-user-graduate me-2"></i> Students Lists</h5>
 
                                 <div class="row">
                                     @foreach ($students as $student)

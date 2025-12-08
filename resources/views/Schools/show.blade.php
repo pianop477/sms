@@ -284,7 +284,7 @@
             <div class="row align-items-center">
                 <!-- School Logo -->
                 <div class="col-12 col-md-3 text-center mb-4 mb-md-0">
-                    <img src="{{asset('assets/img/logo/'. $schools->logo)}}"
+                    <img src="{{asset('storage/logo/'. $schools->logo)}}"
                          alt="School Logo"
                          class="school-logo bounce-in">
                 </div>
@@ -388,16 +388,16 @@
                 <div class="col-12 col-md-4 text-center">
                     @if ($managers->first()->image == NULL)
                         @if ($managers->first()->gender == 'male')
-                            <img src="{{asset('assets/img/profile/avatar.jpg')}}"
+                            <img src="{{asset('storage/profile/avatar.jpg')}}"
                                  alt="Manager Avatar"
                                  class="profile-img bounce-in">
                         @else
-                            <img src="{{asset('assets/img/profile/avatar-female.jpg')}}"
+                            <img src="{{asset('storage/profile/avatar-female.jpg')}}"
                                  alt="Manager Avatar"
                                  class="profile-img bounce-in">
                         @endif
                     @else
-                        <img src="{{asset('assets/img/profile/' .$managers->first()->image)}}"
+                        <img src="{{asset('storage/profile/' .$managers->first()->image)}}"
                              alt="Manager Photo"
                              class="profile-img bounce-in">
                     @endif

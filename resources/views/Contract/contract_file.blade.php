@@ -76,7 +76,7 @@
     <!-- Letterhead / Header -->
     <div class="container">
         <div class="logo">
-            <img src="{{public_path('assets/img/logo/'.$contract ['logo'])}}" alt="" style="max-width: 70px;">
+            <img src="{{storage_path('app/public/logo/'.$contract ['logo'])}}" alt="" style="max-width: 70px;">
         </div>
         <div class="header" style="">
             <h3>{{$contract['school_name']}}</h3>

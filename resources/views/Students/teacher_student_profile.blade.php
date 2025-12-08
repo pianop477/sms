@@ -155,12 +155,12 @@
                     <div class="profile-header text-center">
                         @php
                             $imageName = $students->image;
-                            $imagePath = public_path('assets/img/students/' . $imageName);
+                            $imagePath = storage_path('app/public/students/' . $imageName);
 
                             if (!empty($imageName) && file_exists($imagePath)) {
-                                $avatarImage = asset('assets/img/students/' . $imageName);
+                                $avatarImage = asset('storage/students/' . $imageName);
                             } else {
-                                $avatarImage = asset('assets/img/students/student.jpg');
+                                $avatarImage = asset('storage/students/student.jpg');
                             }
                         @endphp
                         <img src="{{ $avatarImage }}" class="profile-img" alt="Student Photo">

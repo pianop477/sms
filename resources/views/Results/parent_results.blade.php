@@ -140,7 +140,7 @@
 <table class="header">
     <tr>
         <td width="15%">
-            <img src="{{ public_path('assets/img/logo/'.$results->first()->logo) }}" alt="Logo" width="80">
+            <img src="{{ storage_path('app/public/logo/'.$results->first()->logo) }}" alt="Logo" width="80">
         </td>
         <td width="70%" class="school-info">
             <h3 style="margin:0; padding:0;">THE UNITED REPUBLIC OF TANZANIA</h3>
@@ -152,14 +152,14 @@
             @php
                 // Determine the image path
                 $imageName = $studentId->image;
-                $imagePath = public_path('assets/img/students/' . $imageName);
+                $imagePath = storage_path('app/public/students/' . $imageName);
 
                 // Check if the image exists and is not empty
                 if (!empty($imageName) && file_exists($imagePath)) {
-                    $avatarImage = public_path('assets/img/students/' . $imageName);
+                    $avatarImage = storage_path('app/public/students/' . $imageName);
                 } else {
                 // Use default avatar based on gender
-                    $avatarImage = public_path('assets/img/students/' . ($studentId->gender == 'male' ? 'student.jpg' : 'student.jpg'));
+                    $avatarImage = storage_path('app/public/students/' . ($studentId->gender == 'male' ? 'student.jpg' : 'student.jpg'));
                 }
             @endphp
             <img src="{{ $avatarImage }}" alt="" width="80" class="rounded-circle" style="border-radius: 10px">
@@ -170,7 +170,7 @@
     <tr>
         <td>
             <h5 style="margin:5px 0; padding:0;">STUDENT'S ACADEMIC REPORT</h5>
-            <h5 style="margin:0; padding:0;"> {{ strtoupper($results->first()->exam_type) }} Report - {{ \Carbon\Carbon::parse($date)->format('d/m/Y')  }}</h5>
+            <h5 style="margin:0; padding:0;"> {{ strtoupper($results->first()->exam_type) }} Assessment Report - {{ \Carbon\Carbon::parse($date)->format('d/m/Y')  }}</h5>
         </td>
     </tr>
 </table>
@@ -317,6 +317,22 @@
                 </tr>
             </tbody>
         </table>
+        <div style="
+            position: fixed;
+            bottom: 8mm;
+            left: 0;
+            right: 0;
+            text-align: center;
+        ">
+            <img
+                src="data:image/png;base64,{{ $qrPng }}"
+                width="110"
+                alt="Report Verification QR"
+            >
+            <div style="font-size:9px; margin-top:4px; font-style: italic;">
+                Scan to verify
+            </div>
+        </div>
 
     <footer>
         <span class="copyright">

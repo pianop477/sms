@@ -152,20 +152,14 @@ class StudentsController extends Controller
 
                 // Handle file upload if present
                 if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $imageFile = time() . '.' . $image->getClientOriginalExtension();
-                $imagePath = public_path('assets/img/students');
+                    // Create unique image name
+                    $imageFile = time() . '_' . uniqid() . '.' . $request->image->getClientOriginalExtension();
 
-                // Ensure the directory exists
-                if (!file_exists($imagePath)) {
-                mkdir($imagePath, 0775, true);
-                }
+                    // Store in storage/app/public/logo
+                    $request->image->storeAs('students', $imageFile, 'public');
 
-                // Move the file
-                $image->move($imagePath, $imageFile);
-
-                // Set the image file name on the student record
-                $new_student->image = $imageFile;
+                    // Set the image file name on the student record
+                    $new_student->image = $imageFile;
                 }
 
                 // Save the new student record
@@ -351,27 +345,15 @@ class StudentsController extends Controller
             $student->transport_id = $request->driver;
 
             if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $imageFile = time() . '.' . $image->getClientOriginalExtension();
-                $imagePath = public_path('assets/img/students');
-
-                // Ensure the directory exists
-                if (!file_exists($imagePath)) {
-                    mkdir($imagePath, 0775, true);
+                // Log::info('Image upload detected');
+                if ($student->image && Storage::disk('public')->exists('students/'.$student->image)) {
+                    Storage::disk('public')->delete('students/'.$student->image);
                 }
+                // Create unique logo name
+                $imageFile = time() . '_' . uniqid() . '.' . $request->image->getClientOriginalExtension();
 
-                // Check if the existing file exists and delete it
-                if (!empty($student->image)) {
-                    $existingFile = $imagePath . '/' . $student->image;
-                    if (file_exists($existingFile) && is_file($existingFile)) {
-                        unlink($existingFile);
-                    }
-                }
-
-                // Move the new file
-                $image->move($imagePath, $imageFile);
-
-                // Save the file name to the database
+                // Store in storage/app/public/logo
+                $request->image->storeAs('students', $imageFile, 'public');
                 $student->image = $imageFile;
             }
 
@@ -441,25 +423,16 @@ class StudentsController extends Controller
             $student->transport_id = $request->driver;
 
             if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $imageFile = time() . '.' . $image->getClientOriginalExtension();
-                $imagePath = public_path('assets/img/students');
-
-                // Ensure the directory exists
-                if (!file_exists($imagePath)) {
-                    mkdir($imagePath, 0775, true);
+                // Log::info('Image upload detected');
+                if ($student->image && Storage::disk('public')->exists('students/'.$student->image)) {
+                    Storage::disk('public')->delete('students/'.$student->image);
                 }
 
-                // Check if the existing file exists and delete it
-                if (!empty($student->image)) {
-                    $existingFile = $imagePath . '/' . $student->image;
-                    if (file_exists($existingFile) && is_file($existingFile)) {
-                        unlink($existingFile);
-                    }
-                }
+                // Create unique logo name
+                $imageFile = time() . '_' . uniqid() . '.' . $request->image->getClientOriginalExtension();
 
-                // Move the new file
-                $image->move($imagePath, $imageFile);
+                // Store in storage/app/public/logo
+                $request->image->storeAs('students', $imageFile, 'public');
 
                 // Save the file name to the database
                 $student->image = $imageFile;
@@ -891,19 +864,12 @@ class StudentsController extends Controller
 
             // Handle file upload if present
             if ($request->hasFile('image')) {
-                $image = $request->file('image');
-                $imageFile = time() . '.' . $image->getClientOriginalExtension();
-                $imagePath = public_path('assets/img/students');
+                // Log::info('Image upload detected');
+                // Create unique logo name
+                $imageFile = time() . '_' . uniqid() . '.' . $request->image->getClientOriginalExtension();
 
-                // Ensure the directory exists
-                if (!file_exists($imagePath)) {
-                    mkdir($imagePath, 0775, true);
-                }
-
-                // Move the file
-                $image->move($imagePath, $imageFile);
-
-                // Set the image file name on the student record
+                // Store in storage/app/public/logo
+                $request->image->storeAs('students', $imageFile, 'public');
                 $students->image = $imageFile;
             }
 
@@ -1230,7 +1196,7 @@ class StudentsController extends Controller
         }
 
         if($student->image) {
-            $filePath = public_path('assets/img/students/'. $student->image);
+            $filePath = storage_path('app/public/students/'. $student->image);
 
             if(file_exists($filePath)) {
                 unlink($filePath);
@@ -1375,7 +1341,7 @@ class StudentsController extends Controller
         $totalBalance = $totalBilled - $totalPaid;
 
         $studentPicture = $students->image;
-        $imagePath = public_path('assets/img/students/' .$studentPicture);
+        $imagePath = storage_path('app/public/students/' .$studentPicture);
 
         return view('profile.student_profile', compact(
             'students', 'myClassTeacher', 'class_course', 'class', 'packages', 'imagePath',
@@ -1415,7 +1381,7 @@ class StudentsController extends Controller
             return back();
         }
 
-        $filePath = public_path('assets/img/students/' . $studentRecord->image);
+        $filePath = storage_path('app/public/students/' . $studentRecord->image);
 
         if (!file_exists($filePath)) {
             // return back()->with('error', 'Picture file does not exist on the server.');
@@ -1426,7 +1392,6 @@ class StudentsController extends Controller
         $fileName = $studentRecord->first_name . '_' . $studentRecord->last_name . '.jpg';
         return response()->download($filePath, $fileName);
     }
-
 
    public function searchStudent(Request $request)
     {
@@ -1473,7 +1438,7 @@ class StudentsController extends Controller
                     'driver_name' => $s->driver_name ?? 'N/A',
                     'group' => $s->group ?? 'N/A',
                     'phone' => $s->parent_phone ?? 'N/A',
-                    'image_url' => $s->image && file_exists(public_path("assets/img/students/{$s->image}"))
+                    'image_url' => $s->image && file_exists(storage_path("app/public/students/{$s->image}"))
                         ? asset("assets/img/students/{$s->image}")
                         : asset("assets/img/students/student.jpg"),
                 ];

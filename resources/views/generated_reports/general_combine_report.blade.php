@@ -191,7 +191,7 @@
             <div class="card-body">
                 <div class="container">
                     <div class="logo">
-                        <img src="{{public_path('assets/img/logo/'. $schoolInfo->logo)}}" alt="" style="max-width: 80px;">
+                        <img src="{{storage_path('app/public/logo/'. $schoolInfo->logo)}}" alt="" style="max-width: 80px;">
                     </div>
                     <div class="header">
                         <h3>the united republic of tanzania</h3>
@@ -285,7 +285,7 @@
                                     @if(isset($student['subject_averages'][$code]['score']))
                                         {{ number_format($student['subject_averages'][$code]['score'], 1) }}
                                     @else
-                                        X
+                                        <span style="background:rgb(235, 75, 75); padding:2px 10px ">X</span>
                                     @endif
                                 </td>
                             @endforeach

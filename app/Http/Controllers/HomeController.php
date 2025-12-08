@@ -23,6 +23,7 @@ use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 
 class HomeController extends Controller
@@ -534,23 +535,17 @@ class HomeController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $imageDestinationPath = public_path('assets/img/profile');
-
-            if (!file_exists($imageDestinationPath)) {
-                mkdir($imageDestinationPath, 0775, true);
+            // Delete old logo if it exists
+            if ($userData->image && Storage::disk('public')->exists('profile/'.$userData->image)) {
+                Storage::disk('public')->delete('profile/'.$userData->image);
             }
 
-            if(!empty($userData->image)) {
-                $existingFile = $imageDestinationPath . '/' . $userData->image;
-                if(file_exists($existingFile)) {
-                    unlink($existingFile);
-                }
-            }
+            // Create unique logo name
+            $imageFile = time() . '_' . uniqid() . '.' . $request->image->getClientOriginalExtension();
 
-            $image->move($imageDestinationPath, $imageName);
-            $userData->image = $imageName;
+            // Store in storage/app/public/logo
+            $request->image->storeAs('profile', $imageFile, 'public');
+            $userData->image = $imageFile;
         }
 
         // Save user data

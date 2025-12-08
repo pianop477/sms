@@ -186,7 +186,7 @@
             <div class="card-body">
                 <div class="container">
                     <div class="logo">
-                        <img src="{{public_path('assets/img/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 80px;">
+                        <img src="{{storage_path('app/public/logo/'. Auth::user()->school->logo)}}" alt="" style="max-width: 80px;">
                     </div>
                     <div class="header">
                         <h3>the united republic of tanzania</h3>

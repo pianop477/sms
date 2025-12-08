@@ -8,6 +8,7 @@
 /public/exam_results
 /public/reports
 /public/Transactions
+/public/images
 /storage/*.key
 /vendor
 .env

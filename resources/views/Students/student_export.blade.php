@@ -82,19 +82,19 @@
         }
 
        @page {
-            margin-top: 8mm;
-            margin-bottom: 12mm; /* Ongeza nafasi ya chini kwa footer */
-            margin-left: 8mm;
-            margin-right: 8mm;
+            margin-top: 4mm;
+            margin-bottom: 6mm; /* Ongeza nafasi ya chini kwa footer */
+            margin-left: 4mm;
+            margin-right: 4mm;
         }
         footer {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 4mm; /*urefu wa footer*/
+            height: 3mm; /*urefu wa footer*/
             font-size: 10px;
-            padding-top: 8px;
+            padding-top: 5px;
             border-top: 1px solid #ddd;
             text-align: center;
             background-color: white;
@@ -128,7 +128,7 @@
 <body>
     <div class="header-container">
         @if(Auth::user()->school->logo)
-            <img class="school-logo" src="{{ public_path('assets/img/logo/' . Auth::user()->school->logo) }}" alt="School Logo">
+            <img class="school-logo" src="{{ storage_path('app/public/logo/' . Auth::user()->school->logo) }}" alt="School Logo">
         @endif
         <div class="school-info">
             <h4>{{ Auth::user()->school->school_name }}</h4>

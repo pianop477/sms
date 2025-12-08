@@ -204,14 +204,14 @@
                         @php
                             // Determine the image path
                             $imageName = $user->image;
-                            $imagePath = public_path('assets/img/profile/' . $imageName);
+                            $imagePath = storage_path('app/public/profile/' . $imageName);
 
                             // Check if the image exists and is not empty
                             if (!empty($imageName) && file_exists($imagePath)) {
-                                $avatarImage = asset('assets/img/profile/' . $imageName);
+                                $avatarImage = asset('storage/profile/' . $imageName);
                             } else {
                                 // Use default avatar based on gender
-                                $avatarImage = asset('assets/img/profile/' . ($user->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                $avatarImage = asset('storage/profile/' . ($user->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
                             }
                         @endphp
                         <img src="{{ $avatarImage }}" class="profile-img" alt="Teacher Photo">

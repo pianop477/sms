@@ -446,9 +446,9 @@
             <div class="col-lg-7 col-md-6 mb-4">
                 <div class="card-section teal-border">
                     <div class="card-header-custom teal-header">
-                        <h5 class="mb-0"><i class="fas fa-copy me-2"></i> Continuous Assessment Results</h5>
+                        <h5 class="mb-0"><i class="fas fa-copy me-2"></i> Continuous Assessment Report</h5>
                         <button type="button" class="btn btn-compile" data-bs-toggle="modal" data-bs-target="#compileModal">
-                            <i class="fas fa-gears me-1"></i> Generate CA
+                            <i class="fas fa-gears me-1"></i> Compile CA
                         </button>
                     </div>
                     <div class="card-body-custom">
@@ -579,7 +579,7 @@
                                     <option value="mid-term">Mid-Term Assessment</option>
                                     <option value="terminal">Terminal Assessment</option>
                                     <option value="annual">Annual Assessment</option>
-                                    <option value="custom">Custom</option>
+                                    <option value="custom">Custom Report</option>
                                 </select>
                             </div>
 

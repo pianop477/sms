@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Piano">
   <title>ShuleApp</title>
-  <link rel="shortcut icon" type="image/png" href="{{asset('assets/img/favicon/favicon.ico')}}">
-  <link rel="icon" type="image/png" href="{{asset('assets/img/favicon/favicon-16x16.png')}}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/favicon/favicon.ico') }}">
+    <link rel="icon" type="image/png" href="{{asset('assets/images/favicon/favicon-16x16.png')}}">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/scrollreveal"></script>
   <style>
@@ -43,7 +44,7 @@
   </header>
 
   <!-- Hero Section -->
-  <section id="home" class="h-screen bg-cover bg-center relative" style="background-image: url('{{ asset('assets/img/bg/bg-2.jpeg') }}');">
+  <section id="home" class="h-screen bg-cover bg-center relative" style="background-image: url('{{ asset('assets/images/bg/bg-2.jpeg') }}')">
     <div class="absolute inset-0 bg-opacity-50"></div>
     <div class="container mx-auto h-full flex flex-col justify-center items-center text-center relative z-10 text-white pt-40">
       <h1 class="text-4xl md:text-6xl font-bold mb-6">Karibu ShuleApp</h1>

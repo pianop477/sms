@@ -472,7 +472,7 @@
             </h4>
             <p class="mb-1 text-center text-uppercase">{{$schoolInfo->postal_address}}, {{$schoolInfo->postal_name}} - {{$schoolInfo->country}}</p>
             <h5 class="report-title text-uppercase">Student's Academic Report</h5>
-            <p class="mb-0 text-center text-uppercase"><strong>{{ $reports->title }} Report - {{\Carbon\Carbon::parse($reports->created_at)->format('d/m/Y')}}</strong></p>
+            <p class="mb-0 text-center text-uppercase"><strong>{{ $reports->title }} Assessment Report - {{\Carbon\Carbon::parse($reports->created_at)->format('d/m/Y')}}</strong></p>
             <i class="fas fa-graduation-cap floating-icons"></i>
         </div>
 
@@ -511,11 +511,11 @@
                     <div class="student-photo">
                         @php
                             $imageName = $student->image;
-                            $imagePath = public_path('assets/img/students/' . $imageName);
+                            $imagePath = storage_path('app/public/students/' . $imageName);
                             if (!empty($imageName) && file_exists($imagePath)) {
-                                $avatarImage = asset('assets/img/students/' . $imageName);
+                                $avatarImage = asset('storage/students/' . $imageName);
                             } else {
-                                $avatarImage = asset('assets/img/students/student.jpg');
+                                $avatarImage = asset('storage/students/student.jpg');
                             }
                         @endphp
                         <img src="{{ $avatarImage }}" alt="Student Photo" class="student-avatar">
@@ -552,7 +552,7 @@
                                 @foreach($examHeaders as $exam)
                                     <th class="compact-header text-center">
                                         <span class="text-sm text-uppercase">{{ $exam['abbr'] }}</span><br>
-                                        <small>{{ \Carbon\Carbon::parse($exam['date'])->format('d M Y') }}</small>
+                                        <small>{{ \Carbon\Carbon::parse($exam['date'])->format('d M') }}</small>
                                     </th>
                                 @endforeach
                             </tr>

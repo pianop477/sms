@@ -251,12 +251,12 @@
                                     <div class="d-flex align-items-center h-100">
                                         @php
                                             $imageName = $teachers->image;
-                                            $imagePath = public_path('assets/img/profile/' . $imageName);
+                                            $imagePath = storage_path('app/public/profile/' . $imageName);
 
                                             if (!empty($imageName) && file_exists($imagePath)) {
-                                                $avatarImage = asset('assets/img/profile/' . $imageName);
+                                                $avatarImage = asset('storage/profile/' . $imageName);
                                             } else {
-                                                $avatarImage = asset('assets/img/profile/' . ($teachers->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                                $avatarImage = asset('storage/profile/' . ($teachers->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
                                             }
                                         @endphp
                                         <img src="{{ $avatarImage }}" alt="Current Photo" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">

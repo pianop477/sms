@@ -41,7 +41,7 @@ class DeleteGraduatedStudents extends Command
                     foreach ($students as $student) {
                         // Angalia kama mwanafunzi ana picha na ifute
                         if (!empty($student->image)) {
-                            $imagePath = public_path("assets/img/students/{$student->image}");
+                            $imagePath = storage_path("app/public/students/{$student->image}");
 
                             if (File::exists($imagePath)) {
                                 File::delete($imagePath);

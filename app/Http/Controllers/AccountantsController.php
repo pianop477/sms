@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use RealRashid\SweetAlert\Facades\Alert;
 use Vinkla\Hashids\Facades\Hashids;
 
@@ -204,20 +205,17 @@ class AccountantsController extends Controller
 
             if ($request->hasFile('image')) {
                 // Log::info('Image upload detected');
-                $image = $request->file('image');
-                $imageName = time() . '.' . $image->getClientOriginalExtension();
-                $imagePath = public_path('assets/img/profile');
-
-                //check for existing file before update new
-                if(!empty($user->image)) {
-                    $existingImagePath = public_path('assets/img/profile/' . $user->image);
-                    if (file_exists($existingImagePath)) {
-                        unlink($existingImagePath);
-                    }
+                // Log::info('Image upload detected');
+                if ($user->image && Storage::disk('public')->exists('profile/'.$user->image)) {
+                    Storage::disk('public')->delete('profile/'.$user->image);
                 }
 
-                $image->move($imagePath, $imageName);
-                $user->update(['image' => $imageName]);
+                // Create unique logo name
+                $imageFile = time() . '_' . uniqid() . '.' . $request->image->getClientOriginalExtension();
+
+                // Store in storage/app/public/logo
+                $request->image->storeAs('profile', $imageFile, 'public');
+                $user->update(['image' => $imageFile]);
             }
 
             Alert::toast('Accountant information updated successfully', 'success');

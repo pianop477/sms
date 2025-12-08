@@ -159,7 +159,7 @@
         <!-- Header Section -->
         <div class="row mb-4">
             <div class="col-md-10">
-                <h4 class="text-primary fw-bold border-bottom pb-2">MY PROFILE</h4>
+                <h4 class="text-primary fw-bold border-bottom pb-2">Account Profile</h4>
             </div>
             <div class="col-md-2 text-end">
                 <a href="{{route('home')}}" class="btn btn-info btn-action float-right">
@@ -176,14 +176,14 @@
                         @php
                             // Determine the image path
                             $imageName = $user->image;
-                            $imagePath = public_path('assets/img/profile/' . $imageName);
+                            $imagePath = storage_path('app/public/profile/' . $imageName);
 
                             // Check if the image exists and is not empty
                             if (!empty($imageName) && file_exists($imagePath)) {
-                                $avatarImage = asset('assets/img/profile/' . $imageName);
+                                $avatarImage = asset('storage/profile/' . $imageName);
                             } else {
                                 // Use default avatar based on gender
-                                $avatarImage = asset('assets/img/profile/' . ($user->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                $avatarImage = asset('storage/profile/' . ($user->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
                             }
                         @endphp
                         <img src="{{ $avatarImage }}" class="profile-img" alt="User Photo">

@@ -5,7 +5,7 @@
       <div class="col-auto">
         <div class="avatar position-relative">
             @if (!empty($data->image))
-                <img src="{{ asset('assets/img/students/' . $data->image) ?? asset('assets/img/students/student.jpg') }}" alt="profile_image" class="profile-img border-radius-lg shadow-sm" style="width: 120px; object-fit:cover; border-radius: 50px;">
+                <img src="{{ asset('storage/students/' . $data->image) ?? asset('storage/students/student.jpg') }}" alt="profile_image" class="profile-img border-radius-lg shadow-sm" style="width: 120px; object-fit:cover; border-radius: 50px;">
             @else
                 <i class="fas fa-user-graduate text-secondary" style="font-size: 8rem"></i>
             @endif

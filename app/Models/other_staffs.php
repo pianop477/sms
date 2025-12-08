@@ -30,5 +30,6 @@ class other_staffs extends Model
     protected $primaryKey = 'id';
     protected $casts = [
         'date_of_birth' => 'date',
+        'date_of_birth' => 'date:Y-m-d'
     ];
 }

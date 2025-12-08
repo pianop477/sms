@@ -154,18 +154,10 @@ class ParentsController extends Controller
 
             // Handle file upload if present
             if ($request->hasFile('passport')) {
-                $image = $request->file('passport');
-                $imageFile = time() . '.' . $image->getClientOriginalExtension();
-                $imagePath = public_path('assets/img/students');
+                // $image = $request->file('passport');
+                $imageFile = time() . '_' . uniqid() . '.' . $request->passport->getClientOriginalExtension();
 
-                // Ensure the directory exists
-                if (!file_exists($imagePath)) {
-                    mkdir($imagePath, 0775, true);
-                }
-
-                // Move the file
-                $image->move($imagePath, $imageFile);
-
+                $request->passport->storeAs('students', $imageFile, 'public');
                 // Set the image file name on the student record
                 $studentImage = $imageFile;
             }
@@ -410,7 +402,7 @@ class ParentsController extends Controller
 
             // Check and delete the user's profile image if it exists
             if (!empty($user->image)) {
-                $userImagePath = public_path('assets/img/profile/' . $user->image);
+                $userImagePath = storage_path('app/public/students/' . $user->image);
                 if (file_exists($userImagePath)) {
                     unlink($userImagePath);
                 }
@@ -476,28 +468,18 @@ class ParentsController extends Controller
 
         if($request->hasFile('image')) {
             // Log::info('Image upload detected');
-            $image = $request->file('image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $imageDestinationPath = public_path('assets/img/profile');
-
-            // Ensure the directory exists
-            if (!file_exists($imageDestinationPath)) {
-                mkdir($imageDestinationPath, 0775, true);
+            if ($user->image && Storage::disk('public')->exists('profile/'.$user->image)) {
+                Storage::disk('public')->delete('profile/'.$user->image);
             }
 
-            //check for existing image file
-            if(!empty($user->image)) {
-                $existingImagePath = public_path('assets/img/profile/' . $user->image);
-                if (file_exists($existingImagePath)) {
-                    unlink($existingImagePath);
-                }
-            }
+            // Create unique logo name
+            $imageFile = time() . '_' . uniqid() . '.' . $request->image->getClientOriginalExtension();
 
-            // Move the file
-            $image->move($imageDestinationPath, $imageName);
+            // Store in storage/app/public/logo
+            $request->image->storeAs('profile', $imageFile, 'public');
 
             // Save the file name to the database
-            $user->image = $imageName;
+            $user->image = $imageFile;
         }
 
         if ($user->save()) {

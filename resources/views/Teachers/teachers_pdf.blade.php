@@ -203,7 +203,7 @@
 
     <div class="header-container">
         @if(Auth::user()->school->logo)
-            <img class="school-logo" src="{{ public_path('assets/img/logo/' . Auth::user()->school->logo) }}" alt="School Logo">
+            <img class="school-logo" src="{{ storage_path('app/public/logo/' . Auth::user()->school->logo) }}" alt="School Logo">
         @endif
         <div class="school-info">
             <h4>{{ Auth::user()->school->school_name }}</h4>

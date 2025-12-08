@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\Rules\Unique;
@@ -92,8 +93,8 @@ class UsersController extends Controller
 
         if ($req->hasFile('image')) {
             $image = $req->file('image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $imageDestinationPath = public_path('assets/img/profile');
+            $imageName = time() . '_'. uniqid(). $image->getClientOriginalExtension();
+            $imageDestinationPath = storage_path('app/public/profile');
 
             // Ensure the directory exists
             if (!file_exists($imageDestinationPath)) {
@@ -327,6 +328,10 @@ class UsersController extends Controller
             return back();
         }
 
+        if($user->image && Storage::disk('public')->exists('profile/'. $user->image)) {
+            Storage::disk('public')->delete('profile/'. $user->image);
+        }
+
         $user->delete();
 
         Alert()->toast('Admin Account has been deleted successufully', 'success');
@@ -385,19 +390,17 @@ class UsersController extends Controller
         ];
 
         if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            $imageDestinationPath = public_path('assets/img/profile');
 
-            if (!file_exists($imageDestinationPath)) {
-                mkdir($imageDestinationPath, 0755, true);
+            // Delete old image if exists
+            if ($userInfo->image && Storage::disk('public')->exists('profile/'.$userInfo->image)) {
+                Storage::disk('public')->delete('profile/'.$userInfo->image);
             }
 
-            if ($userInfo->image && file_exists($imageDestinationPath.'/'.$userInfo->image)) {
-                unlink($imageDestinationPath.'/'.$userInfo->image);
-            }
+            // Store new image
+            $imageName = time() . '_' . uniqid() . '.' . $request->image->getClientOriginalExtension();
+            $request->image->storeAs('profile', $imageName, 'public');
 
-            $image->move($imageDestinationPath, $imageName);
+            // Save in database
             $updateData['image'] = $imageName;
         }
 
