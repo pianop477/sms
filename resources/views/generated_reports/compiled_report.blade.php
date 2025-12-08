@@ -164,7 +164,7 @@
                     $avatarImage = storage_path('app/public/students/' . ($students->gender == 'male' ? 'student.jpg' : 'student.jpg'));
                 }
             @endphp
-            <img src="{{ $avatarImage }}" alt="" width="80" class="rounded-circle" style="border-radius: 50px">
+            <img src="{{ $avatarImage }}" alt="" width="80" class="rounded-circle" style="border-radius: 50%">
         </td>
     </tr>
 </table>

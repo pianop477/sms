@@ -1753,6 +1753,10 @@ class ResultsController extends Controller
         $combineOption = $reports->combine_option ?? 'individual';
         $finalData = [];
 
+        // Vigezo vya kuweka jumla za mwanafunzi - SASA HUNA
+        $studentTotalMarks = 0;
+        $subjectCount = 0;
+
         foreach ($classResultsGrouped as $subjectId => $subjectResults) {
             $subjectName = $subjectResults->first()->course_name;
             $subjectCode = $subjectResults->first()->course_code;
@@ -1771,52 +1775,127 @@ class ResultsController extends Controller
                 : $subjectResults->first()->teacher_first_name . '. ' . $subjectResults->first()->teacher_last_name[0];
 
             $examScores = [];
-            foreach ($examHeaders as $exam) {
-                $score = $subjectResults
-                    ->where('symbolic_abbr', $exam['abbr'])
-                    ->where('exam_date', $exam['date'])
-                    ->first()->score ?? null;
+            $total = 0;
+            $average = 0;
 
-                $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
-            }
-
-            $filteredScores = collect($examScores)->filter();
-            $total = $filteredScores->sum();
-            $average = $combineOption === 'average' || $combineOption === 'individual'
-                ? ($filteredScores->count() > 0 ? $filteredScores->avg() : 0)
-                : ($filteredScores->count() > 0 ? $total / $filteredScores->count() : 0);
-
-            // ==== Subject-wise position logic (new) ====
-            $subjectScoresByStudent = Examination_result::where('course_id', $subjectId)
-                ->where('class_id', $classId)
-                ->where('school_id', $schoolId)
-                ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                ->get()
-                ->groupBy('student_id')
-                ->map(fn($scores) => $scores->sum('score'));
-
-            $sortedSubjectScores = $subjectScoresByStudent->sortDesc();
-            $subjectRanks = collect();
-            $prevScore = null;
-            $rank = 0;
-            $positionCounter = 0;
-
-            foreach ($sortedSubjectScores as $sid => $sc) {
-                $positionCounter++;
-                if ($sc !== $prevScore) {
-                    $rank = $positionCounter;
-                    $prevScore = $sc;
+            // TUMIA SAME LOGIC KAMA downloadCombinedReport
+            if ($combineOption == 'individual') {
+                foreach ($examHeaders as $exam) {
+                    $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
+                            ->where('exam_date', $exam['date'])
+                            ->first()->score ?? null;
+                    $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
                 }
-                $subjectRanks[$sid] = $rank;
+
+                $total = collect($examScores)->filter()->sum();
+                $average = collect($examScores)->filter()->avg() ?? 0;
+
+            } elseif ($combineOption == 'sum') {
+                foreach ($examHeaders as $exam) {
+                    $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
+                                            ->where('exam_date', $exam['date'])
+                                            ->first()->score ?? null;
+                    $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
+                }
+                $total = collect($examScores)->sum();
+                $average = count(array_filter($examScores)) > 0 ? $total / count(array_filter($examScores)) : 0;
+
+            } elseif ($combineOption == 'average') {
+                foreach ($examHeaders as $exam) {
+                    $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
+                                            ->where('exam_date', $exam['date'])
+                                            ->first()->score ?? null;
+                    $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
+                }
+                $filtered = collect($examScores)->filter();
+                $total = 0;
+                $average = $filtered->count() > 0 ? $filtered->avg() : 0;
             }
 
-            $position = $subjectRanks[$studentId] ?? '-';
+            // Ongeza kwa jumla za mwanafunzi
+            $studentTotalMarks += $average;
+            $subjectCount++;
 
-            $finalData[] = compact('subjectName', 'teacher', 'subjectCode', 'examScores', 'total', 'average', 'position');
+            // Weka placeholder kwa position
+            $finalData[] = [
+                'subjectName' => $subjectName,
+                'teacher' => $teacher,
+                'subjectCode' => $subjectCode,
+                'examScores' => $examScores,
+                'total' => $total,
+                'average' => round($average, 2),
+                'position' => 0 // Placeholder, itabakiweka baada ya rank calculation
+            ];
         }
+
+        // **Sasa hesabu position ya kila somo - SAME LOGIC**
+        foreach ($finalData as &$subject) {
+            $allStudentSubjectAverages = [];
+
+            // Pata wanafunzi wote na averages zao kwenye somo hili
+            $subjectId = DB::table('subjects')
+                ->where('course_name', $subject['subjectName'])
+                ->where('course_code', $subject['subjectCode'])
+                ->value('id');
+
+            if ($subjectId) {
+                // Get all students' averages for this subject
+                $subjectResultsAll = DB::table('examination_results')
+                    ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+                    ->where('examination_results.course_id', $subjectId)
+                    ->where('examination_results.class_id', $classId)
+                    ->where('examination_results.school_id', $schoolId)
+                    ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                    ->select('examination_results.*', 'subjects.course_name')
+                    ->get()
+                    ->groupBy('student_id');
+
+                foreach ($subjectResultsAll as $student_id => $studentResults) {
+                    // Calculate average for each student using the same combine option
+                    if ($combineOption == 'individual') {
+                        $avg = $studentResults->avg('score') ?? 0;
+                    } elseif ($combineOption == 'sum') {
+                        $avg = $studentResults->count() > 0 ? $studentResults->sum('score') / $studentResults->count() : 0;
+                    } elseif ($combineOption == 'average') {
+                        $avg = $studentResults->avg('score') ?? 0;
+                    }
+
+                    $allStudentSubjectAverages[$student_id] = round($avg, 2);
+                }
+
+                // Sort in descending order and assign positions with tie handling
+                arsort($allStudentSubjectAverages);
+                $positions = [];
+                $position = 1;
+                $previousAverage = null;
+                $sameRankCount = 0;
+
+                foreach ($allStudentSubjectAverages as $std_id => $avg) {
+                    if ($previousAverage !== null && $avg < $previousAverage) {
+                        $position += $sameRankCount;
+                        $sameRankCount = 1;
+                    } else {
+                        $sameRankCount++;
+                    }
+
+                    $positions[$std_id] = $position;
+                    $previousAverage = $avg;
+                }
+
+                // Set the position for this student
+                $subject['position'] = $positions[$studentId] ?? '-';
+            }
+        }
+        unset($subject);
 
         $student = $results->first();
         $schoolInfo = $results->first();
+
+        // **Calculate Student General Average** (jumla ya average za masomo / idadi ya masomo)
+        $studentGeneralAverage = $subjectCount > 0 ? round($studentTotalMarks / $subjectCount, 2) : 0;
+
+        // **Total Marks** (jumla ya average za masomo yote)
+        $totalScoreForStudent = round($studentTotalMarks, 2);
 
         $examHeadersWithDates = $results
             ->mapWithKeys(fn($item) => [$item->symbolic_abbr => $item->exam_date])
@@ -1825,52 +1904,85 @@ class ResultsController extends Controller
 
         $examAverages = [];
         foreach ($examHeaders as $exam) {
+            $totalPerExam = 0;
+            $countPerExam = 0;
             $abbr = $exam['abbr'];
             $date = $exam['date'];
 
-            $scores = collect($finalData)->map(fn($s) => $s['examScores'][$abbr . '_' . $date] ?? null)->filter();
-            $examAverages[$abbr . '_' . $date] = $scores->count() > 0 ? number_format($scores->avg(), 2) : 0;
-        }
-
-        $sumOfAverages = array_sum($examAverages);
-        $validScores = $results->filter(fn($item) => !is_null($item->score));
-        $studentGeneralAverage = $validScores->count() > 0
-            ? number_format($validScores->avg('score'), 2)
-            : 0;
-
-        $totalScoreForStudent = $validScores->sum('score');
-
-        // ======= General Position =======
-        $studentTotalScores = Examination_result::where('class_id', $classId)
-            ->where('school_id', $schoolId)
-            ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-            ->get()
-            ->groupBy('student_id')
-            ->map(fn($studentResults) => $studentResults->sum('score'));
-
-        $sortedScores = $studentTotalScores->sortDesc();
-        $rankedStudents = collect();
-        $previousScore = null;
-        $rank = 0;
-        $position = 0;
-
-        foreach ($sortedScores as $studentKey => $score) {
-            $position++;
-            if ($score !== $previousScore) {
-                $rank = $position;
-                $previousScore = $score;
+            foreach ($finalData as $subject) {
+                $score = $subject['examScores'][$abbr.'_'.$date] ?? null;
+                if (is_numeric($score)) {
+                    $totalPerExam += $score;
+                    $countPerExam++;
+                }
             }
 
-            $rankedStudents->push([
-                'student_id' => $studentKey,
-                'score' => $score,
-                'rank' => $rank
-            ]);
+            $examAverages[$abbr.'_'.$date] = $countPerExam > 0 ? round($totalPerExam / $countPerExam, 2) : 0;
         }
 
-        $studentRank = $rankedStudents->firstWhere('student_id', $studentId)['rank'] ?? '-';
-        $totalStudents = $rankedStudents->count();
-        $generalPosition = $studentRank;
+        // =================== GENERAL POSITION (USING TOTAL MARKS) ===================
+        // Pata average za wanafunzi wote kwa kutumia logic ile ile
+        $allStudentAverages = [];
+
+        // Pata wanafunzi wote waliopo kwenye class
+        $allStudents = DB::table('students')
+            ->where('class_id', $classId)
+            ->where('school_id', $schoolId)
+            ->pluck('id');
+
+        foreach ($allStudents as $stdId) {
+            // Pata results za mwanafunzi huyu
+            $studentResults = DB::table('examination_results')
+                ->where('student_id', $stdId)
+                ->where('class_id', $classId)
+                ->where('school_id', $schoolId)
+                ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                ->get()
+                ->groupBy('course_id');
+
+            $studentTotalAvg = 0;
+            $studentSubjectCount = 0;
+
+            foreach ($studentResults as $courseId => $subjectResults) {
+                // Calculate average for each subject using the same combine option
+                if ($combineOption == 'individual') {
+                    $subjectAvg = $subjectResults->avg('score') ?? 0;
+                } elseif ($combineOption == 'sum') {
+                    $subjectAvg = $subjectResults->count() > 0 ? $subjectResults->sum('score') / $subjectResults->count() : 0;
+                } elseif ($combineOption == 'average') {
+                    $subjectAvg = $subjectResults->avg('score') ?? 0;
+                }
+
+                $studentTotalAvg += round($subjectAvg, 2);
+                $studentSubjectCount++;
+            }
+
+            // Calculate student's general average (total of subject averages)
+            $allStudentAverages[$stdId] = $studentSubjectCount > 0 ? round($studentTotalAvg, 2) : 0;
+        }
+
+        // Sort in descending order and assign positions with tie handling
+        arsort($allStudentAverages);
+        $generalRanked = [];
+        $rank = 1;
+        $currentPosition = 1;
+        $previousAverage = null;
+        $sameRankCount = 0;
+
+        foreach ($allStudentAverages as $std_id => $avg) {
+            if ($previousAverage !== null && $avg < $previousAverage) {
+                $rank += $sameRankCount;
+                $sameRankCount = 1;
+            } else {
+                $sameRankCount++;
+            }
+
+            $generalRanked[$std_id] = $rank;
+            $previousAverage = $avg;
+        }
+
+        $generalPosition = $generalRanked[$studentId] ?? '-';
+        $totalStudents = count($generalRanked);
 
         $examSpecifications = $results
             ->map(fn($item) => [
@@ -1889,14 +2001,20 @@ class ResultsController extends Controller
             'examHeadersWithDates',
             'results',
             'examAverages',
-            'sumOfAverages',
             'year',
             'generalPosition',
             'totalStudents',
-            'student', 'studentId',
-            'reports', 'combineOption',
-            'schoolInfo', 'examSpecifications',
-            'school', 'report', 'class', 'studentTotalScores', 'totalScoreForStudent'
+            'student',
+            'studentId',
+            'reports',
+            'combineOption',
+            'schoolInfo',
+            'examSpecifications',
+            'school',
+            'report',
+            'class',
+            'totalScoreForStudent',
+            'subjectCount',
         ));
     }
 
