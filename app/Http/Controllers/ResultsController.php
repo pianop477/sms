@@ -345,9 +345,38 @@ class ResultsController extends Controller
                 $result->courseRank = $ranks[$studentId->id] ?? null;
 
         }
+         // ================= QR CODE VERIFICATION =================
+        $verificationData = [
+            'student_name' => trim($studentId->first_name.' '.$studentId->middle_name.' '.$studentId->last_name),
+            'admission_number' => $studentId->admission_number,
+            'class' => $results->first()->class_name ?? '-',
+            'report_type' => $results->first()->exam_type . ' Assessment',
+            'term' => $results->first()->Exam_term ?? '-',
+            'school' => $results->first()->school_name ?? '-',
+            'report_date' => Carbon::parse($date)->format('Y-m-d'),
+            'report_id' => sha1($studentId->id.$exam_id[0].$date),
+            'issued_at' => now()->timestamp,
+            'total_score' => $totalScore,
+            'average_score' => $averageScore,
+            'student_rank' => $studentRank,
+            'total_students' => $rankings->count(),
+        ];
+
+        $verificationData['signature'] = hash_hmac('sha256', json_encode($verificationData), config('app.key'));
+        $encryptedPayload = Crypt::encryptString(json_encode($verificationData));
+        $verificationUrl = route('report.verify', ['payload' => $encryptedPayload]);
+
+        $resultQr = Builder::create()
+            ->writer(new PngWriter())
+            ->data($verificationUrl)
+            ->size(140)
+            ->margin(4)
+            ->build();
+
+        $qrPng = base64_encode($resultQr->getString());
 
         // Generate the PDF
-        $pdf = \PDF::loadView('Results.parent_results', compact('results', 'year', 'studentId', 'type', 'student', 'month', 'date', 'totalScore', 'averageScore', 'studentRank', 'rankings'));
+        $pdf = \PDF::loadView('Results.parent_results', compact('results', 'year', 'qrPng', 'studentId', 'type', 'student', 'month', 'date', 'totalScore', 'averageScore', 'studentRank', 'rankings'));
 
         // Generate filename using timestamp
         $timestamp = Carbon::now()->timestamp;
@@ -3065,6 +3094,51 @@ class ResultsController extends Controller
             ->values()
             ->keyBy('abbr'); // We key by abbreviation for easy lookup
 
+        //verify using qr code
+        $verificationData = [
+            'student_name' => trim($students->first_name.' '.$students->middle_name.' '.$students->last_name),
+            'admission_number' => $students->admission_number,
+            'class' => $students->class_name,
+            'report_type' => $reports->title,
+            'term' => $reports->term,
+            'school' => $schoolInfo->school_name,
+            'report_date' => $reports->created_at->format('Y-m-d'),
+            'report_id' => $reports->id,
+            'issued_at' => now()->timestamp,
+
+            // ================== SUMMARY INFO ==================
+            'total_score' => $totalScoreForStudent ?? 0,
+            'average_score' => $studentGeneralAverage ?? 0,
+            'student_rank' => $generalPosition ?? '-',
+            'total_students' => $totalStudents ?? 0,
+        ];
+
+        $verificationData['signature'] = hash_hmac(
+            'sha256',
+            json_encode($verificationData),
+            config('app.key')
+        );
+
+
+        $encryptedPayload = Crypt::encryptString(
+            json_encode($verificationData)
+        );
+
+        $verificationUrl = route('report.verify', [
+            'payload' => $encryptedPayload
+        ]);
+
+
+        $result = Builder::create()
+            ->writer(new PngWriter())
+            ->data($verificationUrl)
+            ->size(150)
+            ->margin(5)
+            ->build();
+
+
+        $qrPng = base64_encode($result->getString());
+
         $pdf = \PDF::loadView('generated_reports.compiled_report', compact(
             'finalData',
             'examHeaders',
@@ -3079,7 +3153,7 @@ class ResultsController extends Controller
             'students',
             'reports',
             'schoolInfo', 'examSpecifications',
-            'school', 'report', 'class', 'totalScoreForStudent'
+            'school', 'report', 'class', 'totalScoreForStudent', 'qrPng'
         ));
         // return $pdf->stream('compiled_report.pdf'); // au ->download() kama unataka ipakuliwe
         $timestamp = Carbon::now()->timestamp;
