@@ -7,352 +7,352 @@
   <title>ShuleApp | Login</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="shortcut icon" type="image/png" href="{{asset('assets/img/favicon/favicon.ico')}}">
+  <link rel="shortcut icon" type="image/png" href="{{asset('assets/images/favicon/favicon.ico')}}">
   <style>
-    :root {
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --accent: #10b981;
-      --dark: #0f172a;
-      --light: #f8fafc;
-      --glass-bg: rgba(255, 255, 255, 0.05);
-      --glass-border: rgba(255, 255, 255, 0.15);
-    }
+        :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --accent: #10b981;
+        --dark: #0f172a;
+        --light: #f8fafc;
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.15);
+        }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #1e293b, #0f172a);
-      color: var(--light);
-      min-height: 100vh;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
+        body {
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        color: var(--light);
+        min-height: 100vh;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        }
 
-    .login-card {
-      width: 100%;
-      max-width: 320px;
-      background: var(--glass-bg);
-      backdrop-filter: blur(12px);
-      border-radius: 14px;
-      border: 1px solid var(--glass-border);
-      padding: 26px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      transition: all 0.3s ease;
-    }
+        .login-card {
+        width: 100%;
+        max-width: 320px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border-radius: 14px;
+        border: 1px solid var(--glass-border);
+        padding: 26px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        }
 
-    .login-card:hover {
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-    }
+        .login-card:hover {
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+        }
 
-    .login-header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+        .login-header {
+        text-align: center;
+        margin-bottom: 20px;
+        }
 
-    .login-title {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 5px;
-    }
+        .login-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 5px;
+        }
 
-    .login-subtitle {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.6);
-    }
+        .login-subtitle {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.6);
+        }
 
-    .form-group {
-      margin-bottom: 14px;
-    }
+        .form-group {
+        margin-bottom: 14px;
+        }
 
-    .form-label {
-      display: block;
-      margin-bottom: 5px;
-      font-size: 13px;
-      font-weight: 500;
-      color: rgba(255, 255, 255, 0.8);
-    }
+        .form-label {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 13px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.8);
+        }
 
-    .form-control {
-      width: 93%;
-      padding: 9px 12px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
-      color: white;
-      font-size: 14px;
-    }
+        .form-control {
+        width: 93%;
+        padding: 9px 12px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        font-size: 14px;
+        }
 
-    .form-control:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-    }
+        .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
 
-    .form-options {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 18px;
-      font-size: 13px;
-    }
+        .form-options {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+        font-size: 13px;
+        }
 
-    .remember-me {
-      display: flex;
-      align-items: center;
-    }
+        .remember-me {
+        display: flex;
+        align-items: center;
+        }
 
-    .remember-me input {
-      margin-right: 6px;
-      accent-color: var(--primary);
-    }
+        .remember-me input {
+        margin-right: 6px;
+        accent-color: var(--primary);
+        }
 
-    .forgot-password {
-      color: var(--primary);
-      text-decoration: none;
-    }
+        .forgot-password {
+        color: var(--primary);
+        text-decoration: none;
+        }
 
-    .forgot-password:hover {
-      text-decoration: underline;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      border: none;
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-dark);
-    }
-
-    .divider {
-      display: flex;
-      align-items: center;
-      margin: 20px 0;
-      color: rgba(255, 255, 255, 0.3);
-      font-size: 12px;
-    }
-
-    .divider::before,
-    .divider::after {
-      content: "";
-      flex: 1;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .divider::before {
-      margin-right: 10px;
-    }
-
-    .divider::after {
-      margin-left: 10px;
-    }
-
-    .bio-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      font-size: 14px;
-      background: rgba(16, 185, 129, 0.1);
-      color: var(--accent);
-      border: 1px solid rgba(16, 185, 129, 0.2);
-      cursor: pointer;
-    }
-
-    .setup-bio {
-      display: block;
-      text-align: center;
-      margin-top: 14px;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.5);
-    }
-
-    .setup-bio:hover {
-      color: var(--accent);
-    }
-
-    .password-toggle {
-      position: absolute;
-      right: 0;
-      top: 32px;
-      background: none;
-      border: none;
-      color: rgba(255, 255, 255, 0.5);
-      cursor: pointer;
-    }
-
-    .toast {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: rgba(0, 0, 0, 0.8);
-      color: white;
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.3s ease;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .spinner {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s linear infinite;
-      margin-right: 6px;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    .footer {
-      margin-top: 20px;
-      text-align: center;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.4);
-    }
-
-    .footer a {
-      color: var(--primary);
-      text-decoration: none;
-    }
-
-    .otp-digit {
-      width: 100%;
-      height: 48px;
-      text-align: center;
-      font-size: 18px;
-      border-radius: 8px;
-      border: 1px solid #334155;
-      background: rgba(255,255,255,0.05);
-      color: white;
-    }
-
-    .otp-container {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 42px;
-      height: 22px;
-    }
-
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(255, 255, 255, 0.2);
-      transition: .4s;
-      border-radius: 24px;
-    }
-
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 16px;
-      width: 16px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-
-    input:checked + .slider {
-      background-color: var(--primary);
-    }
-
-    input:checked + .slider:before {
-      transform: translateX(20px);
-    }
-
-    .setup-bio {
-    display: block;
-    text-align: center;
-    margin-top: 14px;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.5);
-    cursor: pointer;
-}
-
-    .setup-bio:hover {
-        color: var(--accent);
-    }
-
-    /* Style maalum kwa clear button */
-    #clearBioBtn:hover {
-        color: #f87171;
+        .forgot-password:hover {
         text-decoration: underline;
-    }
-    /* Brand Section - Compact */
-    .brand-section {
-      text-align: center;
-      margin-bottom: 1.5rem;
-      flex-shrink: 0;
+        }
+
+        .btn {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        }
+
+        .btn-primary {
+        background: var(--primary);
+        color: white;
+        }
+
+        .btn-primary:hover {
+        background: var(--primary-dark);
+        }
+
+        .divider {
+        display: flex;
+        align-items: center;
+        margin: 20px 0;
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 12px;
+        }
+
+        .divider::before,
+        .divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .divider::before {
+        margin-right: 10px;
+        }
+
+        .divider::after {
+        margin-left: 10px;
+        }
+
+        .bio-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 14px;
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--accent);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        cursor: pointer;
+        }
+
+        .setup-bio {
+        display: block;
+        text-align: center;
+        margin-top: 14px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.5);
+        }
+
+        .setup-bio:hover {
+        color: var(--accent);
+        }
+
+        .password-toggle {
+        position: absolute;
+        right: 0;
+        top: 32px;
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        }
+
+        .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+        }
+
+        .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+        }
+
+        .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s linear infinite;
+        margin-right: 6px;
+        }
+
+        @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+        }
+
+        .footer {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.4);
+        }
+
+        .footer a {
+        color: var(--primary);
+        text-decoration: none;
+        }
+
+        .otp-digit {
+        width: 100%;
+        height: 48px;
+        text-align: center;
+        font-size: 18px;
+        border-radius: 8px;
+        border: 1px solid #334155;
+        background: rgba(255,255,255,0.05);
+        color: white;
+        }
+
+        .otp-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 20px;
+        }
+
+        .switch {
+        position: relative;
+        display: inline-block;
+        width: 42px;
+        height: 22px;
+        }
+
+        .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        }
+
+        .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255, 255, 255, 0.2);
+        transition: .4s;
+        border-radius: 24px;
+        }
+
+        .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+        }
+
+        input:checked + .slider {
+        background-color: var(--primary);
+        }
+
+        input:checked + .slider:before {
+        transform: translateX(20px);
+        }
+
+        .setup-bio {
+        display: block;
+        text-align: center;
+        margin-top: 14px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
     }
 
-    .logo {
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      border-radius: 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 0.75rem;
-      box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
-    }
+        .setup-bio:hover {
+            color: var(--accent);
+        }
 
-    .logo i {
-      font-size: 1.6rem;
-      color: white;
-    }
+        /* Style maalum kwa clear button */
+        #clearBioBtn:hover {
+            color: #f87171;
+            text-decoration: underline;
+        }
+        /* Brand Section - Compact */
+        .brand-section {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        flex-shrink: 0;
+        }
+
+        .logo {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.75rem;
+        box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        .logo i {
+        font-size: 1.6rem;
+        color: white;
+        }
   </style>
 </head>
 <body>
