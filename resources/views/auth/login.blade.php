@@ -54,181 +54,181 @@
         }
 
         .login-title {
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 5px;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
         }
 
         .login-subtitle {
-        font-size: 13px;
-        color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
         }
 
         .form-group {
-        margin-bottom: 14px;
+            margin-bottom: 14px;
         }
 
         .form-label {
-        display: block;
-        margin-bottom: 5px;
-        font-size: 13px;
-        font-weight: 500;
-        color: rgba(255, 255, 255, 0.8);
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .form-control {
-        width: 93%;
-        padding: 9px 12px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 8px;
-        color: white;
-        font-size: 14px;
+            width: 93%;
+            padding: 9px 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
         }
 
         .form-control:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
         }
 
         .form-options {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 18px;
-        font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            font-size: 13px;
         }
 
         .remember-me {
-        display: flex;
-        align-items: center;
+            display: flex;
+            align-items: center;
         }
 
         .remember-me input {
-        margin-right: 6px;
-        accent-color: var(--primary);
+            margin-right: 6px;
+            accent-color: var(--primary);
         }
 
         .forgot-password {
-        color: var(--primary);
-        text-decoration: none;
+            color: var(--primary);
+            text-decoration: none;
         }
 
         .forgot-password:hover {
-        text-decoration: underline;
+            text-decoration: underline;
         }
 
         .btn {
-        width: 100%;
-        padding: 10px;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        border: none;
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
         }
 
         .btn-primary {
-        background: var(--primary);
-        color: white;
+            background: var(--primary);
+            color: white;
         }
 
         .btn-primary:hover {
-        background: var(--primary-dark);
+            background: var(--primary-dark);
         }
 
         .divider {
-        display: flex;
-        align-items: center;
-        margin: 20px 0;
-        color: rgba(255, 255, 255, 0.3);
-        font-size: 12px;
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 12px;
         }
 
         .divider::before,
         .divider::after {
-        content: "";
-        flex: 1;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .divider::before {
-        margin-right: 10px;
+            margin-right: 10px;
         }
 
         .divider::after {
-        margin-left: 10px;
+            margin-left: 10px;
         }
 
         .bio-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        width: 100%;
-        padding: 10px;
-        border-radius: 8px;
-        font-size: 14px;
-        background: rgba(16, 185, 129, 0.1);
-        color: var(--accent);
-        border: 1px solid rgba(16, 185, 129, 0.2);
-        cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            cursor: pointer;
         }
 
         .setup-bio {
-        display: block;
-        text-align: center;
-        margin-top: 14px;
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.5);
+            display: block;
+            text-align: center;
+            margin-top: 14px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
         }
 
         .setup-bio:hover {
-        color: var(--accent);
+            color: var(--accent);
         }
 
         .password-toggle {
-        position: absolute;
-        right: 0;
-        top: 32px;
-        background: none;
-        border: none;
-        color: rgba(255, 255, 255, 0.5);
-        cursor: pointer;
+            position: absolute;
+            right: 0;
+            top: 32px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
         }
 
         .toast {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 10px 16px;
-        border-radius: 8px;
-        font-size: 13px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        opacity: 0;
-        transform: translateY(20px);
-        transition: all 0.3s ease;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
         }
 
         .toast.show {
-        opacity: 1;
-        transform: translateY(0);
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .spinner {
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        border-top-color: white;
-        animation: spin 1s linear infinite;
-        margin-right: 6px;
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+            margin-right: 6px;
         }
 
         @keyframes spin {
@@ -238,88 +238,89 @@
         }
 
         .footer {
-        margin-top: 20px;
-        text-align: center;
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.4);
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            bottom: 0;
+            color: rgba(255, 255, 255, 0.4);
         }
 
         .footer a {
-        color: var(--primary);
-        text-decoration: none;
+            color: var(--primary);
+            text-decoration: none;
         }
 
         .otp-digit {
-        width: 100%;
-        height: 48px;
-        text-align: center;
-        font-size: 18px;
-        border-radius: 8px;
-        border: 1px solid #334155;
-        background: rgba(255,255,255,0.05);
-        color: white;
+            width: 100%;
+            height: 48px;
+            text-align: center;
+            font-size: 18px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: rgba(255,255,255,0.05);
+            color: white;
         }
 
         .otp-container {
-        display: flex;
-        justify-content: space-between;
-        gap: 8px;
-        margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 20px;
         }
 
         .switch {
-        position: relative;
-        display: inline-block;
-        width: 42px;
-        height: 22px;
+            position: relative;
+            display: inline-block;
+            width: 42px;
+            height: 22px;
         }
 
         .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
+            opacity: 0;
+            width: 0;
+            height: 0;
         }
 
         .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(255, 255, 255, 0.2);
-        transition: .4s;
-        border-radius: 24px;
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: .4s;
+            border-radius: 24px;
         }
 
         .slider:before {
-        position: absolute;
-        content: "";
-        height: 16px;
-        width: 16px;
-        left: 3px;
-        bottom: 3px;
-        background-color: white;
-        transition: .4s;
-        border-radius: 50%;
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
         }
 
         input:checked + .slider {
-        background-color: var(--primary);
+            background-color: var(--primary);
         }
 
         input:checked + .slider:before {
-        transform: translateX(20px);
+            transform: translateX(20px);
         }
 
         .setup-bio {
-        display: block;
-        text-align: center;
-        margin-top: 14px;
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.5);
-        cursor: pointer;
-    }
+            display: block;
+            text-align: center;
+            margin-top: 14px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+        }
 
         .setup-bio:hover {
             color: var(--accent);
@@ -338,21 +339,62 @@
         }
 
         .logo {
-        width: 60px;
-        height: 60px;
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        border-radius: 14px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 0.75rem;
-        box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
         }
 
         .logo i {
-        font-size: 1.6rem;
-        color: white;
+            font-size: 1.6rem;
+            color: white;
         }
+        .homeAction {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 5px;
+            /* padding: 15px; */
+            /* background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)); */
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+    .home-button {
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 8px 6px;
+        /* background: linear-gradient(45deg, #4f46e5, #7c3aed); */
+        border-radius: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        text-align: center;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .home-button:hover {
+        background: linear-gradient(45deg, #7c3aed, #4f46e5);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+        color: #fbbf24;
+        border-color: rgba(251, 191, 36, 0.3);
+    }
+
+    .home-button:active {
+        transform: translateY(0);
+    }
+
   </style>
 </head>
 <body>
@@ -375,12 +417,12 @@
       @csrf
       <div class="form-group">
         <label for="login" class="form-label">Email or Phone</label>
-        <input type="text" id="login" name="username" class="form-control" placeholder="user@example.com" required />
+        <input type="text" id="login" name="username" class="form-control" placeholder="user@example.com or 075X XXX XXX" required />
       </div>
 
       <div class="form-group" style="position: relative;">
         <label for="password" class="form-label">Password</label>
-        <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required />
+        <input type="password" id="password" name="password" class="form-control" placeholder="********" required />
         <button type="button" class="password-toggle" id="togglePassword">
           <i class="fas fa-eye"></i>
         </button>
@@ -418,6 +460,12 @@
             <a href="#" id="setupBioBtn" class="setup-bio">Set up biometric authentication</a>
             <a href="#" id="clearBioBtn" class="setup-bio" style="color: #f87171;">Clear Biometric</a>
         </div>
+    </div>
+    <div class="homeAction">
+        <a href="{{ route('welcome') }}" class="home-button">
+            <i class="fas fa-home" style="margin-right: 8px;"></i>
+            Go Back Home
+        </a>
     </div>
   </div>
 
