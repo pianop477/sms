@@ -649,11 +649,12 @@
     ">
         <img
             src="data:image/png;base64,{{ $qrPng }}"
-            width="120"
+            width="220"
             alt="Report Verification QR"
+            style="background:#fff;"
         >
-        <div style="font-size:10px; margin-top:0; font-style: italic;">
-            Scan to verify
+        <div style="font-size:12px; margin-top:0; font-style: italic;">
+            Scan to verify Authenticity
         </div>
     </div>
 

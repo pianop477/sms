@@ -53,10 +53,10 @@
             margin-top: 5px;
         }
         @page {
-            margin-top: 8mm;
-            margin-bottom: 12mm; /* Ongeza nafasi ya chini kwa footer */
-            margin-left: 8mm;
-            margin-right: 8mm;
+            margin-top: 6mm;
+            margin-bottom: 6mm; /* Ongeza nafasi ya chini kwa footer */
+            margin-left: 6mm;
+            margin-right: 6mm;
         }
         .logo {
             position: absolute;
@@ -155,7 +155,7 @@
             right: 0;
             height: 4mm; /*urefu wa footer*/
             font-size: 10px;
-            padding-top: 8px;
+            /* padding-top: 3px; */
             border-top: 1px solid #ddd;
             text-align: center;
             background-color: white;
