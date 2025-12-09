@@ -456,7 +456,7 @@
                                                     <tbody>
                                                         @foreach ($studentsByClass as $class)
                                                         <tr>
-                                                            <td class="fw-semibold">{{$class->class_code}}</td>
+                                                            <td class="fw-semibold">{{strtoupper($class->class_code)}}</td>
                                                             <td class="text-end">{{$class->student_count}}</td>
                                                         </tr>
                                                         @endforeach
@@ -487,7 +487,7 @@
                                                     <tbody>
                                                         @foreach ($teacherByGender as $teacher)
                                                         <tr>
-                                                            <td class="fw-semibold text-capitalize">{{$teacher->gender}}</td>
+                                                            <td class="fw-semibold text-capitalize">{{ucwords(strtolower($teacher->gender))}}</td>
                                                             <td class="text-end">{{$teacher->teacher_count}}</td>
                                                         </tr>
                                                         @endforeach
