@@ -319,22 +319,31 @@
         </table>
         <div style="
             position: fixed;
-            bottom: 6mm;
+            bottom: 5mm;
             left: 0;
             right: 0;
             text-align: center;
-        ">
+            line-height: 0.5;">
             <img
                 src="data:image/png;base64,{{ $qrPng }}"
                 width="200"
                 alt="Report Verification QR"
-                style="background:#fff;"
-            >
-            <p style="font-size:12px; margin-top:4px; font-style: italic;">
+                style="
+                    background: #fff;
+                    display: block;
+                    margin: 0 auto 0 auto;
+                    padding: 0;
+                ">
+            <p style="
+                font-size: 12px;
+                margin: -2px 0 0 0;
+                padding: 0;
+                font-style: italic;
+                line-height: 1;
+            ">
                 Scan to verify Authenticity
             </p>
         </div>
-
     <footer>
         <span class="copyright">
         &copy; {{ ucwords(strtolower(Auth::user()->school->school_name)) }} – {{ date('Y') }}
