@@ -9,7 +9,9 @@
 /public/reports
 /public/Transactions
 /public/images
+/public
 /storage/*.key
+/storage
 /vendor
 .env
 .env.*
