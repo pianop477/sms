@@ -117,19 +117,19 @@
         }
 
         @page {
-            margin-top: 8mm;
-            margin-bottom: 12mm; /* Ongeza nafasi ya chini kwa footer */
-            margin-left: 8mm;
-            margin-right: 8mm;
+            margin-top: 6mm;
+            margin-bottom: 8mm; /* Ongeza nafasi ya chini kwa footer */
+            margin-left: 6mm;
+            margin-right: 6mm;
         }
         footer {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 4mm; /*urefu wa footer*/
+            height: 3mm; /*urefu wa footer*/
             font-size: 10px;
-            padding-top: 8px;
+            padding-top: 6px;
             border-top: 1px solid #ddd;
             text-align: center;
             background-color: white;
@@ -642,20 +642,20 @@
 @endif
     <div style="
         position: fixed;
-        bottom: 8mm;
+        bottom: 6mm;
         left: 0;
         right: 0;
         text-align: center;
     ">
         <img
             src="data:image/png;base64,{{ $qrPng }}"
-            width="220"
+            width="200"
             alt="Report Verification QR"
             style="background:#fff;"
         >
-        <div style="font-size:12px; margin-top:0; font-style: italic;">
+        <p style="font-size:12px; font-style: italic;">
             Scan to verify Authenticity
-        </div>
+        </p>
     </div>
 
 
