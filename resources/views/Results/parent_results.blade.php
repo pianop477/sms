@@ -116,55 +116,22 @@
 
         @page {
             margin-top: 6mm;
-            margin-bottom: 15mm; /* Ongeza nafasi ya chini kwa QR code */
+            margin-bottom: 8mm; /* Ongeza nafasi ya chini kwa footer */
             margin-left: 6mm;
             margin-right: 6mm;
         }
-
         footer {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 8mm; /* Ongeza urefu kidogo */
+            height: 3mm; /*urefu wa footer*/
             font-size: 10px;
-            padding: 2px 0; /* Punguza padding */
+            padding-top: 6px;
             border-top: 1px solid #ddd;
             text-align: center;
             background-color: white;
             z-index: 1000;
-        }
-
-        /* Style mpya ya QR code */
-        .qr-verification {
-            position: fixed;
-            bottom: 10mm; /* Weka chini ya footer */
-            left: 0;
-            right: 0;
-            text-align: center;
-            z-index: 999; /* Chini ya footer */
-        }
-
-        .qr-container {
-            display: inline-block;
-            text-align: center;
-            background: white;
-            padding: 2px;
-        }
-
-        .qr-code {
-            display: block;
-            margin: 0 auto;
-            width: 200px;
-            height: auto;
-        }
-
-        .qr-text {
-            font-size: 10px; /* Punguza kidogo */
-            margin: -1px 0 0 0; /* Punguza margin ya juu */
-            padding: 0;
-            font-style: italic;
-            line-height: 1;
         }
     </style>
 </head>
@@ -350,17 +317,32 @@
                 </tr>
             </tbody>
         </table>
-        <div class="qr-verification">
-            <div class="qr-container">
-                <img
-                    src="data:image/png;base64,{{ $qrPng }}"
-                    class="qr-code"
-                    alt="Report Verification QR"
-                >
-                <p class="qr-text">
-                    Scan to verify Authenticity
-                </p>
-            </div>
+        <div style="
+            position: fixed;
+            bottom: 5mm;
+            left: 0;
+            right: 0;
+            text-align: center;
+            line-height: 0.5;">
+            <img
+                src="data:image/png;base64,{{ $qrPng }}"
+                width="200"
+                alt="Report Verification QR"
+                style="
+                    background: #fff;
+                    display: block;
+                    margin: 0 auto 0 auto;
+                    padding: 0;
+                ">
+            <p style="
+                font-size: 12px;
+                margin: -2px 0 0 0;
+                padding: 0;
+                font-style: italic;
+                line-height: 1;
+            ">
+                Scan to verify Authenticity
+            </p>
         </div>
     <footer>
         <span class="copyright">
