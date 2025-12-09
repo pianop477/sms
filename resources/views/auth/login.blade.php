@@ -365,6 +365,7 @@
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            margin-top: 15px;
         }
 
     .home-button {
@@ -372,7 +373,7 @@
         text-decoration: none;
         font-size: 12px;
         font-weight: 600;
-        padding: 8px 6px;
+        padding: 4px 3px;
         /* background: linear-gradient(45deg, #4f46e5, #7c3aed); */
         border-radius: 30px;
         display: inline-flex;
@@ -380,7 +381,7 @@
         justify-content: center;
         transition: all 0.3s ease;
         text-align: center;
-        border: 2px solid rgba(255, 255, 255, 0.2);
+        /* border: 2px solid rgba(255, 255, 255, 0.2); */
     }
 
     .home-button:hover {
