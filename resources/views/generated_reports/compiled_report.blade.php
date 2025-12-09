@@ -649,7 +649,7 @@
             line-height: 0.5;">
             <img
                 src="data:image/png;base64,{{ $qrPng }}"
-                width="200"
+                width="180"
                 alt="Report Verification QR"
                 style="
                     background: #fff;
@@ -658,11 +658,11 @@
                     padding: 0;
                 ">
             <p style="
-                font-size: 12px;
+                font-size: 10px;
                 margin: -2px 0 0 0;
                 padding: 0;
                 font-style: italic;
-                line-height: 1;
+                /* line-height: 1; */
             ">
                 Scan to verify Authenticity
             </p>
