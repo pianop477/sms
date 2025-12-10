@@ -6,6 +6,8 @@ use App\Models\Parents;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class truncateInactiveParents extends Command
 {
@@ -30,26 +32,36 @@ class truncateInactiveParents extends Command
     {
         $oneYearAgo = now()->subYear();
 
-        // Tafuta wazazi ambao hawana mwanafunzi kwa mwaka mmoja
-        $parentsToDelete = Parents::whereDoesntHave('students') // relation ya Parent->students
-                        ->where('updated_at', '<=', $oneYearAgo)
-                        ->get();
+        $parents = Parents::whereDoesntHave('students')
+            ->where('updated_at', '<=', $oneYearAgo)
+            ->with(['user:id,image'])
+            ->chunkById(200, function ($parentsChunk) {
 
-        $deletedCount = 0;
+                DB::transaction(function () use ($parentsChunk) {
 
-        foreach ($parentsToDelete as $parent) {
-            // Futa kwanza user account
-            if ($parent->user_id) {
-                User::where('id', $parent->user_id)->delete();
-            }
+                    foreach ($parentsChunk as $parent) {
 
-            // Halafu futa parent mwenyewe
-            $parent->delete();
+                        $user = $parent->user;
 
-            $deletedCount++;
-        }
+                        if ($user && $user->image) {
 
-        $this->info("Cleanup done. {$deletedCount} parents deleted.");
+                            $path = 'profile/' . $user->image;
+
+                            if (Storage::disk('public')->exists($path)) {
+                                Storage::disk('public')->delete($path);
+                            }
+                        }
+
+                        $parent->delete();
+
+                        if ($user) {
+                            $user->delete();
+                        }
+                    }
+                });
+
+            });
+
+        $this->info('Parent cleanup completed successfully.');
     }
-
 }

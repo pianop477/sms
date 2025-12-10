@@ -183,7 +183,7 @@
     <tr>
         <td>
             <h5 style="margin:5px 0; padding:0;">STUDENT'S ACADEMIC REPORT</h5>
-            <h5 style="margin:0; padding:0;"> {{ strtoupper($results->first()->exam_type) }} Assessment Report - {{ \Carbon\Carbon::parse($date)->format('d/m/Y')  }}</h5>
+            <h5 style="margin:0; padding:0;"> {{ strtoupper($results->first()->exam_type) }} Assessment - {{ \Carbon\Carbon::parse($date)->format('d/m/Y')  }}</h5>
         </td>
     </tr>
 </table>
