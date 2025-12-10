@@ -133,6 +133,19 @@
             background-color: white;
             z-index: 1000;
         }
+         .student-photo {
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .student-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -319,27 +332,25 @@
         </table>
         <div style="
             position: fixed;
-            bottom: 5mm;
+            bottom: 6mm;
             left: 0;
             right: 0;
             text-align: center;
-            line-height: 0.5;">
+        ">
             <img
                 src="data:image/png;base64,{{ $qrPng }}"
                 width="180"
                 alt="Report Verification QR"
                 style="
-                    background: #fff;
                     display: block;
-                    margin: 0 auto 0 auto;
-                    padding: 0;
+                    margin-bottom: -4 auto;
                 ">
             <p style="
                 font-size: 10px;
-                margin: -2px 0 0 0;
-                padding: 0;
+                margin-top: -15px;  /* 🔑 hapa */
+                margin-bottom: 0;
                 font-style: italic;
-                /* line-height: 1; */
+                line-height: 1;
             ">
                 Scan to verify Authenticity
             </p>
