@@ -276,6 +276,12 @@
                                         </td>
                                     </tr>
                                     <tr>
+                                        <th>NIN</th>
+                                        <td>
+                                            {{$teachers->nida ?? 'N/A'}}
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <th>Date of Birth</th>
                                         <td>{{\Carbon\Carbon::parse($teachers->dob)->format('d-m-Y')}}</td>
                                     </tr>
@@ -310,6 +316,18 @@
                                             @else
                                                 <span class="badge-status bg-secondary text-white">Certificate</span>
                                             @endif
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Form Four Index#</th>
+                                        <td>
+                                            {{$teachers->form_four_index_number ?? 'N/A'}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Completed at</th>
+                                        <td>
+                                            {{$teachers->form_four_completion_year ?? 'N/A'}}
                                         </td>
                                     </tr>
                                 </table>

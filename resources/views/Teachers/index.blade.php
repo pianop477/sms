@@ -388,7 +388,6 @@
                                 @enderror
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-md-12 mb-3">
                                 <label for="street" class="form-label">Street/Village</label>

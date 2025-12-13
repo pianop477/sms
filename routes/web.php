@@ -168,7 +168,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     });
 
     //1. SHARED ROUTES ACCESS MANAGER/HEAD TEACHER/ACADEMIC =======================================
-    Route::middleware(['manager.head.academic'])->group(function () {
+    Route::middleware(['manager.head.academic', 'nida_and_form_four'])->group(function () {
         // teachers management
         Route::get('Teachers-list', [TeachersController::class, 'showTeachersList'])->name('Teachers.index');
         Route::post('Teachers-registration', [TeachersController::class, 'registerTeachers'])->name('Teachers.store');
@@ -279,7 +279,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     });
 
     // 2. ROUTE ACCESS FOR EITHER MANAGER OR HEAD TEACHER ONLY ===========================================================================
-    Route::middleware(['ManagerOrTeacher'])->group(function(){
+    Route::middleware(['ManagerOrTeacher', 'nida_and_form_four'])->group(function(){
         //teachers panel management =======================================================================
         Route::put('{teacher}/Delete-teacher', [TeachersController::class, 'deleteTeacher'])->name('Teachers.remove');
 
@@ -344,7 +344,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     });
 
     //3. ROUTE ACCESS FOR EITHER HEAD TEACHER OR ACADEMIC ONLY ============================================================================
-    Route::middleware(['CheckUsertype:3', 'CheckRoleType:2,3'])->group(function () {
+    Route::middleware(['CheckUsertype:3', 'CheckRoleType:2,3', 'nida_and_form_four'])->group(function () {
         // classes management
         Route::post('Register-class', [ClassesController::class, 'registerClass'])->name('Classes.store');
         Route::get('{id}/Edit-class', [ClassesController::class, 'editClass'])->name('Classes.edit');
@@ -414,10 +414,10 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     //4. ROUTES ACCESS FOR ALL USERS ========================================================================================================
     Route::middleware(['CheckUsertype:1,2,3,4,5', 'conditional.api.token'])->group(function () {
         // Dashboard redirection
-        Route::get('/', [HomeController::class, 'index'])->name('home');
+        Route::middleware('nida_and_form_four')->get('/', [HomeController::class, 'index'])->name('home');
         Route::get('Change-password', [HomeController::class, 'changepassword'])->name('change.password');
         Route::post('Change-password', [HomeController::class, 'storePassword'])->name('change.new.password');
-        Route::get('Personal-details', [HomeController::class, 'showProfile'])->name('show.profile');
+        Route::middleware('nida_and_form_four')->get('Personal-details', [HomeController::class, 'showProfile'])->name('show.profile');
         Route::put('{user}/Personal-details', [HomeController::class, 'updateProfile'])->name('update.profile');
         Route::get('/student-profile-picture/{student}', [StudentsController::class, 'downloadProfilePicture'])->name('student.profile.picture');
     });
@@ -505,6 +505,9 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     // 8. ROUTES ACCESS FOR ERROR PAGE REDIRECTION =======================================================================================
     Route::get('Error', [UsersController::class, 'errorPage'])->name('error.page');
     Route::get('Construction-page', [UsersController::class, 'constructionPage'])->name('under.construction.page');
+
+    Route::middleware('CheckUsertype:3')->get('/Teacher/information', [TeachersController::class, 'getNidaOrFormFour'])->name('get.nida.form.four');
+    Route::middleware('CheckUsertype:3')->put('/Update/teacher/information/teacher/{id}', [TeachersController::class, 'updateNidaOrFormFour'])->name('update.nida.form.four');
 
     // 9. ROUTES ACCESS FOR LOGOUT AND REDIRECTION =======================================================================================
     Route::post('Logout', function () {

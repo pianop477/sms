@@ -97,16 +97,18 @@
         }
 
         .form-control-custom {
-            border: 1px solid #d1d3e2;
-            border-radius: 5px;
-            padding: 10px 15px;
-            font-size: 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
             transition: all 0.3s;
+            background-color: white;
         }
 
         .form-control-custom:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
         }
 
         .form-label {
@@ -258,6 +260,13 @@
                                     <i class="fas fa-user me-1"></i> Profile
                                 </a>
                             </li>
+                            @if ($user->usertype == 3)
+                            <li class="nav-item flex-fill text-center">
+                                <a class="nav-link" href="#NIN" data-bs-toggle="tab">
+                                    <i class="fas fa-list me-1"></i> Other Details
+                                </a>
+                            </li>
+                            @endif
                             <li class="nav-item flex-fill text-center">
                                 <a class="nav-link" href="#edit" data-bs-toggle="tab">
                                     <i class="fas fa-user-pen me-1"></i> Edit Account
@@ -327,6 +336,38 @@
                                 </table>
                             </div>
 
+                            {{-- NIN and form IV index number tab --}}
+                            @if ($user->usertype == 3)
+                                <div class="tab-pane fade" id="NIN">
+                                <h5 class="mb-4"><i class="me-2"></i> NIN & Form Four Details</h5>
+                                @php
+                                    $teacher = \App\Models\Teacher::where('user_id', $user->id)->first();
+                                @endphp
+                                <table class="info-table">
+                                    <tr>
+                                        <th>NIN</th>
+                                        <td>{{$teacher->nida ?? 'N/A'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Form Four Index#</th>
+                                        <td>
+                                            {{$teacher->form_four_index_number ?? 'N/A'}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Completed at</th>
+                                        <td>
+                                            {{$teacher->form_four_completion_year ?? 'N/A'}}
+                                        </td>
+                                    </tr>
+                                </table>
+                                <div class="align-items-center mt-4">
+                                    <a href="{{route('get.nida.form.four')}}" class="btn btn-primary">
+                                        <i class="fas fa-pencil"></i> Edit
+                                    </a>
+                                </div>
+                            </div>
+                            @endif
                             <!-- Edit Account Tab -->
                             <div class="tab-pane fade" id="edit">
                                 <h5 class="mb-4"><i class="fas fa-user-pen me-2"></i> Edit Account Information</h5>
@@ -339,7 +380,7 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">First Name</label>
-                                                <input type="text" name="fname" class="form-control form-control-custom" value="{{$user->first_name}}" required>
+                                                <input type="text" name="fname" class="form-control-custom" value="{{$user->first_name}}" required>
                                                 @error('fname')
                                                     <div class="text-danger text-sm mt-1">{{$message}}</div>
                                                 @enderror
@@ -348,7 +389,7 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">Last Name</label>
-                                                <input type="text" name="lname" class="form-control form-control-custom" value="{{$user->last_name}}" required>
+                                                <input type="text" name="lname" class="form-control-custom" value="{{$user->last_name}}" required>
                                                 @error('lname')
                                                     <div class="text-danger text-sm mt-1">{{$message}}</div>
                                                 @enderror
@@ -360,7 +401,7 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">Phone</label>
-                                                <input type="text" name="phone" class="form-control form-control-custom" value="{{$user->phone}}" required>
+                                                <input type="text" name="phone" class="form-control-custom" value="{{$user->phone}}" required>
                                                 @error('phone')
                                                     <div class="text-danger text-sm mt-1">{{$message}}</div>
                                                 @enderror
@@ -369,7 +410,7 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">Email</label>
-                                                <input type="email" name="email" class="form-control form-control-custom" value="{{$user->email}}">
+                                                <input type="email" name="email" class="form-control-custom" value="{{$user->email}}">
                                                 @error('email')
                                                     <div class="text-danger text-sm mt-1">{{$message}}</div>
                                                 @enderror
@@ -378,10 +419,10 @@
                                     </div>
 
                                     <div class="row mb-4">
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">Gender</label>
-                                                <select name="gender" class="form-control form-control-custom text-capitalize">
+                                                <select name="gender" class="form-control-custom text-capitalize">
                                                     <option value="{{$user->gender}}" selected>{{$user->gender}}</option>
                                                     <option value="male">Male</option>
                                                     <option value="female">Female</option>
@@ -391,28 +432,28 @@
                                                 @enderror
                                             </div>
                                         </div>
-
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label">Photo <span class="text-danger text-sm">(Max 1MB)</span></label>
+                                                <input type="file" name="image" class="form-control-custom">
+                                                @error('image')
+                                                    <div class="text-danger text-sm mt-1">{{$message}}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-4">
                                         @if ($user->usertype == 3 || $user->usertype == 4)
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">Address</label>
-                                                <input type="text" name="address" class="form-control form-control-custom" value="{{$user->parent_address ?? $user->teacher_address}}">
+                                                <input type="text" name="address" class="form-control-custom" value="{{$user->parent_address ?? $user->teacher_address}}">
                                                 @error('address')
                                                     <div class="text-danger text-sm mt-1">{{$message}}</div>
                                                 @enderror
                                             </div>
                                         </div>
                                         @endif
-
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label class="form-label">Photo <span class="text-danger text-sm">(Max 1MB)</span></label>
-                                                <input type="file" name="image" class="form-control form-control-custom">
-                                                @error('image')
-                                                    <div class="text-danger text-sm mt-1">{{$message}}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
                                     </div>
 
                                     <button type="submit" id="saveButton" class="btn btn-success btn-action">

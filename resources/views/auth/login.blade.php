@@ -418,7 +418,7 @@
       @csrf
       <div class="form-group">
         <label for="login" class="form-label">Email or Phone</label>
-        <input type="text" id="login" name="username" class="form-control" placeholder="user@example.com or 075X XXX XXX" required />
+        <input type="text" id="login" name="username" class="form-control" placeholder="user@example.com or 075XXXXXXX" required />
       </div>
 
       <div class="form-group" style="position: relative;">

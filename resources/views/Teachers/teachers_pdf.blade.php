@@ -220,12 +220,14 @@
                 <thead>
                     <tr>
                         <th>Member ID</th>
-                        <th>sex</th>
+                        <th>Gender</th>
+                        <th>NIN</th>
                         <th>Full Name</th>
                         <th>DOB</th>
                         <th>Phone</th>
                         <th>Email</th>
                         <th>Qualification</th>
+                        <th>Form Four Index#</th>
                         <th>Joined</th>
                         <th>Street</th>
                         <th>Status</th>
@@ -236,6 +238,7 @@
                     <tr>
                         <td style="text-align:center">{{ strtoupper($teacher->member_id) }}</td>
                         <td style="text-align:center">{{ strtoupper($teacher->gender[0]) }}</td>
+                        <td>{{$teacher->nida ?? 'N/A'}}</td>
                         <td>{{ ucwords(strtolower($teacher->first_name . ' ' . $teacher->last_name)) }}</td>
                         <td>{{ \Carbon\Carbon::parse($teacher->dob)->format('d/m/Y') }}</td>
                         <td>{{ $teacher->phone }}</td>
@@ -248,6 +251,10 @@
                                 @default Certificate
                             @endswitch
                         </td>
+                        @php
+                            $indexNo = $teacher->form_four_index_number.'-'. $teacher->form_four_completion_year
+                        @endphp
+                        <td>{{strtoupper($indexNo ?? 'N/A')}}</td>
                         <td style="text-align:center">{{ $teacher->joined }}</td>
                         <td>{{ $teacher->address }}</td>
                         <td>{{ $teacher->status == 1 ? 'Active' : 'Inactive' }}</td>

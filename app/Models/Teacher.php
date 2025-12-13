@@ -16,7 +16,7 @@ class Teacher extends Model
         'address',
         'role_id',
         'member_id',
-        'status'
+        'status', 'nida', 'form_four_index_number', 'form_four_completion_year',
     ];
 
     protected $guarded = ['id', 'created_at', 'updated_at'];

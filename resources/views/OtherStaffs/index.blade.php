@@ -450,7 +450,14 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-12 mb-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="nida">NIN (NIDA)</label>
+                                <input type="text" name="nida" class="form-control-custom" maxlength="23" required id="nin" value="{{old('nida')}}" placeholder="19700130411110000123">
+                                @error('nida')
+                                    <div class="text-danger small">{{$message}}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-3">
                                 <label for="profile_image" class="form-label">Profile Picture</label>
                                 <input type="file" name="image" class="form-control-custom" id="image" value="{{old('image')}}" placeholder="">
                                 @error('image')
@@ -492,6 +499,44 @@
                     form.submit();
                 }, 500);
             });
+        });
+
+        document.getElementById('nin').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+
+            let formatted = '';
+
+            if (value.length > 0) {
+                formatted += value.substring(0, 8);
+            }
+
+            // DASH ya kwanza — ionekane instantly baada ya digits 8
+            if (value.length >= 8) {
+                formatted += '-';
+            }
+
+            if (value.length > 8) {
+                formatted += value.substring(8, 13);
+            }
+
+            if (value.length >= 13) {
+                formatted += '-';
+            }
+
+            if (value.length > 13) {
+                formatted += value.substring(13, 18);
+            }
+
+            // DASH ya tatu — ionekane instantly baada ya digits 18
+            if (value.length >= 18) {
+                formatted += '-';
+            }
+
+            if (value.length > 18) {
+                formatted += value.substring(18, 20);
+            }
+
+            e.target.value = formatted;
         });
     </script>
 @endsection

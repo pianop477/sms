@@ -285,6 +285,12 @@
                                         </td>
                                     </tr>
                                     <tr>
+                                        <th> NIN</th>
+                                        <td>
+                                            {{$staff->nida ?? 'N/A'}}
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <th>Date of Birth</th>
                                         <td>{{\Carbon\Carbon::parse($staff->date_of_birth)->format('d-m-Y') ?? 'N/A'}}</td>
                                     </tr>
@@ -380,7 +386,7 @@
                                         <div class="col-md-4 mb-3">
                                             <div class="form-group">
                                                 <label for="email">Date of Birth</label>
-                                                <input type="date" required name="dob" class="form-control-custom" value="value="{{ old('dob', optional($staff->date_of_birth)->format('Y-m-d')) }}"">
+                                                <input type="date" required name="dob" class="form-control-custom" value="{{ old('dob', \Carbon\Carbon::parse($staff->date_of_birth)->format('Y-m-d')) }}">
                                                 @error('dob')
                                                     <span class="text-danger">{{$message}}</span>
                                                 @enderror
@@ -438,6 +444,13 @@
                                             @error('street')
                                             <div class="text-danger small">{{$message}}</div>
                                             @enderror
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                                <label for="profile_image" class="form-label">NIN (NIDA)</label>
+                                                <input type="text" required name="nida" class="form-control-custom" id="nin" value="{{old('nida')}}" placeholder="19700130411110000123">
+                                                @error('nida')
+                                                <div class="text-danger small">{{$message}}</div>
+                                                @enderror
                                         </div>
                                         <div class="col-md-4 mb-3">
                                                 <label for="profile_image" class="form-label">Profile Picture</label>
@@ -498,6 +511,45 @@
             triggerTabList.forEach(function (triggerEl) {
                 new bootstrap.Tab(triggerEl)
             });
+        });
+
+        //nida input
+        document.getElementById('nin').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+
+            let formatted = '';
+
+            if (value.length > 0) {
+                formatted += value.substring(0, 8);
+            }
+
+            // DASH ya kwanza — ionekane instantly baada ya digits 8
+            if (value.length >= 8) {
+                formatted += '-';
+            }
+
+            if (value.length > 8) {
+                formatted += value.substring(8, 13);
+            }
+
+            if (value.length >= 13) {
+                formatted += '-';
+            }
+
+            if (value.length > 13) {
+                formatted += value.substring(13, 18);
+            }
+
+            // DASH ya tatu — ionekane instantly baada ya digits 18
+            if (value.length >= 18) {
+                formatted += '-';
+            }
+
+            if (value.length > 18) {
+                formatted += value.substring(18, 20);
+            }
+
+            e.target.value = formatted;
         });
     </script>
 @endsection

@@ -33,12 +33,14 @@
                 <th>#</th>
                 <th>MEMBER ID</th>
                 <th>GENDER</th>
+                <th>NIN</th>
                 <th>FULL NAME</th>
                 <th>ROLE</th>
                 <th>DATE OF BIRTH</th>
                 <th>PHONE</th>
                 <th>EMAIL</th>
                 <th>QUALIFICATION</th>
+                <th>FORM FOUR INDEX#</th>
                 <th>JOINED IN</th>
                 <th>STREET ADDRESS</th>
                 <th>STATUS</th>
@@ -50,6 +52,7 @@
                     <td>{{ $loop->iteration }}</td>
                     <td class="text-uppercase" style="text-transform: uppercase">{{ $teacher->member_id }}</td>
                     <td class="text-capitalize" style="text-transform: uppercase">{{ $teacher->gender[0] }}</td>
+                    <td>{{$teacher->nida ?? 'N/A'}}</td>
                     <td class="text-capitalize" style="text-transform: capitalize">{{ ucwords(strtolower($teacher->first_name. ' '. $teacher->last_name)) }}</td>
                     <td class="text-capitalize" style="text-transform: capitalize">{{ $teacher->role_name }}</td>
                     <td>{{ \Carbon\Carbon::parse($teacher->dob)->format('d/M/Y') }}</td>
@@ -66,6 +69,10 @@
                             {{ __('Certificate') }}
                         @endif
                     </td>
+                    @php
+                        $indexNo = $teacher->form_four_index_number.'-'.$teacher->form_four_completion_year
+                    @endphp
+                    <td>{{strtouppwer($indexNo ?? 'N/A')}}</td>
                     <td>{{ $teacher->joined }}</td>
                     <td class="text-capitalize" style="text-transform: capitalize">{{ $teacher->address }}</td>
                     <td>{{ $teacher->status == 1 ? 'Active' : 'Inactive' }}</td>

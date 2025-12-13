@@ -589,6 +589,61 @@ class TeachersController extends Controller
         return view('Teachers.trash', ['teachers' => $teachers]);
     }
 
+
+    //update nida and form four information
+    public function getNidaOrFormFour()
+    {
+        $user = Auth::user();
+        $teacher = Teacher::where('user_id', $user->id)->first();
+
+        return view('Error.teacher_details', compact('teacher', 'user'));
+    }
+
+
+    //update nida and form four information
+    public function updateNidaOrFormFour(Request $request, $teacher)
+    {
+        $rules = [
+            'completion'  => 'required|integer|min:1985|max:' . date('Y'),
+            'nationality' => 'required|in:tanzania,foreigner',
+        ];
+
+        if ($request->nationality === 'tanzania') {
+            $rules['nida'] = [
+                'required',
+                'regex:/^\d{8}-?\d{5}-?\d{5}-?\d{2}$/'
+            ];
+
+            $rules['index_number'] = [
+                'required',
+                'regex:/^[SP]\d{4}-\d{4}$/'
+            ];
+        } else {
+            // Foreigner: free but still safe
+            $rules['nida'] = 'required|string|min:5|max:50';
+            $rules['index_number'] = 'required|string|min:3|max:30';
+        }
+
+        $validated = $request->validate($rules);
+
+        $decoded = Hashids::decode($teacher);
+        $teacher = Teacher::findOrFail($decoded[0]);
+
+        $nin = $request->nationality === 'tanzania'
+            ? preg_replace('/[^0-9]/', '', $request->nida)
+            : $request->nida;
+
+        $teacher->update([
+            'nida' => $nin,
+            'form_four_index_number' => $request->index_number,
+            'form_four_completion_year' => $request->completion
+        ]);
+
+        Alert()->toast('Information has been updated successfully', 'success');
+        return to_route('home');
+    }
+
+
     private function scanFileForViruses($file): array
     {
         // For production, use actual API

@@ -82,5 +82,6 @@ class Kernel extends HttpKernel
         'checkSessionTimeout' => \App\Http\Middleware\checkSessionTimeout::class,
         'apiSessionToken' => \App\Http\Middleware\ApiSessionTokenMiddleware::class,
         'conditional.api.token' => \App\Http\Middleware\ConditionalApiSessionToken::class,
+        'nida_and_form_four' => \App\Http\Middleware\forceUpdateNidaAndIndexNumber::class,
     ];
 }

@@ -62,6 +62,7 @@ class OtherStaffsController extends Controller
             'street' => 'required|string|max:255',
             'joined' => 'required|date_format:Y',
             'job_title' => 'required|string|max:255',
+            'nida' => 'required|string|regex:/^\d{8}-?\d{5}-?\d{5}-?\d{2}$/',
             'image' => [
                     'nullable',
                     'file',
@@ -82,7 +83,9 @@ class OtherStaffsController extends Controller
             'joined.required' => 'Joined date is required',
             'job_title.required' => 'Job title is required',
             'image.file' => 'Image file must be a valid image file type',
-            'image.max' => 'file size is too large, maximum 1 MB'
+            'image.max' => 'file size is too large, maximum 1 MB',
+            'nida.required' => 'NIN must be filled',
+            'nida.regex' => 'Invalid NIN format',
         ]);
 
          try {
@@ -92,14 +95,20 @@ class OtherStaffsController extends Controller
                 return redirect()->back();
             }
 
+             $nin = preg_replace('/[^0-9]/', '', $request->nida);
+
             // Check for existing student records
-            $existingStaff = other_staffs::whereRaw("
-                                LOWER(TRIM(REPLACE(first_name, '  ', ' '))) = ?
-                                AND LOWER(TRIM(REPLACE(last_name, '  ', ' '))) = ?
-                                ", [
-                                strtolower(preg_replace('/\s+/', ' ', trim($request->fname))),
-                                strtolower(preg_replace('/\s+/', ' ', trim($request->lname))),
-                            ])->first();
+            $existingStaff = other_staffs::query()
+                                ->when($request->phone, fn ($q) =>
+                                    $q->where('phone', $request->phone)
+                                )
+                                ->when($nin, fn ($q) =>
+                                    $q->orWhere('nida', $nin)
+                                )
+                                ->when($request->email, fn ($q) =>
+                                    $q->orWhere('email', $request->email)
+                                )
+                                ->exists();
 
             if ($existingStaff) {
                     Alert()->toast('Staff with the same records already exists', 'error');
@@ -118,15 +127,14 @@ class OtherStaffsController extends Controller
                 'job_title' => $request->job_title,
                 'street_address' => $request->street,
                 'joining_year' => $request->joined,
+                'nida' => $nin
                 // 'profile_image' => $profile_img
             ]);
 
-            $profile_img = '';
-            if ($request->hasFile('image')) {
-                // Create unique logo name
-                $imageFile = time() . '_' . uniqid() . '.' . $request->image->getClientOriginalExtension();
+            $profile_image = null;
 
-                // Store in storage/app/public/logo
+            if ($request->hasFile('image')) {
+                $imageFile = time() . '_' . uniqid() . '.' . $request->image->getClientOriginalExtension();
                 $request->image->storeAs('profile', $imageFile, 'public');
                 $profile_image = $imageFile;
             }
@@ -188,6 +196,7 @@ class OtherStaffsController extends Controller
             'joined'     => 'required|date_format:Y',
             'job_title'  => 'required|string|max:255',
             'image'      => ['nullable','file','mimetypes:image/jpeg,image/png,image/jpg','max:1024'],
+            'nida'       => 'required|string|regex:/^\d{8}-?\d{5}-?\d{5}-?\d{2}$/'
         ];
 
         $extra = $type === 'driver'
@@ -204,6 +213,8 @@ class OtherStaffsController extends Controller
             'email.email'    => 'Email must be a valid email address',
             'joined.date_format' => 'Joining year must be in YYYY format',
             'image.max'      => 'File size is too large, maximum 1 MB',
+            'nida.required' => 'NIN must be filled',
+            'nida.regex' => 'Invalid NIN format provided'
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -220,6 +231,8 @@ class OtherStaffsController extends Controller
             }
         }
 
+        $nin = preg_replace('/[^0-9]/', '', $request->nida);
+
         // Map fields based on staff type
         $updateData = [
             'gender'            => $request->gender,
@@ -229,7 +242,8 @@ class OtherStaffsController extends Controller
             'date_of_birth'     => $request->dob,
             'street_address'    => $request->street,
             'joining_year'      => $request->joined,
-            'educational_level' => $request->education
+            'educational_level' => $request->education,
+            'nida'              => $nin
         ];
 
         if ($type === 'driver') {
@@ -417,7 +431,7 @@ class OtherStaffsController extends Controller
         ]);
 
         $addressRow = $logoRow + 1;
-        $sheet->mergeCells("A{$addressRow}:I{$addressRow}");
+        $sheet->mergeCells("A{$addressRow}:J{$addressRow}");
         $sheet->setCellValue("A{$addressRow}", ucwords(strtolower($school->postal_address)) . ', ' .
             ucwords(strtolower($school->postal_name)) . ' - ' .
             ucwords(strtolower($school->country)));
@@ -430,7 +444,7 @@ class OtherStaffsController extends Controller
         //  REPORT TITLE
         // =========================
         $titleRow = $addressRow + 1;
-        $sheet->mergeCells("A{$titleRow}:I{$titleRow}");
+        $sheet->mergeCells("A{$titleRow}:J{$titleRow}");
         $sheet->setCellValue("A{$titleRow}", "NON-TEACHING STAFF MEMBERS REPORT");
         $sheet->getStyle("A{$titleRow}")->applyFromArray([
             'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '2C3E50']],
@@ -442,7 +456,7 @@ class OtherStaffsController extends Controller
         // =========================
         //  TABLE HEADER
         // =========================
-        $headers = ['#', 'Full Name', 'Gender', 'Phone', 'Email', 'Job Title', 'DoB', 'Address', 'Status'];
+        $headers = ['#', 'NIN', 'Full Name', 'Gender', 'Phone', 'Email', 'Job Title', 'DoB', 'Address', 'Status'];
         $sheet->fromArray($headers, null, 'A' . $startRow, true);
 
         $headerRow = $startRow;
@@ -473,6 +487,7 @@ class OtherStaffsController extends Controller
         foreach ($combinedStaffs as $index => $data) {
             $dataArray[] = [
                 $index + 1,
+                $data->nida ?? 'N/A',
                 isset($data->driver_name)
                     ? $data->driver_name
                     : (($data->first_name ?? '') . ' ' . ($data->last_name ?? '')),
@@ -650,6 +665,4 @@ class OtherStaffsController extends Controller
 
         return $imageFile;
     }
-
-
 }

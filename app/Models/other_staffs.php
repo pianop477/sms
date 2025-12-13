@@ -23,7 +23,7 @@ class other_staffs extends Model
         'educational_level',
         'profile_image',
         'usertype',
-        'status',
+        'status', 'nida',
     ];
 
     protected $table = 'other_staffs';
