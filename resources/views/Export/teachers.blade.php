@@ -72,7 +72,7 @@
                     @php
                         $indexNo = $teacher->form_four_index_number.'-'.$teacher->form_four_completion_year
                     @endphp
-                    <td>{{strtouppwer($indexNo ?? 'N/A')}}</td>
+                    <td>{{strtoupper($indexNo ?? 'N/A')}}</td>
                     <td>{{ $teacher->joined }}</td>
                     <td class="text-capitalize" style="text-transform: capitalize">{{ $teacher->address }}</td>
                     <td>{{ $teacher->status == 1 ? 'Active' : 'Inactive' }}</td>

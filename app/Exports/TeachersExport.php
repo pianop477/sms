@@ -44,7 +44,7 @@ class TeachersExport implements FromView, WithStyles, WithTitle
     public function styles(Worksheet $sheet)
 {
     // Merge cells A1 to L1 for the title
-    $sheet->mergeCells('A1:L1');
+    $sheet->mergeCells('A1:N1');
 
     // Style the merged title cell
     $sheet->getStyle('A1')->applyFromArray([
@@ -76,9 +76,11 @@ class TeachersExport implements FromView, WithStyles, WithTitle
     $sheet->getColumnDimension('J')->setWidth(15);
     $sheet->getColumnDimension('K')->setWidth(30);
     $sheet->getColumnDimension('L')->setWidth(10);
+    $sheet->getColumnDimension('M')->setWidth(20);
+    $sheet->getColumnDimension('N')->setWidth(10);
 
     // Style the header
-    $sheet->getStyle('A2:L2')->applyFromArray([
+    $sheet->getStyle('A2:N2')->applyFromArray([
         'font' => [
             'bold' => true,
             'size' => 12,
@@ -105,7 +107,7 @@ class TeachersExport implements FromView, WithStyles, WithTitle
     ]);
 
     // Style the ID column (B) and other columns to be capitalized
-    $sheet->getStyle('B3:L' . $sheet->getHighestRow())->applyFromArray([
+    $sheet->getStyle('B3:N' . $sheet->getHighestRow())->applyFromArray([
         'font' => [
             'size' => 11,
         ],

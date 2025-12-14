@@ -6,9 +6,9 @@
     <style>
         body, html {
             margin: 0;
-            padding: 30px;
+            padding: 15px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 12px;
+            font-size: 10px; /* Reduced for more space */
             background: #fff;
             color: #2c3e50;
         }
@@ -17,17 +17,17 @@
             display: flex;
             align-items: center;
             border-bottom: 2px solid #ccc;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
             position: relative;
         }
 
         .school-logo {
             position: absolute;
             left: 0;
-            height: 70px;
+            height: 60px;
             width: auto;
-            max-width: 80px;
+            max-width: 70px;
         }
 
         .school-info {
@@ -36,135 +36,109 @@
         }
 
         .school-info h4 {
-            font-size: 18px;
-            margin: 5px 0;
+            font-size: 16px;
+            margin: 4px 0;
             text-transform: uppercase;
             color: #1a5276;
         }
 
         .school-info h5 {
-            font-size: 13px;
-            margin: 3px 0;
+            font-size: 12px;
+            margin: 2px 0;
         }
 
         .table-container {
-            margin-top: 15px;
+            margin-top: 10px;
+            overflow: visible;
         }
 
         .table {
             width: 100%;
+            table-layout: fixed;
             border-collapse: collapse;
-            font-size: 11.5px;
+            font-size: 9.5px;
+            word-wrap: break-word;
         }
 
         .table th {
             background-color: #1a5276;
             color: #fff;
-            padding: 8px 5px;
+            padding: 6px 3px;
             border: 1px solid #dcdcdc;
             text-transform: uppercase;
             font-weight: bold;
             text-align: center;
+            font-size: 9px;
         }
 
         .table td {
-            padding: 6px 5px;
+            padding: 5px 3px;
             border: 1px solid #eee;
             vertical-align: middle;
+            line-height: 1.2;
+            word-break: break-word;
         }
 
         .table tr:nth-child(even) {
             background-color: #f5f8fa;
         }
 
-        .table tr:hover {
-            background-color: #f0f0f0;
+        /* Optimized column widths for 12 columns */
+        .table th:nth-child(1),
+        .table td:nth-child(1) { width: 5%; } /* Member ID */
+        .table th:nth-child(2),
+        .table td:nth-child(2) { width: 4%; } /* Gender */
+        .table th:nth-child(3),
+        .table td:nth-child(3) { width: 9%; } /* NIN */
+        .table th:nth-child(4),
+        .table td:nth-child(4) { width: 14%; } /* Full Name */
+        .table th:nth-child(5),
+        .table td:nth-child(5) { width: 7%; } /* DOB */
+        .table th:nth-child(6),
+        .table td:nth-child(6) { width: 8%; } /* Phone */
+        .table th:nth-child(7),
+        .table td:nth-child(7) { width: 14%; } /* Email */
+        .table th:nth-child(8),
+        .table td:nth-child(8) { width: 9%; } /* Qualification */
+        .table th:nth-child(9),
+        .table td:nth-child(9) { width: 8%; } /* Form Four Index# */
+        .table th:nth-child(10),
+        .table td:nth-child(10) { width: 5%; } /* Joined */
+        .table th:nth-child(11),
+        .table td:nth-child(11) { width: 9%; } /* Street */
+        .table th:nth-child(12),
+        .table td:nth-child(12) { width: 8%; } /* Status */
+
+        /* Text alignment */
+        .table td:nth-child(1),
+        .table td:nth-child(2),
+        .table td:nth-child(5),
+        .table td:nth-child(10) {
+            text-align: center;
         }
 
-        body, html {
-        margin: 0;
-        padding: 30px;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        font-size: 11px; /* slightly reduced */
-        background: #fff;
-        color: #2c3e50;
-    }
-
-    .table-container {
-        margin-top: 15px;
-        overflow: hidden;
-    }
-
-    .table {
-        width: 100%;
-        table-layout: fixed; /* Force fixed layout to prevent overflow */
-        border-collapse: collapse;
-        font-size: 10.5px;
-        word-wrap: break-word;
-    }
-
-    .table th, .table td {
-        border: 1px solid #ddd;
-        padding: 4px 4px;
-        vertical-align: top;
-        text-align: left;
-        word-break: break-word;
-    }
-
-    .table th {
-        background-color: #293b47;
-        color: white;
-        text-transform: uppercase;
-        font-size: 10px;
-        text-align: center;
-    }
-
-    .table tr:nth-child(even) {
-        background-color: #f5f8fa;
-    }
-
-    .table tr:hover {
-        background-color: #f0f0f0;
-    }
-
-    /* Responsive column widths */
-    .table th:nth-child(1),
-    .table td:nth-child(1) { width: 8%; text-align: center; } /* Member ID */
-    .table th:nth-child(2),
-    .table td:nth-child(2) { width: 5%; text-align: center; } /* Gender */
-    .table th:nth-child(3),
-    .table td:nth-child(3) { width: 20%; } /* Full Name */
-    .table th:nth-child(4),
-    .table td:nth-child(4) { width: 10%; } /* Role */
-    .table th:nth-child(5),
-    .table td:nth-child(5) { width: 12%; text-align: center; } /* DOB */
-    .table th:nth-child(6),
-    .table td:nth-child(6) { width: 10%; } /* Phone */
-    .table th:nth-child(7),
-    .table td:nth-child(7) { width: 15%; } /* Email */
-    .table th:nth-child(8),
-    .table td:nth-child(8) { width: 10%; } /* Qualification */
-    .table th:nth-child(9),
-    .table td:nth-child(9) { width: 7%; text-align: center; } /* Joined */
-    .table th:nth-child(10),
-    .table td:nth-child(10) { width: 8%; } /* Street */
-    .table th:nth-child(11),
-    .table td:nth-child(11) { width: 7%; } /* Status */
+        /* Compact text for small cells */
+        .compact-text {
+            font-size: 8.5px;
+            padding: 2px 1px;
+        }
 
         @page {
-            margin-top: 8mm;
-            margin-bottom: 12mm; /* Ongeza nafasi ya chini kwa footer */
-            margin-left: 8mm;
-            margin-right: 8mm;
+            size: A4 landscape;
+            margin-top: 5mm;
+            margin-bottom: 8mm;
+            margin-left: 5mm;
+            margin-right: 5mm;
         }
+
         footer {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 4mm; /*urefu wa footer*/
-            font-size: 10px;
-            padding-top: 8px;
+            height: 4mm;
+            font-size: 8px;
+            padding-top: 6px;
             border-top: 1px solid #ddd;
             text-align: center;
             background-color: white;
@@ -177,12 +151,12 @@
 
         footer .copyright {
             float: left;
-            margin-left: 10px;
+            margin-left: 5px;
         }
 
         footer .printed {
             float: right;
-            margin-right: 10px;
+            margin-right: 5px;
         }
 
         footer:after {
@@ -195,7 +169,26 @@
             text-align: center;
             color: #999;
             font-style: italic;
-            margin-top: 50px;
+            margin-top: 30px;
+            font-size: 12px;
+        }
+
+        /* Force table to stay on one page if possible */
+        .table {
+            page-break-inside: auto;
+        }
+
+        .table tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        /* Optional: Add ellipsis for very long content */
+        .ellipsis {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
         }
     </style>
 </head>
@@ -236,27 +229,27 @@
                 <tbody>
                     @foreach($teachers as $teacher)
                     <tr>
-                        <td style="text-align:center">{{ strtoupper($teacher->member_id) }}</td>
-                        <td style="text-align:center">{{ strtoupper($teacher->gender[0]) }}</td>
-                        <td>{{$teacher->nida ?? 'N/A'}}</td>
+                        <td>{{ strtoupper($teacher->member_id) }}</td>
+                        <td>{{ strtoupper($teacher->gender[0]) }}</td>
+                        <td>{{ $teacher->nida ?? 'N/A' }}</td>
                         <td>{{ ucwords(strtolower($teacher->first_name . ' ' . $teacher->last_name)) }}</td>
                         <td>{{ \Carbon\Carbon::parse($teacher->dob)->format('d/m/Y') }}</td>
                         <td>{{ $teacher->phone }}</td>
                         <td>{{ $teacher->email }}</td>
                         <td>
                             @switch($teacher->qualification)
-                                @case(1) Masters Degree @break
-                                @case(2) Bachelor Degree @break
+                                @case(1) Masters @break
+                                @case(2) Bachelor @break
                                 @case(3) Diploma @break
                                 @default Certificate
                             @endswitch
                         </td>
                         @php
-                            $indexNo = $teacher->form_four_index_number.'-'. $teacher->form_four_completion_year
+                            $indexNo = $teacher->form_four_index_number . '-' . $teacher->form_four_completion_year
                         @endphp
-                        <td>{{strtoupper($indexNo ?? 'N/A')}}</td>
-                        <td style="text-align:center">{{ $teacher->joined }}</td>
-                        <td>{{ $teacher->address }}</td>
+                        <td>{{ strtoupper($indexNo ?? 'N/A') }}</td>
+                        <td>{{ $teacher->joined }}</td>
+                        <td class="ellipsis" title="{{ $teacher->address }}">{{ $teacher->address }}</td>
                         <td>{{ $teacher->status == 1 ? 'Active' : 'Inactive' }}</td>
                     </tr>
                     @endforeach
@@ -271,19 +264,9 @@
         </span>
         <span class="page-number"></span>
         <span class="printed">
-            Printed at: {{ now()->format('d-M-Y H:i') }}
+            Printed: {{ now()->format('d-M-Y H:i') }}
         </span>
     </footer>
-
-    <script>
-        // Optional dynamic page number (may not work in static PDF)
-        document.addEventListener('DOMContentLoaded', function() {
-            const pages = document.querySelectorAll('.page-number');
-            pages.forEach((page, index) => {
-                page.textContent = index + 1;
-            });
-        });
-    </script>
 
 </body>
 </html>

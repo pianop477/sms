@@ -423,7 +423,7 @@ class OtherStaffsController extends Controller
         // =========================
         //  SCHOOL NAME & ADDRESS
         // =========================
-        $sheet->mergeCells("A{$logoRow}:I{$logoRow}");
+        $sheet->mergeCells("A{$logoRow}:J{$logoRow}");
         $sheet->setCellValue("A{$logoRow}", strtoupper($school->school_name));
         $sheet->getStyle("A{$logoRow}")->applyFromArray([
             'font' => ['bold' => true, 'size' => 16, 'color' => ['rgb' => '2C3E50']],
@@ -454,7 +454,7 @@ class OtherStaffsController extends Controller
         $startRow = $titleRow + 2;
 
         // =========================
-        //  TABLE HEADER
+        //  TABLE HEADER - 10 COLUMNS
         // =========================
         $headers = ['#', 'NIN', 'Full Name', 'Gender', 'Phone', 'Email', 'Job Title', 'DoB', 'Address', 'Status'];
         $sheet->fromArray($headers, null, 'A' . $startRow, true);
@@ -462,7 +462,8 @@ class OtherStaffsController extends Controller
         $headerRow = $startRow;
         $dataStartRow = $headerRow + 1;
 
-        $sheet->getStyle("A{$headerRow}:I{$headerRow}")->applyFromArray([
+        // FIX 1: Badilisha I kuwa J (10 columns badala ya 9)
+        $sheet->getStyle("A{$headerRow}:J{$headerRow}")->applyFromArray([
             'font' => ['bold' => true, 'size' => 11, 'color' => ['rgb' => 'FFFFFF']],
             'fill' => [
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
@@ -515,7 +516,8 @@ class OtherStaffsController extends Controller
         if ($lastDataRow >= $dataStartRow) {
             for ($row = $dataStartRow; $row <= $lastDataRow; $row++) {
                 $fillColor = $row % 2 == 0 ? 'FFFFFF' : 'F8F9FA';
-                $sheet->getStyle("A{$row}:I{$row}")->applyFromArray([
+                // FIX 2: Badilisha I kuwa J
+                $sheet->getStyle("A{$row}:J{$row}")->applyFromArray([
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                         'startColor' => ['rgb' => $fillColor]
@@ -529,21 +531,42 @@ class OtherStaffsController extends Controller
                 ]);
             }
 
-            // Alignment
+            // Alignment - Adjust for all columns
             $sheet->getStyle("A{$dataStartRow}:A{$lastDataRow}")
                 ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
             $sheet->getStyle("B{$dataStartRow}:B{$lastDataRow}")
                 ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
             $sheet->getStyle("C{$dataStartRow}:C{$lastDataRow}")
                 ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle("F{$dataStartRow}:F{$lastDataRow}")
-                ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle("I{$dataStartRow}:I{$lastDataRow}")
+
+            // FIX 3: Address column is now J (Status moved from I to J)
+            // Add alignment for other columns as needed
+            $sheet->getStyle("D{$dataStartRow}:D{$lastDataRow}")
                 ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
-            // Status column coloring
+            $sheet->getStyle("E{$dataStartRow}:E{$lastDataRow}")
+                ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+            $sheet->getStyle("F{$dataStartRow}:F{$lastDataRow}")
+                ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+            $sheet->getStyle("G{$dataStartRow}:G{$lastDataRow}")
+                ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+            $sheet->getStyle("H{$dataStartRow}:H{$lastDataRow}")
+                ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+            $sheet->getStyle("I{$dataStartRow}:I{$lastDataRow}")
+                ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT); // Address
+
+            $sheet->getStyle("J{$dataStartRow}:J{$lastDataRow}")
+                ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER); // Status
+
+            // Status column coloring - FIX 4: Now column J
             for ($row = $dataStartRow; $row <= $lastDataRow; $row++) {
-                $status = strtolower(trim($sheet->getCell("I{$row}")->getValue() ?? ''));
+                $status = strtolower(trim($sheet->getCell("J{$row}")->getValue() ?? '')); // Changed from I to J
                 $statusColor = match (true) {
                     in_array($status, ['active', 'approved', 'success', 'completed']) => '27AE60', // green
                     in_array($status, ['pending', 'processing']) => 'F39C12', // orange
@@ -551,13 +574,13 @@ class OtherStaffsController extends Controller
                     default => '000000'
                 };
 
-                $sheet->getStyle("I{$row}")->applyFromArray([
+                $sheet->getStyle("J{$row}")->applyFromArray([ // Changed from I to J
                     'font' => ['bold' => true, 'color' => ['rgb' => $statusColor]]
                 ]);
             }
 
-            // Outline border
-            $sheet->getStyle("A{$headerRow}:I{$lastDataRow}")->applyFromArray([
+            // Outline border - FIX 5: Badilisha I kuwa J
+            $sheet->getStyle("A{$headerRow}:J{$lastDataRow}")->applyFromArray([
                 'borders' => [
                     'outline' => [
                         'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM,
@@ -568,17 +591,18 @@ class OtherStaffsController extends Controller
         }
 
         // =========================
-        //  COLUMN WIDTHS
+        //  COLUMN WIDTHS - FIX 6: Add column J
         // =========================
-        $sheet->getColumnDimension('A')->setWidth(6);
-        $sheet->getColumnDimension('B')->setWidth(20);
-        $sheet->getColumnDimension('C')->setWidth(10);
-        $sheet->getColumnDimension('D')->setWidth(15);
-        $sheet->getColumnDimension('E')->setWidth(25);
-        $sheet->getColumnDimension('F')->setWidth(18);
-        $sheet->getColumnDimension('G')->setWidth(14);
-        $sheet->getColumnDimension('H')->setWidth(20);
-        $sheet->getColumnDimension('I')->setWidth(12);
+        $sheet->getColumnDimension('A')->setWidth(6);    // #
+        $sheet->getColumnDimension('B')->setWidth(20);   // NIN
+        $sheet->getColumnDimension('C')->setWidth(25);   // Full Name
+        $sheet->getColumnDimension('D')->setWidth(10);   // Gender
+        $sheet->getColumnDimension('E')->setWidth(15);   // Phone
+        $sheet->getColumnDimension('F')->setWidth(25);   // Email
+        $sheet->getColumnDimension('G')->setWidth(18);   // Job Title
+        $sheet->getColumnDimension('H')->setWidth(14);   // DoB
+        $sheet->getColumnDimension('I')->setWidth(20);   // Address
+        $sheet->getColumnDimension('J')->setWidth(12);   // Status - ADD THIS LINE
 
         // Freeze header row
         $sheet->freezePane('A' . $dataStartRow);
