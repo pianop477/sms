@@ -177,9 +177,11 @@
                             <div class="col-md-4">
                                 <div class="d-flex justify-content-end gap-2 flex-wrap">
                                     @if ($students->isNotEmpty())
+                                    @if (auth()->user()->usertype != 5)
                                     <button type="button" class="btn btn-info btn-xs mr-1" data-bs-toggle="modal" data-bs-target="#promoteModal">
                                         <i class="fas fa-exchange-alt me-1"></i> Promote
                                     </button>
+                                    @endif
                                     <div class="dropdown">
                                         <button class="btn btn-primary btn-xs btn-action dropdown-toggle mr-1" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                             <i class="fas fa-cloud-arrow-down me-1"></i> Export
@@ -201,9 +203,11 @@
                                     <a href="{{route('classes.list', ['class' => Hashids::encode($classId->id)])}}" class="btn btn-secondary btn-xs mr-1">
                                         <i class="fas fa-arrow-circle-left me-1"></i> Back
                                     </a>
+                                    @if (auth()->user()->usertype != 5)
                                     <button type="button" class="btn btn-success btn-xs mr-1" data-bs-toggle="modal" data-bs-target="#addStudentModal">
                                         <i class="fas fa-plus-circle me-1"></i> New
                                     </button>
+                                    @endif
                                 </div>
                             </div>
                         </div>
