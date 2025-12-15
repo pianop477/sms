@@ -299,9 +299,9 @@
                 <div class="chart-container">
                     <div class="chart-header">
                         <h5 class="chart-title">
-                            <i class="fas fa-chart-bar me-2"></i> Recent Expense Bills Trend
+                            <i class="fas fa-chart-bar me-2"></i> Recent Expense Transactions Trend
                         </h5>
-                        <p class="chart-subtitle">Last 7 days Expenses bills</p>
+                        <p class="chart-subtitle">Last 7 days Expenses transactions</p>
                     </div>
                     <div class="chart-wrapper">
                         <canvas id="recentTransactionsChart"></canvas>
@@ -367,7 +367,7 @@
             <div class="card-body">
                 <div class="row mb-3">
                     <div class="col-md-8">
-                        <h4 class="header-title mb-0">Recent Expense Bills</h4>
+                        <h4 class="header-title mb-0">Recent Expense Transactions</h4>
                     </div>
                     <div class="col-md-2">
                         <button type="button" class="btn btn-info btn-action btn-sm" data-bs-toggle="modal" data-bs-target="#addTeacherModal">

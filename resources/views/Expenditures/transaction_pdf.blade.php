@@ -285,7 +285,7 @@
 
     <!-- Report Title -->
     <div class="report-title">
-        <h1>EXPENSE BILL REPORT</h1>
+        <h1>EXPENSE TRANSACTION REPORT</h1>
         <div class="report-period">
             Reporting Period: {{ \Carbon\Carbon::parse($start_date)->format('d M Y') }} - {{ \Carbon\Carbon::parse($end_date)->format('d M Y') }}
         </div>

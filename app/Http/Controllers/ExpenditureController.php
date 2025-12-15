@@ -308,7 +308,7 @@ class ExpenditureController extends Controller
         $school = school::find($school_id);
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Financial Report');
+        $sheet->setTitle('Expenses Transaction Report');
 
         // =========================
         //  PROFESSIONAL HEADER SECTION
@@ -352,7 +352,7 @@ class ExpenditureController extends Controller
         // Report Title - Row 4
         $titleRow = $addressRow + 1;
         $sheet->mergeCells('A'.$titleRow.':H'.$titleRow);
-        $sheet->setCellValue('A'.$titleRow, "FINANCIAL EXPENSE REPORT");
+        $sheet->setCellValue('A'.$titleRow, "EXPENSE TRANSACTIONS REPORT");
         $sheet->getStyle('A'.$titleRow)->applyFromArray([
             'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '2C3E50']],
             'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
@@ -370,7 +370,7 @@ class ExpenditureController extends Controller
         // Report Summary - Row 6
         $summaryRow = $periodRow + 1;
         $sheet->mergeCells('A'.$summaryRow.':H'.$summaryRow);
-        $sheet->setCellValue('A'.$summaryRow, "Total Expenses Bills Count: " . count($transactions) . " | Generated at: " . \Carbon\Carbon::now()->format('d M Y H:i'));
+        $sheet->setCellValue('A'.$summaryRow, "Total Expenses Count: " . count($transactions) . " | Generated at: " . \Carbon\Carbon::now()->format('d M Y H:i'));
         $sheet->getStyle('A'.$summaryRow)->applyFromArray([
             'font' => ['size' => 10, 'color' => ['rgb' => '2C3E50']],
             'fill' => [

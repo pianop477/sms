@@ -39,7 +39,7 @@
                         @if ($row->status == 'active')
                             <span class="badge bg-primary text-white">{{ strtoupper($row->status) }}</span>
                         @elseif ($row->status == 'cancelled')
-                            <span class="badge bg-warning text-white">{{ strtoupper($row->status) }}</span>
+                            <span class="badge bg-warning text-primary">{{ strtoupper($row->status) }}</span>
                         @elseif ($row->status == 'expired')
                             <span class="badge bg-danger text-white">{{ strtoupper($row->status) }}</span>
                         @elseif ($row->status == 'full paid')
@@ -75,15 +75,17 @@
                                     </a>
                                 </li>
                                 @endif
-                                <li>
-                                    <form action="{{route('bills.resend', ['bill' => Hashids::encode($row->id)])}}" class="dropdown-item" method="POST">
-                                        @csrf
-                                        <button type="submit" class="btn p-1 m-0 text-sm" onclick="return confirm('Are you sure you want to resend this bill?')">
-                                            <i class="fas fa-refresh text-success"></i>
-                                            Resend SMS
-                                        </button>
-                                    </form>
-                                </li>
+                                @if ($row->status == 'active')
+                                    <li>
+                                        <form action="{{route('bills.resend', ['bill' => Hashids::encode($row->id)])}}" class="dropdown-item" method="POST">
+                                            @csrf
+                                            <button type="submit" class="btn p-1 m-0 text-sm" onclick="return confirm('Are you sure you want to resend this bill?')">
+                                                <i class="fas fa-refresh text-success"></i>
+                                                Resend SMS
+                                            </button>
+                                        </form>
+                                    </li>
+                                @endif
                             </ul>
                         </div>
                     </td>
@@ -243,7 +245,15 @@
                                     <div>
                                         <h6 class="mb-1 text-dark text-capitalize">${response.bill.student_first_name} ${response.bill.student_middle_name} ${response.bill.student_last_name} - ${response.bill.class_code.toUpperCase()}</h6>
                                     </div>
-                                    <span class="text-white badge bg-${response.bill.status === 'active' ? 'primary' : response.bill.status === 'cancelled' ? 'warning' : 'success'}">
+                                    <span class="
+                                        badge
+                                        bg-${response.bill.status === 'active'
+                                            ? 'primary'
+                                            : response.bill.status === 'cancelled'
+                                            ? 'warning'
+                                            : 'success'}
+                                        ${response.bill.status === 'cancelled' ? 'text-primary' : 'text-white'}
+                                    ">
                                         ${response.bill.status.toUpperCase()}
                                     </span>
                                 </div>

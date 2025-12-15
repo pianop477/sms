@@ -291,9 +291,9 @@
             <div class="card-header-custom">
                 <div class="row align-items-center">
                     <div class="col-md-10">
-                        <h4 class="header-title">
+                        <h4 class="header-title" style="color:gold">
                             <i class="fas fa-chart-line me-2"></i>
-                            BILL REPORT
+                            Expense Transactions
                         </h4>
                     </div>
                     <div class="col-md-2">
@@ -324,7 +324,7 @@
                                 <div class="year-icon">
                                     <i class="fas fa-calendar-star"></i>
                                 </div>
-                                <h5>{{ $year }} Expense Bills</h5>
+                                <h5>{{ $year }} Expense</h5>
                                 <a href="{{route('expenditure.previous.transactions', ['year' => $year])}}" class="btn-view pulse-animation">
                                     <i class="fas fa-eye me-2"></i> View Bills
                                 </a>

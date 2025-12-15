@@ -159,7 +159,7 @@
                         <!-- Header Section -->
                         <div class="row mb-4">
                             <div class="col-md-10">
-                                <h4 class="header-title">registered Expense Bills on - {{\Carbon\Carbon::now()->format('d-m-Y')}}</h4>
+                                <h4 class="header-title">Registered Expense Transactions on - {{\Carbon\Carbon::now()->format('d-m-Y')}}</h4>
                             </div>
                             <div class="col-md-2">
                                 <div class="d-flex justify-content-end gap-2 flex-wrap">

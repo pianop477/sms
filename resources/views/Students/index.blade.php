@@ -344,7 +344,8 @@
                                                     </a>
 
                                                     <!-- DELETE FORM OUTSIDE BATCH FORM -->
-                                                    <form method="POST"
+                                                    @if (auth()->user()->usertype != 5)
+                                                        <form method="POST"
                                                         action="{{ route('Students.destroy', ['student' => Hashids::encode($student->id)]) }}"
                                                         style="display:inline;">
                                                         @csrf
@@ -354,6 +355,7 @@
                                                             <i class="ti-trash"></i>
                                                         </button>
                                                     </form>
+                                                    @endif
                                                 </div>
                                             </td>
 

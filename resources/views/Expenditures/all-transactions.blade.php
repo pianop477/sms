@@ -423,9 +423,9 @@
                         <div class="row mb-4 align-items-center">
                             <div class="col-md-8">
                                 <h4 class="header-title">
-                                    <i class="fas fa-receipt me-3"></i> This Month Expense Bills
+                                    <i class="fas fa-receipt me-3"></i> Expenses Transaction Report
                                 </h4>
-                                <p class="text-muted mb-0">Overview Financial Report <span class="text-primary" style="font-weight: bold">(This Month - {{\Carbon\Carbon::now()->format('F')}})</span></p>
+                                <p class="text-muted mb-0">Overview Financial Report for this Month<span class="text-primary" style="font-weight: bold">(This Month - {{\Carbon\Carbon::now()->format('F')}})</span></p>
                             </div>
                             <div class="col-md-4 text-end">
                                 <div class="d-flex gap-2 justify-content-end">

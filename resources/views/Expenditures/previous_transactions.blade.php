@@ -423,7 +423,7 @@
                         <div class="row mb-4 align-items-center">
                             <div class="col-md-8">
                                 <h4 class="header-title">
-                                    <i class="fas fa-receipt me-3"></i> All Expense Billed for year {{$year}}
+                                    <i class="fas fa-receipt me-3"></i> All Expense Transactions for year {{$year}}
                                 </h4>
                                 <p class="text-muted mb-0">Overview Financial Report</p>
                             </div>

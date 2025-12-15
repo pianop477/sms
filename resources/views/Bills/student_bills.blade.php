@@ -320,7 +320,7 @@
                                                 @if ($record['status'] == 'active')
                                                     <span class="badge bg-primary text-white">{{strtoupper($record['status'])}}</span>
                                                 @elseif ($record['status'] == 'cancelled')
-                                                    <span class="badge bg-warning text-white">{{strtoupper($record['status'])}}</span>
+                                                    <span class="badge bg-warning text-primary">{{strtoupper($record['status'])}}</span>
                                                 @elseif ($record['status'] =='expired')
                                                     <span class="badge bg-danger text-white">{{strtoupper($record['status'])}}</span>
                                                 @else

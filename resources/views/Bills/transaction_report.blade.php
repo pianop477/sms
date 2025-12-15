@@ -423,7 +423,7 @@
                         <div class="row mb-4 align-items-center">
                             <div class="col-md-8">
                                 <h4 class="header-title">
-                                    <i class="fas fa-coins me-3"></i> Transaction Report
+                                    <i class="fas fa-coins me-3"></i> Income Transaction Report
                                 </h4>
                                 <p class="text-muted mb-0">Overview Transaction Report </p>
                             </div>

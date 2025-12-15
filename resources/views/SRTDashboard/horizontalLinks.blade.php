@@ -204,7 +204,7 @@
                                 <a href="javascript:void(0)"><i class="fas fa-chart-pie"></i><span>Reports & Analytics</span></a>
                                 <ul class="submenu">
                                     <li><a href="{{route('expenditure.all.transactions')}}"><i class="fas fa-sack-dollar"></i> Expenses</a></li>
-                                    <li><a href="{{route('payment.report')}}"><i class="fas fa-money-check-dollar"></i> School Fees</a></li>
+                                    <li><a href="{{route('payment.report')}}"><i class="fas fa-money-check-dollar"></i> Income</a></li>
                                 </ul>
                             </li>
                         @endif
