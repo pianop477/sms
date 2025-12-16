@@ -81,13 +81,6 @@ class BillsController extends Controller
             )
             ->where('school_fees.school_id', $user->school_id);
 
-        // Debug: Check what's coming in request
-        // \Log::info('Request data:', [
-        //     'search' => $request->search,
-        //     'year' => $request->year,
-        //     'ajax' => $request->ajax()
-        // ]);
-
         // Search functionality
         if ($request->has('search') && !empty($request->search)) {
             $searchTerm = $request->search;
@@ -107,27 +100,32 @@ class BillsController extends Controller
         $currentYear = date('Y');
         $selectedYear = $request->get('year', session('selected_year', $currentYear));
 
-        // Debug: Check selected year
-        // \Log::info('Selected year:', ['selected' => $selectedYear]);
 
         // Apply year filter
         if (!empty($selectedYear)) {
             $query->where('school_fees.academic_year', 'LIKE', "%{$selectedYear}%");
         }
 
-        // Order by - Priority Sorting
-        $query->orderByRaw("
-            COALESCE(
-                (SELECT MAX(approved_at) FROM school_fees_payments WHERE student_fee_id = school_fees.id),
-                school_fees.cancelled_at,
-                school_fees.updated_at,
-                school_fees.created_at
-            ) DESC
-        ");
+        $latestBills = DB::table('school_fees')
+            ->select('id')
+            ->where('school_id', $user->school_id)
+            ->when($selectedYear, function ($q) use ($selectedYear) {
+                $q->where('academic_year', 'LIKE', "%{$selectedYear}%");
+            })
+            ->orderByRaw("
+                COALESCE(
+                    (SELECT MAX(approved_at) FROM school_fees_payments WHERE student_fee_id = school_fees.id),
+                    cancelled_at,
+                    updated_at,
+                    created_at
+                ) DESC
+            ")
+            ->limit(20);
 
-        // Debug: Get SQL query
-        // $sql = $query->toSql();
-        // \Log::info('SQL Query:', ['sql' => $sql]);
+        // JOIN subquery (MariaDB safe)
+        $query->joinSub($latestBills, 'latest_bills', function ($join) {
+            $join->on('school_fees.id', '=', 'latest_bills.id');
+        });
 
         // Pagination
         $bills = $query->paginate(10);
@@ -145,9 +143,6 @@ class BillsController extends Controller
             return $bills;
         }
 
-        // Debug: Check bills data
-        // \Log::info('Bills count:', ['count' => $bills->count()]);
-
         try {
             return response()->json([
                 'success' => true,
@@ -157,13 +152,6 @@ class BillsController extends Controller
                 'selectedYear' => $selectedYear
             ]);
         } catch (\Exception $e) {
-            // Debug: Log error
-            // \Log::error('Error rendering views:', [
-            //     'message' => $e->getMessage(),
-            //     'file' => $e->getFile(),
-            //     'line' => $e->getLine()
-            // ]);
-
             return response()->json([
                 'success' => false,
                 'message' => 'Error loading data: ' . $e->getMessage()
@@ -258,7 +246,12 @@ class BillsController extends Controller
     public function feesPayment(Request $request)
     {
         $currentYear = Carbon::now()->year;
-        $selectedYear = $request->get('year', $currentYear);
+
+        if ($request->filled('year')) {
+            session(['selected_year' => $request->year]);
+        }
+
+        $selectedYear = session('selected_year', $currentYear);
 
         $query = school_fees_payment::query()
             ->join('school_fees', 'school_fees.id', '=', 'school_fees_payments.student_fee_id')
@@ -280,41 +273,57 @@ class BillsController extends Controller
                 DB::raw('CONCAT(approver_users.first_name, " ", approver_users.last_name) as approver_name')
             );
 
-        // Year filter functionality
+        // Year filter
         if ($request->has('year') && !empty($request->year)) {
             $query->where('school_fees.academic_year', $request->year);
         } else {
-            // Default to current year if no year is selected
             $query->where('school_fees.academic_year', $currentYear);
         }
 
-        // Search functionality
+        // Search
         if ($request->has('search') && !empty($request->search)) {
             $searchTerm = $request->search;
-            $query->where(function($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm) {
                 $q->where('school_fees.control_number', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('students.first_name', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('students.middle_name', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('students.last_name', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('grades.class_code', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('parent_users.phone', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('school_fees.academic_year', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('school_fees_payments.amount', 'LIKE', "%{$searchTerm}%")
-                ->orWhere(DB::raw('CONCAT(approver_users.first_name, " ", approver_users.last_name)'), 'LIKE', "%{$searchTerm}%");
+                    ->orWhere('students.first_name', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('students.middle_name', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('students.last_name', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('grades.class_code', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('parent_users.phone', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('school_fees.academic_year', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('school_fees_payments.amount', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere(
+                        DB::raw('CONCAT(approver_users.first_name, " ", approver_users.last_name)'),
+                        'LIKE',
+                        "%{$searchTerm}%"
+                    );
             });
         }
 
-        // Order by
-        $query->orderByRaw('school_fees_payments.created_at DESC, school_fees_payments.approved_at IS NULL, school_fees_payments.approved_at DESC');
+        $latestPayments = DB::table('school_fees_payments')
+            ->select('school_fees_payments.id')
+            ->join('school_fees', 'school_fees.id', '=', 'school_fees_payments.student_fee_id')
+            ->where('school_fees.academic_year', $selectedYear ?? $currentYear)
+            ->orderBy('school_fees_payments.created_at', 'DESC')
+            ->limit(20);
 
-        // Pagination
+        // JOIN subquery (MariaDB safe)
+        $query->joinSub($latestPayments, 'latest_payments', function ($join) {
+            $join->on('school_fees_payments.id', '=', 'latest_payments.id');
+        });
+
         $transactions = $query->paginate(10);
 
-        // Get only students who have bills in school_fees
+        // Students with bills
         $studentIds = school_fees::distinct()->pluck('student_id')->toArray();
         $students = Student::whereIn('id', $studentIds)->orderBy('first_name')->get();
 
-        return view('Bills.transaction', compact('transactions', 'students', 'selectedYear', 'currentYear'));
+        return view('Bills.transaction', compact(
+            'transactions',
+            'students',
+            'selectedYear',
+            'currentYear'
+        ));
     }
 
     // ADD THIS NEW METHOD FOR AJAX
@@ -389,16 +398,46 @@ class BillsController extends Controller
 
     public function paymentReport(Request $request)
     {
-        $year   = $request->input('year', date('Y'));
+        if ($request->filled('year')) {
+            session(['selected_year' => $request->input('year')]);
+        }
+
+        $year = session('selected_year', date('Y'));
+
         $search = $request->input('search');
 
-        $classes = Grade::where('school_id', Auth::user()->school_id)->orderBy('class_name')->get();
+        $classes = Grade::where('school_id', Auth::user()->school_id)
+            ->orderBy('class_name')
+            ->get();
 
-        // Fetch ALL records (raw)
+        /*
+        |--------------------------------------------------------------------------
+        | SUBQUERY: latest 20 control numbers (MariaDB safe)
+        |--------------------------------------------------------------------------
+        */
+        $latestControls = DB::table('school_fees_payments')
+            ->join('school_fees', 'school_fees.id', '=', 'school_fees_payments.student_fee_id')
+            ->select('school_fees.control_number')
+            ->when($year, fn ($q) => $q->where('school_fees.academic_year', $year))
+            ->when($search, function ($q) use ($search) {
+                $q->where('school_fees.control_number', 'LIKE', "%{$search}%");
+            })
+            ->groupBy('school_fees.control_number')
+            ->orderByRaw('MAX(school_fees_payments.approved_at) DESC')
+            ->limit(20);
+
+        /*
+        |--------------------------------------------------------------------------
+        | FETCH RAW PAYMENTS (ONLY latest 20 control numbers)
+        |--------------------------------------------------------------------------
+        */
         $raw = school_fees_payment::query()
             ->join('school_fees', 'school_fees.id', '=', 'school_fees_payments.student_fee_id')
             ->join('students', 'students.id', '=', 'school_fees_payments.student_id')
             ->join('grades', 'grades.id', '=', 'students.class_id')
+            ->joinSub($latestControls, 'latest_controls', function ($join) {
+                $join->on('school_fees.control_number', '=', 'latest_controls.control_number');
+            })
             ->select(
                 'school_fees_payments.*',
                 'school_fees.control_number',
@@ -410,31 +449,40 @@ class BillsController extends Controller
                 'students.last_name',
                 'grades.class_code'
             )
-            ->when($year, fn($q) => $q->where('school_fees.academic_year', $year))
-            ->when($search, function ($q) use ($search) {
-                $q->where(function ($x) use ($search) {
-                    $x->where('school_fees.control_number', 'LIKE', "%{$search}%")
-                    ->orWhereRaw("CONCAT(students.first_name,' ',students.last_name) LIKE ?", ["%{$search}%"]);
-                });
-            })
             ->orderBy('school_fees_payments.approved_at', 'desc')
             ->get();
 
-        // ===== SUMMARY SECTION - DIRECT FROM DATABASE =====
+        /*
+        |--------------------------------------------------------------------------
+        | SUMMARY SECTION (DIRECT FROM DB)
+        |--------------------------------------------------------------------------
+        */
         $billsQuery = school_fees::query()
-            ->when($year, fn($q) => $q->where('academic_year', $year))
+            ->when($year, fn ($q) => $q->where('academic_year', $year))
             ->when($search, function ($q) use ($search) {
                 $q->where('control_number', 'LIKE', "%{$search}%");
             });
 
-        $totalActiveBills = (clone $billsQuery)->whereIn('status', ['active', 'full paid', 'overpaid'])->sum('amount');
-        $totalCancelledBills = (clone $billsQuery)->where('status', 'cancelled')->sum('amount');
-        $totalCancelledCount = (clone $billsQuery)->where('status', 'cancelled')->count();
+        $totalActiveBills = (clone $billsQuery)
+            ->whereIn('status', ['active', 'full paid', 'overpaid'])
+            ->sum('amount');
 
-        // Total paid from payments table with filters applied
+        $totalCancelledBills = (clone $billsQuery)
+            ->where('status', 'cancelled')
+            ->sum('amount');
+
+        $totalCancelledCount = (clone $billsQuery)
+            ->where('status', 'cancelled')
+            ->count();
+
+        // Total paid from payments table (already filtered)
         $totalPaid = $raw->sum('amount');
 
-        // ===== GROUP BY CONTROL NUMBER (UNIQUE BILLS) =====
+        /*
+        |--------------------------------------------------------------------------
+        | GROUP BY CONTROL NUMBER
+        |--------------------------------------------------------------------------
+        */
         $grouped = $raw->groupBy('control_number')->map(function ($rows) {
             $first = $rows->first();
             $latestPayment = $rows->sortByDesc('approved_at')->first();
@@ -448,10 +496,11 @@ class BillsController extends Controller
                 'middle_name' => $first->middle_name,
                 'last_name' => $first->last_name,
                 'class_code' => $first->class_code,
+
                 'approved_at' => $latestPayment->approved_at,
                 'approved_by' => $latestPayment->approved_by,
 
-                // Calculations per control number
+                // Calculations
                 'total_paid' => $rows->sum('amount'),
                 'billed_amount' => $first->billed_amount,
                 'last_payment_date' => $rows->max('approved_at'),
@@ -459,10 +508,15 @@ class BillsController extends Controller
             ];
         })->values();
 
-        // ===== MANUAL PAGINATION =====
+        /*
+        |--------------------------------------------------------------------------
+        | MANUAL PAGINATION (10 per page → 2 pages)
+        |--------------------------------------------------------------------------
+        */
         $perPage = 10;
-        $page = LengthAwarePaginator::resolveCurrentPage();
-        $total = $grouped->count();
+        $page    = LengthAwarePaginator::resolveCurrentPage();
+        $total   = $grouped->count();
+
         $results = $grouped->forPage($page, $perPage);
 
         $transactions = new LengthAwarePaginator(
@@ -471,24 +525,28 @@ class BillsController extends Controller
             $perPage,
             $page,
             [
-                'path' => LengthAwarePaginator::resolveCurrentPath(),
+                'path'  => LengthAwarePaginator::resolveCurrentPath(),
                 'query' => $request->query(),
             ]
         );
 
         $services = payment_service::orderBy('service_name')->get();
-        // return $services;
 
         return view(
             'Bills.transaction_report',
             compact(
-                'transactions', 'year',
-                'totalActiveBills', 'totalPaid',
-                'totalCancelledBills', 'totalCancelledCount',
-                'services', 'classes'
+                'transactions',
+                'year',
+                'totalActiveBills',
+                'totalPaid',
+                'totalCancelledBills',
+                'totalCancelledCount',
+                'services',
+                'classes'
             )
         );
     }
+
 
    public function viewBill($billId)
     {
@@ -1346,13 +1404,18 @@ class BillsController extends Controller
         return response()->download($temp_file, $filename)->deleteFileAfterSend(true);
     }
 
-    public function parentPaymentHistory($student)
+    public function parentPaymentHistory($student, Request $request)
     {
         $decoded = Hashids::decode($student);
         $user = Auth::user();
         $students = Student::find($decoded[0]);
         $currentYear = date('Y');
-        $selectedYear = request('year', $currentYear);
+
+        if ($request->filled('year')) {
+            session(['selected_year' => $request->year]);
+        }
+
+        $selectedYear = session('selected_year', $currentYear);
 
         // Get bills for the selected student
         $billsQuery = DB::table('school_fees')

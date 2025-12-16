@@ -236,11 +236,11 @@
                                     <i class="fas fa-user-graduate me-1"></i> Profile
                                 </a>
                             </li>
-                            <li class="nav-item flex-fill text-center">
+                            {{-- <li class="nav-item flex-fill text-center">
                                 <a class="nav-link" href="#parents" data-bs-toggle="tab">
                                     <i class="fas fa-user-shield me-1"></i> Parent
                                 </a>
-                            </li>
+                            </li> --}}
                             <li class="nav-item flex-fill text-center">
                                 <a class="nav-link" href="#subjects" data-bs-toggle="tab">
                                     <i class="ti-book me-1"></i> Subjects
@@ -265,7 +265,7 @@
                             @endif
                             <li class="nav-item flex-fill text-center">
                                 <a class="nav-link" href="#package" data-bs-toggle="tab">
-                                    <i class="fas fa-file-archive-o me-1"></i> Packages
+                                    <i class="fas fa-layer-group me-1"></i> Packages
                                 </a>
                             </li>
                             <li class="nav-item flex-fill text-center">
@@ -421,12 +421,12 @@
                                                         <div class="d-flex align-items-center">
                                                             @php
                                                                 $imageName = $course->image ?? '';
-                                                                $imagePath = public_path('assets/img/profile/' . $imageName);
+                                                                $imagePath = storage_path('app/public/profile/' . $imageName);
 
                                                                 if (!empty($imageName) && file_exists($imagePath)) {
-                                                                    $avatarImage = asset('assets/img/profile/' . $imageName);
+                                                                    $avatarImage = asset('storage/profile/' . $imageName);
                                                                 } else {
-                                                                    $avatarImage = asset('assets/img/profile/' . ($course->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                                                    $avatarImage = asset('storage/profile/' . ($course->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
                                                                 }
                                                             @endphp
                                                                 <img src="{{ $avatarImage }}"
@@ -462,12 +462,12 @@
                                             <div class="col-md-3 text-center">
                                                 @php
                                                     $imageName = $classTeacher->image ?? '';
-                                                    $imagePath = public_path('assets/img/profile/' . $imageName);
+                                                    $imagePath = storage_path('app/public/profile/' . $imageName);
 
                                                     if (!empty($imageName) && file_exists($imagePath)) {
-                                                        $avatarImage = asset('assets/img/profile/' . $imageName);
+                                                        $avatarImage = asset('storage/profile/' . $imageName);
                                                     } else {
-                                                        $avatarImage = asset('assets/img/profile/' . ($classTeacher->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                                        $avatarImage = asset('storage/profile/' . ($classTeacher->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
                                                     }
                                                 @endphp
                                                     <img src="{{ $avatarImage }}"

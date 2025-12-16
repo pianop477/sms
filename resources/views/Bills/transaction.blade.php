@@ -198,7 +198,8 @@
                                             $currentYear  = (int) date('Y');
                                             $start        = 2024;
                                             $end          = $currentYear + 1; // mwaka mmoja mbele
-                                            $selectedYear = (int) request('year', $currentYear);
+                                            // $selectedYear = (int) request('year', $currentYear);
+                                            $selectedYear = (int) session('selected_year', $currentYear);
                                         @endphp
 
                                         <select name="year" id="selectYear" class="form-control-custom" onchange="this.form.submit()">
@@ -215,8 +216,8 @@
                                 <div class="col-md-4">
                                     <form method="GET" action="{{ url()->current() }}" data-no-preloader>
                                         <!-- Hidden field to preserve year parameter -->
-                                        @if(request('year'))
-                                            <input type="hidden" name="year" value="{{ request('year') }}">
+                                        @if(session('selected_year'))
+                                            <input type="hidden" name="year" value="{{ session('selected_year') }}">
                                         @endif
 
                                         <div class="input-group">
@@ -361,6 +362,17 @@
             border: 1px solid #ced4da;
             color: #212529;
             font-weight: bold
+        }
+
+        .opacity-50 {
+            opacity: 0.5;
+        }
+        #loadingSpinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
         }
     </style>
 
@@ -519,17 +531,4 @@
             });
         });
     </script>
-    <style>
-        .opacity-50 {
-            opacity: 0.5;
-        }
-        #loadingSpinner {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1000;
-        }
-    </style>
-
 @endsection

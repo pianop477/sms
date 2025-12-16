@@ -30,7 +30,12 @@ class paymentBatchController extends Controller
 
     public function index(Request $request)
     {
-        $year   = $request->input('year', date('Y'));
+        if ($request->filled('year')) {
+            session(['selected_year' => $request->input('year')]);
+        }
+
+        $year = session('selected_year', date('Y'));
+
         $batch = school_fees_batches::when($year, fn($q) => $q->where('school_fees_batches.year', $year))
                                     ->orderBy('created_at')->get();
         return view('payment_batches.batch_index', compact('batch'));

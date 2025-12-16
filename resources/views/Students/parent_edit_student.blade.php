@@ -152,7 +152,7 @@
                                 <img src="{{ $avatarImage }}" alt="Student Image">
                             </div>
                             <div class="mt-3 text-center">
-                                <h5 class="mb-0 text-uppercase" style="color:gold">{{ $students->first_name }} {{ $students->last_name }}</h5>
+                                <h5 class="mb-0 text-uppercase" style="">{{ $students->first_name }} {{ $students->last_name }}</h5>
                                 <p class="text-muted text-uppercase">Admission No: {{ $students->admission_number }}</p>
                             </div>
                         </div>

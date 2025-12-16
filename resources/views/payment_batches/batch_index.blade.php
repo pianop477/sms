@@ -196,7 +196,7 @@
                                             $currentYear  = (int) date('Y');
                                             $start        = 2024;
                                             $end          = $currentYear + 1; // mwaka mmoja mbele
-                                            $selectedYear = (int) request('year', $currentYear);
+                                            $selectedYear = (int) session('selected_year', $currentYear);
                                         @endphp
 
                                         <select name="year" id="selectYear" class="form-control-custom" onchange="this.form.submit()">
