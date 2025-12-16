@@ -151,6 +151,19 @@ class BillsController extends Controller
                 ? $request->input('control_number')
                 : $this->generateControlNumber();
 
+            // Check existing control number status
+            $existingBill = school_fees::where('control_number', $controlNumber)
+                                ->whereIn('status', ['active', 'full_paid', 'overpaid', 'expired'])
+                                ->first();
+
+            if ($existingBill) {
+                Alert()->toast(
+                    'Control number already exists and has an active or completed bill',
+                    'error'
+                );
+                return back();
+            }
+
             $bills = school_fees::create([
                 'student_id'     => $request->input('student_name'),
                 'service_id'     => $request->input('service'),
@@ -292,14 +305,11 @@ class BillsController extends Controller
 
         try {
             // verify control number
-            $controlNumber = school_fees::where('control_number', $request->control_number)->first();
+            $controlNumber = school_fees::where('control_number', $request->control_number)
+                    ->whereIn('status', ['active', 'full paid', 'overpaid'])
+                    ->first();
 
             if (!$controlNumber) {
-                Alert()->toast('Invalid control number is provided, please check it out', 'error');
-                return back();
-            }
-
-            if ($controlNumber->status !== 'active') {
                 Alert()->toast('Control number is either invalid or expired', 'error');
                 return back();
             }

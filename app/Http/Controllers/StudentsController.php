@@ -1439,8 +1439,8 @@ class StudentsController extends Controller
                     'group' => $s->group ?? 'N/A',
                     'phone' => $s->parent_phone ?? 'N/A',
                     'image_url' => $s->image && file_exists(storage_path("app/public/students/{$s->image}"))
-                        ? asset("assets/img/students/{$s->image}")
-                        : asset("assets/img/students/student.jpg"),
+                        ? asset("storage/students/{$s->image}")
+                        : asset("storage/students/student.jpg"),
                 ];
             });
 
