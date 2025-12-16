@@ -371,7 +371,7 @@ class BillsController extends Controller
                 $q->where('control_number', 'LIKE', "%{$search}%");
             });
 
-        $totalActiveBills = (clone $billsQuery)->where('status', 'active')->sum('amount');
+        $totalActiveBills = (clone $billsQuery)->whereIn('status', ['active', 'full paid', 'overpaid'])->sum('amount');
         $totalCancelledBills = (clone $billsQuery)->where('status', 'cancelled')->sum('amount');
         $totalCancelledCount = (clone $billsQuery)->where('status', 'cancelled')->count();
 
