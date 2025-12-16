@@ -189,27 +189,20 @@
                             <!-- Search Form -->
                             <div class="row mb-3">
                                 <div class="col-md-2 mb-3">
-                                    <form method="GET" action="{{ url()->current() }}">
-                                        <!-- Hidden fields to preserve search parameter -->
-                                        @if(request('search'))
-                                            <input type="hidden" name="search" value="{{ request('search') }}">
-                                        @endif
-
-                                        <select name="year" id="selectYear" class="form-control-custom" onchange="this.form.submit()">
-                                            <option value="">-- Filter by Year --</option>
-                                            @php
-                                                $current = (int) date('Y');
-                                                $start   = 2024;
-                                                $end     = $current + 1; // mwaka mmoja mbele
-                                            @endphp
-                                            @for ($y = $end; $y >= $start; $y--)
-                                                <option value="{{ $y }}" {{ ($selectedYear ?? '') == $y ? 'selected' : '' }}>
-                                                    {{ $y }}
-                                                </option>
-                                            @endfor
-
-                                        </select>
-                                    </form>
+                                    <select id="yearFilter" name="year" class="form-control-custom">
+                                        <option value="">-- Filter by Year --</option>
+                                        @php
+                                            $current = (int) date('Y');
+                                            $start   = 2024;
+                                            $end     = $current + 1;
+                                            $selectedYear = session('selected_year', date('Y'));
+                                        @endphp
+                                        @for ($y = $end; $y >= $start; $y--)
+                                            <option value="{{ $y }}" {{ $selectedYear == $y ? 'selected' : '' }}>
+                                                {{ $y }}
+                                            </option>
+                                        @endfor
+                                    </select>
                                 </div>
                                 <div class="col-md-4">
                                     <form id="searchForm" method="GET" data-no-preloader>
@@ -224,8 +217,8 @@
                                             <button class="btn btn-primary" type="submit">
                                                 <i class="fas fa-search"></i> Search
                                             </button>
-                                            @if(request('search'))
-                                                <a href="{{ url()->current() }}" class="btn btn-outline-secondary" id="clearSearch">
+                                            @if(request('search') || request('year'))
+                                                <a href="{{ route('bills.index') }}" class="btn btn-outline-secondary" id="clearFilters">
                                                     <i class="fas fa-times"></i> Clear
                                                 </a>
                                             @endif
@@ -371,138 +364,220 @@
     </style>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // FIX select2 parent
+            // Initialize select2
             $('#studentSelect').select2({
                 placeholder: "Search Student...",
                 allowClear: true,
                 dropdownParent: $('#addTeacherModal')
             });
 
-            // Populate amount & due date based on service
-            const serviceSelect = document.getElementById("service");
-            const amountInput = document.getElementById("amount");
-            const dueDateInput = document.getElementById("dueDate");
-
-            serviceSelect.addEventListener("change", function () {
+            // Service amount & due date population - USE EVENT DELEGATION
+            $(document).on('change', '#service', function() {
                 const selectedOption = this.options[this.selectedIndex];
                 if (!selectedOption) return;
 
                 const amount = selectedOption.getAttribute("data-amount");
-                const duration = selectedOption.getAttribute("data-duration"); // months
+                const duration = selectedOption.getAttribute("data-duration");
+                const amountInput = document.getElementById("amount");
+                const dueDateInput = document.getElementById("dueDate");
 
-                // Populate amount
-                amountInput.value = amount ? amount : "";
+                if (amountInput) {
+                    amountInput.value = amount ? amount : "";
+                }
 
-                // Populate due date
-                if (duration) {
+                if (dueDateInput && duration) {
                     const today = new Date();
                     today.setMonth(today.getMonth() + parseInt(duration));
-
-                    const formattedDate = today.toISOString().split('T')[0];
-                    dueDateInput.value = formattedDate;
-                } else {
+                    dueDateInput.value = today.toISOString().split('T')[0];
+                } else if (dueDateInput) {
                     dueDateInput.value = "";
                 }
             });
 
-            // Button loader + bootstrap validation
-            const form = document.querySelector(".needs-validation");
-            const submitButton = document.getElementById("saveButton");
-
-            form.addEventListener("submit", function (event) {
+            // Form validation - FIXED VERSION
+            $(document).on('submit', '.needs-validation', function(event) {
                 event.preventDefault();
 
-                submitButton.disabled = true;
-                submitButton.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Saving...`;
+                const form = this;
+                const submitButton = document.getElementById("saveButton");
 
                 if (!form.checkValidity()) {
+                    event.stopPropagation();
                     form.classList.add("was-validated");
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = "Save Bill";
                     return;
                 }
 
-                setTimeout(() => form.submit(), 500);
-            });
-        });
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Saving...`;
+                }
 
-        //search and pagination ajax
-        $(document).ready(function() {
+                // Use setTimeout to allow button state change before form submit
+                setTimeout(() => {
+                    form.submit();
+                }, 100);
+            });
+
+            // Re-initialize form validation when modal opens
+            $('#addTeacherModal').on('shown.bs.modal', function() {
+                // Re-initialize select2
+                if ($('#studentSelect').length && !$('#studentSelect').hasClass("select2-hidden-accessible")) {
+                    $('#studentSelect').select2({
+                        placeholder: "Search Student...",
+                        allowClear: true,
+                        dropdownParent: $('#addTeacherModal')
+                    });
+                }
+
+                // Reset form validation
+                const form = document.querySelector('#addTeacherModal .needs-validation');
+                if (form) {
+                    form.classList.remove("was-validated");
+                }
+
+                // Reset button state
+                const submitButton = document.getElementById("saveButton");
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = "Save Bill";
+                }
+            });
+
+            // Reset form when modal is closed
+            $('#addTeacherModal').on('hidden.bs.modal', function() {
+                const form = this.querySelector('form');
+                if (form) {
+                    form.reset();
+                    form.classList.remove("was-validated");
+
+                    // Reset select2
+                    if ($('#studentSelect').length) {
+                        $('#studentSelect').val(null).trigger('change');
+                    }
+
+                    // Clear amount and due date
+                    const amountInput = document.getElementById("amount");
+                    const dueDateInput = document.getElementById("dueDate");
+                    if (amountInput) amountInput.value = "";
+                    if (dueDateInput) dueDateInput.value = "";
+                }
+            });
+
             let searchTimeout;
             const loadingSpinner = $('#loadingSpinner');
             const billsTableSection = $('#billsTableSection');
             const paginationSection = $('#paginationSection');
-            const summarySection = $('#summarySection');
+            const yearFilter = $('#yearFilter');
 
-            // Initial load
+            // Initialize from localStorage
+            const savedYear = localStorage.getItem('selectedYear');
+            const currentYear = "{{ date('Y') }}";
+
+            if (savedYear && yearFilter.length > 0) {
+                yearFilter.val(savedYear);
+            }
+
+            // Load initial data
             loadBillsData();
 
-            // Real-time search with debouncing
+            // Year filter change
+            yearFilter.on('change', function() {
+                const selectedYear = $(this).val();
+                console.log('Year changed to:', selectedYear);
+
+                // Store in localStorage
+                localStorage.setItem('selectedYear', selectedYear);
+
+                // Load data
+                loadBillsData();
+            });
+
+            // Real-time search
             $('#searchInput').on('input', function() {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => {
                     loadBillsData();
-                }, 500); // 500ms delay
+                }, 500);
             });
 
-            // Form submit prevention
+            // Search form submit
             $('#searchForm').on('submit', function(e) {
                 e.preventDefault();
                 loadBillsData();
             });
 
-            // Clear search
-            $('#clearSearch').on('click', function(e) {
+            // Clear all filters
+            $('#clearFilters').on('click', function(e) {
                 e.preventDefault();
                 $('#searchInput').val('');
+                yearFilter.val('');
+                localStorage.removeItem('selectedYear');
                 loadBillsData();
-                window.history.pushState({}, '', '{{ url()->current() }}');
+                window.history.pushState({}, '', '{{ route("bills.index") }}');
             });
 
             // Pagination links
             $(document).on('click', '#paginationSection .pagination a', function(e) {
                 e.preventDefault();
                 const url = $(this).attr('href');
+                console.log('Pagination clicked:', url);
                 loadBillsData(url);
             });
 
+            // Main function to load bills data
             function loadBillsData(url = null) {
                 const searchValue = $('#searchInput').val();
+                const selectedYear = yearFilter.val() || localStorage.getItem('selectedYear') || currentYear;
                 const targetUrl = url || '{{ route("bills.index") }}';
 
-                // Show loading spinner
+                console.log('Loading bills data:', {
+                    search: searchValue,
+                    year: selectedYear,
+                    url: targetUrl
+                });
+
+                // Show loading
                 loadingSpinner.removeClass('d-none');
                 billsTableSection.addClass('opacity-50');
+
+                // Prepare data for AJAX
+                const requestData = {
+                    search: searchValue,
+                    year: selectedYear,
+                    ajax: true
+                };
 
                 $.ajax({
                     url: targetUrl,
                     type: 'GET',
-                    data: {
-                        search: searchValue,
-                        ajax: true
-                    },
+                    data: requestData,
                     success: function(response) {
+                        console.log('AJAX Success:', response);
+
                         if (response.success) {
                             billsTableSection.html(response.html);
                             paginationSection.html(response.pagination);
-                            summarySection.html(response.summary);
 
-                            // Update URL without page reload
-                            if (!url) {
-                                const newUrl = new URL(targetUrl);
-                                if (searchValue) {
-                                    newUrl.searchParams.set('search', searchValue);
-                                } else {
-                                    newUrl.searchParams.delete('search');
-                                }
-                                window.history.pushState({}, '', newUrl);
+                            // Update year filter from response
+                            if (response.selectedYear) {
+                                yearFilter.val(response.selectedYear);
+                                localStorage.setItem('selectedYear', response.selectedYear);
                             }
+
+                            // Update URL without reloading page
+                            updateUrl(searchValue, selectedYear, url);
+                        } else {
+                            console.error('AJAX Response Error:', response);
+                            billsTableSection.html('<div class="alert alert-danger">' + (response.message || 'Error loading data') + '</div>');
                         }
                     },
-                    error: function(xhr) {
-                        console.error('Error loading bills:', xhr);
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Request Error:', {
+                            status: status,
+                            error: error,
+                            response: xhr.responseText
+                        });
                         billsTableSection.html('<div class="alert alert-danger">Error loading bills. Please try again.</div>');
-                        summarySection.html('<div class="text-muted">Error loading data</div>');
                     },
                     complete: function() {
                         loadingSpinner.addClass('d-none');
@@ -511,8 +586,59 @@
                 });
             }
 
-            // Load data immediately when page loads
-            $(document).ready(function() {
+            // Function to update URL
+            function updateUrl(search, year, isPaginationUrl = false) {
+                const url = new URL(window.location);
+
+                // Update search parameter
+                if (search) {
+                    url.searchParams.set('search', search);
+                } else {
+                    url.searchParams.delete('search');
+                }
+
+                // Update year parameter
+                if (year) {
+                    url.searchParams.set('year', year);
+                } else {
+                    url.searchParams.delete('year');
+                }
+
+                // Remove page parameter if not pagination
+                if (!isPaginationUrl) {
+                    url.searchParams.delete('page');
+                }
+
+                // Update browser history
+                window.history.pushState({}, '', url);
+            }
+
+            // Handle browser back/forward buttons
+            window.addEventListener('popstate', function() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const yearParam = urlParams.get('year');
+                const searchParam = urlParams.get('search');
+
+                console.log('Popstate triggered:', {
+                    year: yearParam,
+                    search: searchParam
+                });
+
+                // Update filters from URL
+                if (yearParam) {
+                    yearFilter.val(yearParam);
+                    localStorage.setItem('selectedYear', yearParam);
+                } else {
+                    yearFilter.val('');
+                    localStorage.removeItem('selectedYear');
+                }
+
+                if (searchParam) {
+                    $('#searchInput').val(searchParam);
+                } else {
+                    $('#searchInput').val('');
+                }
+
                 loadBillsData();
             });
         });

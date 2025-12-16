@@ -30,16 +30,24 @@ class BillsController extends Controller
         $students = Student::where('school_id', $user->school_id)->orderBy('first_name')->get();
         $services = payment_service::orderBy('service_name')->get();
 
+        // Get selected year from session or request
+        $currentYear = date('Y');
+
+        // Prioritize: 1. Request parameter, 2. Session, 3. Current year
+        if ($request->has('year') && !empty($request->year)) {
+            $selectedYear = $request->get('year');
+            session(['selected_year' => $selectedYear]); // Store in session
+        } else {
+            $selectedYear = session('selected_year', $currentYear);
+        }
+
+        // Get bills data
         if ($request->ajax()) {
             return $this->getBillsData($request);
         }
 
         // Load initial data for first page load
         $bills = $this->getBillsData($request, true);
-
-        // Get current year for the filter
-        $currentYear = date('Y');
-        $selectedYear = $request->get('year', $currentYear);
 
         return view('Bills.index', compact('students', 'services', 'bills', 'selectedYear', 'currentYear'));
     }
@@ -73,6 +81,13 @@ class BillsController extends Controller
             )
             ->where('school_fees.school_id', $user->school_id);
 
+        // Debug: Check what's coming in request
+        // \Log::info('Request data:', [
+        //     'search' => $request->search,
+        //     'year' => $request->year,
+        //     'ajax' => $request->ajax()
+        // ]);
+
         // Search functionality
         if ($request->has('search') && !empty($request->search)) {
             $searchTerm = $request->search;
@@ -88,15 +103,16 @@ class BillsController extends Controller
             });
         }
 
-        // Year filter functionality - FIXED
+        // Year filter functionality - IMPROVED
         $currentYear = date('Y');
-        $selectedYear = $request->get('year', $currentYear);
+        $selectedYear = $request->get('year', session('selected_year', $currentYear));
 
-        if ($request->has('year') && !empty($request->year)) {
-            $query->where('school_fees.academic_year', 'LIKE', "%{$request->year}%");
-        } else {
-            // Default to current year if no year is selected
-            $query->where('school_fees.academic_year', 'LIKE', "%{$currentYear}%");
+        // Debug: Check selected year
+        // \Log::info('Selected year:', ['selected' => $selectedYear]);
+
+        // Apply year filter
+        if (!empty($selectedYear)) {
+            $query->where('school_fees.academic_year', 'LIKE', "%{$selectedYear}%");
         }
 
         // Order by - Priority Sorting
@@ -109,20 +125,50 @@ class BillsController extends Controller
             ) DESC
         ");
 
+        // Debug: Get SQL query
+        // $sql = $query->toSql();
+        // \Log::info('SQL Query:', ['sql' => $sql]);
+
         // Pagination
         $bills = $query->paginate(10);
+
+        // Add parameters to pagination links
+        if ($request->has('search')) {
+            $bills->appends(['search' => $request->search]);
+        }
+        if ($request->has('year')) {
+            $bills->appends(['year' => $selectedYear]);
+        }
+        $bills->appends(['ajax' => true]);
 
         if ($returnData) {
             return $bills;
         }
 
-        return response()->json([
-            'success' => true,
-            'html' => view('Bills.partials.bills_table', compact('bills'))->render(),
-            'pagination' => view('Bills.partials.pagination', compact('bills'))->render(),
-            'summary' => view('Bills.partials.summary', compact('bills'))->render(),
-            'total' => $bills->total()
-        ]);
+        // Debug: Check bills data
+        // \Log::info('Bills count:', ['count' => $bills->count()]);
+
+        try {
+            return response()->json([
+                'success' => true,
+                'html' => view('Bills.partials.bills_table', compact('bills'))->render(),
+                'pagination' => view('Bills.partials.pagination', compact('bills'))->render(),
+                'total' => $bills->total(),
+                'selectedYear' => $selectedYear
+            ]);
+        } catch (\Exception $e) {
+            // Debug: Log error
+            // \Log::error('Error rendering views:', [
+            //     'message' => $e->getMessage(),
+            //     'file' => $e->getFile(),
+            //     'line' => $e->getLine()
+            // ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error loading data: ' . $e->getMessage()
+            ]);
+        }
     }
 
     public function store(Request $request)
