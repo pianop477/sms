@@ -77,7 +77,14 @@ class BillsController extends Controller
                         WHERE student_fee_id = school_fees.id) AS latest_approved_at'),
                 DB::raw('(SELECT MAX(updated_at)
                         FROM school_fees_payments
-                        WHERE student_fee_id = school_fees.id) AS latest_payment_updated_at')
+                        WHERE student_fee_id = school_fees.id) AS latest_payment_updated_at'),
+                // Add this column for proper sorting
+                DB::raw('COALESCE(
+                    (SELECT MAX(approved_at) FROM school_fees_payments WHERE student_fee_id = school_fees.id),
+                    school_fees.cancelled_at,
+                    school_fees.updated_at,
+                    school_fees.created_at
+                ) AS latest_activity_date')
             )
             ->where('school_fees.school_id', $user->school_id);
 
@@ -96,36 +103,25 @@ class BillsController extends Controller
             });
         }
 
-        // Year filter functionality - IMPROVED
+        // Year filter functionality - FIXED
         $currentYear = date('Y');
-        $selectedYear = $request->get('year', session('selected_year', $currentYear));
 
+        if ($request->filled('year')) {
+            session(['selected_year' => $request->input('year')]);
+        }
+
+        $selectedYear = session('selected_year', $currentYear); // FIXED: Read session correctly
 
         // Apply year filter
         if (!empty($selectedYear)) {
             $query->where('school_fees.academic_year', 'LIKE', "%{$selectedYear}%");
         }
 
-        $latestBills = DB::table('school_fees')
-            ->select('id')
-            ->where('school_id', $user->school_id)
-            ->when($selectedYear, function ($q) use ($selectedYear) {
-                $q->where('academic_year', 'LIKE', "%{$selectedYear}%");
-            })
-            ->orderByRaw("
-                COALESCE(
-                    (SELECT MAX(approved_at) FROM school_fees_payments WHERE student_fee_id = school_fees.id),
-                    cancelled_at,
-                    updated_at,
-                    created_at
-                ) DESC
-            ")
-            ->limit(20);
+        // Remove the subquery join and use direct ordering instead
+        $query->orderBy('latest_activity_date', 'DESC');
 
-        // JOIN subquery (MariaDB safe)
-        $query->joinSub($latestBills, 'latest_bills', function ($join) {
-            $join->on('school_fees.id', '=', 'latest_bills.id');
-        });
+        // For getting only the latest 20 records if needed (remove if you want all)
+        // $query->limit(20); // Remove this line if you want pagination to work properly
 
         // Pagination
         $bills = $query->paginate(10);
@@ -270,14 +266,14 @@ class BillsController extends Controller
                 'students.last_name as student_last_name',
                 'grades.class_code',
                 'parent_users.phone as parent_phone',
-                DB::raw('CONCAT(approver_users.first_name, " ", approver_users.last_name) as approver_name')
+                DB::raw('CONCAT(approver_users.first_name, " ", approver_users.last_name) as approver_name'),
+                // Add latest activity columns for sorting
+                DB::raw('COALESCE(school_fees_payments.approved_at, school_fees_payments.updated_at, school_fees_payments.created_at) as latest_activity_date')
             );
 
-        // Year filter
-        if ($request->has('year') && !empty($request->year)) {
-            $query->where('school_fees.academic_year', $request->year);
-        } else {
-            $query->where('school_fees.academic_year', $currentYear);
+        // Year filter - FIXED to use selectedYear consistently
+        if (!empty($selectedYear)) {
+            $query->where('school_fees.academic_year', 'LIKE', "%{$selectedYear}%");
         }
 
         // Search
@@ -300,19 +296,25 @@ class BillsController extends Controller
             });
         }
 
-        $latestPayments = DB::table('school_fees_payments')
-            ->select('school_fees_payments.id')
-            ->join('school_fees', 'school_fees.id', '=', 'school_fees_payments.student_fee_id')
-            ->where('school_fees.academic_year', $selectedYear ?? $currentYear)
-            ->orderBy('school_fees_payments.created_at', 'DESC')
-            ->limit(20);
+        // Remove the subquery join that limits to 20 records
+        // Instead, use proper ordering for all records
 
-        // JOIN subquery (MariaDB safe)
-        $query->joinSub($latestPayments, 'latest_payments', function ($join) {
-            $join->on('school_fees_payments.id', '=', 'latest_payments.id');
-        });
+        // Order by latest activity date (approved_at, then updated_at, then created_at)
+        $query->orderBy('latest_activity_date', 'DESC');
 
+        // If you also want secondary sorting, you can add more orderBy clauses
+        $query->orderBy('school_fees_payments.id', 'DESC');
+
+        // Pagination
         $transactions = $query->paginate(10);
+
+        // Add parameters to pagination links if needed
+        if ($request->has('search')) {
+            $transactions->appends(['search' => $request->search]);
+        }
+        if ($request->has('year')) {
+            $transactions->appends(['year' => $selectedYear]);
+        }
 
         // Students with bills
         $studentIds = school_fees::distinct()->pluck('student_id')->toArray();
@@ -1431,7 +1433,7 @@ class BillsController extends Controller
                 'payment_services.service_name'
             )
             ->where('school_fees.student_id', $students->id)
-            // ->where('school_fees.status', '!=', 'cancelled')
+            ->where('school_fees.status', '!=', 'cancelled')
             ->where('school_fees.school_id', $user->school_id);
 
         // Apply year filter
