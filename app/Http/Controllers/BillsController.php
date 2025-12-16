@@ -133,7 +133,7 @@ class BillsController extends Controller
             'amount' => 'required|numeric|min:0',
             'due_date' => 'required|date_format:Y-m-d',
             'academic_year' => 'required|date_format:Y',
-            'control_number' => 'nullable|string|max:255|unique:school_fees,control_number',
+            'control_number' => 'nullable|string|max:255',
             'school_id' => 'exists:schools,id',
             'class_id' => 'exists:grades,id',
         ]);
