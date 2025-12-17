@@ -454,7 +454,7 @@
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
                                                 <div class="card-title">Total Paid Amount</div>
-                                                <div class="card-value">{{ number_format($totalPaid) }}</div>
+                                                <div class="card-value">{{ number_format($totalPaidAll) }}</div>
                                             </div>
                                             <div class="col-auto">
                                                 <i class="fas fa-hand-holding-dollar card-icon"></i>
