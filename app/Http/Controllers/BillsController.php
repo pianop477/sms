@@ -56,42 +56,6 @@ class BillsController extends Controller
     {
         $user = Auth::user();
 
-        // Kwanza, pata IDs za bills 20 za hivi karibuni
-        $latestBillIds = DB::table('school_fees')
-            ->select('id')
-            ->where('school_id', $user->school_id)
-            ->orderByRaw("
-                COALESCE(
-                    (SELECT MAX(approved_at) FROM school_fees_payments WHERE student_fee_id = school_fees.id),
-                    cancelled_at,
-                    updated_at,
-                    created_at
-                ) DESC
-            ")
-            ->limit(20)
-            ->pluck('id')
-            ->toArray();
-
-        // Kama hakuna IDs, rudisha empty
-        if (empty($latestBillIds)) {
-            $bills = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10);
-
-            if ($returnData) {
-                return $bills;
-            }
-
-            return response()->json([
-                'success' => true,
-                'html' => view('Bills.partials.bills_table', compact('bills'))->render(),
-                'pagination' => view('Bills.partials.pagination', compact('bills'))->render(),
-                'total' => 0,
-                'selectedYear' => session('selected_year', date('Y')),
-                'totalRecords' => 0,
-                'showingText' => 'No recent records found'
-            ]);
-        }
-
-        // Sasa, tafuta records zote kwa IDs hizo 20 tu
         $query = DB::table('school_fees')
             ->join('payment_services', 'payment_services.id', '=', 'school_fees.service_id')
             ->leftJoin('students', 'students.id', '=', 'school_fees.student_id')
@@ -121,10 +85,20 @@ class BillsController extends Controller
                     school_fees.created_at
                 ) AS latest_activity_date')
             )
-            ->whereIn('school_fees.id', $latestBillIds); // HAPA ndio tunalimit kwa 20 tu
+            ->where('school_fees.school_id', $user->school_id);
 
-        // Search functionality - ndani ya 20 tu
-        if ($request->has('search') && !empty($request->search)) {
+        // Year filter
+        $currentYear = date('Y');
+        $selectedYear = $request->get('year', session('selected_year', $currentYear));
+
+        if (!empty($selectedYear)) {
+            $query->where('school_fees.academic_year', 'LIKE', "%{$selectedYear}%");
+        }
+
+        // Search functionality - IF SEARCH EXISTS, SHOW ALL MATCHING RECORDS
+        $hasSearch = $request->has('search') && !empty($request->search);
+
+        if ($hasSearch) {
             $searchTerm = $request->search;
             $query->where(function($q) use ($searchTerm) {
                 $q->where('school_fees.control_number', 'LIKE', "%{$searchTerm}%")
@@ -136,55 +110,149 @@ class BillsController extends Controller
                 ->orWhere('payment_services.service_name', 'LIKE', "%{$searchTerm}%")
                 ->orWhere('school_fees.status', 'LIKE', "%{$searchTerm}%");
             });
+
+            // With search, we want ALL matching records (no limit)
+            $totalQuery = clone $query;
+            $totalCount = $totalQuery->count();
+
+            // Sort for search results
+            $query->orderBy('latest_activity_date', 'DESC');
+
+        } else {
+            // WITHOUT SEARCH: Only show 20 latest records
+            // First, get IDs of 20 latest bills
+            $latestBillIds = DB::table('school_fees')
+                ->select('id')
+                ->where('school_id', $user->school_id)
+                ->when(!empty($selectedYear), function($q) use ($selectedYear) {
+                    return $q->where('academic_year', 'LIKE', "%{$selectedYear}%");
+                })
+                ->orderByRaw("
+                    COALESCE(
+                        (SELECT MAX(approved_at) FROM school_fees_payments WHERE student_fee_id = school_fees.id),
+                        cancelled_at,
+                        updated_at,
+                        created_at
+                    ) DESC
+                ")
+                ->limit(20)
+                ->pluck('id')
+                ->toArray();
+
+            // If no latest bills found
+            if (empty($latestBillIds)) {
+                $bills = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10);
+
+                if ($returnData) {
+                    return $bills;
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'html' => view('Bills.partials.bills_table', compact('bills'))->render(),
+                    'pagination' => view('Bills.partials.pagination', compact('bills'))->render(),
+                    'total' => 0,
+                    'selectedYear' => $selectedYear,
+                    'isSearch' => false,
+                    'totalRecords' => 0,
+                    'showingText' => 'No records found'
+                ]);
+            }
+
+            // Limit query to only these 20 IDs
+            $query->whereIn('school_fees.id', $latestBillIds);
+
+            // Get total count (max 20)
+            $totalQuery = clone $query;
+            $totalCount = $totalQuery->count();
+
+            // Sort for latest results
+            $query->orderByRaw("
+                COALESCE(
+                    (SELECT MAX(approved_at) FROM school_fees_payments WHERE student_fee_id = school_fees.id),
+                    school_fees.cancelled_at,
+                    school_fees.updated_at,
+                    school_fees.created_at
+                ) DESC
+            ");
         }
 
-        // Sort by latest activity date
-        $query->orderBy('latest_activity_date', 'DESC');
+        // Get total count for pagination
+        if (!isset($totalCount)) {
+            $totalQuery = clone $query;
+            $totalCount = $totalQuery->count();
+        }
 
-        // Get all results (si zaidi ya 20)
-        $allResults = $query->get();
-
-        // Manually create pagination
-        $page = $request->get('page', 1);
+        // Pagination
         $perPage = 10;
-        $offset = ($page - 1) * $perPage;
+        $page = $request->get('page', 1);
 
-        $currentPageResults = $allResults->slice($offset, $perPage)->all();
+        // For search results: use Laravel pagination
+        if ($hasSearch) {
+            $bills = $query->paginate($perPage);
+        } else {
+            // For latest 20: use manual pagination
+            $allResults = $query->get();
+            $offset = ($page - 1) * $perPage;
+            $currentPageResults = $allResults->slice($offset, $perPage)->all();
 
-        $bills = new \Illuminate\Pagination\LengthAwarePaginator(
-            $currentPageResults,
-            count($allResults), // Total (max 20)
-            $perPage,
-            $page,
-            ['path' => $request->url()]
-        );
+            $bills = new \Illuminate\Pagination\LengthAwarePaginator(
+                $currentPageResults,
+                $totalCount,
+                $perPage,
+                $page,
+                ['path' => $request->url()]
+            );
+        }
 
-        // Add query parameters
+        // Add query parameters to pagination
         if ($request->has('search')) {
             $bills->appends(['search' => $request->search]);
         }
+        if ($request->has('year')) {
+            $bills->appends(['year' => $selectedYear]);
+        }
         $bills->appends(['ajax' => true]);
-
-        $selectedYear = session('selected_year', date('Y'));
 
         if ($returnData) {
             return $bills;
         }
 
         try {
+            // Determine showing text
+            $showingText = '';
+            if ($hasSearch) {
+                if ($bills->total() > 0) {
+                    $showingText = 'Showing ' . $bills->firstItem() . ' to ' . $bills->lastItem() .
+                                ' of ' . $bills->total() . ' search results';
+                } else {
+                    $showingText = 'No search results found for "' . $request->search . '"';
+                }
+            } else {
+                if ($bills->total() > 0) {
+                    $showingText = 'Showing latest ' . $totalCount . ' records';
+                    if ($bills->total() > $totalCount) {
+                        $showingText .= ' (paginated)';
+                    }
+                } else {
+                    $showingText = 'No recent records found';
+                }
+            }
+
             return response()->json([
                 'success' => true,
                 'html' => view('Bills.partials.bills_table', compact('bills'))->render(),
                 'pagination' => view('Bills.partials.pagination', compact('bills'))->render(),
-                'total' => count($allResults),
+                'total' => $bills->total(),
                 'selectedYear' => $selectedYear,
-                'totalRecords' => count($allResults),
-                'showingText' => 'Showing latest ' . count($allResults) . ' records (paginated)'
+                'isSearch' => $hasSearch,
+                'totalRecords' => $totalCount,
+                'showingText' => $showingText
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error loading data: ' . $e->getMessage()
+                'message' => 'Error loading data. Please try again.'
             ]);
         }
     }
@@ -277,36 +345,12 @@ class BillsController extends Controller
     {
         $currentYear = Carbon::now()->year;
 
+        // Get selected year from session or request
         if ($request->filled('year')) {
             session(['selected_year' => $request->year]);
         }
 
         $selectedYear = session('selected_year', $currentYear);
-
-        $latestPaymentIds = DB::table('school_fees_payments')
-            ->select('school_fees_payments.id')
-            ->join('school_fees', 'school_fees.id', '=', 'school_fees_payments.student_fee_id')
-            ->when(!empty($selectedYear), function ($q) use ($selectedYear) {
-                $q->where('school_fees.academic_year', 'LIKE', "%{$selectedYear}%");
-            })
-            ->orderBy('school_fees_payments.created_at', 'DESC')
-            ->limit(20)
-            ->pluck('school_fees_payments.id')
-            ->toArray();
-
-        if (empty($latestPaymentIds)) {
-            $transactions = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10);
-
-            $studentIds = school_fees::distinct()->pluck('student_id')->toArray();
-            $students = Student::whereIn('id', $studentIds)->orderBy('first_name')->get();
-
-            return view('Bills.transaction', compact(
-                'transactions',
-                'students',
-                'selectedYear',
-                'currentYear'
-            ));
-        }
 
         $query = school_fees_payment::query()
             ->join('school_fees', 'school_fees.id', '=', 'school_fees_payments.student_fee_id')
@@ -327,14 +371,18 @@ class BillsController extends Controller
                 'parent_users.phone as parent_phone',
                 DB::raw('CONCAT(approver_users.first_name, " ", approver_users.last_name) as approver_name'),
                 DB::raw('COALESCE(school_fees_payments.approved_at, school_fees_payments.updated_at, school_fees_payments.created_at) as latest_activity_date')
-            )
-            ->whereIn('school_fees_payments.id', $latestPaymentIds); // HAPA ndio tunalimit kwa 20 tu
+            );
 
+        // Apply year filter to main query
         if (!empty($selectedYear)) {
             $query->where('school_fees.academic_year', 'LIKE', "%{$selectedYear}%");
         }
 
-        if ($request->has('search') && !empty($request->search)) {
+        // Check if search exists
+        $hasSearch = $request->has('search') && !empty($request->search);
+
+        if ($hasSearch) {
+            // WITH SEARCH: Show ALL matching transactions
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('school_fees.control_number', 'LIKE', "%{$searchTerm}%")
@@ -351,32 +399,101 @@ class BillsController extends Controller
                         "%{$searchTerm}%"
                     );
             });
+
+            // Get total count for search results
+            $totalQuery = clone $query;
+            $totalCount = $totalQuery->count();
+
+            // Sort for search results
+            $query->orderBy('latest_activity_date', 'DESC')
+                ->orderBy('school_fees_payments.id', 'DESC');
+
+        } else {
+            // WITHOUT SEARCH: Show only 20 latest transactions
+            // First, get IDs of 20 latest payments
+            $latestPaymentIds = DB::table('school_fees_payments')
+                ->select('school_fees_payments.id')
+                ->join('school_fees', 'school_fees.id', '=', 'school_fees_payments.student_fee_id')
+                ->when(!empty($selectedYear), function ($q) use ($selectedYear) {
+                    $q->where('school_fees.academic_year', 'LIKE', "%{$selectedYear}%");
+                })
+                ->orderBy('school_fees_payments.created_at', 'DESC')
+                ->limit(20)
+                ->pluck('school_fees_payments.id')
+                ->toArray();
+
+            // If no latest payments found
+            if (empty($latestPaymentIds)) {
+                $transactions = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10);
+
+                $studentIds = school_fees::distinct()->pluck('student_id')->toArray();
+                $students = Student::whereIn('id', $studentIds)->orderBy('first_name')->get();
+
+                // Handle AJAX request
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => true,
+                        'html' => view('Bills.partials.transactions_table', compact('transactions'))->render(),
+                        'pagination' => view('Bills.partials.pagination', compact('transactions'))->render(),
+                        'selectedYear' => $selectedYear,
+                        'isSearch' => false,
+                        'totalRecords' => 0,
+                        'showingText' => 'No recent transactions found'
+                    ]);
+                }
+
+                return view('Bills.transaction', compact(
+                    'transactions',
+                    'students',
+                    'selectedYear',
+                    'currentYear'
+                ));
+            }
+
+            // Limit query to only these 20 IDs
+            $query->whereIn('school_fees_payments.id', $latestPaymentIds);
+
+            // Get total count (max 20)
+            $totalQuery = clone $query;
+            $totalCount = $totalQuery->count();
+
+            // Sort for latest results
+            $query->orderBy('school_fees_payments.created_at', 'DESC')
+                ->orderBy('school_fees_payments.id', 'DESC');
         }
 
-        $query->orderBy('latest_activity_date', 'DESC')
-            ->orderBy('school_fees_payments.id', 'DESC');
+        // Get total count for pagination (if not already set)
+        if (!isset($totalCount)) {
+            $totalQuery = clone $query;
+            $totalCount = $totalQuery->count();
+        }
 
-        // Get all results (si zaidi ya 20)
-        $allResults = $query->get();
-
-        // Manually create pagination
-        $page = $request->get('page', 1);
+        // Pagination logic
         $perPage = 10;
-        $offset = ($page - 1) * $perPage;
+        $page = $request->get('page', 1);
 
-        $currentPageResults = $allResults->slice($offset, $perPage)->all();
+        // For search results: use Laravel pagination
+        if ($hasSearch) {
+            $transactions = $query->paginate($perPage);
+        } else {
+            // For latest 20: use manual pagination
+            $allResults = $query->get();
+            $offset = ($page - 1) * $perPage;
+            $currentPageResults = $allResults->slice($offset, $perPage)->all();
 
-        $transactions = new \Illuminate\Pagination\LengthAwarePaginator(
-            $currentPageResults,
-            count($allResults),
-            $perPage,
-            $page,
-            [
-                'path' => $request->url(),
-                'query' => $request->query()
-            ]
-        );
+            $transactions = new \Illuminate\Pagination\LengthAwarePaginator(
+                $currentPageResults,
+                $totalCount,
+                $perPage,
+                $page,
+                [
+                    'path' => $request->url(),
+                    'query' => $request->query()
+                ]
+            );
+        }
 
+        // Add query parameters to pagination
         if ($request->has('search')) {
             $transactions->appends(['search' => $request->search]);
         }
@@ -384,8 +501,50 @@ class BillsController extends Controller
             $transactions->appends(['year' => $selectedYear]);
         }
 
+        // Get students for modal
         $studentIds = school_fees::distinct()->pluck('student_id')->toArray();
         $students = Student::whereIn('id', $studentIds)->orderBy('first_name')->get();
+
+        // Handle AJAX request
+        if ($request->ajax()) {
+            try {
+                // Determine showing text
+                $showingText = '';
+                if ($hasSearch) {
+                    if ($transactions->total() > 0) {
+                        $showingText = 'Showing ' . $transactions->firstItem() . ' to ' . $transactions->lastItem() .
+                                    ' of ' . $transactions->total() . ' search results';
+                    } else {
+                        $showingText = 'No search results found for "' . $request->search . '"';
+                    }
+                } else {
+                    if ($transactions->total() > 0) {
+                        $showingText = 'Showing latest ' . $totalCount . ' transactions';
+                        if ($transactions->total() > $totalCount) {
+                            $showingText .= ' (paginated)';
+                        }
+                    } else {
+                        $showingText = 'No recent transactions found';
+                    }
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'html' => view('Bills.partials.transactions_table', compact('transactions'))->render(),
+                    'pagination' => view('Bills.partials.pagination', compact('transactions'))->render(),
+                    'selectedYear' => $selectedYear,
+                    'isSearch' => $hasSearch,
+                    'totalRecords' => $totalCount,
+                    'showingText' => $showingText
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Error in feesPayment AJAX: ' . $e->getMessage());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error loading transactions. Please try again.'
+                ]);
+            }
+        }
 
         return view('Bills.transaction', compact(
             'transactions',
@@ -466,6 +625,7 @@ class BillsController extends Controller
 
     public function paymentReport(Request $request)
     {
+        // Get selected year from session or request
         if ($request->filled('year')) {
             session(['selected_year' => $request->input('year')]);
         }
@@ -473,34 +633,23 @@ class BillsController extends Controller
         $year = session('selected_year', date('Y'));
         $search = $request->input('search');
 
+        // Check if search exists
+        $hasSearch = !empty($search);
+
         $classes = Grade::where('school_id', Auth::user()->school_id)
             ->orderBy('class_name')
             ->get();
 
-        $latestControlNumbers = DB::table('school_fees_payments')
-            ->join('school_fees', 'school_fees.id', '=', 'school_fees_payments.student_fee_id')
-            ->select('school_fees.control_number')
-            ->whereNotNull('school_fees_payments.approved_at')
-            ->when($year, function ($q) use ($year) {
-                $q->where('school_fees.academic_year', 'LIKE', "%{$year}%");
-            })
-            ->when($search, function ($q) use ($search) {
-                $q->where('school_fees.control_number', 'LIKE', "%{$search}%");
-            })
-            ->groupBy('school_fees.control_number')
-            ->orderByRaw('MAX(school_fees_payments.approved_at) DESC')
-            ->limit(20)
-            ->pluck('control_number')
-            ->toArray();
-
+        // Base query for bills (used for summary statistics)
         $billsQueryAll = school_fees::query()
             ->when($year, function ($q) use ($year) {
                 $q->where('academic_year', 'LIKE', "%{$year}%");
             })
-            ->when($search, function ($q) use ($search) {
+            ->when($hasSearch, function ($q) use ($search) {
                 $q->where('control_number', 'LIKE', "%{$search}%");
             });
 
+        // Calculate summary statistics (ALWAYS based on search/year filters)
         $totalActiveBills = (clone $billsQueryAll)
             ->whereIn('status', ['active', 'full paid', 'overpaid'])
             ->sum('amount');
@@ -519,15 +668,76 @@ class BillsController extends Controller
             ->when($year, function ($q) use ($year) {
                 $q->where('school_fees.academic_year', 'LIKE', "%{$year}%");
             })
-            ->when($search, function ($q) use ($search) {
+            ->when($hasSearch, function ($q) use ($search) {
                 $q->where('school_fees.control_number', 'LIKE', "%{$search}%");
             })
             ->sum('school_fees_payments.amount');
 
-        if (empty($latestControlNumbers)) {
-            $transactions = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10);
+        // Handle search vs no-search logic
+        if ($hasSearch) {
+            // WITH SEARCH: Show ALL matching control numbers
+            $controlNumbersQuery = DB::table('school_fees_payments')
+                ->join('school_fees', 'school_fees.id', '=', 'school_fees_payments.student_fee_id')
+                ->select('school_fees.control_number')
+                ->whereNotNull('school_fees_payments.approved_at')
+                ->when($year, function ($q) use ($year) {
+                    $q->where('school_fees.academic_year', 'LIKE', "%{$year}%");
+                })
+                ->where('school_fees.control_number', 'LIKE', "%{$search}%")
+                ->groupBy('school_fees.control_number')
+                ->orderByRaw('MAX(school_fees_payments.approved_at) DESC');
 
+            // Get ALL control numbers matching search
+            $controlNumbers = $controlNumbersQuery->pluck('control_number')->toArray();
+
+        } else {
+            // WITHOUT SEARCH: Show only 20 latest control numbers
+            $controlNumbersQuery = DB::table('school_fees_payments')
+                ->join('school_fees', 'school_fees.id', '=', 'school_fees_payments.student_fee_id')
+                ->select('school_fees.control_number')
+                ->whereNotNull('school_fees_payments.approved_at')
+                ->when($year, function ($q) use ($year) {
+                    $q->where('school_fees.academic_year', 'LIKE', "%{$year}%");
+                })
+                ->groupBy('school_fees.control_number')
+                ->orderByRaw('MAX(school_fees_payments.approved_at) DESC')
+                ->limit(20);
+
+            $controlNumbers = $controlNumbersQuery->pluck('control_number')->toArray();
+        }
+
+        // If no control numbers found
+        if (empty($controlNumbers)) {
+            $transactions = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10);
             $services = payment_service::orderBy('service_name')->get();
+
+            // Handle AJAX request
+            if ($request->ajax()) {
+                try {
+                    return response()->json([
+                        'success' => true,
+                        'html' => view('Bills.partials.report_table', compact('transactions'))->render(),
+                        'pagination' => view('Bills.partials.pagination', compact('transactions'))->render(),
+                        'selectedYear' => $year,
+                        'isSearch' => $hasSearch,
+                        'summary' => [
+                            'totalActiveBills' => $totalActiveBills,
+                            'totalPaidAll' => $totalPaidAll,
+                            'totalCancelledBills' => $totalCancelledBills,
+                            'totalCancelledCount' => $totalCancelledCount,
+                        ],
+                        'showingText' => $hasSearch
+                            ? 'No search results found for "' . $search . '"'
+                            : 'No recent payment reports found'
+                    ]);
+                } catch (\Exception $e) {
+                    // \Log::error('Error in paymentReport AJAX: ' . $e->getMessage());
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Error loading report. Please try again.'
+                    ]);
+                }
+            }
 
             return view(
                 'Bills.transaction_report',
@@ -544,9 +754,10 @@ class BillsController extends Controller
             );
         }
 
+        // Get raw payment data for the control numbers
         $raw = school_fees_payment::query()
             ->join('school_fees', 'school_fees.id', '=', 'school_fees_payments.student_fee_id')
-            ->join('students', 'students.id', '=', 'school_fees_payments.student_id')
+            ->join('students', 'students.id', '=', 'school_fees.student_id')
             ->join('grades', 'grades.id', '=', 'students.class_id')
             ->select(
                 'school_fees_payments.*',
@@ -559,16 +770,18 @@ class BillsController extends Controller
                 'students.last_name',
                 'grades.class_code'
             )
-            ->whereIn('school_fees.control_number', $latestControlNumbers)
+            ->whereIn('school_fees.control_number', $controlNumbers)
             ->when($year, function ($q) use ($year) {
                 $q->where('school_fees.academic_year', 'LIKE', "%{$year}%");
             })
-            ->when($search, function ($q) use ($search) {
+            ->when($hasSearch, function ($q) use ($search) {
                 $q->where('school_fees.control_number', 'LIKE', "%{$search}%");
             })
+            ->whereNotNull('school_fees_payments.approved_at')
             ->orderBy('school_fees_payments.approved_at', 'desc')
             ->get();
 
+        // Group by control number
         $grouped = $raw->groupBy('control_number')->map(function ($rows) {
             $first = $rows->first();
             $latestPayment = $rows->sortByDesc('approved_at')->first();
@@ -596,23 +809,44 @@ class BillsController extends Controller
         // Sort grouped results by latest approved_at
         $grouped = $grouped->sortByDesc('approved_at')->values();
 
+        // Pagination logic
         $perPage = 10;
         $page = $request->get('page', 1);
         $total = $grouped->count();
 
-        $currentPageResults = $grouped->slice(($page - 1) * $perPage, $perPage)->all();
+        // For search results: show all matching
+        if ($hasSearch) {
+            $currentPageResults = $grouped->slice(($page - 1) * $perPage, $perPage)->all();
 
-        $transactions = new \Illuminate\Pagination\LengthAwarePaginator(
-            $currentPageResults,
-            $total,
-            $perPage,
-            $page,
-            [
-                'path' => $request->url(),
-                'query' => $request->query()
-            ]
-        );
+            $transactions = new \Illuminate\Pagination\LengthAwarePaginator(
+                $currentPageResults,
+                $total,
+                $perPage,
+                $page,
+                [
+                    'path' => $request->url(),
+                    'query' => $request->query()
+                ]
+            );
+        } else {
+            // For latest 20: limit to 20 control numbers
+            $limitedGrouped = $grouped->take(20);
+            $limitedTotal = $limitedGrouped->count();
+            $currentPageResults = $limitedGrouped->slice(($page - 1) * $perPage, $perPage)->all();
 
+            $transactions = new \Illuminate\Pagination\LengthAwarePaginator(
+                $currentPageResults,
+                $limitedTotal,
+                $perPage,
+                $page,
+                [
+                    'path' => $request->url(),
+                    'query' => $request->query()
+                ]
+            );
+        }
+
+        // Add query parameters to pagination
         if ($request->has('search')) {
             $transactions->appends(['search' => $search]);
         }
@@ -621,6 +855,55 @@ class BillsController extends Controller
         }
 
         $services = payment_service::orderBy('service_name')->get();
+
+        // Handle AJAX request
+        if ($request->ajax()) {
+            try {
+                // Determine showing text
+                $showingText = '';
+                $totalRecords = $hasSearch ? $total : min($total, 20);
+
+                if ($hasSearch) {
+                    if ($transactions->total() > 0) {
+                        $showingText = 'Showing ' . $transactions->firstItem() . ' to ' . $transactions->lastItem() .
+                                    ' of ' . $transactions->total() . ' search results';
+                    } else {
+                        $showingText = 'No search results found for "' . $search . '"';
+                    }
+                } else {
+                    if ($transactions->total() > 0) {
+                        $showingText = 'Showing latest ' . $totalRecords . ' payment reports';
+                        if ($transactions->total() > $totalRecords) {
+                            $showingText .= ' (paginated)';
+                        }
+                    } else {
+                        $showingText = 'No recent payment reports found';
+                    }
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'html' => view('Bills.partials.report_table', compact('transactions'))->render(),
+                    'pagination' => view('Bills.partials.pagination', compact('transactions'))->render(),
+                    'selectedYear' => $year,
+                    'isSearch' => $hasSearch,
+                    'summary' => [
+                        'totalActiveBills' => $totalActiveBills,
+                        'totalPaidAll' => $totalPaidAll,
+                        'totalCancelledBills' => $totalCancelledBills,
+                        'totalCancelledCount' => $totalCancelledCount,
+                    ],
+                    'totalRecords' => $totalRecords,
+                    'showingText' => $showingText
+                ]);
+            } catch (\Exception $e) {
+                // \Log::error('Error in paymentReport AJAX: ' . $e->getMessage());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error loading report. Please try again.'
+                ]);
+            }
+        }
 
         return view(
             'Bills.transaction_report',
