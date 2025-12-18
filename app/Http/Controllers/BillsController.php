@@ -28,25 +28,21 @@ class BillsController extends Controller
         $user = Auth::user();
 
         $students = Student::where('school_id', $user->school_id)->orderBy('first_name')->get();
-        $services = payment_service::orderBy('service_name')->get();
+        $services = payment_service::orderBy('service_name')->where('status', 'active')->get();
 
-        // Get selected year from session or request
         $currentYear = date('Y');
 
-        // Prioritize: 1. Request parameter, 2. Session, 3. Current year
         if ($request->has('year') && !empty($request->year)) {
             $selectedYear = $request->get('year');
-            session(['selected_year' => $selectedYear]); // Store in session
+            session(['selected_year' => $selectedYear]);
         } else {
             $selectedYear = session('selected_year', $currentYear);
         }
 
-        // Get bills data
         if ($request->ajax()) {
             return $this->getBillsData($request);
         }
 
-        // Load initial data for first page load
         $bills = $this->getBillsData($request, true);
 
         return view('Bills.index', compact('students', 'services', 'bills', 'selectedYear', 'currentYear'));
@@ -319,26 +315,27 @@ class BillsController extends Controller
 
     private function generateControlNumber()
     {
-        $prefix = 'SA99406'; // Prefix
+        return DB::transaction(function () {
+            $prefix = 'SA9940';
 
-        // Fetch last
-        $last = school_fees::orderBy('id', 'desc')->value('control_number');
+            $last = school_fees::lockForUpdate()
+                ->where('control_number', 'like', $prefix . '%')
+                ->orderBy('id', 'desc')
+                ->value('control_number');
 
-        // If none exists
-        if (!$last) {
-            return $prefix . '6001';
-        }
+            $number = $last
+                ? (int) str_replace($prefix, '', $last)
+                : 10000;
 
-        // Remove prefix safely
-        $number = (int) str_replace($prefix, '', $last);
+            do {
+                $number++;
+                $control = $prefix . str_pad($number, 5, '0', STR_PAD_LEFT);
+            } while (
+                school_fees::where('control_number', $control)->exists()
+            );
 
-        // Add 1
-        $newNumber = $number + 1;
-
-        // Determine padding
-        $padLength = max(4, strlen((string)$newNumber));
-
-        return $prefix . str_pad($newNumber, $padLength, '0', STR_PAD_LEFT);
+            return $control;
+        });
     }
 
     public function feesPayment(Request $request)
@@ -1062,7 +1059,7 @@ class BillsController extends Controller
                             ->leftJoin('users', 'users.id', '=', 'parents.user_id')
                             ->select(
                                 'school_fees.*',
-                                'users.phone as parent_phone', 'payment_services.service_name',
+                                'users.phone as parent_phone', 'payment_services.service_name', 'payment_services.collection_account',
                                 DB::raw('(SELECT COALESCE(SUM(amount), 0)
                                     FROM school_fees_payments
                                     WHERE student_fee_id = school_fees.id) AS total_paid'), 'students.first_name', 'students.last_name',
@@ -1075,7 +1072,14 @@ class BillsController extends Controller
             }
 
             // find important information so as to prepare sms payload
-            $controlNumber = strtoupper($bill->control_number);
+            $account = '';
+            if($bill->collection_account != null) {
+                $account = strtoupper($bill->collection_account);
+            } else {
+                $account = strtoupper($bill->control_number);
+            }
+
+            // dd($account);
             $studentName = strtoupper($bill->first_name . ' '. $bill->last_name);
             $paidAmount = (float) $bill->total_paid;
             $billedAmount = (float) $bill->amount;
@@ -1092,14 +1096,14 @@ class BillsController extends Controller
             $sendBillBySms = new NextSmsService();
             $user = Auth::user();
             $school = school::findOrFail($user->school_id);
-            $message = "Habari! Unakumbushwa kulipa {$service} ya {$studentName}, Tsh. {$formattedBalance}. Tumia Control#: {$controlNumber} kulipa kabla ya {$dueDate}. Tafadhali lipa kwa wakati!";
+            $message = "Habari! Unakumbushwa kulipa {$service} ya {$studentName}, Tsh. {$formattedBalance}. Tumia Control#: {$account} kulipa kabla ya {$dueDate}. Tafadhali lipa kwa wakati!";
 
             $senderId = $school->sender_id ?? 'SHULE APP';
             $payload = [
                 'from' => $senderId,
                 'to' => $destinationPhone,
                 'text' => $message,
-                'reference' => $controlNumber,
+                'reference' => uniqid(),
             ];
 
             Log::info('Sending sms to '. $studentName. ' with phone number '. $payload['to']. ' and message content is '. $payload['text']. ' from '. $payload['from']);

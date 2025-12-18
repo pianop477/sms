@@ -378,26 +378,27 @@ class paymentBatchController extends Controller
  */
     private function generateControlNumber()
     {
-        $prefix = 'SA99406';
+        return DB::transaction(function () {
+            $prefix = 'SA9940';
 
-        // Fetch last control number
-        $last = school_fees::orderBy('id', 'desc')->value('control_number');
+            $last = school_fees::lockForUpdate()
+                ->where('control_number', 'like', $prefix . '%')
+                ->orderBy('id', 'desc')
+                ->value('control_number');
 
-        // If none exists
-        if (!$last) {
-            return $prefix . '6001';
-        }
+            $number = $last
+                ? (int) str_replace($prefix, '', $last)
+                : 10000;
 
-        // Remove prefix safely
-        $number = (int) str_replace($prefix, '', $last);
+            do {
+                $number++;
+                $control = $prefix . str_pad($number, 5, '0', STR_PAD_LEFT);
+            } while (
+                school_fees::where('control_number', $control)->exists()
+            );
 
-        // Add 1
-        $newNumber = $number + 1;
-
-        // Determine padding
-        $padLength = max(4, strlen((string)$newNumber));
-
-        return $prefix . str_pad($newNumber, $padLength, '0', STR_PAD_LEFT);
+            return $control;
+        });
     }
 
 /**

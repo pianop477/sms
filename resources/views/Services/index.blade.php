@@ -289,7 +289,7 @@
                                                         <div class="modal-content">
                                                             <div class="modal-header">
                                                                 <h5 class="modal-title" id="cancelModalLabel{{$row->id}}">
-                                                                    Cancel Service - {{strtoupper($row->service_name)}}
+                                                                    Disable Service - {{strtoupper($row->service_name)}}
                                                                 </h5>
                                                                 <button type="button" class="btn btn-close btn-link" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close text-white"></i></button>
                                                             </div>
@@ -351,14 +351,14 @@
                         @csrf
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="gender" class="form-label">Service Name</label>
+                                <label for="gender" class="form-label">Service Name<span class="text-danger">*</span></label>
                                 <input type="text" name="service_name" required class="form-control-custom" placeholder="E.g. School fee, Transport, Accomodation" id="service_name" value="{{old('service_name')}}">
                                 @error('service_name')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="payment" class="form-label">Payment Modality</label>
+                                <label for="payment" class="form-label">Payment Modality<span class="text-danger">*</span></label>
                                 <select name="payment" id="payment" class="form-control-custom" required>
                                     <option value="">--Select--</option>
                                     <option value="partial">Partial</option>
@@ -371,14 +371,25 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="amount" class="form-label">Amount (in. TZS)</label>
+                                <label for="amount" class="form-label">Amount (in. TZS)<span class="text-danger">*</span></label>
                                 <input type="number" required name="amount" class="form-control-custom" id="amount" step="0.01" min="0" placeholder="0.00" value="{{old('amount')}}">
                                 @error('amount')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="duration" class="form-label">Time duration (No. of months)</label>
+                                <label for="duration" class="form-label">Account Number</label>
+                                <div class="input-group">
+                                    <input type="text" name="account" class="form-control-custom" placeholder="Account No" value="{{old('account')}}">
+                                </div>
+                                @error('account')
+                                <div class="text-danger small">{{$message}}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="duration" class="form-label">Time duration (No. of months)<span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input type="number" required name="duration" class="form-control-custom" placeholder="Months" value="{{old('duration')}}">
                                 </div>
@@ -443,6 +454,10 @@
                             </div>
                         </div>
                         <div class="row">
+                            <div class="col-md-6">
+                                <label for="editStatus" class="form-label">Account Number <span class="text-danger">*</span></label>
+                                <input type="text" name="account" class="form-control-custom" id="editAccount">
+                            </div>
                             <div class="col-md-6">
                                 <label for="editStatus" class="form-label">Status <span class="text-danger">*</span></label>
                                 <select name="status" id="editStatus" class="form-control-custom">
@@ -559,6 +574,7 @@
                 document.getElementById('editServiceId').value = service.id;
                 document.getElementById('editName').value = service.service_name;
                 document.getElementById('editAmount').value = service.amount;
+                document.getElementById('editAccount').value = service.collection_account;
 
                 // Payment mode safe selector
                 const paymentModeSelect = document.getElementById('editPaymentMode');
@@ -617,7 +633,7 @@
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Success',
-                                text: data.message || 'Transaction updated successfully',
+                                text: data.message || 'Service updated successfully',
                                 toast: true,
                                 position: 'top-end',
                                 showConfirmButton: false,
@@ -634,7 +650,7 @@
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
-                                text: data.message || 'Failed to update transaction',
+                                text: data.message || 'Failed to update Service',
                                 toast: true,
                                 position: 'top-end',
                                 showConfirmButton: false,
@@ -642,7 +658,7 @@
                                 timerProgressBar: true
                             });
                             updateBtn.disabled = false;
-                            updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update Transaction';
+                            updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update Service';
                         }
                     })
                     .catch(error => {
@@ -650,7 +666,7 @@
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: 'Something went wrong while updating',
+                            text: 'Something went wrong while updating service',
                             toast: true,
                             position: 'top-end',
                             showConfirmButton: false,
@@ -658,7 +674,7 @@
                             timerProgressBar: true
                         });
                         updateBtn.disabled = false;
-                        updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update Transaction';
+                        updateBtn.innerHTML = '<i class="fas fa-save me-2"></i> Update Service';
                     });
             });
 

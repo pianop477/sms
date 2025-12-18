@@ -24,7 +24,8 @@ class ServiceController extends Controller
             'service_name' => 'required|string|max:255',
             'amount' => 'required|numeric',
             'payment' => 'required|string|max:255',
-            'duration' => 'required|string|max:255'
+            'duration' => 'required|string|max:255',
+            'account' => 'nullable|string',
         ]);
 
         $service = payment_service::where('service_name', $request->service_name)->first();
@@ -38,7 +39,8 @@ class ServiceController extends Controller
             'service_name' => $request->service_name,
             'amount' => $request->amount,
             'payment_mode' => $request->payment,
-            'expiry_duration' => $request->duration
+            'expiry_duration' => $request->duration,
+            'collection_account' => $request->account
         ]);
 
         Alert()->toast('Service added successfully', 'success');
@@ -63,7 +65,8 @@ class ServiceController extends Controller
             'amount' => $request->amount,
             'payment_mode' => $request->payment_mode,
             'expiry_duration' => $request->duration,
-            'status' => $request->status
+            'status' => $request->status,
+            'collection_account' => $request->account
         ]);
 
         return response()->json([
