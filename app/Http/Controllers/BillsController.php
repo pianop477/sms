@@ -1074,9 +1074,9 @@ class BillsController extends Controller
             // find important information so as to prepare sms payload
             $account = '';
             if($bill->collection_account != null) {
-                $account = strtoupper($bill->collection_account);
+                $account = 'Tumia Account#: '.strtoupper($bill->collection_account);
             } else {
-                $account = strtoupper($bill->control_number);
+                $account = 'Tumia Control#: ' .strtoupper($bill->control_number);
             }
 
             // dd($account);
@@ -1096,7 +1096,7 @@ class BillsController extends Controller
             $sendBillBySms = new NextSmsService();
             $user = Auth::user();
             $school = school::findOrFail($user->school_id);
-            $message = "Habari! Unakumbushwa kulipa {$service} ya {$studentName}, Tsh. {$formattedBalance}. Tumia Control#: {$account} kulipa kabla ya {$dueDate}. Tafadhali lipa kwa wakati!";
+            $message = "Habari! Unakumbushwa kulipa {$service} ya {$studentName}, Tsh. {$formattedBalance}. {$account} kulipa kabla ya {$dueDate}. Tafadhali lipa kwa wakati!";
 
             $senderId = $school->sender_id ?? 'SHULE APP';
             $payload = [
