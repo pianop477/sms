@@ -1869,4 +1869,47 @@ class BillsController extends Controller
             'students', 'paymentRecords', 'totalBilled', 'totalPaid', 'totalBalance', 'selectedYear'
         ));
     }
+
+    public function edit($bill)
+    {
+        $billId = Hashids::decode($bill)[0];
+        $user = auth()->user();
+
+        return response()->json([
+            'bill' => school_fees::findOrFail($billId),
+            'students' => Student::where('school_id', $user->school_id)->where('status', 1)
+                                ->orderBy('first_name')->get(),
+            'services' => payment_service::where('status', 'active')
+                                ->orderBy('service_name')->get(),
+        ]);
+    }
+
+    public function update(Request $request, $bill)
+    {
+        $billId = Hashids::decode($bill)[0];
+
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'service_id' => 'required|exists:payment_services,id',
+            'amount' => 'required|numeric',
+            'due_date' => 'required|date',
+            'status' => 'required',
+            'control_number' => 'nullable|string',
+            'academic_year' => 'required|date_format:Y',
+        ]);
+
+        school_fees::where('id', $billId)->update($request->only([
+            'student_id',
+            'control_number',
+            'service_id',
+            'amount',
+            'due_date',
+            'status',
+            'academic_year'
+        ]));
+
+        Alert()->toast('Bill updated successfully', 'success');
+        return back();
+    }
+
 }

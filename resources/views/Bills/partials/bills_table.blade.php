@@ -67,11 +67,27 @@
                                         View Bill
                                     </a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item text-sm"
+                                        href="#"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editBillModal"
+                                        onclick="openEditBillModal('{{ Hashids::encode($row->id) }}')">
+                                            <i class="fas fa-pencil text-info"></i>
+                                            Edit Bill
+                                    </a>
+                                </li>
                                 @if ($row->total_paid == 0 && $row->status == 'active')
                                 <li>
-                                    <a class="dropdown-item text-sm" href="#" data-bs-toggle="modal" title="cancel bill" data-bs-target="#cancelModal{{$row->control_number}}">
-                                        <i class="fas fa-ban text-danger"></i>
-                                        Cancel Bill
+                                    <a href="#"
+                                        class="dropdown-item cancel-btn"
+                                        data-id="{{ Hashids::encode($row->id) }}"
+                                        data-control="{{ strtoupper($row->control_number) }}"
+                                        data-service="{{ $row->service_name }}"
+                                        data-amount="{{ number_format($billed) }}"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#cancelBillModal">
+                                        <i class="fas fa-ban text-danger"></i> Cancel Bill
                                     </a>
                                 </li>
                                 @endif
@@ -90,41 +106,6 @@
                         </div>
                     </td>
                 </tr>
-                <!-- Cancel Modal for each row -->
-                <div class="modal fade" id="cancelModal{{$row->control_number}}" tabindex="-1" aria-labelledby="cancelModalLabel{{$row->control_number}}" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="cancelModalLabel{{$row->control_number}}">
-                                    Cancel Bill - {{strtoupper($row->control_number)}}
-                                </h5>
-                                <button type="button" class="btn btn-close btn-link" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close text-white"></i></button>
-                            </div>
-                            <form action="{{route('bills.cancel', ['bill' => Hashids::encode($row->id)])}}" method="POST" enctype="multipart/form-data">
-                                @csrf
-                                @method('PUT')
-                                <div class="modal-body">
-                                    <div class="mb-3">
-                                        <label for="cancelReason{{$row->control_number}}" class="form-label">Cancel Reason <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control-custom" id="cancelReason{{$row->control_number}}" name="reason" placeholder="Enter reason" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <small class="text-muted">
-                                            <strong>Bill Details:</strong><br>
-                                            Reference: {{strtoupper($row->control_number)}}<br>
-                                            Amount: {{number_format($billed)}}<br>
-                                            Service Type: {{ucwords(strtolower($row->service_name ?? 'N/A'))}}
-                                        </small>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to cancel this bill?')"> Cancel</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
             @empty
                 <tr>
                     <td colspan="11" class="text-center py-4">
@@ -148,6 +129,122 @@
         </tbody>
     </table>
 </div>
+{{-- edit bill modal --}}
+<div class="modal fade" id="editBillModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="editBillForm" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title text-dark">
+                        <i class="fas fa-edit"></i> Edit Bill - Control# {{strtoupper($row->control_number)}}
+                    </h5>
+                    <button type="button" class="btn btn-xs btn-secondary" data-bs-dismiss="modal"><i class="fas fa-close"></i></button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" id="edit_bill_id">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>Control Number</label>
+                            <input type="text" class="form-control-custom" name="control_number" id="edit_control_number">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Student</label>
+                            <select class="form-control-custom select2 text-capitalize" id="edit_student_id" name="student_id" required>
+                                <option value="">-- Select Student --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label>Service</label>
+                            <select class="form-control-custom text-capitalize" id="edit_service_id" name="service_id" required>
+                                <option value="">-- Select Service --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Billed Amount</label>
+                            <input type="number" class="form-control-custom" id="edit_amount" name="amount">
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label>Due Date</label>
+                            <input type="date" class="form-control-custom" id="edit_due_date" name="due_date">
+                        </div>
+                        <div class="col-md-6">
+                            <label>Status</label>
+                            <select class="form-control-custom" id="edit_status" name="status">
+                                <option value="active">Active</option>
+                                <option value="full paid">Full Paid</option>
+                                <option value="overpaid">Overpaid</option>
+                                <option value="expired">Expired</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label>Academic Year</label>
+                            <input type="text" class="form-control-custom" id="academic_year" name="academic_year">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Update Bill
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+{{-- cancel bill modal --}}
+<div class="modal fade" id="cancelBillModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Cancel Bill - Control# {{strtoupper($row->control_number)}}</h5>
+        <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal"><i class="fas fa-close"></i></button>
+      </div>
+      <form method="POST" id="cancelBillForm">
+        @csrf
+        @method('PUT')
+
+        <div class="modal-body">
+          <input type="hidden" id="cancelBillId">
+
+          <div class="mb-3">
+            <label class="form-label">Cancel Reason <span class="text-danger">*</span></label>
+            <input type="text" name="reason" class="form-control-custom" required>
+          </div>
+
+          <div class="small text-muted" id="billPreview"></div>
+          <div class="mb-3">
+            <small class="text-muted">
+                <strong>Bill Details:</strong><br>
+                    Reference: {{strtoupper($row->control_number)}}<br>
+                    Amount: {{number_format($billed)}}<br>
+                    Service Type: {{ucwords(strtolower($row->service_name ?? 'N/A'))}}
+            </small>
+        </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this bill?')">Cancel Bill</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
 
 <!-- Bill Details Modal -->
 <div class="modal fade" id="billDetailsModal" tabindex="-1" aria-labelledby="billDetailsModalLabel" aria-hidden="true">
@@ -158,7 +255,7 @@
                     <i class="fas fa-file-invoice me-1"></i>
                     Bill Details
                 </h6>
-                <button type="button" class="btn-close btn-danger btn-sm" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
+                <button type="button" class="btn btn-xs btn-danger btn-sm" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
             </div>
             <div class="modal-body p-3">
                 <div id="billDetailsContent">
@@ -204,6 +301,90 @@
     }
 </style>
 <script>
+    $(document).on('click', '.cancel-btn', function () {
+        const billId = $(this).data('id');
+
+        $('#cancelBillForm').attr('action', `/Bills/cancel/${billId}`);
+    });
+
+    //edit bill function
+    function openEditBillModal(hashId) {
+        $('#editBillModal').modal('show');
+
+        $.get(`/Bills/edit/${hashId}`, function (response) {
+            $('#editBillForm').attr('action', `/Bills/update/${hashId}`);
+
+            // Fill basic fields
+            $('#edit_control_number').val(response.bill.control_number);
+            $('#edit_amount').val(response.bill.amount);
+            $('#academic_year').val(response.bill.academic_year);
+            $('#edit_status').val(response.bill.status);
+
+            // Handle due_date conversion
+            if (response.bill.due_date) {
+                // Convert "2026-10-30 21:34:51" to "2026-10-30"
+                const dueDate = response.bill.due_date.split(' ')[0];
+                $('#edit_due_date').val(dueDate);
+            } else {
+                $('#edit_due_date').val('');
+            }
+
+            // Populate students
+            $('#edit_student_id').empty();
+            response.students.forEach(student => {
+                $('#edit_student_id').append(
+                    `<option value="${student.id}">${student.first_name} ${student.last_name}</option>`
+                );
+            });
+            $('#edit_student_id').val(response.bill.student_id).trigger('change');
+
+            // Populate services
+            $('#edit_service_id').empty();
+            response.services.forEach(service => {
+                $('#edit_service_id').append(
+                    `<option value="${service.id}"
+                            data-amount="${service.amount}"
+                            data-duration="${service.expiry_duration}">
+                        ${service.service_name}
+                    </option>`
+                );
+            });
+            $('#edit_service_id').val(response.bill.service_id);
+        }).fail(function(error) {
+            console.error('Error loading bill data:', error);
+            alert('Error loading bill details. Please try again.');
+        });
+    }
+
+    // Real-time service change - EDIT MODAL
+    $(document).on('change', '#edit_service_id', function () {
+        let option = $(this).find(':selected');
+        const amount = option.data('amount');
+        const duration = option.data('duration');
+
+        // Set amount if exists
+        if (amount) {
+            $('#edit_amount').val(amount);
+        }
+
+        // Set due date based on duration (months from now)
+        if (duration) {
+            const today = new Date();
+            today.setMonth(today.getMonth() + parseInt(duration));
+
+            // Format as YYYY-MM-DD
+            const formattedDate = today.toISOString().split('T')[0];
+            $('#edit_due_date').val(formattedDate);
+        } else {
+            $('#edit_due_date').val('');
+        }
+    });
+
+    // Select2
+    $('.select2').select2({
+        dropdownParent: $('#editBillModal')
+    });
+
     function viewBill(billId) {
         console.log('Loading bill:', billId);
 
@@ -365,4 +546,5 @@
             }
         });
     }
+
 </script>

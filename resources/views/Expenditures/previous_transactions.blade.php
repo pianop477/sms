@@ -157,7 +157,7 @@
 
         .table-responsive {
             border-radius: 15px;
-            overflow: hidden;
+            overflow: auto;
             box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
         }
 

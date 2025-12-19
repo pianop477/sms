@@ -36,7 +36,7 @@
 
         .table-responsive {
             border-radius: 10px;
-            overflow: hidden;
+            overflow-x: auto;
         }
 
         .progress-table {
@@ -263,7 +263,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addTeacherModalLabel"> Register Bills</h5>
-                    <button type="button" class="btn-close btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                    <button type="button" class="btn btn-xs btn btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
                 </div>
                 <div class="modal-body">
                     <form class="needs-validation" novalidate action="{{route('bills.store')}}" method="POST" enctype="multipart/form-data">

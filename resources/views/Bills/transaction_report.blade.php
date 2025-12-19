@@ -157,7 +157,7 @@
 
         .table-responsive {
             border-radius: 15px;
-            overflow: hidden;
+            overflow: auto;
             box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
         }
 
@@ -437,7 +437,7 @@
                                     <div class="card-body">
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
-                                                <div class="card-title">Total Billed Amount</div>
+                                                <div class="card-title">Total Active Bills</div>
                                                 <div class="card-value">{{ number_format($totalActiveBills) }}</div>
                                             </div>
                                             <div class="col-auto">
@@ -453,7 +453,7 @@
                                     <div class="card-body">
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
-                                                <div class="card-title">Total Paid Amount</div>
+                                                <div class="card-title">Total Paid Bills</div>
                                                 <div class="card-value">{{ number_format($totalPaidAll) }}</div>
                                             </div>
                                             <div class="col-auto">
@@ -469,7 +469,7 @@
                                     <div class="card-body">
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
-                                                <div class="card-title">Total Cancelled Amount</div>
+                                                <div class="card-title">Total Cancelled Bills</div>
                                                 <div class="card-value">{{ number_format($totalCancelledBills) }}</div>
                                             </div>
                                             <div class="col-auto">
@@ -485,7 +485,7 @@
                                     <div class="card-body">
                                         <div class="row no-gutters align-items-center">
                                             <div class="col mr-2">
-                                                <div class="card-title">Cancelled Count</div>
+                                                <div class="card-title">Cancelled Bills Count</div>
                                                 <div class="card-value">{{ number_format($totalCancelledCount) }}</div>
                                             </div>
                                             <div class="col-auto">
@@ -498,7 +498,7 @@
                         </div>
                         <hr>
                         {{-- End of Bill Statistics --}}
-                        <div class="row">
+                        <div class="row mb-3">
                             <div class="col-md-2 mb-3">
                                 <form method="GET" action="{{ url()->current() }}">
                                     @php
