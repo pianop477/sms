@@ -220,13 +220,12 @@
 
         <div class="modal-body">
           <input type="hidden" id="cancelBillId">
-
           <div class="mb-3">
             <label class="form-label">Cancel Reason <span class="text-danger">*</span></label>
             <input type="text" name="reason" class="form-control-custom" required>
           </div>
-
           <div class="small text-muted" id="billPreview"></div>
+          <div class="mb-3">
         </div>
         </div>
         <div class="modal-footer">
