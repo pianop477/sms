@@ -138,7 +138,7 @@
                 @method('PUT')
                 <div class="modal-header bg-warning">
                     <h5 class="modal-title text-dark">
-                        <i class="fas fa-edit"></i> Edit Bill - Control# {{strtoupper($row->control_number)}}
+                        <i class="fas fa-edit"></i> Edit Bill
                     </h5>
                     <button type="button" class="btn btn-xs btn-secondary" data-bs-dismiss="modal"><i class="fas fa-close"></i></button>
                 </div>
@@ -211,7 +211,7 @@
     <div class="modal-content">
 
       <div class="modal-header">
-        <h5 class="modal-title">Cancel Bill - Control# {{strtoupper($row->control_number)}}</h5>
+        <h5 class="modal-title">Cancel Bill</h5>
         <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal"><i class="fas fa-close"></i></button>
       </div>
       <form method="POST" id="cancelBillForm">
