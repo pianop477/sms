@@ -227,13 +227,6 @@
           </div>
 
           <div class="small text-muted" id="billPreview"></div>
-          <div class="mb-3">
-            <small class="text-muted">
-                <strong>Bill Details:</strong><br>
-                    Reference: {{strtoupper($row->control_number)}}<br>
-                    Amount: {{number_format($billed)}}<br>
-                    Service Type: {{ucwords(strtolower($row->service_name ?? 'N/A'))}}
-            </small>
         </div>
         </div>
         <div class="modal-footer">
