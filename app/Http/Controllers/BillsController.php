@@ -1898,15 +1898,23 @@ class BillsController extends Controller
             'academic_year' => 'required|date_format:Y',
         ]);
 
-        school_fees::where('id', $billId)->update($request->only([
-            'student_id',
-            'control_number',
-            'service_id',
-            'amount',
-            'due_date',
-            'status',
-            'academic_year'
-        ]));
+        $date = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
+        $bill = school_fees::findOrFail($billId);
+
+        if(! $bill) {
+            Alert()->toast('Bill Not found', 'error');
+            return back();
+        }
+
+        $bill->update([
+             'student_id' => $request->student_id,
+            'control_number' => $request->control_number,
+            'service_id' => $request->service_id,
+            'amount' => $request->amount,
+            'due_date' => $date,
+            'status' => $request->status,
+            'academic_year' => $request->academic_year
+        ]);
 
         Alert()->toast('Bill updated successfully', 'success');
         return back();
