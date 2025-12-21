@@ -596,5 +596,6 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::post('/Batches/upload', [paymentBatchController::class, 'store'])->name('batch.store');
         Route::delete('/Batches/delete/{batch}', [paymentBatchController::class, 'deleteBatch'])->name('batch.delete');
         Route::get('/Batches/download/batch/{batch}', [paymentBatchController::class, 'downloadBatch'])->name('batch.download');
+        Route::get('/Students/list', [BillsController::class, 'studentsList'])->name('students.list');
     });
 });

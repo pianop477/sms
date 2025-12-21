@@ -365,10 +365,42 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // Initialize select2
-            $('#studentSelect').select2({
-                placeholder: "Search Student...",
-                allowClear: true,
-                dropdownParent: $('#addTeacherModal')
+            $('#addTeacherModal').on('shown.bs.modal', function() {
+                // Load students via AJAX
+                $.ajax({
+                    url: '{{ route("students.list") }}',
+                    method: 'GET',
+                    success: function(response) {
+                        const select = $('#studentSelect');
+                        select.empty();
+                        select.append('<option value="">--Select student name--</option>');
+
+                        // FIX: Access response.students instead of response directly
+                        if (response.success && response.students && response.students.length > 0) {
+                            response.students.forEach(student => {
+                                const name = `${student.first_name} ${student.middle_name} ${student.last_name}`;
+                                select.append(`<option value="${student.id}">${name.toUpperCase()}</option>`);
+                            });
+                        } else {
+                            select.append('<option value="" disabled>No students found</option>');
+                        }
+
+                        // Initialize Select2
+                        select.select2({
+                            placeholder: "Search Student...",
+                            allowClear: true,
+                            dropdownParent: $('#addTeacherModal'),
+                            width: '100%'
+                        });
+                    },
+                    error: function(xhr) {
+                        console.error('Error loading students:', xhr);
+                        const select = $('#studentSelect');
+                        select.empty();
+                        select.append('<option value="">--Select student name--</option>');
+                        select.append('<option value="" disabled class="text-danger">Error loading students</option>');
+                    }
+                });
             });
 
             // Service amount & due date population - USE EVENT DELEGATION
@@ -420,15 +452,6 @@
 
             // Re-initialize form validation when modal opens
             $('#addTeacherModal').on('shown.bs.modal', function() {
-                // Re-initialize select2
-                if ($('#studentSelect').length && !$('#studentSelect').hasClass("select2-hidden-accessible")) {
-                    $('#studentSelect').select2({
-                        placeholder: "Search Student...",
-                        allowClear: true,
-                        dropdownParent: $('#addTeacherModal')
-                    });
-                }
-
                 // Reset form validation
                 const form = document.querySelector('#addTeacherModal .needs-validation');
                 if (form) {

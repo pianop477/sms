@@ -27,7 +27,7 @@ class BillsController extends Controller
     {
         $user = Auth::user();
 
-        $students = Student::where('school_id', $user->school_id)->orderBy('first_name')->get();
+        $students = Student::where('school_id', $user->school_id)->where('status', 1)->orderBy('first_name')->get();
         $services = payment_service::orderBy('service_name')->where('status', 'active')->get();
 
         $currentYear = date('Y');
@@ -46,6 +46,20 @@ class BillsController extends Controller
         $bills = $this->getBillsData($request, true);
 
         return view('Bills.index', compact('students', 'services', 'bills', 'selectedYear', 'currentYear'));
+    }
+
+    public function studentsList ()
+    {
+        $user = Auth::user();
+        $students = Student::where('school_id', $user->school_id)
+            ->where('status', 1)
+            ->orderBy('first_name')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'students' => $students
+        ]);
     }
 
     private function getBillsData(Request $request, $returnData = false)
