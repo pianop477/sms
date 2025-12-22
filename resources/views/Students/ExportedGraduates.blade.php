@@ -248,7 +248,7 @@
                                 $imagePath = storage_path('app/public/students/' . $imageName);
 
                                 if (!empty($imageName) && file_exists($imagePath)) {
-                                    $avatarImage = public_path('stirage/students/' . $imageName);
+                                    $avatarImage = public_path('storage/students/' . $imageName);
                                 } else {
                                     $avatarImage = public_path('storage/students/student.jpg');
                                 }
