@@ -199,7 +199,7 @@
     <!-- Header Section -->
     <div class="header-container">
         <div class="logo-container">
-            <img class="logo" src="{{ public_path('assets/img/logo/'. Auth::user()->school->logo) }}" alt="School Logo">
+            <img class="logo" src="{{ storage_path('app/public/logo/'. Auth::user()->school->logo) }}" alt="School Logo">
         </div>
         <div class="school-info">
             <h1 class="school-name">{{ Auth::user()->school->school_name }}</h1>
