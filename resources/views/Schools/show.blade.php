@@ -44,7 +44,7 @@
         }
 
         .header-section {
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            /* background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); */
             color: white;
             border-radius: 24px;
             padding: 10px;
@@ -60,7 +60,7 @@
             right: -50%;
             width: 200%;
             height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            /* background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent); */
             transform: rotate(45deg);
             animation: shimmer 3s infinite;
         }

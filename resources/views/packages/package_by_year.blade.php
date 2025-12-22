@@ -508,7 +508,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        <i class="fas fa-upload me-2"></i> Upload New Holiday Package
+                        <i class="fas fa-upload me-2"></i> Upload New Package
                     </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -522,7 +522,7 @@
                                 <label for="title" class="form-label">
                                     Package Title <span class="required-star">*</span>
                                 </label>
-                                <input type="text" name="title" class="form-control" id="title"
+                                <input type="text" name="title" class="form-control-custom" id="title"
                                        placeholder="Package name" value="{{old('title')}}" required>
                                 @error('title')
                                 <div class="invalid-feedback">{{ $message }}</div>

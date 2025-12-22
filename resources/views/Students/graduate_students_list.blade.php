@@ -334,8 +334,9 @@
 
                             <div id="batch-{{ $gradYear }}" class="collapse">
                                 <div class="batch-content">
-                                    @php $batchStudents = $GraduatedStudents->where('graduated_at', $gradYear); @endphp
-
+                                    @php
+                                        $batchStudents = $GraduatedStudents->where('graduated_at', $gradYear);
+                                    @endphp
                                     @if($batchStudents->isNotEmpty())
                                         <div class="batch-actions">
                                             <span class="student-count">

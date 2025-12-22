@@ -21,7 +21,7 @@ class Student extends Model
         'transport_id',
         'school_id',
         'admission_number',
-        'status'
+        'status', 'graduated', 'graduated_at'
     ];
 
     protected $guarded = ['id', 'created_at', 'updated_at'];

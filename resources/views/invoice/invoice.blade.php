@@ -398,7 +398,7 @@
         /* PRINT STYLES */
         @media print {
             @page {
-                margin: 15mm;
+                margin: 8mm;
                 size: A4;
             }
 
@@ -407,7 +407,7 @@
                 color: black !important;
                 font-size: 11pt;
                 font-family: 'Arial', 'Helvetica', sans-serif;
-                line-height: 1.3;
+                line-height: 1;
                 margin: 0;
                 padding: 0;
             }
@@ -431,7 +431,7 @@
                 color: black !important;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
-                padding: 20px !important;
+                padding: 15px !important;
                 border-bottom: 2px solid #000 !important;
             }
 
@@ -439,13 +439,13 @@
                 display: flex !important;
                 justify-content: space-between !important;
                 align-items: flex-start !important;
-                gap: 20px !important;
+                gap: 15px !important;
             }
 
             .company-info {
                 display: flex !important;
                 align-items: flex-start !important;
-                gap: 15px !important;
+                gap: 10px !important;
             }
 
             .invoice-logo {
@@ -458,7 +458,7 @@
 
             .company-details h1 {
                 color: black !important;
-                font-size: 20pt !important;
+                font-size: 16pt !important;
                 margin-bottom: 5px !important;
             }
 
@@ -492,13 +492,13 @@
             }
 
             .invoice-body {
-                padding: 20px !important;
+                padding: 15px !important;
             }
 
             .info-grid {
                 grid-template-columns: 1fr 1fr !important;
-                gap: 20px !important;
-                margin-bottom: 25px !important;
+                gap: 15px !important;
+                margin-bottom: 20px !important;
             }
 
             .info-card {
@@ -534,13 +534,13 @@
 
             .invoice-table th {
                 border: 1px solid #000 !important;
-                padding: 12px 8px !important;
+                padding: 10px 6px !important;
                 background: #e8e8e8 !important;
             }
 
             .invoice-table td {
                 border: 1px solid #000 !important;
-                padding: 12px 8px !important;
+                padding: 10px 8px !important;
             }
 
             .amount-input {
@@ -552,7 +552,7 @@
 
             .payment-methods {
                 grid-template-columns: 1fr 1fr !important;
-                gap: 20px !important;
+                gap: 15px !important;
                 page-break-inside: avoid;
             }
 
@@ -575,7 +575,7 @@
             .invoice-footer {
                 background: #f0f0f0 !important;
                 border-top: 1px solid #000 !important;
-                margin-top: 20px !important;
+                margin-top: 15px !important;
             }
 
             /* Ensure good print layout */

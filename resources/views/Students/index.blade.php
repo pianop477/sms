@@ -376,7 +376,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title text-uppercase" id="promoteModalLabel">Promote Students to the Next Class</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
                 </div>
                 <div class="modal-body">
                     <p class="text-danger mb-3">Select class you want to promote students to</p>
@@ -385,7 +385,7 @@
                         @method('PUT')
                         <div class="mb-3">
                             <label for="classSelect" class="form-label">Class Name</label>
-                            <select name="class_id" id="classSelect" class="form-select text-uppercase" required>
+                            <select name="class_id" id="classSelect" class="form-control-custom text-uppercase" required>
                                 <option value="">--Select Class--</option>
                                 @if ($classes->isEmpty())
                                     <option value="" class="text-danger">No more classes found</option>
@@ -400,7 +400,7 @@
                         </div>
                         <div class="mb-3" id="graduationYearField" style="display: none;">
                             <label for="graduation_year" class="form-label">Graduation Year</label>
-                            <input type="number" name="graduation_year" id="graduation_year" class="form-control" min="{{date('Y') - 5}}" max="{{date('Y')}}" value="{{old('graduation_year')}}">
+                            <input type="number" name="graduation_year" id="graduation_year" placeholder="e.g 2025" class="form-control-custom" min="{{date('Y') - 5}}" max="{{date('Y')}}" value="{{old('graduation_year')}}">
                             <div class="form-text">Please enter the graduation year</div>
                         </div>
                         <div class="modal-footer">
@@ -525,16 +525,22 @@
                 checkboxes.forEach(checkbox => checkbox.checked = this.checked);
             });
 
-            // Show/hide graduation year field
+            // Show/hide graduation year field and manage required attribute
             const classSelect = document.getElementById('classSelect');
             const graduationYearField = document.getElementById('graduationYearField');
+            const graduationYearInput = document.getElementById('graduation_year');
 
             if (classSelect) {
                 classSelect.addEventListener('change', function() {
                     if (this.value === '0') {
+                        // If graduate class selected, show field and make it required
                         graduationYearField.style.display = 'block';
+                        graduationYearInput.setAttribute('required', 'required');
                     } else {
+                        // If other class selected, hide field and remove required
                         graduationYearField.style.display = 'none';
+                        graduationYearInput.removeAttribute('required');
+                        graduationYearInput.value = ''; // Optional: Clear value when hidden
                     }
                 });
             }
@@ -543,6 +549,14 @@
             const forms = document.querySelectorAll('.needs-validation');
             forms.forEach(form => {
                 form.addEventListener('submit', function(event) {
+                    // Dynamic required attribute handling before validation
+                    const selectedClass = classSelect ? classSelect.value : '';
+                    if (selectedClass === '0') {
+                        graduationYearInput.setAttribute('required', 'required');
+                    } else {
+                        graduationYearInput.removeAttribute('required');
+                    }
+
                     if (!form.checkValidity()) {
                         event.preventDefault();
                         event.stopPropagation();
