@@ -44,7 +44,7 @@
         }
 
         .header-section {
-            /* background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); */
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             color: white;
             border-radius: 24px;
             padding: 8px;

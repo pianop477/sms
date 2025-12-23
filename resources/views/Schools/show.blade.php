@@ -44,7 +44,7 @@
         }
 
         .header-section {
-            /* background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); */
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             color: white;
             border-radius: 24px;
             padding: 10px;
@@ -267,7 +267,7 @@
         <div class="glass-card header-section fade-in">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h3 class="fw-bold mb-3 text-dark">🏫 {{ucwords(strtolower($schools->school_name))}}</h3>
+                    <h3 class="fw-bold mb-3">🏫 {{ucwords(strtolower($schools->school_name))}}</h3>
                     {{-- <p class="lead mb-0 opacity-90">Comprehensive School Management Dashboard</p> --}}
                 </div>
                 <div class="col-md-4 text-md-end">
