@@ -126,10 +126,13 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
 
     // 0. ROUTES ACCESS FOR SUPER USER ADMIN (SYSTEM ADMINISTRATOR) ======================================================================
     Route::middleware(['CheckUsertype:1'])->group(function() {
-        Route::get('Registration', [UsersController::class, 'managerForm'])->name('register.manager');
+        Route::get('/Administrators', [UsersController::class, 'managerForm'])->name('register.manager');
         Route::post('Manager-register', [ManagerController::class, 'store'])->name('manager.store');
         Route::put('{school}/Deactivation', [ManagerController::class, 'updateStatus'])->name('deactivate.status');
         Route::put('{school}/Activate', [ManagerController::class, 'activateStatus'])->name('activate.status');
+        Route::get('/School/administrators//manager/{id}', [ManagerController::class, 'show'])->name('manager.profile');
+        Route::put('/School/administrators//manager/{id}/Update-profile', [ManagerController::class, 'updateProfile'])->name('manager.update.profile');
+        Route::delete('/School/administrators//manager/{id}/Delete', [ManagerController::class, 'destroyManager'])->name('manager.destroy');
         //register new schools or institutions=====================================================================
         Route::resource('Schools', SchoolsController::class);
         Route::get('Admin-reset-password', [ManagerController::class, 'reset'])->name('admin.reset.password');

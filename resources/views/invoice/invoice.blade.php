@@ -698,7 +698,7 @@
                         </div>
                         <div class="info-item">
                             <span class="info-label">Email:</span>
-                            <span class="info-value">{{ $managers->first()->email }}</span>
+                            <span class="info-value">{{ $managers->first()->email ?? 'N/A' }}</span>
                         </div>
                     </div>
 

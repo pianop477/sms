@@ -254,14 +254,14 @@
         <!-- Header Section -->
         <div class="glass-card header-section fade-in">
             <div class="row align-items-center">
-                <div class="col-md-8">
+                <div class="col-md-9">
                     <h1 class="display-5 fw-bold mb-2">🔐 Password Reset Manager</h1>
                     <p class="lead mb-0 opacity-90 text-white"> Reset school managers' passwords securely</p>
                 </div>
-                <div class="col-md-4 text-md-end">
+                <div class="col-md-3 text-md-end">
                     <div class="badge bg-white text-primary p-3 rounded-pill">
                         <i class="fas fa-users me-2"></i>
-                        {{ count($users) }} School Managers
+                        {{ count($users) }} School Administrators
                     </div>
                 </div>
             </div>
@@ -328,7 +328,7 @@
             <div class="card-body p-0">
                 <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
                     <h4 class="text-primary mb-0">
-                        <i class="fas fa-user-shield me-2"></i> School Managers
+                        <i class="fas fa-user-shield me-2"></i> School Administrators
                     </h4>
                     <div class="badge bg-primary p-2 rounded-pill text-white">
                         <i class="fas fa-sync-alt me-2"></i> Real-time
@@ -353,9 +353,6 @@
                                     <td class="fw-bold text-primary">{{ $loop->iteration }}</td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <div class="bg-primary rounded-circle p-2 me-3">
-                                                <i class="fas fa-user-tie text-white"></i>
-                                            </div>
                                             <div>
                                                 <div class="fw-bold text-capitalize">
                                                     {{ $user->first_name }} {{ $user->last_name }}
@@ -366,13 +363,11 @@
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <i class="fas fa-envelope text-primary me-2"></i>
                                             <span class="text-truncate">{{ $user->email }}</span>
                                         </div>
                                     </td>
                                     <td class="text-capitalize">
                                         <div class="d-flex align-items-center">
-                                            <i class="fas fa-school text-primary me-2"></i>
                                             {{ $user->school_name }}
                                         </div>
                                     </td>
@@ -392,9 +387,9 @@
                                             @csrf
                                             @method('PUT')
                                             <button class="btn-reset"
-                                                    onclick="return confirm('Are you sure you want to reset password for {{ $user->first_name }} {{ $user->last_name }}?')"
+                                                    onclick=""
                                                     title="Reset Password">
-                                                <i class="fas fa-key me-2"></i>Reset
+                                                <i class="fas fa-key me-2"></i> Reset
                                             </button>
                                         </form>
                                     </td>

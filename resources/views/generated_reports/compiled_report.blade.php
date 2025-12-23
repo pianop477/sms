@@ -135,6 +135,16 @@
             background-color: white;
             z-index: 1000;
         }
+
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s ease;
+        }
     </style>
 </head>
 <body>
@@ -164,7 +174,7 @@
                     $avatarImage = storage_path('app/public/students/' . ($students->gender == 'male' ? 'student.jpg' : 'student.jpg'));
                 }
             @endphp
-            <img src="{{ $avatarImage }}" alt="" width="80" class="rounded-circle" style="border-radius: 50%">
+            <img src="{{ $avatarImage }}" alt="" width="80" class="profile-img">
         </td>
     </tr>
 </table>

@@ -34,7 +34,7 @@
             border-radius: 24px;
             border: 1px solid rgba(255, 255, 255, 0.3);
             box-shadow: var(--card-shadow);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            /* transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); */
             overflow: hidden;
         }
 
@@ -53,6 +53,21 @@
             overflow: hidden;
         }
 
+        .form-control-custom {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
+        }
+
         .header-section::before {
             content: '';
             position: absolute;
@@ -60,7 +75,7 @@
             right: -50%;
             width: 200%;
             height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            /* background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent); */
             transform: rotate(45deg);
             animation: shimmer 3s infinite;
         }
@@ -282,11 +297,11 @@
         <!-- Header Section -->
         <div class="glass-card header-section fade-in">
             <div class="row align-items-center">
-                <div class="col-md-8">
+                <div class="col-md-10">
                     <h1 class="display-5 fw-bold mb-2">👨‍💼 School Administrators</h1>
                     <p class="lead mb-0 opacity-90 text-white">Manage all school administrators and managers</p>
                 </div>
-                <div class="col-md-4 text-md-end float-right">
+                <div class="col-md-2 text-md-end float-right">
                     <div class="badge bg-white text-primary p-3 rounded-pill">
                         <i class="fas fa-users me-2"></i>
                         {{ count($managers) }} Total Admin
@@ -314,7 +329,7 @@
         <!-- Search and Filters Section -->
         <div class="glass-card search-section fade-in">
             <div class="row align-items-center">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="input-group">
                         <span class="input-group-text bg-transparent border-end-0">
                             <i class="fas fa-search text-primary"></i>
@@ -322,15 +337,11 @@
                         <input type="text" class="form-control border-start-0" placeholder="Search managers..." id="searchInput">
                     </div>
                 </div>
-                <div class="col-md-6 text-end">
-                    <div class="btn-group">
-                        <button class="btn btn-outline-primary">
-                            <i class="fas fa-filter me-2"></i>Filters
-                        </button>
-                        <button class="btn btn-primary">
-                            <i class="fas fa-plus me-2"></i>Add Manager
-                        </button>
-                    </div>
+                <div class="col-md-5"></div>
+                <div class="col-md-3 text-md-end mt-3 mt-md-0">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+                        <i class="fas fa-plus me-2"></i> Add User
+                    </button>
                 </div>
             </div>
         </div>
@@ -358,9 +369,6 @@
                                     <td class="fw-bold text-primary">{{ $loop->iteration }}</td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <div class="bg-primary rounded-circle p-2 me-3">
-                                                <i class="fas fa-user-tie text-white"></i>
-                                            </div>
                                             <div>
                                                 <div class="fw-bold text-capitalize">
                                                     {{ $manager->first_name }} {{ $manager->last_name }}
@@ -376,19 +384,16 @@
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <i class="fas fa-phone text-primary me-2"></i>
                                             {{ $manager->phone }}
                                         </div>
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <i class="fas fa-envelope text-primary me-2"></i>
                                             <span class="text-truncate" style="max-width: 150px;">{{ $manager->email }}</span>
                                         </div>
                                     </td>
                                     <td class="text-capitalize">
                                         <div class="d-flex align-items-center">
-                                            <i class="fas fa-school text-primary me-2"></i>
                                              {{ $manager->school_name }}
                                         </div>
                                     </td>
@@ -405,15 +410,16 @@
                                     </td>
                                     <td>
                                         <div class="action-buttons">
-                                            <button class="btn-icon bg-info text-white" title="View Profile">
+                                            <a href="{{route('manager.profile', ['id' => Hashids::encode($manager->id)])}}" class="btn-icon bg-primary text-white" title="view profile">
                                                 <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button class="btn-icon bg-warning text-white" title="Edit Manager">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn-icon bg-danger text-white" title="Delete Manager">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                            </a>
+                                            <form action="{{route('manager.destroy', ['id' => Hashids::encode($manager->id)])}}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="btn-icon bg-danger text-white" title="Delete Manager" onclick="return confirm('Are you sure you want to delete this Administrator?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
@@ -439,6 +445,88 @@
         @endif
     </div>
 
+    <div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-uppercase" id="addStudentModalLabel"> School Administrator Registration Form</h5>
+                    <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
+                </div>
+                <div class="modal-body">
+                    <form class="needs-validation" novalidate action="{{route('manager.store')}}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="fname" class="form-label">First Name</label>
+                                <input type="text" class="form-control-custom" id="fname" name="fname" value="{{old('fname')}}" required placeholder="First Name">
+                                @error('fname')
+                                    <div class="text-danger mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lname" class="form-label">Last Name</label>
+                                <input type="text" class="form-control-custom" id="lname" name="lname" value="{{old('lname')}}" required placeholder="Last Name">
+                                @error('lname')
+                                    <div class="text-danger mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="text" class="form-control-custom" id="phone" name="phone" value="{{old('phone')}}" required placeholder="Phone Number">
+                                @error('phone')
+                                    <div class="text-danger mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control-custom" id="email" name="email" value="{{old('email')}}" required placeholder="Email Address">
+                                @error('email')
+                                    <div class="text-danger mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="gender" class="form-label">Gender</label>
+                                <select class="form-select form-control-custom" id="gender" name="gender" required>
+                                    <option value="">-- select gender --</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                                @error('gender')
+                                    <div class="text-danger mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="parentSelect" class="form-label">School</label>
+                                <select name="school" id="" class="form-control-custom" required>
+                                    <option value="">Select school</option>
+                                    @if ($schools->isEmpty())
+                                        <option value="" disabled class="text-danger">No schools were found</option>
+                                    @else
+                                        @foreach ($schools as $school)
+                                            <option value="{{$school->id}}">
+                                                {{ucwords(strtolower($school->school_name ?? 'N/A'))}}
+                                            </option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                @error('school')
+                                    <div class="text-danger mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-success">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // Search functionality

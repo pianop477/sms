@@ -175,7 +175,7 @@ class TeachersController extends Controller
 
                 }
 
-                $message = "Welcome Teacher ". strtoupper($users->first_name) .", to ShuleApp. Your Login Details are; username: {$users->phone}, password: shule2025. Visit {$url} to Login.";
+                $message = "Hello ". strtoupper($users->first_name) .", Welcome to ShuleApp. Your Username is: {$users->phone} Password: shule2025. Use link {$url} to Login and change password Thank you.";
                 // $response = $beemSmsService->sendSms($sourceAddr, $message, $recipients);
 
                 // send SMS using nextSMS API ***********************************************
@@ -185,7 +185,7 @@ class TeachersController extends Controller
                 $payload = [
                     'from' => $school->sender_id ?? "SHULE APP",
                     'to' => $destination,
-                    'text' => "Welcome Teacher ". strtoupper($users->first_name) .", to ShuleApp. Your Login Details are; username: {$users->phone}, Password: shule2025. Visit {$url} to Login.",
+                    'text' => $message,
                     'reference' => uniqid(),
                 ];
 

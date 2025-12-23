@@ -267,7 +267,7 @@
         <div class="glass-card header-section fade-in">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h3 class="fw-bold mb-3">🏫 {{ucwords(strtolower($schools->school_name))}}</h3>
+                    <h3 class="fw-bold mb-3 text-dark">🏫 {{ucwords(strtolower($schools->school_name))}}</h3>
                     {{-- <p class="lead mb-0 opacity-90">Comprehensive School Management Dashboard</p> --}}
                 </div>
                 <div class="col-md-4 text-md-end">
@@ -338,7 +338,7 @@
                                     </div>
                                     <div>
                                         <small class="text-muted d-block text-capitalize">School Admin</small>
-                                        <strong>{{ucwords(strtolower($managers->first()->first_name))}} {{ucwords(strtolower($managers->first()->last_name))}}</strong>
+                                        <strong>{{ucwords(strtolower($managers->first()->first_name ?? 'Unknown'))}} {{ucwords(strtolower($managers->first()->last_name ?? 'Unknown'))}}</strong>
                                     </div>
                                 </div>
                             </div>
@@ -357,49 +357,53 @@
                         <div class="col-md-6">
                             <div class="info-item text-capitalize">
                                 <i class="fas fa-user me-2 text-primary"></i>
-                                <strong>Name:</strong> {{$managers->first()->first_name}} {{$managers->first()->last_name}}
+                                <strong>Name:</strong> {{$managers->first()->first_name ?? 'Unknown'}} {{$managers->first()->last_name ?? 'Unknown'}}
                             </div>
                             <div class="info-item text-capitalize">
                                 <i class="fas fa-venus-mars me-2 text-primary"></i>
-                                <strong>Gender:</strong> {{ucwords(strtolower($managers->first()->gender))}}
+                                <strong>Gender:</strong> {{ucwords(strtolower($managers->first()->gender ?? 'Not specified'))}}
                             </div>
                             <div class="info-item">
                                 <i class="fas fa-phone me-2 text-primary"></i>
-                                <strong>Phone:</strong> {{$managers->first()->phone}}
+                                <strong>Phone:</strong> {{$managers->first()->phone ?? 'Not specified'}}
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="info-item">
                                 <i class="fas fa-envelope me-2 text-primary"></i>
-                                <strong>Email:</strong> {{strtolower($managers->first()->email)}}
+                                <strong>Email:</strong> {{strtolower($managers->first()->email ?? 'Not specified')}}
                             </div>
                             <div class="info-item">
                                 <i class="fas fa-circle me-2 text-primary"></i>
                                 <strong>Status:</strong>
-                                @if ($managers->first()->status == 1)
-                                    <span class="badge-modern bg-success text-white">Active</span>
-                                @else
-                                    <span class="badge-modern bg-secondary">Blocked</span>
+                                @if (!empty($managers->first()))
+                                    @if ($managers->first()->status == 1)
+                                        <span class="badge-modern bg-success text-white">Active</span>
+                                    @else
+                                        <span class="badge-modern bg-secondary">Blocked</span>
+                                    @endif
                                 @endif
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-12 col-md-4 text-center">
-                    @if ($managers->first()->image == NULL)
-                        @if ($managers->first()->gender == 'male')
-                            <img src="{{asset('storage/profile/avatar.jpg')}}"
-                                 alt="Manager Avatar"
-                                 class="profile-img bounce-in">
+                    @if (!empty($managers->first()))
+                        @if ($managers->first()->image == NULL)
+                            @if ($managers->first()->gender == 'male')
+                                <img src="{{asset('storage/profile/avatar.jpg')}}"
+                                    alt="Manager Avatar"
+                                    class="profile-img bounce-in">
+                            @else
+                                <img src="{{asset('storage/profile/avatar-female.jpg')}}"
+                                    alt="Manager Avatar"
+                                    class="profile-img bounce-in">
+                            @endif
                         @else
-                            <img src="{{asset('storage/profile/avatar-female.jpg')}}"
-                                 alt="Manager Avatar"
-                                 class="profile-img bounce-in">
+                            <img src="{{asset('storage/profile/' .$managers->first()->image)}}"
+                                alt="Manager Photo"
+                                class="profile-img bounce-in">
                         @endif
-                    @else
-                        <img src="{{asset('storage/profile/' .$managers->first()->image)}}"
-                             alt="Manager Photo"
-                             class="profile-img bounce-in">
                     @endif
                 </div>
             </div>
