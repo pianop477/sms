@@ -578,7 +578,6 @@ class ResultsController extends Controller
         return view('Results.months_by_exam_type', compact('schools', 'results', 'year', 'classes', 'exams', 'class_id', 'exam_id', 'groupedByMonth'));
     }
 
-
     public function resultsByMonth($school, $year, $class, $examType, $month, $date, Request $request)
     {
         $school_id = Hashids::decode($school);
@@ -612,13 +611,14 @@ class ResultsController extends Controller
                     ->select(
                         'examination_results.*',
                         'students.first_name', 'students.middle_name', 'students.last_name', 'students.gender', 'students.id as student_id', 'students.group', 'students.admission_number',
-                        'grades.class_name',
+                        'grades.class_name', 'students.status',
                         'examinations.exam_type',
                         'subjects.course_name', 'subjects.course_code'
                     )
                     ->where('examination_results.school_id', $schools->id)
                     ->where('examination_results.class_id', $class_id[0])
                     ->where('examination_results.exam_type_id', $exam_id[0])
+                    ->where('students.status', 1) // Only active students
                     ->whereDate('examination_results.exam_date', $date)
                     ->get();
 
@@ -812,7 +812,6 @@ class ResultsController extends Controller
         return view('Results.class_pdf_results', compact('fileUrl', 'fileName', 'results', 'date', 'schools', 'exam_id', 'class_id', 'month', 'year'));
     }
 
-
     private function calculateGrade($score, $marking_style)
     {
         if ($marking_style == 1) {
@@ -862,11 +861,13 @@ class ResultsController extends Controller
             }
 
             // Update status in the database
-            $updatedRows = Examination_result::where('school_id', $schools->id)
-                                ->where('class_id', $class_id[0])
-                                ->where('exam_type_id', $exam_id[0])
-                                ->whereDate('exam_date', $date)
-                                ->update(['status' => 2 ]);
+            $updatedRows = Examination_result::join('students', 'students.id', '=', 'examination_results.student_id')
+                                ->where('examination_results.school_id', $schools->id)
+                                ->where('examination_results.class_id', $class_id[0])
+                                ->where('examination_results.exam_type_id', $exam_id[0])
+                                ->where('students.status', 1) //only active students
+                                ->whereDate('examination_results.exam_date', $date)
+                                ->update(['examination_results.status' => 2 ]);
 
             if ($updatedRows) {
                 // If status is 2 (Published), send SMS notifications
@@ -882,9 +883,10 @@ class ResultsController extends Controller
                                     'examinations.exam_type', 'subjects.course_name', 'subjects.course_code', 'schools.school_name'
                                 )
                                 ->where('examination_results.class_id', $class_id[0])
-                                ->where('students.status', 1)
+                                ->where('students.status', 1) //only active students
                                 ->where('examination_results.school_id', $schools->id)
                                 ->where('examination_results.exam_type_id', $exam_id[0])
+                                ->where('examination_results.status', 2) // Published results
                                 ->whereDate('examination_results.exam_date', $date)
                                 ->get();
 
@@ -986,6 +988,8 @@ class ResultsController extends Controller
                         $payload['text'],
                         $payload['reference']
                     );
+
+                    // Log::info("NextSMS Payload: ". $payload['text']);
 
                     if(!$response['success']) {
                         Alert()->toast('SMS failed: '.$response['error'], 'error');
@@ -1704,7 +1708,6 @@ class ResultsController extends Controller
         return view('Results.combined_result_month', compact('reports', 'classes', 'class', 'reports', 'allScores', 'myReportData', 'year', 'school',));
 
     }
-    // end of compiled results by month
 
     //function for showing individual student report which is already compiled
     public function showStudentCompiledReport($school, $year, $class, $report, $student)
@@ -2578,7 +2581,20 @@ class ResultsController extends Controller
         try {
             // STEP 1: Update report status to "published"
             $report = generated_reports::findOrFail($reportId);
+
+            if(!$report) {
+                Alert()->toast('Report not found.', 'error');
+                return redirect()->back();
+            }
+
             $report->update(['status' => $status]);
+
+            $updatedReport = $report->update(['status' => $status]);
+
+            if (!$updatedReport) {
+                Alert()->toast('Failed to publish the report.', 'error');
+                return redirect()->back();
+            }
 
             // STEP 2: Get exam dates from the report
             $examDates = $report->exam_dates; // Array of dates
@@ -2589,21 +2605,22 @@ class ResultsController extends Controller
                         ->join('grades', 'grades.id', '=', 'examination_results.class_id')
                         ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
                         ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                        ->where('examination_results.class_id', $classId)
-                        ->where('examination_results.school_id', $schoolId)
-                        ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
                         ->select(
                             'students.id as student_id',
                             'students.first_name',
                             'students.middle_name',
                             'students.last_name',
-                            'students.parent_id',
+                            'students.parent_id', 'students.status',
                             'examinations.symbolic_abbr',
                             'examination_results.score',
                             'examination_results.exam_date',
                             'examination_results.course_id',
                             'subjects.course_code'
                         )
+                        ->where('students.status', 1) // Only active students
+                        ->where('examination_results.class_id', $classId)
+                        ->where('examination_results.school_id', $schoolId)
+                        ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
                         ->get();
 
             // STEP 4: Group results by student and calculate TOTAL SCORE (like PDF)
@@ -2746,6 +2763,7 @@ class ResultsController extends Controller
         // 1. GET ALL STUDENTS IN THE CLASS
         $students = Student::where('class_id', $classId)
                     ->where('school_id', $schoolId)
+                    ->where('status', 1) // Only active students
                     ->orderBy('admission_number')
                     ->get();
 
@@ -2768,7 +2786,7 @@ class ResultsController extends Controller
                         'students.first_name',
                         'students.middle_name',
                         'students.last_name',
-                        'students.gender',
+                        'students.gender', 'students.status',
                         'subjects.id as subject_id',
                         'subjects.course_name',
                         'subjects.course_code',
@@ -2779,6 +2797,7 @@ class ResultsController extends Controller
                         'examination_results.marking_style'
                     )
                     ->where('examination_results.class_id', $classId)
+                    ->where('students.status', 1) // Only active students
                     ->where('examination_results.school_id', $schoolId)
                     ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
                     ->get();

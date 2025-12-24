@@ -263,8 +263,8 @@
                                 </div>
                             @enderror
                         </div>
-                        <p class="mb-0">Download Sample file here 👉
-                            <a href="{{route('template.export')}}" class="text-decoration-none">
+                        <p class="mb-0">Download Sample file 👉
+                            <a href="{{route('parent.template.export')}}" class="text-decoration-none">
                                 <i class="fas fa-download me-1"></i> Download Template
                             </a>
                         </p>

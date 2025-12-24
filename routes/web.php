@@ -186,15 +186,15 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('/teachers/pdf', [TeachersController::class, 'export'])->name('teachers.pdf.export');
 
         // parents management
-        Route::get('Parents', [ParentsController::class, 'showAllParents'])->name('Parents.index');
-        Route::post('Register-parents', [ParentsController::class, 'registerParents'])->name('Parents.store');
-        Route::put('{parent}/Update-teachers-status', [ParentsController::class, 'updateStatus'])->name('Update.parents.status');
-        Route::put('{parent}/Restore-parents-status', [ParentsController::class, 'restoreStatus'])->name('restore.parents.status');
-        Route::put('{parent}/Delete-permanent', [ParentsController::class, 'deleteParent'])->name('Parents.remove');
-        Route::get('{parent}/Edit-parents', [ParentsController::class, 'editParent'])->name('Parents.edit');
-        Route::put('{parents}/Update-parents', [ParentsController::class, 'updateParent'])->name('Parents.update');
+        Route::get('/Parents', [ParentsController::class, 'showAllParents'])->name('Parents.index');
+        Route::post('/Register-parents', [ParentsController::class, 'registerParents'])->name('Parents.store');
+        Route::put('/{parent}/Update-teachers-status', [ParentsController::class, 'updateStatus'])->name('Update.parents.status');
+        Route::put('/{parent}/Restore-parents-status', [ParentsController::class, 'restoreStatus'])->name('restore.parents.status');
+        Route::put('/{parent}/Delete-permanent', [ParentsController::class, 'deleteParent'])->name('Parents.remove');
+        Route::get('/{parent}/Edit-parents', [ParentsController::class, 'editParent'])->name('Parents.edit');
+        Route::put('/{parents}/Update-parents', [ParentsController::class, 'updateParent'])->name('Parents.update');
         Route::post('/import-parents-students', [ParentsController::class, 'import'])->name('import.parents.students');
-        Route::get('Export-templates', [ParentsController::class, 'exportFile'])->name('template.export');
+        Route::get('/Parents-template', [ParentsController::class, 'parentExportFile'])->name('parent.template.export');
 
         //send sms to specific class
         Route::get('Send-messages-by-class', [SmsController::class, 'smsForm'])->name('sms.form');
@@ -253,6 +253,8 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::put('Unpublish/combined-report/school/{school}/year/{year}/class/{class}/report/{report}', [ResultsController::class, 'unpublishCombinedReport'])->name('Unpublish.combined.report');
         Route::post('Send-results-sms/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/student/{student}/date/{date}', [ResultsController::class, 'sendResultSms'])->name('sms.results');
         Route::get('Delete-student-result/school/{school}/year/{year}/class/{class}/examType/{examTyoe}/month/{month}/student/{student}/date/{date}', [ResultsController::class, 'deleteStudentResult'])->name('delete.student.result');
+        Route::put('Publish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/date/{date}', [ResultsController::class, 'publishResult'])->name('publish.results');
+        Route::put('Unpublish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/date/{date}', [ResultsController::class, 'unpublishResult'])->name('unpublish.results');
 
         // packages management
         Route::get('/Packages/year', [PackagesController::class, 'packagesByYear'])->name('package.byYear');
@@ -377,8 +379,6 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::put('{exams}/Examination-type/Update', [ExamController::class, 'update'])->name('exams.update');
 
         //results management
-        Route::put('Publish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/date/{date}', [ResultsController::class, 'publishResult'])->name('publish.results');
-        Route::put('Unpublish-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/date/{date}', [ResultsController::class, 'unpublishResult'])->name('unpublish.results');
         Route::get('Delete-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/date/{date}', [ResultsController::class, 'deleteResults'])->name('delete.results');
         Route::post('Submit-compiled-results/school/{school}/year/{year}/class/{class}', [ResultsController::class, 'saveCompiledResults'])->name('submit.compiled.results');
         Route::post('/update-score', [ResultsController::class, 'updateScore'])->name('update.score');
@@ -595,7 +595,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         //manage payment batches
         Route::get('/Batches', [paymentBatchController::class, 'index'])->name('batches.index');
         Route::post('/batch/preview', [paymentBatchController::class, 'preview'])->name('batch.preview');
-        Route::get('Export-templates', [paymentBatchController::class, 'exportFile'])->name('template.export');
+        Route::get('Bills-template', [paymentBatchController::class, 'exportFile'])->name('template.export');
         Route::post('/Batches/upload', [paymentBatchController::class, 'store'])->name('batch.store');
         Route::delete('/Batches/delete/{batch}', [paymentBatchController::class, 'deleteBatch'])->name('batch.delete');
         Route::get('/Batches/download/batch/{batch}', [paymentBatchController::class, 'downloadBatch'])->name('batch.download');

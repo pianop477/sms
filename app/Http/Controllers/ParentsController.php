@@ -585,7 +585,7 @@ class ParentsController extends Controller
         }
     }
 
-   public function exportFile()
+   public function parentExportFile()
     {
         if (!Storage::exists('templates/SampleFile.xlsx')) {
             // abort(404, 'File not found.');
