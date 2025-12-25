@@ -11,6 +11,8 @@ use App\Services\NextSmsService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 
 class BiometricController extends Controller
 {
@@ -18,72 +20,101 @@ class BiometricController extends Controller
     {
         $request->validate(['username' => 'required']);
 
-        $user = User::where('email', $request->username)
-                ->orWhere('phone', $request->username)
-                ->first();
-
-        if (!$user) {
+        // Global IP rate limit
+        if (RateLimiter::tooManyAttempts('otp-ip:' . $request->ip(), 5)) {
             return response()->json([
                 'success' => false,
-                'message' => 'User not found'
-            ], 404);
-        }
-
-        $bio_exist = WebAuthnCredential::where('user_id', $user->id)->count();
-        if($bio_exist >= 3) {
-            return response()->json([
-                'success' => false,
-                'message' => 'You have already reached the maximum number of biometric registrations.'
+                'message' => 'Too many requests. Please try again later.'
             ], 429);
         }
 
-        // Generate OTP (6 digits)
-        $otp = rand(10000, 99999);
+        RateLimiter::hit('otp-ip:' . $request->ip(), 60);
 
-        // Delete/expire old OTPs
-        otps::where('user_id', $user->id)
-            ->where('used', false)
-            ->where('expires_at', '>', now())
-            ->update(['expires_at' => now()]); // mark as expired
+        $user = User::where('email', $request->username)
+            ->orWhere('phone', $request->username)
+            ->first();
 
-        // Create new OTP
-        otps::create([
-            'user_id' => $user->id,
-            'otp' => Hash::make($otp),
-            'expires_at' => now()->addMinutes(5),
-            'used' => false,
-        ]);
-
-        // Send SMS (mfano NextSmsService)
-        $message = "Your biometric verification OTP is: $otp. Expires in 5 minutes. Do not share this code with anyone.";
-        $nextSmsService = new NextSmsService();
-        $response = $nextSmsService->sendSmsByNext(
-            "SHULE APP",
-            $this->formatPhoneNumber($user->phone),
-            $message,
-            'otp-'.uniqid()
-        );
-
-        if(!$response['success']) {
-            Alert()->toast('SMS failed: '.$response['error'], 'error');
-            return back();
+        // Generic response to prevent enumeration
+        if (!$user) {
+            return response()->json([
+                'success' => true,
+                'message' => 'OTP has been sent successfully.'
+            ]);
         }
 
-        $beemSmsService = new BeemSmsService();
-        $sender = "shuleApp";
-        $recipient_id = 1;
-        $recipients[] = [
-            'recipient_id' => $recipient_id++,
-            'dest_addr' => $this->formatPhoneNumber($user->phone),
-        ];
+        // Check OTP lock
+        $lockedOtp = otps::where('user_id', $user->id)
+                    ->where('locked_until', '>', now())
+                    ->latest()
+                    ->first();
 
-        // $response = $beemSmsService->sendSms($sender, $message, $recipients);
+        if ($lockedOtp) {
+            return response()->json([
+                'success' => false,
+                'message' => 'OTP temporarily locked. Please try again later.'
+            ], 429);
+        }
+
+        // Biometric registration limit
+        if (WebAuthnCredential::where('user_id', $user->id)->count() >= 3) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Biometric registration limit reached.'
+            ], 429);
+        }
+
+        // Cooldown per user (60s)
+        $recentOtp = otps::where('user_id', $user->id)
+            ->where('created_at', '>', now()->subSeconds(60))
+            ->first();
+
+        if ($recentOtp) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please wait before requesting another OTP.'
+            ], 429);
+        }
+
+        // Expire old OTPs
+        otps::where('user_id', $user->id)
+            ->where('used', false)
+            ->update(['expires_at' => now()]);
+
+        // Generate OTP
+        $otp = random_int(10000, 99999);
+
+        otps::create([
+            'user_id'      => $user->id,
+            'otp'          => Hash::make($otp),
+            'expires_at'   => now()->addMinutes(2),
+            'used'         => false,
+            'attempts'     => 0,
+            'locked_until' => null,
+            'ip_address'   => $request->ip(),
+            'user_agent'   => substr($request->userAgent(), 0, 1000),
+        ]);
+
+        // Send SMS
+        $message = "Your biometric verification OTP is: $otp. Expires in 2 minutes. Do not share this code.";
+        (new NextSmsService())->sendSmsByNext(
+            'SHULE APP',
+            $this->formatPhoneNumber($user->phone),
+            $message,
+            'otp-' . uniqid()
+        );
+
+        Log::info('OTP sent for biometric registration', [
+            'user_id' => $user->id,
+            'ip'      => $request->ip()
+        ]);
 
         return response()->json([
             'success' => true,
-            'phone' => substr($user->phone, -3)
+            'phone'   => substr($user->phone, -3)
         ]);
     }
+
+
 
     private function formatPhoneNumber($phone)
     {
@@ -161,6 +192,17 @@ class BiometricController extends Controller
             'success' => true,
             'message' => 'Biometric credentials deleted successfully'
         ]);
+    }
+
+    public function lockedOtps()
+    {
+        $lockedOtps = otps::with('user:id,name,email,phone')
+            ->whereNotNull('locked_until')
+            ->where('locked_until', '>', now())
+            ->orderBy('locked_until', 'desc')
+            ->get();
+
+        return view('Schools.locked-otp', compact('lockedOtps'));
     }
 
 }

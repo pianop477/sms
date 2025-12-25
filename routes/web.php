@@ -105,8 +105,8 @@ use PHPUnit\Runner\ResultCache\ResultCache;
     Route::get('/contracts/verify/{token}', [ContractController::class, 'verify'])->name('contracts.verify');
 
     // Biometric OTP Routes
-    Route::post('/biometric/send-otp', [BiometricController::class, 'sendOtp']);
-    Route::post('/biometric/verify-otp', [BiometricController::class, 'verifyOtp']);
+    Route::post('/biometric/send-otp', [BiometricController::class, 'sendOtp'])->middleware('throttle: 3:1');
+    Route::post('/biometric/verify-otp', [BiometricController::class, 'verifyOtp'])->middleware('throttle:3:1');
 
     // WebAuthn Routes (existing)
     Route::post('/webauthn/register/options', [WebAuthnRegisterController::class, 'registerOptions']);
@@ -168,6 +168,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('{user}/Delete-admin-accounts', [UsersController::class, 'deleteAdminAccount'])->name('admin.account.destroy');
         Route::get('{user}/Edit-admin-accounts', [UsersController::class, 'editAdminAccount'])->name('admin.account.edit');
         Route::put('{user}/Update-admin-accounts', [UsersController::class, 'updateAdminAccount'])->name('admin.account.update');
+        Route::get('/Locked-otps', [BiometricController::class, 'lockedOtps'])->name('locked.otps');
     });
 
     //1. SHARED ROUTES ACCESS MANAGER/HEAD TEACHER/ACADEMIC =======================================

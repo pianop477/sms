@@ -27,8 +27,8 @@
                     <div class="col-md-8">
                         <h5 class="alert-heading">Instructions:</h5>
                         <ul class="mb-0 pl-3">
-                            <li><i>Enter your valid NIN Number as registered in your LGA</i></li>
-                            <li><i>Enter your valid Form Four Index Number as registered NECTA or other Authorities</i></li>
+                            <li>➡️ <i>Enter your valid NIN Number</i></li>
+                            <li>➡️ <i>Enter your valid Form Four Index Number</i></li>
                         </ul>
                     </div>
                     <div class="col-md-4">

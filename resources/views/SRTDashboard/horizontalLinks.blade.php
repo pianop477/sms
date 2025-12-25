@@ -27,7 +27,11 @@
                                 <a href="{{route('feedback')}}"><i class="ti-email"></i><span>Messages</span></a>
                             </li>
                             <li>
-                                <a href="{{route('failed.login.attempts')}}"><i class="ti-lock"></i><span>System Security</span></a>
+                                <a href="javascript:void(0)"><i class="ti-lock"></i><span>System Security</span></a>
+                                <ul class="submenu">
+                                    <li><a href="{{route('failed.login.attempts')}}"><i class="fa fa-user-slash"></i> Failed Login</a></li>
+                                    <li><a href="{{route('locked.otps')}}"><i class="fa fa-lock"></i> Locked OTP</a></li>
+                                </ul>
                             </li>
                         @endif
 
