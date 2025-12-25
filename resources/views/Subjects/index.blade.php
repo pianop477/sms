@@ -84,6 +84,21 @@
             color: white;
         }
 
+        .form-control-custom {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
+        }
+
         .form-control:focus, .form-select:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
@@ -147,7 +162,7 @@
             <div class="col-lg-4">
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="header-title text-center">Class Learning Subjects</h4>
+                        <h4 class="header-title text-center"> Subjects by Classes</h4>
                         <p class="text-danger mb-3"><i class="fas fa-info-circle me-2"></i>Select class to view subjects</p>
 
                         @if ($classes->isEmpty())
@@ -259,7 +274,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addSubjectModalLabel">Register New Subject</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
                 </div>
                 <div class="modal-body">
                     <form class="needs-validation" novalidate action="{{route('course.registration')}}" method="POST">
@@ -269,7 +284,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="sname" class="form-label">Subject Name</label>
-                                <input type="text" required name="sname" class="form-control" id="sname" placeholder="Course Name" value="{{old('name')}}">
+                                <input type="text" required name="sname" class="form-control-custom" id="sname" placeholder="Course Name" value="{{old('name')}}">
                                 @error('sname')
                                 <div class="text-danger small">
                                     {{$message}}
@@ -278,7 +293,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="scode" class="form-label">Subject Code</label>
-                                <input type="text" required name="scode" class="form-control text-uppercase" id="scode" placeholder="Course Code" value="{{old('code')}}">
+                                <input type="text" required name="scode" class="form-control-custom text-uppercase" id="scode" placeholder="Course Code" value="{{old('code')}}">
                                 @error('scode')
                                 <div class="text-danger small">
                                    {{$message}}
@@ -289,7 +304,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" id="saveButton" class="btn btn-success">Save Subject</button>
+                    <button type="submit" id="saveButton" class="btn btn-success"> <i class="fas fa-save"></i> Save</button>
                 </div>
             </form>
             </div>

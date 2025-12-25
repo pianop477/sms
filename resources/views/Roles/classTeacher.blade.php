@@ -218,7 +218,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="assignModalLabel">Assign Class Teacher</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
                 </div>
                 <div class="modal-body">
                     <form class="needs-validation" novalidate action="{{route('Class.teacher.assign', ['classes' => Hashids::encode($classes->id)])}}" method="POST">

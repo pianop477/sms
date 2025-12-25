@@ -50,6 +50,21 @@
             margin-bottom: 8px;
         }
 
+        .form-control-custom {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
+        }
+
         .form-control:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
@@ -97,7 +112,7 @@
                 <!-- Header Section -->
                 <div class="row mb-4">
                     <div class="col-md-10">
-                        <h4 class="header-title">Edit Course Details</h4>
+                        <h4 class="header-title">Edit Subject Details</h4>
                     </div>
                     <div class="col-md-2 text-end">
                         <a href="{{route('courses.index')}}" class="btn btn-info btn-xs float-right">
@@ -112,12 +127,12 @@
                     @method('PUT')
 
                     <div class="form-section">
-                        <h5 class="mb-4"><i class="fas fa-book me-2 text-primary"></i> Course Information</h5>
+                        <h5 class="mb-4"><i class="fas fa-book me-2 text-primary"></i> Subject Information</h5>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="sname" class="form-label">Course Name</label>
-                                <input type="text" required name="sname" class="form-control text-capitalize" id="sname" value="{{$course->course_name}}">
+                                <input type="text" required name="sname" class="form-control-custom text-capitalize" id="sname" value="{{$course->course_name}}">
                                 @error('sname')
                                 <div class="text-danger small mt-2">
                                     <i class="fas fa-exclamation-circle me-1"></i> {{$message}}
@@ -127,7 +142,7 @@
 
                             <div class="col-md-6 mb-3">
                                 <label for="scode" class="form-label">Course Code</label>
-                                <input type="text" required name="scode" class="form-control text-uppercase" id="scode" value="{{$course->course_code}}">
+                                <input type="text" required name="scode" class="form-control-custom text-uppercase" id="scode" value="{{$course->course_code}}">
                                 @error('scode')
                                 <div class="text-danger small mt-2">
                                     <i class="fas fa-exclamation-circle me-1"></i> {{$message}}

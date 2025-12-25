@@ -73,6 +73,27 @@
             z-index: 1;
         }
 
+        .form-control:focus, .form-select:focus, .select2-container--focus .select2-selection {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25) !important;
+        }
+
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 0.375rem !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 36px !important;
+            padding-left: 12px !important;
+            color: #495057 !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px !important;
+        }
+
         .btn-back:hover {
             background: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
@@ -310,13 +331,13 @@
                                     <i class="fas fa-user-tie text-primary"></i>
                                     Select Teacher <span class="required-star">*</span>
                                 </label>
-                                <select name="teacher" id="teacherSelect" class="form-control-custom text-capitalize" required>
-                                    <option value="{{$classTeacher->teacher_id}}" selected>{{$classTeacher->first_name}} {{$classTeacher->last_name}}</option>
+                                <select name="teacher" id="teacherSelect" class="form-control-custom select2" required>
+                                    <option value="{{$classTeacher->teacher_id}}" selected>{{ucwords(strtolower($classTeacher->first_name))}} {{ucwords(strtolower($classTeacher->last_name))}}</option>
                                     @if ($teachers->isEmpty())
                                         <option value="" class="text-danger" disabled>No teachers found</option>
                                     @else
                                         @foreach ($teachers as $teacher)
-                                            <option value="{{$teacher->id}}">{{$teacher->first_name}} {{$teacher->last_name}}</option>
+                                            <option value="{{$teacher->id}}">{{ucwords(strtolower($teacher->first_name))}} {{ucwords(strtolower($teacher->last_name))}}</option>
                                         @endforeach
                                     @endif
                                 </select>
@@ -342,6 +363,19 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+             // Initialize Select2
+            if (typeof $.fn.select2 !== 'undefined') {
+                $('#teacherSelect').select2({
+                    placeholder: "Search teacher...",
+                    allowClear: true,
+                    dropdownParent: $('#assignModal')
+                }).on('select2:open', function () {
+                    $('.select2-results__option').css('text-transform', 'capitalize');
+                });
+            } else {
+                console.error("Select2 is not loaded!");
+            }
+
             const form = document.getElementById("classTeacherForm");
             const submitButton = document.getElementById("saveButton");
             const teacherSelect = document.getElementById("teacherSelect");

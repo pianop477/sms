@@ -53,6 +53,21 @@
             margin-bottom: 8px;
         }
 
+        .form-control-custom {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
+        }
+
         .form-control:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
@@ -120,7 +135,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="cname" class="form-label">Class Name</label>
-                                <input type="text" name="cname" class="form-control text-uppercase" id="cname" value="{{$class->class_name}}" required>
+                                <input type="text" name="cname" class="form-control-custom text-uppercase" id="cname" value="{{$class->class_name}}" required>
                                 @error('name')
                                 <div class="text-danger small mt-2">
                                     <i class="fas fa-exclamation-circle me-1"></i> {{$message}}
@@ -129,7 +144,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="ccode" class="form-label">Class Code</label>
-                                <input type="text" name="ccode" class="form-control text-uppercase" id="ccode" value="{{$class->class_code}}" required>
+                                <input type="text" name="ccode" class="form-control-custom text-uppercase" id="ccode" value="{{$class->class_code}}" required>
                                 @error('name')
                                 <div class="text-danger small mt-2">
                                     <i class="fas fa-exclamation-circle me-1"></i> {{$message}}
@@ -141,7 +156,7 @@
 
                     <div class="text-center mt-4">
                         <button class="btn btn-success btn-action" id="saveButton" type="submit">
-                            <i class="fas fa-save me-2"></i> Save Changes
+                            <i class="fas fa-save me-2"></i><i class="fas fa-save"></i> Save Changes
                         </button>
                     </div>
                 </form>

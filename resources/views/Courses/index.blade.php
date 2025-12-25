@@ -26,6 +26,21 @@
             margin-bottom: 20px;
         }
 
+        .form-control-custom {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
+        }
+
         .header-title {
             color: var(--primary-color);
             font-weight: 700;
@@ -148,7 +163,7 @@
                                 @if (isset($message))
                                     <h4 class="header-title">{{ $message }}</h4>
                                 @else
-                                    <h4 class="header-title text-uppercase">Courses List: <span class="class-name-highlight">{{$class->class_name}}</span></h4>
+                                    <h4 class="header-title text-uppercase">Subject List by class: <span class="class-name-highlight">({{$class->class_name}})</span></h4>
                                 @endif
                             </div>
                             <div class="col-md-4">
@@ -157,7 +172,7 @@
                                         <i class="fas fa-arrow-circle-left me-1"></i> Back
                                     </a>
                                     <button type="button" class="btn btn-primary btn-action" data-bs-toggle="modal" data-bs-target="#assignModal">
-                                        <i class="fas fa-plus me-1"></i> Assign Course
+                                        <i class="fas fa-plus me-1"></i> Assign Subject
                                     </button>
                                 </div>
                             </div>
@@ -248,7 +263,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="assignModalLabel">Assign Teaching Subject</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
                 </div>
                 <div class="modal-body">
                     <form class="needs-validation" novalidate action="{{route('course.assign')}}" method="POST">
@@ -258,7 +273,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="courseSelect" class="form-label">Select Subject</label>
-                                <select name="course_id" id="courseSelect" class="form-control select2" required>
+                                <select name="course_id" id="courseSelect" class="form-control-custom select2" required>
                                     <option value="">--Select Course--</option>
                                     @if ($courses->isEmpty())
                                         <option value="" class="text-danger" disabled>No courses found</option>
@@ -276,7 +291,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="classSelect" class="form-label">Select Class</label>
-                                <select name="class_id" id="classSelect" class="form-control text-uppercase" required>
+                                <select name="class_id" id="classSelect" class="form-control-custom text-uppercase" required>
                                     <option value="{{$class->id}}" selected>{{$class->class_name}}</option>
                                 </select>
                                 @error('class_id')
@@ -289,13 +304,13 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="teacherSelect" class="form-label">Select Teacher</label>
-                                <select name="teacher_id" id="teacherSelect" class="form-control text-capitalize select2" required>
+                                <select name="teacher_id" id="teacherSelect" class="form-control-custom text-capitalize select2" required>
                                     <option value="">--Select Teacher--</option>
                                     @if ($teachers->isEmpty())
                                         <option value="" class="text-danger" disabled>No teachers found</option>
                                     @else
                                         @foreach ($teachers as $teacher)
-                                            <option value="{{$teacher->id}}">{{$teacher->first_name}} {{$teacher->last_name}}</option>
+                                            <option value="{{$teacher->id}}">{{ucwords(strtolower($teacher->first_name))}} {{ucwords(strtolower($teacher->last_name))}}</option>
                                         @endforeach
                                     @endif
                                 </select>
@@ -309,7 +324,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" id="saveButton" class="btn btn-success">Assign Course</button>
+                    <button type="submit" id="saveButton" class="btn btn-success"><i class="fas fa-save"></i> Save</button>
                 </div>
             </form>
             </div>

@@ -45,6 +45,21 @@
             font-weight: 600;
         }
 
+        .form-control-custom {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
+        }
+
         .form-label {
             font-weight: 600;
             color: var(--dark-color);
@@ -122,7 +137,7 @@
         <div class="card">
             <div class="card-body">
                 <!-- Header Section -->
-                <div class="row mb-4">
+                <div class="row mb-4 mt-3 p-3">
                     <div class="col-md-8">
                         <h4 class="header-title">Change Subject Teacher</h4>
                     </div>
@@ -170,8 +185,8 @@
 
                             <div class="col-md-4 mb-3">
                                 <label for="teacherSelect" class="form-label">Subject Teacher</label>
-                                <select name="teacher_id" id="teacherSelect" class="form-control select2 text-capitalize" required>
-                                    <option value="{{$classCourse->teacherId}}" selected>{{$classCourse->first_name}} {{$classCourse->last_name}}</option>
+                                <select name="teacher_id" id="teacherSelect" class="form-control-custom select2" required>
+                                    <option value="{{$classCourse->teacherId}}" selected>{{ucwords(strtolower($classCourse->first_name))}} {{ucwords(strtolower($classCourse->last_name))}}</option>
                                     @if ($teachers->isEmpty())
                                         <option value="" class="text-danger" disabled>No Teachers found</option>
                                     @else

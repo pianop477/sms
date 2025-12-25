@@ -74,6 +74,21 @@
             justify-content: center;
         }
 
+        .form-control-custom {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
+        }
+
         .action-buttons a, .action-buttons button {
             width: 30px;
             height: 30px;
@@ -204,7 +219,7 @@
                         <!-- Header Section -->
                         <div class="row mb-4">
                             <div class="col-md-12">
-                                <h4 class="header-title">Class Teachers</h4>
+                                <h4 class="header-title">Class Teachers by Classes</h4>
                             </div>
                         </div>
 
@@ -249,7 +264,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addClassModalLabel">Register New Class</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
                 </div>
                 <div class="modal-body">
                     <form class="needs-validation" novalidate action="{{route('Classes.store')}}" method="POST">
@@ -257,7 +272,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="name" class="form-label">Class Name</label>
-                                <input type="text" required name="name" class="form-control text-uppercase" id="name" placeholder="Class Name" value="{{old('name')}}">
+                                <input type="text" required name="name" class="form-control-custom text-uppercase" id="name" placeholder="Class Name" value="{{old('name')}}">
                                 @error('name')
                                 <div class="text-danger small">
                                     {{$message}}
@@ -266,7 +281,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="code" class="form-label">Class Code</label>
-                                <input type="text" required name="code" class="form-control text-uppercase" id="code" placeholder="Class Code" value="{{old('code')}}">
+                                <input type="text" required name="code" class="form-control-custom text-uppercase" id="code" placeholder="Class Code" value="{{old('code')}}">
                                 @error('code')
                                 <div class="text-danger small">
                                    {{$message}}
@@ -277,7 +292,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" id="saveButton" class="btn btn-success">Save Class</button>
+                    <button type="submit" id="saveButton" class="btn btn-success"><i class="fas fa-save"></i> Save</button>
                 </div>
             </form>
             </div>

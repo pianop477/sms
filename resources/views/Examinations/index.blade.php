@@ -50,6 +50,22 @@
             background-color: white;
         }
 
+        .form-control-custom {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
+        }
+
+
         .progress-table thead {
             background-color: var(--primary-color);
             color: white;
@@ -121,7 +137,7 @@
                         <!-- Header Section -->
                         <div class="row mb-4">
                             <div class="col-md-10">
-                                <h4 class="header-title">Tests & Examination Types</h4>
+                                <h4 class="header-title">Tests & Examination</h4>
                             </div>
                             @if (Route::has('exams.store'))
                             <div class="col-md-2 text-end">
@@ -212,7 +228,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="name" class="form-label">Examination Name</label>
-                                <input type="text" name="name" class="form-control" id="name" placeholder="Exam name or test" required>
+                                <input type="text" name="name" class="form-control-custom" id="name" placeholder="Exam name or test" required>
                                 @error('name')
                                 <div class="text-danger small">
                                     {{$message}}
@@ -221,7 +237,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="abbreviation" class="form-label">Exam Code</label>
-                                <input type="text" name="abbreviation" class="form-control text-uppercase" id="abbreviation" placeholder="Exam code" required>
+                                <input type="text" name="abbreviation" class="form-control-custom text-uppercase" id="abbreviation" placeholder="Exam code" required>
                                 @error('abbreviation')
                                 <div class="text-danger small">
                                     {{$message}}
@@ -232,7 +248,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" id="saveButton" class="btn btn-success">Save Exam</button>
+                    <button type="submit" id="saveButton" class="btn btn-success"><i class="fas fa-save"></i> Save Exam</button>
                 </div>
             </form>
             </div>
