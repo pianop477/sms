@@ -104,25 +104,15 @@
             color: white;
         }
 
-        .form-control:focus, .form-select:focus, .select2-container--focus .select2-selection {
-            border-color: var(--primary-color) !important;
-            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25) !important;
-        }
-
         .select2-container .select2-selection--single {
             height: 38px !important;
-            border: 1px solid #ced4da !important;
-            border-radius: 0.375rem !important;
+            border: 1px solid #ccc !important;
+            border-radius: 4px !important;
+            padding: 6px 12px !important;
         }
 
-        .select2-container--default .select2-selection--single .select2-selection__rendered {
-            line-height: 36px !important;
-            padding-left: 12px !important;
-            color: #495057 !important;
-        }
-
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 36px !important;
+        .select2-container {
+            width: 100% !important;
         }
 
         .class-name-highlight {
@@ -274,7 +264,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="courseSelect" class="form-label">Select Subject</label>
                                 <select name="course_id" id="courseSelect" class="form-control-custom select2" required>
-                                    <option value="">--Select Course--</option>
+                                    <option value="">--Select Subjects--</option>
                                     @if ($courses->isEmpty())
                                         <option value="" class="text-danger" disabled>No courses found</option>
                                     @else
