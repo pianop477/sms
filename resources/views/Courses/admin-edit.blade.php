@@ -191,7 +191,7 @@
                                         <option value="" class="text-danger" disabled>No Teachers found</option>
                                     @else
                                         @foreach ($teachers as $teacher)
-                                            <option value="{{$teacher->id}}">{{$teacher->first_name}} {{$teacher->last_name}}</option>
+                                            <option value="{{$teacher->id}}">{{ucwords(strtolower($teacher->first_name))}} {{ucwords(strtolower($teacher->last_name))}}</option>
                                         @endforeach
                                     @endif
                                 </select>
