@@ -166,7 +166,7 @@
 
     <div class="w-full px-4 sm:px-6 lg:px-8 h-full flex flex-col lg:flex-row items-center justify-center relative z-10 pt-20 lg:pt-32">
       <div class="lg:w-1/2 text-white mb-8 lg:mb-0">
-        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight">
+        <h1 class="text-2xl sm:text-4xl md:text-3xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight">
           <span id="hero-title-1">Transform </span><span class="text-yellow-300 typing-text" id="hero-title-2">Your School Management</span>
         </h1>
 
@@ -209,11 +209,11 @@
         <div class="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-6 mt-6 sm:mt-8">
           <div class="flex items-center">
             <i class="fas fa-check-circle text-green-300 text-lg sm:text-xl mr-2"></i>
-            <span class="text-base sm:text-lg" id="hero-benefit-1">No Setup Costs</span>
+            <span class="text-base sm:text-lg text-yellow-300" id="hero-benefit-1">No Setup Costs</span>
           </div>
           <div class="flex items-center">
             <i class="fas fa-check-circle text-green-300 text-lg sm:text-xl mr-2"></i>
-            <span class="text-base sm:text-lg" id="hero-benefit-2">Free Training</span>
+            <span class="text-base sm:text-lg text-yellow-300" id="hero-benefit-2">Free Training</span>
           </div>
         </div>
       </div>
@@ -457,7 +457,7 @@
 
         <div class="counter-box p-6 sm:p-8 rounded-xl sm:rounded-2xl">
           <div class="text-4xl sm:text-5xl font-bold mb-3 sm:mb-4 text-blue-600" id="stat1">3</div>
-          <div class="text-lg sm:text-xl font-semibold mb-2" id="stats-label-1">School</div>
+          <div class="text-lg sm:text-xl font-semibold mb-2 text-gray-700" id="stats-label-1">School</div>
           <p class="text-gray-600 text-sm sm:text-base" id="stats-desc-1">Currently using our system</p>
           <div class="mt-3 sm:mt-4">
             <i class="fas fa-school text-2xl sm:text-3xl text-blue-500"></i>
@@ -466,7 +466,7 @@
 
         <div class="counter-box p-6 sm:p-8 rounded-xl sm:rounded-2xl">
           <div class="text-4xl sm:text-5xl font-bold mb-3 sm:mb-4 text-green-600">1,000+</div>
-          <div class="text-lg sm:text-xl font-semibold mb-2" id="stats-label-2">Students</div>
+          <div class="text-lg sm:text-xl font-semibold mb-2 text-gray-700" id="stats-label-2">Students</div>
           <p class="text-gray-600 text-sm sm:text-base" id="stats-desc-2">Registered in system</p>
           <div class="mt-3 sm:mt-4">
             <i class="fas fa-user-graduate text-2xl sm:text-3xl text-green-500"></i>
@@ -475,7 +475,7 @@
 
         <div class="counter-box p-6 sm:p-8 rounded-xl sm:rounded-2xl">
           <div class="text-4xl sm:text-5xl font-bold mb-3 sm:mb-4 text-purple-600">50+</div>
-          <div class="text-lg sm:text-xl font-semibold mb-2" id="stats-label-3">Teachers</div>
+          <div class="text-lg sm:text-xl font-semibold mb-2 text-gray-700" id="stats-label-3">Teachers</div>
           <p class="text-gray-600 text-sm sm:text-base" id="stats-desc-3">Using the platform</p>
           <div class="mt-3 sm:mt-4">
             <i class="fas fa-chalkboard-teacher text-2xl sm:text-3xl text-purple-500"></i>
@@ -484,7 +484,7 @@
 
         <div class="counter-box p-6 sm:p-8 rounded-xl sm:rounded-2xl">
           <div class="text-4xl sm:text-5xl font-bold mb-3 sm:mb-4 text-red-600">1,000+</div>
-          <div class="text-lg sm:text-xl font-semibold mb-2" id="stats-label-4">Parents</div>
+          <div class="text-lg sm:text-xl font-semibold mb-2 text-gray-700" id="stats-label-4">Parents</div>
           <p class="text-gray-600 text-sm sm:text-base" id="stats-desc-4">Connected to portal</p>
           <div class="mt-3 sm:mt-4">
             <i class="fas fa-user-friends text-2xl sm:text-3xl text-red-500"></i>
