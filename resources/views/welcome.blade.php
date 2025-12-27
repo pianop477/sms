@@ -272,7 +272,7 @@
         <div
             class="w-full px-4 sm:px-6 lg:px-8 h-full flex flex-col lg:flex-row items-center justify-center relative z-10 pt-20 lg:pt-32">
             <div class="lg:w-1/2 text-white mb-8 lg:mb-0">
-                <h1 class="text-3xl sm:text-4xl md:text-4xl lg:text-3xl font-bold mb-4 sm:mb-6 leading-tight">
+                <h1 class="text-2xl sm:text-3xl md:text-3xl lg:text-2xl font-bold mb-4 sm:mb-6 leading-tight">
                     <span id="hero-title-1">Transform </span>
                     <div class="typing-container">
                         <span class="text-yellow-300 typing-text" id="hero-title-2">Your School Management</span>
