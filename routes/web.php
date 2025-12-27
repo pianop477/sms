@@ -1,4 +1,5 @@
 <?php
+
 use App\Exports\StudentsExport;
 use App\Exports\TeachersExport;
 use App\Http\Controllers\AccountantsController;
@@ -63,59 +64,59 @@ use PHPUnit\Runner\ResultCache\ResultCache;
 |
 */
 
-    Route::get('/Home', function () {
-        return view('welcome');
-    })->name('welcome');
+Route::get('/home', function () {
+    return view('welcome');
+})->name('welcome');
 
-    Route::get('/check-session', function () {
-        return response()->json(['active' => auth()->check()]);
-    });
+Route::get('/check-session', function () {
+    return response()->json(['active' => auth()->check()]);
+});
 
-    // Throttle login route - max 5 attempts per 1 minute
-    Route::post('login', [LoginController::class, 'login'])
-                ->middleware('throttle:3,1')
-                ->name('login');
+// Throttle login route - max 5 attempts per 1 minute
+Route::post('login', [LoginController::class, 'login'])
+    ->middleware('throttle:3,1')
+    ->name('login');
 
-    Auth::routes();
+Auth::routes();
 
-    // Show biometric login page
-    Route::get('/login/biometric', [WebAuthnLoginController::class, 'show'])->name('webauthn.login');
+// Show biometric login page
+Route::get('/login/biometric', [WebAuthnLoginController::class, 'show'])->name('webauthn.login');
 
-    // Start WebAuthn login challenge
-    Route::post('/login/biometric/options', [WebAuthnLoginController::class, 'options'])->name('webauthn.login.options')->middleware('throttle:5,1');
+// Start WebAuthn login challenge
+Route::post('/login/biometric/options', [WebAuthnLoginController::class, 'options'])->name('webauthn.login.options')->middleware('throttle:5,1');
 
-    // Verify credential and login
-    Route::post('/login/biometric/verify', [WebAuthnLoginController::class, 'verify'])->name('webauthn.login.verify')->middleware('throttle:5,1');
-    // QR Code Verification Routes
-    Route::get('/verify-report', [ResultsController::class, 'verify'])->name('report.verify');
+// Verify credential and login
+Route::post('/login/biometric/verify', [WebAuthnLoginController::class, 'verify'])->name('webauthn.login.verify')->middleware('throttle:5,1');
+// QR Code Verification Routes
+Route::get('/verify-report', [ResultsController::class, 'verify'])->name('report.verify');
 
-    Route::post('/webauthn/register/options', [WebAuthnRegisterController::class, 'options'])->name('webauthn.register.options')->middleware('throttle:5,1');
-    Route::post('/webauthn/register/verify', [WebAuthnRegisterController::class, 'register'])->name('webauthn.register.verify')->middleware('throttle:5,1');
+Route::post('/webauthn/register/options', [WebAuthnRegisterController::class, 'options'])->name('webauthn.register.options')->middleware('throttle:5,1');
+Route::post('/webauthn/register/verify', [WebAuthnRegisterController::class, 'register'])->name('webauthn.register.verify')->middleware('throttle:5,1');
 
-    // ROUTE ACCESS FOR PARENTS REGISTRATION =================================================================================================
-    Route::prefix('Register')->group(function () {
-        Route::get('Parents', [UsersController::class, 'index'])->name('users.form');
-        Route::post('Parents', [UsersController::class, 'create'])->name('users.create');
-    });
+// ROUTE ACCESS FOR PARENTS REGISTRATION =================================================================================================
+Route::prefix('Register')->group(function () {
+    Route::get('Parents', [UsersController::class, 'index'])->name('users.form');
+    Route::post('Parents', [UsersController::class, 'create'])->name('users.create');
+});
 
-    // ROUTES ACCESS FOR USERS TO SEND FEEDBACK TO THE SYSTEM AND GET SUPPORT ================================================================
-    Route::post('/Feedback', [SendMessageController::class, 'store'])->name('send.feedback.message');
+// ROUTES ACCESS FOR USERS TO SEND FEEDBACK TO THE SYSTEM AND GET SUPPORT ================================================================
+Route::post('/Feedback', [SendMessageController::class, 'store'])->name('send.feedback.message');
 
-    //ROUTES ACCESS TO SCAN AND VERIFY QR CODE FOR CONTRACTS =========================================================
-    Route::get('/contracts/verify/{token}', [ContractController::class, 'verify'])->name('contracts.verify');
+//ROUTES ACCESS TO SCAN AND VERIFY QR CODE FOR CONTRACTS =========================================================
+Route::get('/contracts/verify/{token}', [ContractController::class, 'verify'])->name('contracts.verify');
 
-    // Biometric OTP Routes
-    Route::post('/biometric/send-otp', [BiometricController::class, 'sendOtp'])->middleware('throttle: 3:1');
-    Route::post('/biometric/verify-otp', [BiometricController::class, 'verifyOtp'])->middleware('throttle:3:1');
+// Biometric OTP Routes
+Route::post('/biometric/send-otp', [BiometricController::class, 'sendOtp'])->middleware('throttle: 3:1');
+Route::post('/biometric/verify-otp', [BiometricController::class, 'verifyOtp'])->middleware('throttle:3:1');
 
-    // WebAuthn Routes (existing)
-    Route::post('/webauthn/register/options', [WebAuthnRegisterController::class, 'registerOptions']);
-    Route::post('/webauthn/register/verify', [WebAuthnRegisterController::class, 'registerVerify']);
-    Route::post('/webauthn/login/options', [WebAuthnLoginController::class, 'loginOptions']);
-    Route::post('/webauthn/login/verify', [WebAuthnLoginController::class, 'loginVerify']);
+// WebAuthn Routes (existing)
+Route::post('/webauthn/register/options', [WebAuthnRegisterController::class, 'registerOptions']);
+Route::post('/webauthn/register/verify', [WebAuthnRegisterController::class, 'registerVerify']);
+Route::post('/webauthn/login/options', [WebAuthnLoginController::class, 'loginOptions']);
+Route::post('/webauthn/login/verify', [WebAuthnLoginController::class, 'loginVerify']);
 
-    // routes/web.php
-    Route::post('/webauthn/delete-credentials', [BiometricController::class, 'deleteCredentials']);
+// routes/web.php
+Route::post('/webauthn/delete-credentials', [BiometricController::class, 'deleteCredentials']);
 
 // MIDDLEWARE FILTERING STARTS HERE **************************************************************************************
 Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 'block.ip', 'user.agent')->group(function () {
@@ -125,7 +126,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     */
 
     // 0. ROUTES ACCESS FOR SUPER USER ADMIN (SYSTEM ADMINISTRATOR) ======================================================================
-    Route::middleware(['CheckUsertype:1'])->group(function() {
+    Route::middleware(['CheckUsertype:1'])->group(function () {
         Route::get('/Administrators', [UsersController::class, 'managerForm'])->name('register.manager');
         Route::post('Manager-register', [ManagerController::class, 'store'])->name('manager.store');
         Route::put('{school}/Deactivation', [ManagerController::class, 'updateStatus'])->name('deactivate.status');
@@ -285,7 +286,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     });
 
     // 2. ROUTE ACCESS FOR EITHER MANAGER OR HEAD TEACHER ONLY ===========================================================================
-    Route::middleware(['ManagerOrTeacher', 'nida_and_form_four'])->group(function(){
+    Route::middleware(['ManagerOrTeacher', 'nida_and_form_four'])->group(function () {
         //teachers panel management =======================================================================
         Route::put('{teacher}/Delete-teacher', [TeachersController::class, 'deleteTeacher'])->name('Teachers.remove');
 
@@ -458,7 +459,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     });
 
     // 6. ROUTE ACCESS FOR CLASS TEACHER ONLY ============================================================================================
-    Route::middleware(['CheckUsertype:3'])->group(function() {
+    Route::middleware(['CheckUsertype:3'])->group(function () {
         Route::middleware('CheckRoleType:4')->group(function () {
             Route::get('{class}/Student-list', [AttendanceController::class, 'index'])->name('get.student.list');
             Route::post('{student_class}/Create-Attendance', [AttendanceController::class, 'store'])->name('store.attendance');
@@ -471,13 +472,13 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     });
 
     // 7. ROUTE ACCESS FOR TEACHER WITH TEACHING SUBJECTS=================================================================================
-    Route::middleware(['CheckUsertype:3', 'CheckRoleType:1,3,4'])->group(function() {
+    Route::middleware(['CheckUsertype:3', 'CheckRoleType:1,3,4'])->group(function () {
         // Insert examination score
         Route::get('{id}/Prepare', [ExamController::class, 'prepare'])->name('score.prepare.form');
         Route::post('Examination-result-create', [ExamController::class, 'captureValues'])->name('score.captured.values');
         Route::post('Upload/results', [ExamController::class, 'storeScore'])->name('exams.store.score');
         Route::get('/Results-saved/course/{course}/teacher/{teacher}/school/{school}/class/{class}/style/{style}/term/{term}/type/{type}/date/{date}', [ExamController::class, 'continuePendingResults'])->name('form.saved.values');
-        Route::get('Results/confirmation', function() {
+        Route::get('Results/confirmation', function () {
             return view('Examinations.confirm_results');
         })->name('results.confirm');
         Route::post('/results/edit-draft', [ExamController::class, 'editDraft'])->name('results.edit.draft');
