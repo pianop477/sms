@@ -41,34 +41,43 @@ class TeachersController extends Controller
     {
         $userLogged = Auth::user();
         $teachers = Teacher::query()
-                            ->join('users', 'users.id', '=', 'teachers.user_id')
-                            ->join('schools', 'schools.id', '=', 'teachers.school_id')
-                            ->join('roles', 'roles.id', '=', 'teachers.role_id')
-                            ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.email', 'roles.role_name', 'users.image')
-                            ->where('teachers.school_id', '=', $userLogged->school_id)
-                            ->whereIn('teachers.status', [0,1])
-                            ->where('teachers.role_id', '!=', 2)
-                            ->orderBy('users.first_name', 'ASC')
-                            ->get();
+            ->join('users', 'users.id', '=', 'teachers.user_id')
+            ->join('schools', 'schools.id', '=', 'teachers.school_id')
+            ->join('roles', 'roles.id', '=', 'teachers.role_id')
+            ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.email', 'roles.role_name', 'users.image')
+            ->where('teachers.school_id', '=', $userLogged->school_id)
+            ->whereIn('teachers.status', [0, 1])
+            ->where('teachers.role_id', '!=', 2)
+            ->orderBy('users.first_name', 'ASC')
+            ->get();
         return view('Teachers.index', ['teachers' => $teachers]);
     }
 
     // Export teachers list to PDF in the school ***********************************************************
-    public function export ()
+    public function export()
     {
         $userLogged = Auth::user();
         $teachers = Teacher::query()
-                            ->join('users', 'users.id', '=', 'teachers.user_id')
-                            ->join('schools', 'schools.id', '=', 'teachers.school_id')
-                            ->join('roles', 'roles.id', '=', 'teachers.role_id')
-                            ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.email',
-                            'schools.school_name', 'schools.school_reg_no', 'roles.role_name')
-                            ->where('teachers.school_id', '=', $userLogged->school_id)
-                            ->whereIn('teachers.status', [0,1])
-                            ->orderBy('users.first_name', 'ASC')
-                            ->get();
+            ->join('users', 'users.id', '=', 'teachers.user_id')
+            ->join('schools', 'schools.id', '=', 'teachers.school_id')
+            ->join('roles', 'roles.id', '=', 'teachers.role_id')
+            ->select(
+                'teachers.*',
+                'users.first_name',
+                'users.last_name',
+                'users.gender',
+                'users.phone',
+                'users.email',
+                'schools.school_name',
+                'schools.school_reg_no',
+                'roles.role_name'
+            )
+            ->where('teachers.school_id', '=', $userLogged->school_id)
+            ->whereIn('teachers.status', [0, 1])
+            ->orderBy('users.first_name', 'ASC')
+            ->get();
         $pdf = \PDF::loadView('Teachers.teachers_pdf', compact('teachers'));
-         return $pdf->stream('teachers.pdf');
+        return $pdf->stream('teachers.pdf');
     }
     /**
      * Show the form for creating the resource.
@@ -115,8 +124,8 @@ class TeachersController extends Controller
         $school = school::findOrFail($user->school_id);
 
         $existingRecords = User::where('phone', $request->phone)
-                    ->where('school_id', Auth::user()->school_id)
-                    ->exists();
+            ->where('school_id', Auth::user()->school_id)
+            ->exists();
 
         if ($existingRecords) {
             // Log::info('Duplicate record detected for DOB: ' . $request->dob);
@@ -156,7 +165,7 @@ class TeachersController extends Controller
             DB::commit();
 
             // notify teacher through sms using Beem API *************************************************
-            $url = "https://shuleapp.tech/home";
+            $url = "https://shuleapp.tech";
 
             $beemSmsService = new BeemSmsService();
             $sourceAddr = $school->sender_id ?? 'shuleApp'; // Get sender ID
@@ -164,41 +173,39 @@ class TeachersController extends Controller
 
             // Check if phone number is valid after formatting
             if (strlen($formattedPhone) !== 12 || !preg_match('/^255\d{9}$/', $formattedPhone)) {
-                    // Alert::error('Invalid phone number format', ['phone' => $formattedPhone]);
-                } else {
-                    $recipients = [
-                        [
-                            'recipient_id' => 1,
-                            'dest_addr' => $formattedPhone, // Use validated phone number
-                        ]
-                    ];
-
-                }
-
-                $message = "Hello ". strtoupper($users->first_name) .", Welcome to ShuleApp. Your Username is: {$users->phone} Password: shule2025. Use link {$url} to Login and change password Thank you.";
-                // $response = $beemSmsService->sendSms($sourceAddr, $message, $recipients);
-
-                // send SMS using nextSMS API ***********************************************
-                $nextSmsService = new NextSmsService();
-                $destination = $this->formatPhoneNumber($users->phone);
-
-                $payload = [
-                    'from' => $school->sender_id ?? "SHULE APP",
-                    'to' => $destination,
-                    'text' => $message,
-                    'reference' => uniqid(),
+                // Alert::error('Invalid phone number format', ['phone' => $formattedPhone]);
+            } else {
+                $recipients = [
+                    [
+                        'recipient_id' => 1,
+                        'dest_addr' => $formattedPhone, // Use validated phone number
+                    ]
                 ];
+            }
 
-                $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+            $message = "Hello " . strtoupper($users->first_name) . ", Welcome to ShuleApp. Your Username is: {$users->phone} Password: shule2025. Use link {$url} to Login and change password Thank you.";
+            // $response = $beemSmsService->sendSms($sourceAddr, $message, $recipients);
 
-                if(!$response['success']) {
-                    Alert()->toast('SMS failed: '.$response['error'], 'error');
-                    return back();
-                }
+            // send SMS using nextSMS API ***********************************************
+            $nextSmsService = new NextSmsService();
+            $destination = $this->formatPhoneNumber($users->phone);
 
-                Alert()->toast('Teacher records saved successfully', 'success');
-                return redirect()->back();
+            $payload = [
+                'from' => $school->sender_id ?? "SHULE APP",
+                'to' => $destination,
+                'text' => $message,
+                'reference' => uniqid(),
+            ];
 
+            $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+
+            if (!$response['success']) {
+                Alert()->toast('SMS failed: ' . $response['error'], 'error');
+                return back();
+            }
+
+            Alert()->toast('Teacher records saved successfully', 'success');
+            return redirect()->back();
         } catch (\Exception $e) {
             DB::rollBack();
             Alert()->toast($e->getMessage(), 'error');
@@ -229,72 +236,91 @@ class TeachersController extends Controller
 
     //  show teacher profile in the school ***********************************************************
     public function showProfile($teacher)
-        {
-            $decoded = Hashids::decode($teacher);
-            // Find the teacher by ID
-            $teacherId = Teacher::findOrFail($decoded[0]);
-            $user = Auth::user();
+    {
+        $decoded = Hashids::decode($teacher);
+        // Find the teacher by ID
+        $teacherId = Teacher::findOrFail($decoded[0]);
+        $user = Auth::user();
 
-            if($teacherId->school_id != $user->school_id) {
-                Alert()->toast('You are not authorized to perform this action', 'error');
-                return back();
-            }
-            // Join the teacher with the users table and get the necessary fields
-            $teachers = Teacher::query()
-                ->join('users', 'users.id', '=', 'teachers.user_id')
-                ->join('schools', 'schools.id', '=', 'teachers.school_id')
-                ->join('roles', 'roles.id', '=', 'teachers.role_id')
-                ->select(
-                    'teachers.*', 'users.first_name', 'users.last_name', 'users.gender',
-                    'users.phone', 'users.usertype', 'users.image', 'schools.school_reg_no', 'users.email',
-                    'schools.school_name', 'roles.role_name')
-                ->where('teachers.id', '=', $teacherId->id)
-                ->where('teachers.school_id', '=', Auth::user()->school_id)
-                ->firstOrFail();
-
-            return view('Teachers.show', ['teachers' => $teachers]);
+        if ($teacherId->school_id != $user->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
         }
+        // Join the teacher with the users table and get the necessary fields
+        $teachers = Teacher::query()
+            ->join('users', 'users.id', '=', 'teachers.user_id')
+            ->join('schools', 'schools.id', '=', 'teachers.school_id')
+            ->join('roles', 'roles.id', '=', 'teachers.role_id')
+            ->select(
+                'teachers.*',
+                'users.first_name',
+                'users.last_name',
+                'users.gender',
+                'users.phone',
+                'users.usertype',
+                'users.image',
+                'schools.school_reg_no',
+                'users.email',
+                'schools.school_name',
+                'roles.role_name'
+            )
+            ->where('teachers.id', '=', $teacherId->id)
+            ->where('teachers.school_id', '=', Auth::user()->school_id)
+            ->firstOrFail();
+
+        return view('Teachers.show', ['teachers' => $teachers]);
+    }
 
 
     public function teacherProfile($teacher)
     {
         $decoded = Hashids::decode($teacher);
-            // Find the teacher by ID
-            $teacherId = Teacher::findOrFail($decoded[0]);
-            $user = Auth::user();
+        // Find the teacher by ID
+        $teacherId = Teacher::findOrFail($decoded[0]);
+        $user = Auth::user();
 
-            if($teacherId->school_id != $user->school_id) {
-                Alert()->toast('You are not authorized to perform this action', 'error');
-                return back();
-            }
-            // Join the teacher with the users table and get the necessary fields
-            $teachers = Teacher::query()
-                ->join('users', 'users.id', '=', 'teachers.user_id')
-                ->join('schools', 'schools.id', '=', 'teachers.school_id')
-                ->join('roles', 'roles.id', '=', 'teachers.role_id')
-                ->select(
-                    'teachers.*', 'users.first_name', 'users.last_name', 'users.gender',
-                    'users.phone', 'users.usertype', 'users.image', 'schools.school_reg_no', 'users.email',
-                    'schools.school_name', 'roles.role_name',
-                    'users.created_at as teacher_created_at',
-                    )
-                ->where('teachers.id', '=', $teacherId->id)
-                ->where('teachers.school_id', '=', Auth::user()->school_id)
-                ->firstOrFail();
+        if ($teacherId->school_id != $user->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
+        }
+        // Join the teacher with the users table and get the necessary fields
+        $teachers = Teacher::query()
+            ->join('users', 'users.id', '=', 'teachers.user_id')
+            ->join('schools', 'schools.id', '=', 'teachers.school_id')
+            ->join('roles', 'roles.id', '=', 'teachers.role_id')
+            ->select(
+                'teachers.*',
+                'users.first_name',
+                'users.last_name',
+                'users.gender',
+                'users.phone',
+                'users.usertype',
+                'users.image',
+                'schools.school_reg_no',
+                'users.email',
+                'schools.school_name',
+                'roles.role_name',
+                'users.created_at as teacher_created_at',
+            )
+            ->where('teachers.id', '=', $teacherId->id)
+            ->where('teachers.school_id', '=', Auth::user()->school_id)
+            ->firstOrFail();
 
-                $teachingSubjects = class_learning_courses::query()
-                                                    ->join('grades', 'grades.id', '=', 'class_learning_courses.class_id')
-                                                    ->join('subjects', 'subjects.id', '=', 'class_learning_courses.course_id')
-                                                    ->join('teachers', 'teachers.id', '=', 'class_learning_courses.teacher_id')
-                                                    ->select(
-                                                        'class_learning_courses.*',
-                                                        'grades.class_name', 'grades.class_code',
-                                                        'subjects.course_name', 'subjects.course_code',
-                                                    )
-                                                    ->where('class_learning_courses.teacher_id', $teacherId->id)
-                                                    ->get();
+        $teachingSubjects = class_learning_courses::query()
+            ->join('grades', 'grades.id', '=', 'class_learning_courses.class_id')
+            ->join('subjects', 'subjects.id', '=', 'class_learning_courses.course_id')
+            ->join('teachers', 'teachers.id', '=', 'class_learning_courses.teacher_id')
+            ->select(
+                'class_learning_courses.*',
+                'grades.class_name',
+                'grades.class_code',
+                'subjects.course_name',
+                'subjects.course_code',
+            )
+            ->where('class_learning_courses.teacher_id', $teacherId->id)
+            ->get();
 
-            return view('Teachers.teacher_profile', ['teachers' => $teachers, 'subjects' => $teachingSubjects]);
+        return view('Teachers.teacher_profile', ['teachers' => $teachers, 'subjects' => $teachingSubjects]);
     }
 
     /**
@@ -310,36 +336,36 @@ class TeachersController extends Controller
      */
 
     //  update teacher profile in the school ***********************************************************
-     public function updateTeachers(Request $request, $teachers)
-     {
-         // Find teacher and user
-         $decoded = Hashids::decode($teachers);
-         $teacher = Teacher::findOrFail($decoded[0]);
-         $user = User::findOrFail($teacher->user_id);
+    public function updateTeachers(Request $request, $teachers)
+    {
+        // Find teacher and user
+        $decoded = Hashids::decode($teachers);
+        $teacher = Teacher::findOrFail($decoded[0]);
+        $user = User::findOrFail($teacher->user_id);
 
-         $loggedUser = Auth::user();
+        $loggedUser = Auth::user();
 
-         if($teacher->school_id != $loggedUser->school_id) {
-             Alert()->toast('You are not authorized to perform this action', 'error');
-             return back();
-         }
+        if ($teacher->school_id != $loggedUser->school_id) {
+            Alert()->toast('You are not authorized to perform this action', 'error');
+            return back();
+        }
 
-         $validated = $request->validate([
+        $validated = $request->validate([
             'fname' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
             'dob' => 'required|date|date_format:Y-m-d',
-            'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,'.$user->id,
+            'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,' . $user->id,
             'qualification' => 'required|integer|max:20',
             'street' => 'required|string|max:255',
             'gender' => 'required|max:20',
             'joined_at' => 'required|date_format:Y',
             'image' => [
-                    'nullable',
-                    'file',
-                    'mimetypes:image/jpeg,image/png,image/jpg',
-                    'max:1024'
-                ],
-            'email' => 'nullable|string|email|unique:users,email,'.$user->id,
+                'nullable',
+                'file',
+                'mimetypes:image/jpeg,image/png,image/jpg',
+                'max:1024'
+            ],
+            'email' => 'nullable|string|email|unique:users,email,' . $user->id,
         ], [
             'fname.required' => 'First name is required',
             'lname.required' => 'Last name is required',
@@ -354,7 +380,7 @@ class TeachersController extends Controller
             'email.email' => 'Email must be a valid email address',
         ]);
 
-        if($request->hasFile('image')) {
+        if ($request->hasFile('image')) {
             // Scan the image for viruses
             $scanResult = $this->scanFileForViruses($request->file('image'));
             if (!$scanResult['clean']) {
@@ -374,8 +400,8 @@ class TeachersController extends Controller
             // Handle image upload
             if ($request->hasFile('image')) {
                 // Log::info('Image upload detected');
-                if ($user->image && Storage::disk('public')->exists('profile/'.$user->image)) {
-                    Storage::disk('public')->delete('profile/'.$user->image);
+                if ($user->image && Storage::disk('public')->exists('profile/' . $user->image)) {
+                    Storage::disk('public')->delete('profile/' . $user->image);
                 }
 
                 // Create unique logo name
@@ -416,7 +442,7 @@ class TeachersController extends Controller
             Alert()->toast($e->getMessage(), 'error');
             return back();
         }
-     }
+    }
 
 
     //  update teacher status to inactive in the school ***********************************************************
@@ -427,7 +453,7 @@ class TeachersController extends Controller
         $userLogged = Auth::user();
         $teachers = Teacher::findOrFail($decoded[0]);
 
-        if($teachers->school_id != $userLogged->school_id) {
+        if ($teachers->school_id != $userLogged->school_id) {
             Alert()->toast('You are not authorized to perform this action', 'error');
             return back();
         }
@@ -437,12 +463,12 @@ class TeachersController extends Controller
         $user = User::findOrFail($teachers->user_id);
         // return $user;
 
-        if(Auth::user()->id == $user->id) {
+        if (Auth::user()->id == $user->id) {
             Alert()->toast('You cannot block your own account', 'error');
             return back();
         }
 
-        if($teachers->role_id == 2) {
+        if ($teachers->role_id == 2) {
             Alert()->toast('You do not have permission to block this teacher.', 'error');
             return back();
         }
@@ -516,7 +542,7 @@ class TeachersController extends Controller
 
         $userLogged = Auth::user();
 
-        if($teachers->school_id != $userLogged->school_id) {
+        if ($teachers->school_id != $userLogged->school_id) {
             Alert()->toast('You are not authorized to perform this action', 'error');
             return back();
         }
@@ -534,11 +560,11 @@ class TeachersController extends Controller
             return back();
         }
 
-         //check role of logged user compare with role of deleted user=======
-         if($teachers->role_id == 2) {
+        //check role of logged user compare with role of deleted user=======
+        if ($teachers->role_id == 2) {
             Alert()->toast('You do not have permission to delete this teacher.', 'error');
             return back();
-         }
+        }
 
         // Check if the user is assigned as a class teacher to any class
         $assignedClassTeacher = Class_teacher::where('teacher_id', $teachers->id)->first();
@@ -575,17 +601,17 @@ class TeachersController extends Controller
     }
 
     // display trashed teachers in the school ***********************************************************
-    public function trashedTeachers ()
+    public function trashedTeachers()
     {
         $userLogged = Auth::user();
         $teachers = Teacher::query()
-                            ->join('users', 'users.id', '=', 'teachers.user_id')
-                            ->join('schools', 'schools.id', '=', 'teachers.school_id')
-                            ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.email')
-                            ->where('teachers.school_id', '=', $userLogged->school_id)
-                            ->where('teachers.status', 2)
-                            ->orderBy('users.first_name', 'ASC')
-                            ->get();
+            ->join('users', 'users.id', '=', 'teachers.user_id')
+            ->join('schools', 'schools.id', '=', 'teachers.school_id')
+            ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.email')
+            ->where('teachers.school_id', '=', $userLogged->school_id)
+            ->where('teachers.status', 2)
+            ->orderBy('users.first_name', 'ASC')
+            ->get();
         return view('Teachers.trash', ['teachers' => $teachers]);
     }
 
@@ -651,13 +677,13 @@ class TeachersController extends Controller
             $apiKey = config('services.virustotal.key');
             try {
                 $response = Http::withHeaders(['x-apikey' => $apiKey])
-                            ->attach('file', fopen($file->path(), 'r'))
-                            ->post('https://www.virustotal.com/api/v3/files');
+                    ->attach('file', fopen($file->path(), 'r'))
+                    ->post('https://www.virustotal.com/api/v3/files');
 
                 if ($response->successful()) {
                     $scanId = $response->json()['data']['id'];
                     $analysis = Http::withHeaders(['x-apikey' => $apiKey])
-                                ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
+                        ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
 
                     return [
                         'clean' => $analysis->json()['data']['attributes']['stats']['malicious'] === 0,
@@ -667,7 +693,7 @@ class TeachersController extends Controller
             } catch (\Exception $e) {
                 return [
                     'clean' => false,
-                    'message' => 'Scan failed: '.$e->getMessage()
+                    'message' => 'Scan failed: ' . $e->getMessage()
                 ];
             }
         }
@@ -691,10 +717,8 @@ class TeachersController extends Controller
             $existsInOtherStaffs = other_staffs::where('staff_id', $fullStaffId)->exists();
             $existsInDrivers     = Transport::where('staff_id', $fullStaffId)->exists();
             $existsInTeachers    = Teacher::where('member_id', $fullStaffId)->exists();
-
         } while ($existsInOtherStaffs || $existsInDrivers || $existsInTeachers);
 
         return $fullStaffId;
     }
-
 }

@@ -73,7 +73,7 @@ class ManagerController extends Controller
             ]);
 
             // Generate login link
-            $link = config('app.url') ?? 'https://shuleapp.tech/home';
+            $link = config('app.url') ?? 'https://shuleapp.tech';
 
             // Create SMS message
             $message = "Hello ". strtoupper($user->first_name) .", Welcome to ShuleApp. Your Username is: {$user->phone} Password: shule2025. Use link {$link} to Login and change password Thank you.";

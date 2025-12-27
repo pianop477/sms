@@ -49,10 +49,10 @@ class ResultsController extends Controller
         $decoded = Hashids::decode($student);
 
         $students = Student::query()
-                        ->join('grades', 'grades.id', '=', 'students.class_id')
-                        ->select('students.*', 'grades.class_name', 'grades.class_code')
-                        ->find($decoded[0]);
-        if(! $students) {
+            ->join('grades', 'grades.id', '=', 'students.class_id')
+            ->select('students.*', 'grades.class_name', 'grades.class_code')
+            ->find($decoded[0]);
+        if (! $students) {
             Alert()->toast('No such student was found', 'error');
             return back();
         }
@@ -60,20 +60,20 @@ class ResultsController extends Controller
         $user = Auth::user();
         $parent = Parents::where('user_id', $user->id)->first();
 
-         if($students->parent_id != $parent->id) {
+        if ($students->parent_id != $parent->id) {
             Alert()->toast('You are not authorized to access this page', 'error');
             return to_route('home');
         }
 
         $results = Examination_result::query()
-                                    ->join('students', 'students.id', '=', 'examination_results.student_id')
-                                    ->select('examination_results.*', 'students.parent_id')
-                                    ->where('student_id', $students->id)
-                                    ->where('students.parent_id', $parent->id)
-                                    ->where('examination_results.school_id', $user->school_id)
-                                    ->where('examination_results.status', 2) // Assuming 2 is the status for published results
-                                    ->orderBy('examination_results.exam_date', 'DESC')
-                                    ->get();
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
+            ->select('examination_results.*', 'students.parent_id')
+            ->where('student_id', $students->id)
+            ->where('students.parent_id', $parent->id)
+            ->where('examination_results.school_id', $user->school_id)
+            ->where('examination_results.status', 2) // Assuming 2 is the status for published results
+            ->orderBy('examination_results.exam_date', 'DESC')
+            ->get();
 
         // return $results;
         $groupedData = $results->groupBy(function ($item) {
@@ -91,45 +91,45 @@ class ResultsController extends Controller
 
 
     public function resultByType($student, $year)
-     {
+    {
         $decoded = Hashids::decode($student);
 
         $students = Student::findOrFail($decoded[0]);
 
         //make variables for compact logic
 
-        if(! $students ) {
+        if (! $students) {
             Alert()->toast('No such student was found', 'error');
             return back();
         }
         $user = Auth::user();
         $parent = Parents::where('user_id', $user->id)->first();
 
-        if($students->parent_id != $parent->id) {
+        if ($students->parent_id != $parent->id) {
             Alert()->toast('You are not authorized to access this page', 'error');
             return to_route('home');
         }
-         $examTypes = Examination_result::query()
-                    ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                    ->join('students', 'students.id', '=', 'examination_results.student_id')
-                    ->select('examinations.exam_type', 'examinations.id as exam_id', 'students.parent_id')
-                    ->distinct()
-                    ->whereYear('exam_date', $year)
-                    ->where('student_id', $students->id)
-                    ->where('examination_results.school_id', $students->school_id)
-                    ->where('students.parent_id', $parent->id)
-                    ->where('examination_results.status', 2) // Assuming 2 is the status for published results
-                    ->orderBy('examinations.exam_type', 'asc')
-                    ->get();
+        $examTypes = Examination_result::query()
+            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
+            ->select('examinations.exam_type', 'examinations.id as exam_id', 'students.parent_id')
+            ->distinct()
+            ->whereYear('exam_date', $year)
+            ->where('student_id', $students->id)
+            ->where('examination_results.school_id', $students->school_id)
+            ->where('students.parent_id', $parent->id)
+            ->where('examination_results.status', 2) // Assuming 2 is the status for published results
+            ->orderBy('examinations.exam_type', 'asc')
+            ->get();
 
         // Check for combined examination results
         $reports = generated_reports::where('school_id', $students->school_id)
-                                    ->where('class_id', $students->class_id)
-                                    ->where('status', 1)
-                                    ->orderBy('created_at', 'DESC')
-                                    ->get();
+            ->where('class_id', $students->class_id)
+            ->where('status', 1)
+            ->orderBy('created_at', 'DESC')
+            ->get();
 
-         // Combine both $examTypes and $reports into one array
+        // Combine both $examTypes and $reports into one array
         $combinedItems = collect();
 
         // Add exam types
@@ -150,7 +150,7 @@ class ResultsController extends Controller
             ]);
         }
 
-       // Sort alphabetically by label
+        // Sort alphabetically by label
         $combined = $combinedItems->sortBy('label')->values();
 
         // ✅ Paginate manually
@@ -164,8 +164,7 @@ class ResultsController extends Controller
 
         // Pass the combinedItems to the view
         return view('Results.result_type', compact('students', 'year', 'paginated'));
-
-     }
+    }
 
     public function resultByMonth($student, $year, $exam_type)
     {
@@ -176,7 +175,7 @@ class ResultsController extends Controller
         $user = Auth::user();
         $parent = Parents::where('user_id', $user->id)->first();
 
-         if($students->parent_id != $parent->id) {
+        if ($students->parent_id != $parent->id) {
             Alert()->toast('You are not authorized to access this page', 'error');
             return to_route('home');
         }
@@ -220,30 +219,46 @@ class ResultsController extends Controller
         $parent = Parents::where('user_id', $user->id)->first();
 
         $results = Examination_result::query()
-                    ->join('students', 'students.id', '=', 'examination_results.student_id')
-                    ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                    ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                    ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                    ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
-                    ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-                    ->join('schools', 'schools.id', '=', 'examination_results.school_id')
-                    ->select(
-                        'examination_results.*',
-                        'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.admission_number',
-                        'students.group', 'students.image', 'students.gender', 'students.admission_number', 'students.parent_id',
-                        'subjects.course_name', 'subjects.course_code',
-                        'grades.class_name', 'grades.class_code',
-                        'examinations.exam_type',
-                        'users.first_name as teacher_first_name', 'users.last_name as teacher_last_name',
-                        'schools.school_name', 'schools.school_reg_no', 'schools.postal_address', 'schools.postal_name', 'schools.logo', 'schools.country',
-                    )
-                    ->where('examination_results.student_id', $studentId->id)
-                    ->where('examination_results.exam_type_id', $exam_id[0])
-                    ->whereDate('exam_date', Carbon::parse($date)) // Filtering by date
-                    ->where('examination_results.school_id', $user->school_id)
-                    ->where('examination_results.status', 2) // Assuming 2 is the status for published results
-                    ->where('students.parent_id', $parent->id)
-                    ->get();
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
+            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+            ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
+            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+            ->join('schools', 'schools.id', '=', 'examination_results.school_id')
+            ->select(
+                'examination_results.*',
+                'students.id as studentId',
+                'students.first_name',
+                'students.middle_name',
+                'students.last_name',
+                'students.admission_number',
+                'students.group',
+                'students.image',
+                'students.gender',
+                'students.admission_number',
+                'students.parent_id',
+                'subjects.course_name',
+                'subjects.course_code',
+                'grades.class_name',
+                'grades.class_code',
+                'examinations.exam_type',
+                'users.first_name as teacher_first_name',
+                'users.last_name as teacher_last_name',
+                'schools.school_name',
+                'schools.school_reg_no',
+                'schools.postal_address',
+                'schools.postal_name',
+                'schools.logo',
+                'schools.country',
+            )
+            ->where('examination_results.student_id', $studentId->id)
+            ->where('examination_results.exam_type_id', $exam_id[0])
+            ->whereDate('exam_date', Carbon::parse($date)) // Filtering by date
+            ->where('examination_results.school_id', $user->school_id)
+            ->where('examination_results.status', 2) // Assuming 2 is the status for published results
+            ->where('students.parent_id', $parent->id)
+            ->get();
 
         // Calculate the sum of all scores
         $totalScore = $results->sum('score');
@@ -251,31 +266,31 @@ class ResultsController extends Controller
 
         // Calculate rankings
         $rankings = Examination_result::query()
-                    ->where('examination_results.class_id', $results->first()->class_id) // Angalia wanafunzi wa darasa hili pekee
-                    ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
-                    ->where('examination_results.exam_type_id', $exam_id[0]) // Angalia aina ya mtihani
-                    ->where('examination_results.school_id', $user->school_id)
-                    ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
-                    ->select('student_id', DB::raw('SUM(score) as total_score'))
-                    ->groupBy('student_id')
-                    ->orderByDesc('total_score') // Pangilia kwa score kwanza
-                    ->get();
+            ->where('examination_results.class_id', $results->first()->class_id) // Angalia wanafunzi wa darasa hili pekee
+            ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
+            ->where('examination_results.exam_type_id', $exam_id[0]) // Angalia aina ya mtihani
+            ->where('examination_results.school_id', $user->school_id)
+            ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
+            ->select('student_id', DB::raw('SUM(score) as total_score'))
+            ->groupBy('student_id')
+            ->orderByDesc('total_score') // Pangilia kwa score kwanza
+            ->get();
 
-                // Kutengeneza mfumo wa tie ranking
-                $rank = 1;
-                $previousScore = null;
-                $ranks = [];
+        // Kutengeneza mfumo wa tie ranking
+        $rank = 1;
+        $previousScore = null;
+        $ranks = [];
 
-                foreach ($rankings as $key => $ranking) {
-                    if ($previousScore !== null && $ranking->total_score < $previousScore) {
-                        $rank = $key + 1;
-                    }
-                    $ranks[$ranking->student_id] = $rank;
-                    $previousScore = $ranking->total_score;
-                }
+        foreach ($rankings as $key => $ranking) {
+            if ($previousScore !== null && $ranking->total_score < $previousScore) {
+                $rank = $key + 1;
+            }
+            $ranks[$ranking->student_id] = $rank;
+            $previousScore = $ranking->total_score;
+        }
 
-                // Kupata rank ya mwanafunzi husika
-                $studentRank = $ranks[$studentId->id] ?? null;
+        // Kupata rank ya mwanafunzi husika
+        $studentRank = $ranks[$studentId->id] ?? null;
 
 
         // Add grades, remarks, and individual ranks to each result
@@ -317,44 +332,43 @@ class ResultsController extends Controller
             }
 
             $courseRankings = Examination_result::query()
-                            ->where('course_id', $result->course_id)
-                            ->where('examination_results.class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
-                            ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
-                            ->where('examination_results.exam_type_id', $exam_id[0]) // Angalia aina ya mtihani
-                            ->where('examination_results.school_id', $user->school_id)
-                            ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
-                            ->select('student_id', DB::raw('SUM(score) as total_score'))
-                            ->groupBy('student_id')
-                            ->orderByDesc('total_score') // Pangilia kwa score kwanza
-                            ->get();
+                ->where('course_id', $result->course_id)
+                ->where('examination_results.class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
+                ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
+                ->where('examination_results.exam_type_id', $exam_id[0]) // Angalia aina ya mtihani
+                ->where('examination_results.school_id', $user->school_id)
+                ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
+                ->select('student_id', DB::raw('SUM(score) as total_score'))
+                ->groupBy('student_id')
+                ->orderByDesc('total_score') // Pangilia kwa score kwanza
+                ->get();
 
-                    // Hakikisha wanafunzi wenye score sawa wanashirikiana rank
-                $rank = 1;
-                $previousScore = null;
-                $ranks = [];
+            // Hakikisha wanafunzi wenye score sawa wanashirikiana rank
+            $rank = 1;
+            $previousScore = null;
+            $ranks = [];
 
-                foreach ($courseRankings as $key => $ranking) {
-                    if ($previousScore !== null && $ranking->total_score < $previousScore) {
-                        $rank = $key + 1;
-                    }
-                    $ranks[$ranking->student_id] = $rank;
-                    $previousScore = $ranking->total_score;
+            foreach ($courseRankings as $key => $ranking) {
+                if ($previousScore !== null && $ranking->total_score < $previousScore) {
+                    $rank = $key + 1;
                 }
+                $ranks[$ranking->student_id] = $rank;
+                $previousScore = $ranking->total_score;
+            }
 
-                // Kupata rank ya mwanafunzi husika
-                $result->courseRank = $ranks[$studentId->id] ?? null;
-
+            // Kupata rank ya mwanafunzi husika
+            $result->courseRank = $ranks[$studentId->id] ?? null;
         }
-         // ================= QR CODE VERIFICATION =================
+        // ================= QR CODE VERIFICATION =================
         $verificationData = [
-            'student_name' => trim($studentId->first_name.' '.$studentId->middle_name.' '.$studentId->last_name),
+            'student_name' => trim($studentId->first_name . ' ' . $studentId->middle_name . ' ' . $studentId->last_name),
             'admission_number' => $studentId->admission_number,
             'class' => $results->first()->class_name ?? '-',
             'report_type' => $results->first()->exam_type . ' Assessment',
             'term' => $results->first()->Exam_term ?? '-',
             'school' => $results->first()->school_name ?? '-',
             'report_date' => Carbon::parse($date)->format('Y-m-d'),
-            'report_id' => sha1($studentId->id.$exam_id[0].$date),
+            'report_id' => sha1($studentId->id . $exam_id[0] . $date),
             'issued_at' => now()->timestamp,
             'total_score' => $totalScore,
             'average_score' => $averageScore,
@@ -408,29 +422,31 @@ class ResultsController extends Controller
 
         $schools = school::find($id[0]);
         // return $schools;
-        if($user->school_id != $schools->id){
+        if ($user->school_id != $schools->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return redirect()->route('error.page');
         }
 
         $results = Examination_result::query()
-                                ->join('students', 'students.id', '=', 'examination_results.student_id')
-                                ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                                ->select(
-                                    'examination_results.*',
-                                    'grades.id as class_id', 'grades.class_name', 'grades.class_code'
-                                )
-                                ->where('examination_results.school_id', $schools->id)
-                                ->orderBy('examination_results.exam_date', 'DESC')
-                                ->get();
-            // return $results;
-            $groupedData = $results->groupBy(function ($item) {
-                return Carbon::parse($item->exam_date)->format('Y');
-            })->map(function ($yearGroup) {
-                return $yearGroup->groupBy('class_id');
-            });
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
+            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+            ->select(
+                'examination_results.*',
+                'grades.id as class_id',
+                'grades.class_name',
+                'grades.class_code'
+            )
+            ->where('examination_results.school_id', $schools->id)
+            ->orderBy('examination_results.exam_date', 'DESC')
+            ->get();
+        // return $results;
+        $groupedData = $results->groupBy(function ($item) {
+            return Carbon::parse($item->exam_date)->format('Y');
+        })->map(function ($yearGroup) {
+            return $yearGroup->groupBy('class_id');
+        });
 
-            return view('Results.general_year_result', compact('schools', 'results', 'groupedData'));
+        return view('Results.general_year_result', compact('schools', 'results', 'groupedData'));
     }
 
     public function classesByYear($school, $year)
@@ -440,21 +456,22 @@ class ResultsController extends Controller
 
         $schools = school::find($id[0]);
 
-        if($user->school_id != $schools->id){
+        if ($user->school_id != $schools->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return redirect()->route('error.page');
-        }
-        else {
+        } else {
             $results = Examination_result::query()
-                        ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                        ->select(
-                            'examination_results.*',
-                            'grades.id as class_id', 'grades.class_name', 'grades.class_code'
-                        )
-                        ->where('examination_results.school_id', $schools->id)
-                        ->whereYear('examination_results.exam_date', $year)
-                        ->orderBy('grades.class_code', 'ASC')
-                        ->get();
+                ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+                ->select(
+                    'examination_results.*',
+                    'grades.id as class_id',
+                    'grades.class_name',
+                    'grades.class_code'
+                )
+                ->where('examination_results.school_id', $schools->id)
+                ->whereYear('examination_results.exam_date', $year)
+                ->orderBy('grades.class_code', 'ASC')
+                ->get();
 
             $groupedByClass = $results->groupBy('class_id');
 
@@ -473,55 +490,66 @@ class ResultsController extends Controller
         // return $classes;
 
         $results = Examination_result::query()
-                                    ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                                    ->select(
-                                        'examination_results.*',
-                                        'examinations.id as exam_type_id', 'examinations.exam_type'
-                                    )
-                                    ->where('examination_results.school_id', $schools->id)
-                                    ->whereYear('examination_results.exam_date', $year)
-                                    ->where('examination_results.class_id', $classes->id)
-                                    ->get();
+            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+            ->select(
+                'examination_results.*',
+                'examinations.id as exam_type_id',
+                'examinations.exam_type'
+            )
+            ->where('examination_results.school_id', $schools->id)
+            ->whereYear('examination_results.exam_date', $year)
+            ->where('examination_results.class_id', $classes->id)
+            ->get();
 
-                $months = [
-                    'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4, 'May' => 5, 'June' => 6,
-                    'July' => 7, 'August' => 8, 'September' => 9, 'October' => 10, 'November' => 11, 'December' => 12
-                ];
+        $months = [
+            'January' => 1,
+            'February' => 2,
+            'March' => 3,
+            'April' => 4,
+            'May' => 5,
+            'June' => 6,
+            'July' => 7,
+            'August' => 8,
+            'September' => 9,
+            'October' => 10,
+            'November' => 11,
+            'December' => 12
+        ];
 
-                //query examination lists
-                $exams = Examination::where('status', 1)->where('school_id', $user->school_id)->orderBy('exam_type')->get();
+        //query examination lists
+        $exams = Examination::where('status', 1)->where('school_id', $user->school_id)->orderBy('exam_type')->get();
 
-                //query examination_results by for the specific class which exists in the db table
-                $monthsResult = Examination_result::query()
-                                                    ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                                                    ->select('examination_results.*', 'examinations.exam_type', 'examinations.symbolic_abbr')
-                                                    ->where('class_id', $classes->id)
-                                                    ->whereYear('examination_results.exam_date', $year)
-                                                    ->where('examination_results.school_id', $schools->id)
-                                                    ->orderBy('examination_results.exam_date')
-                                                    ->get();
+        //query examination_results by for the specific class which exists in the db table
+        $monthsResult = Examination_result::query()
+            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+            ->select('examination_results.*', 'examinations.exam_type', 'examinations.symbolic_abbr')
+            ->where('class_id', $classes->id)
+            ->whereYear('examination_results.exam_date', $year)
+            ->where('examination_results.school_id', $schools->id)
+            ->orderBy('examination_results.exam_date')
+            ->get();
 
-                $groupedByMonth = $monthsResult->groupBy(function ($item) {
-                    return Carbon::parse($item->exam_date)->format('Y-m-d');
-                });
+        $groupedByMonth = $monthsResult->groupBy(function ($item) {
+            return Carbon::parse($item->exam_date)->format('Y-m-d');
+        });
 
-                //get compiled results
-                $compiled_results = compiled_results::where('school_id', $schools->id)
-                                                    ->where('class_id', $classes->id)
-                                                    ->get();
+        //get compiled results
+        $compiled_results = compiled_results::where('school_id', $schools->id)
+            ->where('class_id', $classes->id)
+            ->get();
 
-                $groupedByExamType = $results->groupBy('exam_type_id'); // Group by exam type using results
-                $compiledGroupByExam = $compiled_results->groupBy('report_name'); // Group by exam type using compiled results
+        $groupedByExamType = $results->groupBy('exam_type_id'); // Group by exam type using results
+        $compiledGroupByExam = $compiled_results->groupBy('report_name'); // Group by exam type using compiled results
 
-                $reports = generated_reports::query()
-                                                ->join('users', 'users.id', '=', 'generated_reports.created_by')
-                                                ->select('generated_reports.*', 'users.first_name', 'users.last_name')
-                                                ->where('generated_reports.school_id', $schools->id)
-                                                ->where('generated_reports.class_id', $classes->id)
-                                                ->orderBy('generated_reports.created_at', 'desc')
-                                                ->paginate(5);
+        $reports = generated_reports::query()
+            ->join('users', 'users.id', '=', 'generated_reports.created_by')
+            ->select('generated_reports.*', 'users.first_name', 'users.last_name')
+            ->where('generated_reports.school_id', $schools->id)
+            ->where('generated_reports.class_id', $classes->id)
+            ->orderBy('generated_reports.created_at', 'desc')
+            ->paginate(5);
 
-                return view('Results.general_result_type', compact('schools', 'reports', 'groupedByMonth', 'compiledGroupByExam', 'year', 'exams', 'classes', 'groupedByExamType'));
+        return view('Results.general_result_type', compact('schools', 'reports', 'groupedByMonth', 'compiledGroupByExam', 'year', 'exams', 'classes', 'groupedByExamType'));
     }
 
     //function for displaying general results by term ***************************************
@@ -545,8 +573,11 @@ class ResultsController extends Controller
             ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
             ->select(
                 'examination_results.*',
-                'students.first_name', 'students.middle_name', 'students.last_name',
-                'students.id as student_id', 'students.admission_number',
+                'students.first_name',
+                'students.middle_name',
+                'students.last_name',
+                'students.id as student_id',
+                'students.admission_number',
                 'grades.class_name',
                 'examinations.exam_type'
             )
@@ -595,32 +626,49 @@ class ResultsController extends Controller
 
         // Map month names to numbers
         $monthsArray = [
-            'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
-            'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8, 'September' => 9,
-            'October' => 10, 'November' => 11, 'December' => 12,
+            'January' => 1,
+            'February' => 2,
+            'March' => 3,
+            'April' => 4,
+            'May' => 5,
+            'June' => 6,
+            'July' => 7,
+            'August' => 8,
+            'September' => 9,
+            'October' => 10,
+            'November' => 11,
+            'December' => 12,
         ];
 
         $monthNumber = $monthsArray[$month];
 
         // Query for the examination results
         $results = Examination_result::query()
-                    ->join('students', 'students.id', '=', 'examination_results.student_id')
-                    ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                    ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                    ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                    ->select(
-                        'examination_results.*',
-                        'students.first_name', 'students.middle_name', 'students.last_name', 'students.gender', 'students.id as student_id', 'students.group', 'students.admission_number',
-                        'grades.class_name', 'students.status',
-                        'examinations.exam_type',
-                        'subjects.course_name', 'subjects.course_code'
-                    )
-                    ->where('examination_results.school_id', $schools->id)
-                    ->where('examination_results.class_id', $class_id[0])
-                    ->where('examination_results.exam_type_id', $exam_id[0])
-                    ->where('students.status', 1) // Only active students
-                    ->whereDate('examination_results.exam_date', $date)
-                    ->get();
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
+            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+            ->select(
+                'examination_results.*',
+                'students.first_name',
+                'students.middle_name',
+                'students.last_name',
+                'students.gender',
+                'students.id as student_id',
+                'students.group',
+                'students.admission_number',
+                'grades.class_name',
+                'students.status',
+                'examinations.exam_type',
+                'subjects.course_name',
+                'subjects.course_code'
+            )
+            ->where('examination_results.school_id', $schools->id)
+            ->where('examination_results.class_id', $class_id[0])
+            ->where('examination_results.exam_type_id', $exam_id[0])
+            ->where('students.status', 1) // Only active students
+            ->whereDate('examination_results.exam_date', $date)
+            ->get();
 
         // Filter students by class_id
         $studentsByClass = $results->where('class_id', $class_id[0])->groupBy('student_id');
@@ -785,9 +833,27 @@ class ResultsController extends Controller
 
         // Generate the PDF
         $pdf = \PDF::loadView('Results.results_by_month', compact(
-            'school', 'year', 'class', 'examType', 'month', 'results', 'totalMaleStudents', 'totalFemaleStudents', 'totalMaleGrades', 'totalFemaleGrades',
-            'averageScoresByCourse', 'evaluationScores', 'totalAverageScore', 'date', 'sortedStudentsResults', 'sumOfCourseAverages', 'sortedCourses',
-            'totalUniqueStudents', 'subjectGradesByGender', 'courses', 'generalClassAvg',
+            'school',
+            'year',
+            'class',
+            'examType',
+            'month',
+            'results',
+            'totalMaleStudents',
+            'totalFemaleStudents',
+            'totalMaleGrades',
+            'totalFemaleGrades',
+            'averageScoresByCourse',
+            'evaluationScores',
+            'totalAverageScore',
+            'date',
+            'sortedStudentsResults',
+            'sumOfCourseAverages',
+            'sortedCourses',
+            'totalUniqueStudents',
+            'subjectGradesByGender',
+            'courses',
+            'generalClassAvg',
         ));
         $pdf->setOption('isHtml5ParserEnabled', true);
         $pdf->setOption('isPhpEnabled', true);
@@ -823,10 +889,11 @@ class ResultsController extends Controller
                 return 'C';
             } elseif ($score >= 10.5) {
                 return 'D';
-            } elseif($score >= 0.5) {
+            } elseif ($score >= 0.5) {
                 return 'E';
-            } else { return 'ABS'; }
-
+            } else {
+                return 'ABS';
+            }
         } else {
             if ($score >= 80.5) {
                 return 'A';
@@ -836,9 +903,11 @@ class ResultsController extends Controller
                 return 'C';
             } elseif ($score >= 20.5) {
                 return 'D';
-            } elseif($score >= 0.5) {
+            } elseif ($score >= 0.5) {
                 return 'E';
-            } else { return 'ABS'; }
+            } else {
+                return 'ABS';
+            }
         }
     }
     //end of results in general ==============================================
@@ -862,126 +931,133 @@ class ResultsController extends Controller
 
             // Update status in the database
             $updatedRows = Examination_result::join('students', 'students.id', '=', 'examination_results.student_id')
-                                ->where('examination_results.school_id', $schools->id)
-                                ->where('examination_results.class_id', $class_id[0])
-                                ->where('examination_results.exam_type_id', $exam_id[0])
-                                ->where('students.status', 1) //only active students
-                                ->whereDate('examination_results.exam_date', $date)
-                                ->update(['examination_results.status' => 2 ]);
+                ->where('examination_results.school_id', $schools->id)
+                ->where('examination_results.class_id', $class_id[0])
+                ->where('examination_results.exam_type_id', $exam_id[0])
+                ->where('students.status', 1) //only active students
+                ->whereDate('examination_results.exam_date', $date)
+                ->update(['examination_results.status' => 2]);
 
             if ($updatedRows) {
                 // If status is 2 (Published), send SMS notifications
                 $studentResults = Examination_result::join('students', 'students.id', '=', 'examination_results.student_id')
-                                ->join('subjects', 'subjects.id', 'examination_results.course_id')
-                                ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                                ->join('schools', 'schools.id', '=', 'examination_results.school_id')
-                                ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
-                                ->leftJoin('users', 'users.id', '=', 'parents.user_id')
-                                ->select(
-                                    'examination_results.*', 'users.phone',
-                                    'students.first_name', 'students.middle_name', 'students.last_name', 'students.status',
-                                    'examinations.exam_type', 'subjects.course_name', 'subjects.course_code', 'schools.school_name'
-                                )
-                                ->where('examination_results.class_id', $class_id[0])
-                                ->where('students.status', 1) //only active students
-                                ->where('examination_results.school_id', $schools->id)
-                                ->where('examination_results.exam_type_id', $exam_id[0])
-                                ->where('examination_results.status', 2) // Published results
-                                ->whereDate('examination_results.exam_date', $date)
-                                ->get();
+                    ->join('subjects', 'subjects.id', 'examination_results.course_id')
+                    ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+                    ->join('schools', 'schools.id', '=', 'examination_results.school_id')
+                    ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
+                    ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+                    ->select(
+                        'examination_results.*',
+                        'users.phone',
+                        'students.first_name',
+                        'students.middle_name',
+                        'students.last_name',
+                        'students.status',
+                        'examinations.exam_type',
+                        'subjects.course_name',
+                        'subjects.course_code',
+                        'schools.school_name'
+                    )
+                    ->where('examination_results.class_id', $class_id[0])
+                    ->where('students.status', 1) //only active students
+                    ->where('examination_results.school_id', $schools->id)
+                    ->where('examination_results.exam_type_id', $exam_id[0])
+                    ->where('examination_results.status', 2) // Published results
+                    ->whereDate('examination_results.exam_date', $date)
+                    ->get();
 
                 // Remove duplicate student entries
                 $studentsData = $studentResults->unique('student_id')->values();
 
                 // Calculate ranks based on total marks
                 $studentsData = $studentsData->map(function ($student) use ($studentResults) {
-                $courses = $studentResults->where('student_id', $student->student_id)
-                            ->map(fn($result) => "{$result->course_code}={$result->score}")
-                            ->implode("\n");
+                    $courses = $studentResults->where('student_id', $student->student_id)
+                        ->map(fn($result) => "{$result->course_code}={$result->score}")
+                        ->implode("\n");
 
-                $totalMarks = $studentResults->where('student_id', $student->student_id)->sum('score');
-                $averageMarks = $totalMarks / $studentResults->where('student_id', $student->student_id)->count();
+                    $totalMarks = $studentResults->where('student_id', $student->student_id)->sum('score');
+                    $averageMarks = $totalMarks / $studentResults->where('student_id', $student->student_id)->count();
 
-                $student->courses = $courses;
-                $student->total_marks = $totalMarks;
-                $student->average_marks = $averageMarks;
+                    $student->courses = $courses;
+                    $student->total_marks = $totalMarks;
+                    $student->average_marks = $averageMarks;
 
-                return $student;
+                    return $student;
                 });
 
                 // Sort students by total marks in descending order
-            $studentsData = $studentsData->sortByDesc('total_marks')->values();
-            $term = $studentResults->first()->Exam_term;
+                $studentsData = $studentsData->sortByDesc('total_marks')->values();
+                $term = $studentResults->first()->Exam_term;
 
-            $rank = 1;
-            $previousScore = null;
-            $previousRank = null;
+                $rank = 1;
+                $previousScore = null;
+                $previousRank = null;
 
-            $studentsData = $studentsData->map(function ($student, $index) use (&$rank, &$previousScore, &$previousRank) {
-                if ($previousScore !== null && $student->total_marks < $previousScore) {
-                    $rank = $index + 1; // Rank inabadilika tu kama alama ni tofauti
-                }
+                $studentsData = $studentsData->map(function ($student, $index) use (&$rank, &$previousScore, &$previousRank) {
+                    if ($previousScore !== null && $student->total_marks < $previousScore) {
+                        $rank = $index + 1; // Rank inabadilika tu kama alama ni tofauti
+                    }
 
-                // Kama alama ni sawa na ya mwanafunzi uliopita, tumia rank sawa
-                if ($previousScore !== null && $student->total_marks == $previousScore) {
-                    $student->rank = $previousRank; // Wanafunzi wawili wapate rank sawa
-                } else {
-                    $student->rank = $rank;
-                    $previousRank = $rank;
-                }
+                    // Kama alama ni sawa na ya mwanafunzi uliopita, tumia rank sawa
+                    if ($previousScore !== null && $student->total_marks == $previousScore) {
+                        $student->rank = $previousRank; // Wanafunzi wawili wapate rank sawa
+                    } else {
+                        $student->rank = $rank;
+                        $previousRank = $rank;
+                    }
 
-                $previousScore = $student->total_marks;
-                return $student;
-            });
+                    $previousScore = $student->total_marks;
+                    return $student;
+                });
 
-            // School URL
-            $url = "https://shuleapp.tech/home";
-            $beemSmsService = new BeemSmsService();
+                // School URL
+                $url = "https://shuleapp.tech";
+                $beemSmsService = new BeemSmsService();
 
-            // Find total number of students
-            $totalStudents = $studentsData->count();
+                // Find total number of students
+                $totalStudents = $studentsData->count();
 
-            // Loop through each student and prepare the payload for each parent
-            foreach ($studentsData as $student) {
-                $phoneNumber = $this->formatPhoneNumber($student->phone);
-                $dateFormat = Carbon::parse($date)->format('d-m-Y');
-                $fullname = $student->first_name . ' '. $student->last_name;
-                if (!$phoneNumber) {
-                    // Log::error("Invalid phone number for {$student->first_name}: {$student->phone}");
-                    return response()->json([
-                        'success' => false,
-                        'message' => "Invalid phone number for {$student->first_name}",
-                        'type' => 'error'
-                    ]);
-                }
+                // Loop through each student and prepare the payload for each parent
+                foreach ($studentsData as $student) {
+                    $phoneNumber = $this->formatPhoneNumber($student->phone);
+                    $dateFormat = Carbon::parse($date)->format('d-m-Y');
+                    $fullname = $student->first_name . ' ' . $student->last_name;
+                    if (!$phoneNumber) {
+                        // Log::error("Invalid phone number for {$student->first_name}: {$student->phone}");
+                        return response()->json([
+                            'success' => false,
+                            'message' => "Invalid phone number for {$student->first_name}",
+                            'type' => 'error'
+                        ]);
+                    }
 
-                // Construct the SMS message
-                $messageContent = "Matokeo ya ". strtoupper($fullname).", \n";
-                $messageContent .= "Mtihani wa ". strtoupper($student->exam_type).", wa Tar. {$dateFormat} ni: \n";
-                $messageContent .= strtoupper($student->courses) . "\n";
-                $messageContent .= "Jumla {$student->total_marks}, Wastani " . number_format($student->average_marks) . ", Nafasi ya {$student->rank} kati ya {$totalStudents}. \n";
-                $messageContent .= "Pakua ripoti hapa {$url} ";
+                    // Construct the SMS message
+                    $messageContent = "Matokeo ya " . strtoupper($fullname) . ", \n";
+                    $messageContent .= "Mtihani wa " . strtoupper($student->exam_type) . ", wa Tar. {$dateFormat} ni: \n";
+                    $messageContent .= strtoupper($student->courses) . "\n";
+                    $messageContent .= "Jumla {$student->total_marks}, Wastani " . number_format($student->average_marks) . ", Nafasi ya {$student->rank} kati ya {$totalStudents}. \n";
+                    $messageContent .= "Pakua ripoti hapa {$url} ";
 
-                // Prepare the recipients array
-                $recipients = [
-                    [
-                        'recipient_id' => $student->student_id, // Unique ID for each recipient
-                        'dest_addr' => $phoneNumber, // Parent's phone number
-                    ]
-                ];
+                    // Prepare the recipients array
+                    $recipients = [
+                        [
+                            'recipient_id' => $student->student_id, // Unique ID for each recipient
+                            'dest_addr' => $phoneNumber, // Parent's phone number
+                        ]
+                    ];
 
-                // Send SMS to each parent individually using Beem API
-                $source_Addr = $schools->sender_id ?? 'shuleApp';
-                // $beemSmsService->sendSms($source_Addr, $messageContent, $recipients);
+                    // Send SMS to each parent individually using Beem API
+                    $source_Addr = $schools->sender_id ?? 'shuleApp';
+                    // $beemSmsService->sendSms($source_Addr, $messageContent, $recipients);
 
-                // Send using nextSMS API (option 2)
-                $nextSmsService = new NextSmsService();
-                $payload = [
-                    'from' => $schools->sender_id ?? "SHULE APP",
-                    'to' => $phoneNumber,
-                    'text' => $messageContent,
-                    'reference' => $student->student_id
-                ];
+                    // Send using nextSMS API (option 2)
+                    $nextSmsService = new NextSmsService();
+                    $payload = [
+                        'from' => $schools->sender_id ?? "SHULE APP",
+                        'to' => $phoneNumber,
+                        'text' => $messageContent,
+                        'reference' => $student->student_id
+                    ];
                     $response = $nextSmsService->sendSmsByNext(
                         $payload['from'],
                         $payload['to'],
@@ -991,8 +1067,8 @@ class ResultsController extends Controller
 
                     // Log::info("NextSMS Payload: ". $payload['text']);
 
-                    if(!$response['success']) {
-                        Alert()->toast('SMS failed: '.$response['error'], 'error');
+                    if (!$response['success']) {
+                        Alert()->toast('SMS failed: ' . $response['error'], 'error');
                         return back();
                     }
                 }
@@ -1001,14 +1077,13 @@ class ResultsController extends Controller
                 Alert()->toast('Results published and sent to parents successfully', 'success');
                 return back();
             }
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
             return back();
         }
     }
 
-    public function unpublishResult ($school, $year, $class, $examType, $month, $date)
+    public function unpublishResult($school, $year, $class, $examType, $month, $date)
     {
         try {
 
@@ -1020,29 +1095,28 @@ class ResultsController extends Controller
 
             $schools = school::find($school_id[0]);
 
-            if($user->school_id != $schools->id){
+            if ($user->school_id != $schools->id) {
                 Alert()->toast('You are not authorized to view this page', 'error');
                 return redirect()->route('error.page');
             }
 
             $updatedRows = Examination_result::where('school_id', $schools->id)
-                                                // ->whereYear('exam_date', $year)
-                                                ->where('class_id', $class_id[0])
-                                                ->where('exam_type_id', $exam_id[0])
-                                                // ->whereMonth('exam_date', $monthNumber)
-                                                ->whereDate('exam_date', $date)
-                                                ->update(['status' => 1]);
-                if($updatedRows){
-                    Alert()->toast('Results unpublished successfully', 'success');
-                    return back();
-                } else {
-                    Alert()->toast('No results found to unpublish.', 'error' );
-                    return redirect()->back();
-                }
+                // ->whereYear('exam_date', $year)
+                ->where('class_id', $class_id[0])
+                ->where('exam_type_id', $exam_id[0])
+                // ->whereMonth('exam_date', $monthNumber)
+                ->whereDate('exam_date', $date)
+                ->update(['status' => 1]);
+            if ($updatedRows) {
+                Alert()->toast('Results unpublished successfully', 'success');
+                return back();
+            } else {
+                Alert()->toast('No results found to unpublish.', 'error');
+                return redirect()->back();
+            }
 
             // return $monthsArray;
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
             return back();
         }
@@ -1062,61 +1136,67 @@ class ResultsController extends Controller
 
             $schools = school::find($school_id[0]);
 
-            if($user->school_id != $schools->id){
+            if ($user->school_id != $schools->id) {
                 Alert()->toast('You are not authorized to view this page', 'error');
                 return redirect()->route('error.page');
             }
 
             $monthsArray = [
-                'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
-                'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8, 'September' => 9,
-                'October' => 10, 'November' => 11, 'December' => 12,
+                'January' => 1,
+                'February' => 2,
+                'March' => 3,
+                'April' => 4,
+                'May' => 5,
+                'June' => 6,
+                'July' => 7,
+                'August' => 8,
+                'September' => 9,
+                'October' => 10,
+                'November' => 11,
+                'December' => 12,
             ];
 
             $isPublished = Examination_result::where('school_id', $schools->id)
-                                                ->where('class_id', $class_id[0])
-                                                ->where('exam_type_id', $exam_id[0])
-                                                ->whereDate('exam_date', $date)
-                                                ->where('status', 2)
-                                                ->exists();
-            if($isPublished) {
+                ->where('class_id', $class_id[0])
+                ->where('exam_type_id', $exam_id[0])
+                ->whereDate('exam_date', $date)
+                ->where('status', 2)
+                ->exists();
+            if ($isPublished) {
                 Alert()->toast('Results data set is already published. Cannot delete.', 'error');
-                return to_route('results.monthsByExamType',[$school, 'year' => $year, 'class' => $class, 'examType' => $examType]);
+                return to_route('results.monthsByExamType', [$school, 'year' => $year, 'class' => $class, 'examType' => $examType]);
             }
 
             $existInCompile = generated_reports::where('class_id', $class_id[0])
-                                                ->whereJsonContains('exam_dates', $date)
-                                                ->where('school_id', $school_id[0])
-                                                ->exists();
+                ->whereJsonContains('exam_dates', $date)
+                ->where('school_id', $school_id[0])
+                ->exists();
 
             if ($existInCompile) {
                 Alert()->toast('Results already exist in the compiled reports. Cannot delete.', 'error');
-                return to_route('results.monthsByExamType',[$school, 'year' => $year, 'class' => $class, 'examType' => $examType]);
+                return to_route('results.monthsByExamType', [$school, 'year' => $year, 'class' => $class, 'examType' => $examType]);
             }
             // return $monthsArray;
-            if(array_key_exists($month, $monthsArray)){
+            if (array_key_exists($month, $monthsArray)) {
                 $monthNumber = $monthsArray[$month];
                 // return $monthNumber;
 
                 $results = Examination_result::where('school_id', $schools->id)
-                                                // ->whereYear('exam_date', $year)
-                                                ->where('class_id', $class_id[0])
-                                                ->where('exam_type_id', $exam_id[0])
-                                                // ->whereMonth('exam_date', $monthNumber)\
-                                                ->whereDate('exam_date', $date)
-                                                ->delete();
-                if($results) {
+                    // ->whereYear('exam_date', $year)
+                    ->where('class_id', $class_id[0])
+                    ->where('exam_type_id', $exam_id[0])
+                    // ->whereMonth('exam_date', $monthNumber)\
+                    ->whereDate('exam_date', $date)
+                    ->delete();
+                if ($results) {
                     Alert()->toast('Results has deleted successfully', 'success');
                     return redirect()->back();
                 }
-
             } else {
-                Alert()->toast('Invalid month name provided.', 'error' );
+                Alert()->toast('Invalid month name provided.', 'error');
                 return redirect()->back();
             }
-
-        }
-        catch(\Exception $e){
+        } catch (\Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
             return back();
         }
@@ -1133,16 +1213,25 @@ class ResultsController extends Controller
 
         $schools = school::find($school_id[0]);
 
-        if($user->school_id != $schools->id){
+        if ($user->school_id != $schools->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return redirect()->route('error.page');
         }
 
-         // Mwezi kwa namba
+        // Mwezi kwa namba
         $monthsArray = [
-            'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4,
-            'May' => 5, 'June' => 6, 'July' => 7, 'August' => 8, 'September' => 9,
-            'October' => 10, 'November' => 11, 'December' => 12,
+            'January' => 1,
+            'February' => 2,
+            'March' => 3,
+            'April' => 4,
+            'May' => 5,
+            'June' => 6,
+            'July' => 7,
+            'August' => 8,
+            'September' => 9,
+            'October' => 10,
+            'November' => 11,
+            'December' => 12,
         ];
 
         $classId = Grade::findOrFail($class_id[0]);
@@ -1151,32 +1240,37 @@ class ResultsController extends Controller
 
         // Chagua wanafunzi wa kipekee kulingana na student_id
         $studentsResults = Examination_result::query()
-                    ->join('students', 'students.id', '=', 'examination_results.student_id')
-                    ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                    ->join('parents', 'parents.id', '=', 'students.parent_id')
-                    ->leftJoin('users', 'users.id', '=', 'parents.user_id')
-                    ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                    ->select(
-                        'students.id as student_id',
-                        'students.first_name', 'students.middle_name', 'students.last_name', 'students.admission_number',
-                        'students.gender', 'grades.class_name', 'users.phone',
-                        'examination_results.*',
-                        'subjects.course_code',
-                    )
-                        // ->whereYear('examination_results.exam_date', $year)
-                        // ->whereMonth('examination_results.exam_date', $monthNumber)
-                        ->where('examination_results.class_id', $classId->id)
-                        ->whereDate('examination_results.exam_date', $date)
-                        ->where('examination_results.exam_type_id', $exam_id[0])
-                        ->distinct() // Hakikisha data ni ya kipekee kulingana na select fields
-                        ->orderBy('students.first_name')
-                        ->get();
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
+            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+            ->join('parents', 'parents.id', '=', 'students.parent_id')
+            ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+            ->select(
+                'students.id as student_id',
+                'students.first_name',
+                'students.middle_name',
+                'students.last_name',
+                'students.admission_number',
+                'students.gender',
+                'grades.class_name',
+                'users.phone',
+                'examination_results.*',
+                'subjects.course_code',
+            )
+            // ->whereYear('examination_results.exam_date', $year)
+            // ->whereMonth('examination_results.exam_date', $monthNumber)
+            ->where('examination_results.class_id', $classId->id)
+            ->whereDate('examination_results.exam_date', $date)
+            ->where('examination_results.exam_type_id', $exam_id[0])
+            ->distinct() // Hakikisha data ni ya kipekee kulingana na select fields
+            ->orderBy('students.first_name')
+            ->get();
 
         return view('Results.results_students_list', compact('schools', 'year', 'date', 'classId', 'exam_id', 'studentsResults', 'month'));
     }
 
     //delete single student results *****************************
-    public function deleteStudentResult($school, $year, $class, $examType, $month, $student_id, $date )
+    public function deleteStudentResult($school, $year, $class, $examType, $month, $student_id, $date)
     {
         $school_id = Hashids::decode($school);
         $class_id = Hashids::decode($class);
@@ -1188,20 +1282,20 @@ class ResultsController extends Controller
 
         $schools = school::find($school_id[0]);
 
-        if($user->school_id != $schools->id){
+        if ($user->school_id != $schools->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return redirect()->route('error.page');
         }
 
         $results = Examination_result::where('school_id', $schools->id)
-                                    ->where('class_id', $class_id[0])
-                                    ->where('exam_type_id', $exam_id[0])
-                                    ->where('student_id', $student[0])
-                                    ->whereDate('exam_date', $date)
-                                    ->delete();
+            ->where('class_id', $class_id[0])
+            ->where('exam_type_id', $exam_id[0])
+            ->where('student_id', $student[0])
+            ->whereDate('exam_date', $date)
+            ->delete();
         // return $results;
 
-        if($results){
+        if ($results) {
             Alert()->toast('Results deleted successfully', 'success');
             return redirect()->back();
         } else {
@@ -1220,7 +1314,7 @@ class ResultsController extends Controller
         $user = Auth::user();
         $schools = school::find($school_id[0]);
 
-        if($user->school_id != $schools->id){
+        if ($user->school_id != $schools->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return redirect()->route('error.page');
         }
@@ -1228,37 +1322,62 @@ class ResultsController extends Controller
         $studentId = Student::findOrFail($student_id[0]);
 
         $monthsArray = [
-            'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4, 'May' => 5, 'June' => 6,
-            'July' => 7, 'August' => 8, 'September' => 9, 'October' => 10, 'November' => 11, 'December' => 12
+            'January' => 1,
+            'February' => 2,
+            'March' => 3,
+            'April' => 4,
+            'May' => 5,
+            'June' => 6,
+            'July' => 7,
+            'August' => 8,
+            'September' => 9,
+            'October' => 10,
+            'November' => 11,
+            'December' => 12
         ];
 
         $monthValue = $monthsArray[$month];
 
         // First query (unchanged as it works correctly)
         $results = Examination_result::query()
-                ->join('students', 'students.id', '=', 'examination_results.student_id')
-                ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                ->join('schools', 'schools.id', '=', 'examination_results.school_id')
-                ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
-                ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-                ->select(
-                    'examination_results.*',
-                    'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.admission_number',
-                    'students.group', 'students.image', 'students.gender', 'students.admission_number',
-                    'subjects.course_name', 'subjects.course_code',
-                    'grades.class_name', 'grades.class_code',
-                    'examinations.exam_type',
-                    'users.first_name as teacher_first_name', 'users.last_name as teacher_last_name',
-                    'schools.school_name', 'schools.school_reg_no', 'schools.postal_address', 'schools.postal_name', 'schools.logo', 'schools.country',
-                )
-                ->where('examination_results.student_id', $studentId->id)
-                ->where('examination_results.exam_type_id', $exam_id[0])
-                ->where('examination_results.class_id', $class_id[0])
-                ->where('examination_results.school_id', $schools->id)
-                ->where('examination_results.exam_date', $date)
-                ->get();
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
+            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+            ->join('schools', 'schools.id', '=', 'examination_results.school_id')
+            ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
+            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+            ->select(
+                'examination_results.*',
+                'students.id as studentId',
+                'students.first_name',
+                'students.middle_name',
+                'students.last_name',
+                'students.admission_number',
+                'students.group',
+                'students.image',
+                'students.gender',
+                'students.admission_number',
+                'subjects.course_name',
+                'subjects.course_code',
+                'grades.class_name',
+                'grades.class_code',
+                'examinations.exam_type',
+                'users.first_name as teacher_first_name',
+                'users.last_name as teacher_last_name',
+                'schools.school_name',
+                'schools.school_reg_no',
+                'schools.postal_address',
+                'schools.postal_name',
+                'schools.logo',
+                'schools.country',
+            )
+            ->where('examination_results.student_id', $studentId->id)
+            ->where('examination_results.exam_type_id', $exam_id[0])
+            ->where('examination_results.class_id', $class_id[0])
+            ->where('examination_results.school_id', $schools->id)
+            ->where('examination_results.exam_date', $date)
+            ->get();
 
         // Calculate scores
         $totalScore = $results->sum('score');
@@ -1266,15 +1385,15 @@ class ResultsController extends Controller
 
         // Fixed ranking query
         $rankings = Examination_result::query()
-                    ->where('examination_results.class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
-                    ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
-                    ->where('examination_results.exam_type_id', $exam_id[0]) // Angalia aina ya mtihani
-                    ->where('examination_results.school_id', $user->school_id)
-                    ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
-                    ->select('student_id', DB::raw('SUM(score) as total_score'))
-                    ->groupBy('student_id')
-                    ->orderByDesc('total_score') // Pangilia kwa score kwanza
-                    ->get();
+            ->where('examination_results.class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
+            ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
+            ->where('examination_results.exam_type_id', $exam_id[0]) // Angalia aina ya mtihani
+            ->where('examination_results.school_id', $user->school_id)
+            ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
+            ->select('student_id', DB::raw('SUM(score) as total_score'))
+            ->groupBy('student_id')
+            ->orderByDesc('total_score') // Pangilia kwa score kwanza
+            ->get();
 
         // Kutengeneza mfumo wa tie ranking
         $rank = 1;
@@ -1333,16 +1452,16 @@ class ResultsController extends Controller
             }
 
             $courseRankings = Examination_result::query()
-                            ->where('course_id', $result->course_id)
-                            ->where('examination_results.class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
-                            ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
-                            ->where('examination_results.exam_type_id', $exam_id[0]) // Angalia aina ya mtihani
-                            ->where('examination_results.school_id', $user->school_id)
-                            ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
-                            ->select('student_id', DB::raw('SUM(score) as total_score'))
-                            ->groupBy('student_id')
-                            ->orderByDesc('total_score') // Pangilia kwa score kwanza
-                            ->get();
+                ->where('course_id', $result->course_id)
+                ->where('examination_results.class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
+                ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
+                ->where('examination_results.exam_type_id', $exam_id[0]) // Angalia aina ya mtihani
+                ->where('examination_results.school_id', $user->school_id)
+                ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
+                ->select('student_id', DB::raw('SUM(score) as total_score'))
+                ->groupBy('student_id')
+                ->orderByDesc('total_score') // Pangilia kwa score kwanza
+                ->get();
 
             // Hakikisha wanafunzi wenye score sawa wanashirikiana rank
             $rank = 1;
@@ -1359,18 +1478,17 @@ class ResultsController extends Controller
 
             // Kupata rank ya mwanafunzi husika
             $result->courseRank = $ranks[$studentId->id] ?? null;
-
         }
         // Generate QR payload with summary
         $verificationData = [
-            'student_name' => trim($studentId->first_name.' '.$studentId->middle_name.' '.$studentId->last_name),
+            'student_name' => trim($studentId->first_name . ' ' . $studentId->middle_name . ' ' . $studentId->last_name),
             'admission_number' => $studentId->admission_number,
             'class' => $results->first()->class_name,
             'report_type' => $results->first()->exam_type . ' Assessment',
             'term' => $results->first()->Exam_term,
             'school' => $results->first()->school_name,
             'report_date' => \Carbon\Carbon::parse($date)->format('Y-m-d'),
-            'report_id' => sha1($studentId->id.$exam_id[0].$class_id[0].$date),
+            'report_id' => sha1($studentId->id . $exam_id[0] . $class_id[0] . $date),
             'issued_at' => now()->timestamp,
 
             // 🔹 Add these summary fields
@@ -1399,7 +1517,7 @@ class ResultsController extends Controller
         // Pass the calculated data to the view
         $pdf = \PDF::loadView('Results.parent_results', compact('results', 'year', 'date', 'examType', 'studentId', 'student', 'month', 'totalScore', 'averageScore', 'studentRank', 'rankings', 'qrPng'));
 
-        return $pdf->stream($results->first()->first_name .' Results '.$month. ' '. $year. '.pdf');
+        return $pdf->stream($results->first()->first_name . ' Results ' . $month . ' ' . $year . '.pdf');
     }
 
     //Re-send sms results individually
@@ -1417,7 +1535,7 @@ class ResultsController extends Controller
             $schools = school::find($school_id[0]);
             $user = Auth::user();
 
-            if($user->school_id != $schools->id){
+            if ($user->school_id != $schools->id) {
                 Alert()->toast('You are not authorized to view this page', 'error');
                 return redirect()->route('error.page');
             }
@@ -1427,34 +1545,48 @@ class ResultsController extends Controller
 
             // Map month names to their numeric values
             $monthsArray = [
-                'January' => 1, 'February' => 2, 'March' => 3, 'April' => 4, 'May' => 5, 'June' => 6,
-                'July' => 7, 'August' => 8, 'September' => 9, 'October' => 10, 'November' => 11, 'December' => 12
+                'January' => 1,
+                'February' => 2,
+                'March' => 3,
+                'April' => 4,
+                'May' => 5,
+                'June' => 6,
+                'July' => 7,
+                'August' => 8,
+                'September' => 9,
+                'October' => 10,
+                'November' => 11,
+                'December' => 12
             ];
             $monthValue = $monthsArray[$month];
 
             $results = Examination_result::query()
-                        ->join('students', 'students.id', '=', 'examination_results.student_id')
-                        ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                        ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                        ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                        ->join('schools', 'schools.id', '=', 'examination_results.school_id')
-                        ->select(
-                            'examination_results.*',
-                            'students.first_name', 'students.middle_name', 'students.last_name', 'students.status',
-                            'subjects.course_name', 'subjects.course_code',
-                            'examinations.exam_type',
-                            'schools.school_name'
-                        )
-                        ->where('examination_results.student_id', $studentInfo->id)
-                        ->where('examination_results.exam_type_id', $exam_id[0])
-                        ->where('examination_results.class_id', $class_id[0])
-                        ->where('students.status', 1)
-                        // ->whereYear('examination_results.exam_date', $year)
-                        // ->whereMonth('examination_results.exam_date', $monthValue)
-                        ->where('examination_results.school_id', $schools->id)
-                        ->whereDate('examination_results.exam_date', $date)
-                        ->where('examination_results.status', 2)
-                        ->get();
+                ->join('students', 'students.id', '=', 'examination_results.student_id')
+                ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+                ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+                ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+                ->join('schools', 'schools.id', '=', 'examination_results.school_id')
+                ->select(
+                    'examination_results.*',
+                    'students.first_name',
+                    'students.middle_name',
+                    'students.last_name',
+                    'students.status',
+                    'subjects.course_name',
+                    'subjects.course_code',
+                    'examinations.exam_type',
+                    'schools.school_name'
+                )
+                ->where('examination_results.student_id', $studentInfo->id)
+                ->where('examination_results.exam_type_id', $exam_id[0])
+                ->where('examination_results.class_id', $class_id[0])
+                ->where('students.status', 1)
+                // ->whereYear('examination_results.exam_date', $year)
+                // ->whereMonth('examination_results.exam_date', $monthValue)
+                ->where('examination_results.school_id', $schools->id)
+                ->whereDate('examination_results.exam_date', $date)
+                ->where('examination_results.status', 2)
+                ->get();
 
             // Hakikisha kuwa kuna data kwenye $results
             if ($results->isEmpty()) {
@@ -1469,15 +1601,15 @@ class ResultsController extends Controller
 
             // Determine the student's overall rank
             $rankings = Examination_result::query()
-                            ->where('examination_results.class_id', $studentInfo->class_id) // Angalia wanafunzi wa darasa hili pekee
-                            ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
-                            ->where('examination_results.exam_type_id', $exam_id[0])
-                            ->where('examination_results.school_id', $schools->id)
-                            ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
-                            ->select('student_id', DB::raw('SUM(score) as total_score'))
-                            ->groupBy('student_id')
-                            ->orderByDesc('total_score') // Pangilia kwa score kwanza
-                            ->get();
+                ->where('examination_results.class_id', $studentInfo->class_id) // Angalia wanafunzi wa darasa hili pekee
+                ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
+                ->where('examination_results.exam_type_id', $exam_id[0])
+                ->where('examination_results.school_id', $schools->id)
+                ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
+                ->select('student_id', DB::raw('SUM(score) as total_score'))
+                ->groupBy('student_id')
+                ->orderByDesc('total_score') // Pangilia kwa score kwanza
+                ->get();
 
             // Kutengeneza mfumo wa tie ranking
             $rank = 1;
@@ -1496,7 +1628,7 @@ class ResultsController extends Controller
             $studentRank = $ranks[$studentInfo->id] ?? null;
 
             // Prepare the message content
-            $fullName = $studentInfo->first_name. ' '. $studentInfo->last_name;
+            $fullName = $studentInfo->first_name . ' ' . $studentInfo->last_name;
             $examination = $results->first()->exam_type;
             $term = $results->first()->Exam_term;
             $schoolName = $results->first()->school_name;
@@ -1507,7 +1639,7 @@ class ResultsController extends Controller
             }
 
             $totalStudents = $rankings->count();
-            $url = 'https://shuleapp.tech/home';
+            $url = 'https://shuleapp.tech';
             $dateFormat = Carbon::parse($date)->format('d-m-Y');
 
             // find the parent phone number
@@ -1535,10 +1667,10 @@ class ResultsController extends Controller
             $nextSmsService = new NextSmsService();
             $sender = $schools->sender_id ?? "SHULE APP";
             $destination = $this->formatPhoneNumber($users->phone);
-            $messageContent = "Matokeo ya ". strtoupper($fullName ).", Mtihani wa ". strtoupper($examination).",\n";
+            $messageContent = "Matokeo ya " . strtoupper($fullName) . ", Mtihani wa " . strtoupper($examination) . ",\n";
             $messageContent .= "wa Tar. {$dateFormat} ni: \n";
             $messageContent .= strtoupper(implode($courseScores));
-            $messageContent .= "Jumla $totalScore, Wastani ". number_format($averageScore) .", Nafasi $studentRank kati ya $totalStudents. Pakua ripoti hapa {$url}";
+            $messageContent .= "Jumla $totalScore, Wastani " . number_format($averageScore) . ", Nafasi $studentRank kati ya $totalStudents. Pakua ripoti hapa {$url}";
             $reference = uniqid();
 
             $payload = [
@@ -1553,14 +1685,13 @@ class ResultsController extends Controller
 
             $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
-            if(!$response['success']) {
-                Alert()->toast('SMS failed: '.$response['error'], 'error');
+            if (!$response['success']) {
+                Alert()->toast('SMS failed: ' . $response['error'], 'error');
                 return back();
             }
             // return $response;
             Alert()->toast('Results SMS has been Re-sent successfully', 'success');
             return redirect()->back();
-
         } catch (Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
             return redirect()->back();
@@ -1592,8 +1723,8 @@ class ResultsController extends Controller
 
         // Tafuta rekodi ya alama kwenye database
         $result = Examination_result::where('student_id', $request->student_id)
-                        ->where('id', $request->subject_id)
-                        ->first();
+            ->where('id', $request->subject_id)
+            ->first();
 
         if ($result) {
             // Sahihisha alama
@@ -1605,7 +1736,7 @@ class ResultsController extends Controller
 
         return response()->json(['success' => false]);
     }
-  //send compiled results to the table compiled_results table
+    //send compiled results to the table compiled_results table
     public function saveCompiledResults(Request $request, $school, $year, $class)
     {
         // return "hello";
@@ -1631,10 +1762,10 @@ class ResultsController extends Controller
 
         //check for duplicates
         $alreadyExists = generated_reports::where('class_id', $classId)
-                                            ->where('school_id', auth()->user()->school_id)
-                                            ->where('title', $examType)
-                                            ->exists();
-        if($alreadyExists) {
+            ->where('school_id', auth()->user()->school_id)
+            ->where('title', $examType)
+            ->exists();
+        if ($alreadyExists) {
             Alert()->toast('This results data set already exists', 'error');
             return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
         }
@@ -1652,11 +1783,10 @@ class ResultsController extends Controller
         // return redirect()->route('generated-reports.show', $report->id)->with('success', 'Report generated successfully.');
         Alert()->toast('Report generated successfully.', 'success');
         return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
-
     }
 
     // function for displaying compiled results by month ***************************************
-    public function studentGeneratedCombinedReport ($class, $year, $school, $report)
+    public function studentGeneratedCombinedReport($class, $year, $school, $report)
     {
         $reportId = Hashids::decode($report);
         $classId = Hashids::decode($class);
@@ -1670,43 +1800,51 @@ class ResultsController extends Controller
         $classes = Grade::findOrFail($classId[0]);
         //fetch students lists found in the report
         $studentsReport = Examination_result::query()
-                        ->join('students', 'students.id', '=', 'examination_results.student_id')
-                        ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                        ->join('parents', 'parents.id', '=', 'students.parent_id')
-                        ->leftJoin('users', 'users.id', '=', 'parents.user_id')
-                        ->select(
-                            'examination_results.*',
-                            'students.first_name', 'students.middle_name', 'students.last_name', 'students.admission_number', 'students.gender', 'students.id as studentId',
-                            'students.class_id as student_class_id',
-                            'grades.class_name', 'grades.class_code', 'students.school_id as student_school_id',
-                            'users.first_name as user_first_name', 'users.last_name as user_last_name', 'users.phone',
-                        )
-                        ->where('examination_results.class_id', $reports->class_id)
-                        ->where('examination_results.school_id', $reports->school_id)
-                        ->whereIn(DB::raw('DATE(exam_date)'), $reports->exam_dates)
-                        ->orderBy('students.first_name')
-                        ->get()
-                        ->unique('student_id');
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
+            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+            ->join('parents', 'parents.id', '=', 'students.parent_id')
+            ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+            ->select(
+                'examination_results.*',
+                'students.first_name',
+                'students.middle_name',
+                'students.last_name',
+                'students.admission_number',
+                'students.gender',
+                'students.id as studentId',
+                'students.class_id as student_class_id',
+                'grades.class_name',
+                'grades.class_code',
+                'students.school_id as student_school_id',
+                'users.first_name as user_first_name',
+                'users.last_name as user_last_name',
+                'users.phone',
+            )
+            ->where('examination_results.class_id', $reports->class_id)
+            ->where('examination_results.school_id', $reports->school_id)
+            ->whereIn(DB::raw('DATE(exam_date)'), $reports->exam_dates)
+            ->orderBy('students.first_name')
+            ->get()
+            ->unique('student_id');
 
         $myReportData = $studentsReport;
 
         $allScores = Examination_result::query()
-                            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                            ->where('examination_results.class_id', $reports->class_id)
-                            ->where('examination_results.school_id', $reports->school_id)
-                            ->whereIn(DB::raw('DATE(exam_date)'), $reports->exam_dates)
-                            ->get()
-                            ->groupBy([
-                                'student_id',
-                                'course_id',
-                                function ($row) {
-                                    return date('Y-m-d', strtotime($row->exam_date));
-                                }
-                            ]);
+            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+            ->where('examination_results.class_id', $reports->class_id)
+            ->where('examination_results.school_id', $reports->school_id)
+            ->whereIn(DB::raw('DATE(exam_date)'), $reports->exam_dates)
+            ->get()
+            ->groupBy([
+                'student_id',
+                'course_id',
+                function ($row) {
+                    return date('Y-m-d', strtotime($row->exam_date));
+                }
+            ]);
         // return $studentsReport;
 
         return view('Results.combined_result_month', compact('reports', 'classes', 'class', 'reports', 'allScores', 'myReportData', 'year', 'school',));
-
     }
 
     //function for showing individual student report which is already compiled
@@ -1729,13 +1867,30 @@ class ResultsController extends Controller
             ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
             ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
             ->select(
-                'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.group', 'students.gender', 'students.image',
-                'subjects.id as subjectId', 'subjects.course_name', 'subjects.course_code', 'students.admission_number',
-                'grades.class_name', 'grades.class_code',
+                'students.id as studentId',
+                'students.first_name',
+                'students.middle_name',
+                'students.last_name',
+                'students.group',
+                'students.gender',
+                'students.image',
+                'subjects.id as subjectId',
+                'subjects.course_name',
+                'subjects.course_code',
+                'students.admission_number',
+                'grades.class_name',
+                'grades.class_code',
                 'examination_results.*',
-                'examinations.exam_type', 'examinations.symbolic_abbr',
-                'schools.school_name', 'schools.school_reg_no', 'schools.postal_address', 'schools.postal_name', 'schools.logo', 'schools.country',
-                'users.first_name as teacher_first_name', 'users.last_name as teacher_last_name'
+                'examinations.exam_type',
+                'examinations.symbolic_abbr',
+                'schools.school_name',
+                'schools.school_reg_no',
+                'schools.postal_address',
+                'schools.postal_name',
+                'schools.logo',
+                'schools.country',
+                'users.first_name as teacher_first_name',
+                'users.last_name as teacher_last_name'
             )
             ->where('examination_results.student_id', $studentId)
             ->where('examination_results.class_id', $classId)
@@ -1785,29 +1940,27 @@ class ResultsController extends Controller
             if ($combineOption == 'individual') {
                 foreach ($examHeaders as $exam) {
                     $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
-                            ->where('exam_date', $exam['date'])
-                            ->first()->score ?? null;
+                        ->where('exam_date', $exam['date'])
+                        ->first()->score ?? null;
                     $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
                 }
 
                 $total = collect($examScores)->filter()->sum();
                 $average = collect($examScores)->filter()->avg() ?? 0;
-
             } elseif ($combineOption == 'sum') {
                 foreach ($examHeaders as $exam) {
                     $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
-                                            ->where('exam_date', $exam['date'])
-                                            ->first()->score ?? null;
+                        ->where('exam_date', $exam['date'])
+                        ->first()->score ?? null;
                     $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
                 }
                 $total = collect($examScores)->sum();
                 $average = count(array_filter($examScores)) > 0 ? $total / count(array_filter($examScores)) : 0;
-
             } elseif ($combineOption == 'average') {
                 foreach ($examHeaders as $exam) {
                     $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
-                                            ->where('exam_date', $exam['date'])
-                                            ->first()->score ?? null;
+                        ->where('exam_date', $exam['date'])
+                        ->first()->score ?? null;
                     $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
                 }
                 $filtered = collect($examScores)->filter();
@@ -1913,14 +2066,14 @@ class ResultsController extends Controller
             $date = $exam['date'];
 
             foreach ($finalData as $subject) {
-                $score = $subject['examScores'][$abbr.'_'.$date] ?? null;
+                $score = $subject['examScores'][$abbr . '_' . $date] ?? null;
                 if (is_numeric($score)) {
                     $totalPerExam += $score;
                     $countPerExam++;
                 }
             }
 
-            $examAverages[$abbr.'_'.$date] = $countPerExam > 0 ? round($totalPerExam / $countPerExam, 2) : 0;
+            $examAverages[$abbr . '_' . $date] = $countPerExam > 0 ? round($totalPerExam / $countPerExam, 2) : 0;
         }
 
         // =================== GENERAL POSITION (USING TOTAL MARKS) ===================
@@ -2030,33 +2183,33 @@ class ResultsController extends Controller
 
         $reports = generated_reports::findOrFail($reportId);
 
-        if($reports->status == 1) {
+        if ($reports->status == 1) {
             $examDates = $reports->exam_dates;
 
             // STEP 1: Fetch all results for the student
             $results = Examination_result::query()
-                            ->join('students', 'students.id', '=', 'examination_results.student_id')
-                            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                            ->where('examination_results.student_id', $studentId)
-                            ->where('examination_results.class_id', $classId)
-                            ->where('examination_results.school_id', $schoolId)
-                            ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                            ->select(
-                                'students.id as student_id',
-                                'students.first_name',
-                                'students.last_name',
-                                'students.parent_id',
-                                'students.gender',
-                                'examination_results.score',
-                                'examination_results.exam_date',
-                                'examination_results.course_id',
-                                'grades.class_name',
-                                'examinations.symbolic_abbr',
-                                'subjects.course_code'
-                            )
-                            ->get();
+                ->join('students', 'students.id', '=', 'examination_results.student_id')
+                ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+                ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+                ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+                ->where('examination_results.student_id', $studentId)
+                ->where('examination_results.class_id', $classId)
+                ->where('examination_results.school_id', $schoolId)
+                ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                ->select(
+                    'students.id as student_id',
+                    'students.first_name',
+                    'students.last_name',
+                    'students.parent_id',
+                    'students.gender',
+                    'examination_results.score',
+                    'examination_results.exam_date',
+                    'examination_results.course_id',
+                    'grades.class_name',
+                    'examinations.symbolic_abbr',
+                    'subjects.course_code'
+                )
+                ->get();
 
             if ($results->isEmpty()) {
                 Alert()->toast('No results found for this student.', 'error');
@@ -2124,8 +2277,8 @@ class ResultsController extends Controller
             }
 
             $parent = Parents::query()->join('users', 'users.id', '=', 'parents.user_id')
-                            ->select('parents.*', 'users.phone')
-                            ->findOrFail($parentId);
+                ->select('parents.*', 'users.phone')
+                ->findOrFail($parentId);
             $phoneNumber = $parent->phone ?? null;
 
             if (!$phoneNumber) {
@@ -2135,11 +2288,11 @@ class ResultsController extends Controller
 
             // Format SMS message
             $formattedPhone = $this->formatPhoneNumber($phoneNumber);
-            $studentName = strtoupper($studentData->first_name . ' '. $studentData->last_name);
+            $studentName = strtoupper($studentData->first_name . ' ' . $studentData->last_name);
             $reportDate = Carbon::parse($reports->created_at)->format('d-m-Y');
             $schoolInfo = school::find($schoolId);
             $sender = $schoolInfo->sender_id ?? "SHULE APP";
-            $link = "https://shuleapp.tech/home";
+            $link = "https://shuleapp.tech";
 
             // Build subject results part of the message
             $subjectResultsText = "";
@@ -2148,10 +2301,10 @@ class ResultsController extends Controller
             }
 
             $message = "Matokeo ya {$studentName}\n"
-                ."Mtihani wa ". strtoupper($reports->title)."\n"
-                ."wa Tar. {$reportDate} ni:\n"
+                . "Mtihani wa " . strtoupper($reports->title) . "\n"
+                . "wa Tar. {$reportDate} ni:\n"
                 . $subjectResultsText
-                . "Jumla: {$studentAverageTotal}, Wastani: ".number_format($studentAverage, 1)."\n"
+                . "Jumla: {$studentAverageTotal}, Wastani: " . number_format($studentAverage, 1) . "\n"
                 . "Nafasi ya {$position} kati ya {$totalStudents}.\n"
                 . "Pakua ripoti hapa {$link}.";
 
@@ -2164,8 +2317,8 @@ class ResultsController extends Controller
                     uniqid()
                 );
 
-                if(!$response['success']) {
-                    Alert()->toast('SMS failed: '.$response['error'], 'error');
+                if (!$response['success']) {
+                    Alert()->toast('SMS failed: ' . $response['error'], 'error');
                     return back();
                 }
 
@@ -2177,7 +2330,6 @@ class ResultsController extends Controller
                     'class' => $class,
                     'report' => $report
                 ]);
-
             } catch (\Exception $e) {
                 // Log::error("Failed to send SMS: " . $e->getMessage());
                 Alert()->toast('Failed to send SMS: ' . $e->getMessage(), 'error');
@@ -2214,13 +2366,30 @@ class ResultsController extends Controller
             ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
             ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
             ->select(
-                'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.group', 'students.gender', 'students.image',
-                'subjects.id as subjectId', 'subjects.course_name', 'subjects.course_code', 'students.admission_number',
-                'grades.class_name', 'grades.class_code',
+                'students.id as studentId',
+                'students.first_name',
+                'students.middle_name',
+                'students.last_name',
+                'students.group',
+                'students.gender',
+                'students.image',
+                'subjects.id as subjectId',
+                'subjects.course_name',
+                'subjects.course_code',
+                'students.admission_number',
+                'grades.class_name',
+                'grades.class_code',
                 'examination_results.*',
-                'examinations.exam_type', 'examinations.symbolic_abbr',
-                'schools.school_name', 'schools.school_reg_no', 'schools.postal_address', 'schools.postal_name', 'schools.logo', 'schools.country',
-                'users.first_name as teacher_first_name', 'users.last_name as teacher_last_name'
+                'examinations.exam_type',
+                'examinations.symbolic_abbr',
+                'schools.school_name',
+                'schools.school_reg_no',
+                'schools.postal_address',
+                'schools.postal_name',
+                'schools.logo',
+                'schools.country',
+                'users.first_name as teacher_first_name',
+                'users.last_name as teacher_last_name'
             )
             ->where('examination_results.student_id', $studentId)
             ->where('examination_results.class_id', $classId)
@@ -2231,14 +2400,14 @@ class ResultsController extends Controller
         $classResultsGrouped = $results->groupBy('subjectId');
 
         // Badilisha uundaji wa examHeaders kuwa kwa kila mtihani tofauti
-        $examHeaders = $results->map(function($item) {
+        $examHeaders = $results->map(function ($item) {
             return [
                 'abbr' => $item->symbolic_abbr,
                 'date' => $item->exam_date,
                 'display' => $item->symbolic_abbr . ' ' . \Carbon\Carbon::parse($item->exam_date)->format('d M Y')
             ];
-        })->unique(function($item) {
-            return $item['abbr'].$item['date'];
+        })->unique(function ($item) {
+            return $item['abbr'] . $item['date'];
         })->values();
 
         $finalData = [];
@@ -2273,30 +2442,28 @@ class ResultsController extends Controller
             if ($combineOption == 'individual') {
                 foreach ($examHeaders as $exam) {
                     $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
-                            ->where('exam_date', $exam['date'])
-                            ->first()->score ?? null;
-                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
+                        ->where('exam_date', $exam['date'])
+                        ->first()->score ?? null;
+                    $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
                 }
 
                 $total = collect($examScores)->filter()->sum();
                 $average = collect($examScores)->filter()->avg() ?? 0;
-
             } elseif ($combineOption == 'sum') {
                 foreach ($examHeaders as $exam) {
                     $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
-                                            ->where('exam_date', $exam['date'])
-                                            ->first()->score ?? null;
-                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
+                        ->where('exam_date', $exam['date'])
+                        ->first()->score ?? null;
+                    $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
                 }
                 $total = collect($examScores)->sum();
                 $average = count(array_filter($examScores)) > 0 ? $total / count(array_filter($examScores)) : 0;
-
             } elseif ($combineOption == 'average') {
                 foreach ($examHeaders as $exam) {
                     $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
-                                            ->where('exam_date', $exam['date'])
-                                            ->first()->score ?? null;
-                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
+                        ->where('exam_date', $exam['date'])
+                        ->first()->score ?? null;
+                    $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
                 }
                 $filtered = collect($examScores)->filter();
                 $total = 0;
@@ -2316,7 +2483,6 @@ class ResultsController extends Controller
                 'average' => round($average, 2), // Rounded to 1 decimal place
                 'position' => 0 // Placeholder, itabakiweka baada ya rank calculation
             ];
-
         }
 
         // **Sasa hesabu position ya kila somo**
@@ -2403,14 +2569,14 @@ class ResultsController extends Controller
             $date = $exam['date'];
 
             foreach ($finalData as $subject) {
-                $score = $subject['examScores'][$abbr.'_'.$date] ?? null;
+                $score = $subject['examScores'][$abbr . '_' . $date] ?? null;
                 if (is_numeric($score)) {
                     $totalPerExam += $score;
                     $countPerExam++;
                 }
             }
 
-            $examAverages[$abbr.'_'.$date] = $countPerExam > 0 ? round($totalPerExam / $countPerExam, 2) : 0;
+            $examAverages[$abbr . '_' . $date] = $countPerExam > 0 ? round($totalPerExam / $countPerExam, 2) : 0;
         }
 
         // =================== GENERAL POSITION (USING TOTAL MARKS WITH 1 DECIMAL) ===================
@@ -2479,22 +2645,22 @@ class ResultsController extends Controller
 
         // =================== EXAM SPECIFICATIONS ===================
         $examSpecifications = $results
-            ->map(function($item) {
+            ->map(function ($item) {
                 return [
                     'abbr' => $item->symbolic_abbr,
                     'full_name' => $item->exam_type,
                     'date' => $item->exam_date
                 ];
             })
-            ->unique(function($item) {
-                return $item['abbr'].$item['full_name'];
+            ->unique(function ($item) {
+                return $item['abbr'] . $item['full_name'];
             })
             ->values()
             ->keyBy('abbr'); // We key by abbreviation for easy lookup
 
         $verificationData = [
             'student_name' => trim(
-                $students->first_name.' '.$students->middle_name.' '.$students->last_name
+                $students->first_name . ' ' . $students->middle_name . ' ' . $students->last_name
             ),
             'admission_number' => $students->admission_number,
             'class' => $students->class_name,
@@ -2551,9 +2717,16 @@ class ResultsController extends Controller
             'totalStudents',
             'students',
             'reports',
-            'schoolInfo', 'examSpecifications',
-            'school', 'report', 'class',  'totalScoreForStudent',
-            'subjectCount', 'reportId', 'classId', 'qrPng'
+            'schoolInfo',
+            'examSpecifications',
+            'school',
+            'report',
+            'class',
+            'totalScoreForStudent',
+            'subjectCount',
+            'reportId',
+            'classId',
+            'qrPng'
         ));
 
         $timestamp = Carbon::now()->timestamp;
@@ -2582,7 +2755,7 @@ class ResultsController extends Controller
             // STEP 1: Update report status to "published"
             $report = generated_reports::findOrFail($reportId);
 
-            if(!$report) {
+            if (!$report) {
                 Alert()->toast('Report not found.', 'error');
                 return redirect()->back();
             }
@@ -2601,27 +2774,28 @@ class ResultsController extends Controller
 
             // STEP 3: Fetch all exam results for these dates (same as PDF logic)
             $results = Examination_result::query()
-                        ->join('students', 'students.id', '=', 'examination_results.student_id')
-                        ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                        ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                        ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                        ->select(
-                            'students.id as student_id',
-                            'students.first_name',
-                            'students.middle_name',
-                            'students.last_name',
-                            'students.parent_id', 'students.status',
-                            'examinations.symbolic_abbr',
-                            'examination_results.score',
-                            'examination_results.exam_date',
-                            'examination_results.course_id',
-                            'subjects.course_code'
-                        )
-                        ->where('students.status', 1) // Only active students
-                        ->where('examination_results.class_id', $classId)
-                        ->where('examination_results.school_id', $schoolId)
-                        ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                        ->get();
+                ->join('students', 'students.id', '=', 'examination_results.student_id')
+                ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+                ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+                ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+                ->select(
+                    'students.id as student_id',
+                    'students.first_name',
+                    'students.middle_name',
+                    'students.last_name',
+                    'students.parent_id',
+                    'students.status',
+                    'examinations.symbolic_abbr',
+                    'examination_results.score',
+                    'examination_results.exam_date',
+                    'examination_results.course_id',
+                    'subjects.course_code'
+                )
+                ->where('students.status', 1) // Only active students
+                ->where('examination_results.class_id', $classId)
+                ->where('examination_results.school_id', $schoolId)
+                ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                ->get();
 
             // STEP 4: Group results by student and calculate TOTAL SCORE (like PDF)
             $studentsData = $results->groupBy('student_id')->map(function ($studentResults) {
@@ -2680,7 +2854,7 @@ class ResultsController extends Controller
 
                 return [
                     'parent_id' => $student['parent_id'],
-                    'student_name' => strtoupper($student['first_name'] . ' '. $student['last_name']),
+                    'student_name' => strtoupper($student['first_name'] . ' ' . $student['last_name']),
                     'position' => $positionText,
                     'total_score' => number_format($student['total_score'], 1),
                     'total_average' => number_format($student['total_average']), // 2 decimal places like PDF
@@ -2691,7 +2865,7 @@ class ResultsController extends Controller
             // STEP 7: Send SMS to parents (updated message format)
             foreach ($parentsPayload as $payload) {
                 $schoolInfo = school::find($schoolId);
-                $link = "https://shuleapp.tech/home";
+                $link = "https://shuleapp.tech";
                 $nextSmsService = new NextSmsService();
                 $sender = $schoolInfo->sender_id ?? "SHULE APP";
                 $parent = Parents::find($payload['parent_id']);
@@ -2700,8 +2874,8 @@ class ResultsController extends Controller
                 $reportDate = Carbon::parse($report->created_at)->format('d-m-Y');
 
                 $message = "Matokeo ya {$payload['student_name']}\n"
-                    ."Mtihani wa ". strtoupper($report->title)."\n"
-                    ."wa Tar. {$reportDate} ni:\n"
+                    . "Mtihani wa " . strtoupper($report->title) . "\n"
+                    . "wa Tar. {$reportDate} ni:\n"
                     . $payload['subject_results']
                     . "Jumla: {$payload['total_score']}\n"
                     . "Wastani: {$payload['total_average']}\n"
@@ -2711,15 +2885,14 @@ class ResultsController extends Controller
                 // Log::info("Sending SMS to {$phoneNumber}: {$message}");
                 $response = $nextSmsService->sendSmsByNext($sender, $phoneNumber, $message, uniqid());
 
-                if(!$response['success']) {
-                    Alert()->toast('SMS failed: '.$response['error'], 'error');
+                if (!$response['success']) {
+                    Alert()->toast('SMS failed: ' . $response['error'], 'error');
                     return back();
                 }
             }
 
             Alert()->toast('Report has been published and sent to parents successfully!', 'success');
             return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
-
         } catch (Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
             // return redirect()->back();
@@ -2742,12 +2915,10 @@ class ResultsController extends Controller
 
             Alert()->toast('Results data set has been Locked successfully 🔐', 'success');
             return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
-        }
-        catch(Exception $e) {
+        } catch (Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
             return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
         }
-
     }
 
     public function downloadGeneralCombinedReport($school, $year, $class, $report)
@@ -2762,45 +2933,46 @@ class ResultsController extends Controller
 
         // 1. GET ALL STUDENTS IN THE CLASS
         $students = Student::where('class_id', $classId)
-                    ->where('school_id', $schoolId)
-                    ->where('status', 1) // Only active students
-                    ->orderBy('admission_number')
-                    ->get();
+            ->where('school_id', $schoolId)
+            ->where('status', 1) // Only active students
+            ->orderBy('admission_number')
+            ->get();
 
         // 2. GET ALL SUBJECTS FOR THIS CLASS
-        $subjects = Subject::whereHas('examination_results', function($query) use ($classId, $schoolId, $examDates) {
-                        $query->where('class_id', $classId)
-                            ->where('school_id', $schoolId)
-                            ->whereIn(DB::raw('DATE(exam_date)'), $examDates);
-                    })
-                    ->select('id', 'course_name', 'course_code')
-                    ->get();
+        $subjects = Subject::whereHas('examination_results', function ($query) use ($classId, $schoolId, $examDates) {
+            $query->where('class_id', $classId)
+                ->where('school_id', $schoolId)
+                ->whereIn(DB::raw('DATE(exam_date)'), $examDates);
+        })
+            ->select('id', 'course_name', 'course_code')
+            ->get();
 
         // 3. GET ALL EXAM RESULTS
         $results = Examination_result::query()
-                    ->join('students', 'students.id', '=', 'examination_results.student_id')
-                    ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                    ->select(
-                        'students.id as student_id',
-                        'students.admission_number',
-                        'students.first_name',
-                        'students.middle_name',
-                        'students.last_name',
-                        'students.gender', 'students.status',
-                        'subjects.id as subject_id',
-                        'subjects.course_name',
-                        'subjects.course_code',
-                        'examination_results.score',
-                        'examination_results.exam_type_id',
-                        'examination_results.Exam_term',
-                        'examination_results.exam_date',
-                        'examination_results.marking_style'
-                    )
-                    ->where('examination_results.class_id', $classId)
-                    ->where('students.status', 1) // Only active students
-                    ->where('examination_results.school_id', $schoolId)
-                    ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                    ->get();
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
+            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+            ->select(
+                'students.id as student_id',
+                'students.admission_number',
+                'students.first_name',
+                'students.middle_name',
+                'students.last_name',
+                'students.gender',
+                'students.status',
+                'subjects.id as subject_id',
+                'subjects.course_name',
+                'subjects.course_code',
+                'examination_results.score',
+                'examination_results.exam_type_id',
+                'examination_results.Exam_term',
+                'examination_results.exam_date',
+                'examination_results.marking_style'
+            )
+            ->where('examination_results.class_id', $classId)
+            ->where('students.status', 1) // Only active students
+            ->where('examination_results.school_id', $schoolId)
+            ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+            ->get();
 
         $totalCandidates = $results->pluck('student_id')->unique()->count();
         // 4. GROUP RESULTS BY STUDENT AND CALCULATE AVERAGES
@@ -2808,30 +2980,30 @@ class ResultsController extends Controller
         $subjectCodes = $subjects->pluck('course_code')->toArray();
 
         foreach ($students as $student) {
-                $studentResults = $results->where('student_id', $student->id);
+            $studentResults = $results->where('student_id', $student->id);
 
-                $studentSubjectAverages = [];
-                $totalScore = 0;
-                $subjectCount = 0;
+            $studentSubjectAverages = [];
+            $totalScore = 0;
+            $subjectCount = 0;
 
-                foreach ($subjects as $subject) {
-                    $subjectScores = $studentResults->where('subject_id', $subject->id)->pluck('score');
-                    $average = $subjectScores->avg();
+            foreach ($subjects as $subject) {
+                $subjectScores = $studentResults->where('subject_id', $subject->id)->pluck('score');
+                $average = $subjectScores->avg();
 
-                    if (!is_null($average)) {
-                        $roundedAverage = number_format($average, 2);
-                        $studentSubjectAverages[$subject->course_code] = [
-                            'score' => $roundedAverage,
-                            'grade' => $this->calculateGrade($roundedAverage, $results->first()->marking_style)
-                        ];
-                        $totalScore += $roundedAverage;
-                        $subjectCount++;
-                    } else {
-                        $studentSubjectAverages[$subject->course_code] = [
-                            'score' => null,
-                            'grade' => null
-                        ];
-                    }
+                if (!is_null($average)) {
+                    $roundedAverage = number_format($average, 2);
+                    $studentSubjectAverages[$subject->course_code] = [
+                        'score' => $roundedAverage,
+                        'grade' => $this->calculateGrade($roundedAverage, $results->first()->marking_style)
+                    ];
+                    $totalScore += $roundedAverage;
+                    $subjectCount++;
+                } else {
+                    $studentSubjectAverages[$subject->course_code] = [
+                        'score' => null,
+                        'grade' => null
+                    ];
+                }
             }
 
             $overallAverage = $subjectCount > 0 ? number_format($totalScore / $subjectCount, 2) : 0;
@@ -3043,39 +3215,56 @@ class ResultsController extends Controller
         $examDates = $reports->exam_dates; // array
 
         $results = Examination_result::query()
-                    ->join('students', 'students.id', '=', 'examination_results.student_id')
-                    ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                    ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                    ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                    ->join('schools', 'schools.id', '=', 'examination_results.school_id')
-                    ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
-                    ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-                    ->select(
-                        'students.id as studentId', 'students.first_name', 'students.middle_name', 'students.last_name', 'students.group', 'students.gender', 'students.image',
-                        'subjects.id as subjectId', 'subjects.course_name', 'subjects.course_code', 'students.admission_number',
-                        'grades.class_name', 'grades.class_code',
-                        'examination_results.*',
-                        'examinations.exam_type', 'examinations.symbolic_abbr',
-                        'schools.school_name', 'schools.school_reg_no', 'schools.postal_address', 'schools.postal_name', 'schools.logo', 'schools.country',
-                        'users.first_name as teacher_first_name', 'users.last_name as teacher_last_name'
-                    )
-                    ->where('examination_results.student_id', $studentId)
-                    ->where('examination_results.class_id', $classId)
-                    ->where('examination_results.school_id', $schoolId)
-                    ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                    ->get();
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
+            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+            ->join('schools', 'schools.id', '=', 'examination_results.school_id')
+            ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
+            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+            ->select(
+                'students.id as studentId',
+                'students.first_name',
+                'students.middle_name',
+                'students.last_name',
+                'students.group',
+                'students.gender',
+                'students.image',
+                'subjects.id as subjectId',
+                'subjects.course_name',
+                'subjects.course_code',
+                'students.admission_number',
+                'grades.class_name',
+                'grades.class_code',
+                'examination_results.*',
+                'examinations.exam_type',
+                'examinations.symbolic_abbr',
+                'schools.school_name',
+                'schools.school_reg_no',
+                'schools.postal_address',
+                'schools.postal_name',
+                'schools.logo',
+                'schools.country',
+                'users.first_name as teacher_first_name',
+                'users.last_name as teacher_last_name'
+            )
+            ->where('examination_results.student_id', $studentId)
+            ->where('examination_results.class_id', $classId)
+            ->where('examination_results.school_id', $schoolId)
+            ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+            ->get();
 
         $classResultsGrouped = $results->groupBy('subjectId');
 
-         // Badilisha uundaji wa examHeaders kuwa kwa kila mtihani tofauti
-        $examHeaders = $results->map(function($item) {
+        // Badilisha uundaji wa examHeaders kuwa kwa kila mtihani tofauti
+        $examHeaders = $results->map(function ($item) {
             return [
                 'abbr' => $item->symbolic_abbr,
                 'date' => $item->exam_date,
                 'display' => $item->symbolic_abbr . ' ' . \Carbon\Carbon::parse($item->exam_date)->format('d M Y')
             ];
-        })->unique(function($item) {
-            return $item['abbr'].$item['date']; // Unique kwa mchanganyiko wa abbreviation na tarehe
+        })->unique(function ($item) {
+            return $item['abbr'] . $item['date']; // Unique kwa mchanganyiko wa abbreviation na tarehe
         })->values();
 
         $finalData = [];
@@ -3093,30 +3282,28 @@ class ResultsController extends Controller
             if ($combineOption == 'individual') {
                 foreach ($examHeaders as $exam) {
                     $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
-                            ->where('exam_date', $exam['date'])
-                            ->first()->score ?? null;
-                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
+                        ->where('exam_date', $exam['date'])
+                        ->first()->score ?? null;
+                    $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
                 }
 
                 $total = collect($examScores)->filter()->sum();
                 $average = collect($examScores)->filter()->avg() ?? 0;
-
             } elseif ($combineOption == 'sum') {
                 foreach ($examHeaders as $exam) {
                     $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
-                                            ->where('exam_date', $exam['date'])
-                                            ->first()->score ?? null;
-                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
+                        ->where('exam_date', $exam['date'])
+                        ->first()->score ?? null;
+                    $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
                 }
                 $total = collect($examScores)->sum();
                 $average = count(array_filter($examScores)) > 0 ? $total / count(array_filter($examScores)) : 0;
-
             } elseif ($combineOption == 'average') {
                 foreach ($examHeaders as $exam) {
                     $score = $subjectResults->where('symbolic_abbr', $exam['abbr'])
-                                            ->where('exam_date', $exam['date'])
-                                            ->first()->score ?? null;
-                    $examScores[$exam['abbr'].'_'.$exam['date']] = $score;
+                        ->where('exam_date', $exam['date'])
+                        ->first()->score ?? null;
+                    $examScores[$exam['abbr'] . '_' . $exam['date']] = $score;
                 }
                 $filtered = collect($examScores)->filter();
                 $total = 0;
@@ -3124,16 +3311,16 @@ class ResultsController extends Controller
             }
 
             $allScores = Examination_result::where('course_id', $subjectId)
-                        ->where('class_id', $classId)
-                        ->where('school_id', $schoolId)
-                        ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                        ->get()
-                        ->groupBy('student_id')
-                        ->map(function ($scores) {
-                            return $scores->sum('score'); // Daima tumia jumla kwa rank
-                        })
-                        ->sortDesc()
-                        ->values();
+                ->where('class_id', $classId)
+                ->where('school_id', $schoolId)
+                ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                ->get()
+                ->groupBy('student_id')
+                ->map(function ($scores) {
+                    return $scores->sum('score'); // Daima tumia jumla kwa rank
+                })
+                ->sortDesc()
+                ->values();
 
             $position = $allScores->search($total) + 1;
 
@@ -3150,7 +3337,7 @@ class ResultsController extends Controller
                 return [$item->symbolic_abbr => $item->exam_date];
             })->unique()->toBase(); // toBase() to allow ->values()
 
-       // =================== EXAM AVERAGE PER EXAM DATE ===================
+        // =================== EXAM AVERAGE PER EXAM DATE ===================
         $examAverages = [];
         foreach ($examHeaders as $exam) {
             $totalPerExam = 0;
@@ -3159,19 +3346,19 @@ class ResultsController extends Controller
             $date = $exam['date'];
 
             foreach ($finalData as $subject) {
-                $score = $subject['examScores'][$abbr.'_'.$date] ?? null;
+                $score = $subject['examScores'][$abbr . '_' . $date] ?? null;
                 if (is_numeric($score)) {
                     $totalPerExam += $score;
                     $countPerExam++;
                 }
             }
 
-            $examAverages[$abbr.'_'.$date] = $countPerExam > 0 ? number_format($totalPerExam / $countPerExam, 2) : 0;
+            $examAverages[$abbr . '_' . $date] = $countPerExam > 0 ? number_format($totalPerExam / $countPerExam, 2) : 0;
         }
 
         // =================== GENERAL AVERAGE ===================
         $sumOfAverages = array_sum($examAverages);
-        $validScores = $results->filter(function($item) {
+        $validScores = $results->filter(function ($item) {
             return !is_null($item->score);
         });
 
@@ -3218,22 +3405,22 @@ class ResultsController extends Controller
 
         // =================== EXAM SPECIFICATIONS ===================
         $examSpecifications = $results
-            ->map(function($item) {
+            ->map(function ($item) {
                 return [
                     'abbr' => $item->symbolic_abbr,
                     'full_name' => $item->exam_type,
                     'date' => $item->exam_date
                 ];
             })
-            ->unique(function($item) {
-                return $item['abbr'].$item['full_name'];
+            ->unique(function ($item) {
+                return $item['abbr'] . $item['full_name'];
             })
             ->values()
             ->keyBy('abbr'); // We key by abbreviation for easy lookup
 
         //verify using qr code
         $verificationData = [
-            'student_name' => trim($students->first_name.' '.$students->middle_name.' '.$students->last_name),
+            'student_name' => trim($students->first_name . ' ' . $students->middle_name . ' ' . $students->last_name),
             'admission_number' => $students->admission_number,
             'class' => $students->class_name,
             'report_type' => $reports->title,
@@ -3289,8 +3476,13 @@ class ResultsController extends Controller
             'totalStudents',
             'students',
             'reports',
-            'schoolInfo', 'examSpecifications',
-            'school', 'report', 'class', 'totalScoreForStudent', 'qrPng'
+            'schoolInfo',
+            'examSpecifications',
+            'school',
+            'report',
+            'class',
+            'totalScoreForStudent',
+            'qrPng'
         ));
         // return $pdf->stream('compiled_report.pdf'); // au ->download() kama unataka ipakuliwe
         $timestamp = Carbon::now()->timestamp;
@@ -3311,7 +3503,7 @@ class ResultsController extends Controller
         return view('generated_reports.student_pdf_report', compact('fileUrl', 'year', 'reports', 'class', 'school', 'report', 'students', 'studentId', 'schoolId', 'classId', 'reportId'));
     }
 
-     // function to delete compiled results*************************************************
+    // function to delete compiled results*************************************************
     public function destroyReport($class, $year, $school, $reportId)
     {
         try {
@@ -3338,7 +3530,7 @@ class ResultsController extends Controller
             $school_id = $report->school_id;
             $class_id = $report->class_id;
 
-            if($report->status == 1) {
+            if ($report->status == 1) {
                 return redirect()
                     ->route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])
                     ->with('error', 'Cannot delete a published report');
@@ -3353,7 +3545,6 @@ class ResultsController extends Controller
                     'class' => Hashids::encode($class_id)
                 ])
                 ->with('success', 'Report deleted successfully');
-
         } catch (\Exception $e) {
             Log::error("Delete report error: " . $e->getMessage());
             return redirect()
@@ -3390,7 +3581,6 @@ class ResultsController extends Controller
                 'valid' => true,
                 'data' => $payload
             ]);
-
         } catch (\Exception $e) {
             return view('generated_reports.verification', [
                 'valid' => false,
@@ -3398,5 +3588,4 @@ class ResultsController extends Controller
             ]);
         }
     }
-
 }

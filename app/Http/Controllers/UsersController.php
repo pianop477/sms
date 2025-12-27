@@ -34,7 +34,8 @@ class UsersController extends Controller
     }
 
     // get schools list for user registration and show form ********************************************
-    public function index() {
+    public function index()
+    {
         $schools = school::where('status', '=', 1)->orderBy('school_name')->get();
         return view('auth.register', ['schools' => $schools]);
     }
@@ -44,15 +45,18 @@ class UsersController extends Controller
     {
         $this->validate($req, [
             'fname' => ['required', 'string', 'max:255'],
-            'lname' => ['required','string', 'max:255'],
+            'lname' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'string', 'unique:users,email'],
             'phone' => ['required', 'regex:/^[0-9]{10}$/', 'unique:users,phone'],
             'gender' => ['required', 'string', 'max:255'],
             'school' => ['required', 'integer', 'exists:schools,id'],
-            'password' => ['required', 'string', Password::min(8)
-                ->letters()
-                ->mixedCase()
-                ->numbers()
+            'password' => [
+                'required',
+                'string',
+                Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
             ],
             'password_confirmation' => ['same:password'],
             'image' => ['nullable', 'image', 'mimes:jpg,png,jpeg', 'max:1024'],
@@ -67,12 +71,12 @@ class UsersController extends Controller
         ]);
 
         $parentExists = User::where('phone', $req->phone)->where('school_id', $req->school)->exists();
-        if($parentExists) {
+        if ($parentExists) {
             Alert()->toast('This accounts already exists', 'error');
             return back();
         }
 
-        if($req->hasFile('image')) {
+        if ($req->hasFile('image')) {
             $scanResult = $this->scanFileForViruses($req->file('image'));
             if (!$scanResult['clean']) {
                 Alert()->toast('Uploaded file is infected with a virus: ' . $scanResult['message'], 'error');
@@ -93,7 +97,7 @@ class UsersController extends Controller
 
         if ($req->hasFile('image')) {
             $image = $req->file('image');
-            $imageName = time() . '_'. uniqid(). $image->getClientOriginalExtension();
+            $imageName = time() . '_' . uniqid() . $image->getClientOriginalExtension();
             $imageDestinationPath = storage_path('app/public/profile');
 
             // Ensure the directory exists
@@ -117,26 +121,26 @@ class UsersController extends Controller
         $parents->save();
         // return redirect()->back()->with('success', 'User registered successfully, Login now');
 
-        $url = "https://shuleapp.tech/home"; //url for application
+        $url = "https://shuleapp.tech"; //url for application
         //send sms after registration using Beem API *******************************************************
         $beemSmsService = new BeemSmsService();
         $sourceAddr = $school->sender_id ?? 'shuleApp'; // Get sender ID
-            $formattedPhone = $this->formatPhoneNumber($users->phone); // Validate phone before sending
+        $formattedPhone = $this->formatPhoneNumber($users->phone); // Validate phone before sending
 
-            // Check if phone number is valid after formatting
-            if (strlen($formattedPhone) !== 12 || !preg_match('/^255\d{9}$/', $formattedPhone)) {
-                // Log('Invalid phone number format', ['phone' => $formattedPhone]);
-            } else {
-                $recipients = [
-                    [
-                        'recipient_id' => 1,
-                        'dest_addr' => $formattedPhone, // Use validated phone number
-                    ]
-                ];
-            }
+        // Check if phone number is valid after formatting
+        if (strlen($formattedPhone) !== 12 || !preg_match('/^255\d{9}$/', $formattedPhone)) {
+            // Log('Invalid phone number format', ['phone' => $formattedPhone]);
+        } else {
+            $recipients = [
+                [
+                    'recipient_id' => 1,
+                    'dest_addr' => $formattedPhone, // Use validated phone number
+                ]
+            ];
+        }
 
-            $message = "Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: ". htmlspecialchars($req->password) .". Visit {$url} to Login.";
-            $response = $beemSmsService->sendSms($sourceAddr, $message, $recipients);
+        $message = "Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: " . htmlspecialchars($req->password) . ". Visit {$url} to Login.";
+        $response = $beemSmsService->sendSms($sourceAddr, $message, $recipients);
 
         // send sms using NextSMS API *****************************************************************************
         $nextSmsService = new NextSmsService();
@@ -144,7 +148,7 @@ class UsersController extends Controller
         $payload = [
             'from' => $school->sender_id ?? 'SHULE APP',
             'to' => $dest,
-            'text' => "Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: ". htmlspecialchars($req->password) .". Visit {$url} to Login.",
+            'text' => "Welcome to ShuleApp, Your Login details are; Username: {$users->phone}, Password: " . htmlspecialchars($req->password) . ". Visit {$url} to Login.",
             'reference' => uniqid(),
         ];
 
@@ -154,7 +158,6 @@ class UsersController extends Controller
         Alert()->toast('Your Account has been saved successfully', 'success');
         Auth::login($users);
         return redirect()->route('home');
-
     }
 
     // managers registration form, but now this is not working any more *************************************
@@ -162,11 +165,11 @@ class UsersController extends Controller
     {
         $schools = school::where('status', '=', 1)->orderBy('school_name', 'ASC')->get();
         $managers = User::query()
-                        ->join('schools', 'schools.id', '=', 'users.school_id')
-                        ->select('users.*', 'schools.school_name', 'schools.school_reg_no')
-                        ->where('users.usertype', '=', 2)
-                        ->orderBy('users.first_name', 'ASC')
-                        ->get();
+            ->join('schools', 'schools.id', '=', 'users.school_id')
+            ->select('users.*', 'schools.school_name', 'schools.school_reg_no')
+            ->where('users.usertype', '=', 2)
+            ->orderBy('users.first_name', 'ASC')
+            ->get();
 
         return view('Managers.index', ['managers' => $managers], ['schools' => $schools]);
     }
@@ -203,7 +206,7 @@ class UsersController extends Controller
         ]);
 
         $isExisting = User::where('phone', $request->phone)->exists();
-        if($isExisting) {
+        if ($isExisting) {
             Alert()->toast('User information already exist', 'error');
             return back();
         }
@@ -223,7 +226,7 @@ class UsersController extends Controller
         $url = "https://shulapp.tech";
         $sender = "SHULE APP";
         $destination = $this->formatPhoneNumber($user->phone);
-        $message = "Hello!". strtoupper($user->first_name). " Welcome to ShuleApp System. Your Username: {$user->phone} and Password: shule2025. Click here {$url} to login";
+        $message = "Hello!" . strtoupper($user->first_name) . " Welcome to ShuleApp System. Your Username: {$user->phone} and Password: shule2025. Click here {$url} to login";
         $reference = uniqid();
         //create payload
         $payload = [
@@ -235,14 +238,13 @@ class UsersController extends Controller
 
         $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
-        if(!$response['success']) {
-            Alert()->toast('SMS failed: '.$response['error'], 'error');
+        if (!$response['success']) {
+            Alert()->toast('SMS failed: ' . $response['error'], 'error');
             return back();
         }
 
         Alert()->toast('User admin saved successfully', 'success');
         return back();
-
     }
 
     //  phone number format according to Beem API **************************************************
@@ -269,12 +271,12 @@ class UsersController extends Controller
         $loggedUser = Auth::user();
         $status = 0;
 
-        if(! $user) {
+        if (! $user) {
             ALert()->toast('No such user was found', 'error');
             return back();
         }
 
-        if($loggedUser->id == $user->id) {
+        if ($loggedUser->id == $user->id) {
             Alert()->toast('You cannot block your own account', 'error');
             return back();
         }
@@ -285,7 +287,6 @@ class UsersController extends Controller
 
         Alert()->toast('Admin Account has been blocked successufully', 'success');
         return back();
-
     }
 
     // unblock user account **************************************************************************
@@ -295,7 +296,7 @@ class UsersController extends Controller
         $user = User::find($decoded[0]);
         $status = 1;
 
-        if(! $user) {
+        if (! $user) {
             ALert()->toast('No such user was found', 'error');
             return back();
         }
@@ -306,7 +307,6 @@ class UsersController extends Controller
 
         Alert()->toast('Admin Account has been unblocked successufully', 'success');
         return back();
-
     }
 
     // delete user account ****************************************************************************
@@ -318,28 +318,27 @@ class UsersController extends Controller
         $loggedUser = Auth::user();
 
 
-        if(! $user) {
+        if (! $user) {
             ALert()->toast('No such user was found', 'error');
             return back();
         }
 
-        if($loggedUser->id == $user->id) {
+        if ($loggedUser->id == $user->id) {
             Alert()->toast('You cannot delete your own account', 'error');
             return back();
         }
 
-        if($user->image && Storage::disk('public')->exists('profile/'. $user->image)) {
-            Storage::disk('public')->delete('profile/'. $user->image);
+        if ($user->image && Storage::disk('public')->exists('profile/' . $user->image)) {
+            Storage::disk('public')->delete('profile/' . $user->image);
         }
 
         $user->delete();
 
         Alert()->toast('Admin Account has been deleted successufully', 'success');
         return back();
-
     }
 
-    public function constructionPage ()
+    public function constructionPage()
     {
         return view('Error.construction');
     }
@@ -357,7 +356,7 @@ class UsersController extends Controller
         $userId = Hashids::decode($user);
         $userInfo = User::findOrFail($userId[0]);
 
-        if(!$userInfo) {
+        if (!$userInfo) {
             Alert()->toast('User information does not exist', 'error');
             return to_route('admin.accounts');
         }
@@ -365,9 +364,9 @@ class UsersController extends Controller
         $this->validate($request, [
             'fname' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
-            'email' => 'nullable|unique:users,email,'.$userInfo->id,
+            'email' => 'nullable|unique:users,email,' . $userInfo->id,
             'gender' => 'required|string|max:10',
-            'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,'.$userInfo->id,
+            'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,' . $userInfo->id,
             'image' => 'nullable|image|max:1024|mimes:jpg,png,tiff,jpeg',
         ], [
             'fname.required' => 'First name is required',
@@ -392,8 +391,8 @@ class UsersController extends Controller
         if ($request->hasFile('image')) {
 
             // Delete old image if exists
-            if ($userInfo->image && Storage::disk('public')->exists('profile/'.$userInfo->image)) {
-                Storage::disk('public')->delete('profile/'.$userInfo->image);
+            if ($userInfo->image && Storage::disk('public')->exists('profile/' . $userInfo->image)) {
+                Storage::disk('public')->delete('profile/' . $userInfo->image);
             }
 
             // Store new image
@@ -410,20 +409,20 @@ class UsersController extends Controller
         return to_route('admin.account.edit', ['user' => $user]);
     }
 
-     private function scanFileForViruses($file): array
+    private function scanFileForViruses($file): array
     {
         // For production, use actual API
         if (app()->environment('production')) {
             $apiKey = config('services.virustotal.key');
             try {
                 $response = Http::withHeaders(['x-apikey' => $apiKey])
-                            ->attach('file', fopen($file->path(), 'r'))
-                            ->post('https://www.virustotal.com/api/v3/files');
+                    ->attach('file', fopen($file->path(), 'r'))
+                    ->post('https://www.virustotal.com/api/v3/files');
 
                 if ($response->successful()) {
                     $scanId = $response->json()['data']['id'];
                     $analysis = Http::withHeaders(['x-apikey' => $apiKey])
-                                ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
+                        ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
 
                     return [
                         'clean' => $analysis->json()['data']['attributes']['stats']['malicious'] === 0,
@@ -433,7 +432,7 @@ class UsersController extends Controller
             } catch (\Exception $e) {
                 return [
                     'clean' => false,
-                    'message' => 'Scan failed: '.$e->getMessage()
+                    'message' => 'Scan failed: ' . $e->getMessage()
                 ];
             }
         }

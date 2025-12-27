@@ -89,12 +89,12 @@ class SchoolsController extends Controller
             //check if exists
             $schoolExists = school::where('school_reg_no', $request->reg_no)->exists();
 
-            if($schoolExists) {
+            if ($schoolExists) {
                 Alert()->toast('This school already exists', 'error');
                 return back();
             }
             // Virus scanning
-            if($request->hasFile('logo')) {
+            if ($request->hasFile('logo')) {
                 $scanResult = $this->scanFileForViruses($request->file('logo'));
                 if (!$scanResult['clean']) {
                     Alert()->toast('Uploaded file is infected with a virus: ' . $scanResult['message'], 'error');
@@ -117,8 +117,8 @@ class SchoolsController extends Controller
             if ($request->hasFile('logo')) {
 
                 // Delete old logo if it exists
-                if ($school->logo && Storage::disk('public')->exists('logo/'.$school->logo)) {
-                    Storage::disk('public')->delete('logo/'.$school->logo);
+                if ($school->logo && Storage::disk('public')->exists('logo/' . $school->logo)) {
+                    Storage::disk('public')->delete('logo/' . $school->logo);
                 }
 
                 // Create unique logo name
@@ -148,7 +148,7 @@ class SchoolsController extends Controller
 
             //notify manager using nextSms API
             $nextSmsService = new NextSmsService();
-            $url = "https://shuleapp.tech/home";
+            $url = "https://shuleapp.tech";
             $sender = 'SHULE APP';
             $message = "Welcome to Shule App. Your login details are: Username: $users->phone, Password: shule2025, Thanks for choosing us. Visit; $url";
             $destinations = $this->formatPhoneNumber($users->phone);
@@ -162,8 +162,8 @@ class SchoolsController extends Controller
             ];
             $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
-            if(!$response['success']) {
-                Alert()->toast('SMS failed: '.$response['error'], 'error');
+            if (!$response['success']) {
+                Alert()->toast('SMS failed: ' . $response['error'], 'error');
                 return back();
             }
 
@@ -185,8 +185,7 @@ class SchoolsController extends Controller
 
             Alert()->toast('School information saved successfully', 'success');
             return redirect()->back();
-        }
-        catch(\Exception $e){
+        } catch (\Exception $e) {
             Alert::error('Error', $e->getMessage());
             return back();
         }
@@ -215,24 +214,30 @@ class SchoolsController extends Controller
         $decoded = Hashids::decode($school);
         $schools = school::find($decoded[0]);
         $managers = User::query()->join('schools', 'schools.id', '=', 'users.school_id')
-                            ->select(
-                                'users.*', 'schools.school_name', 'schools.school_reg_no', 'schools.logo'
-                            )
-                            ->where('users.usertype', 2)
-                            ->where('users.school_id', $schools->id)
-                            ->get();
+            ->select(
+                'users.*',
+                'schools.school_name',
+                'schools.school_reg_no',
+                'schools.logo'
+            )
+            ->where('users.usertype', 2)
+            ->where('users.school_id', $schools->id)
+            ->get();
         $parents = Parents::query()->join('users', 'users.id', '=', 'parents.user_id')
-                                    ->select(
-                                        'parents.*', 'users.first_name', 'users.last_name', 'users.usertype'
-                                    )
-                                    ->where('users.usertype', 4)
-                                    ->where('parents.school_id', $schools->id)
-                                    ->get();
+            ->select(
+                'parents.*',
+                'users.first_name',
+                'users.last_name',
+                'users.usertype'
+            )
+            ->where('users.usertype', 4)
+            ->where('parents.school_id', $schools->id)
+            ->get();
         $teachers = Teacher::query()->join('users', 'users.id', '=', 'teachers.user_id')
-                                    ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.usertype')
-                                    ->where('users.usertype', 3)
-                                    ->where('teachers.school_id', $schools->id)
-                                    ->get();
+            ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.usertype')
+            ->where('users.usertype', 3)
+            ->where('teachers.school_id', $schools->id)
+            ->get();
         $students = Student::where('school_id', $schools->id)->where('status', 1)->get();
         $courses = Subject::where('school_id', $schools->id)->get();
         $classes = Grade::where('school_id', $schools->id)->get();
@@ -248,28 +253,31 @@ class SchoolsController extends Controller
         $decoded = Hashids::decode($school);
         $schools = school::find($decoded[0]);
         $managers = User::query()->join('schools', 'schools.id', '=', 'users.school_id')
-                            ->select(
-                                'users.*', 'schools.school_name', 'schools.school_reg_no', 'schools.logo'
-                            )
-                            ->where('users.usertype', 2)
-                            ->where('users.school_id', $schools->id)
-                            ->get();
+            ->select(
+                'users.*',
+                'schools.school_name',
+                'schools.school_reg_no',
+                'schools.logo'
+            )
+            ->where('users.usertype', 2)
+            ->where('users.school_id', $schools->id)
+            ->get();
         $students = Student::where('school_id', $schools->id)->where('status', 1)->get();
         return view('invoice.invoice', compact('schools', 'managers', 'students'));
     }
 
     /**
      * Edit the resource in storage
-    */
+     */
 
-    public function edit ($school)
+    public function edit($school)
     {
         $decoded = Hashids::decode($school);
         $schools = school::find($decoded[0]);
         return view('Schools.edit', compact('schools'));
     }
 
-     /** Update the resource in storage.
+    /** Update the resource in storage.
      */
 
     public function updateSchool($school, Request $request)
@@ -306,8 +314,8 @@ class SchoolsController extends Controller
         if ($request->hasFile('logo')) {
 
             // Delete old logo if it exists
-            if ($school->logo && Storage::disk('public')->exists('logo/'.$school->logo)) {
-                Storage::disk('public')->delete('logo/'.$school->logo);
+            if ($school->logo && Storage::disk('public')->exists('logo/' . $school->logo)) {
+                Storage::disk('public')->delete('logo/' . $school->logo);
             }
 
             // Create unique logo name
@@ -334,29 +342,28 @@ class SchoolsController extends Controller
         $decoded = Hashids::decode($school);
         $schools = school::find($decoded[0]);
 
-        if(! $schools) {
+        if (! $schools) {
             Alert()->toast('This school is not found', 'error');
             return back();
         }
         $logoPath = storage_path('app/public/logo');
         $existingFile = $logoPath . '/' . $schools->logo;
-        if(file_exists($existingFile)) {
+        if (file_exists($existingFile)) {
             unlink($existingFile);
         }
         //delete school
         $schools->delete();
         Alert()->toast('School has been deleted successfully', 'success');
         return redirect()->back();
-
     }
 
-    public function showFeedback ()
+    public function showFeedback()
     {
         $message = message::latest()->paginate(15);
         return view('Schools.feedback', compact('message'));
     }
 
-    public function deletePost ($sms)
+    public function deletePost($sms)
     {
         try {
             $decoded = Hashids::decode($sms);
@@ -364,8 +371,7 @@ class SchoolsController extends Controller
             $message->delete();
             Alert()->toast('Post has been moved to trash', 'success');
             return back();
-        }
-        catch(Exception $e) {
+        } catch (Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
             return back();
         }
@@ -395,12 +401,10 @@ class SchoolsController extends Controller
 
             Alert()->toast('Active time has been updated successfully', 'success');
             return back();
-        }
-        catch(Exception $e) {
+        } catch (Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
             return back();
         }
-
     }
 
     public function replyFeedback($sms)
@@ -411,7 +415,7 @@ class SchoolsController extends Controller
         return view('Schools.reply_box', compact('sender', 'schools'));
     }
 
-    public function sendFeebackReply (Request $request)
+    public function sendFeebackReply(Request $request)
     {
         // dd($request->all());
         try {
@@ -420,10 +424,9 @@ class SchoolsController extends Controller
             ]);
 
             $sender_id = '';
-            if($request->sender_id == NULL) {
+            if ($request->sender_id == NULL) {
                 $sender_id = 'SHULE APP';
-            }
-            else {
+            } else {
                 $sender_id = $request->sender_id;
             }
 
@@ -437,8 +440,8 @@ class SchoolsController extends Controller
 
             $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
-            if(!$response['success']) {
-                Alert()->toast('SMS failed: '.$response['error'], 'error');
+            if (!$response['success']) {
+                Alert()->toast('SMS failed: ' . $response['error'], 'error');
                 return back();
             }
 
@@ -449,9 +452,7 @@ class SchoolsController extends Controller
 
             Alert()->toast('Message sent', 'success');
             return redirect()->route('feedback');
-
-        }
-        catch(\Exception $e) {
+        } catch (\Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
             return back();
         }
@@ -468,7 +469,7 @@ class SchoolsController extends Controller
         return view('invoice.send', compact('schools', 'managers', 'students'));
     }
 
-    public function sendSmsInvoce (Request $request, $school, $manager)
+    public function sendSmsInvoce(Request $request, $school, $manager)
     {
         try {
             $nextSmsService = new NextSmsService();
@@ -484,15 +485,15 @@ class SchoolsController extends Controller
                 'from' => 'SHULE APP',
                 'to' => $this->formatPhoneNumber($managerInfo->phone),
                 'text' => "Habari,\n"
-                        ."Ankara ya malipo ya mfumo wa ShuleApp "
-                        ."Kuanzia ". Carbon::parse($schoolInfo->service_start_date)->format('d/m/Y')
-                        ." Hadi ". Carbon::parse($schoolInfo->service_end_date)->format('d/m/Y') . "\n"
-                        ."Jumla: TZS ". number_format($studentCount * $cost, 0, '.', ',') . "/= \n"
-                        ."(Wanafunzi ". $studentCount . " @ TZS ". number_format($cost, 0, '.', ',') . ")\n"
-                        ."Fanya Malipo kupitia: \n"
-                        ."NMB# 50510028891 - Jina: FRANK M. MASAKA au \n"
-                        ."Mixx Lipa Namba #15966786 - Jina: PIANO SHOP\n"
-                        ."Asante kwa kutumia shuleApp, endelea kufurahia huduma zetu.\n",
+                    . "Ankara ya malipo ya mfumo wa ShuleApp "
+                    . "Kuanzia " . Carbon::parse($schoolInfo->service_start_date)->format('d/m/Y')
+                    . " Hadi " . Carbon::parse($schoolInfo->service_end_date)->format('d/m/Y') . "\n"
+                    . "Jumla: TZS " . number_format($studentCount * $cost, 0, '.', ',') . "/= \n"
+                    . "(Wanafunzi " . $studentCount . " @ TZS " . number_format($cost, 0, '.', ',') . ")\n"
+                    . "Fanya Malipo kupitia: \n"
+                    . "NMB# 50510028891 - Jina: FRANK M. MASAKA au \n"
+                    . "Mixx Lipa Namba #15966786 - Jina: PIANO SHOP\n"
+                    . "Asante kwa kutumia shuleApp, endelea kufurahia huduma zetu.\n",
                 'reference' => uniqid()
             ];
             // return $payload['text'];
@@ -500,19 +501,17 @@ class SchoolsController extends Controller
 
             $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
-            if(!$response['success']) {
-                Alert()->toast('SMS failed: '.$response['error'], 'error');
+            if (!$response['success']) {
+                Alert()->toast('SMS failed: ' . $response['error'], 'error');
                 return back();
             }
 
             Alert()->toast('Invoice Bill sent successfully', 'success');
             return redirect()->route('admin.generate.invoice', ['school' => Hashids::encode($school_id[0])]);
-        }
-        catch(\Exception $e) {
+        } catch (\Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
             return back();
         }
-
     }
 
     public function faileLoginAttempts()
@@ -521,20 +520,20 @@ class SchoolsController extends Controller
         return view('Schools.failed-logins', compact('attempts'));
     }
 
-     private function scanFileForViruses($file): array
+    private function scanFileForViruses($file): array
     {
         // For production, use actual API
         if (app()->environment('production')) {
             $apiKey = config('services.virustotal.key');
             try {
                 $response = Http::withHeaders(['x-apikey' => $apiKey])
-                            ->attach('file', fopen($file->path(), 'r'))
-                            ->post('https://www.virustotal.com/api/v3/files');
+                    ->attach('file', fopen($file->path(), 'r'))
+                    ->post('https://www.virustotal.com/api/v3/files');
 
                 if ($response->successful()) {
                     $scanId = $response->json()['data']['id'];
                     $analysis = Http::withHeaders(['x-apikey' => $apiKey])
-                                ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
+                        ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
 
                     return [
                         'clean' => $analysis->json()['data']['attributes']['stats']['malicious'] === 0,
@@ -544,7 +543,7 @@ class SchoolsController extends Controller
             } catch (\Exception $e) {
                 return [
                     'clean' => false,
-                    'message' => 'Scan failed: '.$e->getMessage()
+                    'message' => 'Scan failed: ' . $e->getMessage()
                 ];
             }
         }
@@ -552,5 +551,4 @@ class SchoolsController extends Controller
         // For local development, just mock a successful scan
         return ['clean' => true, 'message' => 'Development mode - scan bypassed'];
     }
-
 }
