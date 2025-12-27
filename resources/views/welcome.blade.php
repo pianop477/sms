@@ -59,9 +59,16 @@
       50% { transform: scale(1.05); }
       100% { transform: scale(1); }
     }
+
+    /* Fix for mobile overflow */
+    .mobile-container {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
   </style>
 </head>
-<body class="bg-gradient-to-br from-gray-50 to-blue-50">
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 mobile-container">
 
   <!-- Language Selector -->
   <div class="fixed top-4 right-4 z-50">
@@ -76,56 +83,57 @@
 
   <!-- Header -->
   <header class="fixed top-0 w-full bg-white/90 backdrop-blur-md shadow-md z-40">
-    <div class="container mx-auto flex justify-between items-center px-6 py-4">
-      <div class="flex items-center space-x-3">
-        <!-- Logo -->
-        <div class="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden">
-          <img src="{{ asset('storage/logo/logo.png') }}" alt="ShuleApp Logo" class="w-full h-full object-contain">
-        </div>
-        <div>
-          <div class="text-2xl font-bold text-blue-700">ShuleApp</div>
-          {{-- <div class="text-xs text-gray-500 font-medium">Complete School Management</div> --}}
-        </div>
-      </div>
-
-      <nav class="hidden md:flex space-x-8">
-        <a href="#home" class="hover:text-blue-600 font-semibold flex items-center space-x-1 transition">
-          <i class="fas fa-home"></i>
-          <span id="nav-home">Home</span>
-        </a>
-        <a href="#features" class="hover:text-blue-600 font-semibold flex items-center space-x-1 transition">
-          <i class="fas fa-star"></i>
-          <span id="nav-features">Features</span>
-        </a>
-        <a href="#stats" class="hover:text-blue-600 font-semibold flex items-center space-x-1 transition">
-          <i class="fas fa-chart-line"></i>
-          <span id="nav-stats">Stats</span>
-        </a>
-        <a href="#contact" class="hover:text-blue-600 font-semibold flex items-center space-x-1 transition">
-          <i class="fas fa-phone"></i>
-          <span id="nav-contact">Contact</span>
-        </a>
-      </nav>
-
-      <div class="flex items-center space-x-4">
-        <!-- Live Time Counter -->
-        <div class="hidden md:block text-sm bg-blue-50 text-blue-700 px-3 py-1 rounded-full">
-          <i class="fas fa-clock mr-1"></i>
-          <span id="live-time">00:00:00</span>
+    <div class="w-full px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-4">
+        <div class="flex items-center space-x-3">
+          <!-- Logo -->
+          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center overflow-hidden">
+            <img src="{{ asset('storage/logo/logo.png') }}" alt="ShuleApp Logo" class="w-full h-full object-contain">
+          </div>
+          <div>
+            <div class="text-xl sm:text-2xl font-bold text-blue-700">ShuleApp</div>
+          </div>
         </div>
 
-        <a href="{{route('login')}}" class="hidden md:block gradient-bg text-white px-6 py-2 rounded-full font-semibold hover:shadow-lg transition-all duration-300 pulse">
-          <span id="nav-login">Login Now</span>
-        </a>
-        <!-- Mobile Menu Button -->
-        <button id="menu-toggle" class="md:hidden focus:outline-none text-gray-700">
-          <i class="fas fa-bars text-2xl"></i>
-        </button>
+        <nav class="hidden md:flex space-x-6 lg:space-x-8">
+          <a href="#home" class="hover:text-blue-600 font-semibold flex items-center space-x-1 transition text-sm lg:text-base">
+            <i class="fas fa-home"></i>
+            <span id="nav-home">Home</span>
+          </a>
+          <a href="#features" class="hover:text-blue-600 font-semibold flex items-center space-x-1 transition text-sm lg:text-base">
+            <i class="fas fa-star"></i>
+            <span id="nav-features">Features</span>
+          </a>
+          <a href="#stats" class="hover:text-blue-600 font-semibold flex items-center space-x-1 transition text-sm lg:text-base">
+            <i class="fas fa-chart-line"></i>
+            <span id="nav-stats">Stats</span>
+          </a>
+          <a href="#contact" class="hover:text-blue-600 font-semibold flex items-center space-x-1 transition text-sm lg:text-base">
+            <i class="fas fa-phone"></i>
+            <span id="nav-contact">Contact</span>
+          </a>
+        </nav>
+
+        <div class="flex items-center space-x-3 sm:space-x-4">
+          <!-- Live Time Counter -->
+          <div class="hidden md:block text-xs sm:text-sm bg-blue-50 text-blue-700 px-2 sm:px-3 py-1 rounded-full">
+            <i class="fas fa-clock mr-1"></i>
+            <span id="live-time">00:00:00</span>
+          </div>
+
+          <a href="{{route('login')}}" class="hidden md:block gradient-bg text-white px-4 sm:px-6 py-2 rounded-full font-semibold hover:shadow-lg transition-all duration-300 pulse text-sm sm:text-base">
+            <span id="nav-login">Login Now</span>
+          </a>
+          <!-- Mobile Menu Button -->
+          <button id="menu-toggle" class="md:hidden focus:outline-none text-gray-700">
+            <i class="fas fa-bars text-2xl"></i>
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-md p-6 space-y-4 shadow-lg">
+    <div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-md p-4 sm:p-6 space-y-3 shadow-lg">
       <a href="#home" class="block text-gray-700 font-medium py-2 border-b border-gray-100 flex items-center space-x-2">
         <i class="fas fa-home w-5"></i>
         <span id="mobile-nav-home">Home</span>
@@ -142,127 +150,123 @@
         <i class="fas fa-phone w-5"></i>
         <span id="mobile-nav-contact">Contact</span>
       </a>
-      <a href="{{route('login')}}" class="block gradient-bg text-white text-center py-3 rounded-lg font-semibold mt-4">
+      <a href="{{route('login')}}" class="block gradient-bg text-white text-center py-3 rounded-lg font-semibold mt-2">
         <span id="mobile-nav-login">Login Now</span>
       </a>
     </div>
   </header>
 
-  <!-- Hero Section -->
-  <section id="home" class="min-h-screen relative overflow-hidden pt-20">
+  <!-- Hero Section - FIXED -->
+  <section id="home" class="min-h-screen relative overflow-hidden pt-16 sm:pt-20">
     <!-- Background Image -->
     <div class="absolute inset-0 z-0">
       <img src="{{ asset('assets/images/bg/bg-2.jpeg') }}" alt="School Background" class="w-full h-full object-cover">
       <div class="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-purple-900/70"></div>
     </div>
 
-    <div class="container mx-auto px-6 h-full flex flex-col lg:flex-row items-center justify-center relative z-10 pt-24 lg:pt-32">
-      <div class="lg:w-1/2 text-white mb-12 lg:mb-0">
-        {{-- <div class="inline-block bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
-          <span class="text-sm font-semibold"><i class="fas fa-rocket mr-2"></i><span id="hero-tagline">School Management System</span></span>
-        </div> --}}
-
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+    <div class="w-full px-4 sm:px-6 lg:px-8 h-full flex flex-col lg:flex-row items-center justify-center relative z-10 pt-20 lg:pt-32">
+      <div class="lg:w-1/2 text-white mb-8 lg:mb-0">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight">
           <span id="hero-title-1">Transform </span><span class="text-yellow-300 typing-text" id="hero-title-2">Your School Management</span>
         </h1>
 
-        <p class="text-xl md:text-2xl mb-8 text-blue-100" id="hero-description">
+        <p class="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 text-blue-100" id="hero-description">
           Complete solution to run your school efficiently, accurately and with top-level security.
         </p>
 
         <!-- Current Time Display -->
-        <div class="mb-8 p-4 bg-white/10 backdrop-blur-sm rounded-xl inline-block">
-          <div class="flex items-center space-x-4">
+        <div class="mb-6 sm:mb-8 p-3 sm:p-4 bg-white/10 backdrop-blur-sm rounded-xl inline-block max-w-full overflow-hidden">
+          <div class="flex items-center justify-center space-x-3 sm:space-x-4">
             <div class="text-center">
-              <div class="text-3xl font-bold text-green-300" id="current-hours">00</div>
-              <div class="text-sm text-blue-100" id="time-label-hours">Hours</div>
+              <div class="text-2xl sm:text-3xl font-bold text-green-300" id="current-hours">00</div>
+              <div class="text-xs sm:text-sm text-blue-100" id="time-label-hours">Hours</div>
             </div>
-            <div class="text-2xl text-white">:</div>
+            <div class="text-xl sm:text-2xl text-white">:</div>
             <div class="text-center">
-              <div class="text-3xl font-bold text-green-300" id="current-minutes">00</div>
-              <div class="text-sm text-blue-100" id="time-label-minutes">Minutes</div>
+              <div class="text-2xl sm:text-3xl font-bold text-green-300" id="current-minutes">00</div>
+              <div class="text-xs sm:text-sm text-blue-100" id="time-label-minutes">Minutes</div>
             </div>
-            <div class="text-2xl text-white">:</div>
+            <div class="text-xl sm:text-2xl text-white">:</div>
             <div class="text-center">
-              <div class="text-3xl font-bold text-green-300" id="current-seconds">00</div>
-              <div class="text-sm text-blue-100" id="time-label-seconds">Seconds</div>
+              <div class="text-2xl sm:text-3xl font-bold text-green-300" id="current-seconds">00</div>
+              <div class="text-xs sm:text-sm text-blue-100" id="time-label-seconds">Seconds</div>
             </div>
           </div>
-          <div class="text-center mt-2 text-blue-100 text-sm">
-            <i class="fas fa-clock mr-2"></i><span id="current-time-label">Current Time (EAT)</span>
+          <div class="text-center mt-1 sm:mt-2 text-blue-100 text-xs sm:text-sm">
+            <i class="fas fa-clock mr-1 sm:mr-2"></i><span id="current-time-label">Current Time (EAT)</span>
           </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row gap-4 mb-10">
-          <a href="{{route('login')}}" class="gradient-bg text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 text-center">
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <a href="{{route('login')}}" class="gradient-bg text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg font-semibold hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 text-center">
             <i class="fas fa-sign-in-alt mr-2"></i><span id="hero-button-1">Login now</span>
           </a>
-          <a href="#features" class="bg-white/20 backdrop-blur-sm text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-white/30 transition-all duration-300 text-center">
+          <a href="#features" class="bg-white/20 backdrop-blur-sm text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg font-semibold hover:bg-white/30 transition-all duration-300 text-center">
             <i class="fas fa-play-circle mr-2"></i><span id="hero-button-2">View Features</span>
           </a>
         </div>
 
-        <div class="flex flex-wrap gap-6 mt-8">
+        <div class="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-6 mt-6 sm:mt-8">
           <div class="flex items-center">
-            <i class="fas fa-check-circle text-green-300 text-xl mr-2"></i>
-            <span class="text-lg" id="hero-benefit-1">No Setup Costs</span>
+            <i class="fas fa-check-circle text-green-300 text-lg sm:text-xl mr-2"></i>
+            <span class="text-base sm:text-lg" id="hero-benefit-1">No Setup Costs</span>
           </div>
           <div class="flex items-center">
-            <i class="fas fa-check-circle text-green-300 text-xl mr-2"></i>
-            <span class="text-lg" id="hero-benefit-2">Free Training</span>
+            <i class="fas fa-check-circle text-green-300 text-lg sm:text-xl mr-2"></i>
+            <span class="text-base sm:text-lg" id="hero-benefit-2">Free Training</span>
           </div>
         </div>
       </div>
 
-      <div class="lg:w-1/2 flex justify-center">
-        <div class="relative w-full max-w-lg">
-          <div class="absolute -top-6 -left-6 w-24 h-24 bg-yellow-400 rounded-full opacity-20"></div>
-          <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-purple-500 rounded-full opacity-20"></div>
-          <div class="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
-            <div class="text-center mb-6">
-              <div class="text-3xl font-bold text-white mb-2" id="stats-title-schools">Schools Using ShuleApp</div>
-              <div class="text-5xl font-bold text-yellow-300" id="live-counter">3</div>
-              <div class="text-white mt-2" id="stats-subtitle-schools">Currently using and growing daily</div>
+      <div class="lg:w-1/2 flex justify-center mt-8 lg:mt-0">
+        <div class="relative w-full max-w-md sm:max-w-lg px-2">
+          <div class="absolute -top-4 -left-4 w-16 h-16 sm:-top-6 sm:-left-6 sm:w-24 sm:h-24 bg-yellow-400 rounded-full opacity-20"></div>
+          <div class="absolute -bottom-4 -right-4 w-20 h-20 sm:-bottom-6 sm:-right-6 sm:w-32 sm:h-32 bg-purple-500 rounded-full opacity-20"></div>
+          <div class="relative bg-white/10 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/20">
+            <div class="text-center mb-4 sm:mb-6">
+              <div class="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2" id="stats-title-schools">Schools Using ShuleApp</div>
+              <div class="text-4xl sm:text-5xl font-bold text-yellow-300" id="live-counter">3</div>
+              <div class="text-white mt-1 sm:mt-2 text-sm sm:text-base" id="stats-subtitle-schools">Currently using and growing daily</div>
             </div>
 
-            <div class="space-y-4">
-              <div class="flex items-center justify-between bg-white/10 p-4 rounded-xl">
+            <div class="space-y-3 sm:space-y-4">
+              <div class="flex items-center justify-between bg-white/10 p-3 sm:p-4 rounded-xl">
                 <div class="flex items-center">
-                  <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
-                    <i class="fas fa-users text-white"></i>
+                  <div class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-2 sm:mr-3">
+                    <i class="fas fa-users text-white text-sm sm:text-base"></i>
                   </div>
                   <div class="text-white">
-                    <div class="font-bold" id="stats-label-students">Students</div>
-                    <div class="text-sm" id="stats-sub-students">Registered</div>
+                    <div class="font-bold text-sm sm:text-base" id="stats-label-students">Students</div>
+                    <div class="text-xs sm:text-sm" id="stats-sub-students">Registered</div>
                   </div>
                 </div>
-                <div class="text-2xl font-bold text-white">1,000+</div>
+                <div class="text-xl sm:text-2xl font-bold text-white">1,000+</div>
               </div>
 
-              <div class="flex items-center justify-between bg-white/10 p-4 rounded-xl">
+              <div class="flex items-center justify-between bg-white/10 p-3 sm:p-4 rounded-xl">
                 <div class="flex items-center">
-                  <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mr-3">
-                    <i class="fas fa-chalkboard-teacher text-white"></i>
+                  <div class="w-8 h-8 sm:w-10 sm:h-10 bg-green-500 rounded-lg flex items-center justify-center mr-2 sm:mr-3">
+                    <i class="fas fa-chalkboard-teacher text-white text-sm sm:text-base"></i>
                   </div>
                   <div class="text-white">
-                    <div class="font-bold" id="stats-label-teachers">Teachers</div>
-                    <div class="text-sm" id="stats-sub-teachers">Using System</div>
+                    <div class="font-bold text-sm sm:text-base" id="stats-label-teachers">Teachers</div>
+                    <div class="text-xs sm:text-sm" id="stats-sub-teachers">Using System</div>
                   </div>
                 </div>
-                <div class="text-2xl font-bold text-white">50+</div>
+                <div class="text-xl sm:text-2xl font-bold text-white">50+</div>
               </div>
 
-              <div class="flex items-center justify-between bg-white/10 p-4 rounded-xl">
+              <div class="flex items-center justify-between bg-white/10 p-3 sm:p-4 rounded-xl">
                 <div class="flex items-center">
-                  <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center mr-3">
-                    <i class="fas fa-user-friends text-white"></i>
+                  <div class="w-8 h-8 sm:w-10 sm:h-10 bg-purple-500 rounded-lg flex items-center justify-center mr-2 sm:mr-3">
+                    <i class="fas fa-user-friends text-white text-sm sm:text-base"></i>
                   </div>
                   <div class="text-white">
-                    <div class="font-bold" id="stats-label-parents">Parents</div>
-                    <div class="text-sm" id="stats-sub-parents">Connected</div>
+                    <div class="font-bold text-sm sm:text-base" id="stats-label-parents">Parents</div>
+                    <div class="text-xs sm:text-sm" id="stats-sub-parents">Connected</div>
                   </div>
                 </div>
-                <div class="text-2xl font-bold text-white">1,000+</div>
+                <div class="text-xl sm:text-2xl font-bold text-white">1,000+</div>
               </div>
             </div>
           </div>
@@ -278,154 +282,154 @@
     </div>
   </section>
 
-  <!-- Features Section -->
-  <section id="features" class="py-20 bg-white relative">
-    <div class="container mx-auto px-6">
-      <div class="text-center mb-16">
-        <div class="inline-block gradient-bg text-white px-6 py-2 rounded-full font-semibold mb-4">
+  <!-- Features Section - ALREADY GOOD -->
+  <section id="features" class="py-16 sm:py-20 bg-white relative">
+    <div class="w-full px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12 sm:mb-16">
+        <div class="inline-block gradient-bg text-white px-4 sm:px-6 py-2 rounded-full font-semibold mb-3 sm:mb-4">
           <i class="fas fa-crown mr-2"></i><span id="features-tagline">Top Features</span>
         </div>
-        <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-gray-800" id="features-title">How ShuleApp Helps You?</h2>
-        <p class="text-xl text-gray-600 max-w-3xl mx-auto" id="features-description">We give you all tools you need to run your school efficiently in one integrated system</p>
+        <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 text-gray-800" id="features-title">How ShuleApp Helps You?</h2>
+        <p class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto" id="features-description">We give you all tools you need to run your school efficiently in one integrated system</p>
       </div>
 
       <!-- Features Grid -->
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16">
 
         <!-- Feature 1 -->
-        <div class="feature-card bg-gradient-to-br from-white to-blue-50 p-8 rounded-2xl shadow-lg border border-gray-100 transition-all duration-500">
-          <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mb-6">
-            <i class="fas fa-users-cog text-white text-2xl"></i>
+        <div class="feature-card bg-gradient-to-br from-white to-blue-50 p-6 sm:p-8 rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 transition-all duration-500">
+          <div class="w-12 h-12 sm:w-16 sm:h-16 gradient-bg rounded-xl flex items-center justify-center mb-4 sm:mb-6">
+            <i class="fas fa-users-cog text-white text-xl sm:text-2xl"></i>
           </div>
-          <h3 class="text-2xl font-bold mb-4 text-gray-800" id="feature-1-title">User Management</h3>
-          <p class="text-gray-600 mb-6" id="feature-1-desc">Manage all stakeholders: teachers, students, parents, drivers, staff and administrators in one dashboard.</p>
-          <ul class="space-y-2">
+          <h3 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-gray-800" id="feature-1-title">User Management</h3>
+          <p class="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base" id="feature-1-desc">Manage all stakeholders: teachers, students, parents, drivers, staff and administrators in one dashboard.</p>
+          <ul class="space-y-1 sm:space-y-2">
             <li class="flex items-center text-gray-700">
-              <i class="fas fa-check-circle text-green-500 mr-3"></i>
-              <span id="feature-1-point-1">User registration and access</span>
+              <i class="fas fa-check-circle text-green-500 mr-2 sm:mr-3 text-sm"></i>
+              <span class="text-sm sm:text-base" id="feature-1-point-1">User registration and access</span>
             </li>
             <li class="flex items-center text-gray-700">
-              <i class="fas fa-check-circle text-green-500 mr-3"></i>
-              <span id="feature-1-point-2">Different roles and permissions</span>
+              <i class="fas fa-check-circle text-green-500 mr-2 sm:mr-3 text-sm"></i>
+              <span class="text-sm sm:text-base" id="feature-1-point-2">Different roles and permissions</span>
             </li>
             <li class="flex items-center text-gray-700">
-              <i class="fas fa-check-circle text-green-500 mr-3"></i>
-              <span id="feature-1-point-3">Contact information</span>
+              <i class="fas fa-check-circle text-green-500 mr-2 sm:mr-3 text-sm"></i>
+              <span class="text-sm sm:text-base" id="feature-1-point-3">Contact information</span>
             </li>
           </ul>
         </div>
 
         <!-- Feature 2 -->
-        <div class="feature-card bg-gradient-to-br from-white to-green-50 p-8 rounded-2xl shadow-lg border border-gray-100 transition-all duration-500">
-          <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-teal-500 rounded-xl flex items-center justify-center mb-6">
-            <i class="fas fa-graduation-cap text-white text-2xl"></i>
+        <div class="feature-card bg-gradient-to-br from-white to-green-50 p-6 sm:p-8 rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 transition-all duration-500">
+          <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-green-500 to-teal-500 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
+            <i class="fas fa-graduation-cap text-white text-xl sm:text-2xl"></i>
           </div>
-          <h3 class="text-2xl font-bold mb-4 text-gray-800" id="feature-2-title">Academic Management</h3>
-          <p class="text-gray-600 mb-6" id="feature-2-desc">Manage classes, subjects, exams, results and holiday packages easily and accurately.</p>
-          <ul class="space-y-2">
+          <h3 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-gray-800" id="feature-2-title">Academic Management</h3>
+          <p class="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base" id="feature-2-desc">Manage classes, subjects, exams, results and holiday packages easily and accurately.</p>
+          <ul class="space-y-1 sm:space-y-2">
             <li class="flex items-center text-gray-700">
-              <i class="fas fa-check-circle text-green-500 mr-3"></i>
-              <span id="feature-2-point-1">Class and subject setup</span>
+              <i class="fas fa-check-circle text-green-500 mr-2 sm:mr-3 text-sm"></i>
+              <span class="text-sm sm:text-base" id="feature-2-point-1">Class and subject setup</span>
             </li>
             <li class="flex items-center text-gray-700">
-              <i class="fas fa-check-circle text-green-500 mr-3"></i>
-              <span id="feature-2-point-2">Exam results and analysis</span>
+              <i class="fas fa-check-circle text-green-500 mr-2 sm:mr-3 text-sm"></i>
+              <span class="text-sm sm:text-base" id="feature-2-point-2">Exam results and analysis</span>
             </li>
             <li class="flex items-center text-gray-700">
-              <i class="fas fa-check-circle text-green-500 mr-3"></i>
-              <span id="feature-2-point-3">Holiday Packages</span>
+              <i class="fas fa-check-circle text-green-500 mr-2 sm:mr-3 text-sm"></i>
+              <span class="text-sm sm:text-base" id="feature-2-point-3">Holiday Packages</span>
             </li>
           </ul>
         </div>
 
         <!-- Feature 3 -->
-        <div class="feature-card bg-gradient-to-br from-white to-yellow-50 p-8 rounded-2xl shadow-lg border border-gray-100 transition-all duration-500">
-          <div class="w-16 h-16 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mb-6">
-            <i class="fas fa-clipboard-check text-white text-2xl"></i>
+        <div class="feature-card bg-gradient-to-br from-white to-yellow-50 p-6 sm:p-8 rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 transition-all duration-500">
+          <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
+            <i class="fas fa-clipboard-check text-white text-xl sm:text-2xl"></i>
           </div>
-          <h3 class="text-2xl font-bold mb-4 text-gray-800" id="feature-3-title">Attendance Management</h3>
-          <p class="text-gray-600 mb-6" id="feature-3-desc">Track student attendance, daily reports and teacher duty rosters in real-time.</p>
-          <ul class="space-y-2">
+          <h3 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-gray-800" id="feature-3-title">Attendance Management</h3>
+          <p class="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base" id="feature-3-desc">Track student attendance, daily reports and teacher duty rosters in real-time.</p>
+          <ul class="space-y-1 sm:space-y-2">
             <li class="flex items-center text-gray-700">
-              <i class="fas fa-check-circle text-green-500 mr-3"></i>
-              <span id="feature-3-point-1">Student and teacher attendance</span>
+              <i class="fas fa-check-circle text-green-500 mr-2 sm:mr-3 text-sm"></i>
+              <span class="text-sm sm:text-base" id="feature-3-point-1">Student and teacher attendance</span>
             </li>
             <li class="flex items-center text-gray-700">
-              <i class="fas fa-check-circle text-green-500 mr-3"></i>
-              <span id="feature-3-point-2">Daily school reports</span>
+              <i class="fas fa-check-circle text-green-500 mr-2 sm:mr-3 text-sm"></i>
+              <span class="text-sm sm:text-base" id="feature-3-point-2">Daily school reports</span>
             </li>
             <li class="flex items-center text-gray-700">
-              <i class="fas fa-check-circle text-green-500 mr-3"></i>
-              <span id="feature-3-point-3">Teacher duty rosters</span>
+              <i class="fas fa-check-circle text-green-500 mr-2 sm:mr-3 text-sm"></i>
+              <span class="text-sm sm:text-base" id="feature-3-point-3">Teacher duty rosters</span>
             </li>
           </ul>
         </div>
 
         <!-- Feature 4 -->
-        <div class="feature-card bg-gradient-to-br from-white to-purple-50 p-8 rounded-2xl shadow-lg border border-gray-100 transition-all duration-500">
-          <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-6">
-            <i class="fas fa-file-contract text-white text-2xl"></i>
+        <div class="feature-card bg-gradient-to-br from-white to-purple-50 p-6 sm:p-8 rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 transition-all duration-500">
+          <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
+            <i class="fas fa-file-contract text-white text-xl sm:text-2xl"></i>
           </div>
-          <h3 class="text-2xl font-bold mb-4 text-gray-800" id="feature-4-title">Contract Management</h3>
-          <p class="text-gray-600 mb-6" id="feature-4-desc">Manage employee contracts and keep records for future reference easily.</p>
-          <ul class="space-y-2">
+          <h3 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-gray-800" id="feature-4-title">Contract Management</h3>
+          <p class="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base" id="feature-4-desc">Manage employee contracts and keep records for future reference easily.</p>
+          <ul class="space-y-1 sm:space-y-2">
             <li class="flex items-center text-gray-700">
-              <i class="fas fa-check-circle text-green-500 mr-3"></i>
-              <span id="feature-4-point-1">Employee contracts</span>
+              <i class="fas fa-check-circle text-green-500 mr-2 sm:mr-3 text-sm"></i>
+              <span class="text-sm sm:text-base" id="feature-4-point-1">Employee contracts</span>
             </li>
             <li class="flex items-center text-gray-700">
-              <i class="fas fa-check-circle text-green-500 mr-3"></i>
-              <span id="feature-4-point-2">Historical records</span>
+              <i class="fas fa-check-circle text-green-500 mr-2 sm:mr-3 text-sm"></i>
+              <span class="text-sm sm:text-base" id="feature-4-point-2">Historical records</span>
             </li>
             <li class="flex items-center text-gray-700">
-              <i class="fas fa-check-circle text-green-500 mr-3"></i>
-              <span id="feature-4-point-3">Expiry notifications</span>
+              <i class="fas fa-check-circle text-green-500 mr-2 sm:mr-3 text-sm"></i>
+              <span class="text-sm sm:text-base" id="feature-4-point-3">Expiry notifications</span>
             </li>
           </ul>
         </div>
 
         <!-- Feature 5 -->
-        <div class="feature-card bg-gradient-to-br from-white to-red-50 p-8 rounded-2xl shadow-lg border border-gray-100 transition-all duration-500">
-          <div class="w-16 h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl flex items-center justify-center mb-6">
-            <i class="fas fa-sms text-white text-2xl"></i>
+        <div class="feature-card bg-gradient-to-br from-white to-red-50 p-6 sm:p-8 rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 transition-all duration-500">
+          <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
+            <i class="fas fa-sms text-white text-xl sm:text-2xl"></i>
           </div>
-          <h3 class="text-2xl font-bold mb-4 text-gray-800" id="feature-5-title">Bulk SMS Announcements</h3>
-          <p class="text-gray-600 mb-6" id="feature-5-desc">Send announcements to parents, teachers and all staff within one minute with single message.</p>
-          <ul class="space-y-2">
+          <h3 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-gray-800" id="feature-5-title">Bulk SMS Announcements</h3>
+          <p class="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base" id="feature-5-desc">Send announcements to parents, teachers and all staff within one minute with single message.</p>
+          <ul class="space-y-1 sm:space-y-2">
             <li class="flex items-center text-gray-700">
-              <i class="fas fa-check-circle text-green-500 mr-3"></i>
-              <span id="feature-5-point-1">Messages to parents & teachers</span>
+              <i class="fas fa-check-circle text-green-500 mr-2 sm:mr-3 text-sm"></i>
+              <span class="text-sm sm:text-base" id="feature-5-point-1">Messages to parents & teachers</span>
             </li>
             <li class="flex items-center text-gray-700">
-              <i class="fas fa-check-circle text-green-500 mr-3"></i>
-              <span id="feature-5-point-2">Announcements within 1 minute</span>
+              <i class="fas fa-check-circle text-green-500 mr-2 sm:mr-3 text-sm"></i>
+              <span class="text-sm sm:text-base" id="feature-5-point-2">Announcements within 1 minute</span>
             </li>
             <li class="flex items-center text-gray-700">
-              <i class="fas fa-check-circle text-green-500 mr-3"></i>
-              <span id="feature-5-point-3">Emergency alerts</span>
+              <i class="fas fa-check-circle text-green-500 mr-2 sm:mr-3 text-sm"></i>
+              <span class="text-sm sm:text-base" id="feature-5-point-3">Emergency alerts</span>
             </li>
           </ul>
         </div>
 
         <!-- Feature 6 -->
-        <div class="feature-card bg-gradient-to-br from-white to-indigo-50 p-8 rounded-2xl shadow-lg border border-gray-100 transition-all duration-500">
-          <div class="w-16 h-16 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-xl flex items-center justify-center mb-6">
-            <i class="fas fa-money-bill-wave text-white text-2xl"></i>
+        <div class="feature-card bg-gradient-to-br from-white to-indigo-50 p-6 sm:p-8 rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 transition-all duration-500">
+          <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-xl flex items-center justify-center mb-4 sm:mb-6">
+            <i class="fas fa-money-bill-wave text-white text-xl sm:text-2xl"></i>
           </div>
-          <h3 class="text-2xl font-bold mb-4 text-gray-800" id="feature-6-title">Financial Management</h3>
-          <p class="text-gray-600 mb-6" id="feature-6-desc">Track daily expenses, school fee payments and invoices easily with comprehensive reports.</p>
-          <ul class="space-y-2">
+          <h3 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-gray-800" id="feature-6-title">Financial Management</h3>
+          <p class="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base" id="feature-6-desc">Track daily expenses, school fee payments and invoices easily with comprehensive reports.</p>
+          <ul class="space-y-1 sm:space-y-2">
             <li class="flex items-center text-gray-700">
-              <i class="fas fa-check-circle text-green-500 mr-3"></i>
-              <span id="feature-6-point-1">Daily expense tracking</span>
+              <i class="fas fa-check-circle text-green-500 mr-2 sm:mr-3 text-sm"></i>
+              <span class="text-sm sm:text-base" id="feature-6-point-1">Daily expense tracking</span>
             </li>
             <li class="flex items-center text-gray-700">
-              <i class="fas fa-check-circle text-green-500 mr-3"></i>
-              <span id="feature-6-point-2">School fee payments</span>
+              <i class="fas fa-check-circle text-green-500 mr-2 sm:mr-3 text-sm"></i>
+              <span class="text-sm sm:text-base" id="feature-6-point-2">School fee payments</span>
             </li>
             <li class="flex items-center text-gray-700">
-              <i class="fas fa-check-circle text-green-500 mr-3"></i>
-              <span id="feature-6-point-3">Invoice tracking</span>
+              <i class="fas fa-check-circle text-green-500 mr-2 sm:mr-3 text-sm"></i>
+              <span class="text-sm sm:text-base" id="feature-6-point-3">Invoice tracking</span>
             </li>
           </ul>
         </div>
@@ -433,79 +437,79 @@
       </div>
 
       <!-- Call to Action -->
-      <div class="gradient-bg rounded-3xl p-10 text-center text-white shadow-2xl mt-12">
-        <h3 class="text-3xl font-bold mb-6" id="cta-title">Ready to Transform Your School?</h3>
-        <p class="text-xl mb-8 max-w-2xl mx-auto" id="cta-description">Be among the first schools to use ShuleApp and simplify your daily management</p>
-        <a href="{{route('login')}}" class="inline-block bg-white text-blue-700 px-10 py-4 rounded-full text-xl font-bold hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+      <div class="gradient-bg rounded-2xl sm:rounded-3xl p-8 sm:p-10 text-center text-white shadow-2xl mt-8 sm:mt-12">
+        <h3 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6" id="cta-title">Ready to Transform Your School?</h3>
+        <p class="text-lg sm:text-xl mb-6 sm:mb-8 max-w-2xl mx-auto" id="cta-description">Be among the first schools to use ShuleApp and simplify your daily management</p>
+        <a href="{{route('login')}}" class="inline-block bg-white text-blue-700 px-8 sm:px-10 py-3 sm:py-4 rounded-full text-lg sm:text-xl font-bold hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
           <i class="fas fa-play mr-3"></i><span id="cta-button">Start Free Trial</span>
         </a>
-        <p class="mt-6 text-blue-100"><i class="fas fa-clock mr-2"></i><span id="cta-note">Registration takes few minutes</span></p>
+        <p class="mt-4 sm:mt-6 text-blue-100 text-sm sm:text-base"><i class="fas fa-clock mr-2"></i><span id="cta-note">Registration takes few minutes</span></p>
       </div>
     </div>
   </section>
 
   <!-- Stats Section -->
-  <section id="stats" class="py-20 bg-gradient-to-br from-gray-900 to-blue-900 text-white">
-    <div class="container mx-auto px-6 text-center">
-      <h2 class="text-3xl md:text-4xl font-bold mb-16" id="stats-title">ShuleApp Growth Statistics</h2>
+  <section id="stats" class="py-16 sm:py-20 bg-gradient-to-br from-gray-900 to-blue-900 text-white">
+    <div class="w-full px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-12 sm:mb-16" id="stats-title">ShuleApp Growth Statistics</h2>
 
-      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-12 sm:mb-16">
 
-        <div class="counter-box p-8 rounded-2xl">
-          <div class="text-5xl font-bold mb-4 text-blue-600" id="stat1">3</div>
-          <div class="text-xl font-semibold mb-2" id="stats-label-1">School</div>
-          <p class="text-gray-600" id="stats-desc-1">Currently using our system</p>
-          <div class="mt-4">
-            <i class="fas fa-school text-3xl text-blue-500"></i>
+        <div class="counter-box p-6 sm:p-8 rounded-xl sm:rounded-2xl">
+          <div class="text-4xl sm:text-5xl font-bold mb-3 sm:mb-4 text-blue-600" id="stat1">3</div>
+          <div class="text-lg sm:text-xl font-semibold mb-2" id="stats-label-1">School</div>
+          <p class="text-gray-600 text-sm sm:text-base" id="stats-desc-1">Currently using our system</p>
+          <div class="mt-3 sm:mt-4">
+            <i class="fas fa-school text-2xl sm:text-3xl text-blue-500"></i>
           </div>
         </div>
 
-        <div class="counter-box p-8 rounded-2xl">
-          <div class="text-5xl font-bold mb-4 text-green-600">1,000+</div>
-          <div class="text-xl font-semibold mb-2" id="stats-label-2">Students</div>
-          <p class="text-gray-600" id="stats-desc-2">Registered in system</p>
-          <div class="mt-4">
-            <i class="fas fa-user-graduate text-3xl text-green-500"></i>
+        <div class="counter-box p-6 sm:p-8 rounded-xl sm:rounded-2xl">
+          <div class="text-4xl sm:text-5xl font-bold mb-3 sm:mb-4 text-green-600">1,000+</div>
+          <div class="text-lg sm:text-xl font-semibold mb-2" id="stats-label-2">Students</div>
+          <p class="text-gray-600 text-sm sm:text-base" id="stats-desc-2">Registered in system</p>
+          <div class="mt-3 sm:mt-4">
+            <i class="fas fa-user-graduate text-2xl sm:text-3xl text-green-500"></i>
           </div>
         </div>
 
-        <div class="counter-box p-8 rounded-2xl">
-          <div class="text-5xl font-bold mb-4 text-purple-600">50+</div>
-          <div class="text-xl font-semibold mb-2" id="stats-label-3">Teachers</div>
-          <p class="text-gray-600" id="stats-desc-3">Using the platform</p>
-          <div class="mt-4">
-            <i class="fas fa-chalkboard-teacher text-3xl text-purple-500"></i>
+        <div class="counter-box p-6 sm:p-8 rounded-xl sm:rounded-2xl">
+          <div class="text-4xl sm:text-5xl font-bold mb-3 sm:mb-4 text-purple-600">50+</div>
+          <div class="text-lg sm:text-xl font-semibold mb-2" id="stats-label-3">Teachers</div>
+          <p class="text-gray-600 text-sm sm:text-base" id="stats-desc-3">Using the platform</p>
+          <div class="mt-3 sm:mt-4">
+            <i class="fas fa-chalkboard-teacher text-2xl sm:text-3xl text-purple-500"></i>
           </div>
         </div>
 
-        <div class="counter-box p-8 rounded-2xl">
-          <div class="text-5xl font-bold mb-4 text-red-600">1,000+</div>
-          <div class="text-xl font-semibold mb-2" id="stats-label-4">Parents</div>
-          <p class="text-gray-600" id="stats-desc-4">Connected to portal</p>
-          <div class="mt-4">
-            <i class="fas fa-user-friends text-3xl text-red-500"></i>
+        <div class="counter-box p-6 sm:p-8 rounded-xl sm:rounded-2xl">
+          <div class="text-4xl sm:text-5xl font-bold mb-3 sm:mb-4 text-red-600">1,000+</div>
+          <div class="text-lg sm:text-xl font-semibold mb-2" id="stats-label-4">Parents</div>
+          <p class="text-gray-600 text-sm sm:text-base" id="stats-desc-4">Connected to portal</p>
+          <div class="mt-3 sm:mt-4">
+            <i class="fas fa-user-friends text-2xl sm:text-3xl text-red-500"></i>
           </div>
         </div>
 
       </div>
 
-      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 max-w-4xl mx-auto">
-        <h3 class="text-2xl font-bold mb-6" id="why-title">Why Choose ShuleApp?</h3>
-        <div class="grid md:grid-cols-3 gap-6">
-          <div class="p-6 bg-white/5 rounded-xl">
-            <i class="fas fa-bolt text-3xl text-yellow-400 mb-4"></i>
-            <h4 class="font-bold text-xl mb-2" id="why-1-title">Fast & Easy</h4>
-            <p class="text-blue-100" id="why-1-desc">Start using within few hours</p>
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl p-6 sm:p-8 max-w-4xl mx-auto">
+        <h3 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6" id="why-title">Why Choose ShuleApp?</h3>
+        <div class="grid md:grid-cols-3 gap-4 sm:gap-6">
+          <div class="p-4 sm:p-6 bg-white/5 rounded-xl">
+            <i class="fas fa-bolt text-2xl sm:text-3xl text-yellow-400 mb-3 sm:mb-4"></i>
+            <h4 class="font-bold text-lg sm:text-xl mb-2" id="why-1-title">Fast & Easy</h4>
+            <p class="text-blue-100 text-sm sm:text-base" id="why-1-desc">Start using within few hours</p>
           </div>
-          <div class="p-6 bg-white/5 rounded-xl">
-            <i class="fas fa-shield-alt text-3xl text-green-400 mb-4"></i>
-            <h4 class="font-bold text-xl mb-2" id="why-2-title">100% Secure</h4>
-            <p class="text-blue-100" id="why-2-desc">Your data stored with highest standards</p>
+          <div class="p-4 sm:p-6 bg-white/5 rounded-xl">
+            <i class="fas fa-shield-alt text-2xl sm:text-3xl text-green-400 mb-3 sm:mb-4"></i>
+            <h4 class="font-bold text-lg sm:text-xl mb-2" id="why-2-title">100% Secure</h4>
+            <p class="text-blue-100 text-sm sm:text-base" id="why-2-desc">Your data stored with highest standards</p>
           </div>
-          <div class="p-6 bg-white/5 rounded-xl">
-            <i class="fas fa-headset text-3xl text-purple-400 mb-4"></i>
-            <h4 class="font-bold text-xl mb-2" id="why-3-title">24/7 Support</h4>
-            <p class="text-blue-100" id="why-3-desc">Our team ready to help anytime</p>
+          <div class="p-4 sm:p-6 bg-white/5 rounded-xl">
+            <i class="fas fa-headset text-2xl sm:text-3xl text-purple-400 mb-3 sm:mb-4"></i>
+            <h4 class="font-bold text-lg sm:text-xl mb-2" id="why-3-title">24/7 Support</h4>
+            <p class="text-blue-100 text-sm sm:text-base" id="why-3-desc">Our team ready to help anytime</p>
           </div>
         </div>
       </div>
@@ -513,108 +517,108 @@
   </section>
 
   <!-- Contact Section -->
-  <section id="contact" class="py-20 bg-gradient-to-b from-white to-blue-50">
-    <div class="container mx-auto px-6">
+  <section id="contact" class="py-16 sm:py-20 bg-gradient-to-b from-white to-blue-50">
+    <div class="w-full px-4 sm:px-6 lg:px-8">
       <div class="max-w-6xl mx-auto">
-        <div class="text-center mb-16">
-          <div class="inline-block gradient-bg text-white px-6 py-2 rounded-full font-semibold mb-4">
+        <div class="text-center mb-12 sm:mb-16">
+          <div class="inline-block gradient-bg text-white px-4 sm:px-6 py-2 rounded-full font-semibold mb-3 sm:mb-4">
             <i class="fas fa-comments mr-2"></i><span id="contact-tagline">Contact Us</span>
           </div>
-          <h2 class="text-3xl md:text-4xl font-bold mb-6 text-gray-800" id="contact-title">Get In Touch</h2>
-          <p class="text-xl text-gray-600" id="contact-description">We're happy to listen and answer any questions you have</p>
+          <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-gray-800" id="contact-title">Get In Touch</h2>
+          <p class="text-lg sm:text-xl text-gray-600" id="contact-description">We're happy to listen and answer any questions you have</p>
         </div>
 
-        <div class="grid lg:grid-cols-2 gap-12">
-          <div class="bg-white rounded-3xl shadow-2xl p-10">
-            <h3 class="text-2xl font-bold mb-8 text-gray-800" id="form-title">Send Your Message</h3>
-            <form class="space-y-6 needs-validation" novalidate action="{{route('send.feedback.message') . ('#contact')}}" method="POST" id="contactForm">
+        <div class="grid lg:grid-cols-2 gap-8 sm:gap-12">
+          <div class="bg-white rounded-xl sm:rounded-3xl shadow-xl sm:shadow-2xl p-6 sm:p-8 md:p-10">
+            <h3 class="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-gray-800" id="form-title">Send Your Message</h3>
+            <form class="space-y-4 sm:space-y-6 needs-validation" novalidate action="{{route('send.feedback.message') . ('#contact')}}" method="POST" id="contactForm">
               @csrf
-              <div class="grid md:grid-cols-2 gap-6">
+              <div class="grid md:grid-cols-2 gap-4 sm:gap-6">
                 <div>
-                  <label class="block text-gray-700 mb-2 font-medium" id="form-label-name">Full Name</label>
-                  <input type="text" name="name" placeholder="Your name" value="{{old('name')}}" class="w-full border border-gray-300 p-4 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                  <label class="block text-gray-700 mb-2 font-medium text-sm sm:text-base" id="form-label-name">Full Name</label>
+                  <input type="text" name="name" placeholder="Your name" value="{{old('name')}}" class="w-full border border-gray-300 p-3 sm:p-4 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base">
                   @error('name')
-                    <span class="text-red-500 text-sm mt-1">{{$message}}</span>
+                    <span class="text-red-500 text-xs sm:text-sm mt-1">{{$message}}</span>
                   @enderror
                 </div>
 
                 <div>
-                  <label class="block text-gray-700 mb-2 font-medium" id="form-label-phone">Phone Number</label>
-                  <input type="text" name="phone" placeholder="Phone number" value="{{old('phone')}}" class="w-full border border-gray-300 p-4 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                  <label class="block text-gray-700 mb-2 font-medium text-sm sm:text-base" id="form-label-phone">Phone Number</label>
+                  <input type="text" name="phone" placeholder="Phone number" value="{{old('phone')}}" class="w-full border border-gray-300 p-3 sm:p-4 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base">
                   @error('phone')
-                    <span class="text-red-500 text-sm mt-1">{{$message}}</span>
+                    <span class="text-red-500 text-xs sm:text-sm mt-1">{{$message}}</span>
                   @enderror
                 </div>
               </div>
               <div>
-                <label class="block text-gray-700 mb-2 font-medium" id="form-label-message">Your Message</label>
-                <textarea placeholder="Write your message here..." name="message" class="w-full border border-gray-300 p-4 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" rows="5" required>{{old('message')}}</textarea>
+                <label class="block text-gray-700 mb-2 font-medium text-sm sm:text-base" id="form-label-message">Your Message</label>
+                <textarea placeholder="Write your message here..." name="message" class="w-full border border-gray-300 p-3 sm:p-4 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm sm:text-base" rows="4" required>{{old('message')}}</textarea>
                 @error('message')
-                  <span class="text-red-500 text-sm mt-1">{{$message}}</span>
+                  <span class="text-red-500 text-xs sm:text-sm mt-1">{{$message}}</span>
                 @enderror
               </div>
 
-              <button type="submit" class="gradient-bg w-full text-white py-4 rounded-xl text-lg font-semibold hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" id="saveButton">
-                <i class="fas fa-paper-plane mr-3"></i><span id="form-button">Send Message</span>
+              <button type="submit" class="gradient-bg w-full text-white py-3 sm:py-4 rounded-xl text-base sm:text-lg font-semibold hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" id="saveButton">
+                <i class="fas fa-paper-plane mr-2 sm:mr-3"></i><span id="form-button">Send Message</span>
               </button>
             </form>
           </div>
 
-          <div class="space-y-8">
-            <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-10 text-white shadow-2xl">
-              <h3 class="text-2xl font-bold mb-6" id="contact-info-title">Quick Contacts</h3>
-              <div class="space-y-6">
+          <div class="space-y-6 sm:space-y-8">
+            <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl sm:rounded-3xl p-6 sm:p-8 md:p-10 text-white shadow-xl sm:shadow-2xl">
+              <h3 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6" id="contact-info-title">Quick Contacts</h3>
+              <div class="space-y-4 sm:space-y-6">
                 <div class="flex items-start">
-                  <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
-                    <i class="fas fa-phone text-xl"></i>
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-full flex items-center justify-center mr-3 sm:mr-4">
+                    <i class="fas fa-phone text-lg sm:text-xl"></i>
                   </div>
                   <div>
-                    <h4 class="font-bold text-lg" id="contact-phone-label">Support Phone</h4>
-                    <a href="tel:+255678669000" class="text-2xl font-bold hover:text-yellow-300 transition">+255 678 669 000</a>
-                    <p class="text-blue-100 mt-1" id="contact-phone-note">Monday - Sunday, 24 Hours</p>
+                    <h4 class="font-bold text-base sm:text-lg" id="contact-phone-label">Support Phone</h4>
+                    <a href="tel:+255678669000" class="text-xl sm:text-2xl font-bold hover:text-yellow-300 transition block mt-1">+255 678 669 000</a>
+                    <p class="text-blue-100 mt-1 text-sm sm:text-base" id="contact-phone-note">Monday - Sunday, 24 Hours</p>
                   </div>
                 </div>
 
                 <div class="flex items-start">
-                  <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
-                    <i class="fas fa-envelope text-xl"></i>
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-full flex items-center justify-center mr-3 sm:mr-4">
+                    <i class="fas fa-envelope text-lg sm:text-xl"></i>
                   </div>
                   <div>
-                    <h4 class="font-bold text-lg" id="contact-email-label">Email Address</h4>
-                    <a href="mailto:support@shuleapp.co.tz" class="text-xl hover:text-yellow-300 transition">pianop477@gmail.com</a>
-                    <p class="text-blue-100 mt-1" id="contact-email-note">We reply within 24 hours</p>
+                    <h4 class="font-bold text-base sm:text-lg" id="contact-email-label">Email Address</h4>
+                    <a href="mailto:support@shuleapp.co.tz" class="text-lg sm:text-xl hover:text-yellow-300 transition block mt-1">pianop477@gmail.com</a>
+                    <p class="text-blue-100 mt-1 text-sm sm:text-base" id="contact-email-note">We reply within 24 hours</p>
                   </div>
                 </div>
 
                 <div class="flex items-start">
-                  <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
-                    <i class="fas fa-map-marker-alt text-xl"></i>
+                  <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-full flex items-center justify-center mr-3 sm:mr-4">
+                    <i class="fas fa-map-marker-alt text-lg sm:text-xl"></i>
                   </div>
                   <div>
-                    <h4 class="font-bold text-lg" id="contact-location-label">Location</h4>
-                    <p class="text-xl">Kikuyu, Dodoma</p>
-                    <p class="text-blue-100 mt-1" id="contact-location-note">Tanzania</p>
+                    <h4 class="font-bold text-base sm:text-lg" id="contact-location-label">Location</h4>
+                    <p class="text-lg sm:text-xl">Kikuyu, Dodoma</p>
+                    <p class="text-blue-100 mt-1 text-sm sm:text-base" id="contact-location-note">Tanzania</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="bg-white rounded-3xl shadow-xl p-8">
-              <h3 class="text-2xl font-bold mb-6 text-gray-800" id="faq-title">Frequently Asked Questions</h3>
-              <div class="space-y-4">
-                <div class="border-l-4 border-blue-500 pl-4 py-2">
-                  <h4 class="font-bold text-gray-800" id="faq-1-q">Can I try before paying?</h4>
-                  <p class="text-gray-600 mt-1" id="faq-1-a">Yes! We offer 30-day free trial with no charges.</p>
+            <div class="bg-white rounded-xl sm:rounded-3xl shadow-xl p-6 sm:p-8">
+              <h3 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-800" id="faq-title">Frequently Asked Questions</h3>
+              <div class="space-y-3 sm:space-y-4">
+                <div class="border-l-4 border-blue-500 pl-3 sm:pl-4 py-1 sm:py-2">
+                  <h4 class="font-bold text-gray-800 text-sm sm:text-base" id="faq-1-q">Can I try before paying?</h4>
+                  <p class="text-gray-600 mt-1 text-xs sm:text-sm" id="faq-1-a">Yes! We offer 30-day free trial with no charges.</p>
                 </div>
 
-                <div class="border-l-4 border-green-500 pl-4 py-2">
-                  <h4 class="font-bold text-gray-800" id="faq-2-q">Does system work online only?</h4>
-                  <p class="text-gray-600 mt-1" id="faq-2-a">Yes We offer online service options based on our system needs.</p>
+                <div class="border-l-4 border-green-500 pl-3 sm:pl-4 py-1 sm:py-2">
+                  <h4 class="font-bold text-gray-800 text-sm sm:text-base" id="faq-2-q">Does system work online only?</h4>
+                  <p class="text-gray-600 mt-1 text-xs sm:text-sm" id="faq-2-a">Yes We offer online service options based on our system needs.</p>
                 </div>
 
-                <div class="border-l-4 border-purple-500 pl-4 py-2">
-                  <h4 class="font-bold text-gray-800" id="faq-3-q">There is internal training once I join with ShuleApp</h4>
-                  <p class="text-gray-600 mt-1" id="faq-3-a">Yes, The team will provide internal training as much as you will be satisfied</p>
+                <div class="border-l-4 border-purple-500 pl-3 sm:pl-4 py-1 sm:py-2">
+                  <h4 class="font-bold text-gray-800 text-sm sm:text-base" id="faq-3-q">There is internal training once I join with ShuleApp</h4>
+                  <p class="text-gray-600 mt-1 text-xs sm:text-sm" id="faq-3-a">Yes, The team will provide internal training as much as you will be satisfied</p>
                 </div>
               </div>
             </div>
@@ -624,73 +628,76 @@
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="bg-gray-900 text-white py-12">
-    <div class="container mx-auto px-6">
-      <div class="grid md:grid-cols-4 gap-10 mb-10">
-        <div>
-          <div class="flex items-center space-x-3 mb-6">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden">
+  <!-- Footer - FIXED -->
+  <footer class="bg-gray-900 text-white py-8 sm:py-12">
+    <div class="w-full px-4 sm:px-6 lg:px-8">
+      <div class="grid md:grid-cols-4 gap-6 sm:gap-8 md:gap-10 mb-8 sm:mb-10">
+        <div class="md:col-span-2 lg:col-span-1">
+          <div class="flex items-center space-x-3 mb-4 sm:mb-6">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center overflow-hidden">
               <img src="{{ asset('storage/logo/logo.png') }}" alt="ShuleApp Logo" class="w-full h-full object-contain">
             </div>
             <div>
-              <div class="text-2xl font-bold">ShuleApp</div>
-              {{-- <div class="text-sm text-gray-400" id="footer-tagline">Complete School Management</div> --}}
+              <div class="text-xl sm:text-2xl font-bold">ShuleApp</div>
             </div>
           </div>
-          <p class="text-gray-400" id="footer-description">We help schools have better management, accuracy and modern system at affordable cost.</p>
+          <p class="text-gray-400 text-sm sm:text-base" id="footer-description">We help schools have better management, accuracy and modern system at affordable cost.</p>
         </div>
 
         <div>
-          <h4 class="text-xl font-bold mb-6" id="footer-links-title">Important Links</h4>
-          <ul class="space-y-3">
-            <li><a href="{{route('welcome')}}" class="text-gray-400 hover:text-white transition" id="footer-link-home">Home</a></li>
-            <li><a href="#features" class="text-gray-400 hover:text-white transition" id="footer-link-features">Features</a></li>
-            <li><a href="#contact" class="text-gray-400 hover:text-white transition" id="footer-link-contact">Contact Us</a></li>
-            <li><a href="{{route('login')}}" class="text-gray-400 hover:text-white transition" id="footer-link-login">Login</a></li>
+          <h4 class="text-lg sm:text-xl font-bold mb-3 sm:mb-4" id="footer-links-title">Important Links</h4>
+          <ul class="space-y-2">
+            <li><a href="{{route('welcome')}}" class="text-gray-400 hover:text-white transition text-sm sm:text-base block py-1" id="footer-link-home">Home</a></li>
+            <li><a href="#features" class="text-gray-400 hover:text-white transition text-sm sm:text-base block py-1" id="footer-link-features">Features</a></li>
+            <li><a href="#contact" class="text-gray-400 hover:text-white transition text-sm sm:text-base block py-1" id="footer-link-contact">Contact Us</a></li>
+            <li><a href="{{route('login')}}" class="text-gray-400 hover:text-white transition text-sm sm:text-base block py-1" id="footer-link-login">Login</a></li>
           </ul>
         </div>
 
         <div>
-          <h4 class="text-xl font-bold mb-6" id="footer-services-title">Our Services</h4>
-          <ul class="space-y-3">
-            <li class="text-gray-400" id="footer-service-1">Academic Management</li>
-            <li class="text-gray-400" id="footer-service-2">Financial Management</li>
-            <li class="text-gray-400" id="footer-service-3">SMS Messaging</li>
-            <li class="text-gray-400" id="footer-service-4">Parent Portal</li>
+          <h4 class="text-lg sm:text-xl font-bold mb-3 sm:mb-4" id="footer-services-title">Our Services</h4>
+          <ul class="space-y-2">
+            <li class="text-gray-400 text-sm sm:text-base" id="footer-service-1">Academic Management</li>
+            <li class="text-gray-400 text-sm sm:text-base" id="footer-service-2">Financial Management</li>
+            <li class="text-gray-400 text-sm sm:text-base" id="footer-service-3">SMS Messaging</li>
+            <li class="text-gray-400 text-sm sm:text-base" id="footer-service-4">Parent Portal</li>
           </ul>
         </div>
 
         <div>
-          <h4 class="text-xl font-bold mb-6" id="footer-follow-title">Follow Us</h4>
-          <div class="flex space-x-4 mb-6">
-            <a href="#" class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition">
-              <i class="fab fa-facebook-f"></i>
+          <h4 class="text-lg sm:text-xl font-bold mb-3 sm:mb-4" id="footer-follow-title">Follow Us</h4>
+          <div class="flex space-x-3 sm:space-x-4 mb-4 sm:mb-6">
+            <a href="#" class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition">
+              <i class="fab fa-facebook-f text-sm sm:text-base"></i>
             </a>
-            <a href="#" class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-400 transition">
-              <i class="fab fa-twitter"></i>
+            <a href="#" class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-400 transition">
+              <i class="fab fa-twitter text-sm sm:text-base"></i>
             </a>
-            <a href="#" class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center hover:bg-pink-600 transition">
-              <i class="fab fa-instagram"></i>
+            <a href="#" class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-800 rounded-full flex items-center justify-center hover:bg-pink-600 transition">
+              <i class="fab fa-instagram text-sm sm:text-base"></i>
             </a>
-            <a href="#" class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-700 transition">
-              <i class="fab fa-linkedin-in"></i>
+            <a href="#" class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-700 transition">
+              <i class="fab fa-linkedin-in text-sm sm:text-base"></i>
             </a>
           </div>
-          <p class="text-gray-400" id="footer-whatsapp-text">Join our WhatsApp</p>
-          <a href="https://wa.me/255678669000" class="inline-flex items-center text-green-400 hover:text-green-300 mt-2">
-            <i class="fab fa-whatsapp text-2xl mr-3"></i>
-            <span>+255 678 669 000</span>
+          <p class="text-gray-400 text-sm sm:text-base mb-2" id="footer-whatsapp-text">Join our WhatsApp</p>
+          <a href="https://wa.me/255678669000" class="inline-flex items-center text-green-400 hover:text-green-300 mt-1">
+            <i class="fab fa-whatsapp text-xl sm:text-2xl mr-2 sm:mr-3"></i>
+            <span class="text-sm sm:text-base">+255 678 669 000</span>
           </a>
         </div>
       </div>
 
-      <div class="border-t border-gray-800 pt-8 text-center">
+      <div class="border-t border-gray-800 pt-6 sm:pt-8 text-center">
         @php
           $startYear = 2025;
           $currentYear = date('Y');
         @endphp
-        <p class="text-gray-400">©{{ $startYear == $currentYear ? $startYear : $startYear . ' - ' . $currentYear }} ShuleApp. All Rights Reserved. | <a href="#" class="hover:text-white transition" id="footer-privacy">Privacy Policy</a> | <a href="#" class="hover:text-white transition" id="footer-terms">Terms of Use</a></p>
+        <p class="text-gray-400 text-xs sm:text-sm md:text-base">
+          ©{{ $startYear == $currentYear ? $startYear : $startYear . ' - ' . $currentYear }} ShuleApp. All Rights Reserved. |
+          <a href="#" class="hover:text-white transition mx-1" id="footer-privacy">Privacy Policy</a> |
+          <a href="#" class="hover:text-white transition mx-1" id="footer-terms">Terms of Use</a>
+        </p>
       </div>
     </div>
   </footer>
@@ -713,7 +720,6 @@
         'mobile-nav-login': 'Login Now',
 
         // Hero Section
-        // 'hero-tagline': '#School Management System',
         'hero-title-1': 'Transform ',
         'hero-title-2': 'Your School Management',
         'hero-description': 'Complete solution to run your school efficiently, accurately and with top-level security.',
@@ -814,7 +820,6 @@
         'form-title': 'Send Your Message',
         'form-label-name': 'Full Name',
         'form-label-phone': 'Phone Number',
-        'form-label-email': 'Email Address',
         'form-label-message': 'Your Message',
         'form-button': 'Send Message',
         'contact-info-title': 'Quick Contacts',
@@ -822,8 +827,8 @@
         'contact-phone-note': 'Monday - Sunday, 24 Hours',
         'contact-email-label': 'Email Address',
         'contact-email-note': 'We reply within 24 hours',
-        'contact-location-label': 'Our Offices',
-        'contact-location-note': 'P.O. Box 12345, Posta',
+        'contact-location-label': 'Location',
+        'contact-location-note': 'Tanzania',
         'faq-title': 'Frequently Asked Questions',
         'faq-1-q': 'Can I try before paying?',
         'faq-1-a': 'Yes! We offer 30-day free trial with no charges.',
@@ -833,7 +838,6 @@
         'faq-3-a': 'Yes, The team will provide internal training as much as you will be satisfied',
 
         // Footer
-        // 'footer-tagline': 'Complete School Management',
         'footer-description': 'We help schools have better management, accuracy and modern system at affordable cost.',
         'footer-links-title': 'Important Links',
         'footer-link-home': 'Home',
@@ -846,7 +850,7 @@
         'footer-service-3': 'SMS Messaging',
         'footer-service-4': 'Parent Portal',
         'footer-follow-title': 'Follow Us',
-        'footer-whatsapp-text': 'Join our WhatsApp profile',
+        'footer-whatsapp-text': 'Join our WhatsApp',
         'footer-privacy': 'Privacy Policy',
         'footer-terms': 'Terms of Use'
       },
@@ -864,7 +868,6 @@
         'mobile-nav-login': 'Ingia Sasa',
 
         // Hero Section
-        // 'hero-tagline': 'Mfumo wa Kwanza wa Usimamizi wa Shule Tanzania',
         'hero-title-1': 'Badilisha ',
         'hero-title-2': 'Usimamizi wa Shule Yako',
         'hero-description': 'Suluhisho kamili la kuendesha shule yako kwa ufanisi, usahihi na usalama wa hali ya juu.',
@@ -872,7 +875,7 @@
         'time-label-minutes': 'Dakika',
         'time-label-seconds': 'Sekunde',
         'current-time-label': 'Sasa Hivi (EAT)',
-        'hero-button-1': 'Anza Kuitumia Sasa',
+        'hero-button-1': 'Ingia Sasa',
         'hero-button-2': 'Ona Vipengele',
         'hero-benefit-1': 'Hakuna Gharama za Uanzishaji',
         'hero-benefit-2': 'Mafunzo ya Bure',
@@ -965,7 +968,6 @@
         'form-title': 'Tuma Ujumbe Wako',
         'form-label-name': 'Jina Kamili',
         'form-label-phone': 'Namba ya Simu',
-        'form-label-email': 'Barua Pepe',
         'form-label-message': 'Ujumbe Wako',
         'form-button': 'Tuma Ujumbe',
         'contact-info-title': 'Mawasiliano ya Haraka',
@@ -973,8 +975,8 @@
         'contact-phone-note': 'Juma moja, Masaa 24',
         'contact-email-label': 'Barua Pepe',
         'contact-email-note': 'Tunajibu ndani ya masaa 24',
-        'contact-location-label': 'Ofisi Zetu',
-        'contact-location-note': 'S.L.P 12345, Posta',
+        'contact-location-label': 'Eneo',
+        'contact-location-note': 'Tanzania',
         'faq-title': 'Maswali Yanayoulizwa Mara Kwa Mara',
         'faq-1-q': 'Je, naweza kujaribu kabla ya kulipia?',
         'faq-1-a': 'Ndio! Tunatoa kipindi cha majaribio cha siku 30 bila malipo.',
@@ -984,7 +986,6 @@
         'faq-3-a': 'Ndio, timu ipo tayari kutoa mafunzo kwa watumiaji wapya.',
 
         // Footer
-        'footer-tagline': 'Usimamizi Kamili wa Shule',
         'footer-description': 'Tunasaidia shule kuwa na usimamizi bora, usahihi na wa kisasa kwa gharama nafuu.',
         'footer-links-title': 'Viungo Muhimu',
         'footer-link-home': 'Nyumbani',
