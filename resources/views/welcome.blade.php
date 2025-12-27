@@ -272,7 +272,7 @@
         <div
             class="w-full px-4 sm:px-6 lg:px-8 h-full flex flex-col lg:flex-row items-center justify-center relative z-10 pt-20 lg:pt-32">
             <div class="lg:w-1/2 text-white mb-8 lg:mb-0">
-                <h1 class="text-3xl sm:text-4xl md:text-4xl lg:text-4xl font-bold mb-4 sm:mb-6 leading-tight">
+                <h1 class="text-3xl sm:text-4xl md:text-4xl lg:text-3xl font-bold mb-4 sm:mb-6 leading-tight">
                     <span id="hero-title-1">Transform </span>
                     <div class="typing-container">
                         <span class="text-yellow-300 typing-text" id="hero-title-2">Your School Management</span>
@@ -280,7 +280,7 @@
                 </h1>
 
                 <p class="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 text-blue-100" id="hero-description">
-                    Altimate solution to run your school efficiently, accurately and with top-level security.
+                    Altimate solution to run your school efficiently and with top-level security.
                 </p>
 
                 <!-- Current Time Display -->
@@ -1174,7 +1174,7 @@
                 // Hero Section
                 'hero-title-1': 'Transform ',
                 'hero-title-2': 'Your School Management',
-                'hero-description': 'Altimate solution to run your school efficiently, accurately and with top-level security.',
+                'hero-description': 'Altimate solution to run your school efficiently and with top-level security.',
                 'time-label-hours': 'Hours',
                 'time-label-minutes': 'Minutes',
                 'time-label-seconds': 'Seconds',
@@ -1320,7 +1320,7 @@
                 // Hero Section
                 'hero-title-1': 'Badilisha ',
                 'hero-title-2': 'Usimamizi wa Shule Yako',
-                'hero-description': 'Suluhisho kamili la kuendesha shule yako kwa ufanisi, usahihi na usalama wa hali ya juu.',
+                'hero-description': 'Suluhisho kamili la kuendesha shule yako kwa ufanisi na usalama wa hali ya juu.',
                 'time-label-hours': 'Masaa',
                 'time-label-minutes': 'Dakika',
                 'time-label-seconds': 'Sekunde',
