@@ -272,14 +272,14 @@
         <div
             class="w-full px-4 sm:px-6 lg:px-8 h-full flex flex-col lg:flex-row items-center justify-center relative z-10 pt-20 lg:pt-32">
             <div class="lg:w-1/2 text-white mb-8 lg:mb-0">
-                <h1 class="text-2xl sm:text-3xl md:text-3xl lg:text-2xl font-bold mb-4 sm:mb-6 leading-tight">
+                <h1 class="text-3xl sm:text-3xl md:text-3xl lg:text-3xl font-bold mb-4 sm:mb-6 leading-tight">
                     <span id="hero-title-1">Transform </span>
                     <div class="typing-container">
                         <span class="text-yellow-300 typing-text" id="hero-title-2">Your School Management</span>
                     </div>
                 </h1>
 
-                <p class="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 text-blue-100" id="hero-description">
+                <p class="text-lg sm:text-xl md:text-1xl mb-6 sm:mb-8 text-blue-100" id="hero-description">
                     Altimate solution to run your school efficiently and with top-level security.
                 </p>
 
@@ -340,11 +340,11 @@
                         class="absolute -bottom-4 -right-4 w-20 h-20 sm:-bottom-6 sm:-right-6 sm:w-32 sm:h-32 bg-purple-500 rounded-full opacity-20">
                     </div>
                     <div
-                        class="relative bg-white/10 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl border border-white/20">
+                        class="relative bg-white/10 backdrop-blur-lg rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl border border-white/20">
                         <div class="text-center mb-4 sm:mb-6">
                             <div class="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2"
                                 id="stats-title-schools">Schools Using ShuleApp</div>
-                            <div class="text-4xl sm:text-5xl font-bold text-yellow-300" id="live-counter">3</div>
+                            <div class="text-3xl sm:text-3xl font-bold text-yellow-300" id="live-counter">3</div>
                             <div class="text-white mt-1 sm:mt-2 text-sm sm:text-base" id="stats-subtitle-schools">
                                 Currently using and growing daily</div>
                         </div>
@@ -362,7 +362,7 @@
                                         <div class="text-xs sm:text-sm" id="stats-sub-students">Registered</div>
                                     </div>
                                 </div>
-                                <div class="text-xl sm:text-2xl font-bold text-white">1,000+</div>
+                                <div class="text-xl sm:text-2xl font-bold text-white">1,500+</div>
                             </div>
 
                             <div class="flex items-center justify-between bg-white/10 p-3 sm:p-4 rounded-xl">
@@ -377,7 +377,7 @@
                                         <div class="text-xs sm:text-sm" id="stats-sub-teachers">Using System</div>
                                     </div>
                                 </div>
-                                <div class="text-xl sm:text-2xl font-bold text-white">50+</div>
+                                <div class="text-xl sm:text-2xl font-bold text-white">100+</div>
                             </div>
 
                             <div class="flex items-center justify-between bg-white/10 p-3 sm:p-4 rounded-xl">
@@ -392,7 +392,7 @@
                                         <div class="text-xs sm:text-sm" id="stats-sub-parents">Connected</div>
                                     </div>
                                 </div>
-                                <div class="text-xl sm:text-2xl font-bold text-white">1,000+</div>
+                                <div class="text-xl sm:text-2xl font-bold text-white">1,500+</div>
                             </div>
                         </div>
                     </div>
@@ -401,13 +401,13 @@
         </div>
 
         <!-- Wave Divider -->
-        <div class="absolute bottom-0 left-0 right-0">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" class="w-full">
-                <path fill="#ffffff" fill-opacity="1"
+        {{-- <div class="absolute bottom-0 left-0 right-0">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 300" class="w-full">
+                <path fill="gray" fill-opacity="1"
                     d="M0,224L48,218.7C96,213,192,203,288,181.3C384,160,480,128,576,138.7C672,149,768,203,864,202.7C960,203,1056,149,1152,138.7C1248,128,1344,160,1392,176L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z">
                 </path>
             </svg>
-        </div>
+        </div> --}}
     </section>
 
     <!-- Features Section - ALREADY GOOD -->
@@ -632,7 +632,7 @@
                 </div>
 
                 <div class="counter-box p-6 sm:p-8 rounded-xl sm:rounded-2xl">
-                    <div class="text-4xl sm:text-5xl font-bold mb-3 sm:mb-4 text-green-600">1,000+</div>
+                    <div class="text-4xl sm:text-5xl font-bold mb-3 sm:mb-4 text-green-600">1,500+</div>
                     <div class="text-lg sm:text-xl font-semibold mb-2 text-gray-700" id="stats-label-2">Students</div>
                     <p class="text-gray-600 text-sm sm:text-base" id="stats-desc-2">Registered in system</p>
                     <div class="mt-3 sm:mt-4">
@@ -641,7 +641,7 @@
                 </div>
 
                 <div class="counter-box p-6 sm:p-8 rounded-xl sm:rounded-2xl">
-                    <div class="text-4xl sm:text-5xl font-bold mb-3 sm:mb-4 text-purple-600">50+</div>
+                    <div class="text-4xl sm:text-5xl font-bold mb-3 sm:mb-4 text-purple-600">100+</div>
                     <div class="text-lg sm:text-xl font-semibold mb-2 text-gray-700" id="stats-label-3">Teachers</div>
                     <p class="text-gray-600 text-sm sm:text-base" id="stats-desc-3">Using the platform</p>
                     <div class="mt-3 sm:mt-4">
@@ -650,7 +650,7 @@
                 </div>
 
                 <div class="counter-box p-6 sm:p-8 rounded-xl sm:rounded-2xl">
-                    <div class="text-4xl sm:text-5xl font-bold mb-3 sm:mb-4 text-red-600">1,000+</div>
+                    <div class="text-4xl sm:text-5xl font-bold mb-3 sm:mb-4 text-red-600">1,500+</div>
                     <div class="text-lg sm:text-xl font-semibold mb-2 text-gray-700" id="stats-label-4">Parents</div>
                     <p class="text-gray-600 text-sm sm:text-base" id="stats-desc-4">Connected to portal</p>
                     <div class="mt-3 sm:mt-4">
@@ -1391,7 +1391,7 @@
                 'cta-title': 'Tayari Kubadilisha Shule Yako?',
                 'cta-description': 'Jiunge na shule za kwanza kutumia ShuleApp na rahisisha usimamizi wako wa kila siku',
                 'cta-button': 'Anza Bila Malipo',
-                'cta-note': 'Usajili huchukua dakika 5 tu',
+                'cta-note': 'Usajili huchukua dakika chache tu',
 
                 // Stats Section
                 'stats-title': 'Takwimu za Ukuaji wa ShuleApp',
