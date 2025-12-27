@@ -63,7 +63,7 @@ use PHPUnit\Runner\ResultCache\ResultCache;
 |
 */
 
-    Route::get('/welcome', function () {
+    Route::get('/Home', function () {
         return view('welcome');
     })->name('welcome');
 
@@ -544,7 +544,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         // 4. Feedback
         Alert()->toast('Goodbye! See you back later 👋', 'success');
 
-        return redirect()->route('login');
+        return redirect()->route('welcome');
     })->name('logout');
 
     //10. ROUTE ACCESS FOR ACCOUNTANT USER GROUP =======================================================================================

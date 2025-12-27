@@ -148,7 +148,7 @@ class SchoolsController extends Controller
 
             //notify manager using nextSms API
             $nextSmsService = new NextSmsService();
-            $url = "https://shuleapp.tech";
+            $url = "https://shuleapp.tech/home";
             $sender = 'SHULE APP';
             $message = "Welcome to Shule App. Your login details are: Username: $users->phone, Password: shule2025, Thanks for choosing us. Visit; $url";
             $destinations = $this->formatPhoneNumber($users->phone);

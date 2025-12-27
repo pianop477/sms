@@ -117,7 +117,7 @@ class UsersController extends Controller
         $parents->save();
         // return redirect()->back()->with('success', 'User registered successfully, Login now');
 
-        $url = "https://shuleapp.tech"; //url for application
+        $url = "https://shuleapp.tech/home"; //url for application
         //send sms after registration using Beem API *******************************************************
         $beemSmsService = new BeemSmsService();
         $sourceAddr = $school->sender_id ?? 'shuleApp'; // Get sender ID

@@ -178,7 +178,7 @@ class RolesController extends Controller
 
             //notify via SMS after password reset
             $nextSmsService = new NextSmsService();
-            $link = "https://shuleapp.tech/login";
+            $link = "https://shuleapp.tech/home";
 
             $senderId = $school->sender_id ?? "SHULE APP";
             $message = "Hello {$users->first_name} \n";

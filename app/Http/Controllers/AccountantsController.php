@@ -60,7 +60,7 @@ class AccountantsController extends Controller
 
             // send SMS using nextSMS API ***********************************************
                 $nextSmsService = new NextSmsService();
-                $url = "https://shuleapp.tech";
+                $url = "https://shuleapp.tech/home";
                 $school = school::findOrFail($accountant->school_id);
                 $destination = $this->formatPhoneNumber($accountant->phone);
 

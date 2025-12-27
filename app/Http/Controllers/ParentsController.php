@@ -179,7 +179,7 @@ class ParentsController extends Controller
 
             DB::commit();
 
-                $url = "https://shuleapp.tech/login";
+                $url = "https://shuleapp.tech/login/home";
 
                 $nextSmsService = new NextSmsService();
                 $senderId = $school->sender_id ?? "SHULE APP";
@@ -506,7 +506,7 @@ class ParentsController extends Controller
     {
         $parents = Parents::where('school_id', $schoolId)->get();
         $school = $user = Auth::user();
-        $url = "https://shuleapp.tech";
+        $url = "https://shuleapp.tech/home";
 
         foreach ($parents as $parent) {
             // Fetch user linked to the parent

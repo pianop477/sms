@@ -1,176 +1,1110 @@
 <!DOCTYPE html>
-<html lang="sw">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="Piano">
   <title>ShuleApp</title>
-    <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/favicon/favicon.ico') }}">
-    <link rel="icon" type="image/png" href="{{asset('assets/images/favicon/favicon-16x16.png')}}">
+  <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/favicon/favicon.ico') }}">
+  <link rel="icon" type="image/png" href="{{asset('assets/images/favicon/favicon-16x16.png')}}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/scrollreveal"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
     body {
       scroll-behavior: smooth;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+
+    .counter-box {
+      background: linear-gradient(145deg, #ffffff, #f0f0f0);
+      box-shadow: 10px 10px 30px #d9d9d9, -10px -10px 30px #ffffff;
+    }
+
+    .typing-text {
+      border-right: 3px solid #3b82f6;
+      white-space: nowrap;
+      overflow: hidden;
+      animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+    }
+
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+
+    @keyframes blink-caret {
+      from, to { border-color: transparent }
+      50% { border-color: #3b82f6 }
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
     }
   </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gradient-to-br from-gray-50 to-blue-50">
+
+  <!-- Language Selector -->
+  <div class="fixed top-4 right-4 z-50">
+    <div class="flex items-center space-x-2 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg">
+      <i class="fas fa-globe text-blue-600"></i>
+      <select id="language-selector" class="bg-transparent border-0 focus:ring-0 text-sm">
+        <option value="en" selected>English</option>
+        <option value="sw">Kiswahili</option>
+      </select>
+    </div>
+  </div>
 
   <!-- Header -->
-  <header class="fixed top-0 w-full bg-white shadow-md z-50">
-    <div class="container mx-auto flex justify-between items-center p-4">
-      <div class="text-2xl font-bold text-blue-600">ShuleApp</div>
+  <header class="fixed top-0 w-full bg-white/90 backdrop-blur-md shadow-md z-40">
+    <div class="container mx-auto flex justify-between items-center px-6 py-4">
+      <div class="flex items-center space-x-3">
+        <!-- Logo -->
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden">
+          <img src="{{ asset('storage/logo/logo.png') }}" alt="ShuleApp Logo" class="w-full h-full object-contain">
+        </div>
+        <div>
+          <div class="text-2xl font-bold text-blue-700">ShuleApp</div>
+          {{-- <div class="text-xs text-gray-500 font-medium">Complete School Management</div> --}}
+        </div>
+      </div>
+
       <nav class="hidden md:flex space-x-8">
-        <a href="#home" class="hover:text-blue-600 font-semibold">Home</a>
-        <a href="#features" class="hover:text-blue-600 font-semibold">Features</a>
-        <a href="#contact" class="hover:text-blue-600 font-semibold">Contact</a>
+        <a href="#home" class="hover:text-blue-600 font-semibold flex items-center space-x-1 transition">
+          <i class="fas fa-home"></i>
+          <span id="nav-home">Home</span>
+        </a>
+        <a href="#features" class="hover:text-blue-600 font-semibold flex items-center space-x-1 transition">
+          <i class="fas fa-star"></i>
+          <span id="nav-features">Features</span>
+        </a>
+        <a href="#stats" class="hover:text-blue-600 font-semibold flex items-center space-x-1 transition">
+          <i class="fas fa-chart-line"></i>
+          <span id="nav-stats">Stats</span>
+        </a>
+        <a href="#contact" class="hover:text-blue-600 font-semibold flex items-center space-x-1 transition">
+          <i class="fas fa-phone"></i>
+          <span id="nav-contact">Contact</span>
+        </a>
       </nav>
-      <!-- Mobile Menu Button -->
-      <div class="md:hidden">
-        <button id="menu-toggle" class="focus:outline-none">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
-          </svg>
+
+      <div class="flex items-center space-x-4">
+        <!-- Live Time Counter -->
+        <div class="hidden md:block text-sm bg-blue-50 text-blue-700 px-3 py-1 rounded-full">
+          <i class="fas fa-clock mr-1"></i>
+          <span id="live-time">00:00:00</span>
+        </div>
+
+        <a href="{{route('login')}}" class="hidden md:block gradient-bg text-white px-6 py-2 rounded-full font-semibold hover:shadow-lg transition-all duration-300 pulse">
+          <span id="nav-login">Login Now</span>
+        </a>
+        <!-- Mobile Menu Button -->
+        <button id="menu-toggle" class="md:hidden focus:outline-none text-gray-700">
+          <i class="fas fa-bars text-2xl"></i>
         </button>
       </div>
     </div>
+
     <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden bg-white p-4 space-y-4">
-      <a href="#home" class="block text-gray-700">Home</a>
-      <a href="#features" class="block text-gray-700">Features</a>
-      <a href="#contact" class="block text-gray-700">Contact</a>
+    <div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-md p-6 space-y-4 shadow-lg">
+      <a href="#home" class="block text-gray-700 font-medium py-2 border-b border-gray-100 flex items-center space-x-2">
+        <i class="fas fa-home w-5"></i>
+        <span id="mobile-nav-home">Home</span>
+      </a>
+      <a href="#features" class="block text-gray-700 font-medium py-2 border-b border-gray-100 flex items-center space-x-2">
+        <i class="fas fa-star w-5"></i>
+        <span id="mobile-nav-features">Features</span>
+      </a>
+      <a href="#stats" class="block text-gray-700 font-medium py-2 border-b border-gray-100 flex items-center space-x-2">
+        <i class="fas fa-chart-line w-5"></i>
+        <span id="mobile-nav-stats">Stats</span>
+      </a>
+      <a href="#contact" class="block text-gray-700 font-medium py-2 border-b border-gray-100 flex items-center space-x-2">
+        <i class="fas fa-phone w-5"></i>
+        <span id="mobile-nav-contact">Contact</span>
+      </a>
+      <a href="{{route('login')}}" class="block gradient-bg text-white text-center py-3 rounded-lg font-semibold mt-4">
+        <span id="mobile-nav-login">Login Now</span>
+      </a>
     </div>
   </header>
 
   <!-- Hero Section -->
-  <section id="home" class="h-screen bg-cover bg-center relative" style="background-image: url('{{ asset('assets/images/bg/bg-2.jpeg') }}')">
-    <div class="absolute inset-0 bg-opacity-50"></div>
-    <div class="container mx-auto h-full flex flex-col justify-center items-center text-center relative z-10 text-white pt-40">
-      <h1 class="text-4xl md:text-6xl font-bold mb-6">Karibu ShuleApp</h1>
-      <p class="text-xl md:text-2xl mb-8">Suluhisho lako Bora la Usimamizi wa Elimu</p>
-      <a href="{{route('login')}}" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full text-lg font-semibold transition">Ingia Hapa</a>
+  <section id="home" class="min-h-screen relative overflow-hidden pt-20">
+    <!-- Background Image -->
+    <div class="absolute inset-0 z-0">
+      <img src="{{ asset('assets/images/bg/bg-2.jpeg') }}" alt="School Background" class="w-full h-full object-cover">
+      <div class="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-purple-900/70"></div>
+    </div>
+
+    <div class="container mx-auto px-6 h-full flex flex-col lg:flex-row items-center justify-center relative z-10 pt-24 lg:pt-32">
+      <div class="lg:w-1/2 text-white mb-12 lg:mb-0">
+        {{-- <div class="inline-block bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
+          <span class="text-sm font-semibold"><i class="fas fa-rocket mr-2"></i><span id="hero-tagline">School Management System</span></span>
+        </div> --}}
+
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+          <span id="hero-title-1">Transform </span><span class="text-yellow-300 typing-text" id="hero-title-2">Your School Management</span>
+        </h1>
+
+        <p class="text-xl md:text-2xl mb-8 text-blue-100" id="hero-description">
+          Complete solution to run your school efficiently, accurately and with top-level security.
+        </p>
+
+        <!-- Current Time Display -->
+        <div class="mb-8 p-4 bg-white/10 backdrop-blur-sm rounded-xl inline-block">
+          <div class="flex items-center space-x-4">
+            <div class="text-center">
+              <div class="text-3xl font-bold text-green-300" id="current-hours">00</div>
+              <div class="text-sm text-blue-100" id="time-label-hours">Hours</div>
+            </div>
+            <div class="text-2xl text-white">:</div>
+            <div class="text-center">
+              <div class="text-3xl font-bold text-green-300" id="current-minutes">00</div>
+              <div class="text-sm text-blue-100" id="time-label-minutes">Minutes</div>
+            </div>
+            <div class="text-2xl text-white">:</div>
+            <div class="text-center">
+              <div class="text-3xl font-bold text-green-300" id="current-seconds">00</div>
+              <div class="text-sm text-blue-100" id="time-label-seconds">Seconds</div>
+            </div>
+          </div>
+          <div class="text-center mt-2 text-blue-100 text-sm">
+            <i class="fas fa-clock mr-2"></i><span id="current-time-label">Current Time (EAT)</span>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 mb-10">
+          <a href="{{route('login')}}" class="gradient-bg text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 text-center">
+            <i class="fas fa-sign-in-alt mr-2"></i><span id="hero-button-1">Login now</span>
+          </a>
+          <a href="#features" class="bg-white/20 backdrop-blur-sm text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-white/30 transition-all duration-300 text-center">
+            <i class="fas fa-play-circle mr-2"></i><span id="hero-button-2">View Features</span>
+          </a>
+        </div>
+
+        <div class="flex flex-wrap gap-6 mt-8">
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-300 text-xl mr-2"></i>
+            <span class="text-lg" id="hero-benefit-1">No Setup Costs</span>
+          </div>
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-green-300 text-xl mr-2"></i>
+            <span class="text-lg" id="hero-benefit-2">Free Training</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:w-1/2 flex justify-center">
+        <div class="relative w-full max-w-lg">
+          <div class="absolute -top-6 -left-6 w-24 h-24 bg-yellow-400 rounded-full opacity-20"></div>
+          <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-purple-500 rounded-full opacity-20"></div>
+          <div class="relative bg-white/10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/20">
+            <div class="text-center mb-6">
+              <div class="text-3xl font-bold text-white mb-2" id="stats-title-schools">Schools Using ShuleApp</div>
+              <div class="text-5xl font-bold text-yellow-300" id="live-counter">3</div>
+              <div class="text-white mt-2" id="stats-subtitle-schools">Currently using and growing daily</div>
+            </div>
+
+            <div class="space-y-4">
+              <div class="flex items-center justify-between bg-white/10 p-4 rounded-xl">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-3">
+                    <i class="fas fa-users text-white"></i>
+                  </div>
+                  <div class="text-white">
+                    <div class="font-bold" id="stats-label-students">Students</div>
+                    <div class="text-sm" id="stats-sub-students">Registered</div>
+                  </div>
+                </div>
+                <div class="text-2xl font-bold text-white">1,000+</div>
+              </div>
+
+              <div class="flex items-center justify-between bg-white/10 p-4 rounded-xl">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mr-3">
+                    <i class="fas fa-chalkboard-teacher text-white"></i>
+                  </div>
+                  <div class="text-white">
+                    <div class="font-bold" id="stats-label-teachers">Teachers</div>
+                    <div class="text-sm" id="stats-sub-teachers">Using System</div>
+                  </div>
+                </div>
+                <div class="text-2xl font-bold text-white">50+</div>
+              </div>
+
+              <div class="flex items-center justify-between bg-white/10 p-4 rounded-xl">
+                <div class="flex items-center">
+                  <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center mr-3">
+                    <i class="fas fa-user-friends text-white"></i>
+                  </div>
+                  <div class="text-white">
+                    <div class="font-bold" id="stats-label-parents">Parents</div>
+                    <div class="text-sm" id="stats-sub-parents">Connected</div>
+                  </div>
+                </div>
+                <div class="text-2xl font-bold text-white">1,000+</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wave Divider -->
+    <div class="absolute bottom-0 left-0 right-0">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" class="w-full">
+        <path fill="#ffffff" fill-opacity="1" d="M0,224L48,218.7C96,213,192,203,288,181.3C384,160,480,128,576,138.7C672,149,768,203,864,202.7C960,203,1056,149,1152,138.7C1248,128,1344,160,1392,176L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+      </svg>
     </div>
   </section>
 
   <!-- Features Section -->
-  <section id="features" class="py-20 bg-white">
-    <div class="container mx-auto px-6 text-center">
-      <h2 class="text-3xl md:text-4xl font-bold mb-12 text-gray-800">Huduma Zetu</h2>
-      <div class="grid md:grid-cols-3 gap-12">
+  <section id="features" class="py-20 bg-white relative">
+    <div class="container mx-auto px-6">
+      <div class="text-center mb-16">
+        <div class="inline-block gradient-bg text-white px-6 py-2 rounded-full font-semibold mb-4">
+          <i class="fas fa-crown mr-2"></i><span id="features-tagline">Top Features</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-gray-800" id="features-title">How ShuleApp Helps You?</h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto" id="features-description">We give you all tools you need to run your school efficiently in one integrated system</p>
+      </div>
 
-        <!-- Attendance -->
-        <div class="p-8 shadow-lg rounded-xl hover:scale-105 transition transform bg-gray-50">
-          <div class="text-blue-600 mb-4">
-            <svg class="mx-auto w-14 h-14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M5 13l4 4L19 7"></path>
-            </svg>
+      <!-- Features Grid -->
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+
+        <!-- Feature 1 -->
+        <div class="feature-card bg-gradient-to-br from-white to-blue-50 p-8 rounded-2xl shadow-lg border border-gray-100 transition-all duration-500">
+          <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center mb-6">
+            <i class="fas fa-users-cog text-white text-2xl"></i>
           </div>
-          <h3 class="text-2xl font-semibold mb-2">Mahudhurio ya Wanafunzi</h3>
-          <p class="text-gray-600">Fuatilia mahudhurio ya kila mwanafunzi kwa haraka, kwa usahihi wa hali ya juu kila siku.</p>
+          <h3 class="text-2xl font-bold mb-4 text-gray-800" id="feature-1-title">User Management</h3>
+          <p class="text-gray-600 mb-6" id="feature-1-desc">Manage all stakeholders: teachers, students, parents, drivers, staff and administrators in one dashboard.</p>
+          <ul class="space-y-2">
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              <span id="feature-1-point-1">User registration and access</span>
+            </li>
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              <span id="feature-1-point-2">Different roles and permissions</span>
+            </li>
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              <span id="feature-1-point-3">Contact information</span>
+            </li>
+          </ul>
         </div>
 
-        <!-- Matokeo -->
-        <div class="p-8 shadow-lg rounded-xl hover:scale-105 transition transform bg-gray-50">
-          <div class="text-green-600 mb-4">
-            <svg class="mx-auto w-14 h-14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M9 17v-2a4 4 0 014-4h6"></path>
-              <path d="M13 7h6"></path>
-            </svg>
+        <!-- Feature 2 -->
+        <div class="feature-card bg-gradient-to-br from-white to-green-50 p-8 rounded-2xl shadow-lg border border-gray-100 transition-all duration-500">
+          <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-teal-500 rounded-xl flex items-center justify-center mb-6">
+            <i class="fas fa-graduation-cap text-white text-2xl"></i>
           </div>
-          <h3 class="text-2xl font-semibold mb-2">Matokeo ya Mitihani</h3>
-          <p class="text-gray-600">Rekodi, changanua na sambaza matokeo ya wanafunzi kwa urahisi bila usumbufu.</p>
+          <h3 class="text-2xl font-bold mb-4 text-gray-800" id="feature-2-title">Academic Management</h3>
+          <p class="text-gray-600 mb-6" id="feature-2-desc">Manage classes, subjects, exams, results and holiday packages easily and accurately.</p>
+          <ul class="space-y-2">
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              <span id="feature-2-point-1">Class and subject setup</span>
+            </li>
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              <span id="feature-2-point-2">Exam results and analysis</span>
+            </li>
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              <span id="feature-2-point-3">Holiday Packages</span>
+            </li>
+          </ul>
         </div>
 
-        <!-- Records -->
-        <div class="p-8 shadow-lg rounded-xl hover:scale-105 transition transform bg-gray-50">
-          <div class="text-purple-600 mb-4">
-            <svg class="mx-auto w-14 h-14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M4 4h16v16H4z"></path>
-              <path d="M8 2v4"></path>
-            </svg>
+        <!-- Feature 3 -->
+        <div class="feature-card bg-gradient-to-br from-white to-yellow-50 p-8 rounded-2xl shadow-lg border border-gray-100 transition-all duration-500">
+          <div class="w-16 h-16 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center mb-6">
+            <i class="fas fa-clipboard-check text-white text-2xl"></i>
           </div>
-          <h3 class="text-2xl font-semibold mb-2">Usimamizi wa Taarifa</h3>
-          <p class="text-gray-600">Hifadhi taarifa muhimu za shule kama kumbukumbu za wanafunzi, walimu na wazazi kwa usalama wa hali ya juu.</p>
+          <h3 class="text-2xl font-bold mb-4 text-gray-800" id="feature-3-title">Attendance Management</h3>
+          <p class="text-gray-600 mb-6" id="feature-3-desc">Track student attendance, daily reports and teacher duty rosters in real-time.</p>
+          <ul class="space-y-2">
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              <span id="feature-3-point-1">Student and teacher attendance</span>
+            </li>
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              <span id="feature-3-point-2">Daily school reports</span>
+            </li>
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              <span id="feature-3-point-3">Teacher duty rosters</span>
+            </li>
+          </ul>
         </div>
 
-        <!-- Bulk SMS -->
-        <div class="p-8 shadow-lg rounded-xl hover:scale-105 transition transform bg-gray-50">
-          <div class="text-yellow-500 mb-4">
-            <svg class="mx-auto w-14 h-14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
-              <path d="M7 10l5 5 5-5"></path>
-            </svg>
+        <!-- Feature 4 -->
+        <div class="feature-card bg-gradient-to-br from-white to-purple-50 p-8 rounded-2xl shadow-lg border border-gray-100 transition-all duration-500">
+          <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-6">
+            <i class="fas fa-file-contract text-white text-2xl"></i>
           </div>
-          <h3 class="text-2xl font-semibold mb-2">Bulk SMS</h3>
-          <p class="text-gray-600">Tuma ujumbe wa pamoja kwa wazazi kwa sekunde chache tu, bila bughudha.</p>
+          <h3 class="text-2xl font-bold mb-4 text-gray-800" id="feature-4-title">Contract Management</h3>
+          <p class="text-gray-600 mb-6" id="feature-4-desc">Manage employee contracts and keep records for future reference easily.</p>
+          <ul class="space-y-2">
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              <span id="feature-4-point-1">Employee contracts</span>
+            </li>
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              <span id="feature-4-point-2">Historical records</span>
+            </li>
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              <span id="feature-4-point-3">Expiry notifications</span>
+            </li>
+          </ul>
         </div>
 
-        <!-- Security -->
-        <div class="p-8 shadow-lg rounded-xl hover:scale-105 transition transform bg-gray-50">
-          <div class="text-red-500 mb-4">
-            <svg class="mx-auto w-14 h-14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            </svg>
+        <!-- Feature 5 -->
+        <div class="feature-card bg-gradient-to-br from-white to-red-50 p-8 rounded-2xl shadow-lg border border-gray-100 transition-all duration-500">
+          <div class="w-16 h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl flex items-center justify-center mb-6">
+            <i class="fas fa-sms text-white text-2xl"></i>
           </div>
-          <h3 class="text-2xl font-semibold mb-2">Usalama wa Data</h3>
-          <p class="text-gray-600">Data yako inalindwa kwa viwango vya juu vya usalama kuhakikisha faragha na uhakika wa taarifa zako.</p>
+          <h3 class="text-2xl font-bold mb-4 text-gray-800" id="feature-5-title">Bulk SMS Announcements</h3>
+          <p class="text-gray-600 mb-6" id="feature-5-desc">Send announcements to parents, teachers and all staff within one minute with single message.</p>
+          <ul class="space-y-2">
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              <span id="feature-5-point-1">Messages to parents & teachers</span>
+            </li>
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              <span id="feature-5-point-2">Announcements within 1 minute</span>
+            </li>
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              <span id="feature-5-point-3">Emergency alerts</span>
+            </li>
+          </ul>
         </div>
 
-        <!-- Parent Portal -->
-        <div class="p-8 shadow-lg rounded-xl hover:scale-105 transition transform bg-gray-50">
-          <div class="text-indigo-600 mb-4">
-            <svg class="mx-auto w-14 h-14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M16 12a4 4 0 01-8 0m8 0a4 4 0 00-8 0m8 0H8"></path>
-              <path d="M12 14v6"></path>
-              <path d="M8 18h8"></path>
-            </svg>
+        <!-- Feature 6 -->
+        <div class="feature-card bg-gradient-to-br from-white to-indigo-50 p-8 rounded-2xl shadow-lg border border-gray-100 transition-all duration-500">
+          <div class="w-16 h-16 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-xl flex items-center justify-center mb-6">
+            <i class="fas fa-money-bill-wave text-white text-2xl"></i>
           </div>
-          <h3 class="text-2xl font-semibold mb-2">Portal ya Wazazi</h3>
-          <p class="text-gray-600">Wazazi hupata taarifa za mahudhurio, matokeo, na matukio moja kwa moja kwa urahisi mtandaoni.</p>
+          <h3 class="text-2xl font-bold mb-4 text-gray-800" id="feature-6-title">Financial Management</h3>
+          <p class="text-gray-600 mb-6" id="feature-6-desc">Track daily expenses, school fee payments and invoices easily with comprehensive reports.</p>
+          <ul class="space-y-2">
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              <span id="feature-6-point-1">Daily expense tracking</span>
+            </li>
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              <span id="feature-6-point-2">School fee payments</span>
+            </li>
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              <span id="feature-6-point-3">Invoice tracking</span>
+            </li>
+          </ul>
         </div>
 
+      </div>
+
+      <!-- Call to Action -->
+      <div class="gradient-bg rounded-3xl p-10 text-center text-white shadow-2xl mt-12">
+        <h3 class="text-3xl font-bold mb-6" id="cta-title">Ready to Transform Your School?</h3>
+        <p class="text-xl mb-8 max-w-2xl mx-auto" id="cta-description">Be among the first schools to use ShuleApp and simplify your daily management</p>
+        <a href="{{route('login')}}" class="inline-block bg-white text-blue-700 px-10 py-4 rounded-full text-xl font-bold hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+          <i class="fas fa-play mr-3"></i><span id="cta-button">Start Free Trial</span>
+        </a>
+        <p class="mt-6 text-blue-100"><i class="fas fa-clock mr-2"></i><span id="cta-note">Registration takes few minutes</span></p>
       </div>
     </div>
   </section>
 
-  <!-- Testimonials Section -->
+  <!-- Stats Section -->
+  <section id="stats" class="py-20 bg-gradient-to-br from-gray-900 to-blue-900 text-white">
+    <div class="container mx-auto px-6 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold mb-16" id="stats-title">ShuleApp Growth Statistics</h2>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+
+        <div class="counter-box p-8 rounded-2xl">
+          <div class="text-5xl font-bold mb-4 text-blue-600" id="stat1">3</div>
+          <div class="text-xl font-semibold mb-2" id="stats-label-1">School</div>
+          <p class="text-gray-600" id="stats-desc-1">Currently using our system</p>
+          <div class="mt-4">
+            <i class="fas fa-school text-3xl text-blue-500"></i>
+          </div>
+        </div>
+
+        <div class="counter-box p-8 rounded-2xl">
+          <div class="text-5xl font-bold mb-4 text-green-600">1,000+</div>
+          <div class="text-xl font-semibold mb-2" id="stats-label-2">Students</div>
+          <p class="text-gray-600" id="stats-desc-2">Registered in system</p>
+          <div class="mt-4">
+            <i class="fas fa-user-graduate text-3xl text-green-500"></i>
+          </div>
+        </div>
+
+        <div class="counter-box p-8 rounded-2xl">
+          <div class="text-5xl font-bold mb-4 text-purple-600">50+</div>
+          <div class="text-xl font-semibold mb-2" id="stats-label-3">Teachers</div>
+          <p class="text-gray-600" id="stats-desc-3">Using the platform</p>
+          <div class="mt-4">
+            <i class="fas fa-chalkboard-teacher text-3xl text-purple-500"></i>
+          </div>
+        </div>
+
+        <div class="counter-box p-8 rounded-2xl">
+          <div class="text-5xl font-bold mb-4 text-red-600">1,000+</div>
+          <div class="text-xl font-semibold mb-2" id="stats-label-4">Parents</div>
+          <p class="text-gray-600" id="stats-desc-4">Connected to portal</p>
+          <div class="mt-4">
+            <i class="fas fa-user-friends text-3xl text-red-500"></i>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 max-w-4xl mx-auto">
+        <h3 class="text-2xl font-bold mb-6" id="why-title">Why Choose ShuleApp?</h3>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="p-6 bg-white/5 rounded-xl">
+            <i class="fas fa-bolt text-3xl text-yellow-400 mb-4"></i>
+            <h4 class="font-bold text-xl mb-2" id="why-1-title">Fast & Easy</h4>
+            <p class="text-blue-100" id="why-1-desc">Start using within few hours</p>
+          </div>
+          <div class="p-6 bg-white/5 rounded-xl">
+            <i class="fas fa-shield-alt text-3xl text-green-400 mb-4"></i>
+            <h4 class="font-bold text-xl mb-2" id="why-2-title">100% Secure</h4>
+            <p class="text-blue-100" id="why-2-desc">Your data stored with highest standards</p>
+          </div>
+          <div class="p-6 bg-white/5 rounded-xl">
+            <i class="fas fa-headset text-3xl text-purple-400 mb-4"></i>
+            <h4 class="font-bold text-xl mb-2" id="why-3-title">24/7 Support</h4>
+            <p class="text-blue-100" id="why-3-desc">Our team ready to help anytime</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- Contact Section -->
-  <section id="contact" class="py-20 bg-gray-100">
-    <div class="container mx-auto px-6 text-center">
-      <h2 class="text-3xl font-bold mb-12 text-gray-800">Wasiliana Nasi</h2>
-      <p>Kwa Msaada: <a href="tel:+255678669000">0678 669 000</a></p>
-      <form class="max-w-2xl mx-auto space-y-6 needs-validation" novalidate action="{{route('send.feedback.message') . ('#contact')}}" method="POST">
-        @csrf
-        <input type="text" name="name" placeholder="Jina lako" value="{{old('name')}}" class="w-full border border-gray-300 p-4 rounded-lg">
-        @error('name')
-            <span class="" style="color: red;">{{$message}}</span>
-        @enderror
-        <input type="text" name="phone" placeholder="Namba ya simu" value="{{old('phone')}}" class="w-full border border-gray-300 p-4 rounded-lg">
-        @error('phone')
-            <span class="" style="color: red;">{{$message}}</span>
-        @enderror
-        <textarea placeholder="Ujumbe wako" name="message" class="w-full border border-gray-300 p-4 rounded-lg" rows="5" required>{{old('message')}}</textarea>
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-full transition" id="saveButton">Tuma Ujumbe</button>
-      </form>
+  <section id="contact" class="py-20 bg-gradient-to-b from-white to-blue-50">
+    <div class="container mx-auto px-6">
+      <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-16">
+          <div class="inline-block gradient-bg text-white px-6 py-2 rounded-full font-semibold mb-4">
+            <i class="fas fa-comments mr-2"></i><span id="contact-tagline">Contact Us</span>
+          </div>
+          <h2 class="text-3xl md:text-4xl font-bold mb-6 text-gray-800" id="contact-title">Get In Touch</h2>
+          <p class="text-xl text-gray-600" id="contact-description">We're happy to listen and answer any questions you have</p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-12">
+          <div class="bg-white rounded-3xl shadow-2xl p-10">
+            <h3 class="text-2xl font-bold mb-8 text-gray-800" id="form-title">Send Your Message</h3>
+            <form class="space-y-6 needs-validation" novalidate action="{{route('send.feedback.message') . ('#contact')}}" method="POST" id="contactForm">
+              @csrf
+              <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-gray-700 mb-2 font-medium" id="form-label-name">Full Name</label>
+                  <input type="text" name="name" placeholder="Your name" value="{{old('name')}}" class="w-full border border-gray-300 p-4 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                  @error('name')
+                    <span class="text-red-500 text-sm mt-1">{{$message}}</span>
+                  @enderror
+                </div>
+
+                <div>
+                  <label class="block text-gray-700 mb-2 font-medium" id="form-label-phone">Phone Number</label>
+                  <input type="text" name="phone" placeholder="Phone number" value="{{old('phone')}}" class="w-full border border-gray-300 p-4 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                  @error('phone')
+                    <span class="text-red-500 text-sm mt-1">{{$message}}</span>
+                  @enderror
+                </div>
+              </div>
+              <div>
+                <label class="block text-gray-700 mb-2 font-medium" id="form-label-message">Your Message</label>
+                <textarea placeholder="Write your message here..." name="message" class="w-full border border-gray-300 p-4 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" rows="5" required>{{old('message')}}</textarea>
+                @error('message')
+                  <span class="text-red-500 text-sm mt-1">{{$message}}</span>
+                @enderror
+              </div>
+
+              <button type="submit" class="gradient-bg w-full text-white py-4 rounded-xl text-lg font-semibold hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" id="saveButton">
+                <i class="fas fa-paper-plane mr-3"></i><span id="form-button">Send Message</span>
+              </button>
+            </form>
+          </div>
+
+          <div class="space-y-8">
+            <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-10 text-white shadow-2xl">
+              <h3 class="text-2xl font-bold mb-6" id="contact-info-title">Quick Contacts</h3>
+              <div class="space-y-6">
+                <div class="flex items-start">
+                  <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-phone text-xl"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-lg" id="contact-phone-label">Support Phone</h4>
+                    <a href="tel:+255678669000" class="text-2xl font-bold hover:text-yellow-300 transition">+255 678 669 000</a>
+                    <p class="text-blue-100 mt-1" id="contact-phone-note">Monday - Sunday, 24 Hours</p>
+                  </div>
+                </div>
+
+                <div class="flex items-start">
+                  <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-envelope text-xl"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-lg" id="contact-email-label">Email Address</h4>
+                    <a href="mailto:support@shuleapp.co.tz" class="text-xl hover:text-yellow-300 transition">pianop477@gmail.com</a>
+                    <p class="text-blue-100 mt-1" id="contact-email-note">We reply within 24 hours</p>
+                  </div>
+                </div>
+
+                <div class="flex items-start">
+                  <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                    <i class="fas fa-map-marker-alt text-xl"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-lg" id="contact-location-label">Location</h4>
+                    <p class="text-xl">Kikuyu, Dodoma</p>
+                    <p class="text-blue-100 mt-1" id="contact-location-note">Tanzania</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-xl p-8">
+              <h3 class="text-2xl font-bold mb-6 text-gray-800" id="faq-title">Frequently Asked Questions</h3>
+              <div class="space-y-4">
+                <div class="border-l-4 border-blue-500 pl-4 py-2">
+                  <h4 class="font-bold text-gray-800" id="faq-1-q">Can I try before paying?</h4>
+                  <p class="text-gray-600 mt-1" id="faq-1-a">Yes! We offer 30-day free trial with no charges.</p>
+                </div>
+
+                <div class="border-l-4 border-green-500 pl-4 py-2">
+                  <h4 class="font-bold text-gray-800" id="faq-2-q">Does system work online only?</h4>
+                  <p class="text-gray-600 mt-1" id="faq-2-a">Yes We offer online service options based on our system needs.</p>
+                </div>
+
+                <div class="border-l-4 border-purple-500 pl-4 py-2">
+                  <h4 class="font-bold text-gray-800" id="faq-3-q">There is internal training once I join with ShuleApp</h4>
+                  <p class="text-gray-600 mt-1" id="faq-3-a">Yes, The team will provide internal training as much as you will be satisfied</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="bg-gray-800 text-gray-400 py-8 text-center">
+  <footer class="bg-gray-900 text-white py-12">
+    <div class="container mx-auto px-6">
+      <div class="grid md:grid-cols-4 gap-10 mb-10">
+        <div>
+          <div class="flex items-center space-x-3 mb-6">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden">
+              <img src="{{ asset('storage/logo/logo.png') }}" alt="ShuleApp Logo" class="w-full h-full object-contain">
+            </div>
+            <div>
+              <div class="text-2xl font-bold">ShuleApp</div>
+              {{-- <div class="text-sm text-gray-400" id="footer-tagline">Complete School Management</div> --}}
+            </div>
+          </div>
+          <p class="text-gray-400" id="footer-description">We help schools have better management, accuracy and modern system at affordable cost.</p>
+        </div>
+
+        <div>
+          <h4 class="text-xl font-bold mb-6" id="footer-links-title">Important Links</h4>
+          <ul class="space-y-3">
+            <li><a href="{{route('welcome')}}" class="text-gray-400 hover:text-white transition" id="footer-link-home">Home</a></li>
+            <li><a href="#features" class="text-gray-400 hover:text-white transition" id="footer-link-features">Features</a></li>
+            <li><a href="#contact" class="text-gray-400 hover:text-white transition" id="footer-link-contact">Contact Us</a></li>
+            <li><a href="{{route('login')}}" class="text-gray-400 hover:text-white transition" id="footer-link-login">Login</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-xl font-bold mb-6" id="footer-services-title">Our Services</h4>
+          <ul class="space-y-3">
+            <li class="text-gray-400" id="footer-service-1">Academic Management</li>
+            <li class="text-gray-400" id="footer-service-2">Financial Management</li>
+            <li class="text-gray-400" id="footer-service-3">SMS Messaging</li>
+            <li class="text-gray-400" id="footer-service-4">Parent Portal</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-xl font-bold mb-6" id="footer-follow-title">Follow Us</h4>
+          <div class="flex space-x-4 mb-6">
+            <a href="#" class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-400 transition">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="#" class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center hover:bg-pink-600 transition">
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a href="#" class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-700 transition">
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+          </div>
+          <p class="text-gray-400" id="footer-whatsapp-text">Join our WhatsApp</p>
+          <a href="https://wa.me/255678669000" class="inline-flex items-center text-green-400 hover:text-green-300 mt-2">
+            <i class="fab fa-whatsapp text-2xl mr-3"></i>
+            <span>+255 678 669 000</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-800 pt-8 text-center">
         @php
-            $startYear = 2025;
-            $currentYear = date('Y');
+          $startYear = 2025;
+          $currentYear = date('Y');
         @endphp
-    <p>©{{ $startYear == $currentYear ? $startYear : $startYear . ' - ' . $currentYear }} ShuleApp. Haki Zote Zimehifadhiwa.</p>
+        <p class="text-gray-400">©{{ $startYear == $currentYear ? $startYear : $startYear . ' - ' . $currentYear }} ShuleApp. All Rights Reserved. | <a href="#" class="hover:text-white transition" id="footer-privacy">Privacy Policy</a> | <a href="#" class="hover:text-white transition" id="footer-terms">Terms of Use</a></p>
+      </div>
+    </div>
   </footer>
 
   @include('sweetalert::alert')
   <script>
+    // Language translations
+    const translations = {
+      en: {
+        // Navigation
+        'nav-home': 'Home',
+        'nav-features': 'Features',
+        'nav-stats': 'Stats',
+        'nav-contact': 'Contact',
+        'nav-login': 'Login Now',
+        'mobile-nav-home': 'Home',
+        'mobile-nav-features': 'Features',
+        'mobile-nav-stats': 'Stats',
+        'mobile-nav-contact': 'Contact',
+        'mobile-nav-login': 'Login Now',
+
+        // Hero Section
+        // 'hero-tagline': '#School Management System',
+        'hero-title-1': 'Transform ',
+        'hero-title-2': 'Your School Management',
+        'hero-description': 'Complete solution to run your school efficiently, accurately and with top-level security.',
+        'time-label-hours': 'Hours',
+        'time-label-minutes': 'Minutes',
+        'time-label-seconds': 'Seconds',
+        'current-time-label': 'Current Time (EAT)',
+        'hero-button-1': 'Login Now',
+        'hero-button-2': 'View Features',
+        'hero-benefit-1': 'No Setup Costs',
+        'hero-benefit-2': 'Free Training',
+
+        // Stats Cards
+        'stats-title-schools': 'Schools Using ShuleApp',
+        'stats-subtitle-schools': 'Currently using and growing daily',
+        'stats-label-students': 'Students',
+        'stats-sub-students': 'Registered',
+        'stats-label-teachers': 'Teachers',
+        'stats-sub-teachers': 'Using System',
+        'stats-label-parents': 'Parents',
+        'stats-sub-parents': 'Connected',
+
+        // Features Section
+        'features-tagline': 'Top Features',
+        'features-title': 'How ShuleApp Helps You?',
+        'features-description': 'We give you all tools you need to run your school efficiently in one integrated system',
+
+        // Feature 1
+        'feature-1-title': 'User Management',
+        'feature-1-desc': 'Manage all stakeholders: teachers, students, parents, drivers, staff and administrators in one dashboard.',
+        'feature-1-point-1': 'User registration and access',
+        'feature-1-point-2': 'Different roles and permissions',
+        'feature-1-point-3': 'Contact information',
+
+        // Feature 2
+        'feature-2-title': 'Academic Management',
+        'feature-2-desc': 'Manage classes, subjects, exams, results and holiday packages easily and accurately.',
+        'feature-2-point-1': 'Class and subject setup',
+        'feature-2-point-2': 'Exam results and analysis',
+        'feature-2-point-3': 'Holiday Packages',
+
+        // Feature 3
+        'feature-3-title': 'Attendance Management',
+        'feature-3-desc': 'Track student attendance, daily reports and teacher duty rosters in real-time.',
+        'feature-3-point-1': 'Student and teacher attendance',
+        'feature-3-point-2': 'Daily school reports',
+        'feature-3-point-3': 'Teacher duty rosters',
+
+        // Feature 4
+        'feature-4-title': 'Contract Management',
+        'feature-4-desc': 'Manage employee contracts and keep records for future reference easily.',
+        'feature-4-point-1': 'Employee contracts',
+        'feature-4-point-2': 'Historical records',
+        'feature-4-point-3': 'Expiry notifications',
+
+        // Feature 5
+        'feature-5-title': 'Bulk SMS Announcements',
+        'feature-5-desc': 'Send announcements to parents, teachers and all staff within one minute with single message.',
+        'feature-5-point-1': 'Messages to parents & teachers',
+        'feature-5-point-2': 'Announcements within 1 minute',
+        'feature-5-point-3': 'Emergency alerts',
+
+        // Feature 6
+        'feature-6-title': 'Financial Management',
+        'feature-6-desc': 'Track daily expenses, school fee payments and invoices easily with comprehensive reports.',
+        'feature-6-point-1': 'Daily expense tracking',
+        'feature-6-point-2': 'School fee payments',
+        'feature-6-point-3': 'Invoice tracking',
+
+        // CTA
+        'cta-title': 'Ready to Transform Your School?',
+        'cta-description': 'Be among the first schools to use ShuleApp and simplify your daily management',
+        'cta-button': 'Start Free Trial',
+        'cta-note': 'Registration takes few minutes',
+
+        // Stats Section
+        'stats-title': 'ShuleApp Growth Statistics',
+        'stats-label-1': 'School',
+        'stats-desc-1': 'Currently using our system',
+        'stats-label-2': 'Students',
+        'stats-desc-2': 'Registered in system',
+        'stats-label-3': 'Teachers',
+        'stats-desc-3': 'Using the platform',
+        'stats-label-4': 'Parents',
+        'stats-desc-4': 'Connected to portal',
+        'why-title': 'Why Choose ShuleApp?',
+        'why-1-title': 'Fast & Easy',
+        'why-1-desc': 'Start using within few hours',
+        'why-2-title': '100% Secure',
+        'why-2-desc': 'Your data stored with highest standards',
+        'why-3-title': '24/7 Support',
+        'why-3-desc': 'Our team ready to help anytime',
+
+        // Contact Section
+        'contact-tagline': 'Contact Us',
+        'contact-title': 'Get In Touch',
+        'contact-description': "We're happy to listen and answer any questions you have",
+        'form-title': 'Send Your Message',
+        'form-label-name': 'Full Name',
+        'form-label-phone': 'Phone Number',
+        'form-label-email': 'Email Address',
+        'form-label-message': 'Your Message',
+        'form-button': 'Send Message',
+        'contact-info-title': 'Quick Contacts',
+        'contact-phone-label': 'Support Phone',
+        'contact-phone-note': 'Monday - Sunday, 24 Hours',
+        'contact-email-label': 'Email Address',
+        'contact-email-note': 'We reply within 24 hours',
+        'contact-location-label': 'Our Offices',
+        'contact-location-note': 'P.O. Box 12345, Posta',
+        'faq-title': 'Frequently Asked Questions',
+        'faq-1-q': 'Can I try before paying?',
+        'faq-1-a': 'Yes! We offer 30-day free trial with no charges.',
+        'faq-2-q': 'Does system work online only?',
+        'faq-2-a': 'Yes We offer online service options based on our system needs.',
+        'faq-3-q': 'There is internal training once I join with ShuleApp',
+        'faq-3-a': 'Yes, The team will provide internal training as much as you will be satisfied',
+
+        // Footer
+        // 'footer-tagline': 'Complete School Management',
+        'footer-description': 'We help schools have better management, accuracy and modern system at affordable cost.',
+        'footer-links-title': 'Important Links',
+        'footer-link-home': 'Home',
+        'footer-link-features': 'Features',
+        'footer-link-contact': 'Contact Us',
+        'footer-link-login': 'Login',
+        'footer-services-title': 'Our Services',
+        'footer-service-1': 'Academic Management',
+        'footer-service-2': 'Financial Management',
+        'footer-service-3': 'SMS Messaging',
+        'footer-service-4': 'Parent Portal',
+        'footer-follow-title': 'Follow Us',
+        'footer-whatsapp-text': 'Join our WhatsApp profile',
+        'footer-privacy': 'Privacy Policy',
+        'footer-terms': 'Terms of Use'
+      },
+      sw: {
+        // Navigation
+        'nav-home': 'Nyumbani',
+        'nav-features': 'Vipengele',
+        'nav-stats': 'Takwimu',
+        'nav-contact': 'Wasiliana',
+        'nav-login': 'Ingia Sasa',
+        'mobile-nav-home': 'Nyumbani',
+        'mobile-nav-features': 'Vipengele',
+        'mobile-nav-stats': 'Takwimu',
+        'mobile-nav-contact': 'Wasiliana',
+        'mobile-nav-login': 'Ingia Sasa',
+
+        // Hero Section
+        // 'hero-tagline': 'Mfumo wa Kwanza wa Usimamizi wa Shule Tanzania',
+        'hero-title-1': 'Badilisha ',
+        'hero-title-2': 'Usimamizi wa Shule Yako',
+        'hero-description': 'Suluhisho kamili la kuendesha shule yako kwa ufanisi, usahihi na usalama wa hali ya juu.',
+        'time-label-hours': 'Masaa',
+        'time-label-minutes': 'Dakika',
+        'time-label-seconds': 'Sekunde',
+        'current-time-label': 'Sasa Hivi (EAT)',
+        'hero-button-1': 'Anza Kuitumia Sasa',
+        'hero-button-2': 'Ona Vipengele',
+        'hero-benefit-1': 'Hakuna Gharama za Uanzishaji',
+        'hero-benefit-2': 'Mafunzo ya Bure',
+
+        // Stats Cards
+        'stats-title-schools': 'Shule Zinazotumia ShuleApp',
+        'stats-subtitle-schools': 'Zinatumia sasa na zinakua kila siku',
+        'stats-label-students': 'Wanafunzi',
+        'stats-sub-students': 'Waliosajiliwa',
+        'stats-label-teachers': 'Walimu',
+        'stats-sub-teachers': 'Wanatumia Mfumo',
+        'stats-label-parents': 'Wazazi',
+        'stats-sub-parents': 'Wameunganishwa',
+
+        // Features Section
+        'features-tagline': 'Vipengele Bora',
+        'features-title': 'ShuleApp Inakusaidia Kwa Nini?',
+        'features-description': 'Tunakupa zana zote unazohitaji kuendesha shule yako kwa ufanisi kwenye mfumo mmoja uliounganishwa',
+
+        // Feature 1
+        'feature-1-title': 'Usimamizi wa Watumiaji',
+        'feature-1-desc': 'Fuatilia: walimu, wanafunzi, wazazi, dereva, wafanyakasi na watendaji katika eneo moja la usimamizi.',
+        'feature-1-point-1': 'Usajili na ufikiaji wa watumiaji',
+        'feature-1-point-2': 'Majukumu na ruhusa tofauti',
+        'feature-1-point-3': 'Taarifa za mawasiliano',
+
+        // Feature 2
+        'feature-2-title': 'Usimamizi wa Masomo',
+        'feature-2-desc': 'Fuatilia madarasa, masomo, mitihani, matokeo kwa urahisi na usahihi.',
+        'feature-2-point-1': 'Usanidi wa madarasa na masomo',
+        'feature-2-point-2': 'Matokeo ya mitihani na uchambuzi',
+        'feature-2-point-3': 'Ratiba za likizo na vipindi',
+
+        // Feature 3
+        'feature-3-title': 'Usimamizi wa Mahudhurio',
+        'feature-3-desc': 'Fuatilia mahudhurio ya wanafunzi, ripoti za kila siku na ratiba za majukumu ya walimu kwa wakati halisi.',
+        'feature-3-point-1': 'Mahudhurio ya wanafunzi na walimu',
+        'feature-3-point-2': 'Ripoti za shule za kila siku',
+        'feature-3-point-3': 'Ratiba za majukumu ya walimu',
+
+        // Feature 4
+        'feature-4-title': 'Usimamizi wa Mikataba',
+        'feature-4-desc': 'Dhibiti Mikataba ya wafanyakazi wako na uhifadhi kumbukumbu kwa marejeleo ya baadaye kwa urahisi.',
+        'feature-4-point-1': 'Mitakaba yaa wafanyakazi',
+        'feature-4-point-2': 'Kumbukumbu za kihistoria',
+        'feature-4-point-3': 'Taarifa za kuisha kwa muda wa Mkataba',
+
+        // Feature 5
+        'feature-5-title': 'Tangazo kwa SMS',
+        'feature-5-desc': 'Tuma tangazo kwa wazazi, walimu na wafanyakazi wote ndani ya dakika moja kwa ujumbe mmoja.',
+        'feature-5-point-1': 'Ujumbe kwa wazazi na walimu',
+        'feature-5-point-2': 'Tangazo ndani ya dakika moja',
+        'feature-5-point-3': 'Ujumbe wa dharura',
+
+        // Feature 6
+        'feature-6-title': 'Usimamizi wa Fedha',
+        'feature-6-desc': 'Fuatilia matumizi ya kila siku, malipo ya ada ya shule na ankara kwa urahisi na ripoti kamili.',
+        'feature-6-point-1': 'Matumizi ya kila siku',
+        'feature-6-point-2': 'Malipo ya ada ya shule',
+        'feature-6-point-3': 'Ufuatiliaji wa ankara',
+
+        // CTA
+        'cta-title': 'Tayari Kubadilisha Shule Yako?',
+        'cta-description': 'Jiunge na shule za kwanza kutumia ShuleApp na rahisisha usimamizi wako wa kila siku',
+        'cta-button': 'Anza Bila Malipo',
+        'cta-note': 'Usajili huchukua dakika 5 tu',
+
+        // Stats Section
+        'stats-title': 'Takwimu za Ukuaji wa ShuleApp',
+        'stats-label-1': 'Shule',
+        'stats-desc-1': 'Inatumia mfumo wetu sasa',
+        'stats-label-2': 'Wanafunzi',
+        'stats-desc-2': 'Waliyosajiliwa kwenye mfumo',
+        'stats-label-3': 'Walimu',
+        'stats-desc-3': 'Wanatumia mfumo',
+        'stats-label-4': 'Wazazi',
+        'stats-desc-4': 'Wameunganishwa kwenye portal',
+        'why-title': 'Kwa Nini Kuchagua ShuleApp?',
+        'why-1-title': 'Haraka na Rahisi',
+        'why-1-desc': 'Anza kuitumia ndani ya masaa machache tu',
+        'why-2-title': 'Salama Kabisa',
+        'why-2-desc': 'Data yako imehifadhiwa kwa viwango vya juu',
+        'why-3-title': 'Msaada 24/7',
+        'why-3-desc': 'Timu yetu iko tayari kukusaidia kila wakati',
+
+        // Contact Section
+        'contact-tagline': 'Wasiliana Nasi',
+        'contact-title': 'Tuongee',
+        'contact-description': 'Tuna furaha kukusikiliza na kukujibu maswali yako yoyote',
+        'form-title': 'Tuma Ujumbe Wako',
+        'form-label-name': 'Jina Kamili',
+        'form-label-phone': 'Namba ya Simu',
+        'form-label-email': 'Barua Pepe',
+        'form-label-message': 'Ujumbe Wako',
+        'form-button': 'Tuma Ujumbe',
+        'contact-info-title': 'Mawasiliano ya Haraka',
+        'contact-phone-label': 'Simu ya Msaada',
+        'contact-phone-note': 'Juma moja, Masaa 24',
+        'contact-email-label': 'Barua Pepe',
+        'contact-email-note': 'Tunajibu ndani ya masaa 24',
+        'contact-location-label': 'Ofisi Zetu',
+        'contact-location-note': 'S.L.P 12345, Posta',
+        'faq-title': 'Maswali Yanayoulizwa Mara Kwa Mara',
+        'faq-1-q': 'Je, naweza kujaribu kabla ya kulipia?',
+        'faq-1-a': 'Ndio! Tunatoa kipindi cha majaribio cha siku 30 bila malipo.',
+        'faq-2-q': 'Mfumo unafanya kazi mtandaoni tu?',
+        'faq-2-a': 'Tunatoa chaguo la mtandaoni pekee hii ni kulingana na mahitaji ya kimfumo.',
+        'faq-3-q': 'Je, mnatoa mafunzo kwa watumiaji wapya wanapojiunga?',
+        'faq-3-a': 'Ndio, timu ipo tayari kutoa mafunzo kwa watumiaji wapya.',
+
+        // Footer
+        'footer-tagline': 'Usimamizi Kamili wa Shule',
+        'footer-description': 'Tunasaidia shule kuwa na usimamizi bora, usahihi na wa kisasa kwa gharama nafuu.',
+        'footer-links-title': 'Viungo Muhimu',
+        'footer-link-home': 'Nyumbani',
+        'footer-link-features': 'Vipengele',
+        'footer-link-contact': 'Wasiliana Nasi',
+        'footer-link-login': 'Ingia',
+        'footer-services-title': 'Huduma Zetu',
+        'footer-service-1': 'Usimamizi wa Masomo',
+        'footer-service-2': 'Usimamizi wa Fedha',
+        'footer-service-3': 'Ujumbe wa SMS',
+        'footer-service-4': 'Portal ya Wazazi',
+        'footer-follow-title': 'Tufuate',
+        'footer-whatsapp-text': 'Jiunge na wasifu wetu wa WhatsApp',
+        'footer-privacy': 'Sera ya Faragha',
+        'footer-terms': 'Masharti ya Matumizi'
+      }
+    };
+
+    // Current language
+    let currentLang = 'en';
+
+    // Function to change language
+    function changeLanguage(lang) {
+      currentLang = lang;
+      document.getElementById('language-selector').value = lang;
+
+      // Update all text elements
+      Object.keys(translations[lang]).forEach(key => {
+        const element = document.getElementById(key);
+        if (element) {
+          element.textContent = translations[lang][key];
+        }
+      });
+
+      // Save to localStorage
+      localStorage.setItem('shuleapp_lang', lang);
+
+      // Update typing animation
+      const typingElement = document.querySelector('.typing-text');
+      if (typingElement && typingElement.id === 'hero-title-2') {
+        typingElement.style.animation = 'none';
+        setTimeout(() => {
+          typingElement.style.animation = 'typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite';
+        }, 10);
+      }
+    }
+
     // Mobile menu toggle
     document.getElementById('menu-toggle').addEventListener('click', function() {
       document.getElementById('mobile-menu').classList.toggle('hidden');
+    });
+
+    // Close mobile menu when clicking a link
+    document.querySelectorAll('#mobile-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('mobile-menu').classList.add('hidden');
+      });
+    });
+
+    // Live time counter
+    function updateLiveTime() {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+
+      // Update header time
+      document.getElementById('live-time').textContent = `${hours}:${minutes}:${seconds}`;
+
+      // Update current time display
+      document.getElementById('current-hours').textContent = hours;
+      document.getElementById('current-minutes').textContent = minutes;
+      document.getElementById('current-seconds').textContent = seconds;
+    }
+
+    // Initialize live time
+    setInterval(updateLiveTime, 1000);
+    updateLiveTime();
+
+    // Language selector change
+    document.getElementById('language-selector').addEventListener('change', function() {
+      changeLanguage(this.value);
+    });
+
+    // Load saved language
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedLang = localStorage.getItem('shuleapp_lang') || 'en';
+      changeLanguage(savedLang);
+
+      // Animate stats counter
+      function animateCounter(elementId, finalValue, duration = 2000) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+
+        let start = 0;
+        const increment = finalValue / (duration / 16);
+        const timer = setInterval(() => {
+          start += increment;
+          if (start >= finalValue) {
+            element.textContent = finalValue.toLocaleString();
+            clearInterval(timer);
+          } else {
+            element.textContent = Math.floor(start).toLocaleString();
+          }
+        }, 16);
+      }
+
+      // Animate school counter
+      animateCounter('stat1', 3, 1000);
+
+      // Typing animation
+      const typingElement = document.querySelector('.typing-text');
+      if (typingElement) {
+        setTimeout(() => {
+          typingElement.style.animation = 'none';
+          setTimeout(() => {
+            typingElement.style.animation = 'typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite';
+          }, 10);
+        }, 3500);
+      }
     });
 
     // Scroll animations
@@ -182,34 +1116,33 @@
       origin: 'bottom'
     });
 
+    // Form submission handler
     document.addEventListener("DOMContentLoaded", function () {
-        const form = document.querySelector(".needs-validation");
-        const submitButton = document.getElementById("saveButton"); // Tafuta button kwa ID
+      const form = document.getElementById("contactForm");
+      const submitButton = document.getElementById("saveButton");
 
-        if (!form || !submitButton) return; // Kama form au button haipo, acha script isifanye kazi
+      if (!form || !submitButton) return;
 
-        form.addEventListener("submit", function (event) {
-            event.preventDefault(); // Zuia submission ya haraka
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
 
-            // Disable button na badilisha maandishi
-            submitButton.disabled = true;
-            submitButton.innerHTML = `<span class="inline-block w-5 h-5 border-4 border-t-4 border-white rounded-full animate-spin"></span> Please Wait...`;
+        // Validate form
+        if (!form.checkValidity()) {
+          form.classList.add("was-validated");
+          return;
+        }
 
-            // Hakikisha form haina errors kabla ya kutuma
-            if (!form.checkValidity()) {
-                form.classList.add("was-validated");
-                submitButton.disabled = false; // Warudishe button kama kuna errors
-                submitButton.innerHTML = "Tuma Ujumbe";
-                return;
-            }
+        // Disable button and show loading
+        submitButton.disabled = true;
+        const originalText = submitButton.innerHTML;
+        submitButton.innerHTML = `<span class="inline-block w-5 h-5 border-4 border-t-4 border-white rounded-full animate-spin"></span> ${currentLang === 'en' ? 'Sending...' : 'Inatumwa...'}`;
 
-            // Chelewesha submission kidogo ili button ibadilike kwanza
-            setTimeout(() => {
-                form.submit();
-            }, 500);
-        });
+        // Submit the form after delay
+        setTimeout(() => {
+          form.submit();
+        }, 1500);
+      });
     });
   </script>
-
 </body>
 </html>

@@ -156,7 +156,7 @@ class TeachersController extends Controller
             DB::commit();
 
             // notify teacher through sms using Beem API *************************************************
-            $url = "https://shuleapp.tech";
+            $url = "https://shuleapp.tech/home";
 
             $beemSmsService = new BeemSmsService();
             $sourceAddr = $school->sender_id ?? 'shuleApp'; // Get sender ID

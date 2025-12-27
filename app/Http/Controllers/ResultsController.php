@@ -935,7 +935,7 @@ class ResultsController extends Controller
             });
 
             // School URL
-            $url = "https://shuleapp.tech";
+            $url = "https://shuleapp.tech/home";
             $beemSmsService = new BeemSmsService();
 
             // Find total number of students
@@ -1507,7 +1507,7 @@ class ResultsController extends Controller
             }
 
             $totalStudents = $rankings->count();
-            $url = 'https://shuleapp.tech';
+            $url = 'https://shuleapp.tech/home';
             $dateFormat = Carbon::parse($date)->format('d-m-Y');
 
             // find the parent phone number
@@ -2139,7 +2139,7 @@ class ResultsController extends Controller
             $reportDate = Carbon::parse($reports->created_at)->format('d-m-Y');
             $schoolInfo = school::find($schoolId);
             $sender = $schoolInfo->sender_id ?? "SHULE APP";
-            $link = "https://shuleapp.tech";
+            $link = "https://shuleapp.tech/home";
 
             // Build subject results part of the message
             $subjectResultsText = "";
@@ -2691,7 +2691,7 @@ class ResultsController extends Controller
             // STEP 7: Send SMS to parents (updated message format)
             foreach ($parentsPayload as $payload) {
                 $schoolInfo = school::find($schoolId);
-                $link = "https://shuleapp.tech";
+                $link = "https://shuleapp.tech/home";
                 $nextSmsService = new NextSmsService();
                 $sender = $schoolInfo->sender_id ?? "SHULE APP";
                 $parent = Parents::find($payload['parent_id']);
