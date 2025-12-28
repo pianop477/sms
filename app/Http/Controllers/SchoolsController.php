@@ -346,6 +346,36 @@ class SchoolsController extends Controller
             Alert()->toast('This school is not found', 'error');
             return back();
         }
+        //check school status first
+        if ($schools->status == 1) {
+            Alert()->toast('Active school cannot be deleted. Please deactivate the school first.', 'error');
+            return back();
+        }
+
+        $today = Carbon::today();
+        $twoYearsAgo = Carbon::today()->subYears(2);
+
+        if ($schools->service_end_date) {
+
+            // 1. Huduma bado inaendelea
+            if ($schools->service_end_date->gt($today)) {
+                Alert()->toast(
+                    'School with active service period cannot be deleted. Please wait until the service period ends.',
+                    'error'
+                );
+                return back();
+            }
+
+            // 2. Huduma imeisha lakini haijapita miaka 2
+            if ($schools->service_end_date->gt($twoYearsAgo)) {
+                Alert()->toast(
+                    'School with service period ended within the last two years cannot be deleted.',
+                    'error'
+                );
+                return back();
+            }
+        }
+
         $logoPath = storage_path('app/public/logo');
         $existingFile = $logoPath . '/' . $schools->logo;
         if (file_exists($existingFile)) {
