@@ -230,7 +230,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::post('/students/batch-update-stream', [StudentsController::class, 'batchUpdateStream'])->name('students.batchUpdateStream');
 
         // courses and class course management
-        Route::get('View-all', [CoursesController::class, 'index'])->name('courses.index');
+        Route::get('/subjects', [CoursesController::class, 'index'])->name('courses.index');
         Route::get('{id}/Class-courses', [CoursesController::class, 'classCourses'])->name('courses.view.class');
         Route::get('{class}/Class-Teacher', [RolesController::class, 'index'])->name('Class.Teachers');
 
@@ -357,6 +357,8 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('{id}/Edit-class', [ClassesController::class, 'editClass'])->name('Classes.edit');
         Route::put('{id}/Update-class', [ClassesController::class, 'updateClass'])->name('Classes.update');
         Route::delete('{id}/Delete-class', [ClassesController::class, 'deleteClass'])->name('Classes.destroy');
+        Route::put('{id}/Block-class', [ClassesController::class, 'blockClass'])->name('Classes.block');
+        Route::put('{id}/Unblock-class', [ClassesController::class, 'unblockClass'])->name('Classes.unblock');
 
         // roles assignment management
         Route::get('{teacher}/Edit', [RolesController::class, 'edit'])->name('roles.edit');
@@ -374,7 +376,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
 
         // examination management
         Route::post('/Examination-type/Register', [ExamController::class, 'store'])->name('exams.store');
-        Route::get('{exam}/Examination-type/Delete', [ExamController::class, 'destroy'])->name('exams.destroy');
+        Route::delete('{exam}/Examination-type/Delete', [ExamController::class, 'destroy'])->name('exams.destroy');
         Route::put('{exam}/Examination-type/Block', [ExamController::class, 'blockExams'])->name('exams.block');
         Route::put('{exam}/Examination-type/Unblock', [ExamController::class, 'unblockExams'])->name('exams.unblock');
         Route::get('{exam}/Examination-type/Edit', [ExamController::class, 'edit'])->name('exams.type.edit');
@@ -389,6 +391,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('{id}/Delete-course', [CoursesController::class, 'deleteCourse'])->name('courses.delete');
         Route::put('{id}/Block', [CoursesController::class, 'blockCourse'])->name('courses.block');
         Route::put('{id}/Unblock', [CoursesController::class, 'unblockCourse'])->name('courses.unblock');
+        Route::delete('{id}/Delete-class-course', [CoursesController::class, 'deleteClassCourse'])->name('courses.destroy');
         Route::get('{id}/Assign-teacher', [CoursesController::class, 'assign'])->name('courses.assign');
         Route::put('{id}/Assigned-teacher', [CoursesController::class, 'assignedTeacher'])->name('courses.assigned.teacher');
         Route::put('{id}/Block-assigned-class-course', [CoursesController::class, 'blockAssignedCourse'])->name('block.assigned.course');

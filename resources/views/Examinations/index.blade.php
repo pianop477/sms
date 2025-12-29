@@ -177,25 +177,26 @@
                                                 <td>
                                                     <div class="action-buttons">
                                                         @if ($exam->status == 1)
-                                                            <a href="{{route('exams.type.edit', $exam->id)}}" class="btn btn-sm btn-secondary" title="Edit">
-                                                                <i class="ti-pencil"></i>
-                                                            </a>
-                                                            <form action="{{route('exams.block', $exam->id)}}" method="POST">
+                                                            <form action="{{route('exams.block', ['exam' => Hashids::encode($exam->id)])}}" method="POST">
                                                                 @csrf
                                                                 @method('PUT')
                                                                 <button type="submit" class="btn btn-sm btn-warning" title="Block" onclick="return confirm('Are you sure you want to Block {{strtoupper($exam->exam_type)}} Examination test?')">
                                                                     <i class="ti-na"></i>
                                                                 </button>
                                                             </form>
-                                                            <a href="{{route('exams.destroy', $exam->id)}}" class="btn btn-sm btn-danger" title="Delete" onclick="return confirm('Are you sure you want to Delete this Examination test permanently?')">
-                                                                <i class="ti-trash"></i>
-                                                            </a>
                                                         @else
-                                                            <form action="{{route('exams.unblock', $exam->id)}}" method="POST">
+                                                            <form action="{{route('exams.unblock', ['exam' => Hashids::encode($exam->id)])}}" method="POST">
                                                                 @csrf
                                                                 @method('PUT')
                                                                 <button type="submit" class="btn btn-sm btn-success" title="Unblock" onclick="return confirm('Are you sure you want to Unblock {{strtoupper($exam->exam_type)}} Examination test?')">
                                                                     <i class="ti-reload"></i>
+                                                                </button>
+                                                            </form>
+                                                            <form action="{{route('exams.destroy', ['exam' => Hashids::encode($exam->id)])}}" method="POST">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-sm btn-danger" title="Delete" onclick="return confirm('Are you sure you want to Delete this Examination test permanently?')">
+                                                                    <i class="ti-trash"></i>
                                                                 </button>
                                                             </form>
                                                         @endif

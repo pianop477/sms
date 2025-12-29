@@ -27,8 +27,8 @@ class ExamController extends Controller
     public function index()
     {
         $exams = Examination::where('school_id', '=', Auth::user()->school_id)
-                            ->orderBy('exam_type', 'ASC')
-                            ->get();
+            ->orderBy('exam_type', 'ASC')
+            ->get();
         return view('Examinations.index', ['exams' => $exams]);
     }
     /**
@@ -44,17 +44,17 @@ class ExamController extends Controller
         $class_course = class_learning_courses::findOrFail($decoded[0]);
         // return $class_course;
 
-        if($class_course->teacher_id != $loggedTeacher->id) {
+        if ($class_course->teacher_id != $loggedTeacher->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
 
         $savedResults = temporary_results::where('course_id', $class_course->course_id)
-                                        ->where('teacher_id', $class_course->teacher_id)
-                                        ->where('class_id', $class_course->class_id)
-                                        ->where('school_id', $user->school_id)
-                                        ->where('status', 'draft')
-                                        ->get();
+            ->where('teacher_id', $class_course->teacher_id)
+            ->where('class_id', $class_course->class_id)
+            ->where('school_id', $user->school_id)
+            ->where('status', 'draft')
+            ->get();
         // return $savedResults;
         $exams = Examination::where('school_id', Auth::user()->school_id)->where('status', 1)->orderBy('exam_type')->get();
         return view('Examinations.prepare_form', ['exams' => $exams, 'class_course' => $class_course, 'saved_results' => $savedResults]);
@@ -90,10 +90,10 @@ class ExamController extends Controller
 
         // Pata wanafunzi wa darasa husika
         $students = Student::where('class_id', $classId)
-                            ->where('status', 1)
-                            ->where('graduated', 0)
-                            ->orderBy('first_name', 'ASC')
-                            ->get();
+            ->where('status', 1)
+            ->where('graduated', 0)
+            ->orderBy('first_name', 'ASC')
+            ->get();
 
         // Pata majina ya darasa, somo, na mtihani
         $className = Grade::find($classId)->class_code;
@@ -102,10 +102,10 @@ class ExamController extends Controller
 
         // Angalia kama mwalimu huyu bado ana matokeo ya muda kwenye database
         $existingSavedResults = temporary_results::where('course_id', $courseId)
-                                                ->where('teacher_id', $teacherId)
-                                                ->where('class_id', $classId)
-                                                ->where('school_id', $schoolId)
-                                                ->exists();
+            ->where('teacher_id', $teacherId)
+            ->where('class_id', $classId)
+            ->where('school_id', $schoolId)
+            ->exists();
 
         if ($existingSavedResults) {
             Alert()->toast('You have pending results, please submit or delete first', 'error');
@@ -212,10 +212,10 @@ class ExamController extends Controller
 
                 // Check if the result already exists in the examination_results table
                 $existingRecord = Examination_result::where('student_id', $studentId)
-                                                    ->where('course_id', $request->course_id)
-                                                    ->where('exam_type_id', $request->exam_id)
-                                                    ->whereDate('exam_date', Carbon::parse($request->exam_date)->format('Y-m-d'))
-                                                    ->exists();
+                    ->where('course_id', $request->course_id)
+                    ->where('exam_type_id', $request->exam_id)
+                    ->whereDate('exam_date', Carbon::parse($request->exam_date)->format('Y-m-d'))
+                    ->exists();
 
                 if ($existingRecord) {
                     Alert::toast('Examination results already submitted for this Course', 'error');
@@ -262,8 +262,8 @@ class ExamController extends Controller
             'abbreviation.required' => 'Examination code is required'
         ]);
 
-        $existingRecords = Examination::where('exam_type', '=', $request->name)->where('symbolic_abbr', $request->abbreviation)->where('school_id', '='. Auth::user()->school_id)->exists();
-        if($existingRecords) {
+        $existingRecords = Examination::where('exam_type', '=', $request->name)->where('symbolic_abbr', $request->abbreviation)->where('school_id', '=' . Auth::user()->school_id)->exists();
+        if ($existingRecords) {
             // Alert::error('Error!', 'The Examination type already Exists');
             Alert::toast('The Examination type already Exists', 'error');
             return back();
@@ -285,7 +285,8 @@ class ExamController extends Controller
     public function unblockExams(Request $request, $exam)
     {
         //
-        $exams = Examination::findOrFail($exam);
+        $decoded = Hashids::decode($exam);
+        $exams = Examination::findOrFail($decoded[0]);
         $exams->status = $request->input('status', 1);
         $exams->save();
         // Alert::success('Success!', 'Examination test Unblocked successfully');
@@ -327,13 +328,23 @@ class ExamController extends Controller
     public function blockExams(Request $request, $exam)
     {
         //
-        $exams = Examination::findOrFail($exam);
+        $decoded = Hashids::decode($exam);
+        $exams = Examination::findOrFail($decoded[0]);
+
+        // check if there is pending results
+        $hasPending = temporary_results::where('exam_type_id', $exams->id)->get();
+
+        if ($hasPending->count() > 0) {
+            foreach ($hasPending as $pending) {
+                $pending->delete();
+            }
+        }
+
         $exams->status = $request->input('status', 0);
         $exams->save();
         // Alert::success('Success!', 'Examination test Blocked successfully');
         Alert::toast('Examination test Blocked successfully', 'success');
         return back();
-
     }
 
     /**
@@ -342,23 +353,32 @@ class ExamController extends Controller
     public function destroy($exam)
     {
         // abort(404);
-       $examination = Examination::find($exam);
-       if(! $examination) {
+        // dd($exam);
+        $decoded = Hashids::decode($exam);
+        $examination = Examination::find($decoded[0]);
+
+        if (! $examination) {
             Alert()->toast('No such examination type was found', 'error');
             return back();
-       }
+        }
 
-       $hasTempResults = temporary_results::where('exam_type_id', $examination)->exists();
-       $hasPermResults = Examination_result::where('exam_type_id', $examination)->exists();
+        //    check for active exams
+        if ($examination->status == 1) {
+            Alert()->toast('Cannot delete an active examination type, please block it first', 'info');
+            return back();
+        }
 
-       if($hasTempResults || $hasPermResults) {
+        $hasTempResults = temporary_results::where('exam_type_id', $examination->id)->exists();
+        $hasPermResults = Examination_result::where('exam_type_id', $examination->id)->exists();
+
+        if ($hasTempResults || $hasPermResults) {
             Alert()->toast('Cannot delete this examination because has results payload', 'info');
             return back();
-       }
+        }
 
-       $examination->delete();
-       Alert()->toast('Examination type has been deleted successfully', 'success');
-       return back();
+        $examination->delete();
+        Alert()->toast('Examination type has been deleted successfully', 'success');
+        return back();
     }
 
     //get results by its course=========================
@@ -371,17 +391,17 @@ class ExamController extends Controller
         $class_course = class_learning_courses::findOrFail($decoded[0]);
         // return $class_course;
 
-        if(! $class_course) {
+        if (! $class_course) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
 
         $results = Examination_result::where('course_id', $class_course->course_id)
-                                        ->where('class_id', $class_course->class_id)
-                                        // ->where('teacher_id', $loggedTeacher->id)
-                                        ->where('school_id', $user->school_id)
-                                        ->orderBy('exam_date', 'DESC')
-                                        ->get();
+            ->where('class_id', $class_course->class_id)
+            // ->where('teacher_id', $loggedTeacher->id)
+            ->where('school_id', $user->school_id)
+            ->orderBy('exam_date', 'DESC')
+            ->get();
 
         // Use distinct to ensure unique years
         $groupedData = $results->groupBy(function ($item) {
@@ -400,23 +420,23 @@ class ExamController extends Controller
         $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
         $class_course = class_learning_courses::findOrFail($id[0]);
 
-        if($class_course->teacher_id != $loggedTeacher->id) {
+        if ($class_course->teacher_id != $loggedTeacher->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return to_route('home');
         }
         // return ['data' => $class_course];
         $results = Examination_result::query()
-                    ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                    ->select('examination_results.*', 'examinations.exam_type')
-                    ->where('course_id', $class_course->course_id)
-                    ->where('class_id', $class_course->class_id)
-                    ->whereYear('exam_date', $year)
-                    ->where('examination_results.school_id', $user->school_id)
-                    ->orderBy('examination_results.exam_date', 'DESC')
-                    ->distinct()  // Ensure distinct exam types
-                    ->get();
+            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+            ->select('examination_results.*', 'examinations.exam_type')
+            ->where('course_id', $class_course->course_id)
+            ->where('class_id', $class_course->class_id)
+            ->whereYear('exam_date', $year)
+            ->where('examination_results.school_id', $user->school_id)
+            ->orderBy('examination_results.exam_date', 'DESC')
+            ->distinct()  // Ensure distinct exam types
+            ->get();
 
-            // return ['results' => $results ];
+        // return ['results' => $results ];
 
         // Group by exam type ID
         $examTypes = $results->groupBy('exam_type_id');
@@ -434,18 +454,18 @@ class ExamController extends Controller
         $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
         $class_course = class_learning_courses::findOrFail($id[0]);
 
-        if($class_course->teacher_id != $loggedTeacher->id) {
+        if ($class_course->teacher_id != $loggedTeacher->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
         // return ['data' => $class_course];
         $results = Examination_result::where('course_id', $class_course->course_id)
-                                ->where('class_id', $class_course->class_id)
-                                ->whereYear('exam_date', $year)
-                                ->where('exam_type_id', $exam_id[0])
-                                ->where('school_id', $user->school_id)
-                                ->distinct()  // Ensure distinct months
-                                ->get();
+            ->where('class_id', $class_course->class_id)
+            ->whereYear('exam_date', $year)
+            ->where('exam_type_id', $exam_id[0])
+            ->where('school_id', $user->school_id)
+            ->distinct()  // Ensure distinct months
+            ->get();
 
         $months = $results->sortBy('exam_date') // Panga kwa tarehe
             ->groupBy(function ($item) {
@@ -453,9 +473,9 @@ class ExamController extends Controller
             })->map(function ($monthData) {
 
                 return $monthData->sortBy('exam_date')->groupBy(function ($item) {
-                 return Carbon::parse($item->exam_date)->format('d F Y'); // Group by specific date
+                    return Carbon::parse($item->exam_date)->format('d F Y'); // Group by specific date
+                });
             });
-        });
 
         return view('Examinations.teacher_results_by_month', compact('months', 'year', 'examType', 'exam_id', 'course', 'class_course'));
     }
@@ -468,7 +488,7 @@ class ExamController extends Controller
         $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
         $class_course = class_learning_courses::findOrFail($id[0]);
 
-        if($class_course->teacher_id != $loggedTeacher->id) {
+        if ($class_course->teacher_id != $loggedTeacher->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return back();
         }
@@ -476,39 +496,63 @@ class ExamController extends Controller
         $subjectCourse = Subject::findOrFail($class_course->course_id);
 
         $monthMap = [
-            'January' => 1, 'February' => 2, 'March' => 3,
-            'April' => 4, 'May' => 5, 'June' => 6,
-            'July' => 7, 'August' => 8, 'September' => 9,
-            'October' => 10, 'November' => 11, 'December' => 12
+            'January' => 1,
+            'February' => 2,
+            'March' => 3,
+            'April' => 4,
+            'May' => 5,
+            'June' => 6,
+            'July' => 7,
+            'August' => 8,
+            'September' => 9,
+            'October' => 10,
+            'November' => 11,
+            'December' => 12
         ];
 
         $monthNumber = $monthMap[$month] ?? null;
         $resultDate = Carbon::parse($date)->format('Y-m-d');
 
         $results = Examination_result::query()
-                    ->join('students', 'students.id', '=', 'examination_results.student_id')
-                    ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                    ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                    ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                    ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
-                    ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-                    ->leftJoin('schools', 'schools.id', '=', 'students.school_id')
-                    ->select(
-                        'examination_results.*', 'grades.class_name', 'grades.class_code', 'examinations.exam_type',
-                        'students.first_name', 'students.id as studentId', 'students.middle_name', 'students.last_name', 'students.gender', 'students.group', 'students.class_id', 'students.admission_number',
-                        'subjects.course_name', 'subjects.course_code', 'users.first_name as teacher_firstname', 'students.status',
-                        'users.last_name as teacher_lastname', 'users.gender as teacher_gender', 'users.phone as teacher_phone', 'schools.school_reg_no'
-                    )
-                    ->where('examination_results.course_id', $class_course->course_id)
-                    ->where('examination_results.class_id', $class_course->class_id)
-                    ->where('students.status', 1)
-                    ->where('examination_results.exam_type_id', $exam_id)
-                    ->where('examination_results.school_id', $user->school_id)
-                    ->whereDate('examination_results.exam_date', $resultDate)
-                    ->distinct()
-                    ->orderBy('examination_results.score', 'desc')
-                    ->orderBy('students.first_name', 'asc')
-                    ->get();
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
+            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+            ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
+            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+            ->leftJoin('schools', 'schools.id', '=', 'students.school_id')
+            ->select(
+                'examination_results.*',
+                'grades.class_name',
+                'grades.class_code',
+                'examinations.exam_type',
+                'students.first_name',
+                'students.id as studentId',
+                'students.middle_name',
+                'students.last_name',
+                'students.gender',
+                'students.group',
+                'students.class_id',
+                'students.admission_number',
+                'subjects.course_name',
+                'subjects.course_code',
+                'users.first_name as teacher_firstname',
+                'students.status',
+                'users.last_name as teacher_lastname',
+                'users.gender as teacher_gender',
+                'users.phone as teacher_phone',
+                'schools.school_reg_no'
+            )
+            ->where('examination_results.course_id', $class_course->course_id)
+            ->where('examination_results.class_id', $class_course->class_id)
+            ->where('students.status', 1)
+            ->where('examination_results.exam_type_id', $exam_id)
+            ->where('examination_results.school_id', $user->school_id)
+            ->whereDate('examination_results.exam_date', $resultDate)
+            ->distinct()
+            ->orderBy('examination_results.score', 'desc')
+            ->orderBy('students.first_name', 'asc')
+            ->get();
 
         // Initialize grade counts
         $gradeCounts = [
@@ -521,8 +565,8 @@ class ExamController extends Controller
 
         // Calculate grades, positions, and average score
         $validResults = $results
-                        ->whereNotNull('score')
-                        ->filter(fn($res) => is_numeric($res->score) && $res->score >= 0);
+            ->whereNotNull('score')
+            ->filter(fn($res) => is_numeric($res->score) && $res->score >= 0);
 
         $totalScore = $validResults->sum('score');
         $totalRecords = $validResults->count();
@@ -557,7 +601,7 @@ class ExamController extends Controller
                 } elseif ($result->score >= 10.5) {
                     $result->grade = 'D';
                     $gradeCounts['D']++;
-                } elseif($result->score >= 0.1) {
+                } elseif ($result->score >= 0.1) {
                     $result->grade = 'E';
                     $gradeCounts['E']++;
                 } else {
@@ -576,7 +620,7 @@ class ExamController extends Controller
                 } elseif ($result->score >= 20.5) {
                     $result->grade = 'D';
                     $gradeCounts['D']++;
-                } elseif($result->score >= 0.5) {
+                } elseif ($result->score >= 0.5) {
                     $result->grade = 'E';
                     $gradeCounts['E']++;
                 } else {
@@ -598,12 +642,23 @@ class ExamController extends Controller
 
         // Generate the PDF and store it in the 'exam_results' folder within 'public' directory
         $pdf = \PDF::loadView('Examinations.teacher_results_by_type', compact(
-            'results', 'year', 'examType', 'month', 'course', 'subjectCourse', 'class_course', 'maleStudents', 'femaleStudents', 'averageScore', 'averageGrade', 'gradeCounts'
+            'results',
+            'year',
+            'examType',
+            'month',
+            'course',
+            'subjectCourse',
+            'class_course',
+            'maleStudents',
+            'femaleStudents',
+            'averageScore',
+            'averageGrade',
+            'gradeCounts'
         ));
 
         // Generate a timestamp-based filename for the PDF
         $timestamp = now()->timestamp; // Current timestamp in seconds
-        $pdfFileName = 'results_'.$timestamp.'.pdf'; // Using timestamp as the filename
+        $pdfFileName = 'results_' . $timestamp . '.pdf'; // Using timestamp as the filename
 
         // Define the folder path where you want to store the PDF
         $folderPath = public_path('exam_results');
@@ -614,11 +669,11 @@ class ExamController extends Controller
         }
 
         // Store the generated PDF in the 'exam_results' folder
-        $pdfPath = $folderPath.'/'.$pdfFileName;
+        $pdfPath = $folderPath . '/' . $pdfFileName;
         $pdf->save($pdfPath);
 
         // Return the URL of the generated PDF to be embedded in the iframe
-        $pdfUrl = url('exam_results/'.$pdfFileName);
+        $pdfUrl = url('exam_results/' . $pdfFileName);
 
         // Optionally: You can schedule a task to delete the file after a certain time (e.g., after 30 days).
         // For example, you can schedule a cron job to delete old reports or use Laravel's task scheduling for automatic deletion.
@@ -637,7 +692,7 @@ class ExamController extends Controller
                 return 'C';
             } elseif ($score >= 10.5) {
                 return 'D';
-            } elseif($score >= 0.5) {
+            } elseif ($score >= 0.5) {
                 return 'E';
             } else {
                 return 'ABS';
@@ -651,7 +706,7 @@ class ExamController extends Controller
                 return 'C';
             } elseif ($score >= 20.5) {
                 return 'D';
-            } elseif($score >= 0.5) {
+            } elseif ($score >= 0.5) {
                 return 'E';
             } else {
                 return 'ABS';
@@ -676,9 +731,9 @@ class ExamController extends Controller
         $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
 
         $exists = class_learning_courses::where('course_id', $courseId)
-                                        ->where('class_id', $classId)
-                                        ->where('teacher_id', $loggedTeacher->id)
-                                        ->exists();
+            ->where('class_id', $classId)
+            ->where('teacher_id', $loggedTeacher->id)
+            ->exists();
 
         if (!$exists) {
             Alert()->toast('You are not authorized to view this page', 'error');
@@ -688,22 +743,22 @@ class ExamController extends Controller
 
         // Pata matokeo yaliyohifadhiwa kwenye draft
         $draftResults = temporary_results::where('course_id', $courseId)
-                                       ->where('teacher_id', $teacherId)
-                                       ->where('exam_type_id', $examTypeId)
-                                       ->where('class_id', $classId)
-                                        ->where('exam_date', $examDate)
-                                        ->where('school_id', $schoolId)
-                                        ->where('marking_style', $markingStyle)
-                                        // ->where('exam_term', $examTerm)
-                                       ->get();
+            ->where('teacher_id', $teacherId)
+            ->where('exam_type_id', $examTypeId)
+            ->where('class_id', $classId)
+            ->where('exam_date', $examDate)
+            ->where('school_id', $schoolId)
+            ->where('marking_style', $markingStyle)
+            // ->where('exam_term', $examTerm)
+            ->get();
         // return $draftResults;
 
         // Pata wanafunzi wa darasa hili
         $students = Student::where('class_id', $classId)
-                            ->where('status', 1)
-                            ->where('graduated', 0)
-                            ->orderBy('first_name', 'ASC')
-                            ->get();
+            ->where('status', 1)
+            ->where('graduated', 0)
+            ->orderBy('first_name', 'ASC')
+            ->get();
 
         // Pata majina ya darasa, somo, na mtihani
         $className = Grade::find($classId)->class_code;
@@ -748,9 +803,9 @@ class ExamController extends Controller
         $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
 
         $exists = class_learning_courses::where('course_id', $courseId)
-                                        ->where('class_id', $classId)
-                                        ->where('teacher_id', $loggedTeacher->id)
-                                        ->exists();
+            ->where('class_id', $classId)
+            ->where('teacher_id', $loggedTeacher->id)
+            ->exists();
 
         if (!$exists) {
             Alert()->toast('You are not authorized to view this page', 'error');
@@ -781,16 +836,15 @@ class ExamController extends Controller
             Alert()->toast('Results saved successfully, remember to submit before expiry date.', 'success');
             // return redirect()->route('score.prepare.form', Hashids::encode($courseId));
             return to_route('home');
-
         } elseif ($action === 'submit') {
             // CHECK IF RESULTS ALREADY EXIST IN EXAMINATION_RESULT TABLE
             foreach ($scores as $studentId => $score) {
                 $existingResult = Examination_result::where('student_id', $studentId)
-                                ->where('course_id', $courseId)
-                                ->where('teacher_id', $teacherId)
-                                ->where('exam_type_id', $examTypeId)
-                                ->where('exam_date', $examDate)
-                                ->first();
+                    ->where('course_id', $courseId)
+                    ->where('teacher_id', $teacherId)
+                    ->where('exam_type_id', $examTypeId)
+                    ->where('exam_date', $examDate)
+                    ->first();
 
                 if ($existingResult) {
                     // If result already exists, reject this submission
@@ -818,12 +872,12 @@ class ExamController extends Controller
 
                 // DELETE TEMPORARY RESULTS AFTER FINAL SUBMISSION
                 temporary_results::where('course_id', $courseId)
-                        ->where('teacher_id', $teacherId)
-                        ->where('exam_type_id', $examTypeId)
-                        ->where('class_id', $classId)
-                        ->where('exam_date', $examDate)
-                        ->where('school_id', $schoolId)
-                        ->delete();
+                    ->where('teacher_id', $teacherId)
+                    ->where('exam_type_id', $examTypeId)
+                    ->where('class_id', $classId)
+                    ->where('exam_date', $examDate)
+                    ->where('school_id', $schoolId)
+                    ->delete();
             });
 
             Alert()->toast('Results submitted successfully. Editing is no longer allowed.', 'success');
@@ -836,7 +890,7 @@ class ExamController extends Controller
     }
 
     //pending results outside button
-    public function continuePendingResults ($course, $teacher, $school, $class, $style, $term, $type,   $date)
+    public function continuePendingResults($course, $teacher, $school, $class, $style, $term, $type,   $date)
     {
         // Decode the Hashids and get the first element of the returned array
         $courseId = Hashids::decode($course)[0];  // Get the first element
@@ -854,9 +908,9 @@ class ExamController extends Controller
         $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
 
         $exists = class_learning_courses::where('course_id', $courseId)
-                                        ->where('class_id', $classId)
-                                        ->where('teacher_id', $loggedTeacher->id)
-                                        ->exists();
+            ->where('class_id', $classId)
+            ->where('teacher_id', $loggedTeacher->id)
+            ->exists();
 
         if (!$exists) {
             Alert()->toast('You are not authorized to view this page', 'error');
@@ -866,10 +920,10 @@ class ExamController extends Controller
 
         // Pata wanafunzi wa darasa husika
         $students = Student::where('class_id', $classId)
-                            ->where('status', 1)
-                            ->where('graduated', 0)
-                            ->orderBy('first_name', 'ASC')
-                            ->get();
+            ->where('status', 1)
+            ->where('graduated', 0)
+            ->orderBy('first_name', 'ASC')
+            ->get();
 
         // Pata majina ya darasa, somo, na mtihani
         $className = Grade::find($classId)->class_code;
@@ -878,19 +932,33 @@ class ExamController extends Controller
 
         // Ikiwa tayari kuna matokeo ambayo hayajahakikiwa, rudisha mtumiaji kwenye ukurasa wa uthibitisho
         $saved_results = temporary_results::where('course_id', $courseId)
-                                    ->where('teacher_id', $teacherId)
-                                    ->where('class_id', $classId)
-                                    ->where('exam_term', $exam_term)
-                                    ->where('school_id', $schoolId)
-                                    ->where('exam_type_id', $examTypeId)
-                                    ->where('exam_date', $examDate)
-                                    ->where('marking_style', $marking_style)
-                                    ->get();
+            ->where('teacher_id', $teacherId)
+            ->where('class_id', $classId)
+            ->where('exam_term', $exam_term)
+            ->where('school_id', $schoolId)
+            ->where('exam_type_id', $examTypeId)
+            ->where('exam_date', $examDate)
+            ->where('marking_style', $marking_style)
+            ->get();
 
         // Return the view with decoded IDs
-        return view('Examinations.confirm_results',
-                    compact('courseId', 'examTypeId', 'examDate', 'marking_style', 'examName',
-                    'classId', 'teacherId', 'schoolId', 'courseName', 'className', 'students', 'saved_results'));
+        return view(
+            'Examinations.confirm_results',
+            compact(
+                'courseId',
+                'examTypeId',
+                'examDate',
+                'marking_style',
+                'examName',
+                'classId',
+                'teacherId',
+                'schoolId',
+                'courseName',
+                'className',
+                'students',
+                'saved_results'
+            )
+        );
     }
 
     public function deleteDraftResults($course, $teacher, $type, $class, $date)
@@ -905,9 +973,9 @@ class ExamController extends Controller
         $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
 
         $exists = class_learning_courses::where('course_id', $course_id[0])
-                                        ->where('class_id', $class_id[0])
-                                        ->where('teacher_id', $loggedTeacher->id)
-                                        ->exists();
+            ->where('class_id', $class_id[0])
+            ->where('teacher_id', $loggedTeacher->id)
+            ->exists();
 
         if (!$exists) {
             Alert()->toast('You are not authorized to view this page', 'error');
@@ -946,16 +1014,16 @@ class ExamController extends Controller
         $loggedTeacher = Teacher::where('user_id', $user->id)->firstOrFail();
         $class_course = class_learning_courses::findOrFail($couurse_id[0]);
 
-        if($class_course->teacher_id != $loggedTeacher->id) {
+        if ($class_course->teacher_id != $loggedTeacher->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
             return to_route('results.byExamType', ['course' => $course, 'year' => $year, 'examType' => $examType]);
         }
         $examDate = Carbon::parse($date)->format('Y-m-d');
 
         $existInCompile = generated_reports::where('class_id', $class_course->class_id)
-                                    ->whereJsonContains('exam_dates', $examDate)
-                                    ->where('school_id', $class_course->school_id)
-                                    ->exists();
+            ->whereJsonContains('exam_dates', $examDate)
+            ->where('school_id', $class_course->school_id)
+            ->exists();
 
         if ($existInCompile) {
             Alert()->toast('Results already exist in the compiled reports. Cannot delete.', 'error');
@@ -964,12 +1032,12 @@ class ExamController extends Controller
 
         // already published results
         $isPublished = Examination_result::where('course_id', $class_course->course_id)
-                                    ->where('class_id', $class_course->class_id)
-                                    ->where('teacher_id', $loggedTeacher->id)
-                                    ->where('exam_type_id', $exam_id[0])
-                                    ->whereDate('exam_date', $examDate)
-                                    ->where('status', 2)
-                                    ->exists();
+            ->where('class_id', $class_course->class_id)
+            ->where('teacher_id', $loggedTeacher->id)
+            ->where('exam_type_id', $exam_id[0])
+            ->whereDate('exam_date', $examDate)
+            ->where('status', 2)
+            ->exists();
         if ($isPublished) {
             Alert()->toast('Results has already been published. Cannot delete.', 'error');
             return to_route('results.byExamType', ['course' => $course, 'year' => $year, 'examType' => $examType]);
@@ -978,12 +1046,12 @@ class ExamController extends Controller
         try {
             // Delete the results for the specified course, year, and exam type
             Examination_result::where('course_id', $class_course->course_id)
-                            ->where('class_id', $class_course->class_id)
-                            ->where('teacher_id', $loggedTeacher->id)
-                            ->where('exam_type_id', $exam_id[0])
-                            ->whereDate('exam_date', $examDate)
-                            ->where('status', 1)
-                            ->delete();
+                ->where('class_id', $class_course->class_id)
+                ->where('teacher_id', $loggedTeacher->id)
+                ->where('exam_type_id', $exam_id[0])
+                ->whereDate('exam_date', $examDate)
+                ->where('status', 1)
+                ->delete();
 
             Alert()->toast('Results deleted successfully', 'success');
             return to_route('results.byExamType', ['course' => $course, 'year' => $year, 'examType' => $examType]);
@@ -992,5 +1060,4 @@ class ExamController extends Controller
             return to_route('results.byExamType', ['course' => $course, 'year' => $year, 'examType' => $examType]);
         }
     }
-
 }

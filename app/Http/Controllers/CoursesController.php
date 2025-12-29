@@ -11,6 +11,7 @@ use App\Models\Teacher;
 use Hashids\Hashids as HashidsHashids;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use RealRashid\SweetAlert\Facades\Alert;
 use Vinkla\Hashids\Facades\Hashids;
@@ -390,6 +391,47 @@ class CoursesController extends Controller
         ]);
 
         Alert()->toast('Class course has been blocked successfully', 'success');
+        return back();
+    }
+
+
+    public function deleteClassCourse($id)
+    {
+        $decode = Hashids::decode($id);
+        $class_course = Subject::find($decode[0]);
+
+        if(! $class_course) {
+            Alert()->toast('No such class course was found', 'error');
+            return back();
+        }
+
+        // check if the subject is not active before delete
+        if($class_course->status == 1) {
+            Alert()->toast('This class course is active and cannot be deleted.', 'info');
+            return back();
+        }
+
+        // check if is used in the results
+        $usedInResults = DB::table('examination_results')
+                            ->where('course_id', $class_course->id)
+                            ->exists();
+        if($usedInResults) {
+            Alert()->toast('This class course cannot be deleted as it has been used in exam results', 'info');
+            return back();
+        }
+
+        // check if is assigned to any teacher
+        $isAlreadyAssigned = DB::table('class_learning_courses')
+                                    ->where('course_id', $class_course->id)
+                                    ->exists();
+        if($isAlreadyAssigned) {
+            Alert()->toast('This class course cannot be deleted as it has been assigned to teachers', 'info');
+            return back();
+        }
+
+        $class_course->delete();
+
+        Alert()->toast('Class course has been deleted successfully', 'success');
         return back();
     }
 }

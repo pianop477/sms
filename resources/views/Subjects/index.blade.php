@@ -235,9 +235,6 @@
                                                 <td>
                                                     <div class="action-buttons">
                                                         @if ($course->status == 1)
-                                                            <a href="{{route('course.edit', ['id' => Hashids::encode($course->id)])}}" class="btn btn-sm btn-secondary" title="Edit">
-                                                                <i class="fas fa-pencil"></i>
-                                                            </a>
                                                             <form action="{{route('courses.block', ['id' => Hashids::encode($course->id)])}}" method="POST">
                                                                 @csrf
                                                                 @method('PUT')
@@ -251,6 +248,13 @@
                                                                 @method('PUT')
                                                                 <button type="submit" class="btn btn-sm btn-success" title="Unblock" onclick="return confirm('Are you sure you want to unblock {{strtoupper($course->course_name)}} Course?')">
                                                                     <i class="ti-reload"></i>
+                                                                </button>
+                                                            </form>
+                                                            <form action="{{route('courses.destroy', ['id' => Hashids::encode($course->id)])}}" method="POST">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-sm btn-danger" title="Delete" onclick="return confirm('Are you sure you want to Delete {{strtoupper($course->course_name)}} Course Permanently?')">
+                                                                    <i class="ti-trash"></i>
                                                                 </button>
                                                             </form>
                                                         @endif

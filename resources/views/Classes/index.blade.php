@@ -1,7 +1,7 @@
 @extends('SRTDashboard.frame')
 
 @section('content')
-<!DOCTYPE html>
+    <!DOCTYPE html>
     <style>
         :root {
             --primary-color: #4e73df;
@@ -89,7 +89,8 @@
             box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
         }
 
-        .action-buttons a, .action-buttons button {
+        .action-buttons a,
+        .action-buttons button {
             width: 30px;
             height: 30px;
             display: flex;
@@ -103,7 +104,8 @@
             color: white;
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus,
+        .form-select:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
         }
@@ -154,7 +156,8 @@
                                 <h4 class="header-title">Classes List</h4>
                             </div>
                             <div class="col-md-4 text-end">
-                                <button type="button" class="btn btn-info btn-action float-right" data-bs-toggle="modal" data-bs-target="#addClassModal">
+                                <button type="button" class="btn btn-info btn-action float-right" data-bs-toggle="modal"
+                                    data-bs-target="#addClassModal">
                                     <i class="fas fa-plus me-1"></i> New Class
                                 </button>
                             </div>
@@ -176,33 +179,62 @@
                                             <tr>
                                                 <td colspan="3" class="text-center py-4">
                                                     <div class="alert alert-warning mb-0">
-                                                        <i class="fas fa-exclamation-triangle me-2"></i> No classes records found.
+                                                        <i class="fas fa-exclamation-triangle me-2"></i> No classes records
+                                                        found.
                                                     </div>
                                                 </td>
                                             </tr>
                                         @else
-                                        @foreach ($classes as $class)
-                                            <tr>
-                                                <td class="text-uppercase fw-bold">
-                                                    <i class="fas fa-angle-double-right me-2 text-success"></i> {{$class->class_name}}
-                                                </td>
-                                                <td class="text-uppercase">{{$class->class_code}}</td>
-                                                <td>
-                                                    <div class="action-buttons">
-                                                        <a href="{{route('Classes.edit', ['id' => Hashids::encode($class->id)])}}" class="btn btn-sm btn-secondary" title="Edit">
-                                                            <i class="ti-pencil"></i>
-                                                        </a>
-                                                        <form action="{{route('Classes.destroy', ['id' => Hashids::encode($class->id)])}}" method="POST">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button class="btn btn-sm btn-danger" type="submit" title="Delete" onclick="return confirm('Are you sure you want to delete this class Permanently?')">
-                                                                <i class="ti-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
+                                            @foreach ($classes as $class)
+                                                <tr>
+                                                    <td class="text-uppercase fw-bold">
+                                                        <i class="fas fa-angle-double-right me-2 text-success"></i>
+                                                        {{ $class->class_name }}
+                                                    </td>
+                                                    <td class="text-uppercase">{{ $class->class_code }}</td>
+                                                    <td>
+                                                        <div class="action-buttons">
+                                                            @if ($class->status == 1)
+                                                                <form
+                                                                    action="{{ route('Classes.block', ['id' => Hashids::encode($class->id)]) }}"
+                                                                    method="POST">
+                                                                    @csrf
+                                                                    @method('PUT')
+                                                                    <button class="btn btn-sm btn-warning" type="submit"
+                                                                        title="Disable"
+                                                                        onclick="return confirm('Are you sure you want to disable this class?')">
+                                                                        <i class="ti-na"></i>
+                                                                    </button>
+                                                                </form>
+                                                            @else
+                                                                <form
+                                                                    action="{{ route('Classes.unblock', ['id' => Hashids::encode($class->id)]) }}"
+                                                                    method="POST">
+                                                                    @csrf
+                                                                    @method('PUT')
+                                                                    <button class="btn btn-sm btn-success" type="submit"
+                                                                        title="Enable"
+                                                                        onclick="return confirm('Are you sure you want to enable this class?')">
+                                                                        <i class="fas fa-refresh"></i>
+                                                                    </button>
+                                                                </form>
+                                                                <form
+                                                                    action="{{ route('Classes.destroy', ['id' => Hashids::encode($class->id)]) }}"
+                                                                    method="POST">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button class="btn btn-sm btn-danger" type="submit"
+                                                                        title="Delete"
+                                                                        onclick="return confirm('Are you sure you want to delete this class Permanently?')">
+                                                                        <i class="ti-trash"></i>
+                                                                    </button>
+                                                                </form>
+                                                            @endif
+
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
                                         @endif
                                     </tbody>
                                 </table>
@@ -228,29 +260,30 @@
                                 <i class="fas fa-exclamation-triangle me-2"></i> No classes records found.
                             </div>
                         @else
-                        <div class="single-table">
-                            <div class="table-responsive">
-                                <table class="table table-hover table-primary">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Classes</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($classes as $class)
+                            <div class="single-table">
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-primary">
+                                        <thead>
                                             <tr>
-                                                <td class="text-uppercase fw-bold">
-                                                    <a href="{{route('Class.Teachers', ['class' => Hashids::encode($class->id)])}}" class="class-link">
-                                                        <i class="fas fa-angle-double-right me-2 text-primary"></i>
-                                                        {{$class->class_name}} - {{$class->class_code}}
-                                                    </a>
-                                                </td>
+                                                <th scope="col">Classes</th>
                                             </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            @foreach ($classes as $class)
+                                                <tr>
+                                                    <td class="text-uppercase fw-bold">
+                                                        <a href="{{ route('Class.Teachers', ['class' => Hashids::encode($class->id)]) }}"
+                                                            class="class-link">
+                                                            <i class="fas fa-angle-double-right me-2 text-primary"></i>
+                                                            {{ $class->class_name }} - {{ $class->class_code }}
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
                         @endif
                     </div>
                 </div>
@@ -264,53 +297,58 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addClassModalLabel">Register New Class</h5>
-                    <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
+                    <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close"><i
+                            class="fas fa-close"></i></button>
                 </div>
                 <div class="modal-body">
-                    <form class="needs-validation" novalidate action="{{route('Classes.store')}}" method="POST">
+                    <form class="needs-validation" novalidate action="{{ route('Classes.store') }}" method="POST">
                         @csrf
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="name" class="form-label">Class Name</label>
-                                <input type="text" required name="name" class="form-control-custom text-uppercase" id="name" placeholder="Class Name" value="{{old('name')}}">
+                                <input type="text" required name="name" class="form-control-custom text-uppercase"
+                                    id="name" placeholder="Class Name" value="{{ old('name') }}">
                                 @error('name')
-                                <div class="text-danger small">
-                                    {{$message}}
-                                </div>
+                                    <div class="text-danger small">
+                                        {{ $message }}
+                                    </div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="code" class="form-label">Class Code</label>
-                                <input type="text" required name="code" class="form-control-custom text-uppercase" id="code" placeholder="Class Code" value="{{old('code')}}">
+                                <input type="text" required name="code" class="form-control-custom text-uppercase"
+                                    id="code" placeholder="Class Code" value="{{ old('code') }}">
                                 @error('code')
-                                <div class="text-danger small">
-                                   {{$message}}
-                                </div>
+                                    <div class="text-danger small">
+                                        {{ $message }}
+                                    </div>
                                 @enderror
                             </div>
                         </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" id="saveButton" class="btn btn-success"><i class="fas fa-save"></i> Save</button>
+                    <button type="submit" id="saveButton" class="btn btn-success"><i class="fas fa-save"></i>
+                        Save</button>
                 </div>
-            </form>
+                </form>
             </div>
         </div>
     </div>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const form = document.querySelector(".needs-validation");
             const submitButton = document.getElementById("saveButton");
 
             if (!form || !submitButton) return;
 
-            form.addEventListener("submit", function (event) {
+            form.addEventListener("submit", function(event) {
                 event.preventDefault();
 
                 // Disable button and show loading state
                 submitButton.disabled = true;
-                submitButton.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Saving...`;
+                submitButton.innerHTML =
+                    `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Saving...`;
 
                 // Check form validity
                 if (!form.checkValidity()) {
