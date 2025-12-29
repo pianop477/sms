@@ -328,6 +328,12 @@ class UsersController extends Controller
             return back();
         }
 
+        // check if user is active
+        if ($user->status == 1) {
+            Alert()->toast('You cannot delete an active account. Please block the account first.', 'error');
+            return back();
+        }
+
         if ($user->image && Storage::disk('public')->exists('profile/' . $user->image)) {
             Storage::disk('public')->delete('profile/' . $user->image);
         }

@@ -256,7 +256,7 @@
                 </div>
                 <div class="col-md-2 text-end">
                     <a href="{{route('admin.accounts')}}" class="btn btn-back">
-                        <i class="fas fa-arrow-left me-2"></i>Back
+                        <i class="fas fa-arrow-left me-2"></i> Back
                     </a>
                 </div>
             </div>
@@ -316,12 +316,12 @@
                         <ul class="nav nav-pills justify-content-center">
                             <li class="nav-item">
                                 <a class="nav-link active" href="#profile" data-bs-toggle="tab">
-                                    <i class="fas fa-user me-2"></i>Profile
+                                    <i class="fas fa-user me-2"></i> Profile
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#edit" data-bs-toggle="tab">
-                                    <i class="fas fa-user-pen me-2"></i>Edit Information
+                                    <i class="fas fa-user-pen me-2"></i> Edit Information
                                 </a>
                             </li>
                         </ul>
@@ -335,15 +335,15 @@
                                     <table class="info-table">
                                         <tbody>
                                             <tr class="slide-in">
-                                                <th><i class="fas fa-phone me-2 text-primary"></i>Phone</th>
+                                                <th><i class="fas fa-phone me-2 text-primary"></i> Phone</th>
                                                 <td class="fw-bold">{{ $user->phone }}</td>
                                             </tr>
                                             <tr class="slide-in" style="animation-delay: 0.1s;">
-                                                <th><i class="fas fa-envelope me-2 text-primary"></i>Email</th>
+                                                <th><i class="fas fa-envelope me-2 text-primary"></i> Email</th>
                                                 <td>{{ $user->email ?? 'Email not provided' }}</td>
                                             </tr>
                                             <tr class="slide-in" style="animation-delay: 0.2s;">
-                                                <th><i class="fas fa-calendar me-2 text-primary"></i>Registration Date</th>
+                                                <th><i class="fas fa-calendar me-2 text-primary"></i> Registration Date</th>
                                                 <td>
                                                     @if ($user->created_at == Null)
                                                         Unknown
@@ -353,8 +353,8 @@
                                                 </td>
                                             </tr>
                                             <tr class="slide-in" style="animation-delay: 0.3s;">
-                                                <th><i class="fas fa-id-card me-2 text-primary"></i>User ID</th>
-                                                <td class="text-muted">Undefined</td>
+                                                <th><i class="fas fa-id-card me-2 text-primary"></i> User ID</th>
+                                                <td class="text-muted">{{Hashids::encode($user->id ?? 'Undefined')}} <i><b>(Encrypted)</b></i></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -365,9 +365,9 @@
                             <div class="tab-pane fade" id="edit">
                                 <div class="text-center mb-4">
                                     <h4 class="text-primary">
-                                        <i class="fas fa-user-edit me-2"></i>Edit User Information
+                                        <i class="fas fa-user-edit me-2"></i> Edit User Information
                                     </h4>
-                                    <p class="text-muted">Update administrator account details</p>
+                                    <p class="text-muted"> Update administrator account details</p>
                                 </div>
 
                                 <form action="{{ route('admin.account.update', ['user' => Hashids::encode($user->id)]) }}" method="POST" enctype="multipart/form-data" class="needs-validation">
@@ -377,7 +377,7 @@
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">
-                                                <i class="fas fa-user me-2"></i>First Name
+                                                <i class="fas fa-user me-2"></i> First Name
                                             </label>
                                             <input type="text" name="fname" class="form-control" value="{{ $user->first_name }}" required>
                                             @error('fname')
@@ -386,7 +386,7 @@
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">
-                                                <i class="fas fa-user me-2"></i>Last Name
+                                                <i class="fas fa-user me-2"></i> Last Name
                                             </label>
                                             <input type="text" name="lname" class="form-control" value="{{ $user->last_name }}" required>
                                             @error('lname')
@@ -398,7 +398,7 @@
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">
-                                                <i class="fas fa-phone me-2"></i>Phone
+                                                <i class="fas fa-phone me-2"></i> Phone
                                             </label>
                                             <input type="text" name="phone" class="form-control" value="{{ $user->phone }}" required>
                                             @error('phone')
@@ -407,7 +407,7 @@
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">
-                                                <i class="fas fa-envelope me-2"></i>Email
+                                                <i class="fas fa-envelope me-2"></i> Email
                                             </label>
                                             <input type="email" name="email" class="form-control" value="{{ $user->email }}">
                                             @error('email')
@@ -419,7 +419,7 @@
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">
-                                                <i class="fas fa-venus-mars me-2"></i>Gender
+                                                <i class="fas fa-venus-mars me-2"></i> Gender
                                             </label>
                                             <select name="gender" class="form-control" required>
                                                 <option value="{{ $user->gender }}" selected>{{ ucfirst($user->gender) }}</option>
@@ -432,7 +432,7 @@
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">
-                                                <i class="fas fa-image me-2"></i>Profile Photo
+                                                <i class="fas fa-image me-2"></i> Profile Photo
                                             </label>
                                             <input type="file" name="image" class="form-control" accept="image/*">
                                             <small class="text-muted">Maximum 1MB • JPG, PNG, GIF</small>
@@ -444,7 +444,7 @@
 
                                     <div class="text-center mt-4">
                                         <button type="submit" id="saveButton" class="btn btn-modern">
-                                            <i class="fas fa-save me-2"></i>Save Changes
+                                            <i class="fas fa-save me-2"></i> Save Changes
                                         </button>
                                     </div>
                                 </form>

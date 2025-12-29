@@ -302,6 +302,12 @@
                                             @endif
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <th><i class="fas fa-calendar-alt"></i> Admin ID</th>
+                                        <td>
+                                            {{Hashids::encode($user->id ?? 'Undefined')}} <i><b>(Encrypted)</b></i>
+                                        </td>
+                                    </tr>
                                 </table>
                             </div>
 

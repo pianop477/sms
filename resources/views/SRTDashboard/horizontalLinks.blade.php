@@ -29,8 +29,8 @@
                             <li>
                                 <a href="javascript:void(0)"><i class="ti-lock"></i><span>System Security</span></a>
                                 <ul class="submenu">
-                                    <li><a href="{{route('failed.login.attempts')}}"><i class="fa fa-user-slash"></i> Failed Login</a></li>
-                                    <li><a href="{{route('locked.otps')}}"><i class="fa fa-lock"></i> Locked OTP</a></li>
+                                    <li><a href="{{route('failed.login.attempts')}}"><i class="fas fa-user-secret"></i> Failed Login</a></li>
+                                    <li><a href="{{route('locked.otps')}}"><i class="fas fa-user-lock"></i> Locked OTP</a></li>
                                 </ul>
                             </li>
                         @endif
@@ -82,8 +82,8 @@
                             <li>
                                 <a href="javascript:void(0)"><i class="fa fa-screwdriver-wrench"></i><span>Advanced Settings</span></a>
                                 <ul class="submenu">
-                                    <li><a href="{{route('Teachers.trashed')}}"><i class="fas fa-trash"></i> Recycle Bin</a></li>
                                     <li><a href="{{route('users.lists')}}"><i class="fas fa-key"></i> Password Reset</a></li>
+                                    <li><a href="{{route('Teachers.trashed')}}"><i class="fas fa-trash"></i> Recycle Bin</a></li>
 
                                 </ul>
                             </li>

@@ -340,7 +340,7 @@
                 <div class="col-md-5"></div>
                 <div class="col-md-3 text-md-end mt-3 mt-md-0">
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStudentModal">
-                        <i class="fas fa-plus me-2"></i> Add User
+                        <i class="fas fa-plus me-2"></i> New Administrator
                     </button>
                 </div>
             </div>
@@ -410,9 +410,26 @@
                                     </td>
                                     <td>
                                         <div class="action-buttons">
-                                            <a href="{{route('manager.profile', ['id' => Hashids::encode($manager->id)])}}" class="btn-icon bg-primary text-white" title="view profile">
+                                            @if ($manager->status == 1)
+                                                <a href="{{route('manager.profile', ['id' => Hashids::encode($manager->id)])}}" class="btn-icon bg-primary text-white" title="view profile">
                                                 <i class="fas fa-eye"></i>
                                             </a>
+
+                                            <form action="" method="POST">
+                                                @csrf
+                                                @method('PUT')
+                                                <button formaction="{{route('admin.account.block', ['user' => Hashids::encode($manager->id)])}}" class="btn-icon bg-warning text-dark" title="Block Manager" onclick="return confirm('Are you sure you want to block this Administrator?')">
+                                                    <i class="ti-na"></i>
+                                                </button>
+                                            </form>
+                                            @else
+                                            <form action="" method="POST">
+                                                @csrf
+                                                @method('PUT')
+                                                <button formaction="{{route('admin.account.unblock', ['user' => Hashids::encode($manager->id)])}}" class="btn-icon bg-success text-white" title="Unblock Manager" onclick="return confirm('Are you sure you want to unblock this Administrator?')">
+                                                    <i class="fas fa-refresh"></i>
+                                                </button>
+                                            </form>
                                             <form action="{{route('manager.destroy', ['id' => Hashids::encode($manager->id)])}}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
@@ -420,6 +437,7 @@
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>

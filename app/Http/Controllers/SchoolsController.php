@@ -57,7 +57,6 @@ class SchoolsController extends Controller
         // abort(404);
         $request->validate([
             'name' => 'required|string|max:255',
-            'reg_no' => 'required|string|max:255',
             'abbriv' => 'required|string|max:4',
             'logo' => 'max:1024|mimes:png,jpg,jpeg',
             'postal' => 'required|string|max:255',
@@ -71,7 +70,6 @@ class SchoolsController extends Controller
             'sender_name' => 'nullable|string|max:11'
         ], [
             'name.required' => 'School name is required',
-            'reg_no.required' => 'School registration number is required',
             'abbriv.required' => 'Abbreviation code is required',
             'postal.required' => 'Postal address is required',
             'postal_name.required' => 'Postal name is required',
@@ -105,7 +103,7 @@ class SchoolsController extends Controller
             //store schools information
             $school = new school();
             $school->school_name = $request->name;
-            $school->school_reg_no = $request->reg_no;
+            $school->school_reg_no = $this->generateRegistrationNumber();
             $school->abbriv_code = $request->abbriv;
             $school->sender_id = $request->sender_name;
             $school->reg_date = Carbon::now()->format('Y-m-d');
@@ -190,6 +188,33 @@ class SchoolsController extends Controller
             return back();
         }
     }
+
+    private function isValidSchoolRegNo($regNo)
+    {
+        return preg_match('/^SHULEAPP-\d{4}-\d{4}$/', $regNo);
+    }
+
+
+    private function generateRegistrationNumber()
+    {
+        $year = Carbon::now()->year;
+        $prefix = 'SHULEAPP-' . $year . '-';
+
+        // pata number ya mwisho kwa mwaka huu
+        $lastSchool = School::where('school_reg_no', 'like', $prefix . '%')
+            ->orderBy('school_reg_no', 'desc')
+            ->first();
+
+        if ($lastSchool) {
+            $lastNumber = (int) substr($lastSchool->school_reg_no, -4);
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        return $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+    }
+
 
     private function formatPhoneNumber($phone)
     {
@@ -282,56 +307,63 @@ class SchoolsController extends Controller
 
     public function updateSchool($school, Request $request)
     {
-        //
         $decoded = Hashids::decode($school);
+
+        if (empty($decoded)) {
+            abort(404);
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
-            'reg_no' => 'required|string|max:255',
             'logo' => 'max:1024|mimes:png,jpg,jpeg',
             'abbriv' => 'required|string|max:4',
             'postal' => 'required|string|max:255',
             'postal_name' => 'required|string|max:255',
             'country' => 'required|string',
             'sender_name' => 'nullable|string|max:11'
-        ], [
-            'name.required' => 'School name is required',
-            'reg_no.required' => 'School registration number is required',
-            'abbriv.required' => 'Abbreviation code is required',
-            'postal.required' => 'Postal address is required',
-            'postal_name.required' => 'Postal name is required',
-            'country.required' => 'Country is required',
         ]);
 
-        $schools = school::findOrFail($decoded[0]);
-        $schools->school_name = $request->name;
-        $schools->abbriv_code = $request->abbriv;
-        $schools->school_reg_no = $request->reg_no;
-        $schools->postal_address = $request->postal;
-        $schools->postal_name = $request->postal_name;
-        $schools->sender_id = $request->sender_name;
-        $schools->country = $request->country;
+        $school = School::findOrFail($decoded[0]);
 
+        $school->school_name = $request->name;
+        $school->abbriv_code = $request->abbriv;
+        $school->postal_address = $request->postal;
+        $school->postal_name = $request->postal_name;
+        $school->sender_id = $request->sender_name;
+        $school->country = $request->country;
+
+        /**
+         * AUTO GENERATE school_reg_no
+         * (only if missing or invalid)
+         */
+        if (
+            empty($school->school_reg_no) ||
+            ! $this->isValidSchoolRegNo($school->school_reg_no)
+        ) {
+            $school->school_reg_no = $this->generateRegistrationNumber();
+        }
+
+        /**
+         * Logo update
+         */
         if ($request->hasFile('logo')) {
 
-            // Delete old logo if it exists
             if ($school->logo && Storage::disk('public')->exists('logo/' . $school->logo)) {
                 Storage::disk('public')->delete('logo/' . $school->logo);
             }
 
-            // Create unique logo name
             $imageFile = time() . '_' . uniqid() . '.' . $request->logo->getClientOriginalExtension();
-
-            // Store in storage/app/public/logo
             $request->logo->storeAs('logo', $imageFile, 'public');
 
-            // Save filename in DB
             $school->logo = $imageFile;
         }
 
-        $schools->save();
+        $school->save();
+
         Alert()->toast('School information updated successfully', 'success');
         return redirect()->route('home');
     }
+
 
     /**
      * Remove the resource from storage.
@@ -429,7 +461,7 @@ class SchoolsController extends Controller
             //update users who disabled
             User::where('school_id', $schools->id)->where('status', 0)->update(['status' => 1]);
 
-            Alert()->toast('Active time has been updated successfully', 'success');
+            Alert()->toast('Service has been activated successfully', 'success');
             return back();
         } catch (Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
@@ -546,7 +578,7 @@ class SchoolsController extends Controller
 
     public function faileLoginAttempts()
     {
-        $attempts = DB::table('failed_logins')->orderByDesc('attempted_at')->paginate(20);
+        $attempts = DB::table('failed_logins')->orderByDesc('attempted_at')->get();
         return view('Schools.failed-logins', compact('attempts'));
     }
 

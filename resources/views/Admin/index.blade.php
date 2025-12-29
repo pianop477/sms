@@ -86,6 +86,16 @@
             background: rgba(255, 255, 255, 0.9);
         }
 
+        .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
         .form-select:focus {
             border-color: var(--primary);
             box-shadow: 0 0 0 0.3rem rgba(67, 97, 238, 0.1);
@@ -378,9 +388,6 @@
                                     <td class="fw-bold text-primary">{{ $loop->iteration }}</td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <div class="bg-primary rounded-circle p-2 me-3">
-                                                <i class="fas fa-user-tie text-white"></i>
-                                            </div>
                                             <div>
                                                 <div class="fw-bold text-capitalize">
                                                     {{ $user->first_name }} {{ $user->last_name }}
@@ -395,31 +402,29 @@
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <i class="fas fa-phone text-primary me-2"></i>
                                             {{ $user->phone }}
                                         </div>
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <i class="fas fa-envelope text-primary me-2"></i>
                                             <span class="text-truncate">{{ $user->email }}</span>
                                         </div>
                                     </td>
                                     <td>
                                         @if ($user->status == 1)
                                             <span class="badge-modern bg-success">
-                                                <i class="fas fa-check-circle me-1"></i>Active
+                                                <i class="fas fa-check-circle me-1"></i> Active
                                             </span>
                                         @else
                                             <span class="badge-modern bg-danger">
-                                                <i class="fas fa-times-circle me-1"></i>Blocked
+                                                <i class="fas fa-times-circle me-1"></i> Blocked
                                             </span>
                                         @endif
                                     </td>
                                     <td>
                                         @if ($user->id == 1)
                                             <span class="badge-modern bg-warning">
-                                                <i class="fas fa-crown me-1"></i>Super User
+                                                <i class="fas fa-crown me-1"></i> Super User
                                             </span>
                                         @else
                                             <div class="action-buttons">
@@ -431,10 +436,10 @@
                                                     <form action="{{ route('admin.account.block', ['user' => Hashids::encode($user->id)]) }}" method="POST">
                                                         @csrf
                                                         @method('PUT')
-                                                        <button type="submit" class="btn-icon bg-warning text-white"
+                                                        <button type="submit" class="btn-icon bg-warning text-dark"
                                                                 onclick="return confirm('Are you sure you want to Block {{ $user->first_name }} {{ $user->last_name }}?')"
                                                                 title="Block User">
-                                                            <i class="fas fa-ban"></i>
+                                                            <i class="ti-na"></i>
                                                         </button>
                                                     </form>
                                                 @else
@@ -444,16 +449,19 @@
                                                         <button type="submit" class="btn-icon bg-success text-white"
                                                                 onclick="return confirm('Are you sure you want to Unblock {{ $user->first_name }} {{ $user->last_name }}?')"
                                                                 title="Unblock User">
-                                                            <i class="fas fa-unlock"></i>
+                                                            <i class="fas fa-refresh"></i>
+                                                        </button>
+                                                    </form>
+                                                    <form action="{{ route('admin.account.destroy', ['user' => Hashids::encode($user->id)]) }}" method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn-icon bg-danger text-white"
+                                                                onclick="return confirm('Are you sure you want to Delete {{ $user->first_name }} {{ $user->last_name }}?')"
+                                                                title="Delete User">
+                                                            <i class="fas fa-trash-alt"></i>
                                                         </button>
                                                     </form>
                                                 @endif
-                                                <a href="{{ route('admin.account.destroy', ['user' => Hashids::encode($user->id)]) }}"
-                                                   class="btn-icon bg-danger text-white"
-                                                   onclick="return confirm('Are you sure you want to delete {{ $user->first_name }} {{ $user->last_name }} permanently?')"
-                                                   title="Delete User">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
                                             </div>
                                         @endif
                                     </td>
@@ -473,7 +481,7 @@
                         <h5 class="modal-title">
                             <i class="fas fa-user-plus me-2"></i>Admin Registration Form
                         </h5>
-                        <button type="button" class="btn-close btn-close-white" data-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
                     </div>
                     <div class="modal-body p-4">
                         <form class="needs-validation" novalidate action="{{ route('admin.accounts.registration') }}" method="POST">
@@ -481,7 +489,7 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="firstName" class="form-label">
-                                        <i class="fas fa-user me-2"></i>First Name
+                                        <i class="fas fa-user me-2"></i>First Name <span class="text-danger">*</span>
                                     </label>
                                     <input type="text" name="fname" class="form-control" id="firstName"
                                            placeholder="First name" value="{{ old('fname') }}" required>
@@ -491,7 +499,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="lastName" class="form-label">
-                                        <i class="fas fa-user me-2"></i>Last Name
+                                        <i class="fas fa-user me-2"></i>Last Name <span class="text-danger">*</span>
                                     </label>
                                     <input type="text" name="lname" class="form-control" id="lastName"
                                            placeholder="Last name" value="{{ old('lname') }}" required>
@@ -504,7 +512,7 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="email" class="form-label">
-                                        <i class="fas fa-envelope me-2"></i>Email
+                                        <i class="fas fa-envelope me-2"></i>Email <span class="text-danger">*</span>
                                     </label>
                                     <div class="input-group">
                                         <span class="input-group-text">@</span>
@@ -517,7 +525,7 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label for="gender" class="form-label">
-                                        <i class="fas fa-venus-mars me-2"></i>Gender
+                                        <i class="fas fa-venus-mars me-2"></i>Gender <span class="text-danger">*</span>
                                     </label>
                                     <select name="gender" id="gender" class="form-select" required>
                                         <option value="">-- select gender --</option>
@@ -533,10 +541,10 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="phone" class="form-label">
-                                        <i class="fas fa-phone me-2"></i>Mobile Phone
+                                        <i class="fas fa-phone me-2"></i>Mobile Phone <span class="text-danger">*</span>
                                     </label>
                                     <input type="text" name="phone" class="form-control" id="phone"
-                                           placeholder="+255 123 456 789" value="{{ old('phone') }}" required>
+                                           placeholder="0712 456 789" value="{{ old('phone') }}" required>
                                     @error('phone')
                                     <div class="text-danger small mt-2">{{ $message }}</div>
                                     @enderror
@@ -548,7 +556,7 @@
                                     <i class="fas fa-times me-2"></i> Close
                                 </button>
                                 <button type="submit" id="saveButton" class="btn btn-success">
-                                    <i class="fas fa-save me-2"></i> Save Admin
+                                    <i class="fas fa-save me-2"></i> Submit
                                 </button>
                             </div>
                         </form>
@@ -578,7 +586,7 @@
                 if (!form.checkValidity()) {
                     form.classList.add("was-validated");
                     submitButton.disabled = false;
-                    submitButton.innerHTML = '<i class="fas fa-save me-2"></i>Save Admin';
+                    submitButton.innerHTML = '<i class="fas fa-save me-2"></i>Submit';
                     return;
                 }
 

@@ -300,8 +300,8 @@
                         <label for="regNumber" class="form-label">
                             <i class="fas fa-id-card"></i>Registration No
                         </label>
-                        <input type="text" name="reg_no" class="form-control text-uppercase" id="regNumber"
-                               placeholder="REG12345" value="{{ old('reg_no', $schools->school_reg_no) }}" required>
+                        <input type="text" name="reg_no" class="form-control text-uppercase" id="regNumber" readonly
+                               placeholder="REG12345" value="{{ old('reg_no', $schools->school_reg_no) }}">
                         @error('reg_no')
                         <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
@@ -336,7 +336,7 @@
                     <!-- Abbreviation Code -->
                     <div class="col-md-4 form-group">
                         <label for="abbreviationCode" class="form-label">
-                            <i class="fas fa-code"></i>Abbreviation Code
+                            <i class="fas fa-code"></i>School Code (Admission Prefix)
                         </label>
                         <input type="text" name="abbriv" class="form-control" id="abbreviationCode"
                                value="{{ old('abbriv', $schools->abbriv_code) }}" required>
@@ -398,7 +398,7 @@
                                 <i class="fas fa-arrow-left me-2"></i>Back
                             </a>
                             <button class="btn btn-modern btn-lg" id="saveButton" type="submit">
-                                <i class="fas fa-save me-2"></i>Update School
+                                <i class="fas fa-save me-2"></i> Save Changes
                             </button>
                         </div>
                     </div>
@@ -443,7 +443,7 @@
                 if (!form.checkValidity()) {
                     form.classList.add("was-validated");
                     submitButton.disabled = false;
-                    submitButton.innerHTML = '<i class="fas fa-save me-2"></i>Update School';
+                    submitButton.innerHTML = '<i class="fas fa-save me-2"></i>Save Changes';
                     return;
                 }
 

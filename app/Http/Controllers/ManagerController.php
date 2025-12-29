@@ -167,7 +167,7 @@ class ManagerController extends Controller
         $users->password = Hash::make($request->input('password', 'shule2025'));
         $users->save();
         event(new PasswordResetEvent($user));
-        Alert()->toast('User Password reset successfully', 'success');
+        Alert()->toast('Account Password reset successfully', 'success');
         return back();
     }
 
@@ -223,7 +223,7 @@ class ManagerController extends Controller
                 Transport::where('school_id', $school_info->id)->update(['status' => $status]);
 
             if($school_info) {
-                Alert()->toast('User Blocked Successfully', 'success');
+                Alert()->toast('School has been deactivated Successfully', 'success');
                 return back();
             } else {
                 Alert()->toast('Something went wrong, try again', 'error');
@@ -268,7 +268,7 @@ class ManagerController extends Controller
             Transport::where('school_id', $school_info->id)->update(['status' => $status]);
 
         if($school_info) {
-            Alert()->toast('User Unblocked successfully', 'success');
+            Alert()->toast('School has been activated successfully', 'success');
             return back();
         }
     }

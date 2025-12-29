@@ -421,12 +421,13 @@
                                                     </form>
                                                 </li>
                                                 <li>
-                                                    <a href="{{route('student.delete.permanent', ['student' => Hashids::encode($student->id)])}}"
-                                                       class="action-btn action-btn-danger"
-                                                       title="Delete Permanently"
-                                                       onclick="return confirmAction('delete permanently', '{{$student->first_name}}', '{{$student->last_name}}')">
-                                                        <i class="fas fa-trash"></i>
-                                                    </a>
+                                                    <form action="{{route('student.delete.permanent', ['student' => Hashids::encode($student->id)])}}" method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="action-btn action-btn-danger" title="Delete" onclick="return confirm('Are you sure you want delete permanently {{strtoupper($student->first_name)}} {{strtoupper($student->last_name)}}')">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
                                                 </li>
                                             </ul>
                                         </td>

@@ -1221,12 +1221,13 @@ class StudentsController extends Controller
     public function deletePerStudent($student)
     {
         $decoded = Hashids::decode($student);
+
         if (empty($decoded)) {
             Alert()->toast('No such student was found', 'error');
             return back();
         }
-        $student = Student::find($decoded[0]);
 
+        $student = Student::find($decoded[0]);
 
         if (! $student) {
             Alert()->toast('No such student was found', 'error');
@@ -1234,22 +1235,58 @@ class StudentsController extends Controller
         }
 
         $user = Auth::user();
-        if ($student->school_id != $user->school_id) {
+
+        if ($student->school_id !== $user->school_id) {
             Alert()->toast('You are not authorized to perform this action', 'error');
             return back();
         }
 
-        if ($student->image) {
-            $filePath = storage_path('app/public/students/' . $student->image);
-
-            if (file_exists($filePath)) {
-                unlink($filePath);
-            }
+        /**
+         * 1. Student lazima awe inactive
+         */
+        if ($student->status == 1) {
+            Alert()->toast('Active student cannot be deleted.', 'info');
+            return back();
         }
 
-        $student->delete();
-        Alert()->toast('Student has been deleted permanently', 'success');
-        return back();
+        /**
+         * 2. Grace period: miezi 6 tangu updated_at
+         */
+        $sixMonthsAgo = Carbon::now()->subMonths(6);
+
+        if ($student->updated_at > $sixMonthsAgo) {
+            Alert()->toast(
+                'This student is still in the grace period.',
+                'info'
+            );
+            return back();
+        }
+
+        try {
+            DB::transaction(function () use ($student) {
+
+                /**
+                 * Futa picha kama ipo
+                 */
+                if ($student->image) {
+                    $filePath = storage_path('app/public/students/' . $student->image);
+                    if (file_exists($filePath)) {
+                        unlink($filePath);
+                    }
+                }
+
+                /**
+                 * Futa student
+                 */
+                $student->delete();
+            });
+
+            Alert()->toast('Student has been deleted permanently.', 'success');
+            return back();
+        } catch (\Exception $e) {
+            Alert()->toast('Something went wrong. Please try again.', 'error');
+            return back();
+        }
     }
 
     public function batchUpdateStream(Request $request)

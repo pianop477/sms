@@ -91,6 +91,16 @@
             color: var(--primary);
         }
 
+        .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            background-color: white;
+        }
+
         .form-control {
             border: 2px solid rgba(67, 97, 238, 0.2);
             border-radius: 12px;
@@ -369,7 +379,7 @@
                     <!-- School Name -->
                     <div class="col-md-6 form-group">
                         <label for="validationCustom01" class="form-label">
-                            <i class="fas fa-school"></i>School Name
+                            <i class="fas fa-school"></i>School Name <span class="text-danger">*</span>
                         </label>
                         <input type="text" required name="name" class="form-control text-uppercase" id="validationCustom01"
                                placeholder="Enter school name" value="{{ old('name') }}">
@@ -378,24 +388,10 @@
                         @enderror
                     </div>
 
-                    <!-- Registration Number -->
-                    <div class="col-md-6 form-group">
-                        <label for="validationCustom02" class="form-label">
-                            <i class="fas fa-id-card"></i>Registration No
-                        </label>
-                        <input type="text" required name="reg_no" class="form-control text-uppercase"
-                               id="validationCustom02" placeholder="REG12345" value="{{ old('reg_no') }}">
-                        @error('reg_no')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="row">
                     <!-- Postal Address -->
-                    <div class="col-md-4 form-group">
+                    <div class="col-md-6 form-group">
                         <label for="postalAddress" class="form-label">
-                            <i class="fas fa-envelope"></i>Postal Address
+                            <i class="fas fa-envelope"></i>Postal Address <span class="text-danger">*</span>
                         </label>
                         <input type="text" required name="postal" class="form-control" id="postalAddress"
                                placeholder="P.O Box 123" value="{{ old('postal') }}">
@@ -403,11 +399,13 @@
                         <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
+                </div>
 
+                <div class="row">
                     <!-- Address Name -->
-                    <div class="col-md-4 form-group">
+                    <div class="col-md-6 form-group">
                         <label for="addressName" class="form-label">
-                            <i class="fas fa-map-marker-alt"></i>Address Name
+                            <i class="fas fa-map-marker-alt"></i>Address Name <span class="text-danger">*</span>
                         </label>
                         <input type="text" required name="postal_name" class="form-control text-capitalize"
                                id="addressName" placeholder="Dodoma" value="{{ old('postal_name') }}">
@@ -415,13 +413,12 @@
                         <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
-
                     <!-- Abbreviation Code -->
-                    <div class="col-md-4 form-group">
+                    <div class="col-md-6 form-group">
                         <label for="abbreviationCode" class="form-label">
-                            <i class="fas fa-code"></i>Abbreviation Code
+                            <i class="fas fa-code"></i>School Code (Admission Prefix) <span class="text-danger">*</span>
                         </label>
-                        <input type="text" name="abbriv" class="form-control" id="abbreviationCode"
+                        <input type="text" name="abbriv" class="form-control" id="abbreviationCode" placeholder="SHU"
                                value="{{ old('abbriv') }}" required>
                         @error('abbriv')
                         <div class="text-danger small mt-2">{{ $message }}</div>
@@ -444,9 +441,9 @@
                     </div>
 
                     <!-- Country -->
-                    <div class="col-md-3 form-group">
+                    <div class="col-md-6 form-group">
                         <label for="countrySelect" class="form-label">
-                            <i class="fas fa-globe"></i>Country
+                            <i class="fas fa-globe"></i>Country <span class="text-danger">*</span>
                         </label>
                         <select name="country" id="countrySelect" class="form-select" required>
                             <option value="Tanzania" selected>Tanzania</option>
@@ -455,11 +452,12 @@
                         <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
-
+                </div>
+                <div class="row">
                     <!-- School Logo -->
-                    <div class="col-md-3 form-group">
+                    <div class="col-md-6 form-group">
                         <label for="schoolLogo" class="form-label">
-                            <i class="fas fa-image"></i>School Logo
+                            <i class="fas fa-image"></i>School Logo <span class="text-danger">*</span>
                         </label>
                         <input type="file" required name="logo" class="form-control" id="schoolLogo">
                         @error('logo')
@@ -471,14 +469,14 @@
                 <div class="divider" style="height: 2px; background: linear-gradient(90deg, transparent, rgba(67, 97, 238, 0.3), transparent); margin: 2rem 0;"></div>
 
                 <h4 class="text-primary mb-4">
-                    <i class="fas fa-user-tie me-2"></i>School Admin Information
+                    <i class="fas fa-user-tie me-2"></i>School Administrator
                 </h4>
 
                 <div class="row">
                     <!-- First Name -->
                     <div class="col-md-4 form-group">
                         <label for="firstName" class="form-label">
-                            <i class="fas fa-user"></i>First Name
+                            <i class="fas fa-user"></i>First Name <span class="text-danger">*</span>
                         </label>
                         <input type="text" name="fname" class="form-control text-capitalize" id="firstName"
                                placeholder="First name" value="{{ old('fname') }}" required>
@@ -490,7 +488,7 @@
                     <!-- Last Name -->
                     <div class="col-md-4 form-group">
                         <label for="lastName" class="form-label">
-                            <i class="fas fa-user"></i>Last Name
+                            <i class="fas fa-user"></i>Last Name <span class="text-danger">*</span>
                         </label>
                         <input type="text" name="lname" class="form-control text-capitalize" id="lastName"
                                placeholder="Last name" value="{{ old('lname') }}" required>
@@ -502,7 +500,7 @@
                     <!-- Email -->
                     <div class="col-md-4 form-group">
                         <label for="emailAddress" class="form-label">
-                            <i class="fas fa-envelope"></i>Email
+                            <i class="fas fa-envelope"></i>Email <span class="text-danger">*</span>
                         </label>
                         <div class="input-group">
                             <span class="input-group-text">@</span>
@@ -519,7 +517,7 @@
                     <!-- Gender -->
                     <div class="col-md-4 form-group">
                         <label for="genderSelect" class="form-label">
-                            <i class="fas fa-venus-mars"></i>Gender
+                            <i class="fas fa-venus-mars"></i>Gender <span class="text-danger">*</span>
                         </label>
                         <select name="gender" id="genderSelect" class="form-select" required>
                             <option value="">-- select gender --</option>
@@ -534,7 +532,7 @@
                     <!-- Phone -->
                     <div class="col-md-4 form-group">
                         <label for="phoneNumber" class="form-label">
-                            <i class="fas fa-phone"></i>Mobile Phone
+                            <i class="fas fa-phone"></i>Mobile Phone <span class="text-danger">*</span>
                         </label>
                         <input type="tel" name="phone" class="form-control" id="phoneNumber"
                                placeholder="+255 123 456 789" value="{{ old('phone') }}" required>
@@ -546,7 +544,7 @@
 
                 <div class="text-center mt-4">
                     <button class="btn btn-modern btn-lg" id="saveButton" type="submit">
-                        <i class="fas fa-plus me-2"></i> Register School
+                        <i class="fas fa-plus me-2"></i> Submit
                     </button>
                 </div>
             </form>
@@ -565,7 +563,7 @@
                             <th>#</th>
                             <th>School Name</th>
                             <th>Sender ID</th>
-                            <th>Abbreviation</th>
+                            <th>Prefix</th>
                             <th>Registration No</th>
                             <th>Logo</th>
                             <th>Status</th>
@@ -727,7 +725,7 @@
                 if (!form.checkValidity()) {
                     form.classList.add("was-validated");
                     submitButton.disabled = false;
-                    submitButton.innerHTML = '<i class="fas fa-plus me-2"></i>Register School';
+                    submitButton.innerHTML = '<i class="fas fa-plus me-2"></i>Submit';
                     return;
                 }
 
