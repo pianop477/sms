@@ -29,7 +29,6 @@ class ParentStudentImport implements ToModel, WithValidation, WithHeadingRow
             'parent_email' => 'nullable|email',
             'parent_phone' => [
                 'required',
-                'integer',
                 function ($attribute, $value, $fail) {
                     // Ondoa space na characters zisizo namba
                     $phone = preg_replace('/[^0-9]/', '', $value);
@@ -56,54 +55,64 @@ class ParentStudentImport implements ToModel, WithValidation, WithHeadingRow
                 },
             ],
 
-            'parent_gender' => 'required|string',
-                                function ($attribute, $value, $fail) {
-                                    $value = strtolower(trim($value));
-                                    $allowed = ['male', 'female'];
+            'parent_gender' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    $value = strtolower(trim($value));
+                    $allowed = ['male', 'female'];
 
-                                    if(!in_array($value, $allowed)) {
-                                        $fail("Invalid selected {$attribute} is invalid. allowed values are: ". implode(', ', $allowed));
-                                    }
-                                },
+                    if (!in_array($value, $allowed)) {
+                        $fail("Invalid selected {$attribute} is invalid. allowed values are: " . implode(', ', $allowed));
+                    }
+                },
+            ],
+
             'parent_address' => 'required|string',
             'class_name' => 'required|exists:grades,class_name,school_id,' . Auth::user()->school_id,
             'bus_no' => 'nullable|exists:transports,bus_no,school_id,' . Auth::user()->school_id,
             'student_first_name' => 'required|string',
             'student_middle_name' => 'nullable|string',
             'student_last_name' => 'required|string',
-            'student_gender' => 'required|string',
-                                function ($attribute, $value, $fail) {
-                                    $value = strtolower(trim($value));
-                                    $allowed = ['male', 'female'];
 
-                                    if(!in_array($value, $allowed)) {
-                                        $fail("Invalid selected {$attribute} is invalid. allowed values are: ". implode(', ', $allowed));
-                                    }
-                                },
+            'student_gender' => [
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    $value = strtolower(trim($value));
+                    $allowed = ['male', 'female'];
+
+                    if (!in_array($value, $allowed)) {
+                        $fail("Invalid selected {$attribute} is invalid. allowed values are: " . implode(', ', $allowed));
+                    }
+                },
+            ],
+
             'student_dob' => [
                 'required',
-                    function ($attribute, $value, $fail) {
-                        try {
-                            $date = \Carbon\Carbon::parse($value);
-                            if ($date->isAfter(now())) {
-                                $fail('The date of birth must be before or equal today.');
+                function ($attribute, $value, $fail) {
+                    try {
+                        $date = \Carbon\Carbon::parse($value);
+                        if ($date->isAfter(now())) {
+                            $fail('The date of birth must be before or equal today.');
                         }
                     } catch (\Exception $e) {
                         $fail('Invalid date format. Use mm/dd/yyyy format.');
                     }
                 }
             ],
+
             'student_group' => [
                 'required',
                 'string',
-                    function ($attribute, $value, $fail) {
-                        $value = strtolower(trim($value)); // Convert to lowercase & remove spaces
-                        $allowed = ['a', 'b', 'c', 'd', 'e'];
+                function ($attribute, $value, $fail) {
+                    $value = strtolower(trim($value));
+                    $allowed = ['a', 'b', 'c', 'd', 'e'];
 
-                        if (!in_array($value, $allowed)) {
-                            $fail("The selected {$attribute} is invalid. Allowed values are: " . implode(', ', $allowed));
-                        }
-                    },
+                    if (!in_array($value, $allowed)) {
+                        $fail("The selected {$attribute} is invalid. Allowed values are: " . implode(', ', $allowed));
+                    }
+                },
             ],
         ];
     }
@@ -131,70 +140,139 @@ class ParentStudentImport implements ToModel, WithValidation, WithHeadingRow
             $phone = $row['parent_phone'];
             $preparedPhone = $this->formatPhoneForDatabase($phone);
 
-            // Create/Find Parent User
-            $user = User::firstOrCreate(
-                ['email' => ucwords(strtolower($email))],
+            // ========== CRITICAL FIX: Find/Create Parent User by PHONE NUMBER ==========
+            // First check if user exists by phone (main identifier)
+            $parentUser = User::where('phone', $preparedPhone)
+                ->where('school_id', $school->id)
+                ->first();
+
+            $isNewUser = false;
+
+            if (!$parentUser) {
+                // If user doesn't exist by phone, check by email if provided
+                if ($email) {
+                    $parentUser = User::where('email', $email)
+                        ->where('school_id', $school->id)
+                        ->first();
+                }
+
+                // If still not found, create new user
+                if (!$parentUser) {
+                    $isNewUser = true;
+
+                    // Generate unique username based on phone
+                    $username = 'parent_' . $preparedPhone;
+
+                    $parentUser = User::create([
+                        'first_name' => ucwords(strtolower($row['parent_first_name'])),
+                        'last_name' => ucwords(strtolower($row['parent_last_name'])),
+                        'gender' => ucwords(strtolower($row['parent_gender'])),
+                        'phone' => $preparedPhone,
+                        'email' => $email,
+                        'username' => $username,
+                        'usertype' => 4, // Parent user type
+                        'password' => Hash::make('shule2025'),
+                        'school_id' => $school->id,
+                        'status' => 1, // Active
+                    ]);
+                } else {
+                    // User exists by email but with different phone? Update phone if empty
+                    if (empty($parentUser->phone)) {
+                        $parentUser->phone = $preparedPhone;
+                        $parentUser->save();
+                    }
+                }
+            }
+
+            // ========== Create/Update Parent Record ==========
+            $parent = Parents::firstOrCreate(
                 [
-                    'first_name' => ucwords(strtolower($row['parent_first_name'])),
-                    'last_name' => ucwords(strtolower($row['parent_last_name'])),
-                    'gender' => ucwords(strtolower($row['parent_gender'])),
-                    'phone' => $preparedPhone,
-                    'usertype' => 4,
-                    'password' => Hash::make('shule2025'),
-                    'school_id' => $school->id,
+                    'user_id' => $parentUser->id,
+                    'school_id' => $school->id
+                ],
+                [
+                    'address' => ucwords(strtolower($row['parent_address']))
                 ]
             );
 
-            // Create Parent Record
-            $parent = Parents::firstOrCreate(
-                ['user_id' => $user->id, 'school_id' => $school->id],
-                ['address' => ucwords(strtolower($row['parent_address']))],
-                ['school_id' => $school->id],
-            );
+            // Update address if it's different
+            if ($parent->address !== ucwords(strtolower($row['parent_address']))) {
+                $parent->address = ucwords(strtolower($row['parent_address']));
+                $parent->save();
+            }
 
             // Parse Student DOB
             $dob = is_numeric($row['student_dob'])
                 ? Carbon::parse(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['student_dob']))
                 : Carbon::parse($row['student_dob']);
 
-            // Create Student
-            $student = Student::firstOrCreate(
-                [
-                    'first_name' => ucwords(strtolower($row['student_first_name'])),
-                    'middle_name' => ucwords(strtolower($row['student_middle_name'])),
-                    'last_name' => ucwords(strtolower($row['student_last_name'])),
-                    'school_id' => $school->id,
+            // Check if student already exists (by name, parent, and school)
+            $existingStudent = Student::where('first_name', ucwords(strtolower($row['student_first_name'])))
+                ->where('last_name', ucwords(strtolower($row['student_last_name'])))
+                ->where('parent_id', $parent->id)
+                ->where('school_id', $school->id)
+                ->first();
+
+            if ($existingStudent) {
+                // Update existing student
+                $existingStudent->update([
+                    'middle_name' => ucwords(strtolower($row['student_middle_name'] ?? '')),
                     'gender' => ucwords(strtolower($row['student_gender'])),
                     'group' => ucwords(strtolower($row['student_group'])),
-                ],
-                [
+                    'dob' => $dob,
+                    'class_id' => $class->id,
+                    'transport_id' => $transport?->id,
+                ]);
+
+                $student = $existingStudent;
+            } else {
+                // Create new student
+                $student = Student::create([
+                    'first_name' => ucwords(strtolower($row['student_first_name'])),
+                    'middle_name' => ucwords(strtolower($row['student_middle_name'] ?? '')),
+                    'last_name' => ucwords(strtolower($row['student_last_name'])),
+                    'gender' => ucwords(strtolower($row['student_gender'])),
+                    'group' => ucwords(strtolower($row['student_group'])),
                     'dob' => $dob,
                     'admission_number' => $this->getAdmissionNumber($school->id),
                     'class_id' => $class->id,
                     'parent_id' => $parent->id,
                     'transport_id' => $transport?->id,
-                ]
-            );
+                    'school_id' => $school->id,
+                    'status' => 1, // Active
+                ]);
+            }
 
-            if ($user->wasRecentlyCreated) {
-                $formattedPhone = $this->formatPhoneNumber($user->phone); // tumia namba halisi iliyosajiliwa
+            // ========== Send SMS only for NEW users ==========
+            if ($isNewUser) {
+                $formattedPhone = $this->formatPhoneNumber($parentUser->phone);
 
                 $nextSmsService = new NextSmsService();
-                $link = "https://shuleapp.tech/login";
+                $link = "https://shuleapp.tech";
                 $payload = [
                     'from' => $school->sender_id ?? "SHULE APP",
-                    'to' => [$formattedPhone], // iwe array
-                    'text' => "Hello {$user->first_name} {$user->last_name}\nWelcome to ShuleApp\nYour login credentials are:\nUsername: {$preparedPhone}\nPassword: shule2025\nclick here {$link} to Login",
-                    'reference' => $user->id,
+                    'to' => [$formattedPhone],
+                    'text' => "Hello {$parentUser->first_name} {$parentUser->last_name}\nWelcome to ShuleApp\nYour login credentials are:\nUsername: {$parentUser->phone}\nPassword: shule2025\nLogin: {$link}",
+                    'reference' => $parentUser->id,
                 ];
 
-                // Log::info("Sending Message to: " . $user->phone, ['message' => $payload['text']]);
+                // Log::info("Sending SMS to new parent: " . $parentUser->phone, [
+                //     'parent_id' => $parent->id,
+                //     'user_id' => $parentUser->id,
+                //     'message' => $payload['text']
+                // ]);
+
                 $response = $nextSmsService->sendSmsByNext(
                     $payload['from'],
                     $payload['to'],
                     $payload['text'],
                     $payload['reference']
                 );
+            } else {
+                Log::info("Existing parent, no SMS sent: " . $parentUser->phone, [
+                    'parent_id' => $parent->id,
+                    'user_id' => $parentUser->id
+                ]);
             }
 
             return $student;

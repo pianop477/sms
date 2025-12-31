@@ -47,17 +47,17 @@ class ParentsController extends Controller
         $classes = Grade::where('school_id', '=', $user->school_id, 'AND', 'status', '=', 1)->orderBy('class_code')->get();
         $buses = Transport::where('school_id', '=', $user->school_id, 'AND', 'status', '=', 1)->orderBy('bus_no', 'ASC')->get();
         $parents = Parents::query()
-                            ->join('users', 'users.id', '=', 'parents.user_id')
-                            ->join('schools', 'schools.id', '=', 'parents.school_id')
-                            ->select('parents.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.email')
-                            ->where('parents.school_id', '=', $user->school_id)
-                            ->where(function ($query) {
-                                $query->where('parents.status', 1)
-                                        ->orWhere('parents.status', 0);
-                            })
-                            ->orderBy('users.first_name', 'ASC')
-                            ->get();
-        return view('Parents.index', compact('parents','classes', 'buses'));
+            ->join('users', 'users.id', '=', 'parents.user_id')
+            ->join('schools', 'schools.id', '=', 'parents.school_id')
+            ->select('parents.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.email')
+            ->where('parents.school_id', '=', $user->school_id)
+            ->where(function ($query) {
+                $query->where('parents.status', 1)
+                    ->orWhere('parents.status', 0);
+            })
+            ->orderBy('users.first_name', 'ASC')
+            ->get();
+        return view('Parents.index', compact('parents', 'classes', 'buses'));
     }
     /**
      * Show the form for creating the resource.
@@ -103,7 +103,7 @@ class ParentsController extends Controller
             'passport.max' => 'The image may not be greater than 1MB.',
         ]);
 
-        if($request->hasFile('passport')) {
+        if ($request->hasFile('passport')) {
             // Scan the uploaded file for viruses
             $scanResult = $this->scanFileForViruses($request->file('passport'));
             if (!$scanResult['clean']) {
@@ -116,16 +116,16 @@ class ParentsController extends Controller
         try {
             // Check if user (parent) exists
             $userExists = User::where('phone', $request->phone)
-                        ->where('school_id', $user->school_id)
-                        ->exists();
+                ->where('school_id', $user->school_id)
+                ->exists();
 
             // Check if student exists
             $studentExists = Student::whereRaw('LOWER(first_name) = ?', [strtolower($request->student_first_name)])
-                    ->whereRaw('LOWER(middle_name) = ?', [strtolower($request->student_middle_name)])
-                    ->whereRaw('LOWER(last_name) = ?', [strtolower($request->student_last_name)])
-                    ->where('dob', $request->dob) // Angalia tarehe ya kuzaliwa ili kuwa na uhakika zaidi
-                    ->where('school_id', $request->school_id)
-                    ->first();
+                ->whereRaw('LOWER(middle_name) = ?', [strtolower($request->student_middle_name)])
+                ->whereRaw('LOWER(last_name) = ?', [strtolower($request->student_last_name)])
+                ->where('dob', $request->dob) // Angalia tarehe ya kuzaliwa ili kuwa na uhakika zaidi
+                ->where('school_id', $request->school_id)
+                ->first();
 
             if ($userExists || $studentExists) {
                 Alert()->toast('Parent or Student information already exists in our records', 'error');
@@ -179,47 +179,46 @@ class ParentsController extends Controller
 
             DB::commit();
 
-                $url = "https://shuleapp.tech/login";
+            $url = "https://shuleapp.tech/login";
 
-                $nextSmsService = new NextSmsService();
-                $senderId = $school->sender_id ?? "SHULE APP";
-                $message = "Hello {$users->first_name} {$users->last_name},\n";
-                $message .= "Welcome to ShuleApp, Your Login details are:\n";
-                $message .= " Username: {$users->phone}\n";
-                $message .= " Password: shule2025.\n"; // Default password
-                $message .= " Click here {$url} to Login";
+            $nextSmsService = new NextSmsService();
+            $senderId = $school->sender_id ?? "SHULE APP";
+            $message = "Hello {$users->first_name} {$users->last_name},\n";
+            $message .= "Welcome to ShuleApp, Your Login details are:\n";
+            $message .= " Username: {$users->phone}\n";
+            $message .= " Password: shule2025.\n"; // Default password
+            $message .= " Click here {$url} to Login";
 
-                $reference = uniqid();
-                $formattedPhone = $this->formatPhoneNumber($users->phone);
+            $reference = uniqid();
+            $formattedPhone = $this->formatPhoneNumber($users->phone);
 
-                $payload = [
-                    'from' => $senderId,
-                    'to' => $formattedPhone,
-                    'text' => $message,
-                    'reference' => $reference
-                ];
+            $payload = [
+                'from' => $senderId,
+                'to' => $formattedPhone,
+                'text' => $message,
+                'reference' => $reference
+            ];
 
-                $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+            $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
-                if(!$response['success']) {
-                    Alert()->toast('SMS failed: '.$response['error'], 'error');
-                    return back();
-                }
+            if (!$response['success']) {
+                Alert()->toast('SMS failed: ' . $response['error'], 'error');
+                return back();
+            }
 
-                $beemSmsService = new BeemSmsService();
-                $senderId = $school->sender_id ?? 'shuleApp';
-                $Code_id = 1;
-                $recipients = [
-                    [
-                        'recipient_id' => 1,
-                        'dest_addr' => $formattedPhone, // Use validated phone number
-                    ],
-                ];
+            $beemSmsService = new BeemSmsService();
+            $senderId = $school->sender_id ?? 'shuleApp';
+            $Code_id = 1;
+            $recipients = [
+                [
+                    'recipient_id' => 1,
+                    'dest_addr' => $formattedPhone, // Use validated phone number
+                ],
+            ];
 
-                // $response = $beemSmsService->sendSms($senderId, $message, $recipients);
-                Alert()->toast('Parent and student information saved successfully', 'success');
-                return redirect()->route('Parents.index');
-
+            // $response = $beemSmsService->sendSms($senderId, $message, $recipients);
+            Alert()->toast('Parent and student information saved successfully', 'success');
+            return redirect()->route('Parents.index');
         } catch (\Exception $e) {
             DB::rollBack();
             Alert()->toast($e->getMessage(), 'error');
@@ -251,8 +250,8 @@ class ParentsController extends Controller
 
         // Pata ID ya mwisho ya mwanafunzi na uongeze 1
         $lastStudent = Student::where('school_id', $user->school_id)
-                            ->orderBy('id', 'desc')
-                            ->first();
+            ->orderBy('id', 'desc')
+            ->first();
 
         $lastId = $lastStudent ? $lastStudent->id + 1 : 1;
 
@@ -287,19 +286,19 @@ class ParentsController extends Controller
         $decoded = Hashids::decode($parent);
         $loggedUser = Auth::user();
         $parents = Parents::query()->join('users', 'users.id', '=', 'parents.user_id')
-                                    ->select('parents.*', 'users.first_name', 'users.last_name', 'users.created_at as user_created_at', 'users.email', 'users.gender', 'users.phone', 'users.image')
-                                    ->where('parents.id', '=', $decoded[0])
-                                    ->first();
-        if($parents->school_id != $loggedUser->school_id) {
+            ->select('parents.*', 'users.first_name', 'users.last_name', 'users.created_at as user_created_at', 'users.email', 'users.gender', 'users.phone', 'users.image')
+            ->where('parents.id', '=', $decoded[0])
+            ->first();
+        if ($parents->school_id != $loggedUser->school_id) {
             Alert()->toast('You are not authorized to edit this parent', 'error');
             return back();
         }
         $students = Student::query()
-                        ->join('grades', 'grades.id', '=', 'students.class_id')
-                        ->select('students.*', 'grades.class_name', 'grades.class_code' )
-                        ->where('students.parent_id', $parents->id)
-                        ->where('students.status', 1)
-                        ->get();
+            ->join('grades', 'grades.id', '=', 'students.class_id')
+            ->select('students.*', 'grades.class_name', 'grades.class_code')
+            ->where('students.parent_id', $parents->id)
+            ->where('students.status', 1)
+            ->get();
 
         return view('Parents.edit', ['parents' => $parents, 'students' => $students]);
     }
@@ -316,17 +315,17 @@ class ParentsController extends Controller
         $loggedUser = Auth::user();
         $parents = Parents::findOrFail($decoded[0]);
 
-        if($parents->school_id != $loggedUser->school_id) {
+        if ($parents->school_id != $loggedUser->school_id) {
             Alert()->toast('You are not authorized to block this parent', 'error');
             return back();
         }
 
         $user = User::findOrFail($parents->user_id);
         $user->status = $request->input('status', 0);
-        if($user->save()) {
+        if ($user->save()) {
             $parents->status = $request->input('status', 0);
 
-            if($parents->save()) {
+            if ($parents->save()) {
                 event(new PasswordResetEvent($user->id));
                 Alert()->toast('Parent blocked successfully', 'success');
                 return back();
@@ -341,17 +340,17 @@ class ParentsController extends Controller
         $loggedUser = Auth::user();
         $parents = Parents::findOrFail($decoded[0]);
 
-        if($parents->school_id != $loggedUser->school_id){
+        if ($parents->school_id != $loggedUser->school_id) {
             Alert()->toast('You are not authorized to block this parent', 'error');
             return back();
         }
 
         $user = User::findOrFail($parents->user_id);
         $user->status = $request->input('status', 1);
-        if($user->save()) {
+        if ($user->save()) {
             $parents->status = $request->input('status', 1);
 
-            if($parents->save()) {
+            if ($parents->save()) {
                 Alert()->toast('Parent unblocked successfully', 'success');
                 return back();
             }
@@ -371,7 +370,7 @@ class ParentsController extends Controller
             // Find the parent record
             $parent = Parents::find($decoded[0]);
 
-            if($parent->school_id != $loggedUser->school_id) {
+            if ($parent->school_id != $loggedUser->school_id) {
                 Alert()->toast('You are not authorized to delete this parent', 'error');
                 return back();
             }
@@ -398,13 +397,29 @@ class ParentsController extends Controller
             }
 
             // Delete any related inactive students (if needed)
-            Student::where('parent_id', $parent->id)->where('status', '!=', 1)->delete();
+            $student = Student::where('parent_id', $parent->id)->where('status', '!=', 1)->get();
 
-            // Check and delete the user's profile image if it exists
-            if (!empty($user->image)) {
-                $userImagePath = storage_path('app/public/students/' . $user->image);
-                if (file_exists($userImagePath)) {
-                    unlink($userImagePath);
+            foreach ($student as $s) {
+                try {
+                    $sixMonthsAgo = now()->subMonths(6);
+
+                    if ($s->updated_at > $sixMonthsAgo) {
+                        Alert()->toast('Cannot delete this parent because student is still in grace period', 'info');
+                        return back();
+                    }
+                    // Check and delete the student's profile image if it exists
+                    if (!empty($student->image)) {
+                        $studentImagePath = storage_path('app/public/students/' . $student->image);
+                        if (file_exists($studentImagePath)) {
+                            unlink($studentImagePath);
+                        }
+                    }
+                    // Delete the student record
+                    $student->delete();
+
+                } catch (Exception $e) {
+                    Alert()->toast($e->getMessage(), 'error');
+                    return back();
                 }
             }
 
@@ -421,38 +436,41 @@ class ParentsController extends Controller
     }
 
     // update full data for parents **************************************************
-    public function updateParent (Request $request, $parents)
+    public function updateParent(Request $request, $parents)
     {
         $decoded = Hashids::decode($parents);
         $parent = Parents::findOrFail($decoded[0]);
         $loggedUser = Auth::user();
 
-        if($parent->school_id != $loggedUser->school_id) {
+        if ($parent->school_id != $loggedUser->school_id) {
             Alert()->toast('You are not authorized to block this parent', 'error');
             return back();
         }
         $user = User::findOrFail($parent->user_id);
 
         // run validation
-        $this->validate($request, [
-            'fname' => 'required|max:255|string',
-            'lname' => 'required|max:255|string',
-            'gender' => 'required|string|max:255',
-            'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,'.$user->id,
-            'email' => 'nullable|unique:users,email,'.$user->id,
-            'street' => 'required|string|max:255',
-            'image' => 'nullable|mimes:jpg,png,jpeg,tiff,bmp,giff|max:1024',
-        ],
-        [
-            'phone.regex' => 'The phone number must be 10 digits long.',
-            'phone.unique' => 'The phone number has already been taken.',
-            'email.unique' => 'The email has already been taken.',
-            'image.mimes' => 'The image must be a file of type: jpg, png, jpeg.',
-            'image.max' => 'The image may not be greater than 1MB.',
-        ]);
+        $this->validate(
+            $request,
+            [
+                'fname' => 'required|max:255|string',
+                'lname' => 'required|max:255|string',
+                'gender' => 'required|string|max:255',
+                'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,' . $user->id,
+                'email' => 'nullable|unique:users,email,' . $user->id,
+                'street' => 'required|string|max:255',
+                'image' => 'nullable|mimes:jpg,png,jpeg,tiff,bmp,giff|max:1024',
+            ],
+            [
+                'phone.regex' => 'The phone number must be 10 digits long.',
+                'phone.unique' => 'The phone number has already been taken.',
+                'email.unique' => 'The email has already been taken.',
+                'image.mimes' => 'The image must be a file of type: jpg, png, jpeg.',
+                'image.max' => 'The image may not be greater than 1MB.',
+            ]
+        );
 
         // scan image file for virus
-        if($request->hasFile('image')) {
+        if ($request->hasFile('image')) {
             $scanResult = $this->scanFileForViruses($request->file('image'));
             if (!$scanResult['clean']) {
                 Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
@@ -466,10 +484,10 @@ class ParentsController extends Controller
         $user->gender = $request->gender;
         $user->email = $request->email;
 
-        if($request->hasFile('image')) {
+        if ($request->hasFile('image')) {
             // Log::info('Image upload detected');
-            if ($user->image && Storage::disk('public')->exists('profile/'.$user->image)) {
-                Storage::disk('public')->delete('profile/'.$user->image);
+            if ($user->image && Storage::disk('public')->exists('profile/' . $user->image)) {
+                Storage::disk('public')->delete('profile/' . $user->image);
             }
 
             // Create unique logo name
@@ -548,44 +566,190 @@ class ParentsController extends Controller
     {
         try {
             $request->validate([
-                'file' => 'required|file|mimes:xlsx,csv|max:2048',
-                    ],
-                    [
-                        'file.mimes' => 'The file must be a file of type: xlsx, csv.',
-                        'file.max' => 'The file may not be greater than 2MB.',
-                        'file.required' => 'The field must be filled.',
-                        'file.file' => 'The file must be a file.',
+                'file' => 'required|file|mimes:xlsx,csv,xls|max:2048',
+            ], [
+                'file.mimes' => 'The file must be a file of type: xlsx, csv.',
+                'file.max' => 'The file may not be greater than 2MB.',
+                'file.required' => 'The field must be filled.',
+                'file.file' => 'The file must be a file.',
             ]);
         } catch (Exception $e) {
-            Alert()->toast($e->getMessage(), 'error');
-            return back();
-        }
-        /*
-        PHP code for scanning files for viruses using virustotal.com API
-        */
-
-       try {
-            $scanResult = $this->scanFileForViruses($request->file('file'));
-            if (!$scanResult['clean']) {
-                Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
-                return redirect()->back();
-            }
-       } catch(Exception $e) {
-            Alert()->toast($e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 422);
         }
         try {
-
-            Excel::import(new ParentStudentImport, $request->file('file'));
-            Alert()->toast('Records has been imported successfully', 'success');
-            return back();
+            $scanResult = $this->scanFileForViruses($request->file('file'));
+            if (!$scanResult['clean']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'File security check failed: ' . $scanResult['message']
+                ], 422);
+            }
         } catch (Exception $e) {
-            Alert()->toast($e->getMessage(), 'error');
-            return back();
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 422);
+        }
+
+        try {
+            // Step 1: Validate and extract data for preview
+            $file = $request->file('file');
+
+            // Create a new import instance
+            $import = new ParentStudentImport();
+
+            // Use Laravel Excel's Reader to read the file
+            $data = Excel::toArray($import, $file);
+
+            if (empty($data) || empty($data[0])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No data found in the file'
+                ], 422);
+            }
+
+            // Validate each row
+            $rows = $data[0];
+            $previewData = [];
+            $errors = [];
+            $rules = $import->rules();
+
+            foreach ($rows as $index => $row) {
+                $rowNumber = $index + 2;
+
+                try {
+                    // Validate the row
+                    $validator = Validator::make($row, $rules);
+
+                    if ($validator->fails()) {
+                        foreach ($validator->errors()->all() as $error) {
+                            $errors[] = "Row {$rowNumber}: {$error}";
+                        }
+                    } else {
+                        // Check for duplicate phones in the SAME FILE
+                        $phone = $this->formatPhoneForPreview($row['parent_phone']);
+
+                        // Track phones we've seen in this file
+                        static $seenPhones = [];
+                        if (in_array($phone, $seenPhones)) {
+                            $errors[] = "Row {$rowNumber}: Duplicate parent phone number '{$phone}' found in this file. Each parent must have a unique phone.";
+                            continue;
+                        }
+                        $seenPhones[] = $phone;
+
+                        // Prepare row for preview
+                        $previewRow = [
+                            'row_number' => $rowNumber,
+                            'parent_name' => ucwords(strtolower($row['parent_first_name'] . ' ' . $row['parent_last_name'])),
+                            'parent_gender' => ucwords(strtolower($row['parent_gender'])),
+                            'parent_phone' => $phone,
+                            'parent_email' => $row['parent_email'] ?? 'N/A',
+                            'student_name' => ucwords(strtolower(
+                                $row['student_first_name'] . ' ' .
+                                    ($row['student_middle_name'] ?? '') . ' ' .
+                                    $row['student_last_name']
+                            )),
+                            'student_gender' => ucwords(strtolower($row['student_gender'])),
+                            'class_name' => $row['class_name'],
+                            'student_group' => strtoupper($row['student_group']),
+                            'status' => 'pending',
+                            'original_data' => $row
+                        ];
+                        $previewData[] = $previewRow;
+                    }
+                } catch (Exception $e) {
+                    $errors[] = "Row {$rowNumber}: " . $e->getMessage();
+                }
+            }
+
+            // Store the file and data in session for actual import
+            $fileName = 'import_' . time() . '_' . $file->getClientOriginalName();
+            $file->storeAs('temp_imports', $fileName);
+
+            session([
+                'import_file' => $fileName,
+                'import_preview_data' => $previewData,
+                'import_errors' => $errors
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'preview_data' => $previewData,
+                'errors' => $errors,
+                'total_rows' => count($rows),
+                'valid_rows' => count($previewData),
+                'invalid_rows' => count($errors),
+                'file_name' => $fileName
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error reading file: ' . $e->getMessage()
+            ], 422);
         }
     }
 
-   public function parentExportFile()
+    // New function for actual import
+    public function processImport(Request $request)
+    {
+        try {
+            if (!session()->has('import_file') || !session()->has('import_preview_data')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No import session found. Please upload the file again.'
+                ], 422);
+            }
+
+            $fileName = session('import_file');
+            $previewData = session('import_preview_data');
+
+            // Get the file from storage
+            $filePath = storage_path('app/temp_imports/' . $fileName);
+
+            if (!file_exists($filePath)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'File not found. Please upload again.'
+                ], 422);
+            }
+
+            // Import the file
+            Excel::import(new ParentStudentImport, $filePath);
+
+            // Clean up
+            Storage::delete('temp_imports/' . $fileName);
+            session()->forget(['import_file', 'import_preview_data', 'import_errors']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Successfully imported ' . count($previewData) . ' records',
+                'count' => count($previewData)
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Import failed: ' . $e->getMessage()
+            ], 422);
+        }
+    }
+
+    private function formatPhoneForPreview($phone)
+    {
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+
+        if (strlen($phone) === 12 && str_starts_with($phone, '255')) {
+            return '0' . substr($phone, 3);
+        } elseif (strlen($phone) === 9) {
+            return '0' . $phone;
+        }
+
+        return $phone;
+    }
+
+    public function parentExportFile()
     {
         if (!Storage::exists('templates/SampleFile.xlsx')) {
             // abort(404, 'File not found.');
@@ -602,13 +766,13 @@ class ParentsController extends Controller
             $apiKey = config('services.virustotal.key');
             try {
                 $response = Http::withHeaders(['x-apikey' => $apiKey])
-                            ->attach('file', fopen($file->path(), 'r'))
-                            ->post('https://www.virustotal.com/api/v3/files');
+                    ->attach('file', fopen($file->path(), 'r'))
+                    ->post('https://www.virustotal.com/api/v3/files');
 
                 if ($response->successful()) {
                     $scanId = $response->json()['data']['id'];
                     $analysis = Http::withHeaders(['x-apikey' => $apiKey])
-                                ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
+                        ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
 
                     return [
                         'clean' => $analysis->json()['data']['attributes']['stats']['malicious'] === 0,
@@ -618,7 +782,7 @@ class ParentsController extends Controller
             } catch (\Exception $e) {
                 return [
                     'clean' => false,
-                    'message' => 'Scan failed: '.$e->getMessage()
+                    'message' => 'Scan failed: ' . $e->getMessage()
                 ];
             }
         }
