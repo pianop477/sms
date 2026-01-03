@@ -144,6 +144,7 @@ class ParentStudentImport implements ToModel, WithValidation, WithHeadingRow
             // First check if user exists by phone (main identifier)
             $parentUser = User::where('phone', $preparedPhone)
                 ->where('school_id', $school->id)
+                ->lockForUpdate()
                 ->first();
 
             $isNewUser = false;

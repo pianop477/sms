@@ -416,7 +416,6 @@ class ParentsController extends Controller
                     }
                     // Delete the student record
                     $student->delete();
-
                 } catch (Exception $e) {
                     Alert()->toast($e->getMessage(), 'error');
                     return back();
@@ -632,13 +631,13 @@ class ParentsController extends Controller
                         // Check for duplicate phones in the SAME FILE
                         $phone = $this->formatPhoneForPreview($row['parent_phone']);
 
-                        // Track phones we've seen in this file
-                        static $seenPhones = [];
+                        // // Track phones we've seen in this file
+                        // static $seenPhones = [];
                         // if (in_array($phone, $seenPhones)) {
                         //     $errors[] = "Row {$rowNumber}: Duplicate parent phone number '{$phone}' found in this file. Each parent must have a unique phone.";
                         //     continue;
                         // }
-                        $seenPhones[] = $phone;
+                        // $seenPhones[] = $phone;
 
                         // Prepare row for preview
                         $previewRow = [
