@@ -634,10 +634,10 @@ class ParentsController extends Controller
 
                         // Track phones we've seen in this file
                         static $seenPhones = [];
-                        if (in_array($phone, $seenPhones)) {
-                            $errors[] = "Row {$rowNumber}: Duplicate parent phone number '{$phone}' found in this file. Each parent must have a unique phone.";
-                            continue;
-                        }
+                        // if (in_array($phone, $seenPhones)) {
+                        //     $errors[] = "Row {$rowNumber}: Duplicate parent phone number '{$phone}' found in this file. Each parent must have a unique phone.";
+                        //     continue;
+                        // }
                         $seenPhones[] = $phone;
 
                         // Prepare row for preview
