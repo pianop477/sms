@@ -35,11 +35,11 @@ class UpdateBillStatuses extends Command
 
             $this->info("Bill status update completed successfully");
 
-            Log::info("Optimized bill status update completed");
+            // Log::info("Optimized bill status update completed");
 
         } catch (\Exception $e) {
             $this->error("Error updating bill statuses: " . $e->getMessage());
-            Log::error("Optimized bill status update failed: " . $e->getMessage());
+            // Log::error("Optimized bill status update failed: " . $e->getMessage());
             return 1;
         }
 
