@@ -66,7 +66,7 @@ class DeleteExpiredResults extends Command
                 try {
                     Mail::to($user->email)->send(new ResultExpiryNotification($result));
                 } catch (\Exception $e) {
-                    Log::error("Email not sent for result {$result->id}: " . $e->getMessage());
+                    // Log::error("Email not sent for result {$result->id}: " . $e->getMessage());
                 }
 
                 /*
@@ -91,7 +91,7 @@ class DeleteExpiredResults extends Command
                         $payload['reference']
                     );
                 } catch (\Exception $e) {
-                    Log::error("SMS not sent for result {$result->id}: " . $e->getMessage());
+                    // Log::error("SMS not sent for result {$result->id}: " . $e->getMessage());
                 }
 
                 /*
@@ -106,10 +106,10 @@ class DeleteExpiredResults extends Command
             $this->info(count($soonExpiringResults) . ' teachers notified (once only).');
 
         } catch (\Exception $e) {
-            Log::error('Error in results:cleanup command', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
+            // Log::error('Error in results:cleanup command', [
+            //     'error' => $e->getMessage(),
+            //     'trace' => $e->getTraceAsString(),
+            // ]);
 
             $this->error('An error occurred. Check logs for details.');
         }

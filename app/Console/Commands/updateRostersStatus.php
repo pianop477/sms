@@ -44,7 +44,7 @@ class updateRostersStatus extends Command
                 $roster->save();
 
                 $this->info("Roster {$roster->roster_id} imewekwa completed.");
-                Log::info("Roster {$roster->roster_id} imewekwa completed.");
+                // Log::info("Roster {$roster->roster_id} imewekwa completed.");
             }
         }
 
@@ -72,7 +72,7 @@ class updateRostersStatus extends Command
                         $roster->save();
 
                         $this->info("Roster {$roster->roster_id} imewekwa active kwa mwalimu {$roster->teacher_id}.");
-                        Log::info("Roster {$roster->roster_id} imewekwa active kwa mwalimu {$roster->teacher_id}.");
+                        // Log::info("Roster {$roster->roster_id} imewekwa active kwa mwalimu {$roster->teacher_id}.");
 
                         // SMS ya kuanza tu
                         $this->sendStartSms($roster);
@@ -126,9 +126,9 @@ class updateRostersStatus extends Command
             }
 
             $this->info("SMS ya kuanza imetumwa kwa {$phone}");
-            Log::info("SMS ya kuanza imetumwa kwa {$phone}");
+            // Log::info("SMS ya kuanza imetumwa kwa {$phone}");
         } catch (\Exception $e) {
-            Log::error("Hitilafu ya kutuma SMS: " . $e->getMessage());
+            // Log::error("Hitilafu ya kutuma SMS: " . $e->getMessage());
         }
     }
 

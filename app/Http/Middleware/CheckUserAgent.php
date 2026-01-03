@@ -36,10 +36,10 @@ class CheckUserAgent
 
         // If not allowed, log it and block or redirect
         if (! $isAllowed) {
-            Log::warning("Blocked suspicious user agent: {$userAgent}", [
-                'ip' => $request->ip(),
-                'path' => $request->path(),
-            ]);
+            // Log::warning("Blocked suspicious user agent: {$userAgent}", [
+            //     'ip' => $request->ip(),
+            //     'path' => $request->path(),
+            // ]);
 
             // Option 1: block completely
             // return abort(403, 'Access denied due to suspicious browser.');

@@ -30,21 +30,21 @@ class ApiSessionTokenMiddleware
 
         // Token haipo kabisa
         if (!$token || !$expiresAt) {
-            Log::warning("Finance token missing for user: " . Auth::id());
+            // Log::warning("Finance token missing for user: " . Auth::id());
             $this->forceLogout();
             return redirect()->route('login')->with('error', 'Session has expired. Please login.');
         }
 
         // Ikiwa imebaki dakika chini ya 2, jaribu ku-refresh token
         if (now()->diffInSeconds($expiresAt, false) <= 120 && now()->lessThan($expiresAt)) {
-            Log::info("Finance token is about to expire, refreshing...", [
-                'user_id' => Auth::id(),
-                'expires_in_seconds' => now()->diffInSeconds($expiresAt, false)
-            ]);
+            // Log::info("Finance token is about to expire, refreshing...", [
+            //     'user_id' => Auth::id(),
+            //     'expires_in_seconds' => now()->diffInSeconds($expiresAt, false)
+            // ]);
 
             $newToken = $this->financeTokenService->ensureValidToken();
             if (!$newToken) {
-                Log::warning("Token refresh failed for user: " . Auth::id());
+                // Log::warning("Token refresh failed for user: " . Auth::id());
                 $this->forceLogout();
                 return redirect()->route('login')->with('error', 'Session expired. Please login again.');
             }
@@ -52,7 +52,7 @@ class ApiSessionTokenMiddleware
 
         // Ikiwa imekwisha kabisa
         if (now()->greaterThanOrEqualTo($expiresAt)) {
-            Log::warning("Finance token expired for user: " . Auth::id());
+            // Log::warning("Finance token expired for user: " . Auth::id());
             $newToken = $this->financeTokenService->ensureValidToken();
             if (!$newToken) {
                 $this->forceLogout();
@@ -67,7 +67,7 @@ class ApiSessionTokenMiddleware
     {
         try {
             $userId = Auth::id();
-            Log::info("Force logging out user {$userId} due to expired finance token");
+            // Log::info("Force logging out user {$userId} due to expired finance token");
 
             // Clean Laravel session properly
             Auth::logout();
@@ -80,7 +80,7 @@ class ApiSessionTokenMiddleware
             Session::invalidate();
             Session::regenerateToken();
         } catch (\Throwable $e) {
-            Log::error("Error during forced logout: " . $e->getMessage());
+            // Log::error("Error during forced logout: " . $e->getMessage());
         }
     }
 }

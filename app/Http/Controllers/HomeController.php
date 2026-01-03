@@ -387,7 +387,7 @@ class HomeController extends Controller
                         return back();
                     }
                 } catch (\Throwable $e) {
-                    Log::error("Dashboard API error: " . $e->getMessage());
+                    // Log::error("Dashboard API error: " . $e->getMessage());
                     Alert()->toast('Unable to connect to finance service', 'error');
                     return to_route('home');
                 }

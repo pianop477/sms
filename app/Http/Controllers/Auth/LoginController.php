@@ -106,11 +106,11 @@ class LoginController extends Controller
                     DB::table('sessions')->where('id', $sessionId)->delete();
                     Auth::logout();
                     Session::invalidate();
-                    Log::error("Finance token acquisition failed for user: {$user->id}");
+                    // Log::error("Finance token acquisition failed for user: {$user->id}");
                     return to_route('login')->with('error', 'Unable to connect to finance service. Please try again.');
                 }
 
-                Log::info("Finance API token acquired for user: {$user->id}");
+                // Log::info("Finance API token acquired for user: {$user->id}");
             }
 
             Alert()->toast('Hello '. ucwords(strtolower(Auth::user()->first_name))  .' Welcome back!', 'success');

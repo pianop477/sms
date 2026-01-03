@@ -4,11 +4,12 @@ namespace App\Imports;
 
 use App\Models\Grade;
 use App\Models\Parents;
-use App\Models\School;
+use App\Models\school;
 use App\Models\Student;
 use App\Models\Transport;
 use App\Models\User;
 use App\Jobs\SendParentWelcomeSms;
+use App\Models\school as ModelsSchool;
 use App\Services\NextSmsService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -121,7 +122,7 @@ class ParentStudentImport implements ToModel, WithValidation, WithHeadingRow
     {
         return DB::transaction(function () use ($row) {
             $user = Auth::user();
-            $school = School::findOrFail($user->school_id);
+            $school = school::findOrFail($user->school_id);
 
             // Find Class
             $class = Grade::where('class_name', $row['class_name'])
@@ -270,10 +271,10 @@ class ParentStudentImport implements ToModel, WithValidation, WithHeadingRow
                     $payload['reference']
                 );
             } else {
-                Log::info("Existing parent, no SMS sent: " . $parentUser->phone, [
-                    'parent_id' => $parent->id,
-                    'user_id' => $parentUser->id
-                ]);
+                // Log::info("Existing parent, no SMS sent: " . $parentUser->phone, [
+                //     'parent_id' => $parent->id,
+                //     'user_id' => $parentUser->id
+                // ]);
             }
 
             return $student;
@@ -299,7 +300,7 @@ class ParentStudentImport implements ToModel, WithValidation, WithHeadingRow
 
     protected function getAdmissionNumber($school_id)
     {
-        $school = School::findOrFail($school_id);
+        $school = school::findOrFail($school_id);
 
         $lastStudent = Student::where('school_id', $school_id)
             ->lockForUpdate()
