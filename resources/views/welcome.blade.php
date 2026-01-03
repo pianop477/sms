@@ -905,7 +905,7 @@
                     </div>
                     <p class="text-gray-400 text-sm sm:text-base mb-2" id="footer-whatsapp-text">Chat on WhatsApp</p>
                     <a href="https://wa.me/255678669000"
-                        class="inline-flex items-center text-green-400 hover:text-green-300 mt-1">
+                        class="inline-flex items-center text-green-400 hover:text-green-300 mt-1" target="_blank">
                         <i class="fab fa-whatsapp text-xl sm:text-2xl mr-2 sm:mr-3"></i>
                         <span class="text-sm sm:text-base">+255 678 669 000</span>
                     </a>
