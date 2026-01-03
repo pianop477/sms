@@ -670,6 +670,10 @@ class ResultsController extends Controller
             ->whereDate('examination_results.exam_date', $date)
             ->get();
 
+        if ($results->isEmpty()) {
+            Alert()->toast('No results found for this selection', 'info');
+            return redirect()->route('results.general', ['school' => $school]);
+        }
         // Filter students by class_id
         $studentsByClass = $results->where('class_id', $class_id[0])->groupBy('student_id');
 
@@ -830,6 +834,43 @@ class ResultsController extends Controller
             );
         }
 
+        $teachersWithCourses = Examination_result::query()
+            ->where('examination_results.school_id', $schools->id)
+            ->where('examination_results.class_id', $class_id[0])
+            ->where('examination_results.exam_type_id', $exam_id[0])
+            ->whereDate('examination_results.exam_date', $date)
+            ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
+            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+            ->select(
+                'teachers.id as teacher_id',
+                'users.first_name',
+                'users.last_name',
+                'examination_results.course_id',
+                'subjects.course_name',
+                'subjects.course_code'
+            )
+            ->get()
+            ->groupBy('teacher_id');
+
+        // Format for teachers dropdown - CORRECTED:
+        $teachers = $teachersWithCourses->map(function ($teacherResults, $teacherId) {
+            $firstRecord = $teacherResults->first();
+            return [
+                'id' => Hashids::encode($teacherId),
+                'name' => $firstRecord->first_name . ' ' . $firstRecord->last_name, // REMOVED middle_name
+                'courses' => $teacherResults->map(function ($result) {
+                    return [
+                        'id' => Hashids::encode($result->course_id),
+                        'name' => $result->course_name . ' (' . $result->course_code . ')'
+                    ];
+                })->unique('id')->values()
+            ];
+        })->values();
+
+        // If there's only one teacher, prepare their courses
+        $firstTeacherCourses = $teachers->isNotEmpty() ? $teachers->first()['courses'] : [];
+
 
         // Generate the PDF
         $pdf = \PDF::loadView('Results.results_by_month', compact(
@@ -875,8 +916,80 @@ class ResultsController extends Controller
         $fileUrl = asset('reports/' . $fileName);
 
         // Return the view with the file URL to be used in the iframe
-        return view('Results.class_pdf_results', compact('fileUrl', 'fileName', 'results', 'date', 'schools', 'exam_id', 'class_id', 'month', 'year'));
+        return view('Results.class_pdf_results', compact(
+            'fileUrl',
+            'fileName',
+            'results',
+            'date',
+            'schools',
+            'exam_id',
+            'class_id',
+            'month',
+            'year',
+            'teachers',
+            // 'availableCourses',
+            'firstTeacherCourses'
+        ));
     }
+
+    public function getCoursesByTeacher(Request $request)
+    {
+        try {
+            $request->validate([
+                'teacher_id' => 'required',
+                'school' => 'required',
+                'class' => 'required',
+                'examType' => 'required',
+                'date' => 'required|date',
+            ]);
+
+            $teacherDecoded = Hashids::decode($request->teacher_id);
+            $schoolDecoded  = Hashids::decode($request->school);
+            $classDecoded   = Hashids::decode($request->class);
+            $examDecoded    = Hashids::decode($request->examType);
+
+            if (
+                empty($teacherDecoded) ||
+                empty($schoolDecoded) ||
+                empty($classDecoded) ||
+                empty($examDecoded)
+            ) {
+                return response()->json([], 400);
+            }
+
+            $teacher_id = $teacherDecoded[0];
+            $school_id  = $schoolDecoded[0];
+            $class_id   = $classDecoded[0];
+            $exam_type  = $examDecoded[0];
+
+            $courses = Examination_result::query()
+                ->where('examination_results.school_id', $school_id)
+                ->where('class_id', $class_id)
+                ->where('exam_type_id', $exam_type)
+                ->where('teacher_id', $teacher_id)
+                ->whereDate('exam_date', $request->date)
+                ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+                ->select('course_id', 'course_name', 'course_code')
+                ->distinct()
+                ->get();
+
+            return response()->json(
+                $courses->map(fn($c) => [
+                    'id' => Hashids::encode($c->course_id),
+                    'name' => $c->course_name . ' (' . $c->course_code . ')'
+                ])
+            );
+        } catch (\Throwable $e) {
+            Log::error('getCoursesByTeacher error', [
+                'msg' => $e->getMessage(),
+                'line' => $e->getLine()
+            ]);
+
+            return response()->json([], 500);
+        }
+    }
+
+
 
     private function calculateGrade($score, $marking_style)
     {
@@ -3586,6 +3699,115 @@ class ResultsController extends Controller
                 'valid' => false,
                 'message' => 'Invalid or expired QR code'
             ]);
+        }
+    }
+
+    public function rollbackResults(Request $request)
+    {
+        // dd($request->all());
+        try {
+            $request->validate([
+                'teacher_id' => 'required',
+                'course_id' => 'required',
+                'school' => 'required',
+                'class' => 'required',
+                'examType' => 'required',
+                'date' => 'required|date',
+            ]);
+
+            // Decode parameters from URL
+            $school_id = Hashids::decode($request->school)[0];
+            $class_id = Hashids::decode($request->class)[0];
+            $exam_type_id = Hashids::decode($request->examType)[0];
+            $teacher_id = Hashids::decode($request->teacher_id)[0];
+            $course_id = $request->course_id === 'all' ? null : Hashids::decode($request->course_id)[0];
+            $exam_date = $request->date;
+
+            // Start building the query
+            $query = Examination_result::where('school_id', $school_id)
+                ->where('class_id', $class_id)
+                ->where('exam_type_id', $exam_type_id)
+                ->where('teacher_id', $teacher_id)
+                ->whereDate('exam_date', $exam_date);
+
+            // If not "all", filter by specific course
+            if ($course_id) {
+                $query->where('course_id', $course_id);
+            }
+
+            // Get the results to rollback
+            $results = $query->get();
+
+            if ($results->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No results found for the selected criteria'
+                ]);
+            }
+
+            if ($results->contains('status', 2)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Results data set has been locked and cannot be rolled back 🔐'
+                ]);
+            }
+
+            // Start database transaction
+            DB::beginTransaction();
+
+            foreach ($results as $result) {
+                // Check if this result already exists in temporary_results
+                $existingTemp = temporary_results::where([
+                    'student_id' => $result->student_id,
+                    'course_id' => $result->course_id,
+                    'class_id' => $result->class_id,
+                    'exam_type_id' => $result->exam_type_id,
+                    'school_id' => $result->school_id,
+                    'teacher_id' => $result->teacher_id,
+                    'exam_date' => $result->exam_date,
+                ])->first();
+
+                if (!$existingTemp) {
+                    // Create temporary result
+                    temporary_results::create([
+                        'student_id' => $result->student_id,
+                        'course_id' => $result->course_id,
+                        'class_id' => $result->class_id,
+                        'teacher_id' => $result->teacher_id,
+                        'exam_type_id' => $result->exam_type_id,
+                        'school_id' => $result->school_id,
+                        'score' => $result->score,
+                        'exam_term' => $result->Exam_term,
+                        'marking_style' => $result->marking_style,
+                        'exam_date' => $result->exam_date,
+                        'expiry_date' => now()->addHours(72)
+                    ]);
+                }
+
+                // Delete from examination_results
+                $result->delete();
+            }
+
+            DB::commit();
+            $remainingResultsCount = Examination_result::where('school_id', $school_id)
+                ->where('class_id', $class_id)
+                ->where('exam_type_id', $exam_type_id)
+                ->whereDate('exam_date', $exam_date)
+                ->count();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Successfully rolled back ' . $results->count() . ' records to temporary storage',
+                'count' => $results->count(),
+                'has_remaining_results' => $remainingResultsCount > 0
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error rolling back results: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

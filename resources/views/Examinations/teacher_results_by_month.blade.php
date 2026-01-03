@@ -334,11 +334,11 @@
                                                 {{ \Carbon\Carbon::parse($date)->format('d-m-Y') }}
                                             </button>
                                         </a>
-                                        <a href="{{ route('results.delete.byTeacher', ['course' => Hashids::encode($class_course->id), 'year' => $year, 'examType' => Hashids::encode($exam_id), 'month' => $month, 'date' => $date]) }}"
+                                        {{-- <a href="{{ route('results.delete.byTeacher', ['course' => Hashids::encode($class_course->id), 'year' => $year, 'examType' => Hashids::encode($exam_id), 'month' => $month, 'date' => $date]) }}"
                                             class="delete-btn"
                                             onclick="return confirm('Are you sure you want to delete this result for date: {{\Carbon\Carbon::parse($date)->format('d-m-Y')}}?')">
                                             <i class="fas fa-trash"></i> Delete
-                                        </a>
+                                        </a> --}}
                                     </div>
                                 @endforeach
                             </div>

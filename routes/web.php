@@ -388,7 +388,9 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('Delete-results/school/{school}/year/{year}/class/{class}/examType/{examType}/month/{month}/date/{date}', [ResultsController::class, 'deleteResults'])->name('delete.results');
         Route::post('Submit-compiled-results/school/{school}/year/{year}/class/{class}', [ResultsController::class, 'saveCompiledResults'])->name('submit.compiled.results');
         Route::post('/update-score', [ResultsController::class, 'updateScore'])->name('update.score');
-
+        Route::post('/results/rollback', [ResultsController::class, 'rollbackResults'])->name('results.rollback');
+        Route::post('/results/get-courses-by-teacher', [ResultsController::class, 'getCoursesByTeacher'])
+            ->name('results.getCoursesByTeacher');
         // courses and class courses management
         Route::get('{id}/Delete-course', [CoursesController::class, 'deleteCourse'])->name('courses.delete');
         Route::put('{id}/Block', [CoursesController::class, 'blockCourse'])->name('courses.block');

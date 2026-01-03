@@ -151,7 +151,7 @@
                         <!-- Exams Table -->
                         <div class="single-table">
                             <div class="table-responsive">
-                                <table class="table table-hover progress-table" id="examsTable">
+                                <table class="table table-hover progress-table" id="myTable">
                                     <thead>
                                         <tr>
                                             <th scope="col">#</th>
@@ -221,7 +221,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addExamModalLabel">Register Examination or Test</h5>
-                    <button type="button" class="btn-close btn btn-danger" data-bs-dismiss="modal" aria-label="Close"> Close</button>
+                    <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
                 </div>
                 <div class="modal-body">
                     <form class="needs-validation" novalidate action="{{route('exams.store')}}" method="POST">
