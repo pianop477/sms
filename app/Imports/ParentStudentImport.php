@@ -300,17 +300,43 @@ class ParentStudentImport implements ToModel, WithValidation, WithHeadingRow
 
     protected function getAdmissionNumber($school_id)
     {
-        $school = school::findOrFail($school_id);
+        return DB::transaction(function () use ($school_id) {
 
-        $lastStudent = Student::where('school_id', $school_id)
-            ->lockForUpdate()
-            ->orderBy('id', 'desc')
-            ->first();
+            $school = School::findOrFail($school_id);
 
-        $lastId = $lastStudent ? $lastStudent->id + 1 : 1;
-        $admissionNumber = str_pad($lastId, 4, '0', STR_PAD_LEFT);
+            // Chukua admission number ya mwisho kwa shule husika
+            $lastStudent = Student::where('school_id', $school_id)
+                ->whereNotNull('admission_number')
+                ->orderBy('admission_number', 'desc')
+                ->lockForUpdate()
+                ->first();
 
-        return $school->abbriv_code . '-' . $admissionNumber;
+            if ($lastStudent) {
+                // Tenganisha prefix na namba
+                $lastNumber = (int) str_replace(
+                    $school->abbriv_code . '-',
+                    '',
+                    $lastStudent->admission_number
+                );
+                $nextNumber = $lastNumber + 1;
+            } else {
+                $nextNumber = 1;
+            }
+
+            // Loop kuhakikisha haijirudii kabisa
+            do {
+                $formattedNumber = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+                $admissionNumber = $school->abbriv_code . '-' . $formattedNumber;
+
+                $exists = Student::where('school_id', $school_id)
+                    ->where('admission_number', $admissionNumber)
+                    ->exists();
+
+                $nextNumber++;
+            } while ($exists);
+
+            return $admissionNumber;
+        });
     }
 
     private function formatPhoneNumber($phone)
