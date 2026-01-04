@@ -528,7 +528,7 @@
                                             @elseif(strtolower($trans->gender[0]) === 'f')
                                                 <span class="gender-badge female" title="Female">F</span>
                                             @else
-                                                <span class="gender-badge" title="Other">{{$trans->gender[0]}}</span>
+                                                <span class="gender-badge" title="Other">{{strtoupper($trans->gender[0])}}</span>
                                             @endif
                                         </td>
                                         <td>{{$trans->phone}}</td>

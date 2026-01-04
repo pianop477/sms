@@ -226,7 +226,7 @@
                                                     </div>
                                                 </td>
                                                 <td class="text-capitalize">
-                                                    <span class="badge bg-info text-white">{{$teacher->gender[0]}}</span>
+                                                    <span class="badge bg-info text-white">{{strtoupper($teacher->gender[0])}}</span>
                                                 </td>
                                                 <td>
                                                     @if ($teacher->role_id == 1)

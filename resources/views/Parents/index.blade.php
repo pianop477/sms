@@ -192,7 +192,7 @@
                                                     {{ ucwords(strtolower($parent->first_name . ' ' . $parent->last_name)) }}
                                                 </td>
                                                 <td class="text-capitalize">
-                                                    <span class="badge bg-info text-white">{{ $parent->gender[0] }}</span>
+                                                    <span class="badge bg-info text-white">{{ strtoupper($parent->gender[0]) }}</span>
                                                 </td>
                                                 <td>{{ $parent->phone }}</td>
                                                 <td>{{ $parent->email ?? 'N/A' }}</td>

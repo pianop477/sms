@@ -316,7 +316,7 @@
                                             <td class="text-capitalize">{{ ucwords(strtolower($student->last_name)) }}</td>
 
                                             <td class="text-center">
-                                                <span class="badge bg-info text-white">{{ $student->gender[0] }}</span>
+                                                <span class="badge bg-info text-white">{{ strtoupper($student->gender[0]) }}</span>
                                             </td>
 
                                             <td class="text-center">

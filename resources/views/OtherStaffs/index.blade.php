@@ -269,7 +269,7 @@
                                                     </div>
                                                 </td>
                                                 <td class="text-capitalize">
-                                                    <span class="badge bg-info text-white">{{$row->gender[0]}}</span>
+                                                    <span class="badge bg-info text-white">{{strtoupper($row->gender[0])}}</span>
                                                 </td>
                                                 <td>
                                                     {{$row->job_title ?? 'N/A'}}
