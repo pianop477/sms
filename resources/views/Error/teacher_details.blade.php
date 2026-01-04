@@ -53,7 +53,7 @@
                     <div class="col-md-6 mb-3">
                         <label for="currentPassword">NIN (NIDA)</label>
                         <div class="">
-                            <input type="text" name="nida" maxlength="23" class="form-control-custom" id="nin" placeholder="19700130411110000123" value="{{old('nida', $teacher->nida)}}" required>
+                            <input type="text" name="nida" maxlength="23" class="form-control-custom" id="nin" placeholder="Enter NIDA" value="{{old('nida', $teacher->nida)}}" required>
                         </div>
                         @error('nida')
                             <div class="text-danger text-sm">{{$message}}</div>

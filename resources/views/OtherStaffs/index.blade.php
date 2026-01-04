@@ -452,7 +452,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="nida">NIN (NIDA)</label>
-                                <input type="text" name="nida" class="form-control-custom" maxlength="23" required id="nin" value="{{old('nida')}}" placeholder="19700130411110000123">
+                                <input type="text" name="nida" class="form-control-custom" maxlength="23" required id="nin" value="{{old('nida')}}" placeholder="Enter NIDA">
                                 @error('nida')
                                     <div class="text-danger small">{{$message}}</div>
                                 @enderror
