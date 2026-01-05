@@ -124,8 +124,9 @@ class ResultsController extends Controller
 
         // Check for combined examination results
         $reports = generated_reports::where('school_id', $students->school_id)
-            ->where('class_id', $students->class_id)
+            // ->where('class_id', $students->class_id)
             ->where('status', 1)
+            ->whereYear('report_date', $year)
             ->orderBy('created_at', 'DESC')
             ->get();
 
@@ -3316,17 +3317,15 @@ class ResultsController extends Controller
     }
 
     //download parent_student combined report
-    public function parentDownloadStudentCombinedReport($school, $year, $class, $report, $student)
+    public function parentDownloadStudentCombinedReport($school, $year, $report, $student)
     {
         $studentId = Hashids::decode($student)[0];
+        // return $studentId;
         $schoolId = Hashids::decode($school)[0];
-        $classId = Hashids::decode($class)[0];
         $reportId = Hashids::decode($report)[0];
 
         $reports = generated_reports::find($reportId);
         $examDates = $reports->exam_dates; // array
-
-        return "Student ID: ". $studentId. "School ID ". $schoolId. "Class ID: ". $classId . 'Report ID '. $reportId;
 
         $results = Examination_result::query()
             ->join('students', 'students.id', '=', 'examination_results.student_id')
@@ -3363,10 +3362,15 @@ class ResultsController extends Controller
                 'users.last_name as teacher_last_name'
             )
             ->where('examination_results.student_id', $studentId)
-            ->where('examination_results.class_id', $classId)
+            ->where('examination_results.class_id', $reports->class_id)
             ->where('examination_results.school_id', $schoolId)
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->get();
+
+        if($results->isEmpty()){
+            Alert()->toast('No examination results found for the selected student and report.', 'error');
+            return redirect()->back();
+        }
 
         $classResultsGrouped = $results->groupBy('subjectId');
 
@@ -3443,14 +3447,6 @@ class ResultsController extends Controller
 
         $students = $results->first();
         $schoolInfo = $results->first();
-
-        $studentModel = Student::find($studentId);
-
-        if (!$studentModel) {
-            // return back()->with('error', 'Mwanafunzi hakupatikana.');
-            Alert()->toast('Student not found.', 'error');
-            return redirect()->back();
-        }
         // return $schoolInfo;
 
         // =================== EXAM HEADERS WITH DATES ===================
@@ -3542,9 +3538,9 @@ class ResultsController extends Controller
 
         //verify using qr code
         $verificationData = [
-            'student_name' => trim($studentModel->first_name . ' ' . $studentModel->middle_name . ' ' . $studentModel->last_name),
-            'admission_number' => $studentModel->admission_number,
-            // 'class' => $students->class_name,
+            'student_name' => trim($students->first_name . ' ' . $students->middle_name . ' ' . $students->last_name),
+            'admission_number' => $students->admission_number,
+            'class' => $students->class_name,
             'report_type' => $reports->title,
             'term' => $reports->term,
             'school' => $schoolInfo->school_name,
