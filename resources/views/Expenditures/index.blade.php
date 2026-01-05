@@ -628,7 +628,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="email" class="form-label">Amount (in. TZS)</label>
                                 <div class="input-group">
-                                    <input type="number" name="amount" class="form-control-custom" step="0.01" min="0" placeholder="0.00" value="{{old('amount')}}">
+                                    <input type="number" name="amount" class="form-control-custom" step="0.01" min="0" placeholder="Enter Amount" value="{{old('amount')}}">
                                 </div>
                                 @error('amount')
                                 <div class="text-danger small">{{$message}}</div>
@@ -727,7 +727,7 @@
                                         id="editAmount"
                                         step="0.01"
                                         min="0"
-                                        placeholder="0.00"
+                                        placeholder="Enter Amount"
                                         required>
                                 </div>
                                 <div class="invalid-feedback">Please enter a valid amount</div>

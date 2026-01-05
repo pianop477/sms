@@ -244,7 +244,7 @@
                         </div>
                         <div class="col-md-4 mb-4">
                             <label for="validationCustom02" class="form-label">Amount</label>
-                            <input type="text" name="amount" class="form-control form-control-custom" id="validationCustom02" placeholder="" value="{{ old('amount', intval($bill->amount)) }}" required="">
+                            <input type="text" name="amount" class="form-control form-control-custom" id="validationCustom02" placeholder="Enter Amount" value="{{ old('amount', intval($bill->amount)) }}" required="">
                             @error('amount')
                             <div class="invalid-feedback">
                                 <span class="text-danger">{{$message}}</span>

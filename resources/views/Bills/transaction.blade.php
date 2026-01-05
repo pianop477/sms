@@ -447,7 +447,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                     <label for="amount" class="form-label">Amount</label>
-                    <input type="text" required name="amount" class="form-control-custom" id="amount" placeholder="100000" value="{{ old('amount') }}">
+                    <input type="text" required name="amount" class="form-control-custom" id="amount" placeholder="Enter Amount" value="{{ old('amount') }}">
                     @error('amount')
                         <div class="text-danger small">{{ $message }}</div>
                     @enderror

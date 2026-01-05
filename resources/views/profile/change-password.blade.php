@@ -21,7 +21,7 @@
                     <div class="col-md-4 mb-3">
                         <label for="currentPassword">Current Password</label>
                         <div class="input-group">
-                            <input type="password" name="current_password" class="form-control" id="currentPassword" placeholder="" value="{{old('current_password')}}" required>
+                            <input type="password" name="current_password" class="form-control" id="currentPassword" placeholder="••••••••" value="{{old('current_password')}}" required>
                             <div class="input-group-append">
                                 <span class="input-group-text toggle-password" data-target="currentPassword">
                                     <i class="ti-eye"></i>
@@ -40,7 +40,7 @@
                     <div class="col-md-4 mb-3">
                         <label for="newPassword">New Password</label>
                         <div class="input-group">
-                            <input type="password" name="new_password" class="form-control" id="newPassword" placeholder="" required value="{{old('new_password')}}"
+                            <input type="password" name="new_password" class="form-control" id="newPassword" placeholder="••••••••" required value="{{old('new_password')}}"
                                    pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
                                    title="Must be at least 8 characters with letters and numbers">
                             <div class="input-group-append">
@@ -58,7 +58,7 @@
                     <div class="col-md-4 mb-3">
                         <label for="confirmPassword">Confirm Password</label>
                         <div class="input-group">
-                            <input type="password" name="confirm_password" class="form-control" id="confirmPassword" placeholder="" required value="{{old('confirm_password')}}">
+                            <input type="password" name="confirm_password" class="form-control" id="confirmPassword" placeholder="••••••••" required value="{{old('confirm_password')}}">
                             <div class="input-group-append">
                                 <span class="input-group-text toggle-password" data-target="confirmPassword">
                                     <i class="ti-eye"></i>

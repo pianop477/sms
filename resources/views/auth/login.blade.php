@@ -423,7 +423,7 @@
 
       <div class="form-group" style="position: relative;">
         <label for="password" class="form-label">Password</label>
-        <input type="password" id="password" name="password" class="form-control" placeholder="********" required />
+        <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required />
         <button type="button" class="password-toggle" id="togglePassword">
           <i class="fas fa-eye"></i>
         </button>

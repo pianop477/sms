@@ -305,30 +305,26 @@
                                     <i class="fas fa-walking me-2 text-secondary"></i> Parents without Transport Students
                                 </label>
                             </div>
-
-                            <div class="form-check p-2 rounded" style="background: rgba(78, 84, 200, 0.05);">
+                            <div class="form-check mb-3 p-2 rounded" style="background: rgba(78, 84, 200, 0.05);">
                                 <input class="form-check-input" type="checkbox" name="send_to_teachers" id="sendToTeachers" value="1" {{ old('send_to_teachers') ? 'checked' : '' }}>
                                 <label class="form-check-label" for="sendToTeachers">
-                                    <i class="fas fa-chalkboard-teacher me-2 text-info"></i> All Teaching Staffs
+                                    <i class="fas fa-chalkboard-teacher me-2 text-info"></i> Teaching Staffs
                                 </label>
                             </div>
-
-                            <div class="form-check p-2 rounded" style="background: rgba(78, 84, 200, 0.05);">
+                            <div class="form-check mb-3 p-2 rounded" style="background: rgba(78, 84, 200, 0.05);">
                                 <input class="form-check-input" type="checkbox" name="send_to_other_staff" id="sendToOtherStaff" value="1" {{ old('send_to_other_staff') ? 'checked' : '' }}>
                                 <label class="form-check-label" for="sendToTeachers">
-                                    <i class="fas fa-user-tie me-2 text-secondary"></i> All Non-Teaching Staffs
+                                    <i class="fas fa-user-tie me-2 text-secondary"></i> Non-Teaching Staffs
                                 </label>
                             </div>
-
-                            <div class="form-check p-2 rounded" style="background: rgba(78, 84, 200, 0.05);">
+                            <div class="form-check mb-3 p-2 rounded" style="background: rgba(78, 84, 200, 0.05);">
                                 <input class="form-check-input" type="checkbox" name="send_to_drivers" id="SendToDrivers" value="1" {{ old('send_to_drivers') ? 'checked' : '' }}>
                                 <label class="form-check-label" for="sendToTeachers">
-                                    <i class="fas fa-drivers-license me-2 text-danger"></i> All Drivers Only
+                                    <i class="fas fa-drivers-license me-2 text-danger"></i> Drivers Only
                                 </label>
                             </div>
                         </div>
                     </div>
-
                     <!-- Right Column (Message Area) -->
                     <div class="col-md-6">
                         <div class="checkbox-card border-info h-100">
