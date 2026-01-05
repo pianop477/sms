@@ -3326,7 +3326,7 @@ class ResultsController extends Controller
         $reports = generated_reports::find($reportId);
         $examDates = $reports->exam_dates; // array
 
-        return $examDates . ' ' . $studentId . ' ' . $schoolId . ' ' . $classId .''. $reportId;
+        return $studentId . ' ' . $schoolId . ' ' . $classId .''. $reportId;
 
         $results = Examination_result::query()
             ->join('students', 'students.id', '=', 'examination_results.student_id')
@@ -3541,49 +3541,49 @@ class ResultsController extends Controller
             ->keyBy('abbr'); // We key by abbreviation for easy lookup
 
         //verify using qr code
-        // $verificationData = [
-        //     'student_name' => trim($studentModel->first_name . ' ' . $studentModel->middle_name . ' ' . $studentModel->last_name),
-        //     'admission_number' => $studentModel->admission_number,
-        //     // 'class' => $students->class_name,
-        //     'report_type' => $reports->title,
-        //     'term' => $reports->term,
-        //     'school' => $schoolInfo->school_name,
-        //     'report_date' => $reports->created_at->format('Y-m-d'),
-        //     'report_id' => $reports->id,
-        //     'issued_at' => now()->timestamp,
+        $verificationData = [
+            'student_name' => trim($studentModel->first_name . ' ' . $studentModel->middle_name . ' ' . $studentModel->last_name),
+            'admission_number' => $studentModel->admission_number,
+            // 'class' => $students->class_name,
+            'report_type' => $reports->title,
+            'term' => $reports->term,
+            'school' => $schoolInfo->school_name,
+            'report_date' => $reports->created_at->format('Y-m-d'),
+            'report_id' => $reports->id,
+            'issued_at' => now()->timestamp,
 
-        //     // ================== SUMMARY INFO ==================
-        //     'total_score' => $totalScoreForStudent ?? 0,
-        //     'average_score' => $studentGeneralAverage ?? 0,
-        //     'student_rank' => $generalPosition ?? '-',
-        //     'total_students' => $totalStudents ?? 0,
-        // ];
+            // ================== SUMMARY INFO ==================
+            'total_score' => $totalScoreForStudent ?? 0,
+            'average_score' => $studentGeneralAverage ?? 0,
+            'student_rank' => $generalPosition ?? '-',
+            'total_students' => $totalStudents ?? 0,
+        ];
 
-        // $verificationData['signature'] = hash_hmac(
-        //     'sha256',
-        //     json_encode($verificationData),
-        //     config('app.key')
-        // );
-
-
-        // $encryptedPayload = Crypt::encryptString(
-        //     json_encode($verificationData)
-        // );
-
-        // $verificationUrl = route('report.verify', [
-        //     'payload' => $encryptedPayload
-        // ]);
+        $verificationData['signature'] = hash_hmac(
+            'sha256',
+            json_encode($verificationData),
+            config('app.key')
+        );
 
 
-        // $result = Builder::create()
-        //     ->writer(new PngWriter())
-        //     ->data($verificationUrl)
-        //     ->size(150)
-        //     ->margin(5)
-        //     ->build();
+        $encryptedPayload = Crypt::encryptString(
+            json_encode($verificationData)
+        );
+
+        $verificationUrl = route('report.verify', [
+            'payload' => $encryptedPayload
+        ]);
 
 
-        // $qrPng = base64_encode($result->getString());
+        $result = Builder::create()
+            ->writer(new PngWriter())
+            ->data($verificationUrl)
+            ->size(150)
+            ->margin(5)
+            ->build();
+
+
+        $qrPng = base64_encode($result->getString());
 
         $pdf = \PDF::loadView('generated_reports.compiled_report', compact(
             'finalData',
@@ -3604,7 +3604,7 @@ class ResultsController extends Controller
             'report',
             'class',
             'totalScoreForStudent',
-            // 'qrPng'
+            'qrPng'
         ));
         // return $pdf->stream('compiled_report.pdf'); // au ->download() kama unataka ipakuliwe
         $timestamp = Carbon::now()->timestamp;
