@@ -118,15 +118,17 @@ class ResultsController extends Controller
             ->where('student_id', $students->id)
             ->where('examination_results.school_id', $students->school_id)
             ->where('students.parent_id', $parent->id)
-            ->where('examination_results.status', 2) // Assuming 2 is the status for published results
+            ->where('examination_results.status', 2)
             ->orderBy('examinations.exam_type', 'asc')
             ->get();
 
         // Check for combined examination results
         $reports = generated_reports::where('school_id', $students->school_id)
-            // ->where('class_id', $students->class_id)
             ->where('status', 1)
             ->whereYear('created_at', $year)
+            ->whereHas('examinationResults', function ($q) use ($students) {
+                $q->where('student_id', $students->id);
+            })
             ->orderBy('created_at', 'DESC')
             ->get();
 
@@ -3367,7 +3369,7 @@ class ResultsController extends Controller
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->get();
 
-        if($results->isEmpty()){
+        if ($results->isEmpty()) {
             Alert()->toast('No examination results found for the selected student and report.', 'error');
             return redirect()->back();
         }
