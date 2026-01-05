@@ -458,7 +458,7 @@
             <span id="bioBtnText">Use Biometric</span>
         </button>
         <div id="biometricActions" style="display: none; justify-content: center; gap: 10px; margin-top: 10px;">
-            <a href="#" id="setupBioBtn" class="setup-bio">Set up biometric authentication</a>
+            <a href="#" id="setupBioBtn" class="setup-bio"><i class="fas fa-settings text-white"></i> Setup biometric</a>
             <a href="#" id="clearBioBtn" class="setup-bio" style="color: #f87171;">Clear Biometric</a>
         </div>
     </div>
@@ -881,7 +881,7 @@
                 const username = bioSettings.username;
 
                 if (!username) {
-                    showToast('Click Setup Biometric Authentication below to register your device', 'warning');
+                    showToast('Click Setup Biometric button below to register your device', 'warning');
                     return;
                 }
 
@@ -972,7 +972,7 @@
                     const verifyData = await verifyRes.json();
 
                     if (verifyData.success) {
-                        showToast('Biometric login successful!', 'success');
+                        showToast('You are Logged in Successfully, Welcome Back!', 'success');
                         setTimeout(() => {
                             window.location.href = verifyData.redirect || '/';
                         }, 500);
