@@ -3440,7 +3440,7 @@ class ResultsController extends Controller
             $finalData[] = compact('subjectName', 'teacher', 'subjectCode', 'examScores', 'total', 'average', 'position');
         }
 
-        // $students = $results->first();
+        $students = $results->first();
         $schoolInfo = $results->first();
 
         $studentModel = Student::find($studentId);
