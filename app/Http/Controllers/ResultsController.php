@@ -3319,13 +3319,14 @@ class ResultsController extends Controller
     public function parentDownloadStudentCombinedReport($school, $year, $class, $report, $student)
     {
         $studentId = Hashids::decode($student)[0];
-        // return $studentId;
         $schoolId = Hashids::decode($school)[0];
         $classId = Hashids::decode($class)[0];
         $reportId = Hashids::decode($report)[0];
 
         $reports = generated_reports::find($reportId);
         $examDates = $reports->exam_dates; // array
+
+        return $examDates . ' ' . $studentId . ' ' . $schoolId . ' ' . $classId .''. $reportId;
 
         $results = Examination_result::query()
             ->join('students', 'students.id', '=', 'examination_results.student_id')
