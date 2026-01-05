@@ -126,7 +126,7 @@ class ResultsController extends Controller
         $reports = generated_reports::where('school_id', $students->school_id)
             // ->where('class_id', $students->class_id)
             ->where('status', 1)
-            ->whereYear('report_date', $year)
+            // ->whereYear('report_date', $year)
             ->orderBy('created_at', 'DESC')
             ->get();
 
