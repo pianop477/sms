@@ -3326,7 +3326,7 @@ class ResultsController extends Controller
         $reports = generated_reports::find($reportId);
         $examDates = $reports->exam_dates; // array
 
-        return $studentId . ' ' . $schoolId . ' ' . $classId .''. $reportId;
+        return "Student ID: ". $studentId ?? 'NULL' . ' ' . "School ID ". $schoolId ?? 'NULL' . ' ' . "Class ID: ". $classId ?? 'NULL' .''. 'Report ID '. $reportId ?? 'NULL';
 
         $results = Examination_result::query()
             ->join('students', 'students.id', '=', 'examination_results.student_id')
