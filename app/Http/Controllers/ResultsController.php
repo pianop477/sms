@@ -3362,7 +3362,7 @@ class ResultsController extends Controller
                 'users.last_name as teacher_last_name'
             )
             ->where('examination_results.student_id', $studentId)
-            ->where('examination_results.class_id', $reports->class_id)
+            ->where('examination_results.class_id', $reports->first()->class_id)
             ->where('examination_results.school_id', $schoolId)
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->get();
