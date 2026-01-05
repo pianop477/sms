@@ -354,7 +354,7 @@
                                         <i class="fas fa-eye me-2"></i> View Results
                                     </a>
                                 @else
-                                    <a href="{{route('student.combined.report', ['school' => Hashids::encode($students->school_id), 'year' => $year, 'report' => Hashids::encode($item['id']), 'student' => Hashids::encode($students->id)])}}" class="btn-view pulse-animation">
+                                    <a href="{{route('student.combined.report', ['school' => Hashids::encode($students->school_id), 'year' => $year, 'report' => Hashids::encode($item['id']), 'student' => Hashids::encode($students->id), 'class' => Hashids::encode($item['class_id'])])}}" class="btn-view pulse-animation">
                                         <i class="fas fa-eye me-2"></i> View Report
                                     </a>
                                 @endif

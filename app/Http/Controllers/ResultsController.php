@@ -156,7 +156,8 @@ class ResultsController extends Controller
             $combinedItems->push([
                 'type' => 'report',
                 'id' => $report->id,
-                'label' => $report->title ?? 'Generated Report'
+                'label' => $report->title ?? 'Generated Report',
+                'class_id' => $report->class_id,
             ]);
         }
 
@@ -3326,12 +3327,13 @@ class ResultsController extends Controller
     }
 
     //download parent_student combined report
-    public function parentDownloadStudentCombinedReport($school, $year, $report, $student)
+    public function parentDownloadStudentCombinedReport($school, $year, $report, $student, $class)
     {
         $studentId = Hashids::decode($student)[0];
         // return $studentId;
         $schoolId = Hashids::decode($school)[0];
         $reportId = Hashids::decode($report)[0];
+        $classId = Hashids::decode($class)[0];
 
         $reports = generated_reports::find($reportId);
         $examDates = $reports->exam_dates; // array
@@ -3371,7 +3373,7 @@ class ResultsController extends Controller
                 'users.last_name as teacher_last_name'
             )
             ->where('examination_results.student_id', $studentId)
-            ->where('examination_results.class_id', $reports->class_id)
+            ->where('examination_results.class_id', $classId)
             ->where('examination_results.school_id', $schoolId)
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->get();

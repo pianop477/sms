@@ -455,7 +455,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('Result-months/Student/{student}/Year/{year}/Type/{exam_type}', [ResultsController::class, 'resultByMonth'])->name('result.byMonth');
         Route::get('Result/student/{student}/year/{year}/exam-type/{exam_id}/month/{month}/date/{date}', [ResultsController::class, 'viewStudentResult'])->name('results.student.get');
         Route::get('student/{student}/Courses-list', [CoursesController::class, 'viewStudentCourses'])->name('student.courses.list');
-        Route::get('/Student-report/school/{school}/year/{year}/report/{report}/student/{student}', [ResultsController::class, 'parentDownloadStudentCombinedReport'])->name('student.combined.report');
+        Route::get('/Student-report/school/{school}/year/{year}/report/{report}/student/{student}/class/{class}', [ResultsController::class, 'parentDownloadStudentCombinedReport'])->name('student.combined.report');
         Route::get('Student/view/id/{student}', [StudentsController::class, 'studentProfile'])->name('students.profile');
 
         //parent download holiday package
