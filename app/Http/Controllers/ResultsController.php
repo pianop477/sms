@@ -122,14 +122,22 @@ class ResultsController extends Controller
             ->orderBy('examinations.exam_type', 'asc')
             ->get();
 
-        // Check for combined examination results
-        $reports = generated_reports::select('id', 'title')
+        $classIdsForYear = Examination_result::where('student_id', $students->id)
             ->where('school_id', $students->school_id)
+            ->whereYear('exam_date', $year)
+            ->pluck('class_id')
+            ->unique()
+            ->values();
+
+
+        // Check for combined examination results
+        $reports = generated_reports::where('school_id', $students->school_id)
             ->where('status', 1)
             ->whereYear('created_at', $year)
-            ->groupBy('title')
+            ->whereIn('class_id', $classIdsForYear)
             ->orderBy('created_at', 'DESC')
             ->get();
+
 
         // Combine both $examTypes and $reports into one array
         $combinedItems = collect();
