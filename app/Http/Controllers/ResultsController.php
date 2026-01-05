@@ -123,12 +123,11 @@ class ResultsController extends Controller
             ->get();
 
         // Check for combined examination results
-        $reports = generated_reports::where('school_id', $students->school_id)
+        $reports = generated_reports::select('id', 'title')
+            ->where('school_id', $students->school_id)
             ->where('status', 1)
             ->whereYear('created_at', $year)
-            ->whereHas('examinationResults', function ($q) use ($students) {
-                $q->where('student_id', $students->id);
-            })
+            ->groupBy('title')
             ->orderBy('created_at', 'DESC')
             ->get();
 
