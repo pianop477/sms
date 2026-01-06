@@ -1472,7 +1472,7 @@ class BillsController extends Controller
         $dataStartRow = $headerRow + 1;
 
         // Professional header styling
-        $sheet->getStyle("A{$headerRow}:L{$headerRow}")->applyFromArray([
+        $sheet->getStyle("A{$headerRow}:M{$headerRow}")->applyFromArray([
             'font' => [
                 'bold' => true,
                 'size' => 11,
