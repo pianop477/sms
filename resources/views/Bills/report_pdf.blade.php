@@ -358,7 +358,7 @@
 
             <!-- Summary Row -->
             <tr class="summary-row">
-                <td colspan="6" class="text-right text-bold">GRAND TOTALS:</td>
+                <td colspan="7" class="text-right text-bold">GRAND TOTALS:</td>
                 <td class="amount text-bold">{{ number_format($total_billed) }}</td>
                 <td class="amount text-bold">{{ number_format($total_paid) }}</td>
                 <td class="amount text-bold">{{ number_format($total_balance) }}</td>
