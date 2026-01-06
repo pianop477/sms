@@ -1268,7 +1268,7 @@ class BillsController extends Controller
                 'payment_services.service_name',
                 'students.first_name as student_first_name',
                 'students.middle_name as student_middle_name',
-                'students.last_name as student_last_name',
+                'students.last_name as student_last_name', 'students.admission_number',
                 'grades.class_code',
                 'users.phone as parent_phone',
                 DB::raw('(SELECT COALESCE(SUM(amount), 0)
@@ -1300,6 +1300,7 @@ class BillsController extends Controller
                 'student_name' => trim(ucwords(strtolower($bill->student_first_name ?? 'N/A')) . ' ' .
                                 ucwords(strtolower($bill->student_middle_name ?? '')) . ' ' .
                                 ucwords(strtolower($bill->student_last_name ?? ''))),
+                'admission' => $bill->admission_number,
                 'level' => strtoupper($bill->class_code ?? 'N/A'),
                 'academic_year' => $bill->academic_year,
                 'billed_amount' => $billed,
@@ -1403,7 +1404,7 @@ class BillsController extends Controller
         }
 
         // School Name - Row 2
-        $sheet->mergeCells('A'.$logoRow.':L'.$logoRow);
+        $sheet->mergeCells('A'.$logoRow.':M'.$logoRow);
         $sheet->setCellValue('A'.$logoRow, strtoupper($school->school_name));
         $sheet->getStyle('A'.$logoRow)->applyFromArray([
             'font' => ['bold' => true, 'size' => 16, 'color' => ['rgb' => '2C3E50']],
@@ -1412,7 +1413,7 @@ class BillsController extends Controller
 
         // School Address - Row 3
         $addressRow = $logoRow + 1;
-        $sheet->mergeCells('A'.$addressRow.':L'.$addressRow);
+        $sheet->mergeCells('A'.$addressRow.':M'.$addressRow);
         $sheet->setCellValue('A'.$addressRow, ucwords(strtolower($school->postal_address)) . ', ' . ucwords(strtolower($school->postal_name)) . ' - ' . ucwords(strtolower($school->country)));
         $sheet->getStyle('A'.$addressRow)->applyFromArray([
             'font' => ['size' => 11, 'color' => ['rgb' => '7F8C8D']],
@@ -1421,7 +1422,7 @@ class BillsController extends Controller
 
         // Report Title - Row 4
         $titleRow = $addressRow + 1;
-        $sheet->mergeCells('A'.$titleRow.':L'.$titleRow);
+        $sheet->mergeCells('A'.$titleRow.':M'.$titleRow);
         $sheet->setCellValue('A'.$titleRow, "BILLS REPORT");
         $sheet->getStyle('A'.$titleRow)->applyFromArray([
             'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '2C3E50']],
@@ -1430,7 +1431,7 @@ class BillsController extends Controller
 
         // Report Period - Row 5
         $periodRow = $titleRow + 1;
-        $sheet->mergeCells('A'.$periodRow.':L'.$periodRow);
+        $sheet->mergeCells('A'.$periodRow.':M'.$periodRow);
         $sheet->setCellValue('A'.$periodRow, "Reporting Period: " . \Carbon\Carbon::parse($start_date)->format('d M Y') . " - " . \Carbon\Carbon::parse($end_date)->format('d M Y'));
         $sheet->getStyle('A'.$periodRow)->applyFromArray([
             'font' => ['italic' => true, 'size' => 11, 'color' => ['rgb' => '7F8C8D']],
@@ -1439,7 +1440,7 @@ class BillsController extends Controller
 
         // Report Summary - Row 6
         $summaryRow = $periodRow + 1;
-        $sheet->mergeCells('A'.$summaryRow.':L'.$summaryRow);
+        $sheet->mergeCells('A'.$summaryRow.':M'.$summaryRow);
         $sheet->setCellValue('A'.$summaryRow,
             "Total Bills: " . count($bills) .
             " | Total Billed: " . number_format($total_billed) .
@@ -1464,7 +1465,7 @@ class BillsController extends Controller
         // =========================
         //  PROFESSIONAL TABLE HEADER
         // =========================
-        $headers = ['#', 'Control #', 'Student Name', 'Level', 'Year', 'Service', 'Billed Amount', 'Paid Amount', 'Balance', 'Status', 'Issued At', 'Expires At'];
+        $headers = ['#', 'Control #', 'Admission #', 'Student Name', 'Level', 'Year', 'Service', 'Billed Amount', 'Paid Amount', 'Balance', 'Status', 'Issued At', 'Expires At'];
         $sheet->fromArray($headers, null, 'A' . $startRow, true);
 
         $headerRow = $startRow;
@@ -1501,6 +1502,7 @@ class BillsController extends Controller
             $dataArray[] = [
                 $index + 1, // Row number
                 strtoupper($bill['control_number']),
+                strtoupper($bill['admission']),
                 $bill['student_name'],
                 $bill['level'],
                 $bill['academic_year'],
@@ -1508,7 +1510,7 @@ class BillsController extends Controller
                 $bill['billed_amount'],
                 $bill['paid_amount'],
                 $bill['balance'],
-                $bill['status'],
+                strtoupper($bill['status']),
                 \Carbon\Carbon::parse($bill['issued_at'])->format('d-m-Y'),
                 $bill['expires_at'] ? \Carbon\Carbon::parse($bill['expires_at'])->format('d-m-Y') : 'N/A',
             ];
@@ -1545,7 +1547,7 @@ class BillsController extends Controller
             ]);
 
             // Format amount columns
-            $amountColumns = ['G', 'H', 'I']; // Billed, Paid, Balance
+            $amountColumns = ['H', 'I', 'J']; // Billed, Paid, Balance
             foreach ($amountColumns as $column) {
                 $sheet->getStyle("{$column}{$dataStartRow}:{$column}{$lastDataRow}")->applyFromArray([
                     'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT],
@@ -1555,7 +1557,7 @@ class BillsController extends Controller
 
             // Color code status column
             for ($row = $dataStartRow; $row <= $lastDataRow; $row++) {
-                $status = $sheet->getCell("J{$row}")->getValue();
+                $status = $sheet->getCell("K{$row}")->getValue();
                 $status = strtolower(trim($status ?? ''));
                 $statusColor = '000000'; // default black
 
@@ -1573,13 +1575,13 @@ class BillsController extends Controller
                     $statusColor = '2980B9'; // blue
                 }
 
-                $sheet->getStyle("J{$row}")->applyFromArray([
+                $sheet->getStyle("K{$row}")->applyFromArray([
                     'font' => ['bold' => true, 'color' => ['rgb' => $statusColor]]
                 ]);
             }
 
             // Center align status and date columns
-            $centerColumns = ['J', 'K', 'L']; // Status, Issued At, Expires At
+            $centerColumns = ['K', 'L', 'M']; // Status, Issued At, Expires At
             foreach ($centerColumns as $column) {
                 $sheet->getStyle("{$column}{$dataStartRow}:{$column}{$lastDataRow}")->applyFromArray([
                     'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER]
@@ -1593,15 +1595,15 @@ class BillsController extends Controller
         //  PROFESSIONAL TOTAL ROW
         // =========================
         $totalRow = $lastDataRow + 1;
-        $sheet->mergeCells("A{$totalRow}:F{$totalRow}");
+        $sheet->mergeCells("A{$totalRow}:G{$totalRow}");
         $sheet->setCellValue("A{$totalRow}", "GRAND TOTALS");
-        $sheet->setCellValue("G{$totalRow}", $total_billed);
-        $sheet->setCellValue("H{$totalRow}", $total_paid);
-        $sheet->setCellValue("I{$totalRow}", $total_balance);
-        $sheet->setCellValue("J{$totalRow}", "End of Report");
-        $sheet->mergeCells("J{$totalRow}:L{$totalRow}");
+        $sheet->setCellValue("H{$totalRow}", $total_billed);
+        $sheet->setCellValue("I{$totalRow}", $total_paid);
+        $sheet->setCellValue("J{$totalRow}", $total_balance);
+        $sheet->setCellValue("K{$totalRow}", "End of Report");
+        $sheet->mergeCells("K{$totalRow}:L{$totalRow}");
 
-        $sheet->getStyle("A{$totalRow}:L{$totalRow}")->applyFromArray([
+        $sheet->getStyle("A{$totalRow}:M{$totalRow}")->applyFromArray([
             'font' => [
                 'bold' => true,
                 'size' => 12,
@@ -1624,7 +1626,7 @@ class BillsController extends Controller
         ]);
 
         // Format total amounts
-        $sheet->getStyle("G{$totalRow}:I{$totalRow}")->applyFromArray([
+        $sheet->getStyle("H{$totalRow}:J{$totalRow}")->applyFromArray([
             'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT],
             'numberFormat' => ['formatCode' => '#,##0']
         ]);
@@ -1633,7 +1635,7 @@ class BillsController extends Controller
         //  PROFESSIONAL FOOTER
         // =========================
         $footerRow = $totalRow + 2;
-        $sheet->mergeCells("A{$footerRow}:L{$footerRow}");
+        $sheet->mergeCells("A{$footerRow}:M{$footerRow}");
         $sheet->setCellValue("A{$footerRow}",
             strtoupper($school->school_name) . " | " .
             "Computer Generated Bills Report | " .
@@ -1652,20 +1654,21 @@ class BillsController extends Controller
         // Set specific column widths for better layout
         $sheet->getColumnDimension('A')->setWidth(6);  // #
         $sheet->getColumnDimension('B')->setWidth(15); // Control #
-        $sheet->getColumnDimension('C')->setWidth(25); // Student Name
-        $sheet->getColumnDimension('D')->setWidth(12); // Level
-        $sheet->getColumnDimension('E')->setWidth(10); // Year
-        $sheet->getColumnDimension('F')->setWidth(20); // Service
-        $sheet->getColumnDimension('G')->setWidth(15); // Billed Amount
-        $sheet->getColumnDimension('H')->setWidth(15); // Paid Amount
-        $sheet->getColumnDimension('I')->setWidth(15); // Balance
-        $sheet->getColumnDimension('J')->setWidth(12); // Status
-        $sheet->getColumnDimension('K')->setWidth(12); // Issued At
-        $sheet->getColumnDimension('L')->setWidth(12); // Expires At
+        $sheet->getColumnDimension('C')->setWidth(12); // admission
+        $sheet->getColumnDimension('D')->setWidth(25); // student name
+        $sheet->getColumnDimension('E')->setWidth(10); // level
+        $sheet->getColumnDimension('F')->setWidth(20); // year
+        $sheet->getColumnDimension('G')->setWidth(15); // service
+        $sheet->getColumnDimension('H')->setWidth(15); // billed
+        $sheet->getColumnDimension('I')->setWidth(15); // paid
+        $sheet->getColumnDimension('J')->setWidth(12); // balance
+        $sheet->getColumnDimension('K')->setWidth(12); // status
+        $sheet->getColumnDimension('L')->setWidth(12); // issued at
+        $sheet->getColumnDimension('M')->setWidth(12); //expired at
 
         // Format amount columns
         if ($lastDataRow >= $dataStartRow) {
-            $amountColumns = ['G', 'H', 'I'];
+            $amountColumns = ['H', 'I', 'J'];
             foreach ($amountColumns as $column) {
                 $sheet->getStyle("{$column}{$dataStartRow}:{$column}{$lastDataRow}")
                     ->getNumberFormat()
@@ -1711,7 +1714,7 @@ class BillsController extends Controller
         $sheet->setCellValue("A{$row}", "Generated: " . \Carbon\Carbon::now()->format('d M Y H:i')); $row += 2;
 
         // Column headers
-        $headers = ['#', 'Control #', 'Student Name', 'Level', 'Year', 'Service', 'Billed Amount', 'Paid Amount', 'Balance', 'Status', 'Issued At', 'Expires At'];
+        $headers = ['#', 'Control #', 'Admission #', 'Student Name', 'Level', 'Year', 'Service', 'Billed Amount', 'Paid Amount', 'Balance', 'Status', 'Issued At', 'Expires At'];
         $sheet->fromArray($headers, null, "A{$row}");
 
         // Style headers
@@ -1733,6 +1736,7 @@ class BillsController extends Controller
             $sheet->fromArray([
                 $index + 1,
                 strtoupper($bill['control_number']),
+                strtoupper($bill['admission']),
                 $bill['student_name'],
                 $bill['level'],
                 $bill['academic_year'],
@@ -1749,12 +1753,12 @@ class BillsController extends Controller
 
         // Total row
         $sheet->setCellValue("A{$row}", "GRAND TOTALS");
-        $sheet->mergeCells("A{$row}:F{$row}");
-        $sheet->setCellValue("G{$row}", $total_billed);
-        $sheet->setCellValue("H{$row}", $total_paid);
-        $sheet->setCellValue("I{$row}", $total_balance);
-        $sheet->setCellValue("J{$row}", "End of Report");
-        $sheet->mergeCells("J{$row}:L{$row}");
+        $sheet->mergeCells("A{$row}:G{$row}");
+        $sheet->setCellValue("H{$row}", $total_billed);
+        $sheet->setCellValue("I{$row}", $total_paid);
+        $sheet->setCellValue("J{$row}", $total_balance);
+        $sheet->setCellValue("K{$row}", "End of Report");
+        $sheet->mergeCells("K{$row}:L{$row}");
 
         $sheet->getStyle("A{$row}:L{$row}")->applyFromArray([
             'font' => ['bold' => true],
@@ -1768,12 +1772,12 @@ class BillsController extends Controller
         ]);
 
         // Auto-size columns
-        foreach(range('A','L') as $columnID) {
+        foreach(range('A','M') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
 
         // Format amount columns
-        $amountColumns = ['G', 'H', 'I'];
+        $amountColumns = ['H', 'I', 'J'];
         foreach ($amountColumns as $column) {
             $sheet->getStyle("{$column}2:{$column}{$row}")
                 ->getNumberFormat()

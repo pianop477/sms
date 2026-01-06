@@ -238,7 +238,8 @@
         /* Column widths for bills report */
         .col-number { width: 3%; }
         .col-control { width: 8%; }
-        .col-student { width: 12%; }
+        .col-admission { width: 8% }
+        .col-student { width: 13%; }
         .col-level { width: 6%; }
         .col-year { width: 6%; }
         .col-billed { width: 8%; }
@@ -305,6 +306,7 @@
             <tr>
                 <th class="col-number">#</th>
                 <th class="col-control">Control #</th>
+                <th class="col-admission">Admission #</th>
                 <th class="col-student">Student Name</th>
                 <th class="col-level">Level</th>
                 <th class="col-year">Year</th>
@@ -322,6 +324,7 @@
                 <tr class="avoid-break">
                     <td class="text-center col-number">{{ $loop->iteration }}</td>
                     <td class="col-control">{{ strtoupper($bill['control_number']) }}</td>
+                    <td class="col-admission">{{strtoupper($bill['admission'])}}</td>
                     <td class="col-student">{{ $bill['student_name'] }}</td>
                     <td class="col-level">{{ $bill['level'] }}</td>
                     <td class="col-year">{{ $bill['academic_year'] }}</td>
