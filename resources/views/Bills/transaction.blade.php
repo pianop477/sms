@@ -172,16 +172,16 @@
                     <div class="card-body">
                         <!-- Header Section -->
                         <div class="row mb-4">
-                            <div class="col-md-8">
+                            <div class="col-md-12">
                                 <h4 class="header-title">School fee payment transactions</h4>
                             </div>
-                            <div class="col-md-4">
+                            {{-- <div class="col-md-4">
                                 <div class="d-flex justify-content-end gap-2 flex-wrap">
                                     <button type="button" class="btn btn-info btn-action" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
                                         <i class="fas fa-plus-circle me-1"></i> Add Payment
                                     </button>
                                 </div>
-                            </div>
+                            </div> --}}
                         </div>
                         <!-- Teachers Table -->
                         <div class="single-table">
@@ -382,7 +382,7 @@
             <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addTeacherModalLabel"> Add New Payment</h5>
-                <button type="button" class="btn-close btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
             </div>
             <div class="modal-body">
                 <form class="needs-validation" novalidate action="{{route('payment.store')}}" method="POST" enctype="multipart/form-data">

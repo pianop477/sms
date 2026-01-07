@@ -344,7 +344,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addTeacherModalLabel"><i class="fas fa-coins"></i> Manage new Services</h5>
-                    <button type="button" class="btn-close btn btn-danger" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                    <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
                 </div>
                 <div class="modal-body">
                     <form class="needs-validation" novalidate action="{{route('services.store')}}" method="POST" enctype="multipart/form-data">

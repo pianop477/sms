@@ -71,7 +71,8 @@
             justify-content: center;
         }
 
-        .action-buttons a, .action-buttons button {
+        .action-buttons a,
+        .action-buttons button {
             width: 30px;
             height: 30px;
             display: flex;
@@ -134,7 +135,8 @@
             color: #d93025;
         }
 
-        .form-control:focus, .select2-container--focus .select2-selection {
+        .form-control:focus,
+        .select2-container--focus .select2-selection {
             border-color: var(--primary-color) !important;
             box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25) !important;
         }
@@ -177,7 +179,8 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="d-flex justify-content-end gap-2 flex-wrap">
-                                    <button type="button" class="btn btn-info btn-action" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
+                                    <button type="button" class="btn btn-info btn-action" data-bs-toggle="modal"
+                                        data-bs-target="#addTeacherModal">
                                         <i class="fas fa-plus-circle me-1"></i> New Bill
                                     </button>
                                 </div>
@@ -193,8 +196,8 @@
                                         <option value="">-- Filter by Year --</option>
                                         @php
                                             $current = (int) date('Y');
-                                            $start   = 2024;
-                                            $end     = $current + 1;
+                                            $start = 2024;
+                                            $end = $current + 1;
                                             $selectedYear = session('selected_year', date('Y'));
                                         @endphp
                                         @for ($y = $end; $y >= $start; $y--)
@@ -207,18 +210,15 @@
                                 <div class="col-md-4">
                                     <form id="searchForm" method="GET" data-no-preloader>
                                         <div class="input-group">
-                                            <input type="text"
-                                                name="search"
-                                                id="searchInput"
-                                                class="form-control"
-                                                placeholder="Search here..."
-                                                value="{{ request('search') }}"
+                                            <input type="text" name="search" id="searchInput" class="form-control"
+                                                placeholder="Search here..." value="{{ request('search') }}"
                                                 autocomplete="off">
                                             <button class="btn btn-primary" type="submit">
                                                 <i class="fas fa-search"></i> Search
                                             </button>
-                                            @if(request('search') || request('year'))
-                                                <a href="{{ route('bills.index') }}" class="btn btn-outline-secondary" id="clearFilters">
+                                            @if (request('search') || request('year'))
+                                                <a href="{{ route('bills.index') }}" class="btn btn-outline-secondary"
+                                                    id="clearFilters">
                                                     <i class="fas fa-times"></i> Clear
                                                 </a>
                                             @endif
@@ -244,7 +244,7 @@
                             <!-- Pagination Section -->
                             <div id="paginationSection">
                                 <!-- Pagination will be loaded here via AJAX -->
-                                @if(isset($bills) && $bills->hasPages())
+                                @if (isset($bills) && $bills->hasPages())
                                     <div class="mt-4">
                                         {{ $bills->links('vendor.pagination.bootstrap-5') }}
                                     </div>
@@ -263,81 +263,93 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addTeacherModalLabel"> Register Bills</h5>
-                    <button type="button" class="btn btn-xs btn btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
+                    <button type="button" class="btn btn-xs btn btn-danger" data-bs-dismiss="modal" aria-label="Close"><i
+                            class="fas fa-close"></i></button>
                 </div>
                 <div class="modal-body">
-                    <form class="needs-validation" novalidate action="{{route('bills.store')}}" method="POST" enctype="multipart/form-data">
+                    <form class="needs-validation" novalidate action="{{ route('bills.store') }}" method="POST"
+                        enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="fname" class="form-label">Student Name <span class="text-danger">*</span></label>
+                                <label for="fname" class="form-label">Student Name <span
+                                        class="text-danger">*</span></label>
                                 <select name="student_name" id="studentSelect" class="form-control-custom" required>
                                     <option value="">--Select student name--</option>
                                     @if ($students->isEmpty())
-                                        <option value="" disabled class="text-danger">No students records were found</option>
+                                        <option value="" disabled class="text-danger">No students records were found
+                                        </option>
                                     @else
                                         @foreach ($students as $student)
-                                            <option value="{{$student->id}}">
-                                                {{ucwords(strtoupper($student->first_name . ' ' . $student->middle_name. ' '. $student->last_name))}}
+                                            <option value="{{ $student->id }}">
+                                                {{ ucwords(strtoupper($student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name)) }}
                                             </option>
                                         @endforeach
                                     @endif
                                 </select>
                                 @error('student_name')
-                                <div class="text-danger small">{{$message}}</div>
+                                    <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="controlNumber" class="form-label">Control Number</label>
-                                <input type="text" name="control_number" class="form-control-custom" id="controlNumber" placeholder="Enter Control Number" value="{{old('control_number')}}">
+                                <input type="text" name="control_number" class="form-control-custom" id="controlNumber"
+                                    placeholder="Enter Control Number" value="{{ old('control_number') }}">
                                 @error('control_number')
-                                <div class="text-danger small">{{$message}}</div>
+                                    <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Academic Year <span class="text-danger">*</span></label>
+                                <label for="email" class="form-label">Academic Year <span
+                                        class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <input type="text" name="academic_year" class="form-control-custom" id="email" placeholder="2020" value="{{old('academic_year', date('Y'))}}">
+                                    <input type="text" name="academic_year" class="form-control-custom"
+                                        id="email" placeholder="2020" value="{{ old('academic_year', date('Y')) }}">
                                 </div>
                                 @error('academic_year')
-                                <div class="text-danger small">{{$message}}</div>
+                                    <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="service" class="form-label">Service <span class="text-danger">*</span></label>
+                                <label for="service" class="form-label">Service <span
+                                        class="text-danger">*</span></label>
                                 <select name="service" id="service" class="form-control-custom" required>
                                     <option value="">-- select service --</option>
                                     @if ($services->isEmpty())
-                                        <option value="">{{_('No services were found')}}</option>
+                                        <option value="">{{ _('No services were found') }}</option>
                                     @else
                                         @foreach ($services as $row)
-                                            <option value="{{$row->id}}" data-amount="{{$row->amount}}" data-duration="{{$row->expiry_duration}}">
-                                                {{strtoupper($row->service_name)}}
+                                            <option value="{{ $row->id }}" data-amount="{{ $row->amount }}"
+                                                data-duration="{{ $row->expiry_duration }}">
+                                                {{ strtoupper($row->service_name) }}
                                             </option>
                                         @endforeach
                                     @endif
                                 </select>
                                 @error('service')
-                                <div class="text-danger small">{{$message}}</div>
+                                    <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="amount" class="form-label">Amount <span class="text-danger">*</span></label>
-                                <input type="text" required name="amount" class="form-control-custom" id="amount" placeholder="Enter Amount" value="{{old('amount')}}">
+                                <label for="amount" class="form-label">Amount <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" required name="amount" class="form-control-custom" id="amount"
+                                    placeholder="Enter Amount" value="{{ old('amount') }}">
                                 @error('amount')
-                                <div class="text-danger small">{{$message}}</div>
+                                    <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="dueDate" class="form-label">Due Date <span class="text-danger">*</span></label>
+                                <label for="dueDate" class="form-label">Due Date <span
+                                        class="text-danger">*</span></label>
                                 <input type="date" name="due_date" class="form-control-custom" id="dueDate">
                                 @error('due_date')
-                                <div class="text-danger small">{{$message}}</div>
+                                    <div class="text-danger small">{{ $message }}</div>
                                 @enderror
                             </div>
                         </div>
@@ -350,10 +362,98 @@
             </div>
         </div>
     </div>
+
+    <!-- Payment Modal -->
+    <div class="modal fade" id="addPaymentModal" tabindex="-1" aria-labelledby="addPaymentModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addPaymentModalLabel">Record Payment</h5>
+                    <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-close"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form class="needs-validation" novalidate action="{{ route('payment.store') }}" method="POST"
+                        enctype="multipart/form-data">
+                        @csrf
+                        <!-- Hidden fields - populated automatically -->
+                        <input type="hidden" name="bill_id" id="payment_bill_id">
+                        <input type="hidden" name="student_id" id="payment_student_id">
+                        <input type="hidden" name="control_number" id="payment_control_number">
+                        <input type="hidden" name="academic_year" id="payment_academic_year_hidden">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Student Name</label>
+                                <input type="text" id="payment_student_display" class="form-control-custom" readonly>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Control Number</label>
+                                <input type="text" id="payment_control_display"
+                                    class="form-control-custom text-uppercase" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="payment_academic_display" class="form-label">Academic Year</label>
+                                <div class="input-group">
+                                    <input type="text" id="payment_academic_display" class="form-control-custom"
+                                        readonly>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="payment_mode" class="form-label">Payment Mode <span
+                                        class="text-danger">*</span></label>
+                                <select name="payment" id="payment_mode" class="form-control-custom" required>
+                                    <option value="">-- select payment mode --</option>
+                                    <option value="bank" selected>Bank</option>
+                                    <option value="cash">Cash</option>
+                                    <option value="mobile">Mobile Money</option>
+                                </select>
+                                @error('payment')
+                                    <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="payment_amount" class="form-label">Payment Amount <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" required name="amount" class="form-control-custom"
+                                    id="payment_amount" placeholder="Enter amount" value="{{ old('amount') }}">
+                                @error('amount')
+                                    <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Current Balance</label>
+                                <input type="text" id="payment_balance_display" class="form-control-custom" readonly
+                                    style="background-color: #f8f9fa;">
+                                <small class="text-muted">(For reference only - you can pay any amount)</small>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" id="payment_save_button" class="btn btn-success">Save Payment</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     <style>
         .opacity-50 {
             opacity: 0.5;
         }
+
         #loadingSpinner {
             position: absolute;
             top: 50%;
@@ -363,12 +463,12 @@
         }
     </style>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             // Initialize select2
             $('#addTeacherModal').on('shown.bs.modal', function() {
                 // Load students via AJAX
                 $.ajax({
-                    url: '{{ route("students.list") }}',
+                    url: '{{ route('students.list') }}',
                     method: 'GET',
                     success: function(response) {
                         const select = $('#studentSelect');
@@ -376,13 +476,18 @@
                         select.append('<option value="">--Select student name--</option>');
 
                         // FIX: Access response.students instead of response directly
-                        if (response.success && response.students && response.students.length > 0) {
+                        if (response.success && response.students && response.students.length >
+                            0) {
                             response.students.forEach(student => {
-                                const name = `${student.first_name} ${student.middle_name} ${student.last_name}`;
-                                select.append(`<option value="${student.id}">${name.toUpperCase()}</option>`);
+                                const name =
+                                    `${student.first_name} ${student.middle_name} ${student.last_name}`;
+                                select.append(
+                                    `<option value="${student.id}">${name.toUpperCase()}</option>`
+                                );
                             });
                         } else {
-                            select.append('<option value="" disabled>No students found</option>');
+                            select.append(
+                                '<option value="" disabled>No students found</option>');
                         }
 
                         // Initialize Select2
@@ -398,7 +503,9 @@
                         const select = $('#studentSelect');
                         select.empty();
                         select.append('<option value="">--Select student name--</option>');
-                        select.append('<option value="" disabled class="text-danger">Error loading students</option>');
+                        select.append(
+                            '<option value="" disabled class="text-danger">Error loading students</option>'
+                        );
                     }
                 });
             });
@@ -441,7 +548,8 @@
 
                 if (submitButton) {
                     submitButton.disabled = true;
-                    submitButton.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Saving...`;
+                    submitButton.innerHTML =
+                        `<span class="spinner-border spinner-border-sm me-2"></span> Saving...`;
                 }
 
                 // Use setTimeout to allow button state change before form submit
@@ -536,7 +644,7 @@
                 yearFilter.val('');
                 localStorage.removeItem('selectedYear');
                 loadBillsData();
-                window.history.pushState({}, '', '{{ route("bills.index") }}');
+                window.history.pushState({}, '', '{{ route('bills.index') }}');
             });
 
             // Pagination links
@@ -551,7 +659,7 @@
             function loadBillsData(url = null) {
                 const searchValue = $('#searchInput').val();
                 const selectedYear = yearFilter.val() || localStorage.getItem('selectedYear') || currentYear;
-                const targetUrl = url || '{{ route("bills.index") }}';
+                const targetUrl = url || '{{ route('bills.index') }}';
 
                 console.log('Loading bills data:', {
                     search: searchValue,
@@ -591,7 +699,8 @@
                             updateUrl(searchValue, selectedYear, url);
                         } else {
                             console.error('AJAX Response Error:', response);
-                            billsTableSection.html('<div class="alert alert-danger">' + (response.message || 'Error loading data') + '</div>');
+                            billsTableSection.html('<div class="alert alert-danger">' + (response
+                                .message || 'Error loading data') + '</div>');
                         }
                     },
                     error: function(xhr, status, error) {
@@ -600,7 +709,9 @@
                             error: error,
                             response: xhr.responseText
                         });
-                        billsTableSection.html('<div class="alert alert-danger">Error loading bills. Please try again.</div>');
+                        billsTableSection.html(
+                            '<div class="alert alert-danger">Error loading bills. Please try again.</div>'
+                        );
                     },
                     complete: function() {
                         loadingSpinner.addClass('d-none');
@@ -663,6 +774,117 @@
                 }
 
                 loadBillsData();
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Handle Pay button click - Simple version
+            $(document).on('click', '.btn-pay', function() {
+                // Get data from button attributes
+                const billId = $(this).data('bill-id');
+                const studentId = $(this).data('student-id');
+                const studentName = $(this).data('student-name');
+                const controlNumber = $(this).data('control-number');
+                const academicYear = $(this).data('academic-year');
+                const billed = parseFloat($(this).data('billed'));
+                const paid = parseFloat($(this).data('paid'));
+                const balance = parseFloat($(this).data('balance'));
+
+                // Format currency
+                const formatter = new Intl.NumberFormat('en-US');
+
+                // Set values in modal
+                $('#payment_bill_id').val(billId);
+                $('#payment_student_id').val(studentId);
+                $('#payment_control_number').val(controlNumber);
+                $('#payment_academic_year_hidden').val(academicYear);
+
+                // Display values
+                $('#payment_student_display').val(studentName);
+                $('#payment_control_display').val(controlNumber);
+                $('#payment_academic_display').val(academicYear);
+                $('#payment_balance_display').val(formatter.format(balance));
+
+                // Reset form fields (optional)
+                $('#payment_amount').val('');
+                $('#payment_mode').val('bank'); // Default to bank
+                $('#payment_note').val('');
+
+                // Optional: Set focus on amount field
+                setTimeout(() => {
+                    $('#payment_amount').focus();
+                }, 500);
+            });
+
+            // BETTER: Format as user types with proper cleanup
+            $('#payment_amount').on('input', function(e) {
+                let value = $(this).val();
+
+                // Remove all non-numeric characters except decimal
+                let numericValue = value.replace(/[^\d.]/g, '');
+
+                // Remove extra decimal points
+                let parts = numericValue.split('.');
+                if (parts.length > 2) {
+                    numericValue = parts[0] + '.' + parts.slice(1).join('');
+                }
+
+                // Format with commas for display only
+                if (numericValue) {
+                    let displayParts = numericValue.split('.');
+                    displayParts[0] = displayParts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+                    // Update display with commas
+                    $(this).val(displayParts.join('.'));
+                } else {
+                    $(this).val('');
+                }
+            });
+
+            // Before form submission, remove commas
+            $('#addPaymentModal form').on('submit', function(e) {
+                let amountInput = $('#payment_amount');
+                let amountValue = amountInput.val();
+
+                if (!amountValue || amountValue.trim() === '') {
+                    e.preventDefault();
+                    amountInput.addClass('is-invalid');
+                    amountInput.after('<div class="text-danger small">Please enter an amount</div>');
+                    return false;
+                }
+
+                // Clean the value: remove commas and validate
+                let cleanAmount = amountValue.replace(/,/g, '');
+
+                // Check if it's a valid number
+                if (isNaN(cleanAmount) || parseFloat(cleanAmount) <= 0) {
+                    e.preventDefault();
+                    amountInput.addClass('is-invalid');
+                    amountInput.after(
+                        '<div class="text-danger small">Please enter a valid amount (greater than 0)</div>'
+                        );
+                    return false;
+                }
+
+                // Update hidden/cleaned value for submission
+                amountInput.val(cleanAmount);
+
+                // Optional: Show processing state
+                $('#payment_save_button').prop('disabled', true)
+                    .html('<span class="spinner-border spinner-border-sm me-2"></span>Processing...');
+            });
+
+            // Reset button state when modal closes
+            $('#addPaymentModal').on('hidden.bs.modal', function() {
+                $('#payment_save_button').prop('disabled', false)
+                    .html('Save Payment');
+
+                // Clear validation
+                $('.is-invalid').removeClass('is-invalid');
+                $('.text-danger').remove();
+
+                // Reset amount field
+                $('#payment_amount').val('');
             });
         });
     </script>

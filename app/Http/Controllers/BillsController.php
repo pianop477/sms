@@ -48,7 +48,7 @@ class BillsController extends Controller
         return view('Bills.index', compact('students', 'services', 'bills', 'selectedYear', 'currentYear'));
     }
 
-    public function studentsList ()
+    public function studentsList()
     {
         $user = Auth::user();
         $students = Student::where('school_id', $user->school_id)
@@ -73,7 +73,8 @@ class BillsController extends Controller
             ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
             ->leftJoin('users', 'users.id', '=', 'parents.user_id')
             ->select(
-                'school_fees.*', 'payment_services.service_name',
+                'school_fees.*',
+                'payment_services.service_name',
                 'students.first_name as student_first_name',
                 'students.middle_name as student_middle_name',
                 'students.last_name as student_last_name',
@@ -110,15 +111,15 @@ class BillsController extends Controller
 
         if ($hasSearch) {
             $searchTerm = $request->search;
-            $query->where(function($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm) {
                 $q->where('school_fees.control_number', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('students.first_name', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('students.middle_name', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('students.last_name', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('grades.class_code', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('users.phone', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('payment_services.service_name', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('school_fees.status', 'LIKE', "%{$searchTerm}%");
+                    ->orWhere('students.first_name', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('students.middle_name', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('students.last_name', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('grades.class_code', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('users.phone', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('payment_services.service_name', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('school_fees.status', 'LIKE', "%{$searchTerm}%");
             });
 
             // With search, we want ALL matching records (no limit)
@@ -127,14 +128,13 @@ class BillsController extends Controller
 
             // Sort for search results
             $query->orderBy('latest_activity_date', 'DESC');
-
         } else {
             // WITHOUT SEARCH: Only show 20 latest records
             // First, get IDs of 20 latest bills
             $latestBillIds = DB::table('school_fees')
                 ->select('id')
                 ->where('school_id', $user->school_id)
-                ->when(!empty($selectedYear), function($q) use ($selectedYear) {
+                ->when(!empty($selectedYear), function ($q) use ($selectedYear) {
                     return $q->where('academic_year', 'LIKE', "%{$selectedYear}%");
                 })
                 ->orderByRaw("
@@ -234,7 +234,7 @@ class BillsController extends Controller
             if ($hasSearch) {
                 if ($bills->total() > 0) {
                     $showingText = 'Showing ' . $bills->firstItem() . ' to ' . $bills->lastItem() .
-                                ' of ' . $bills->total() . ' search results';
+                        ' of ' . $bills->total() . ' search results';
                 } else {
                     $showingText = 'No search results found for "' . $request->search . '"';
                 }
@@ -295,8 +295,8 @@ class BillsController extends Controller
 
             // Check existing control number status
             $existingBill = school_fees::where('control_number', $controlNumber)
-                                ->whereIn('status', ['active', 'full_paid', 'overpaid', 'expired'])
-                                ->first();
+                ->whereIn('status', ['active', 'full_paid', 'overpaid', 'expired'])
+                ->first();
 
             if ($existingBill) {
                 Alert()->toast(
@@ -320,9 +320,8 @@ class BillsController extends Controller
 
             Alert()->toast('Bill generated successfully', 'success');
             return back();
-
         } catch (Exception $e) {
-            Alert()->toast('Error '. $e->getMessage(), 'error');
+            Alert()->toast('Error ' . $e->getMessage(), 'error');
             return back();
         }
     }
@@ -418,7 +417,6 @@ class BillsController extends Controller
             // Sort for search results
             $query->orderBy('latest_activity_date', 'DESC')
                 ->orderBy('school_fees_payments.id', 'DESC');
-
         } else {
             // WITHOUT SEARCH: Show only 20 latest transactions
             // First, get IDs of 20 latest payments
@@ -524,7 +522,7 @@ class BillsController extends Controller
                 if ($hasSearch) {
                     if ($transactions->total() > 0) {
                         $showingText = 'Showing ' . $transactions->firstItem() . ' to ' . $transactions->lastItem() .
-                                    ' of ' . $transactions->total() . ' search results';
+                            ' of ' . $transactions->total() . ' search results';
                     } else {
                         $showingText = 'No search results found for "' . $request->search . '"';
                     }
@@ -569,9 +567,9 @@ class BillsController extends Controller
     {
         try {
             $fees = school_fees::where('student_id', $studentId)
-                    ->select('id', 'control_number', 'academic_year', 'status')
-                    ->where('status', 'active')
-                    ->get();
+                ->select('id', 'control_number', 'academic_year', 'status')
+                ->where('status', 'active')
+                ->get();
 
             return response()->json([
                 'success' => true,
@@ -590,38 +588,58 @@ class BillsController extends Controller
         $user = Auth::user();
 
         $this->validate($request, [
-            'student_id' => 'required|exists:students,id',
-            'control_number' => 'required|string|exists:school_fees,control_number',
+            'bill_id' => 'required|string',
+            'amount' => 'required|numeric|min:1',
             'payment' => 'required|string|in:bank,mobile,cash',
-            'amount' => 'required|numeric',
+            'payment_note' => 'nullable|string|max:500',
         ]);
 
         try {
-            // verify control number
-            $controlNumber = school_fees::where('control_number', $request->control_number)
-                    ->whereIn('status', ['active', 'full paid', 'overpaid'])
-                    ->first();
-
-            if (!$controlNumber) {
-                Alert()->toast('Control number is either invalid or expired', 'error');
+            // Decode the bill ID
+            $billId = Hashids::decode($request->bill_id);
+            if (empty($billId)) {
+                Alert()->toast('Invalid bill reference', 'error');
                 return back();
             }
 
-            $studentFeeId = $controlNumber->id;
+            $billId = $billId[0];
 
-            $latestInstallment = school_fees_payment::where('student_fee_id', $studentFeeId)
-                                ->max('installment');
+            // Get the bill/school_fee record
+            $bill = school_fees::where('id', $billId)->first();
+
+            if (!$bill) {
+                Alert()->toast('Bill not found', 'error');
+                return back();
+            }
+
+            // Verify bill status
+            if (!in_array($bill->status, ['active', 'partially_paid'])) {
+                Alert()->toast('This bill is not eligible for payment', 'error');
+                return back();
+            }
+
+            // Check if amount doesn't exceed balance
+            $balance = $bill->amount - $bill->total_paid;
+            if ($request->amount > $balance) {
+                Alert()->toast('Payment amount exceeds outstanding balance', 'error');
+                return back();
+            }
+
+            // Get the latest installment
+            $latestInstallment = school_fees_payment::where('student_fee_id', $billId)
+                ->max('installment');
 
             $installment = $latestInstallment ? $latestInstallment + 1 : 1;
 
-            // CREATE
+            // Create payment record
             $newPayment = school_fees_payment::create([
                 'school_id' => $user->school_id,
-                'student_id' => $request->student_id,
-                'student_fee_id' => $studentFeeId,
+                'student_id' => $bill->student_id,
+                'student_fee_id' => $billId,
                 'amount' => $request->amount,
                 'payment_mode' => $request->payment,
                 'installment' => $installment,
+                'payment_note' => $request->payment_note,
                 'approved_by' => $user->id,
                 'approved_at' => Carbon::now()->format('Y-m-d H:i:s'),
             ]);
@@ -629,7 +647,7 @@ class BillsController extends Controller
             Alert()->toast('Payment has been recorded successfully', 'success');
             return back();
         } catch (Exception $e) {
-            Alert()->toast('Error '. $e->getMessage(), 'error');
+            Alert()->toast('Error: ' . $e->getMessage(), 'error');
             return back();
         }
     }
@@ -700,7 +718,6 @@ class BillsController extends Controller
 
             // Get ALL control numbers matching search
             $controlNumbers = $controlNumbersQuery->pluck('control_number')->toArray();
-
         } else {
             // WITHOUT SEARCH: Show only 20 latest control numbers
             $controlNumbersQuery = DB::table('school_fees_payments')
@@ -877,7 +894,7 @@ class BillsController extends Controller
                 if ($hasSearch) {
                     if ($transactions->total() > 0) {
                         $showingText = 'Showing ' . $transactions->firstItem() . ' to ' . $transactions->lastItem() .
-                                    ' of ' . $transactions->total() . ' search results';
+                            ' of ' . $transactions->total() . ' search results';
                     } else {
                         $showingText = 'No search results found for "' . $search . '"';
                     }
@@ -931,7 +948,7 @@ class BillsController extends Controller
         );
     }
 
-   public function viewBill($billId)
+    public function viewBill($billId)
     {
         try {
             // Log::info('View Bill Request:', ['billId' => $billId]);
@@ -951,21 +968,21 @@ class BillsController extends Controller
 
             // Get bill basic info
             $bill = school_fees::query()
-                                ->join('payment_services', 'payment_services.id', '=', 'school_fees.service_id')
-                                ->leftJoin('students', 'students.id', '=', 'school_fees.student_id')
-                                ->leftJoin('grades', 'grades.id', '=', 'students.class_id')
-                                ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
-                                ->leftJoin('users', 'users.id', '=', 'parents.user_id')
-                                ->select(
-                                    'school_fees.*',
-                                    'payment_services.service_name',
-                                    'students.first_name as student_first_name',
-                                    'students.middle_name as student_middle_name',
-                                    'students.last_name as student_last_name',
-                                    'grades.class_code',
-                                    'users.phone as parent_phone'
-                                )
-                                ->find($billId);
+                ->join('payment_services', 'payment_services.id', '=', 'school_fees.service_id')
+                ->leftJoin('students', 'students.id', '=', 'school_fees.student_id')
+                ->leftJoin('grades', 'grades.id', '=', 'students.class_id')
+                ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
+                ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+                ->select(
+                    'school_fees.*',
+                    'payment_services.service_name',
+                    'students.first_name as student_first_name',
+                    'students.middle_name as student_middle_name',
+                    'students.last_name as student_last_name',
+                    'grades.class_code',
+                    'users.phone as parent_phone'
+                )
+                ->find($billId);
 
             if (!$bill) {
                 // Log::warning('Bill not found:', ['billId' => $billId]);
@@ -1001,7 +1018,6 @@ class BillsController extends Controller
                     'payment_count' => $paymentHistory->count()
                 ]
             ]);
-
         } catch (\Exception $e) {
             // Log::error('Error in viewBill: ' . $e->getMessage(), [
             //     'exception' => $e,
@@ -1025,7 +1041,7 @@ class BillsController extends Controller
             $decodedBill = Hashids::decode($billId);
 
             if (empty($decodedBill)) {
-               Alert()->toast('Invalid bill parameter', 'error');
+                Alert()->toast('Invalid bill parameter', 'error');
                 return back();
             }
 
@@ -1054,12 +1070,12 @@ class BillsController extends Controller
             Alert()->toast('Bill cancelled successfully', 'success');
             return back();
         } catch (\Exception $e) {
-            Alert()->toast('Error '. $e->getMessage(), 'error');
+            Alert()->toast('Error ' . $e->getMessage(), 'error');
             return back();
         }
     }
 
-    public function resendBill (Request $request, $billId)
+    public function resendBill(Request $request, $billId)
     {
         //
         $decodedBill = Hashids::decode($billId);
@@ -1067,34 +1083,38 @@ class BillsController extends Controller
         // return $decodedBill;
         try {
             $bill = school_fees::query()
-                            ->join('students', 'students.id', '=', 'school_fees.student_id')
-                            ->join('payment_services', 'payment_services.id', '=', 'school_fees.service_id')
-                            ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
-                            ->leftJoin('users', 'users.id', '=', 'parents.user_id')
-                            ->select(
-                                'school_fees.*',
-                                'users.phone as parent_phone', 'payment_services.service_name', 'payment_services.collection_account',
-                                DB::raw('(SELECT COALESCE(SUM(amount), 0)
+                ->join('students', 'students.id', '=', 'school_fees.student_id')
+                ->join('payment_services', 'payment_services.id', '=', 'school_fees.service_id')
+                ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
+                ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+                ->select(
+                    'school_fees.*',
+                    'users.phone as parent_phone',
+                    'payment_services.service_name',
+                    'payment_services.collection_account',
+                    DB::raw('(SELECT COALESCE(SUM(amount), 0)
                                     FROM school_fees_payments
-                                    WHERE student_fee_id = school_fees.id) AS total_paid'), 'students.first_name', 'students.last_name',
-                            )
-                            ->find($decodedBill[0]);
+                                    WHERE student_fee_id = school_fees.id) AS total_paid'),
+                    'students.first_name',
+                    'students.last_name',
+                )
+                ->find($decodedBill[0]);
 
-            if($bill->status != 'active') {
+            if ($bill->status != 'active') {
                 Alert()->toast('Invalid Bill or Inactive bill', 'error');
                 return back();
             }
 
             // find important information so as to prepare sms payload
             $account = '';
-            if($bill->collection_account != null) {
-                $account = 'Tumia Account#: '.strtoupper($bill->collection_account);
+            if ($bill->collection_account != null) {
+                $account = 'Tumia Account#: ' . strtoupper($bill->collection_account);
             } else {
-                $account = 'Tumia Control#: ' .strtoupper($bill->control_number);
+                $account = 'Tumia Control#: ' . strtoupper($bill->control_number);
             }
 
             // dd($account);
-            $studentName = strtoupper($bill->first_name . ' '. $bill->last_name);
+            $studentName = strtoupper($bill->first_name . ' ' . $bill->last_name);
             $paidAmount = (float) $bill->total_paid;
             $billedAmount = (float) $bill->amount;
             $dueDate = Carbon::parse($bill->due_date)->format('d-m-Y');
@@ -1120,24 +1140,22 @@ class BillsController extends Controller
                 'reference' => uniqid(),
             ];
 
-            Log::info('Sending sms to '. $studentName. ' with phone number '. $payload['to']. ' and message content is '. $payload['text']. ' from '. $payload['from']);
+            Log::info('Sending sms to ' . $studentName . ' with phone number ' . $payload['to'] . ' and message content is ' . $payload['text'] . ' from ' . $payload['from']);
 
             $response = $sendBillBySms->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
-            if(!$response['success']) {
-                Alert()->toast('SMS failed: '.$response['error'], 'error');
+            if (!$response['success']) {
+                Alert()->toast('SMS failed: ' . $response['error'], 'error');
                 return back();
             }
 
             Alert()->toast('SMS sent successfully', 'success');
             return back();
-        }
-        catch (Exception $e) {
-            Log::error('Error '. $e->getMessage());
-            Alert()->toast('Error '. $e->getMessage(), 'error');
+        } catch (Exception $e) {
+            Log::error('Error ' . $e->getMessage());
+            Alert()->toast('Error ' . $e->getMessage(), 'error');
             return back();
         }
-
     }
 
     private function formatPhoneNumber($phone)
@@ -1161,7 +1179,7 @@ class BillsController extends Controller
             $decodedBill = Hashids::decode($billId);
 
             if (empty($decodedBill)) {
-               Alert()->toast('Invalid bill parameter', 'error');
+                Alert()->toast('Invalid bill parameter', 'error');
                 return back();
             }
 
@@ -1180,7 +1198,7 @@ class BillsController extends Controller
             Alert()->toast('Bill has been deleted successfully', 'success');
             return back();
         } catch (\Exception $e) {
-            Alert()->toast('Error '. $e->getMessage(), 'error');
+            Alert()->toast('Error ' . $e->getMessage(), 'error');
             return back();
         }
     }
@@ -1191,20 +1209,25 @@ class BillsController extends Controller
         $decodedBill = Hashids::decode($billId);
 
         $bill = school_fees_payment::query()
-                            ->join('school_fees', 'school_fees.id', '=', 'school_fees_payments.student_fee_id')
-                            ->join('students', 'students.id', '=', 'school_fees_payments.student_id')
-                            ->leftJoin('grades', 'grades.id', '=', 'students.class_id')
-                            ->select(
-                                'school_fees_payments.*', 'grades.class_name', 'grades.class_code',
-                                'students.first_name', 'students.middle_name', 'students.last_name',
-                                'school_fees.control_number', 'school_fees.academic_year'
-                            )
-                            ->find($decodedBill[0]);
+            ->join('school_fees', 'school_fees.id', '=', 'school_fees_payments.student_fee_id')
+            ->join('students', 'students.id', '=', 'school_fees_payments.student_id')
+            ->leftJoin('grades', 'grades.id', '=', 'students.class_id')
+            ->select(
+                'school_fees_payments.*',
+                'grades.class_name',
+                'grades.class_code',
+                'students.first_name',
+                'students.middle_name',
+                'students.last_name',
+                'school_fees.control_number',
+                'school_fees.academic_year'
+            )
+            ->find($decodedBill[0]);
 
         return view('Bills.edit', compact('bill'));
     }
 
-    public function updateBill (Request $request, $billId)
+    public function updateBill(Request $request, $billId)
     {
         $decodedBill = Hashids::decode($billId);
 
@@ -1217,7 +1240,7 @@ class BillsController extends Controller
         try {
             $bill = school_fees_payment::find($decodedBill[0]);
 
-            if(! $bill) {
+            if (! $bill) {
                 Alert()->toast('Invalid bill or missing parameter');
                 return back();
             }
@@ -1231,7 +1254,7 @@ class BillsController extends Controller
             Alert()->toast('Payment has been updated successfully', 'success');
             return to_route('bills.transactions');
         } catch (Exception $e) {
-            Alert()->toast('Error '. $e->getMessage(), 'error');
+            Alert()->toast('Error ' . $e->getMessage(), 'error');
             return back();
         }
     }
@@ -1268,7 +1291,8 @@ class BillsController extends Controller
                 'payment_services.service_name',
                 'students.first_name as student_first_name',
                 'students.middle_name as student_middle_name',
-                'students.last_name as student_last_name', 'students.admission_number',
+                'students.last_name as student_last_name',
+                'students.admission_number',
                 'grades.class_code',
                 'users.phone as parent_phone',
                 DB::raw('(SELECT COALESCE(SUM(amount), 0)
@@ -1298,8 +1322,8 @@ class BillsController extends Controller
             return [
                 'control_number' => $bill->control_number,
                 'student_name' => trim(ucwords(strtolower($bill->student_first_name ?? 'N/A')) . ' ' .
-                                ucwords(strtolower($bill->student_middle_name ?? '')) . ' ' .
-                                ucwords(strtolower($bill->student_last_name ?? ''))),
+                    ucwords(strtolower($bill->student_middle_name ?? '')) . ' ' .
+                    ucwords(strtolower($bill->student_last_name ?? ''))),
                 'admission' => $bill->admission_number,
                 'level' => strtoupper($bill->class_code ?? 'N/A'),
                 'academic_year' => $bill->academic_year,
@@ -1314,7 +1338,7 @@ class BillsController extends Controller
         });
 
         try {
-            if($exportData->isEmpty()) {
+            if ($exportData->isEmpty()) {
                 if ($request->ajax()) {
                     return response()->json([
                         'error' => 'No bills found for the selected criteria.'
@@ -1404,51 +1428,52 @@ class BillsController extends Controller
         }
 
         // School Name - Row 2
-        $sheet->mergeCells('A'.$logoRow.':M'.$logoRow);
-        $sheet->setCellValue('A'.$logoRow, strtoupper($school->school_name));
-        $sheet->getStyle('A'.$logoRow)->applyFromArray([
+        $sheet->mergeCells('A' . $logoRow . ':M' . $logoRow);
+        $sheet->setCellValue('A' . $logoRow, strtoupper($school->school_name));
+        $sheet->getStyle('A' . $logoRow)->applyFromArray([
             'font' => ['bold' => true, 'size' => 16, 'color' => ['rgb' => '2C3E50']],
             'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
         ]);
 
         // School Address - Row 3
         $addressRow = $logoRow + 1;
-        $sheet->mergeCells('A'.$addressRow.':M'.$addressRow);
-        $sheet->setCellValue('A'.$addressRow, ucwords(strtolower($school->postal_address)) . ', ' . ucwords(strtolower($school->postal_name)) . ' - ' . ucwords(strtolower($school->country)));
-        $sheet->getStyle('A'.$addressRow)->applyFromArray([
+        $sheet->mergeCells('A' . $addressRow . ':M' . $addressRow);
+        $sheet->setCellValue('A' . $addressRow, ucwords(strtolower($school->postal_address)) . ', ' . ucwords(strtolower($school->postal_name)) . ' - ' . ucwords(strtolower($school->country)));
+        $sheet->getStyle('A' . $addressRow)->applyFromArray([
             'font' => ['size' => 11, 'color' => ['rgb' => '7F8C8D']],
             'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
         ]);
 
         // Report Title - Row 4
         $titleRow = $addressRow + 1;
-        $sheet->mergeCells('A'.$titleRow.':M'.$titleRow);
-        $sheet->setCellValue('A'.$titleRow, "BILLS REPORT");
-        $sheet->getStyle('A'.$titleRow)->applyFromArray([
+        $sheet->mergeCells('A' . $titleRow . ':M' . $titleRow);
+        $sheet->setCellValue('A' . $titleRow, "BILLS REPORT");
+        $sheet->getStyle('A' . $titleRow)->applyFromArray([
             'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '2C3E50']],
             'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
         ]);
 
         // Report Period - Row 5
         $periodRow = $titleRow + 1;
-        $sheet->mergeCells('A'.$periodRow.':M'.$periodRow);
-        $sheet->setCellValue('A'.$periodRow, "Reporting Period: " . \Carbon\Carbon::parse($start_date)->format('d M Y') . " - " . \Carbon\Carbon::parse($end_date)->format('d M Y'));
-        $sheet->getStyle('A'.$periodRow)->applyFromArray([
+        $sheet->mergeCells('A' . $periodRow . ':M' . $periodRow);
+        $sheet->setCellValue('A' . $periodRow, "Reporting Period: " . \Carbon\Carbon::parse($start_date)->format('d M Y') . " - " . \Carbon\Carbon::parse($end_date)->format('d M Y'));
+        $sheet->getStyle('A' . $periodRow)->applyFromArray([
             'font' => ['italic' => true, 'size' => 11, 'color' => ['rgb' => '7F8C8D']],
             'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
         ]);
 
         // Report Summary - Row 6
         $summaryRow = $periodRow + 1;
-        $sheet->mergeCells('A'.$summaryRow.':M'.$summaryRow);
-        $sheet->setCellValue('A'.$summaryRow,
+        $sheet->mergeCells('A' . $summaryRow . ':M' . $summaryRow);
+        $sheet->setCellValue(
+            'A' . $summaryRow,
             "Total Bills: " . count($bills) .
-            " | Total Billed: " . number_format($total_billed) .
-            " | Total Paid: " . number_format($total_paid) .
-            " | Total Balance: " . number_format($total_balance) .
-            " | Generated at: " . \Carbon\Carbon::now()->format('d M Y H:i')
+                " | Total Billed: " . number_format($total_billed) .
+                " | Total Paid: " . number_format($total_paid) .
+                " | Total Balance: " . number_format($total_balance) .
+                " | Generated at: " . \Carbon\Carbon::now()->format('d M Y H:i')
         );
-        $sheet->getStyle('A'.$summaryRow)->applyFromArray([
+        $sheet->getStyle('A' . $summaryRow)->applyFromArray([
             'font' => ['size' => 10, 'color' => ['rgb' => '2C3E50']],
             'fill' => [
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
@@ -1567,11 +1592,9 @@ class BillsController extends Controller
                     $statusColor = 'E74C3C'; // red
                 } elseif ($status == 'cancelled') {
                     $statusColor = 'F39C12'; // orange
-                }
-                elseif ($status == 'overpaid') {
+                } elseif ($status == 'overpaid') {
                     $statusColor = '8E44AD'; // purple
-                }
-                 else {
+                } else {
                     $statusColor = '2980B9'; // blue
                 }
 
@@ -1636,11 +1659,12 @@ class BillsController extends Controller
         // =========================
         $footerRow = $totalRow + 2;
         $sheet->mergeCells("A{$footerRow}:M{$footerRow}");
-        $sheet->setCellValue("A{$footerRow}",
+        $sheet->setCellValue(
+            "A{$footerRow}",
             strtoupper($school->school_name) . " | " .
-            "Computer Generated Bills Report | " .
-            "Confidential & Proprietary | " .
-            "Generated on " . \Carbon\Carbon::now()->format('F d, Y \\a\\t H:i:s')
+                "Computer Generated Bills Report | " .
+                "Confidential & Proprietary | " .
+                "Generated on " . \Carbon\Carbon::now()->format('F d, Y \\a\\t H:i:s')
         );
         $sheet->getStyle("A{$footerRow}")->applyFromArray([
             'font' => ['italic' => true, 'size' => 9, 'color' => ['rgb' => '7F8C8D']],
@@ -1701,17 +1725,24 @@ class BillsController extends Controller
         $row = 1;
 
         // Report header
-        $sheet->setCellValue("A{$row}", strtoupper($school->school_name)); $row++;
-        $sheet->setCellValue("A{$row}", ucwords(strtolower($school->postal_address)) . ', ' . ucwords(strtolower($school->postal_name)) . ' - ' . ucwords(strtolower($school->country))); $row++;
-        $sheet->setCellValue("A{$row}", "BILLS REPORT"); $row++;
-        $sheet->setCellValue("A{$row}", "Reporting Period: " . \Carbon\Carbon::parse($start_date)->format('d M Y') . " - " . \Carbon\Carbon::parse($end_date)->format('d M Y')); $row++;
-        $sheet->setCellValue("A{$row}",
+        $sheet->setCellValue("A{$row}", strtoupper($school->school_name));
+        $row++;
+        $sheet->setCellValue("A{$row}", ucwords(strtolower($school->postal_address)) . ', ' . ucwords(strtolower($school->postal_name)) . ' - ' . ucwords(strtolower($school->country)));
+        $row++;
+        $sheet->setCellValue("A{$row}", "BILLS REPORT");
+        $row++;
+        $sheet->setCellValue("A{$row}", "Reporting Period: " . \Carbon\Carbon::parse($start_date)->format('d M Y') . " - " . \Carbon\Carbon::parse($end_date)->format('d M Y'));
+        $row++;
+        $sheet->setCellValue(
+            "A{$row}",
             "Total Bills: " . count($bills) .
-            " | Total Billed: " . number_format($total_billed) .
-            " | Total Paid: " . number_format($total_paid) .
-            " | Total Balance: " . number_format($total_balance)
-        ); $row++;
-        $sheet->setCellValue("A{$row}", "Generated: " . \Carbon\Carbon::now()->format('d M Y H:i')); $row += 2;
+                " | Total Billed: " . number_format($total_billed) .
+                " | Total Paid: " . number_format($total_paid) .
+                " | Total Balance: " . number_format($total_balance)
+        );
+        $row++;
+        $sheet->setCellValue("A{$row}", "Generated: " . \Carbon\Carbon::now()->format('d M Y H:i'));
+        $row += 2;
 
         // Column headers
         $headers = ['#', 'Control #', 'Admission #', 'Student Name', 'Level', 'Year', 'Service', 'Billed Amount', 'Paid Amount', 'Balance', 'Status', 'Issued At', 'Expires At'];
@@ -1772,7 +1803,7 @@ class BillsController extends Controller
         ]);
 
         // Auto-size columns
-        foreach(range('A','M') as $columnID) {
+        foreach (range('A', 'M') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
 
@@ -1884,7 +1915,12 @@ class BillsController extends Controller
         $totalBalance = $totalBilled - $totalPaid;
 
         return view('Bills.student_bills', compact(
-            'students', 'paymentRecords', 'totalBilled', 'totalPaid', 'totalBalance', 'selectedYear'
+            'students',
+            'paymentRecords',
+            'totalBilled',
+            'totalPaid',
+            'totalBalance',
+            'selectedYear'
         ));
     }
 
@@ -1896,9 +1932,9 @@ class BillsController extends Controller
         return response()->json([
             'bill' => school_fees::findOrFail($billId),
             'students' => Student::where('school_id', $user->school_id)->where('status', 1)
-                                ->orderBy('first_name')->get(),
+                ->orderBy('first_name')->get(),
             'services' => payment_service::where('status', 'active')
-                                ->orderBy('service_name')->get(),
+                ->orderBy('service_name')->get(),
         ]);
     }
 
@@ -1919,13 +1955,13 @@ class BillsController extends Controller
         $date = Carbon::parse($request->due_date)->format('Y-m-d H:i:s');
         $bill = school_fees::findOrFail($billId);
 
-        if(! $bill) {
+        if (! $bill) {
             Alert()->toast('Bill Not found', 'error');
             return back();
         }
 
         $bill->update([
-             'student_id' => $request->student_id,
+            'student_id' => $request->student_id,
             'control_number' => $request->control_number,
             'service_id' => $request->service_id,
             'amount' => $request->amount,
@@ -1937,5 +1973,4 @@ class BillsController extends Controller
         Alert()->toast('Bill updated successfully', 'success');
         return back();
     }
-
 }

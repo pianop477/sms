@@ -636,7 +636,7 @@
                         <i class="fas fa-pencil me-2"></i>
                         Edit Transaction - <span id="modalReferenceNumber" class="text-uppercase fw-bold"></span>
                     </h5>
-                    <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
+                    <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
                 </div>
                 <div class="modal-body">
                     <form id="editTransactionForm" class="needs-validation" novalidate method="POST" enctype="multipart/form-data" data-no-preloader>

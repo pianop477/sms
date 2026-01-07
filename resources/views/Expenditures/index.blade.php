@@ -266,7 +266,7 @@
                                                                 <h5 class="modal-title" id="viewModalLabel{{$row['reference_number']}}">
                                                                     <i class="fas fa-receipt me-2"></i> Expense Details
                                                                 </h5>
-                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close text-danger"></i></button>
+                                                                <button type="button" class="btn btn-xs btn-close-white" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
                                                             </div>
                                                             <div class="modal-body p-0">
                                                                 <!-- Header with Reference & Status -->

@@ -45,7 +45,7 @@
                         @elseif ($row->status == 'full paid')
                             <span class="badge bg-success text-white">{{ strtoupper($row->status) }}</span>
                         @else
-                            <span class="badge bg-info text-white">{{strtoupper($row->status)}}</span>
+                            <span class="badge bg-info text-white">{{ strtoupper($row->status) }}</span>
                         @endif
                     </td>
                     <td>
@@ -57,49 +57,72 @@
                     </td>
                     <td>
                         <div class="dropdown">
-                            <button class="btn btn-action btn-xs dropdown-toggle mr-2" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-cog me-1"></i> Manage
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="exportDropdown">
-                                <li>
-                                    <a class="dropdown-item text-sm" href="javascript:void(0)" onclick="viewBill('{{ Hashids::encode($row->id) }}')" title="view bill">
-                                        <i class="fas fa-eye text-primary"></i>
-                                        View Bill
-                                    </a>
+                            <ul class="d-flex justify-content-center">
+                                <li class="mr-3">
+                                    <button class="btn btn-action btn-xs dropdown-toggle mr-2" type="button"
+                                        id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-cog me-1"></i> Manage
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                                        <li>
+                                            <a class="dropdown-item text-sm" href="javascript:void(0)"
+                                                onclick="viewBill('{{ Hashids::encode($row->id) }}')"
+                                                title="view bill">
+                                                <i class="fas fa-eye text-primary"></i>
+                                                View Bill
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item text-sm" href="#" data-bs-toggle="modal"
+                                                data-bs-target="#editBillModal"
+                                                onclick="openEditBillModal('{{ Hashids::encode($row->id) }}')">
+                                                <i class="fas fa-pencil text-info"></i>
+                                                Edit Bill
+                                            </a>
+                                        </li>
+                                        @if ($row->total_paid == 0 && $row->status == 'active')
+                                            <li>
+                                                <a href="#" class="dropdown-item cancel-btn"
+                                                    data-id="{{ Hashids::encode($row->id) }}"
+                                                    data-control="{{ strtoupper($row->control_number) }}"
+                                                    data-service="{{ $row->service_name }}"
+                                                    data-amount="{{ number_format($billed) }}" data-bs-toggle="modal"
+                                                    data-bs-target="#cancelBillModal">
+                                                    <i class="fas fa-ban text-danger"></i> Cancel Bill
+                                                </a>
+                                            </li>
+                                        @endif
+                                        @if ($row->status == 'active')
+                                            <li>
+                                                <form
+                                                    action="{{ route('bills.resend', ['bill' => Hashids::encode($row->id)]) }}"
+                                                    class="dropdown-item" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="btn p-1 m-0 text-sm"
+                                                        onclick="return confirm('Are you sure you want to resend this bill?')">
+                                                        <i class="fas fa-refresh text-success"></i>
+                                                        Resend SMS
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        @endif
+                                    </ul>
                                 </li>
-                                <li>
-                                    <a class="dropdown-item text-sm"
-                                        href="#"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#editBillModal"
-                                        onclick="openEditBillModal('{{ Hashids::encode($row->id) }}')">
-                                            <i class="fas fa-pencil text-info"></i>
-                                            Edit Bill
-                                    </a>
-                                </li>
-                                @if ($row->total_paid == 0 && $row->status == 'active')
-                                <li>
-                                    <a href="#"
-                                        class="dropdown-item cancel-btn"
-                                        data-id="{{ Hashids::encode($row->id) }}"
-                                        data-control="{{ strtoupper($row->control_number) }}"
-                                        data-service="{{ $row->service_name }}"
-                                        data-amount="{{ number_format($billed) }}"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#cancelBillModal">
-                                        <i class="fas fa-ban text-danger"></i> Cancel Bill
-                                    </a>
-                                </li>
-                                @endif
                                 @if ($row->status == 'active')
                                     <li>
-                                        <form action="{{route('bills.resend', ['bill' => Hashids::encode($row->id)])}}" class="dropdown-item" method="POST">
-                                            @csrf
-                                            <button type="submit" class="btn p-1 m-0 text-sm" onclick="return confirm('Are you sure you want to resend this bill?')">
-                                                <i class="fas fa-refresh text-success"></i>
-                                                Resend SMS
-                                            </button>
-                                        </form>
+                                        <button type="button" class="btn btn-info btn-pay btn-xs"
+                                            data-bs-toggle="modal" data-bs-target="#addPaymentModal"
+                                            data-bill-id="{{ Hashids::encode($row->id) }}"
+                                            data-student-id="{{ $row->student_id }}"
+                                            data-student-name="{{ ucwords(strtolower($row->student_first_name . ' ' . $row->student_middle_name . ' ' . $row->student_last_name)) }}"
+                                            data-control-number="{{ strtoupper($row->control_number) }}"
+                                            data-academic-year="{{ $row->academic_year }}"
+                                            data-class="{{ strtoupper($row->class_code) }}"
+                                            data-service="{{ ucwords(strtolower($row->service_name)) }}"
+                                            data-billed="{{ $billed }}" data-paid="{{ $paid }}"
+                                            data-balance="{{ $balance }}">
+                                            <i class="fas fa-credit-card"></i> Pay
+                                        </button>
                                     </li>
                                 @endif
                             </ul>
@@ -109,7 +132,7 @@
             @empty
                 <tr>
                     <td colspan="11" class="text-center py-4">
-                        @if(request('search'))
+                        @if (request('search'))
                             No records found for "{{ request('search') }}"
                         @else
                             No records found
@@ -124,6 +147,12 @@
                     border: 1px solid #ced4da;
                     color: #212529;
                     font-weight: bold
+                }
+
+                .btn-pay {
+                    background-color: #7fd89c border: 1px solid #7ef67c;
+                    color: #212529;
+                    font-weight: bold;
                 }
             </style>
         </tbody>
@@ -140,7 +169,8 @@
                     <h5 class="modal-title text-dark">
                         <i class="fas fa-edit"></i> Edit Bill
                     </h5>
-                    <button type="button" class="btn btn-xs btn-secondary" data-bs-dismiss="modal"><i class="fas fa-close"></i></button>
+                    <button type="button" class="btn btn-xs btn-secondary" data-bs-dismiss="modal"><i
+                            class="fas fa-close"></i></button>
                 </div>
 
                 <div class="modal-body">
@@ -148,11 +178,13 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label>Control Number</label>
-                            <input type="text" class="form-control-custom" name="control_number" id="edit_control_number">
+                            <input type="text" class="form-control-custom" name="control_number"
+                                id="edit_control_number">
                         </div>
                         <div class="col-md-6 mb-3">
                             <label>Student</label>
-                            <select class="form-control-custom select2 text-capitalize" id="edit_student_id" name="student_id" required>
+                            <select class="form-control-custom select2 text-capitalize" id="edit_student_id"
+                                name="student_id" required>
                                 <option value="">-- Select Student --</option>
                             </select>
                         </div>
@@ -160,7 +192,8 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label>Service</label>
-                            <select class="form-control-custom text-capitalize" id="edit_service_id" name="service_id" required>
+                            <select class="form-control-custom text-capitalize" id="edit_service_id"
+                                name="service_id" required>
                                 <option value="">-- Select Service --</option>
                             </select>
                         </div>
@@ -188,7 +221,8 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label>Academic Year</label>
-                            <input type="text" class="form-control-custom" id="academic_year" name="academic_year">
+                            <input type="text" class="form-control-custom" id="academic_year"
+                                name="academic_year">
                         </div>
                     </div>
                 </div>
@@ -207,39 +241,42 @@
 
 {{-- cancel bill modal --}}
 <div class="modal fade" id="cancelBillModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
+    <div class="modal-dialog">
+        <div class="modal-content">
 
-      <div class="modal-header">
-        <h5 class="modal-title">Cancel Bill</h5>
-        <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal"><i class="fas fa-close"></i></button>
-      </div>
-      <form method="POST" id="cancelBillForm">
-        @csrf
-        @method('PUT')
+            <div class="modal-header">
+                <h5 class="modal-title">Cancel Bill</h5>
+                <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal"><i
+                        class="fas fa-close"></i></button>
+            </div>
+            <form method="POST" id="cancelBillForm">
+                @csrf
+                @method('PUT')
 
-        <div class="modal-body">
-          <input type="hidden" id="cancelBillId">
-          <div class="mb-3">
-            <label class="form-label">Cancel Reason <span class="text-danger">*</span></label>
-            <input type="text" name="reason" class="form-control-custom" required>
-          </div>
-          <div class="small text-muted" id="billPreview"></div>
-          <div class="mb-3">
-        </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this bill?')">Cancel Bill</button>
-        </div>
-      </form>
+                <div class="modal-body">
+                    <input type="hidden" id="cancelBillId">
+                    <div class="mb-3">
+                        <label class="form-label">Cancel Reason <span class="text-danger">*</span></label>
+                        <input type="text" name="reason" class="form-control-custom" required>
+                    </div>
+                    <div class="small text-muted" id="billPreview"></div>
+                    <div class="mb-3">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger"
+                        onclick="return confirm('Are you sure you want to cancel this bill?')">Cancel Bill</button>
+                </div>
+            </form>
 
+        </div>
     </div>
-  </div>
 </div>
 
 <!-- Bill Details Modal -->
-<div class="modal fade" id="billDetailsModal" tabindex="-1" aria-labelledby="billDetailsModalLabel" aria-hidden="true">
+<div class="modal fade" id="billDetailsModal" tabindex="-1" aria-labelledby="billDetailsModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-md"> <!-- Changed to modal-md for smaller size -->
         <div class="modal-content">
             <div class="modal-header bg-primary text-white py-2">
@@ -247,7 +284,8 @@
                     <i class="fas fa-file-invoice me-1"></i>
                     Bill Details
                 </h6>
-                <button type="button" class="btn btn-xs btn-danger btn-sm" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
+                <button type="button" class="btn btn-xs btn-danger btn-sm" data-bs-dismiss="modal"
+                    aria-label="Close"><i class="fas fa-close"></i></button>
             </div>
             <div class="modal-body p-3">
                 <div id="billDetailsContent">
@@ -263,47 +301,53 @@
         </div>
     </div>
 </div>
-<style>
-    /* Table styling for payment history */
-    .table-sm td, .table-sm th {
-        padding: 0.8rem 0.7rem;
-        font-size: 0.85rem;
-    }
+<script>
+    < style >
+        /* Table styling for payment history */
+        .table - sm td,
+        .table - sm th {
+            padding: 0.8 rem 0.7 rem;
+            font - size: 0.85 rem;
+        }
 
-    .table-borderless tbody tr:last-child {
-        border-bottom: none !important;
-    }
+        .table - borderless tbody tr: last - child {
+            border - bottom: none!important;
+        }
 
-    .bg-light {
-        background-color: #f8f9fa !important;
-    }
+        .bg - light {
+            background - color: #f8f9fa!important;
+        }
 
     /* Scrollbar styling */
-    [style*="max-height"]::-webkit-scrollbar {
-        width: 4px;
+    [style *= "max-height"]::-webkit - scrollbar {
+        width: 4 px;
     }
 
-    [style*="max-height"]::-webkit-scrollbar-track {
+    [style *= "max-height"]::-webkit - scrollbar - track {
         background: #f1f1f1;
     }
 
-    [style*="max-height"]::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 2px;
-    }
-</style>
-<script>
-    $(document).on('click', '.cancel-btn', function () {
-        const billId = $(this).data('id');
+    [style *= "max-height"]::-webkit - scrollbar - thumb {
+            background: #c1c1c1;
+            border - radius: 2 px;
+        } <
+        /style>
 
-        $('#cancelBillForm').attr('action', `/Bills/cancel/${billId}`);
-    });
 
-    //edit bill function
+        <
+        script >
+        $(document).on('click', '.cancel-btn', function() {
+            const billId = $(this).data('id');
+
+            $('#cancelBillForm').attr('action', `/Bills/cancel/${billId}`);
+        });
+
+    // edit bill function
+
     function openEditBillModal(hashId) {
         $('#editBillModal').modal('show');
 
-        $.get(`/Bills/edit/${hashId}`, function (response) {
+        $.get(`/Bills/edit/${hashId}`, function(response) {
             $('#editBillForm').attr('action', `/Bills/update/${hashId}`);
 
             // Fill basic fields
@@ -349,7 +393,7 @@
     }
 
     // Real-time service change - EDIT MODAL
-    $(document).on('change', '#edit_service_id', function () {
+    $(document).on('change', '#edit_service_id', function() {
         let option = $(this).find(':selected');
         const amount = option.data('amount');
         const duration = option.data('duration');
@@ -538,5 +582,4 @@
             }
         });
     }
-
 </script>

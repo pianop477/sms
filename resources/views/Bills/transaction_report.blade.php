@@ -624,7 +624,7 @@
                 <h5 class="modal-title" id="exportReportModalLabel">
                     <i class="fas fa-file-export me-2"></i> Generate Transaction Report
                 </h5>
-                <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close text-white"></i></button>
+                <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
             </div>
             <form id="exportReportForm" class="report-form">
                 @csrf
