@@ -270,7 +270,7 @@
                         @csrf
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="fname" class="form-label">Student Name</label>
+                                <label for="fname" class="form-label">Student Name <span class="text-danger">*</span></label>
                                 <select name="student_name" id="studentSelect" class="form-control-custom" required>
                                     <option value="">--Select student name--</option>
                                     @if ($students->isEmpty())
@@ -289,7 +289,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="controlNumber" class="form-label">Control Number</label>
-                                <input type="text" name="control_number" class="form-control-custom" id="controlNumber" placeholder="EB994012345" value="{{old('control_number')}}">
+                                <input type="text" name="control_number" class="form-control-custom" id="controlNumber" placeholder="Enter Control Number" value="{{old('control_number')}}">
                                 @error('control_number')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror
@@ -298,7 +298,7 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Academic Year</label>
+                                <label for="email" class="form-label">Academic Year <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <input type="text" name="academic_year" class="form-control-custom" id="email" placeholder="2020" value="{{old('academic_year', date('Y'))}}">
                                 </div>
@@ -307,7 +307,7 @@
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="service" class="form-label">Service</label>
+                                <label for="service" class="form-label">Service <span class="text-danger">*</span></label>
                                 <select name="service" id="service" class="form-control-custom" required>
                                     <option value="">-- select service --</option>
                                     @if ($services->isEmpty())
@@ -327,14 +327,14 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="amount" class="form-label">Amount</label>
+                                <label for="amount" class="form-label">Amount <span class="text-danger">*</span></label>
                                 <input type="text" required name="amount" class="form-control-custom" id="amount" placeholder="Enter Amount" value="{{old('amount')}}">
                                 @error('amount')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="dueDate" class="form-label">Due Date</label>
+                                <label for="dueDate" class="form-label">Due Date <span class="text-danger">*</span></label>
                                 <input type="date" name="due_date" class="form-control-custom" id="dueDate">
                                 @error('due_date')
                                 <div class="text-danger small">{{$message}}</div>

@@ -389,7 +389,7 @@
                 @csrf
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="studentSelect" class="form-label">Student Name</label>
+                        <label for="studentSelect" class="form-label">Student Name <span class="text-danger">*</span></label>
                         <select name="student_id" id="studentSelect" class="form-control-custom" required>
                             <option value="">--Select student name--</option>
                             @if ($students->isEmpty())
@@ -408,7 +408,7 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="controlNumberSelect" class="form-label">Control Number</label>
+                        <label for="controlNumberSelect" class="form-label">Control Number <span class="text-danger">*</span></label>
                         <select name="control_number" id="controlNumberSelect" class="form-control-custom text-uppercase" required>
                             <option value="">--Select Control Number--</option>
                         </select>
@@ -446,7 +446,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                    <label for="amount" class="form-label">Amount</label>
+                    <label for="amount" class="form-label">Amount <span class="text-danger">*</span></label>
                     <input type="text" required name="amount" class="form-control-custom" id="amount" placeholder="Enter Amount" value="{{ old('amount') }}">
                     @error('amount')
                         <div class="text-danger small">{{ $message }}</div>
