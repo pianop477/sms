@@ -475,7 +475,6 @@
                         select.empty();
                         select.append('<option value="">--Select student name--</option>');
 
-                        // FIX: Access response.students instead of response directly
                         if (response.success && response.students && response.students.length >
                             0) {
                             response.students.forEach(student => {
@@ -483,7 +482,7 @@
                                     `${student.first_name} ${student.middle_name} ${student.last_name}`;
                                 select.append(
                                     `<option value="${student.id}">${name.toUpperCase()}</option>`
-                                );
+                                    );
                             });
                         } else {
                             select.append(
@@ -505,7 +504,7 @@
                         select.append('<option value="">--Select student name--</option>');
                         select.append(
                             '<option value="" disabled class="text-danger">Error loading students</option>'
-                        );
+                            );
                     }
                 });
             });
@@ -594,6 +593,7 @@
                 }
             });
 
+            // ============ TABLE & AJAX HANDLING ============
             let searchTimeout;
             const loadingSpinner = $('#loadingSpinner');
             const billsTableSection = $('#billsTableSection');
@@ -689,6 +689,9 @@
                             billsTableSection.html(response.html);
                             paginationSection.html(response.pagination);
 
+                            // CRITICAL: REBIND ALL TABLE EVENTS
+                            bindTableEvents();
+
                             // Update year filter from response
                             if (response.selectedYear) {
                                 yearFilter.val(response.selectedYear);
@@ -711,7 +714,7 @@
                         });
                         billsTableSection.html(
                             '<div class="alert alert-danger">Error loading bills. Please try again.</div>'
-                        );
+                            );
                     },
                     complete: function() {
                         loadingSpinner.addClass('d-none');
@@ -775,10 +778,9 @@
 
                 loadBillsData();
             });
-        });
 
-        document.addEventListener("DOMContentLoaded", function() {
-            // Handle Pay button click - Simple version
+            // ============ PAYMENT MODAL HANDLING ============
+            // Handle Pay button click
             $(document).on('click', '.btn-pay', function() {
                 // Get data from button attributes
                 const billId = $(this).data('bill-id');
@@ -805,18 +807,18 @@
                 $('#payment_academic_display').val(academicYear);
                 $('#payment_balance_display').val(formatter.format(balance));
 
-                // Reset form fields (optional)
+                // Reset form fields
                 $('#payment_amount').val('');
-                $('#payment_mode').val('bank'); // Default to bank
+                $('#payment_mode').val('bank');
                 $('#payment_note').val('');
 
-                // Optional: Set focus on amount field
+                // Set focus on amount field
                 setTimeout(() => {
                     $('#payment_amount').focus();
                 }, 500);
             });
 
-            // BETTER: Format as user types with proper cleanup
+            // Format amount input
             $('#payment_amount').on('input', function(e) {
                 let value = $(this).val();
 
@@ -869,7 +871,7 @@
                 // Update hidden/cleaned value for submission
                 amountInput.val(cleanAmount);
 
-                // Optional: Show processing state
+                // Show processing state
                 $('#payment_save_button').prop('disabled', true)
                     .html('<span class="spinner-border spinner-border-sm me-2"></span>Processing...');
             });
@@ -885,6 +887,302 @@
 
                 // Reset amount field
                 $('#payment_amount').val('');
+            });
+
+            // ============ BIND ALL TABLE EVENTS ============
+            function bindTableEvents() {
+                console.log('Binding table events...');
+
+                // 1. Handle Cancel button click
+                $(document).off('click', '.cancel-btn').on('click', '.cancel-btn', function() {
+                    const billId = $(this).data('id');
+                    const controlNumber = $(this).data('control');
+                    const serviceName = $(this).data('service');
+                    const amount = $(this).data('amount');
+
+                    console.log('Cancel button clicked:', billId);
+
+                    $('#cancelBillForm').attr('action', `/Bills/cancel/${billId}`);
+                    $('#billPreview').html(`
+                <div class="alert alert-info small">
+                    <strong>Bill:</strong> ${controlNumber}<br>
+                    <strong>Service:</strong> ${serviceName}<br>
+                    <strong>Amount:</strong> ${amount}
+                </div>
+            `);
+                });
+
+                // 2. Handle View Bill click
+                $(document).off('click', '[onclick^="viewBill"]').on('click', '[onclick^="viewBill"]', function(e) {
+                    e.preventDefault();
+                    const onclickAttr = $(this).attr('onclick');
+                    const match = onclickAttr.match(/viewBill\('([^']+)'\)/);
+                    if (match && match[1]) {
+                        viewBill(match[1]);
+                    }
+                });
+
+                // 3. Handle Edit Bill click
+                $(document).off('click', '[onclick^="openEditBillModal"]').on('click',
+                    '[onclick^="openEditBillModal"]',
+                    function(e) {
+                        e.preventDefault();
+                        const onclickAttr = $(this).attr('onclick');
+                        const match = onclickAttr.match(/openEditBillModal\('([^']+)'\)/);
+                        if (match && match[1]) {
+                            openEditBillModal(match[1]);
+                        }
+                    });
+
+                console.log('Table events bound successfully');
+            }
+
+            // Initial binding on page load
+            bindTableEvents();
+
+            // ============ HELPER FUNCTIONS ============
+            // View Bill function
+            function viewBill(billId) {
+                console.log('Loading bill:', billId);
+
+                // Show loading spinner
+                $('#billDetailsContent').html(`
+            <div class="text-center py-3">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 mb-0 small">Loading bill details...</p>
+            </div>
+        `);
+
+                // Show modal
+                $('#billDetailsModal').modal('show');
+
+                // Fetch bill details
+                $.ajax({
+                    url: `/Bills/view/${billId}`,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log('Bill details response:', response);
+
+                        if (response.success) {
+                            // Format dates
+                            const formatDate = (dateString) => {
+                                if (!dateString) return 'N/A';
+                                return new Date(dateString).toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                });
+                            };
+
+                            $('#billDetailsContent').html(`
+                        <!-- Student & Bill Info -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h6 class="mb-1 text-dark text-capitalize">${response.bill.student_first_name} ${response.bill.student_middle_name} ${response.bill.student_last_name}</h6>
+                                        <small class="text-muted">${response.bill.class_code.toUpperCase()}</small>
+                                    </div>
+                                    <span class="badge bg-${response.bill.status === 'active' ? 'primary' : response.bill.status === 'cancelled' ? 'warning' : response.bill.status === 'full paid' ? 'success' : 'info'} ${response.bill.status === 'cancelled' ? 'text-primary' : 'text-white'}">
+                                        ${response.bill.status.toUpperCase()}
+                                    </span>
+                                </div>
+                                <div class="text-muted mb-2">
+                                    <div><strong>Control #:</strong> ${response.bill.control_number.toUpperCase()}</div>
+                                    <div><strong>Academic Year:</strong> ${response.bill.academic_year}</div>
+                                    <div><strong>Due Date:</strong> ${response.bill.due_date || 'N/A'}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Financial Summary -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-4">
+                                <div class="border rounded p-2 text-center bg-light">
+                                    <div class="small text-muted">Billed</div>
+                                    <div class="fw-bold text-primary">${new Intl.NumberFormat().format(response.summary.total_billed)}</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="border rounded p-2 text-center bg-light">
+                                    <div class="small text-muted">Paid</div>
+                                    <div class="fw-bold text-success">${new Intl.NumberFormat().format(response.summary.total_paid)}</div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="border rounded p-2 text-center bg-light">
+                                    <div class="small text-muted">Balance</div>
+                                    <div class="fw-bold ${response.summary.balance > 0 ? 'text-danger' : 'text-success'}">
+                                        ${new Intl.NumberFormat().format(response.summary.balance)}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment History -->
+                        <div class="border-top pt-2">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0 small text-muted" style="font-weight:bold"><i class="fas fa-history me-1"></i>PAYMENT HISTORY</h6>
+                                <span class="badge bg-secondary text-white">${response.summary.payment_count} payments</span>
+                            </div>
+
+                            ${response.payment_history.length > 0 ? `
+                                    <div style="max-height: 200px; overflow-y: auto;">
+                                        <table class="table table-sm table-borderless mb-0">
+                                            <thead>
+                                                <tr class="small text-muted border-bottom">
+                                                    <th class="ps-2">#</th>
+                                                    <th>Date</th>
+                                                    <th>Mode</th>
+                                                    <th class="text-end pe-2">Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${response.payment_history.map((payment, index) => `
+                                                <tr class="small border-bottom">
+                                                    <td class="ps-2">#${payment.installment}</td>
+                                                    <td>${new Date(payment.approved_at).toLocaleDateString('en-GB')}</td>
+                                                    <td>
+                                                        <span class="badge bg-info">${payment.payment_mode}</span>
+                                                    </td>
+                                                    <td class="text-end pe-2 fw-bold text-success">
+                                                        ${new Intl.NumberFormat().format(payment.amount)}
+                                                    </td>
+                                                </tr>
+                                            `).join('')}
+                                                <!-- Total Row -->
+                                                <tr class="small border-top fw-bold bg-light">
+                                                    <td class="ps-2" colspan="3" style="font-weight:bold">Total Paid:</td>
+                                                    <td class="text-end pe-2 text-success" style="font-weight:bold">
+                                                        ${new Intl.NumberFormat().format(response.summary.total_paid)}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ` : `
+                                    <div class="text-center py-2">
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            No payments recorded
+                                        </small>
+                                    </div>
+                                `}
+                        </div>
+                    `);
+                        } else {
+                            $('#billDetailsContent').html(`
+                        <div class="alert alert-danger py-2 mb-0">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            <small>${response.message || 'Failed to load details'}</small>
+                        </div>
+                    `);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading bill details:', error);
+                        $('#billDetailsContent').html(`
+                    <div class="alert alert-danger py-2 mb-0">
+                        <i class="fas fa-times-circle me-1"></i>
+                        <small>Error loading bill details. Please try again.</small>
+                    </div>
+                `);
+                    }
+                });
+            }
+
+            // Edit Bill function
+            function openEditBillModal(hashId) {
+                $('#editBillModal').modal('show');
+
+                $.get(`/Bills/edit/${hashId}`, function(response) {
+                    $('#editBillForm').attr('action', `/Bills/update/${hashId}`);
+
+                    // Fill basic fields
+                    $('#edit_control_number').val(response.bill.control_number);
+                    $('#edit_amount').val(response.bill.amount);
+                    $('#academic_year').val(response.bill.academic_year);
+                    $('#edit_status').val(response.bill.status);
+
+                    // Handle due_date conversion
+                    if (response.bill.due_date) {
+                        // Convert "2026-10-30 21:34:51" to "2026-10-30"
+                        const dueDate = response.bill.due_date.split(' ')[0];
+                        $('#edit_due_date').val(dueDate);
+                    } else {
+                        $('#edit_due_date').val('');
+                    }
+
+                    // Populate students
+                    $('#edit_student_id').empty();
+                    response.students.forEach(student => {
+                        $('#edit_student_id').append(
+                            `<option value="${student.id}">${student.first_name} ${student.last_name}</option>`
+                        );
+                    });
+                    $('#edit_student_id').val(response.bill.student_id).trigger('change');
+
+                    // Populate services
+                    $('#edit_service_id').empty();
+                    response.services.forEach(service => {
+                        $('#edit_service_id').append(
+                            `<option value="${service.id}"
+                            data-amount="${service.amount}"
+                            data-duration="${service.expiry_duration}">
+                        ${service.service_name}
+                    </option>`
+                        );
+                    });
+                    $('#edit_service_id').val(response.bill.service_id);
+                }).fail(function(error) {
+                    console.error('Error loading bill data:', error);
+                    alert('Error loading bill details. Please try again.');
+                });
+            }
+
+            // Real-time service change - EDIT MODAL
+            $(document).on('change', '#edit_service_id', function() {
+                let option = $(this).find(':selected');
+                const amount = option.data('amount');
+                const duration = option.data('duration');
+
+                // Set amount if exists
+                if (amount) {
+                    $('#edit_amount').val(amount);
+                }
+
+                // Set due date based on duration (months from now)
+                if (duration) {
+                    const today = new Date();
+                    today.setMonth(today.getMonth() + parseInt(duration));
+
+                    // Format as YYYY-MM-DD
+                    const formattedDate = today.toISOString().split('T')[0];
+                    $('#edit_due_date').val(formattedDate);
+                } else {
+                    $('#edit_due_date').val('');
+                }
+            });
+
+            // Select2 for edit modal
+            $('.select2').select2({
+                dropdownParent: $('#editBillModal')
+            });
+
+            // Cancel form submission
+            $('#cancelBillForm').on('submit', function(e) {
+                // Add confirmation
+                if (!confirm('Are you sure you want to cancel this bill?')) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                // Show processing
+                $(this).find('.btn-danger').prop('disabled', true)
+                    .html('<span class="spinner-border spinner-border-sm me-2"></span>Cancelling...');
             });
         });
     </script>
