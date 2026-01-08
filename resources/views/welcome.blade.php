@@ -216,7 +216,7 @@
                     <div
                         class="hidden md:block text-xs sm:text-sm bg-blue-50 text-blue-700 px-2 sm:px-3 py-1 rounded-full">
                         <i class="fas fa-clock mr-1"></i>
-                        <span id="live-time">00:00:00</span>
+                        {{-- <span id="live-time">00:00:00</span> --}}
                     </div>
 
                     <a href="{{ route('login') }}"
