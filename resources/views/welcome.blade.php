@@ -213,11 +213,11 @@
 
                 <div class="flex items-center space-x-3 sm:space-x-4">
                     <!-- Live Time Counter -->
-                    <div
+                    {{-- <div
                         class="hidden md:block text-xs sm:text-sm bg-blue-50 text-blue-700 px-2 sm:px-3 py-1 rounded-full">
-                        {{-- <i class="fas fa-clock mr-1"></i> --}}
-                        {{-- <span id="live-time">00:00:00</span> --}}
-                    </div>
+                        <i class="fas fa-clock mr-1"></i>
+                        <span id="live-time">00:00:00</span>
+                    </div> --}}
 
                     <a href="{{ route('login') }}"
                         class="hidden md:block gradient-bg text-white px-4 sm:px-6 py-2 rounded-full font-semibold hover:shadow-lg transition-all duration-300 pulse text-sm sm:text-base">
