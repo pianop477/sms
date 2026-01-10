@@ -620,10 +620,10 @@ class BillsController extends Controller
 
             // Check if amount doesn't exceed balance
             $balance = $bill->amount - $bill->total_paid;
-            if ($request->amount > $balance) {
-                Alert()->toast('Payment amount exceeds outstanding balance', 'error');
-                return back();
-            }
+            // if ($request->amount > $balance) {
+            //     Alert()->toast('Payment amount exceeds outstanding balance', 'error');
+            //     return back();
+            // }
 
             // Get the latest installment
             $latestInstallment = school_fees_payment::where('student_fee_id', $billId)
