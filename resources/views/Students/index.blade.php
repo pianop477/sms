@@ -350,7 +350,7 @@
                                                         style="display:inline;">
                                                         @csrf
                                                         <button class="btn btn-danger btn-sm"
-                                                            onclick="return confirm('Are you sure you want to delete {{ strtoupper($student->first_name) }} {{ strtoupper($student->middle_name) }} {{ strtoupper($student->last_name) }} permanently?')"
+                                                            onclick="return confirm('Are you sure you want to move {{ strtoupper($student->first_name) }} {{ strtoupper($student->middle_name) }} {{ strtoupper($student->last_name) }} to trash?')"
                                                             title="Delete">
                                                             <i class="ti-trash"></i>
                                                         </button>
