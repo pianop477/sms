@@ -6,8 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Piano">
     <title>ShuleApp</title>
-    <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/favicon/favicon.ico') }}">
-    <link rel="icon" type="image/png" href="{{ asset('assets/images/favicon/favicon-16x16.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon.ico') }}">
+    <link rel="icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon-16x16.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon-32 x 32.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon-192 x 192.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon-512 x 512.png') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ filemtime(public_path('manifest.json')) }}">
     <script src="https://cdn.tailwindcss.com"></script>
