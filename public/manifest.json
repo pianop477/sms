@@ -1,7 +1,7 @@
 {
-    "name": "School Management System",
+    "name": "ShuleApp",
     "short_name": "ShuleApp",
-    "description": "Comprehensive school management solution for results, students, teachers, and administration with real-time analytics",
+    "description": "Empowering Education",
     "categories": ["education", "productivity", "school"],
     "start_url": "/?source=pwa",
     "display": "standalone",
@@ -16,26 +16,20 @@
     "dir": "auto",
     "icons": [
         {
-            "src" : "/icons/icon_4.png",
+            "src" : "/icons/new_icon1.png",
             "sizes": "96x96",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/icons/icon.png",
+            "src": "/icons/new_icon2.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/icons/icon_2.png",
+            "src": "/icons/new_icon3.png",
             "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any maskable"
-        },
-        {
-            "src": "/icons/icon_3.png",
-            "sizes": "256x256",
             "type": "image/png",
             "purpose": "any maskable"
         }

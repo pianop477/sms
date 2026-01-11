@@ -9,6 +9,7 @@
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/favicon/favicon.ico') }}">
     <link rel="icon" type="image/png" href="{{ asset('assets/images/favicon/favicon-16x16.png') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ filemtime(public_path('manifest.json')) }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/scrollreveal"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -180,7 +181,7 @@
                 <div class="flex items-center space-x-3">
                     <!-- Logo -->
                     <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center overflow-hidden">
-                        <img src="{{ asset('storage/logo/logo.png') }}" alt="ShuleApp Logo"
+                        <img src="{{ asset('storage/logo/new_logo.png') }}" alt="ShuleApp Logo"
                             class="w-full h-full object-contain">
                     </div>
                     <div>
@@ -844,7 +845,7 @@
                     <div class="flex items-center space-x-3 mb-4 sm:mb-6">
                         <div
                             class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center overflow-hidden">
-                            <img src="{{ asset('storage/logo/logo.png') }}" alt="ShuleApp Logo"
+                            <img src="{{ asset('storage/logo/new_logo.png') }}" alt="ShuleApp Logo"
                                 class="w-full h-full object-contain">
                         </div>
                         <div>

@@ -34,7 +34,7 @@
             border-radius: 24px;
             border: 1px solid rgba(255, 255, 255, 0.3);
             box-shadow: var(--card-shadow);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            /* transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); */
             overflow: hidden;
         }
 
@@ -62,7 +62,7 @@
             height: 200%;
             background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
             transform: rotate(45deg);
-            animation: shimmer 3s infinite;
+            /* animation: shimmer 3s infinite; */
         }
 
         @keyframes shimmer {

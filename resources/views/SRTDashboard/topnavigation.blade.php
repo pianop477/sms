@@ -10,7 +10,7 @@
 
                     $logoPath = Auth::user()->school && Auth::user()->school->logo
                                 ? url('storage/logo/' . Auth::user()->school->logo)
-                                : url('storage/logo/logo.png');
+                                : url('storage/logo/new_logo.png');
                 @endphp
 
                 <img src="{{ $logoPath }}"

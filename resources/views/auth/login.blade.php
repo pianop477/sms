@@ -7,6 +7,7 @@
   <title>ShuleApp | Login</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ filemtime(public_path('manifest.json')) }}">
   <link rel="shortcut icon" type="image/png" href="{{asset('assets/images/favicon/favicon.ico')}}">
   <style>
         :root {

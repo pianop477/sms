@@ -1,51 +1,56 @@
 @extends('SRTDashboard.frame')
 @section('content')
     <style>
+        /* ===== CORE STYLES ===== */
         :root {
-            --primary: #2c5aa0;
-            --secondary: #1e3a8a;
-            --accent: #3b82f6;
-            --light-bg: #f8fafc;
-            --border: #e2e8f0;
-            --text: #1e293b;
-            --text-light: #64748b;
+            --primary-color: #1a237e;
+            --secondary-color: #283593;
+            --accent-color: #3949ab;
+            --border-color: #e0e0e0;
+            --light-gray: #f5f5f5;
+            --text-primary: #212121;
+            --text-secondary: #757575;
+            --font-main: 'Helvetica Neue', Arial, sans-serif;
         }
 
         body {
-            background: #f1f5f9;
-            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-            min-height: 100vh;
+            background: #fafafa;
+            font-family: var(--font-main);
+            color: var(--text-primary);
+            line-height: 1.2;
+            margin: 0;
+            padding: 15px;
         }
 
-        .dashboard-container {
-            max-width: 1000px;
+        /* ===== INVOICE CONTAINER ===== */
+        .invoice-container {
+            max-width: 210mm;
+            min-height: 297mm;
             margin: 0 auto;
-            padding: 20px;
-        }
-
-        .modern-card {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            overflow: hidden;
-            border: 1px solid var(--border);
-        }
-
-        .invoice-header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
-        .header-content {
+        .invoice-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== HEADER SECTION ===== */
+        .invoice-header {
+            padding: 20px 35px 15px;
+            border-bottom: 2px solid var(--primary-color);
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            gap: 30px;
+            flex-shrink: 0;
         }
 
-        .company-info {
+        .company-section {
             flex: 1;
             display: flex;
             align-items: flex-start;
@@ -54,784 +59,711 @@
 
         .logo-container {
             flex-shrink: 0;
+            position: relative;
         }
 
-        .invoice-logo {
-            max-width: 120px;
-            height: 100px;
-            object-fit: contain;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 8px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        /* FIXED LOGO - NO WHITE SPACES */
+        .company-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: cover; /* CHANGED: COVER instead of contain */
+            border-radius: 50%;
+            border: 1px solid var(--primary-color); /* THINNER BORDER */
+            background: white;
         }
 
-        .company-details {
+        .company-info {
             flex: 1;
         }
 
-        .company-details h1 {
-            font-size: 2.5rem;
+        .company-name {
+            font-size: 26px;
             font-weight: 700;
-            margin-bottom: 8px;
-            color: white;
+            color: var(--primary-color);
+            letter-spacing: -0.5px;
+            margin: 0 0 5px 0;
         }
 
-        .company-details .tagline {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            color: white;
-            margin-bottom: 20px;
+        .company-tagline {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin: 0 0 15px 0;
+            font-weight: bold;
+            font-style: italic;
+            text-decoration: underline;
         }
 
-        .user-details {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 15px;
-            border-radius: 8px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .contact-details {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.2;
         }
 
-        .user-details p {
-            margin: 5px 0;
-            color: white;
-            font-size: 0.95rem;
-        }
-
-        .invoice-meta {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 20px;
-            border-radius: 8px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .invoice-info-section {
+            text-align: right;
             min-width: 250px;
         }
 
-        .invoice-meta h2 {
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-            font-weight: 600;
-            color: white;
+        .invoice-title {
+            font-size: 24px;
+            font-weight: 300;
+            color: var(--primary-color);
+            margin: 0 0 15px 0;
+            letter-spacing: 2px;
         }
 
-        .meta-item {
+        .invoice-meta {
+            font-size: 12px;
+        }
+
+        .meta-row {
+            margin: 6px 0;
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
-            color: white;
         }
 
-        .meta-item span:first-child {
-            opacity: 0.9;
+        .meta-label {
+            font-weight: 600;
+            min-width: 100px;
+            text-align: left;
         }
 
-        .invoice-body {
-            padding: 30px;
+        .meta-value {
+            text-align: right;
+            color: var(--text-secondary);
         }
 
-        .info-grid {
+        /* ===== CLIENT & DETAILS SECTION ===== */
+        .details-section {
+            padding: 20px 35px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
+            gap: 35px;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
         }
 
-        .info-card {
-            background: var(--light-bg);
-            padding: 25px;
-            border-radius: 10px;
-            border-left: 4px solid var(--accent);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        .details-card {
+            padding: 0;
         }
 
-        .info-card h3 {
-            color: var(--primary);
-            margin-bottom: 20px;
-            font-size: 1.3rem;
+        .section-title {
+            font-size: 14px;
             font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            color: var(--primary-color);
+            margin: 0 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .info-card h3 i {
-            font-size: 1.2rem;
-        }
-
-        .info-item {
+        .detail-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            margin-bottom: 6px;
+            padding-bottom: 6px;
+            border-bottom: 1px dotted #eee;
         }
 
-        .info-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-
-        .info-label {
+        .detail-label {
             font-weight: 600;
-            color: var(--text);
-            min-width: 100px;
+            color: var(--text-primary);
+            min-width: 120px;
         }
 
-        .info-value {
-            color: var(--text-light);
+        .detail-value {
+            color: var(--text-secondary);
             text-align: right;
             flex: 1;
         }
 
-        .service-period {
-            background: var(--light-bg);
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            border: 1px solid var(--border);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        /* ===== SERVICES TABLE ===== */
+        .services-section {
+            padding: 20px 35px 0; /* REDUCED BOTTOM PADDING */
+            flex: 1;
         }
 
-        .service-period h3 {
-            color: var(--primary);
-            margin-bottom: 20px;
-            font-size: 1.3rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .period-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .period-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .period-item:last-child {
-            border-bottom: none;
-        }
-
-        .invoice-table {
+        .services-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 30px;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin: 15px 0 15px; /* REDUCED MARGIN */
         }
 
-        .invoice-table thead {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
+        .services-table thead {
+            background: var(--light-gray);
+            border-top: 2px solid var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
         }
 
-        .invoice-table th {
-            padding: 16px 12px;
-            text-align: left;
+        .services-table th {
+            padding: 12px 10px;
             font-weight: 600;
-            font-size: 0.9rem;
+            text-align: left;
+            font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border: none;
+            color: var(--text-primary);
         }
 
-        .invoice-table td {
-            padding: 16px 12px;
-            border-bottom: 1px solid var(--border);
-            vertical-align: middle;
-        }
-
-        .invoice-table tbody tr:hover {
-            background: #f8fafc;
+        .services-table td {
+            padding: 14px 10px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
         }
 
         .amount-input {
-            width: 140px;
-            padding: 10px 12px;
-            border: 2px solid var(--border);
-            border-radius: 6px;
-            font-size: 1rem;
-            text-align: center;
+            width: 100px;
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 13px;
             font-weight: 600;
-            transition: all 0.3s ease;
+            color: var(--text-primary);
+            text-align: right;
+            transition: border-color 0.2s;
         }
 
         .amount-input:focus {
             outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-            transform: translateY(-1px);
+            border-color: var(--primary-color);
+        }
+
+        /* ===== TOTALS SECTION ===== */
+        .totals-section {
+            padding: 0 35px 10px; /* REDUCED BOTTOM PADDING */
+            text-align: right;
+            flex-shrink: 0;
         }
 
         .total-row {
-            background: var(--light-bg) !important;
+            display: inline-block;
+            text-align: left;
+            min-width: 300px;
+        }
+
+        .total-label {
+            font-size: 14px;
             font-weight: 600;
+            color: var(--text-primary);
+            margin-right: 20px;
+            min-width: 150px;
+            display: inline-block;
         }
 
         .total-amount {
-            font-size: 1.3rem;
-            color: var(--primary);
+            font-size: 20px;
             font-weight: 700;
+            color: var(--primary-color);
+            letter-spacing: 1px;
         }
 
-        .payment-section {
-            margin-top: 40px;
-        }
-
-        .payment-section h3 {
-            color: var(--primary);
-            margin-bottom: 25px;
-            font-size: 1.4rem;
-            font-weight: 600;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .payment-methods {
+        /* ===== SIGNATURE & STAMP SECTION ===== */
+        .signature-section {
+            padding: 20px 35px;
+            border-top: 1px dashed var(--border-color);
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 25px;
+            gap: 40px;
+            flex-shrink: 0;
         }
 
-        .payment-method {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .payment-method:hover {
-            transform: translateY(-2px);
-        }
-
-        .payment-method h4 {
-            color: var(--primary);
-            margin-bottom: 18px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .payment-method p {
-            margin-bottom: 8px;
-            color: var(--text-light);
-        }
-
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 40px;
-            padding: 25px;
-            background: var(--light-bg);
-            border-radius: 10px;
-            border: 1px solid var(--border);
-        }
-
-        .btn {
-            padding: 14px 28px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            font-size: 1rem;
-        }
-
-        .btn-print {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-print:hover {
-            background: var(--secondary);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
-        }
-
-        .btn-send {
-            background: #10b981;
-            color: white;
-        }
-
-        .btn-send:hover {
-            background: #059669;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-
-        .invoice-footer {
-            background: var(--light-bg);
+        .signature-box, .stamp-box {
             padding: 20px;
-            border-top: 1px solid var(--border);
-            font-size: 0.9rem;
-            color: var(--text-light);
+            text-align: center;
         }
 
-        .footer-content {
+        .signature-line {
+            width: 250px;
+            height: 1px;
+            background: #000;
+            margin: 60px auto 10px;
+            position: relative;
+        }
+
+        .signature-line:before {
+            content: "";
+            position: absolute;
+            top: -25px;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            border-bottom: 1px solid #000;
+        }
+
+        .signature-text {
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .signature-name {
+            margin-top: 5px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .signature-title {
+            margin-top: 2px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .stamp-container {
+            display: inline-block;
+            padding: 35px 50px;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            transform: rotate(-5deg);
+            position: relative;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .stamp-container:before {
+            /* content: "UNPAID"; */
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            /* background: #4CAF50; */
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .stamp-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stamp-subtext {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        /* ===== PAYMENT & TERMS ===== */
+        .payment-section {
+            padding: 20px 35px;
+            border-top: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 35px;
+            flex-shrink: 0;
+        }
+
+        .payment-method,
+        .terms-conditions {
+            padding: 15px;
+            background: var(--light-gray);
+            border-radius: 4px;
+        }
+
+        .payment-method h4,
+        .terms-conditions h4 {
+            margin: 0 0 15px 0;
+            color: var(--primary-color);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .payment-detail {
+            margin: 6px 0;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* ===== FIXED FOOTER ===== */
+        .invoice-footer {
+            padding: 15px 35px;
+            background: var(--light-gray);
+            border-top: 1px solid var(--border-color);
+            font-size: 10px;
+            color: var(--text-secondary);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
+            margin-top: auto;
         }
 
-        /* PRINT STYLES */
-        @media print {
-            @page {
-                margin: 8mm;
-                size: A4;
-            }
-
-            body {
-                background: white !important;
-                color: black !important;
-                font-size: 11pt;
-                font-family: 'Arial', 'Helvetica', sans-serif;
-                line-height: 1;
-                margin: 0;
-                padding: 0;
-            }
-
-            .dashboard-container {
-                max-width: 100% !important;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-
-            .modern-card {
-                box-shadow: none !important;
-                border: 1px solid #000 !important;
-                border-radius: 0 !important;
-                margin: 0 !important;
-                page-break-inside: avoid;
-            }
-
-            .invoice-header {
-                background: #f0f0f0 !important;
-                color: black !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-                padding: 15px !important;
-                border-bottom: 2px solid #000 !important;
-            }
-
-            .header-content {
-                display: flex !important;
-                justify-content: space-between !important;
-                align-items: flex-start !important;
-                gap: 15px !important;
-            }
-
-            .company-info {
-                display: flex !important;
-                align-items: flex-start !important;
-                gap: 10px !important;
-            }
-
-            .invoice-logo {
-                /* background: white !important; */
-                border: 1px solid #000 !important;
-                box-shadow: none !important;
-                max-width: 120px !important;
-                height: 100px !important;
-            }
-
-            .company-details h1 {
-                color: black !important;
-                font-size: 16pt !important;
-                margin-bottom: 5px !important;
-            }
-
-            .company-details .tagline {
-                color: black !important;
-                opacity: 0.8 !important;
-            }
-
-            .user-details {
-                background: #e8e8e8 !important;
-                color: black !important;
-                border: 1px solid #000 !important;
-            }
-
-            .user-details p {
-                color: black !important;
-            }
-
-            .invoice-meta {
-                background: #e8e8e8 !important;
-                color: black !important;
-                border: 1px solid #000 !important;
-            }
-
-            .invoice-meta h2 {
-                color: black !important;
-            }
-
-            .meta-item {
-                color: black !important;
-            }
-
-            .invoice-body {
-                padding: 15px !important;
-            }
-
-            .info-grid {
-                grid-template-columns: 1fr 1fr !important;
-                gap: 15px !important;
-                margin-bottom: 20px !important;
-            }
-
-            .info-card {
-                background: #f8f9fa !important;
-                border-left: 3px solid #000 !important;
-                border: 1px solid #000 !important;
-                page-break-inside: avoid;
-            }
-
-            .info-card h3 {
-                color: black !important;
-            }
-
-            .service-period {
-                background: #f8f9fa !important;
-                border: 1px solid #000 !important;
-                page-break-inside: avoid;
-            }
-
-            .service-period h3 {
-                color: black !important;
-            }
-
-            .invoice-table {
-                border: 1px solid #000 !important;
-                page-break-inside: avoid;
-            }
-
-            .invoice-table thead {
-                background: #e8e8e8 !important;
-                color: black !important;
-            }
-
-            .invoice-table th {
-                border: 1px solid #000 !important;
-                padding: 10px 6px !important;
-                background: #e8e8e8 !important;
-            }
-
-            .invoice-table td {
-                border: 1px solid #000 !important;
-                padding: 10px 8px !important;
-            }
-
-            .amount-input {
-                border: 1px solid #000 !important;
-                background: white !important;
-                color: black !important;
-                width: 120px !important;
-            }
-
-            .payment-methods {
-                grid-template-columns: 1fr 1fr !important;
-                gap: 15px !important;
-                page-break-inside: avoid;
-            }
-
-            .payment-method {
-                border: 1px solid #000 !important;
-                background: white !important;
-                page-break-inside: avoid;
-            }
-
-            .payment-method h4 {
-                color: black !important;
-            }
-
-            .action-buttons,
-            .btn,
-            .no-print {
-                display: none !important;
-            }
-
-            .invoice-footer {
-                background: #f0f0f0 !important;
-                border-top: 1px solid #000 !important;
-                margin-top: 15px !important;
-            }
-
-            /* Ensure good print layout */
-            .modern-card {
-                page-break-inside: avoid;
-                break-inside: avoid;
-            }
+        /* ===== ACTION BUTTONS ===== */
+        .action-buttons {
+            position: fixed;
+            bottom: 35px;
+            right: 30px;
+            z-index: 1000;
+            display: flex;
+            gap: 15px;
         }
 
-        /* RESPONSIVE DESIGN */
+        .print-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+
+        .print-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
         @media (max-width: 768px) {
-            .dashboard-container {
-                padding: 10px;
-            }
-
-            .header-content {
+            .invoice-header {
                 flex-direction: column;
                 gap: 20px;
             }
 
-            .company-info {
+            .company-section {
                 flex-direction: column;
                 text-align: center;
-                gap: 15px;
+                align-items: center;
             }
 
-            .invoice-logo {
-                align-self: center;
-            }
-
-            .invoice-meta {
-                min-width: auto;
+            .invoice-info-section {
+                text-align: left;
                 width: 100%;
             }
 
-            .info-grid {
+            .details-section,
+            .payment-section,
+            .signature-section {
                 grid-template-columns: 1fr;
-            }
-
-            .payment-methods {
-                grid-template-columns: 1fr;
-            }
-
-            .period-grid {
-                grid-template-columns: 1fr;
+                gap: 20px;
             }
 
             .action-buttons {
+                bottom: 25px;
+                right: 25px;
                 flex-direction: column;
-                gap: 15px;
             }
 
-            .footer-content {
-                flex-direction: column;
-                gap: 10px;
-                text-align: center;
+            .signature-line {
+                width: 180px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .invoice-header {
+                padding: 10px !important;
             }
 
-            .invoice-table {
-                font-size: 0.9rem;
+            .company-name {
+                font-size: 20px;
             }
 
-            .invoice-table th,
-            .invoice-table td {
-                padding: 12px 8px;
+            .invoice-title {
+                font-size: 24px;
+            }
+
+            .company-logo {
+                width: 70px;
+                height: 70px;
             }
         }
     </style>
 
-    <div class="dashboard-container">
-        <div class="modern-card">
-            <!-- Invoice Header -->
+    <div class="invoice-container">
+        <div class="invoice-content">
+            <!-- Header - Fixed Layout -->
             <div class="invoice-header">
-                <div class="header-content">
+                <div class="company-section">
+                    <div class="logo-container">
+                        <img src="{{ asset('storage/logo/new_logo.png') }}" alt="ShuleApp Logo" class="company-logo">
+                    </div>
                     <div class="company-info">
-                        <div class="logo-container">
-                            <img src="{{ asset('storage/logo/logo.png') }}" alt="ShuleApp Logo" class="invoice-logo">
-                        </div>
-                        <div class="company-details">
-                            <h1>INVOICE</h1>
-                            <p class="tagline">SHULEAPP - School Management System</p>
-                            <div class="user-details">
-                                <p><strong>{{ ucwords(strtolower(Auth::user()->first_name)) }} {{ ucwords(strtolower(Auth::user()->last_name)) }}</strong></p>
-                                <p>{{ Auth::user()->email }}</p>
-                                <p>{{ Auth::user()->phone }}</p>
-                            </div>
+                        <h1 class="company-name">SHULEAPP</h1>
+                        <p class="company-tagline">Empowering Education</p>
+                        <div class="contact-details">
+                            <div>{{ ucwords(strtolower(Auth::user()->first_name)) }}
+                                {{ ucwords(strtolower(Auth::user()->last_name)) }}</div>
+                            <div>Email: {{ Auth::user()->email }}</div>
+                            <div>Phone: {{ Auth::user()->phone }}</div>
                         </div>
                     </div>
+                </div>
+
+                <div class="invoice-info-section">
+                    <h2 class="invoice-title">INVOICE</h2>
                     <div class="invoice-meta">
-                        <h2>INV-{{ \Carbon\Carbon::now()->format('Ymd-His') }}</h2>
-                        <div class="meta-item">
-                            <span>Invoice Date:</span>
-                            <strong>{{\Carbon\Carbon::now()->format('d M Y')}}</strong>
+                        <div class="meta-row">
+                            <span class="meta-label">Invoice #:</span>
+                            <span class="meta-value">INV-{{ \Carbon\Carbon::now()->format('Ymd-His') }}</span>
                         </div>
-                        <div class="meta-item">
-                            <span>Due Date:</span>
-                            <strong>{{ \Carbon\Carbon::now()->addMonth()->format('d M Y') }}</strong>
+                        <div class="meta-row">
+                            <span class="meta-label">Date:</span>
+                            <span class="meta-value">{{ \Carbon\Carbon::now()->format('d M Y') }}</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">Due Date:</span>
+                            <span class="meta-value">{{ \Carbon\Carbon::now()->addMonth()->format('d M Y') }}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Invoice Body -->
-            <div class="invoice-body">
-                <!-- Client and Invoice Info -->
-                <div class="info-grid">
-                    <div class="info-card">
-                        <h3>🏢 Billed To</h3>
-                        <div class="info-item">
-                            <span class="info-label">School:</span>
-                            <span class="info-value"><strong>{{ ucwords(strtolower($schools->school_name)) }}</strong></span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Address:</span>
-                            <span class="info-value">{{ ucwords(strtolower($schools->postal_address)) }} - {{ ucwords(strtolower($schools->postal_name)) }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Country:</span>
-                            <span class="info-value">{{ ucwords(strtolower($schools->country)) }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Email:</span>
-                            <span class="info-value">{{ $managers->first()->email ?? 'N/A' }}</span>
-                        </div>
+            <!-- Client & Billing Details -->
+            <div class="details-section">
+                <div class="details-card">
+                    <h3 class="section-title">Billed To</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">School:</span>
+                        <span class="detail-value"><strong>{{ ucwords(strtolower($schools->school_name)) }}</strong></span>
                     </div>
-
-                    <div class="info-card">
-                        <h3>📅 Service Period</h3>
-                        <div class="info-item">
-                            <span class="info-label">Start Date:</span>
-                            <span class="info-value">{{ \Carbon\Carbon::parse($schools->service_start_date)->format('d M Y') ?? 'Not set' }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">End Date:</span>
-                            <span class="info-value">{{ \Carbon\Carbon::parse($schools->service_end_date)->format('d M Y') ?? 'Not set' }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Duration:</span>
-                            <span class="info-value">{{ \Carbon\Carbon::parse($schools->service_start_date)->diffInMonths(\Carbon\Carbon::parse($schools->service_end_date)) }} months</span>
-                        </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Address:</span>
+                        <span class="detail-value">{{ ucwords(strtolower($schools->postal_address)) }},
+                            {{ ucwords(strtolower($schools->postal_name)) }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Country:</span>
+                        <span class="detail-value">{{ ucwords(strtolower($schools->country)) }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Contact Email:</span>
+                        <span class="detail-value">{{ $managers->first()->email ?? 'N/A' }}</span>
                     </div>
                 </div>
 
-                <!-- Invoice Table -->
-                <table class="invoice-table">
+                <div class="details-card">
+                    <h3 class="section-title">Service Period</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Start Date:</span>
+                        <span
+                            class="detail-value">{{ \Carbon\Carbon::parse($schools->service_start_date)->format('d M Y') ?? 'Not set' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">End Date:</span>
+                        <span
+                            class="detail-value">{{ \Carbon\Carbon::parse($schools->service_end_date)->format('d M Y') ?? 'Not set' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Duration:</span>
+                        <span
+                            class="detail-value">{{ \Carbon\Carbon::parse($schools->service_start_date)->diffInMonths(\Carbon\Carbon::parse($schools->service_end_date)) }}
+                            months</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">No. of Students:</span>
+                        <span class="detail-value"><strong>{{ count($students) }}</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services Table -->
+            <div class="services-section">
+                <h3 class="section-title">Service Description</h3>
+                <table class="services-table">
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Description</th>
-                            <th>Time Duration</th>
-                            <th>No. of Students</th>
-                            <th>Unit Cost (TZS)</th>
-                            <th>Total (TZS)</th>
+                            <th style="width: 5%">#</th>
+                            <th style="width: 35%">Description</th>
+                            <th style="width: 20%">Period</th>
+                            <th style="width: 10%">Students</th>
+                            <th style="width: 15%">Unit Cost (TZS)</th>
+                            <th style="width: 15%">Total (TZS)</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>1</td>
                             <td>
-                                <strong>Service Cost for {{ \Carbon\Carbon::now()->format('Y') }}</strong>
-                                <br>
-                                {{-- <small style="color: var(--text-light);">Comprehensive school management services</small> --}}
+                                <strong>Service Subscription</strong><br>
+                                <small style="color: var(--text-secondary);">Complete school management system for academic
+                                    year {{ \Carbon\Carbon::now()->format('Y') }}</small>
                             </td>
                             <td>
-                                {{ \Carbon\Carbon::parse($schools->service_start_date)->format('d/m/Y') ?? '-' }} -
+                                {{ \Carbon\Carbon::parse($schools->service_start_date)->format('d/m/Y') ?? '-' }}<br>
+                                to<br>
                                 {{ \Carbon\Carbon::parse($schools->service_end_date)->format('d/m/Y') ?? '-' }}
                             </td>
-                            <td style="text-align: center;">
-                                <strong>{{ count($students) }}</strong>
+                            <td style="text-align: center; font-weight: 600;">
+                                {{ count($students) }}
                             </td>
                             <td style="text-align: center;">
-                                <input type="number" id="unit_cost" class="amount-input"
-                                       placeholder="0" min="0" value=""
-                                       oninput="calculateTotal()">
+                                <input type="number" id="unit_cost" class="amount-input" placeholder="0" min="0"
+                                    value="" oninput="calculateTotal()">
                             </td>
-                            <td style="text-align: center;" class="total-amount" id="total_cost">
+                            <td style="text-align: center; font-weight: 600;" id="total_cost">
                                 0
                             </td>
                         </tr>
                     </tbody>
-                    <tfoot>
-                        <tr class="total-row">
-                            <td colspan="5" style="text-align: right; padding-right: 20px;">
-                                <strong>TOTAL AMOUNT:</strong>
-                            </td>
-                            <td style="text-align: center;" class="total-amount" id="total_balance">
-                                TZS 0
-                            </td>
-                        </tr>
-                    </tfoot>
                 </table>
+            </div>
 
-                <!-- Payment Methods -->
-                <div class="payment-section">
-                    <h3>💳 Payment Methods</h3>
-                    <div class="payment-methods">
-                        <div class="payment-method">
-                            <h4>🏦 Bank Transfer</h4>
-                            <p><strong>Bank:</strong> NMB Bank</p>
-                            <p><strong>Account Number:</strong> 50510028891</p>
-                            <p><strong>Account Name:</strong> Frank Mathias Masaka</p>
-                        </div>
-                        <div class="payment-method">
-                            <h4>📱 Mobile Payment</h4>
-                            <p><strong>Provider:</strong> Tigo Pesa</p>
-                            <p><strong>Merchant Number:</strong> 15966786</p>
-                            <p><strong>Merchant Name:</strong> Piano Shop</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="action-buttons no-print">
-                    <button class="btn btn-print" onclick="scrollToTopAndPrint()">
-                        🖨️ Print Invoice
-                    </button>
-                    <a href="{{ route('admin.send.invoice', ['school' => Hashids::encode($schools->id)]) }}" class="btn btn-send">
-                        ✉️ Send Invoice
-                    </a>
+            <!-- Totals -->
+            <div class="totals-section">
+                <div class="total-row">
+                    <span class="total-label">TOTAL AMOUNT DUE:</span>
+                    <span class="total-amount" id="total_balance">TZS 0</span>
                 </div>
             </div>
 
-            <!-- Footer -->
-            <div class="invoice-footer">
-                <div class="footer-content">
-                    <div>
-                        <strong>Printed by:</strong> {{ Auth::user()->email }}
-                    </div>
-                    <div>
-                        <strong>Printed on:</strong> {{ \Carbon\Carbon::now()->format('d M Y H:i:s') }}
+            <!-- SIGNATURE & STAMP SECTION -->
+            <div class="signature-section">
+                <div class="signature-box">
+                    <div class="">------------------------------------</div>
+                    <div class="signature-text">Signature</div>
+                    <div class="signature-title">Recieved/Approved by</div>
+                </div>
+
+                <div class="stamp-box">
+                    <div class="stamp-container">
+                        <div class="stamp-text">{{ucwords(strtolower($schools->school_name))}}</div>
+                        <div class="stamp-subtext">Official Stamp here</div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Payment & Terms -->
+            <div class="payment-section">
+                <div class="payment-method">
+                    <h4>Payment Information</h4>
+                    <div class="payment-detail"><strong>Bank:</strong> NMB Bank</div>
+                    <div class="payment-detail"><strong>Account:</strong> 50510028891</div>
+                    <div class="payment-detail"><strong>Name:</strong> Frank Mathias Masaka</div>
+                    <div class="payment-detail" style="margin-top: 15px;"><strong>Mixx by Yas:</strong> 15966786</div>
+                </div>
+
+                <div class="terms-conditions">
+                    <h4>Terms & Conditions</h4>
+                    <div class="payment-detail">• Payment due within 30 days</div>
+                    <div class="payment-detail">• Late fees may apply after due date</div>
+                    <div class="payment-detail">• All amounts in Tanzanian Shillings</div>
+                    <div class="payment-detail">• Contact for invoice queries</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fixed Footer -->
+        <div class="invoice-footer">
+            <div>
+                <strong>Invoice Generated By:</strong> {{ Auth::user()->email }}
+            </div>
+            <div>
+                <strong>Printed On:</strong> {{ \Carbon\Carbon::now()->format('d M Y H:i') }}
+            </div>
+            <div>
+                <strong>Page:</strong> 1 of 1
             </div>
         </div>
     </div>
 
+    <!-- Action Buttons (Screen only) -->
+    <div class="action-buttons">
+        <button class="print-btn" onclick="generatePDF()" id="downloadPdfBtn">
+            📥 Download PDF Invoice
+        </button>
+        <a href="{{ route('admin.send.invoice', ['school' => Hashids::encode($schools->id)]) }}" class="print-btn"
+            style="background: #4CAF50;">
+            📧 Send Invoice
+        </a>
+    </div>
+
+    <!-- Add required libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <script>
+        // Initialize jsPDF
+        window.jsPDF = window.jspdf.jsPDF;
+
         function calculateTotal() {
-            let unitCost = parseFloat(document.getElementById("unit_cost").value) || 0;
-            let totalStudents = {{ count($students) }};
-            let total = unitCost * totalStudents;
+            const unitCost = parseFloat(document.getElementById("unit_cost").value) || 0;
+            const totalStudents = {{ count($students) }};
+            const total = unitCost * totalStudents;
 
-            document.getElementById("total_cost").textContent = total.toLocaleString();
-            document.getElementById("total_balance").textContent = 'TZS ' + total.toLocaleString();
+            const formatter = new Intl.NumberFormat('en-US');
+
+            document.getElementById("total_cost").textContent = formatter.format(total);
+            document.getElementById("total_balance").textContent = 'TZS ' + formatter.format(total);
         }
 
-        function scrollToTopAndPrint() {
-            window.scrollTo(0, 0);
-            setTimeout(() => {
-                window.print();
-            }, 500);
+        function generatePDF() {
+            const unitCost = document.getElementById("unit_cost").value;
+            const downloadBtn = document.getElementById("downloadPdfBtn");
+
+            // Validate unit cost
+            if (!unitCost || parseFloat(unitCost) <= 0) {
+                alert('Please enter unit cost before downloading PDF');
+                document.getElementById("unit_cost").focus();
+                return;
+            }
+
+            // Show loading
+            const originalText = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = '⏳ Generating PDF...';
+            downloadBtn.disabled = true;
+
+            // Get invoice element
+            const invoiceElement = document.querySelector('.invoice-container');
+
+            // Set PDF options
+            const pdfOptions = {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff',
+                width: invoiceElement.offsetWidth,
+                height: invoiceElement.offsetHeight
+            };
+
+            // Generate PDF
+            html2canvas(invoiceElement, pdfOptions)
+                .then(canvas => {
+                    // Create PDF
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+
+                    // Calculate dimensions
+                    const imgWidth = 190;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                    // Add image to PDF
+                    pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+
+                    // Generate filename
+                    const fileName = `Invoice-{{ $schools->school_name }}-{{ \Carbon\Carbon::now()->format('Y-m-d') }}.pdf`
+                        .replace(/\s+/g, '-')
+                        .toLowerCase();
+
+                    // Save PDF
+                    pdf.save(fileName);
+
+                    // Restore button
+                    downloadBtn.innerHTML = originalText;
+                    downloadBtn.disabled = false;
+                })
+                .catch(error => {
+                    console.error('PDF generation error:', error);
+                    alert('Error generating PDF. Please try again.');
+
+                    // Restore button
+                    downloadBtn.innerHTML = originalText;
+                    downloadBtn.disabled = false;
+                });
         }
 
-        // Auto-focus on unit cost input
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('unit_cost').focus();
+            const input = document.getElementById('unit_cost');
+            input.focus();
+            input.select();
+
+            if (input.value) calculateTotal();
         });
     </script>
 @endsection

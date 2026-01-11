@@ -1,14 +1,14 @@
-const CACHE_NAME = 'ShuleApp-cache-v4.1.2'; // Ongeza version number
+const CACHE_NAME = 'ShuleApp-cache-v2026.01.11'; // Increase/change version number
 const ASSETS_TO_CACHE = [
     '/manifest.json',
     '/assets/css/styles.css',
     '/assets/js/scripts.js',
-    '/icons/icon.png',
-    '/icons/icon_2.png',
-    '/icons/icon_3.png',
-    '/icons/icon_4.png',
+    '/icons/new_icon1.png',
+    '/icons/new_icon2.png',
+    '/icons/new_icon3.png',
+    // '/icons/icon_4.png',
     '/offline.html'
-].map(url => `${url}?v=4.1.2`); // Auto-add version parameter
+].map(url => `${url}?v=2026.01.11`); // Auto-add version parameter
 
 // Install Event
 self.addEventListener('install', (event) => {
@@ -58,7 +58,7 @@ self.addEventListener('fetch', (event) => {
                 })
                 .catch(() => {
                     return caches.match(event.request)
-                        .then(cachedResponse => cachedResponse || caches.match('/offline.html?v=4.1.2'));
+                        .then(cachedResponse => cachedResponse || caches.match('/offline.html?v=2026.01.11'));
                 })
         );
         return;
@@ -67,6 +67,6 @@ self.addEventListener('fetch', (event) => {
     // For other requests: Network first, offline page fallback
     event.respondWith(
         fetch(event.request)
-            .catch(() => caches.match('/offline.html?v=4.1.2'))
+            .catch(() => caches.match('/offline.html?v=2026.01.11'))
     );
 });
