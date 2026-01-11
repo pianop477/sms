@@ -3,7 +3,7 @@
     "short_name": "ShuleApp",
     "description": "Empowering Education",
     "categories": ["education", "productivity", "school"],
-    "start_url": "/?v=2026.01",
+    "start_url": "/?v=2026.1",
     "display": "standalone",
     "display_override": ["window-controls-overlay", "minimal-ui"],
     "background_color": "#ffffff",
@@ -11,7 +11,7 @@
     "color": "#2C3E50",
     "orientation": "potrait",
     "scope": "/",
-    "id": "shuleapp-2026-01",
+    "id": "shuleapp-2026-1",
     "lang": "en",
     "dir": "auto",
     "icons": [

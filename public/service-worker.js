@@ -1,5 +1,5 @@
-const CACHE_NAME = 'ShuleApp-cache-v2026.01'; // Increase/change version number
-const APP_VERSION = '2026.01'; // ⬅️ ADD SEPARATE VERSION VARIABLE
+const CACHE_NAME = 'ShuleApp-cache-v2026.1'; // Increase/change version number
+const APP_VERSION = '2026.1'; // ⬅️ ADD SEPARATE VERSION VARIABLE
 const ASSETS_TO_CACHE = [
     '/manifest.json',
     '/assets/css/styles.css',
