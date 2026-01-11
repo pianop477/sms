@@ -369,19 +369,81 @@
     }
 
     // Sajili Service Worker
+    let newWorker;
     function registerServiceWorker() {
-        navigator.serviceWorker.register('/service-worker.js').then((registration) => {
-            console.log('Service Worker registered successfully:', registration);
-        }).catch((err) => {
-            console.error('Error during service worker registration:', err);
-        });
+        if (!('serviceWorker' in navigator)) return;
 
+        navigator.serviceWorker.register('/service-worker.js')
+            .then((registration) => {
+                console.log('Service Worker registered:', registration);
+
+                // 1️⃣ If there's already a waiting worker → show update UI
+                if (registration.waiting) {
+                    showUpdateUI(registration.waiting);
+                }
+
+                // 2️⃣ Listen for new SW installation
+                registration.addEventListener('updatefound', () => {
+                    newWorker = registration.installing;
+
+                    newWorker.addEventListener('statechange', () => {
+                        if (
+                            newWorker.state === 'installed' &&
+                            navigator.serviceWorker.controller
+                        ) {
+                            showUpdateUI(newWorker);
+                        }
+                    });
+                });
+            })
+            .catch((err) => {
+                console.error('SW registration failed:', err);
+            });
+
+        // 3️⃣ Reload page once new SW takes control
         navigator.serviceWorker.addEventListener('controllerchange', () => {
-            setTimeout(() => {
-                alert('New updates are available for ShuleApp!');
-                location.reload();
-            }, 1000);
+            window.location.reload();
         });
     }
 
-    })(jQuery);
+    function showUpdateUI(worker) {
+        // Avoid duplicate prompts
+        if (document.getElementById('update-toast')) return;
+
+        const toast = document.createElement('div');
+        toast.id = 'update-toast';
+        toast.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #0d6efd;
+        color: #fff;
+        padding: 14px 20px;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0,0,0,.2);
+        z-index: 9999;
+        font-family: sans-serif;
+    `;
+
+        toast.innerHTML = `
+        <span>New update available for <b>ShuleApp</b></span>
+        <button id="update-btn" style="
+            margin-left: 15px;
+            padding: 6px 12px;
+            border: none;
+            background: #fff;
+            color: #0d6efd;
+            border-radius: 4px;
+            cursor: pointer;
+        ">Update</button>
+    `;
+
+        document.body.appendChild(toast);
+
+        document.getElementById('update-btn').onclick = () => {
+            worker.postMessage({ type: 'SKIP_WAITING' });
+        };
+    }
+
+})(jQuery);
