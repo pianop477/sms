@@ -217,7 +217,6 @@ class ResultsController extends Controller
         return view('Results.result_months', compact('students', 'year', 'examType', 'exam_id', 'months'));
     }
 
-
     /**
      * Store the newly created resource in storage.
      */
@@ -265,26 +264,32 @@ class ResultsController extends Controller
             )
             ->where('examination_results.student_id', $studentId->id)
             ->where('examination_results.exam_type_id', $exam_id[0])
-            ->whereDate('exam_date', Carbon::parse($date)) // Filtering by date
+            ->whereDate('exam_date', Carbon::parse($date))
             ->where('examination_results.school_id', $user->school_id)
-            ->where('examination_results.status', 2) // Assuming 2 is the status for published results
+            ->where('examination_results.status', 2)
             ->where('students.parent_id', $parent->id)
             ->get();
 
         // Calculate the sum of all scores
         $totalScore = $results->sum('score');
-        $averageScore = $totalScore / $results->count();
+        $averageScore = $results->count() > 0 ? $totalScore / $results->count() : 0;
 
-        // Calculate rankings
+        // ==== REKEDISHA: Kupata class_id ya mtihani husika ====
+        $examClassId = null;
+        if ($results->isNotEmpty()) {
+            $examClassId = $results->first()->class_id; // Hii ni class_id iliyohifadhiwa wakati wa mtihani
+        }
+
+        // Calculate rankings - tumia examClassId badala ya student->class_id
         $rankings = Examination_result::query()
-            ->where('examination_results.class_id', $results->first()->class_id) // Angalia wanafunzi wa darasa hili pekee
-            ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
-            ->where('examination_results.exam_type_id', $exam_id[0]) // Angalia aina ya mtihani
+            ->where('examination_results.class_id', $examClassId) // TUMIA CLASS_ID YA MTIHANI
+            ->whereDate('exam_date', Carbon::parse($date))
+            ->where('examination_results.exam_type_id', $exam_id[0])
             ->where('examination_results.school_id', $user->school_id)
-            ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
             ->select('student_id', DB::raw('SUM(score) as total_score'))
             ->groupBy('student_id')
-            ->orderByDesc('total_score') // Pangilia kwa score kwanza
+            ->orderByDesc('total_score')
             ->get();
 
         // Kutengeneza mfumo wa tie ranking
@@ -303,9 +308,9 @@ class ResultsController extends Controller
         // Kupata rank ya mwanafunzi husika
         $studentRank = $ranks[$studentId->id] ?? null;
 
-
         // Add grades, remarks, and individual ranks to each result
         foreach ($results as $result) {
+            // Add grade and remarks (hii bado iko sawa)
             if ($result->marking_style == 1) {
                 if ($result->score >= 41) {
                     $result->grade = 'A';
@@ -342,34 +347,36 @@ class ResultsController extends Controller
                 }
             }
 
+            // ==== REKEDISHA: Course ranking - tumia examClassId ====
             $courseRankings = Examination_result::query()
                 ->where('course_id', $result->course_id)
-                ->where('examination_results.class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
-                ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
-                ->where('examination_results.exam_type_id', $exam_id[0]) // Angalia aina ya mtihani
+                ->where('examination_results.class_id', $examClassId) // TUMIA CLASS_ID YA MTIHANI
+                ->whereDate('exam_date', Carbon::parse($date))
+                ->where('examination_results.exam_type_id', $exam_id[0])
                 ->where('examination_results.school_id', $user->school_id)
-                ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
+                ->join('students', 'students.id', '=', 'examination_results.student_id')
                 ->select('student_id', DB::raw('SUM(score) as total_score'))
                 ->groupBy('student_id')
-                ->orderByDesc('total_score') // Pangilia kwa score kwanza
+                ->orderByDesc('total_score')
                 ->get();
 
             // Hakikisha wanafunzi wenye score sawa wanashirikiana rank
             $rank = 1;
             $previousScore = null;
-            $ranks = [];
+            $courseRanks = []; // Badilisha jina ili usiwe na conflict
 
             foreach ($courseRankings as $key => $ranking) {
                 if ($previousScore !== null && $ranking->total_score < $previousScore) {
                     $rank = $key + 1;
                 }
-                $ranks[$ranking->student_id] = $rank;
+                $courseRanks[$ranking->student_id] = $rank;
                 $previousScore = $ranking->total_score;
             }
 
-            // Kupata rank ya mwanafunzi husika
-            $result->courseRank = $ranks[$studentId->id] ?? null;
+            // Kupata rank ya mwanafunzi husika kwa somo husika
+            $result->courseRank = $courseRanks[$studentId->id] ?? null;
         }
+
         // ================= QR CODE VERIFICATION =================
         $verificationData = [
             'student_name' => trim($studentId->first_name . ' ' . $studentId->middle_name . ' ' . $studentId->last_name),
@@ -405,8 +412,8 @@ class ResultsController extends Controller
 
         // Generate filename using timestamp
         $timestamp = Carbon::now()->timestamp;
-        $fileName = "student_result_{$studentId->admission_number}_{$timestamp}.pdf"; // Filename format: student_result_<admission_number>_<timestamp>.pdf
-        $folderPath = public_path('reports'); // Folder path in public directory
+        $fileName = "student_result_{$studentId->admission_number}_{$timestamp}.pdf";
+        $folderPath = public_path('reports');
 
         // Make sure the directory exists
         if (!File::exists($folderPath)) {
@@ -420,9 +427,8 @@ class ResultsController extends Controller
         $fileUrl = asset('reports/' . $fileName);
 
         // Return the view with the file URL to be used in the iframe
-        return view('Results.parent_academic_reports', compact('fileUrl', 'fileName', 'exam_id', 'results', 'year', 'studentId', 'type', 'student', 'month', 'date',));
+        return view('Results.parent_academic_reports', compact('fileUrl', 'fileName', 'exam_id', 'results', 'year', 'studentId', 'type', 'student', 'month', 'date'));
     }
-
 
     //general results are intialized here ====================================
     public function general($school)
@@ -999,8 +1005,6 @@ class ResultsController extends Controller
             return response()->json([], 500);
         }
     }
-
-
 
     private function calculateGrade($score, $marking_style)
     {
