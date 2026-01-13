@@ -179,7 +179,7 @@ class ParentsController extends Controller
 
             DB::commit();
 
-            $url = "https://shuleapp.tech/login";
+            $url = "https://shuleapp.tech";
 
             $nextSmsService = new NextSmsService();
             $senderId = $school->sender_id ?? "SHULE APP";

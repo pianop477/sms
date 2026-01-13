@@ -1986,6 +1986,9 @@ class ResultsController extends Controller
         $reports = generated_reports::find($reportId);
         $examDates = $reports->exam_dates;
 
+        // ==== REKEDISHA 1: Pata class_id ya kwenye generated_reports (iliyohifadhiwa) ====
+        $storedClassId = $reports->class_id ?? $classId;
+
         $results = Examination_result::query()
             ->join('students', 'students.id', '=', 'examination_results.student_id')
             ->join('grades', 'grades.id', '=', 'examination_results.class_id')
@@ -2018,10 +2021,11 @@ class ResultsController extends Controller
                 'schools.logo',
                 'schools.country',
                 'users.first_name as teacher_first_name',
-                'users.last_name as teacher_last_name'
+                'users.last_name as teacher_last_name',
+                'teachers.id as teacher_id' // ==== REKEDISHA: Pata teacher_id ya aliyepakia ====
             )
             ->where('examination_results.student_id', $studentId)
-            ->where('examination_results.class_id', $classId)
+            ->where('examination_results.class_id', $storedClassId) // TUMIA CLASS_ID ILIYOHIFADHIWA
             ->where('examination_results.school_id', $schoolId)
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->get();
@@ -2039,7 +2043,7 @@ class ResultsController extends Controller
         $combineOption = $reports->combine_option ?? 'individual';
         $finalData = [];
 
-        // Vigezo vya kuweka jumla za mwanafunzi - SASA HUNA
+        // Vigezo vya kuweka jumla za mwanafunzi
         $studentTotalMarks = 0;
         $subjectCount = 0;
 
@@ -2047,18 +2051,29 @@ class ResultsController extends Controller
             $subjectName = $subjectResults->first()->course_name;
             $subjectCode = $subjectResults->first()->course_code;
 
-            $currentTeacher = DB::table('class_learning_courses')
-                ->join('teachers', 'teachers.id', '=', 'class_learning_courses.teacher_id')
-                ->join('users', 'users.id', '=', 'teachers.user_id')
-                ->where('class_learning_courses.class_id', $classId)
-                ->where('class_learning_courses.course_id', $subjectId)
-                ->where('class_learning_courses.status', 1)
-                ->select('users.first_name', 'users.last_name')
-                ->first();
+            // ==== REKEDISHA 2: Tafuta mwalimu aliyepakia matokeo ====
+            // Chukua mwalimu wa kwanza aliyepakia matokeo kwenye somo hili
+            $uploadingTeacher = $subjectResults->first();
+            $teacher = $uploadingTeacher && $uploadingTeacher->teacher_first_name && $uploadingTeacher->teacher_last_name
+                ? $uploadingTeacher->teacher_first_name . '. ' . substr($uploadingTeacher->teacher_last_name, 0, 1)
+                : 'N/A';
 
-            $teacher = $currentTeacher
-                ? $currentTeacher->first_name . '. ' . $currentTeacher->last_name[0]
-                : $subjectResults->first()->teacher_first_name . '. ' . $subjectResults->first()->teacher_last_name[0];
+            // AU: Tafuta mwalimu kutoka kwa teacher_id iliyohifadhiwa kwenye examination_results
+            $examTeacher = null;
+            foreach ($subjectResults as $result) {
+                if ($result->teacher_id) {
+                    $examTeacher = DB::table('teachers')
+                        ->join('users', 'users.id', '=', 'teachers.user_id')
+                        ->where('teachers.id', $result->teacher_id)
+                        ->select('users.first_name', 'users.last_name')
+                        ->first();
+                    break;
+                }
+            }
+
+            if ($examTeacher) {
+                $teacher = $examTeacher->first_name . '. ' . substr($examTeacher->last_name, 0, 1);
+            }
 
             $examScores = [];
             $total = 0;
@@ -2127,7 +2142,7 @@ class ResultsController extends Controller
                 $subjectResultsAll = DB::table('examination_results')
                     ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
                     ->where('examination_results.course_id', $subjectId)
-                    ->where('examination_results.class_id', $classId)
+                    ->where('examination_results.class_id', $storedClassId) // TUMIA CLASS_ID ILIYOHIFADHIWA
                     ->where('examination_results.school_id', $schoolId)
                     ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
                     ->select('examination_results.*', 'subjects.course_name')
@@ -2208,17 +2223,20 @@ class ResultsController extends Controller
         // Pata average za wanafunzi wote kwa kutumia logic ile ile
         $allStudentAverages = [];
 
-        // Pata wanafunzi wote waliopo kwenye class
-        $allStudents = DB::table('students')
-            ->where('class_id', $classId)
+        // ==== REKEDISHA 3: Pata wanafunzi wote walio kwenye class iliyohifadhiwa ====
+        // Pata wanafunzi wote waliopo kwenye class (kutoka kwa results za wakati huo)
+        $allStudents = DB::table('examination_results')
+            ->where('class_id', $storedClassId) // TUMIA CLASS_ID ILIYOHIFADHIWA
             ->where('school_id', $schoolId)
-            ->pluck('id');
+            ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+            ->distinct()
+            ->pluck('student_id');
 
         foreach ($allStudents as $stdId) {
             // Pata results za mwanafunzi huyu
             $studentResults = DB::table('examination_results')
                 ->where('student_id', $stdId)
-                ->where('class_id', $classId)
+                ->where('class_id', $storedClassId) // TUMIA CLASS_ID ILIYOHIFADHIWA
                 ->where('school_id', $schoolId)
                 ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
                 ->get()
