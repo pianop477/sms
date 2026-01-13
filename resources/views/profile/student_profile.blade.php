@@ -53,6 +53,65 @@
             padding: 12px 20px;
         }
 
+        .teacher-avatar {
+            min-width: 40px !important;
+            min-height: 40px !important;
+            width: 40px !important;
+            height: 40px !important;
+            object-fit: cover;
+            border: 2px solid #dee2e6;
+            transition: transform 0.3s ease;
+        }
+
+        .class-teacher-avatar {
+            min-width: 80px !important;
+            min-height: 80px !important;
+            width: 80px !important;
+            height: 80px !important;
+            object-fit: cover;
+            border: 3px solid #dee2e6;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar-overlay,
+        .avatar-overlay-large {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .avatar-overlay {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-overlay-large {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .teacher-avatar-container:hover .avatar-overlay,
+        .class-teacher-avatar-container:hover .avatar-overlay-large {
+            opacity: 1;
+        }
+
+        .teacher-avatar-container:hover .teacher-avatar,
+        .class-teacher-avatar-container:hover .class-teacher-avatar {
+            transform: scale(1.05);
+        }
+
         .nav-pills .nav-link.active {
             background-color: var(--primary-color);
             color: white;
@@ -122,6 +181,103 @@
                 height: 100px;
             }
 
+            /* Fix table layout for mobile */
+            .table-responsive-md table {
+                display: block;
+            }
+
+            .table-responsive-md thead {
+                display: none;
+            }
+
+            .table-responsive-md tbody tr {
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 15px;
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+                padding: 15px;
+                background-color: white;
+            }
+
+            .table-responsive-md tbody td {
+                display: flex;
+                align-items: center;
+                padding: 10px 0;
+                border: none;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .table-responsive-md tbody td:last-child {
+                border-bottom: none;
+            }
+
+            /* Custom styling for each cell in mobile */
+            .table-responsive-md tbody td:nth-child(1):before {
+                content: "#";
+                font-weight: bold;
+                margin-right: 10px;
+                min-width: 30px;
+            }
+
+            .table-responsive-md tbody td:nth-child(2):before {
+                content: "Subject:";
+                font-weight: bold;
+                margin-right: 10px;
+                min-width: 80px;
+            }
+
+            .table-responsive-md tbody td:nth-child(3):before {
+                content: "Teacher:";
+                font-weight: bold;
+                margin-right: 10px;
+                min-width: 80px;
+            }
+
+            .table-responsive-md tbody td:nth-child(4):before {
+                content: "Phone:";
+                font-weight: bold;
+                margin-right: 10px;
+                min-width: 80px;
+            }
+
+            /* Ensure teacher avatar maintains size in mobile */
+            .teacher-avatar {
+                min-width: 50px !important;
+                min-height: 50px !important;
+                width: 50px !important;
+                height: 50px !important;
+            }
+
+            /* Fix class teacher card for mobile */
+            .teacher-card {
+                margin-bottom: 15px;
+            }
+
+            .teacher-card .row {
+                flex-direction: column;
+            }
+
+            .teacher-card .col-md-3 {
+                margin-bottom: 15px;
+            }
+
+            .class-teacher-avatar {
+                min-width: 100px !important;
+                min-height: 100px !important;
+                width: 100px !important;
+                height: 100px !important;
+            }
+
+            /* Remove column layout for class teacher info */
+            .teacher-card .col-md-9 .row {
+                flex-direction: column;
+            }
+
+            .teacher-card .col-md-9 .col-md-6 {
+                margin-bottom: 10px;
+            }
+
             .info-table th,
             .info-table td {
                 display: block;
@@ -145,6 +301,29 @@
 
             .nav-pills .nav-item {
                 margin-bottom: 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+
+            /* Extra small devices */
+            .teacher-avatar {
+                min-width: 45px !important;
+                min-height: 45px !important;
+                width: 45px !important;
+                height: 45px !important;
+            }
+
+            .class-teacher-avatar {
+                min-width: 80px !important;
+                min-height: 80px !important;
+                width: 80px !important;
+                height: 80px !important;
+            }
+
+            /* Adjust font sizes */
+            .teacher-card p {
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -408,8 +587,8 @@
                             <div class="tab-pane fade" id="subjects">
                                 <h5 class="mb-4"><i class="ti-book me-2"></i> Subjects Enrollment</h5>
 
-                                <div class="table-responsive">
-                                    <table class="table table-hover table-responsive-md table-bordered">
+                                <div class="table-responsive table-responsive-md">
+                                    <table class="table table-hover table-bordered">
                                         <thead class="table-light">
                                             <tr>
                                                 <th>#</th>
@@ -529,13 +708,13 @@
 
                                                     <!-- Clickable Image for Class Teacher Modal -->
                                                     <div class="class-teacher-avatar-container position-relative"
-                                                        style="cursor: pointer; display: inline-block;"
+                                                        style="cursor: pointer; display: inline-block; width: 120px; height: 120px;"
                                                         onclick="openTeacherModal('{{ $avatarImage }}', '{{ $teacherName }}', 'Class Teacher')"
                                                         data-bs-toggle="tooltip" data-bs-title="Click to view photo"
                                                         data-bs-placement="top">
                                                         <img src="{{ $avatarImage }}" alt="Class Teacher"
-                                                            class="img-fluid rounded class-teacher-avatar"
-                                                            style="max-width: 120px; border: 3px solid #dee2e6;">
+                                                            class="class-teacher-avatar"
+                                                            style="width: 100%; height: 100%; object-fit: cover;">
                                                         <div class="avatar-overlay-large">
                                                             <i class="fas fa-search-plus fa-lg"></i>
                                                         </div>
@@ -715,8 +894,8 @@
                                         No Data uploaded yet!
                                     </div>
                                 @else
-                                    <div class="table-responsive">
-                                        <table class="table table-hover package-table table-responsive-md">
+                                    <div class="table-responsive table-responsive-md">
+                                        <table class="table table-hover package-table">
                                             <thead>
                                                 <tr>
                                                     <th>Title</th>
