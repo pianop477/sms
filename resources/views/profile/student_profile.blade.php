@@ -181,7 +181,8 @@
                             {{ ucwords(strtolower($students->first_name . ' ' . $students->middle_name . ' ' . $students->last_name)) }}
                         </h5>
                         <p class="mb-0 text-white text-uppercase">Admission #:
-                            <strong>{{ $students->admission_number }}</strong></p>
+                            <strong>{{ $students->admission_number }}</strong>
+                        </p>
                     </div>
 
                     <div class="card-body">
@@ -405,7 +406,7 @@
 
                             <!-- Subjects Tab -->
                             <div class="tab-pane fade" id="subjects">
-                                <h5 class="mb-4"><i class="ti-book me-2"></i> Subjects Enrollment </span></h5>
+                                <h5 class="mb-4"><i class="ti-book me-2"></i> Subjects Enrollment</h5>
 
                                 <div class="table-responsive">
                                     <table class="table table-hover table-responsive-md table-bordered">
@@ -413,7 +414,6 @@
                                             <tr>
                                                 <th>#</th>
                                                 <th>Subject</th>
-                                                {{-- <th>Code</th> --}}
                                                 <th>Teacher</th>
                                                 <th>Phone</th>
                                             </tr>
@@ -421,7 +421,7 @@
                                         <tbody>
                                             @if ($class_course->isEmpty())
                                                 <tr>
-                                                    <td colspan="5" class="text-danger text-center py-4"> No Available
+                                                    <td colspan="4" class="text-danger text-center py-4">No Available
                                                         subjects assigned!</td>
                                                 </tr>
                                             @else
@@ -430,7 +430,6 @@
                                                         <td>{{ $loop->iteration }}</td>
                                                         <td class="text-capitalize">
                                                             {{ ucwords(strtolower($course->course_name)) }}</td>
-                                                        {{-- <td class="text-uppercase fw-bold">{{ $course->course_code }}</td> --}}
                                                         <td>
                                                             <div class="d-flex align-items-center">
                                                                 @php
@@ -438,11 +437,19 @@
                                                                     $imagePath = storage_path(
                                                                         'app/public/profile/' . $imageName,
                                                                     );
+                                                                    $teacherName = ucwords(
+                                                                        strtolower(
+                                                                            $course->first_name .
+                                                                                ' ' .
+                                                                                $course->last_name,
+                                                                        ),
+                                                                    );
 
                                                                     if (!empty($imageName) && file_exists($imagePath)) {
                                                                         $avatarImage = asset(
                                                                             'storage/profile/' . $imageName,
                                                                         );
+                                                                        $hasImage = true;
                                                                     } else {
                                                                         $avatarImage = asset(
                                                                             'storage/profile/' .
@@ -450,13 +457,26 @@
                                                                                     ? 'avatar.jpg'
                                                                                     : 'avatar-female.jpg'),
                                                                         );
+                                                                        $hasImage = false;
                                                                     }
                                                                 @endphp
-                                                                <img src="{{ $avatarImage }}" alt="Teacher"
-                                                                    class="rounded-circle me-3"
-                                                                    style="width: 40px; height: 40px; object-fit: cover;">
-                                                                <span class="text-capitalize">
-                                                                    {{ ucwords(strtolower($course->first_name . ' ' . $course->last_name)) }}</span>
+
+                                                                <!-- Clickable Image for Modal -->
+                                                                <div class="teacher-avatar-container position-relative"
+                                                                    style="cursor: pointer;"
+                                                                    onclick="openTeacherModal('{{ $avatarImage }}', '{{ $teacherName }}', '{{ $course->course_name }}')"
+                                                                    data-bs-toggle="tooltip"
+                                                                    data-bs-title="Click to view photo"
+                                                                    data-bs-placement="top">
+                                                                    <img src="{{ $avatarImage }}" alt="Teacher"
+                                                                        class="rounded-circle me-3 teacher-avatar"
+                                                                        style="width: 40px; height: 40px; object-fit: cover;">
+                                                                    <div class="avatar-overlay">
+                                                                        <i class="fas fa-search-plus"></i>
+                                                                    </div>
+                                                                </div>
+
+                                                                <span class="text-capitalize">{{ $teacherName }}</span>
                                                             </div>
                                                         </td>
                                                         <td>
@@ -483,15 +503,19 @@
                                     </div>
                                 @else
                                     @foreach ($myClassTeacher as $classTeacher)
-                                        <div class="teacher-card">
+                                        <div class="teacher-card mb-4 p-3 border rounded">
                                             <div class="row">
                                                 <div class="col-md-3 text-center">
                                                     @php
                                                         $imageName = $classTeacher->image ?? '';
                                                         $imagePath = storage_path('app/public/profile/' . $imageName);
+                                                        $teacherName = strtoupper(
+                                                            $classTeacher->first_name . ' ' . $classTeacher->last_name,
+                                                        );
 
                                                         if (!empty($imageName) && file_exists($imagePath)) {
                                                             $avatarImage = asset('storage/profile/' . $imageName);
+                                                            $hasImage = true;
                                                         } else {
                                                             $avatarImage = asset(
                                                                 'storage/profile/' .
@@ -499,16 +523,28 @@
                                                                         ? 'avatar.jpg'
                                                                         : 'avatar-female.jpg'),
                                                             );
+                                                            $hasImage = false;
                                                         }
                                                     @endphp
-                                                    <img src="{{ $avatarImage }}" alt="Class Teacher"
-                                                        class="img-fluid rounded" style="max-width: 100px;">
+
+                                                    <!-- Clickable Image for Class Teacher Modal -->
+                                                    <div class="class-teacher-avatar-container position-relative"
+                                                        style="cursor: pointer; display: inline-block;"
+                                                        onclick="openTeacherModal('{{ $avatarImage }}', '{{ $teacherName }}', 'Class Teacher')"
+                                                        data-bs-toggle="tooltip" data-bs-title="Click to view photo"
+                                                        data-bs-placement="top">
+                                                        <img src="{{ $avatarImage }}" alt="Class Teacher"
+                                                            class="img-fluid rounded class-teacher-avatar"
+                                                            style="max-width: 120px; border: 3px solid #dee2e6;">
+                                                        <div class="avatar-overlay-large">
+                                                            <i class="fas fa-search-plus fa-lg"></i>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div class="col-md-9">
                                                     <div class="row">
                                                         <div class="col-md-6">
-                                                            <p class="mb-1"><strong>Name:</strong>
-                                                                {{ strtoupper($classTeacher->first_name . ' ' . $classTeacher->last_name) }}
+                                                            <p class="mb-1"><strong>Name:</strong> {{ $teacherName }}
                                                             </p>
                                                             <p class="mb-1"><strong>Gender:</strong>
                                                                 {{ strtoupper($classTeacher->gender) }}</p>
@@ -532,6 +568,78 @@
                                         </div>
                                     @endforeach
                                 @endif
+                            </div>
+
+                            <!-- Teacher Image Modal -->
+                            <div class="modal fade" id="teacherImageModal" tabindex="-1"
+                                aria-labelledby="teacherImageModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-primary text-white">
+                                            <h5 class="modal-title" id="teacherImageModalLabel">
+                                                <i class="fas fa-user-circle me-2"></i>
+                                                <span id="modalTeacherName"></span>
+                                            </h5>
+                                            <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal"
+                                                aria-label="Close"><i class="fas fa-close"></i></button>
+                                        </div>
+                                        <div class="modal-body text-center p-4">
+                                            <div class="mb-3">
+                                                <span class="badge bg-info text-white" id="modalTeacherRole"></span>
+                                            </div>
+                                            <div class="image-container position-relative">
+                                                <img id="modalTeacherImage" src="" alt="Teacher Photo"
+                                                    class="img-fluid rounded shadow-lg"
+                                                    style="max-height: 70vh; max-width: 100%; object-fit: contain;">
+
+                                                <!-- Loading Spinner -->
+                                                <div id="imageLoading"
+                                                    class="position-absolute top-50 start-50 translate-middle"
+                                                    style="display: none;">
+                                                    <div class="spinner-border text-primary" role="status">
+                                                        <span class="visually-hidden">Loading...</span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Error Message -->
+                                                <div id="imageError" class="alert alert-danger mt-3"
+                                                    style="display: none;">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                    Failed to load image
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-outline-secondary"
+                                                data-bs-dismiss="modal">
+                                                <i class="fas fa-times me-1"></i> Close
+                                            </button>
+                                            {{-- <button type="button" class="btn btn-primary"
+                                                onclick="downloadTeacherImage()">
+                                                <i class="fas fa-download me-1"></i> Download
+                                            </button> --}}
+                                            <button type="button" class="btn btn-info" onclick="zoomInImage()">
+                                                <i class="fas fa-search-plus me-1"></i> Zoom
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Full Screen Image Modal -->
+                            <div class="modal fade" id="fullScreenImageModal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-fullscreen">
+                                    <div class="modal-content bg-dark">
+                                        <div class="modal-header border-0">
+                                            <button type="button" class="btn-close btn-close-white"
+                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body d-flex align-items-center justify-content-center">
+                                            <img id="fullScreenImage" src="" alt="Full Screen" class="img-fluid"
+                                                style="max-height: 90vh;">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Attendance Tab -->
@@ -681,8 +789,8 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="studentPhotoModalLabel">Student Photo</h5>
-                        <button type="button" class="btn-close btn btn-danger" data-dismiss="modal"
-                            aria-label="Close">Close</button>
+                        <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal" aria-label="Close"><i
+                                class="fas fa-close"></i></button>
                     </div>
                     <div class="modal-body text-center">
                         <h6 class="text-primary mb-3">
@@ -696,6 +804,73 @@
                 </div>
             </div>
         </div>
+        <style>
+            /* Hover effects for avatars */
+            .teacher-avatar-container,
+            .class-teacher-avatar-container {
+                transition: transform 0.3s ease;
+                display: inline-block;
+            }
+
+            .teacher-avatar-container:hover,
+            .class-teacher-avatar-container:hover {
+                transform: scale(1.05);
+            }
+
+            .teacher-avatar-container:hover .teacher-avatar,
+            .class-teacher-avatar-container:hover .class-teacher-avatar {
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            /* Overlay effect */
+            .avatar-overlay,
+            .avatar-overlay-large {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.4);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                color: white;
+            }
+
+            .avatar-overlay-large {
+                border-radius: 8px;
+            }
+
+            .teacher-avatar-container:hover .avatar-overlay,
+            .class-teacher-avatar-container:hover .avatar-overlay-large {
+                opacity: 1;
+            }
+
+            /* Modal custom styling */
+            .modal-content {
+                border-radius: 10px;
+                overflow: hidden;
+            }
+
+            .modal-body .image-container {
+                min-height: 300px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            #modalTeacherImage {
+                transition: transform 0.3s ease;
+            }
+
+            .zoomed {
+                transform: scale(1.5);
+                cursor: move;
+            }
+        </style>
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 // Handle photo view modal
@@ -713,6 +888,148 @@
                 triggerTabList.forEach(function(triggerEl) {
                     new bootstrap.Tab(triggerEl)
                 });
+            });
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const teacherModalElement = document.getElementById('teacherImageModal');
+                const fullScreenModalElement = document.getElementById('fullScreenImageModal');
+                // Initialize Bootstrap tooltips
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+
+                // Initialize modals
+                const teacherModal = new bootstrap.Modal(document.getElementById('teacherImageModal'));
+                const fullScreenModal = new bootstrap.Modal(document.getElementById('fullScreenImageModal'));
+
+                // Track current image for zoom functionality
+                let currentImageUrl = '';
+                let isZoomed = false;
+
+                // Global function to open teacher modal
+                window.openTeacherModal = function(imageUrl, teacherName, teacherRole) {
+                    currentImageUrl = imageUrl;
+
+                    // Set modal content
+                    document.getElementById('modalTeacherName').textContent = teacherName;
+                    document.getElementById('modalTeacherRole').textContent = teacherRole;
+
+                    // Show loading spinner
+                    document.getElementById('imageLoading').style.display = 'block';
+                    document.getElementById('imageError').style.display = 'none';
+                    document.getElementById('modalTeacherImage').style.display = 'none';
+
+                    // Load image
+                    const img = new Image();
+                    img.onload = function() {
+                        document.getElementById('modalTeacherImage').src = imageUrl;
+                        document.getElementById('modalTeacherImage').style.display = 'block';
+                        document.getElementById('imageLoading').style.display = 'none';
+                        resetImageZoom();
+                    };
+
+                    img.onerror = function() {
+                        document.getElementById('imageLoading').style.display = 'none';
+                        document.getElementById('imageError').style.display = 'block';
+                    };
+
+                    img.src = imageUrl;
+
+                    // Show modal
+                    teacherModal.show();
+                };
+
+                // Function to download image
+                window.downloadTeacherImage = function() {
+                    if (!currentImageUrl) return;
+
+                    const link = document.createElement('a');
+                    link.href = currentImageUrl;
+                    link.download = 'teacher_photo_' + Date.now() + '.jpg';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    // Show toast notification (optional)
+                    showToast('Download started', 'success');
+                };
+
+                // Function to zoom image
+                window.zoomInImage = function() {
+                    const image = document.getElementById('modalTeacherImage');
+
+                    if (!isZoomed) {
+                        image.classList.add('zoomed');
+                        isZoomed = true;
+
+                        // Add click to view full screen
+                        image.style.cursor = 'zoom-out';
+                        image.onclick = function() {
+                            openFullScreenModal(currentImageUrl);
+                        };
+
+                        // Update button text
+                        document.querySelector('.btn-info i').className = 'fas fa-search-minus me-1';
+                    } else {
+                        resetImageZoom();
+                    }
+                };
+
+                // Function to reset zoom
+                function resetImageZoom() {
+                    const image = document.getElementById('modalTeacherImage');
+                    image.classList.remove('zoomed');
+                    image.style.cursor = 'default';
+                    image.onclick = null;
+                    isZoomed = false;
+
+                    // Update button text
+                    document.querySelector('.btn-info i').className = 'fas fa-search-plus me-1';
+                }
+
+                // Function to open full screen modal
+                window.openFullScreenModal = function(imageUrl) {
+                    document.getElementById('fullScreenImage').src = imageUrl;
+                    fullScreenModal.show();
+                };
+
+                // Close full screen modal with ESC key
+                document.getElementById('fullScreenImageModal').addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        fullScreenModal.hide();
+                    }
+                });
+
+                // Keyboard navigation for teacher modal
+                document.getElementById('teacherImageModal').addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        resetImageZoom();
+                    }
+                });
+
+                // Function to show toast (optional)
+                function showToast(message, type) {
+                    // You can implement toast notification here
+                    // Example: using Bootstrap toasts
+                    console.log(message, type);
+                }
+
+                // Make teacher images tabbable for accessibility
+                document.querySelectorAll('.teacher-avatar-container, .class-teacher-avatar-container').forEach(
+                    container => {
+                        container.setAttribute('tabindex', '0');
+                        container.addEventListener('keydown', function(e) {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                const img = this.querySelector('img');
+                                const name = this.closest('.d-flex').querySelector('span').textContent ||
+                                    this.closest('.teacher-card').querySelector('strong').textContent;
+                                const role = this.closest('tr') ? 'Subject Teacher' : 'Class Teacher';
+                                openTeacherModal(img.src, name.trim(), role);
+                            }
+                        });
+                    });
             });
         </script>
     @endsection
