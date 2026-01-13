@@ -1044,11 +1044,9 @@ class ResultsController extends Controller
     public function publishResult(Request $request, $school, $year, $class, $examType, $month, $date)
     {
         try {
-
             $school_id = Hashids::decode($school);
             $class_id = Hashids::decode($class);
             $exam_id = Hashids::decode($examType);
-            // dd($school_id, $class_id, $exam_id);
 
             $user = Auth::user();
             $schools = School::find($school_id[0]);
@@ -1057,156 +1055,213 @@ class ResultsController extends Controller
                 return response()->json(['success' => false, 'message' => 'You are not authorized to perform this action.', 'type' => 'error']);
             }
 
-            // Update status in the database
+            // ==== REKEDISHA: Update status in the database ====
             $updatedRows = Examination_result::join('students', 'students.id', '=', 'examination_results.student_id')
                 ->where('examination_results.school_id', $schools->id)
-                ->where('examination_results.class_id', $class_id[0])
+                ->where('examination_results.class_id', $class_id[0]) // Tumia class_id kutoka URL
                 ->where('examination_results.exam_type_id', $exam_id[0])
-                ->where('students.status', 1) //only active students
+                ->where('students.status', 1) // only active students
                 ->whereDate('examination_results.exam_date', $date)
                 ->update(['examination_results.status' => 2]);
 
-            if ($updatedRows) {
-                // If status is 2 (Published), send SMS notifications
-                $studentResults = Examination_result::join('students', 'students.id', '=', 'examination_results.student_id')
-                    ->join('subjects', 'subjects.id', 'examination_results.course_id')
+            if ($updatedRows > 0) {
+                // ==== REKEDISHA: Fetch all results for ranking calculation ====
+                $allStudentResults = Examination_result::query()
+                    ->join('students', 'students.id', '=', 'examination_results.student_id')
+                    ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
                     ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
                     ->join('schools', 'schools.id', '=', 'examination_results.school_id')
-                    ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
-                    ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+                    ->where('examination_results.class_id', $class_id[0]) // Tumia class_id kutoka URL
+                    ->where('students.status', 1) // only active students
+                    ->where('examination_results.school_id', $schools->id)
+                    ->where('examination_results.exam_type_id', $exam_id[0])
+                    ->whereDate('examination_results.exam_date', $date)
                     ->select(
                         'examination_results.*',
-                        'users.phone',
+                        'students.id as student_id',
                         'students.first_name',
                         'students.middle_name',
                         'students.last_name',
+                        'students.parent_id',
                         'students.status',
                         'examinations.exam_type',
                         'subjects.course_name',
                         'subjects.course_code',
                         'schools.school_name'
                     )
-                    ->where('examination_results.class_id', $class_id[0])
-                    ->where('students.status', 1) //only active students
-                    ->where('examination_results.school_id', $schools->id)
-                    ->where('examination_results.exam_type_id', $exam_id[0])
-                    ->where('examination_results.status', 2) // Published results
-                    ->whereDate('examination_results.exam_date', $date)
                     ->get();
 
-                // Remove duplicate student entries
-                $studentsData = $studentResults->unique('student_id')->values();
+                // Group results by student
+                $studentsGrouped = $allStudentResults->groupBy('student_id');
 
-                // Calculate ranks based on total marks
-                $studentsData = $studentsData->map(function ($student) use ($studentResults) {
-                    $courses = $studentResults->where('student_id', $student->student_id)
-                        ->map(fn($result) => "{$result->course_code}={$result->score}")
-                        ->implode("\n");
+                // Calculate total marks for each student
+                $studentsData = collect();
+                foreach ($studentsGrouped as $studentId => $studentResults) {
+                    $firstResult = $studentResults->first();
+                    $totalMarks = $studentResults->sum('score');
+                    $averageMarks = $studentResults->count() > 0 ? $totalMarks / $studentResults->count() : 0;
 
-                    $totalMarks = $studentResults->where('student_id', $student->student_id)->sum('score');
-                    $averageMarks = $totalMarks / $studentResults->where('student_id', $student->student_id)->count();
+                    // Prepare courses string
+                    $courses = $studentResults->map(function ($result) {
+                        return "{$result->course_code}={$result->score}";
+                    })->implode("\n");
 
-                    $student->courses = $courses;
-                    $student->total_marks = $totalMarks;
-                    $student->average_marks = $averageMarks;
+                    $studentsData->push([
+                        'student_id' => $studentId,
+                        'first_name' => $firstResult->first_name,
+                        'middle_name' => $firstResult->middle_name,
+                        'last_name' => $firstResult->last_name,
+                        'parent_id' => $firstResult->parent_id,
+                        'total_marks' => $totalMarks,
+                        'average_marks' => $averageMarks,
+                        'courses' => $courses,
+                        'exam_type' => $firstResult->exam_type,
+                    ]);
+                }
 
-                    return $student;
-                });
+                // Sort by total marks descending
+                $sortedStudents = $studentsData->sortByDesc('total_marks')->values();
 
-                // Sort students by total marks in descending order
-                $studentsData = $studentsData->sortByDesc('total_marks')->values();
-                $term = $studentResults->first()->Exam_term;
-
+                // Calculate ranks with tie handling
                 $rank = 1;
                 $previousScore = null;
                 $previousRank = null;
+                $rankedStudents = collect();
 
-                $studentsData = $studentsData->map(function ($student, $index) use (&$rank, &$previousScore, &$previousRank) {
-                    if ($previousScore !== null && $student->total_marks < $previousScore) {
-                        $rank = $index + 1; // Rank inabadilika tu kama alama ni tofauti
+                foreach ($sortedStudents as $index => $student) {
+                    if ($previousScore !== null && $student['total_marks'] < $previousScore) {
+                        $rank = $index + 1;
                     }
 
-                    // Kama alama ni sawa na ya mwanafunzi uliopita, tumia rank sawa
-                    if ($previousScore !== null && $student->total_marks == $previousScore) {
-                        $student->rank = $previousRank; // Wanafunzi wawili wapate rank sawa
+                    if ($previousScore !== null && $student['total_marks'] == $previousScore) {
+                        // Same score, same rank
+                        $student['rank'] = $previousRank;
                     } else {
-                        $student->rank = $rank;
+                        $student['rank'] = $rank;
                         $previousRank = $rank;
                     }
 
-                    $previousScore = $student->total_marks;
-                    return $student;
-                });
+                    $rankedStudents->push($student);
+                    $previousScore = $student['total_marks'];
+                }
 
-                // School URL
+                $totalStudents = $rankedStudents->count();
                 $url = "https://shuleapp.tech";
-                $beemSmsService = new BeemSmsService();
+                $dateFormat = Carbon::parse($date)->format('d-m-Y');
+                $nextSmsService = new NextSmsService();
+                $sender = $schools->sender_id ?? "SHULE APP";
 
-                // Find total number of students
-                $totalStudents = $studentsData->count();
+                // ==== REKEDISHA: Track SMS sending results ====
+                $successCount = 0;
+                $failCount = 0;
+                $failedStudents = [];
 
-                // Loop through each student and prepare the payload for each parent
-                foreach ($studentsData as $student) {
-                    $phoneNumber = $this->formatPhoneNumber($student->phone);
-                    $dateFormat = Carbon::parse($date)->format('d-m-Y');
-                    $fullname = $student->first_name . ' ' . $student->last_name;
-                    if (!$phoneNumber) {
-                        // Log::error("Invalid phone number for {$student->first_name}: {$student->phone}");
-                        return response()->json([
-                            'success' => false,
-                            'message' => "Invalid phone number for {$student->first_name}",
-                            'type' => 'error'
-                        ]);
-                    }
+                // Loop through ranked students and send SMS
+                foreach ($rankedStudents as $student) {
+                    try {
+                        // ==== REKEDISHA: Fetch parent and phone information ====
+                        $parent = Parents::find($student['parent_id']);
 
-                    // Construct the SMS message
-                    $messageContent = "Matokeo ya " . strtoupper($fullname) . ", \n";
-                    $messageContent .= "Mtihani wa " . strtoupper($student->exam_type) . ", wa Tar. {$dateFormat} ni: \n";
-                    $messageContent .= strtoupper($student->courses) . "\n";
-                    $messageContent .= "Jumla {$student->total_marks}, Wastani " . number_format($student->average_marks) . ", Nafasi ya {$student->rank} kati ya {$totalStudents}. \n";
-                    $messageContent .= "Pakua ripoti hapa {$url} ";
+                        if (!$parent) {
+                            // Log::warning("Parent not found for student ID: {$student['student_id']}");
+                            $failCount++;
+                            $failedStudents[] = $student['first_name'] . ' ' . $student['last_name'];
+                            continue;
+                        }
 
-                    // Prepare the recipients array
-                    $recipients = [
-                        [
-                            'recipient_id' => $student->student_id, // Unique ID for each recipient
-                            'dest_addr' => $phoneNumber, // Parent's phone number
-                        ]
-                    ];
+                        $user = User::find($parent->user_id);
 
-                    // Send SMS to each parent individually using Beem API
-                    $source_Addr = $schools->sender_id ?? 'shuleApp';
-                    // $beemSmsService->sendSms($source_Addr, $messageContent, $recipients);
+                        if (!$user || empty($user->phone)) {
+                            // Log::warning("User or phone not found for parent ID: {$parent->id}");
+                            $failCount++;
+                            $failedStudents[] = $student['first_name'] . ' ' . $student['last_name'];
+                            continue;
+                        }
 
-                    // Send using nextSMS API (option 2)
-                    $nextSmsService = new NextSmsService();
-                    $payload = [
-                        'from' => $schools->sender_id ?? "SHULE APP",
-                        'to' => $phoneNumber,
-                        'text' => $messageContent,
-                        'reference' => $student->student_id
-                    ];
-                    $response = $nextSmsService->sendSmsByNext(
-                        $payload['from'],
-                        $payload['to'],
-                        $payload['text'],
-                        $payload['reference']
-                    );
+                        $phoneNumber = $this->formatPhoneNumber($user->phone);
 
-                    // Log::info("NextSMS Payload: ". $payload['text']);
+                        if (!$phoneNumber) {
+                            // Log::warning("Invalid phone number format: {$user->phone}");
+                            $failCount++;
+                            $failedStudents[] = $student['first_name'] . ' ' . $student['last_name'];
+                            continue;
+                        }
 
-                    if (!$response['success']) {
-                        Alert()->toast('SMS failed: ' . $response['error'], 'error');
-                        return back();
+                        // ==== REKEDISHA: Create better formatted message ====
+                        $fullname = $student['first_name'] . ' ' . $student['last_name'];
+                        $message = "MATOKEO YA " . strtoupper($fullname) . "\n";
+                        $message .= "==========================\n";
+                        $message .= "Mtihani: " . strtoupper($student['exam_type']) . "\n";
+                        $message .= "Tarehe: {$dateFormat}\n";
+                        $message .= "==========================\n";
+                        $message .= "MATOKEO YA MASOMO:\n";
+
+                        // Parse courses string and format better
+                        $coursesArray = explode("\n", $student['courses']);
+                        foreach ($coursesArray as $course) {
+                            $message .= strtoupper($course) . "\n";
+                        }
+
+                        $message .= "==========================\n";
+                        $message .= "Jumla: {$student['total_marks']}\n";
+                        $message .= "Wastani: " . number_format($student['average_marks'], 1) . "\n";
+                        $message .= "Nafasi: {$student['rank']} kati ya {$totalStudents}\n";
+                        $message .= "==========================\n";
+                        $message .= "Pakua ripoti: {$url}";
+
+                        // Check message length
+                        if (strlen($message) > 480) {
+                            $message = substr($message, 0, 477) . "...";
+                        }
+
+                        // Send SMS
+                        $response = $nextSmsService->sendSmsByNext(
+                            $sender,
+                            $phoneNumber,
+                            $message,
+                            $student['student_id'] . '_' . uniqid()
+                        );
+
+                        if ($response['success']) {
+                            $successCount++;
+                            // Log::info("SMS sent successfully to {$phoneNumber} for {$fullname}");
+                        } else {
+                            $failCount++;
+                            $failedStudents[] = $fullname;
+                            // Log::error("SMS failed for {$fullname}: {$response['error']}");
+                        }
+
+                        // Add small delay to avoid rate limiting
+                        usleep(50000); // 0.05 second delay
+
+                    } catch (\Exception $e) {
+                        $failCount++;
+                        $failedStudents[] = $student['first_name'] . ' ' . $student['last_name'];
+                        // Log::error("Error sending SMS for student ID {$student['student_id']}: " . $e->getMessage());
+                        continue;
                     }
                 }
 
-                // Log::info("Send SMS: ". $payload['text']);
-                Alert()->toast('Results published and sent to parents successfully', 'success');
+                // ==== REKEDISHA: Show appropriate message ====
+                if ($successCount == 0 && $failCount > 0) {
+                    Alert()->toast("Results published but failed to send SMS to all {$failCount} parents", 'error');
+                } elseif ($failCount > 0) {
+                    $failedNames = implode(', ', array_slice($failedStudents, 0, 5));
+                    if (count($failedStudents) > 5) {
+                        $failedNames .= ' and ' . (count($failedStudents) - 5) . ' more';
+                    }
+                    Alert()->toast("Results published! {$successCount} SMS sent, {$failCount} failed (e.g., {$failedNames})", 'warning');
+                } else {
+                    Alert()->toast("Results published and SMS sent to {$successCount} parents successfully!", 'success');
+                }
+
+                return back();
+            } else {
+                Alert()->toast('No results found to publish', 'warning');
                 return back();
             }
         } catch (Exception $e) {
-            Alert()->toast($e->getMessage(), 'error');
+            Alert()->toast('Error: ' . $e->getMessage(), 'error');
             return back();
         }
     }
@@ -1466,7 +1521,7 @@ class ResultsController extends Controller
 
         $monthValue = $monthsArray[$month];
 
-        // First query (unchanged as it works correctly)
+        // ==== REKEDISHA: Add teacher_id kwenye select ====
         $results = Examination_result::query()
             ->join('students', 'students.id', '=', 'examination_results.student_id')
             ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
@@ -1499,6 +1554,7 @@ class ResultsController extends Controller
                 'schools.postal_name',
                 'schools.logo',
                 'schools.country',
+                'teachers.id as teacher_id' // ==== REKEDISHA: Ongeza teacher_id ====
             )
             ->where('examination_results.student_id', $studentId->id)
             ->where('examination_results.exam_type_id', $exam_id[0])
@@ -1509,18 +1565,18 @@ class ResultsController extends Controller
 
         // Calculate scores
         $totalScore = $results->sum('score');
-        $averageScore = $totalScore / $results->count();
+        $averageScore = $results->count() > 0 ? $totalScore / $results->count() : 0;
 
-        // Fixed ranking query
+        // ==== REKEDISHA 1: Ranking query - tumia class_id[0] badala ya studentId->class_id ====
         $rankings = Examination_result::query()
-            ->where('examination_results.class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
-            ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
-            ->where('examination_results.exam_type_id', $exam_id[0]) // Angalia aina ya mtihani
+            ->where('examination_results.class_id', $class_id[0]) // TUMIA CLASS_ID KUTOKA URL
+            ->whereDate('exam_date', Carbon::parse($date))
+            ->where('examination_results.exam_type_id', $exam_id[0])
             ->where('examination_results.school_id', $user->school_id)
-            ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
             ->select('student_id', DB::raw('SUM(score) as total_score'))
             ->groupBy('student_id')
-            ->orderByDesc('total_score') // Pangilia kwa score kwanza
+            ->orderByDesc('total_score')
             ->get();
 
         // Kutengeneza mfumo wa tie ranking
@@ -1538,7 +1594,6 @@ class ResultsController extends Controller
 
         // Kupata rank ya mwanafunzi husika
         $studentRank = $ranks[$studentId->id] ?? null;
-
 
         // Add grades, remarks, and individual ranks to each result
         foreach ($results as $result) {
@@ -1579,43 +1634,60 @@ class ResultsController extends Controller
                 }
             }
 
+            // ==== REKEDISHA 2: Course ranking - tumia class_id[0] ====
             $courseRankings = Examination_result::query()
                 ->where('course_id', $result->course_id)
-                ->where('examination_results.class_id', $studentId->class_id) // Angalia wanafunzi wa darasa hili pekee
-                ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
-                ->where('examination_results.exam_type_id', $exam_id[0]) // Angalia aina ya mtihani
+                ->where('examination_results.class_id', $class_id[0]) // TUMIA CLASS_ID KUTOKA URL
+                ->whereDate('exam_date', Carbon::parse($date))
+                ->where('examination_results.exam_type_id', $exam_id[0])
                 ->where('examination_results.school_id', $user->school_id)
-                ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
+                ->join('students', 'students.id', '=', 'examination_results.student_id')
                 ->select('student_id', DB::raw('SUM(score) as total_score'))
                 ->groupBy('student_id')
-                ->orderByDesc('total_score') // Pangilia kwa score kwanza
+                ->orderByDesc('total_score')
                 ->get();
 
             // Hakikisha wanafunzi wenye score sawa wanashirikiana rank
             $rank = 1;
             $previousScore = null;
-            $ranks = [];
+            $courseRanks = []; // ==== REKEDISHA: Badilisha jina la variable ====
 
             foreach ($courseRankings as $key => $ranking) {
                 if ($previousScore !== null && $ranking->total_score < $previousScore) {
                     $rank = $key + 1;
                 }
-                $ranks[$ranking->student_id] = $rank;
+                $courseRanks[$ranking->student_id] = $rank;
                 $previousScore = $ranking->total_score;
             }
 
             // Kupata rank ya mwanafunzi husika
-            $result->courseRank = $ranks[$studentId->id] ?? null;
+            $result->courseRank = $courseRanks[$studentId->id] ?? null;
+
+            // ==== REKEDISHA 3: Ongeza mwalimu aliyepakia matokeo ====
+            // Tafuta maelezo kamili ya mwalimu aliyepakia
+            if ($result->teacher_id) {
+                $uploadingTeacher = DB::table('teachers')
+                    ->join('users', 'users.id', '=', 'teachers.user_id')
+                    ->where('teachers.id', $result->teacher_id)
+                    ->select('users.first_name', 'users.last_name')
+                    ->first();
+
+                if ($uploadingTeacher) {
+                    $result->uploading_teacher_name = $uploadingTeacher->first_name . ' ' . $uploadingTeacher->last_name;
+                    $result->uploading_teacher_initials = $uploadingTeacher->first_name . '. ' . substr($uploadingTeacher->last_name, 0, 1);
+                }
+            }
         }
+
         // Generate QR payload with summary
         $verificationData = [
             'student_name' => trim($studentId->first_name . ' ' . $studentId->middle_name . ' ' . $studentId->last_name),
             'admission_number' => $studentId->admission_number,
-            'class' => $results->first()->class_name,
-            'report_type' => $results->first()->exam_type . ' Assessment',
-            'term' => $results->first()->Exam_term,
-            'school' => $results->first()->school_name,
-            'report_date' => \Carbon\Carbon::parse($date)->format('Y-m-d'),
+            'class' => $results->isNotEmpty() ? $results->first()->class_name : '-',
+            'report_type' => $results->isNotEmpty() ? $results->first()->exam_type . ' Assessment' : 'Assessment',
+            'term' => $results->isNotEmpty() ? $results->first()->Exam_term : '-',
+            'school' => $results->isNotEmpty() ? $results->first()->school_name : $schools->school_name,
+            'report_date' => Carbon::parse($date)->format('Y-m-d'),
             'report_id' => sha1($studentId->id . $exam_id[0] . $class_id[0] . $date),
             'issued_at' => now()->timestamp,
 
@@ -1625,7 +1697,6 @@ class ResultsController extends Controller
             'student_rank' => $studentRank,
             'total_students' => $rankings->count(),
         ];
-
 
         // Sign and encrypt
         $verificationData['signature'] = hash_hmac('sha256', json_encode($verificationData), config('app.key'));
@@ -1645,20 +1716,17 @@ class ResultsController extends Controller
         // Pass the calculated data to the view
         $pdf = \PDF::loadView('Results.parent_results', compact('results', 'year', 'date', 'examType', 'studentId', 'student', 'month', 'totalScore', 'averageScore', 'studentRank', 'rankings', 'qrPng'));
 
-        return $pdf->stream($results->first()->first_name . ' Results ' . $month . ' ' . $year . '.pdf');
+        return $pdf->stream($results->isNotEmpty() ? $results->first()->first_name . ' Results ' . $month . ' ' . $year . '.pdf' : 'Report_' . $year . '.pdf');
     }
 
     //Re-send sms results individually
     public function sendResultSms($school, $year, $class, $examType, $month, $student_id, $date)
     {
         try {
-
             $school_id = Hashids::decode($school);
             $class_id = Hashids::decode($class);
             $exam_id = Hashids::decode($examType);
             $student = Hashids::decode($student_id);
-
-            // dd($school_id, $class_id, $student, $exam_id);
 
             $schools = school::find($school_id[0]);
             $user = Auth::user();
@@ -1707,10 +1775,8 @@ class ResultsController extends Controller
                 )
                 ->where('examination_results.student_id', $studentInfo->id)
                 ->where('examination_results.exam_type_id', $exam_id[0])
-                ->where('examination_results.class_id', $class_id[0])
+                ->where('examination_results.class_id', $class_id[0]) // Tumia class_id kutoka URL
                 ->where('students.status', 1)
-                // ->whereYear('examination_results.exam_date', $year)
-                // ->whereMonth('examination_results.exam_date', $monthValue)
                 ->where('examination_results.school_id', $schools->id)
                 ->whereDate('examination_results.exam_date', $date)
                 ->where('examination_results.status', 2)
@@ -1718,7 +1784,6 @@ class ResultsController extends Controller
 
             // Hakikisha kuwa kuna data kwenye $results
             if ($results->isEmpty()) {
-                // Log::error("Hakuna matokeo yaliyopatikana kwa mwanafunzi: {$studentInfo->id}");
                 Alert()->toast('This result data set is locked 🔐', 'error');
                 return redirect()->back();
             }
@@ -1727,16 +1792,17 @@ class ResultsController extends Controller
             $totalScore = $results->sum('score');
             $averageScore = $results->count() > 0 ? $totalScore / $results->count() : 0;
 
-            // Determine the student's overall rank
+            // ==== REKEDISHA: Determine the student's overall rank ====
+            // Tumia class_id[0] badala ya studentInfo->class_id
             $rankings = Examination_result::query()
-                ->where('examination_results.class_id', $studentInfo->class_id) // Angalia wanafunzi wa darasa hili pekee
-                ->whereDate('exam_date', Carbon::parse($date)) // Angalia mtihani wa tarehe husika pekee
+                ->where('examination_results.class_id', $class_id[0]) // TUMIA CLASS_ID KUTOKA URL
+                ->whereDate('exam_date', Carbon::parse($date))
                 ->where('examination_results.exam_type_id', $exam_id[0])
                 ->where('examination_results.school_id', $schools->id)
-                ->join('students', 'students.id', '=', 'examination_results.student_id') // Kuunganisha na students
+                ->join('students', 'students.id', '=', 'examination_results.student_id')
                 ->select('student_id', DB::raw('SUM(score) as total_score'))
                 ->groupBy('student_id')
-                ->orderByDesc('total_score') // Pangilia kwa score kwanza
+                ->orderByDesc('total_score')
                 ->get();
 
             // Kutengeneza mfumo wa tie ranking
@@ -1755,6 +1821,25 @@ class ResultsController extends Controller
             // Kupata rank ya mwanafunzi husika
             $studentRank = $ranks[$studentInfo->id] ?? null;
 
+            // ==== REKEDISHA: Ongeza ukaguzi wa kama mwanafunzi alishiriki mtihani ====
+            // Ikiwa $studentRank ni null, labda mwanafunzi hakushiriki mtihani huo
+            if ($studentRank === null) {
+                // Angalia kama mwanafunzi huyu yuko kwenye rankings
+                $studentInRankings = $rankings->contains('student_id', $studentInfo->id);
+
+                if (!$studentInRankings) {
+                    // Mwanafunzi hakushiriki mtihani huo katika darasa hilo
+                    $studentRank = 'N/A';
+                    $totalStudents = 0;
+                } else {
+                    // Mwanafunzi yuko kwenye rankings lakini rank imekosekana
+                    $studentRank = 'N/A';
+                    $totalStudents = $rankings->count();
+                }
+            } else {
+                $totalStudents = $rankings->count();
+            }
+
             // Prepare the message content
             $fullName = $studentInfo->first_name . ' ' . $studentInfo->last_name;
             $examination = $results->first()->exam_type;
@@ -1766,39 +1851,59 @@ class ResultsController extends Controller
                 $courseScores[] = "{$result->course_code}={$result->score} \n";
             }
 
-            $totalStudents = $rankings->count();
             $url = 'https://shuleapp.tech';
             $dateFormat = Carbon::parse($date)->format('d-m-Y');
 
             // find the parent phone number
             $parent = Parents::where('id', $studentInfo->parent_id)->first();
-            // return $parent;
-            //find phone related to parent in users table
+
+            if (!$parent) {
+                Alert()->toast('Parent information not found for this student', 'error');
+                return redirect()->back();
+            }
+
+            // find phone related to parent in users table
             $users = User::where('id', $parent->user_id)->first();
-            // return $users->phone;
 
-            //prepare send sms payload to send via Beem API *************************************
-            $sourceAddr = $schools->sender_id ?? 'shuleApp';
-            $recipient_id = 1;
-            $phone = $this->formatPhoneNumber($users->phone);
-            $recipients = [
-                [
-                    'recipient_id' => $recipient_id++,
-                    'dest_addr' => $phone
-                ],
-            ];
+            if (!$users || empty($users->phone)) {
+                Alert()->toast('Parent phone number not found', 'error');
+                return redirect()->back();
+            }
 
-            //send sms by Beem API
-            // $response = $beemSmsService->sendSms($sourceAddr, $messageContent, $recipients);
+            // ==== REKEDISHA: Prepare message with better formatting ====
+            $messageContent = "Matokeo ya " . strtoupper($fullName) . "\n";
+            $messageContent .= "Mtihani: " . strtoupper($examination) . "\n";
+            $messageContent .= "Tarehe: {$dateFormat}\n";
+            $messageContent .= "--------------------------------\n";
 
-            // send sms via NextSMS API ************************************************************
+            // Add course scores with better formatting
+            foreach ($results as $result) {
+                $messageContent .= strtoupper($result->course_code) . ": {$result->score}\n";
+            }
+
+            $messageContent .= "--------------------------------\n";
+            $messageContent .= "Jumla: {$totalScore}\n";
+            $messageContent .= "Wastani: " . number_format($averageScore, 1) . "\n";
+            $messageContent .= "Nafasi: {$studentRank}";
+
+            if ($totalStudents > 0) {
+                $messageContent .= " kati ya {$totalStudents}\n";
+            }
+
+            $messageContent .= "--------------------------------\n";
+            $messageContent .= "Pakua ripoti: {$url}";
+
+            // Check message length
+            $messageLength = strlen($messageContent);
+            if ($messageLength > 480) {
+                // Trim message if too long
+                $messageContent = substr($messageContent, 0, 477) . "...";
+            }
+
+            // send sms via NextSMS API
             $nextSmsService = new NextSmsService();
             $sender = $schools->sender_id ?? "SHULE APP";
             $destination = $this->formatPhoneNumber($users->phone);
-            $messageContent = "Matokeo ya " . strtoupper($fullName) . ", Mtihani wa " . strtoupper($examination) . ",\n";
-            $messageContent .= "wa Tar. {$dateFormat} ni: \n";
-            $messageContent .= strtoupper(implode($courseScores));
-            $messageContent .= "Jumla $totalScore, Wastani " . number_format($averageScore) . ", Nafasi $studentRank kati ya $totalStudents. Pakua ripoti hapa {$url}";
             $reference = uniqid();
 
             $payload = [
@@ -1808,16 +1913,13 @@ class ResultsController extends Controller
                 'reference' => $reference
             ];
 
-            // Output the message content (or send it via SMS)
-            // Log::info("Sending sms to ". $messageContent);
-
             $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
             if (!$response['success']) {
                 Alert()->toast('SMS failed: ' . $response['error'], 'error');
                 return back();
             }
-            // return $response;
+
             Alert()->toast('Results SMS has been Re-sent successfully', 'success');
             return redirect()->back();
         } catch (Exception $e) {
@@ -2322,176 +2424,203 @@ class ResultsController extends Controller
 
     public function sendSmsForCombinedReport($school, $year, $class, $report, $student)
     {
-        $studentId = Hashids::decode($student)[0];
-        $schoolId = Hashids::decode($school)[0];
-        $classId = Hashids::decode($class)[0];
-        $reportId = Hashids::decode($report)[0];
+        try {
+            $studentId = Hashids::decode($student)[0];
+            $schoolId = Hashids::decode($school)[0];
+            $classId = Hashids::decode($class)[0];
+            $reportId = Hashids::decode($report)[0];
 
-        $reports = generated_reports::findOrFail($reportId);
+            $reports = generated_reports::findOrFail($reportId);
 
-        if ($reports->status == 1) {
-            $examDates = $reports->exam_dates;
+            if ($reports->status == 1) {
+                $examDates = $reports->exam_dates;
 
-            // STEP 1: Fetch all results for the student
-            $results = Examination_result::query()
-                ->join('students', 'students.id', '=', 'examination_results.student_id')
-                ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-                ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-                ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-                ->where('examination_results.student_id', $studentId)
-                ->where('examination_results.class_id', $classId)
-                ->where('examination_results.school_id', $schoolId)
-                ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                ->select(
-                    'students.id as student_id',
-                    'students.first_name',
-                    'students.last_name',
-                    'students.parent_id',
-                    'students.gender',
-                    'examination_results.score',
-                    'examination_results.exam_date',
-                    'examination_results.course_id',
-                    'grades.class_name',
-                    'examinations.symbolic_abbr',
-                    'subjects.course_code'
-                )
-                ->get();
+                // ==== REKEDISHA: Pata class_id ya kwenye generated_reports ====
+                $storedClassId = $reports->class_id ?? $classId;
 
-            if ($results->isEmpty()) {
-                Alert()->toast('No results found for this student.', 'error');
-                return to_route('students.combined.report', ['school' => $school, 'year' => $year, 'class' => $class, 'report' => $report]);
-            }
+                // STEP 1: Fetch all results for the student
+                $results = Examination_result::query()
+                    ->join('students', 'students.id', '=', 'examination_results.student_id')
+                    ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+                    ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+                    ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+                    ->where('examination_results.student_id', $studentId)
+                    ->where('examination_results.class_id', $storedClassId) // TUMIA STORED CLASS ID
+                    ->where('examination_results.school_id', $schoolId)
+                    ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                    ->select(
+                        'students.id as student_id',
+                        'students.first_name',
+                        'students.last_name',
+                        'students.parent_id',
+                        'students.gender',
+                        'examination_results.score',
+                        'examination_results.exam_date',
+                        'examination_results.course_id',
+                        'grades.class_name',
+                        'examinations.symbolic_abbr',
+                        'subjects.course_code'
+                    )
+                    ->get();
 
-            // STEP 2: Group results by subject and calculate averages
-            $subjectAverages = $results->groupBy('course_id')->map(function ($subjectResults) {
-                return [
-                    'course_code' => $subjectResults->first()->course_code,
-                    'average' => $subjectResults->avg('score')
-                ];
-            });
-
-            // STEP 2: Calculate totals
-            $studentTotal = $results->sum('score');
-            $studentAverageTotal = number_format($subjectAverages->sum('average'));
-            $studentAverage = $results->avg('score');
-
-            // STEP 3: Calculate position WITH TIE RANKING (like publishCombinedReport)
-            $allStudentsScores = Examination_result::where('class_id', $reports->class_id)
-                ->where('school_id', $schoolId)
-                ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
-                ->get()
-                ->groupBy('student_id')
-                ->map(function ($studentResults) {
-                    return $studentResults->sum('score');
-                })
-                ->sortDesc();
-
-            // Apply tie ranking logic
-            $sortedStudents = $allStudentsScores->sortDesc()->values();
-
-            $rank = 1;
-            $previousScore = null;
-            $studentsWithRank = collect();
-
-            foreach ($sortedStudents as $index => $score) {
-                if ($previousScore !== null && $score < $previousScore) {
-                    $rank = $index + 1; // Only increase rank if score is different
+                if ($results->isEmpty()) {
+                    Alert()->toast('No results found for this student.', 'error');
+                    return to_route('students.combined.report', ['school' => $school, 'year' => $year, 'class' => $class, 'report' => $report]);
                 }
 
-                $studentsWithRank->push([
-                    'student_id' => $allStudentsScores->keys()[$index],
-                    'score' => $score,
-                    'rank' => $rank
-                ]);
+                // STEP 2: Group results by subject and calculate averages
+                $subjectAverages = $results->groupBy('course_id')->map(function ($subjectResults) {
+                    return [
+                        'course_code' => $subjectResults->first()->course_code,
+                        'average' => $subjectResults->avg('score')
+                    ];
+                });
 
-                $previousScore = $score;
-            }
+                // STEP 2: Calculate totals
+                $studentTotal = $results->sum('score');
+                $studentAverageTotal = number_format($subjectAverages->sum('average'));
+                $studentAverage = $results->avg('score');
 
-            // Find current student's position
-            $studentRank = $studentsWithRank->firstWhere('student_id', $studentId)['rank'] ?? '-';
-            $totalStudents = $sortedStudents->count();
+                // ==== REKEDISHA: STEP 3: Calculate position WITH TIE RANKING ====
+                // Pata wanafunzi wote walio kwenye class iliyohifadhiwa
+                $allStudentsScores = Examination_result::where('class_id', $storedClassId) // TUMIA STORED CLASS ID
+                    ->where('school_id', $schoolId)
+                    ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+                    ->get()
+                    ->groupBy('student_id')
+                    ->map(function ($studentResults) {
+                        return $studentResults->sum('score');
+                    });
 
-            $position = $studentRank;
+                // Apply tie ranking logic
+                $sortedStudents = $allStudentsScores->sortDesc();
 
-            // Rest of the code remains the same...
-            $studentData = $results->first();
-            $parentId = $studentData->parent_id ?? null;
+                $rank = 1;
+                $previousScore = null;
+                $studentsWithRank = collect();
+                $index = 0;
 
-            if (!$parentId) {
-                Alert()->toast('Parent not found for this student.', 'error');
-                return to_route('students.combined.report', ['school' => $school, 'year' => $year, 'class' => $class, 'report' => $report]);
-            }
+                foreach ($sortedStudents as $student_id => $score) {
+                    if ($previousScore !== null && $score < $previousScore) {
+                        $rank = $index + 1;
+                    }
 
-            $parent = Parents::query()->join('users', 'users.id', '=', 'parents.user_id')
-                ->select('parents.*', 'users.phone')
-                ->findOrFail($parentId);
-            $phoneNumber = $parent->phone ?? null;
+                    $studentsWithRank->push([
+                        'student_id' => $student_id,
+                        'score' => $score,
+                        'rank' => $rank
+                    ]);
 
-            if (!$phoneNumber) {
-                Alert()->toast('Phone number not found for parent.', 'error');
-                return to_route('students.combined.report', ['school' => $school, 'year' => $year, 'class' => $class, 'report' => $report]);
-            }
-
-            // Format SMS message
-            $formattedPhone = $this->formatPhoneNumber($phoneNumber);
-            $studentName = strtoupper($studentData->first_name . ' ' . $studentData->last_name);
-            $reportDate = Carbon::parse($reports->created_at)->format('d-m-Y');
-            $schoolInfo = school::find($schoolId);
-            $sender = $schoolInfo->sender_id ?? "SHULE APP";
-            $link = "https://shuleapp.tech";
-
-            // Build subject results part of the message
-            $subjectResultsText = "";
-            foreach ($subjectAverages as $subject) {
-                $subjectResultsText .= strtoupper($subject['course_code']) . ": " . number_format($subject['average']) . "\n";
-            }
-
-            $message = "Matokeo ya {$studentName}\n"
-                . "Mtihani wa " . strtoupper($reports->title) . "\n"
-                . "wa Tar. {$reportDate} ni:\n"
-                . $subjectResultsText
-                . "Jumla: {$studentAverageTotal}, Wastani: " . number_format($studentAverage, 1) . "\n"
-                . "Nafasi ya {$position} kati ya {$totalStudents}.\n"
-                . "Pakua ripoti hapa {$link}.";
-
-            try {
-                $nextSmsService = new NextSmsService();
-                $response = $nextSmsService->sendSmsByNext(
-                    $sender,
-                    $formattedPhone,
-                    $message,
-                    uniqid()
-                );
-
-                if (!$response['success']) {
-                    Alert()->toast('SMS failed: ' . $response['error'], 'error');
-                    return back();
+                    $previousScore = $score;
+                    $index++;
                 }
 
-                // Log::info("Sending SMS to {$formattedPhone}: {$message}");
-                Alert()->toast('Results SMS has been Re-sent successfully', 'success');
+                // Find current student's position
+                $studentRankData = $studentsWithRank->firstWhere('student_id', $studentId);
+                $studentRank = $studentRankData['rank'] ?? '-';
+                $totalStudents = $sortedStudents->count();
+
+                // Rest of the code remains the same...
+                $studentData = $results->first();
+                $parentId = $studentData->parent_id ?? null;
+
+                if (!$parentId) {
+                    Alert()->toast('Parent not found for this student.', 'error');
+                    return to_route('students.combined.report', ['school' => $school, 'year' => $year, 'class' => $class, 'report' => $report]);
+                }
+
+                $parent = Parents::query()->join('users', 'users.id', '=', 'parents.user_id')
+                    ->select('parents.*', 'users.phone')
+                    ->findOrFail($parentId);
+                $phoneNumber = $parent->phone ?? null;
+
+                if (!$phoneNumber) {
+                    Alert()->toast('Phone number not found for parent.', 'error');
+                    return to_route('students.combined.report', ['school' => $school, 'year' => $year, 'class' => $class, 'report' => $report]);
+                }
+
+                // Format SMS message
+                $formattedPhone = $this->formatPhoneNumber($phoneNumber);
+                $studentName = strtoupper($studentData->first_name . ' ' . $studentData->last_name);
+                $reportDate = Carbon::parse($reports->created_at)->format('d-m-Y');
+                $schoolInfo = school::find($schoolId);
+                $sender = $schoolInfo->sender_id ?? "SHULE APP";
+                $link = "https://shuleapp.tech";
+
+                // ==== REKEDISHA: Build subject results part of the message ====
+                $subjectResultsText = "";
+                foreach ($subjectAverages as $subject) {
+                    $averageValue = $subject['average'] ?? 0;
+                    $subjectResultsText .= strtoupper($subject['course_code']) . ": " . number_format($averageValue, 1) . "\n";
+                }
+
+                // ==== REKEDISHA: Create better formatted message ====
+                $message = "MATOKEO YA {$studentName}\n";
+                $message .= "==========================\n";
+                $message .= "Ripoti: " . strtoupper($reports->title) . "\n";
+                $message .= "Tarehe: {$reportDate}\n";
+                $message .= "Darasa: {$studentData->class_name}\n";
+                $message .= "==========================\n";
+                $message .= "MATOKEO YA MASOMO:\n";
+                $message .= $subjectResultsText;
+                $message .= "==========================\n";
+                $message .= "Jumla: {$studentTotal}\n";
+                $message .= "Wastani: " . number_format($studentAverage, 1) . "\n";
+
+                if ($studentRank !== '-' && $totalStudents > 0) {
+                    $message .= "Nafasi: {$studentRank} kati ya {$totalStudents}\n";
+                } else {
+                    $message .= "Nafasi: N/A\n";
+                }
+
+                $message .= "==========================\n";
+                $message .= "Pakua ripoti: {$link}";
+
+                // Check message length
+                if (strlen($message) > 480) {
+                    // Trim if too long
+                    $message = substr($message, 0, 477) . "...";
+                }
+
+                try {
+                    $nextSmsService = new NextSmsService();
+                    $response = $nextSmsService->sendSmsByNext(
+                        $sender,
+                        $formattedPhone,
+                        $message,
+                        uniqid()
+                    );
+
+                    if (!$response['success']) {
+                        Alert()->toast('SMS failed: ' . $response['error'], 'error');
+                        return back();
+                    }
+
+                    Alert()->toast('Results SMS has been Re-sent successfully', 'success');
+                    return to_route('students.combined.report', [
+                        'school' => $school,
+                        'year' => $year,
+                        'class' => $class,
+                        'report' => $report
+                    ]);
+                } catch (\Exception $e) {
+                    Alert()->toast('Failed to send SMS: ' . $e->getMessage(), 'error');
+                    return redirect()->back();
+                }
+            } else {
+                Alert()->toast('This report data set is locked 🔐, please unlock it first', 'error');
                 return to_route('students.combined.report', [
                     'school' => $school,
                     'year' => $year,
                     'class' => $class,
                     'report' => $report
                 ]);
-            } catch (\Exception $e) {
-                // Log::error("Failed to send SMS: " . $e->getMessage());
-                Alert()->toast('Failed to send SMS: ' . $e->getMessage(), 'error');
-                return redirect()->back();
             }
-        } else {
-            Alert()->toast('This report data set is locked 🔐, please unlock it first', 'error');
-            return to_route('students.combined.report', [
-                'school' => $school,
-                'year' => $year,
-                'class' => $class,
-                'report' => $report
-            ]);
+        } catch (\Exception $e) {
+            Alert()->toast('Error: ' . $e->getMessage(), 'error');
+            return redirect()->back();
         }
     }
-
     //download student report
     public function downloadCombinedReport($school, $year, $class, $report, $student)
     {
@@ -2919,8 +3048,10 @@ class ResultsController extends Controller
                 return redirect()->back();
             }
 
-            $report->update(['status' => $status]);
+            // ==== REKEDISHA: Pata class_id ya kwenye generated_reports ====
+            $storedClassId = $report->class_id ?? $classId;
 
+            // Fanya update moja tu
             $updatedReport = $report->update(['status' => $status]);
 
             if (!$updatedReport) {
@@ -2951,10 +3082,16 @@ class ResultsController extends Controller
                     'subjects.course_code'
                 )
                 ->where('students.status', 1) // Only active students
-                ->where('examination_results.class_id', $classId)
+                ->where('examination_results.class_id', $storedClassId) // TUMIA STORED CLASS ID
                 ->where('examination_results.school_id', $schoolId)
                 ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
                 ->get();
+
+            // Check if results exist
+            if ($results->isEmpty()) {
+                Alert()->toast('No exam results found for these dates.', 'error');
+                return redirect()->back();
+            }
 
             // STEP 4: Group results by student and calculate TOTAL SCORE (like PDF)
             $studentsData = $results->groupBy('student_id')->map(function ($studentResults) {
@@ -3008,53 +3145,109 @@ class ResultsController extends Controller
                 // Build subject results text
                 $subjectResultsText = "";
                 foreach ($student['subject_averages'] as $subject) {
-                    $subjectResultsText .= strtoupper($subject['course_code']) . "=" . number_format($subject['average']) . "\n";
+                    $subjectAverage = $subject['average'] ?? 0;
+                    $subjectResultsText .= strtoupper($subject['course_code']) . ": " . number_format($subjectAverage, 1) . "\n";
                 }
 
                 return [
+                    'student_id' => $student['student_id'],
                     'parent_id' => $student['parent_id'],
                     'student_name' => strtoupper($student['first_name'] . ' ' . $student['last_name']),
                     'position' => $positionText,
                     'total_score' => number_format($student['total_score'], 1),
-                    'total_average' => number_format($student['total_average']), // 2 decimal places like PDF
+                    'total_average' => number_format($student['total_average'], 1), // 1 decimal place
                     'subject_results' => $subjectResultsText
                 ];
             });
 
             // STEP 7: Send SMS to parents (updated message format)
+            $successCount = 0;
+            $failCount = 0;
+            $schoolInfo = school::find($schoolId);
+            $link = "https://shuleapp.tech";
+            $sender = $schoolInfo->sender_id ?? "SHULE APP";
+            $reportDate = Carbon::parse($report->created_at)->format('d-m-Y');
+            $nextSmsService = new NextSmsService();
+
             foreach ($parentsPayload as $payload) {
-                $schoolInfo = school::find($schoolId);
-                $link = "https://shuleapp.tech";
-                $nextSmsService = new NextSmsService();
-                $sender = $schoolInfo->sender_id ?? "SHULE APP";
-                $parent = Parents::find($payload['parent_id']);
-                $user = User::findOrFail($parent->user_id);
-                $phoneNumber = $this->formatPhoneNumber($user->phone);
-                $reportDate = Carbon::parse($report->created_at)->format('d-m-Y');
+                try {
+                    // ==== REKEDISHA: Check if parent exists ====
+                    $parent = Parents::find($payload['parent_id']);
 
-                $message = "Matokeo ya {$payload['student_name']}\n"
-                    . "Mtihani wa " . strtoupper($report->title) . "\n"
-                    . "wa Tar. {$reportDate} ni:\n"
-                    . $payload['subject_results']
-                    . "Jumla: {$payload['total_score']}\n"
-                    . "Wastani: {$payload['total_average']}\n"
-                    . "Nafasi ya {$payload['position']}.\n"
-                    . "Pakua ripoti hapa {$link}";
+                    if (!$parent) {
+                        // Log::warning("Parent not found for student ID: {$payload['student_id']}");
+                        $failCount++;
+                        continue;
+                    }
 
-                // Log::info("Sending SMS to {$phoneNumber}: {$message}");
-                $response = $nextSmsService->sendSmsByNext($sender, $phoneNumber, $message, uniqid());
+                    // ==== REKEDISHA: Check if user exists ====
+                    $user = User::find($parent->user_id);
 
-                if (!$response['success']) {
-                    Alert()->toast('SMS failed: ' . $response['error'], 'error');
-                    return back();
+                    if (!$user || empty($user->phone)) {
+                        // Log::warning("User or phone not found for parent ID: {$parent->id}");
+                        $failCount++;
+                        continue;
+                    }
+
+                    $phoneNumber = $this->formatPhoneNumber($user->phone);
+
+                    if (!$phoneNumber) {
+                        // Log::warning("Invalid phone number format: {$user->phone}");
+                        $failCount++;
+                        continue;
+                    }
+
+                    // ==== REKEDISHA: Create better formatted message ====
+                    $message = "MATOKEO YA {$payload['student_name']}\n";
+                    $message .= "==========================\n";
+                    $message .= "Ripoti: " . strtoupper($report->title) . "\n";
+                    $message .= "Tarehe: {$reportDate}\n";
+                    $message .= "==========================\n";
+                    $message .= "MATOKEO YA MASOMO:\n";
+                    $message .= $payload['subject_results'];
+                    $message .= "==========================\n";
+                    $message .= "Jumla: {$payload['total_score']}\n";
+                    $message .= "Wastani: {$payload['total_average']}\n";
+                    $message .= "Nafasi: {$payload['position']}\n";
+                    $message .= "==========================\n";
+                    $message .= "Pakua ripoti: {$link}";
+
+                    // Check message length
+                    if (strlen($message) > 480) {
+                        $message = substr($message, 0, 477) . "...";
+                    }
+
+                    // Log::info("Sending SMS to {$phoneNumber} for student: {$payload['student_name']}");
+                    $response = $nextSmsService->sendSmsByNext($sender, $phoneNumber, $message, uniqid());
+
+                    if ($response['success']) {
+                        $successCount++;
+                        // Log::info("SMS sent successfully to {$phoneNumber}");
+                    } else {
+                        $failCount++;
+                        // Log::error("SMS failed for {$phoneNumber}: {$response['error']}");
+                    }
+
+                    // Add small delay to avoid rate limiting
+                    usleep(100000); // 0.1 second delay
+
+                } catch (\Exception $e) {
+                    $failCount++;
+                    // Log::error("Error sending SMS for student ID {$payload['student_id']}: " . $e->getMessage());
+                    continue;
                 }
             }
 
-            Alert()->toast('Report has been published and sent to parents successfully!', 'success');
+            // Show summary alert
+            if ($failCount > 0) {
+                Alert()->toast("Report published! {$successCount} SMS sent successfully, {$failCount} failed.", 'warning');
+            } else {
+                Alert()->toast("Report has been published and {$successCount} SMS sent to parents successfully!", 'success');
+            }
+
             return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
         } catch (Exception $e) {
-            Alert()->toast($e->getMessage(), 'error');
-            // return redirect()->back();
+            Alert()->toast('Error: ' . $e->getMessage(), 'error');
             return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
         }
     }
