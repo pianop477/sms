@@ -2503,6 +2503,9 @@ class ResultsController extends Controller
         $reports = generated_reports::find($reportId);
         $examDates = $reports->exam_dates; // array
 
+        // ==== REKEDISHA 1: Pata class_id ya kwenye generated_reports ====
+        $storedClassId = $reports->class_id ?? $classId;
+
         $results = Examination_result::query()
             ->join('students', 'students.id', '=', 'examination_results.student_id')
             ->join('grades', 'grades.id', '=', 'examination_results.class_id')
@@ -2535,10 +2538,11 @@ class ResultsController extends Controller
                 'schools.logo',
                 'schools.country',
                 'users.first_name as teacher_first_name',
-                'users.last_name as teacher_last_name'
+                'users.last_name as teacher_last_name',
+                'teachers.id as teacher_id' // ==== REKEDISHA: Ongeza teacher_id ====
             )
             ->where('examination_results.student_id', $studentId)
-            ->where('examination_results.class_id', $classId)
+            ->where('examination_results.class_id', $storedClassId) // TUMIA STORED CLASS ID
             ->where('examination_results.school_id', $schoolId)
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
             ->get();
@@ -2567,19 +2571,29 @@ class ResultsController extends Controller
             $subjectName = $subjectResults->first()->course_name;
             $subjectCode = $subjectResults->first()->course_code;
 
-            // onyesha mwalimu wa sasa na kama hayupo onyesha mwalimu wa zamani
-            $currentTeacher = DB::table('class_learning_courses')
-                ->join('teachers', 'teachers.id', '=', 'class_learning_courses.teacher_id')
-                ->join('users', 'users.id', '=', 'teachers.user_id')
-                ->where('class_learning_courses.class_id', $classId)
-                ->where('class_learning_courses.course_id', $subjectId)
-                ->where('class_learning_courses.status', 1)
-                ->select('users.first_name', 'users.last_name')
-                ->first();
+            // ==== REKEDISHA 2: Tafuta mwalimu aliyepakia matokeo ====
+            $uploadingTeacher = null;
+            foreach ($subjectResults as $result) {
+                if ($result->teacher_id) {
+                    $uploadingTeacher = DB::table('teachers')
+                        ->join('users', 'users.id', '=', 'teachers.user_id')
+                        ->where('teachers.id', $result->teacher_id)
+                        ->select('users.first_name', 'users.last_name')
+                        ->first();
+                    break;
+                }
+            }
 
-            $teacher = $currentTeacher
-                ? $currentTeacher->first_name . '. ' . $currentTeacher->last_name[0]
-                : $subjectResults->first()->teacher_first_name . '. ' . $subjectResults->first()->teacher_last_name[0];
+            $teacher = 'N/A';
+            if ($uploadingTeacher) {
+                $teacher = $uploadingTeacher->first_name . '. ' . substr($uploadingTeacher->last_name, 0, 1);
+            } else {
+                // Fallback: tumia mwalimu kutoka kwenye results (iliyokuwa awali)
+                $firstResult = $subjectResults->first();
+                if ($firstResult && $firstResult->teacher_first_name && $firstResult->teacher_last_name) {
+                    $teacher = $firstResult->teacher_first_name . '. ' . substr($firstResult->teacher_last_name, 0, 1);
+                }
+            }
 
             $examScores = [];
             $total = 0;
@@ -2626,7 +2640,7 @@ class ResultsController extends Controller
                 'subjectCode' => $subjectCode,
                 'examScores' => $examScores,
                 'total' => $total,
-                'average' => round($average, 2), // Rounded to 1 decimal place
+                'average' => round($average, 2),
                 'position' => 0 // Placeholder, itabakiweka baada ya rank calculation
             ];
         }
@@ -2646,7 +2660,7 @@ class ResultsController extends Controller
                 $subjectResultsAll = DB::table('examination_results')
                     ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
                     ->where('examination_results.course_id', $subjectId)
-                    ->where('examination_results.class_id', $classId)
+                    ->where('examination_results.class_id', $storedClassId) // TUMIA STORED CLASS ID
                     ->where('examination_results.school_id', $schoolId)
                     ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
                     ->select('examination_results.*', 'subjects.course_name')
@@ -2729,17 +2743,20 @@ class ResultsController extends Controller
         // Pata average za wanafunzi wote kwa kutumia logic ile ile
         $allStudentAverages = [];
 
-        // Pata wanafunzi wote waliopo kwenye class
-        $allStudents = DB::table('students')
-            ->where('class_id', $classId)
+        // ==== REKEDISHA 3: Pata wanafunzi wote kutoka kwa examination_results ====
+        // Hii inahakikisha tunapata wanafunzi waliokuwepo wakati wa mtihani
+        $allStudents = DB::table('examination_results')
+            ->where('class_id', $storedClassId) // TUMIA STORED CLASS ID
             ->where('school_id', $schoolId)
-            ->pluck('id');
+            ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
+            ->distinct()
+            ->pluck('student_id');
 
         foreach ($allStudents as $stdId) {
             // Pata results za mwanafunzi huyu
             $studentResults = DB::table('examination_results')
                 ->where('student_id', $stdId)
-                ->where('class_id', $classId)
+                ->where('class_id', $storedClassId) // TUMIA STORED CLASS ID
                 ->where('school_id', $schoolId)
                 ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
                 ->get()
@@ -2758,7 +2775,7 @@ class ResultsController extends Controller
                     $subjectAvg = $subjectResults->avg('score') ?? 0;
                 }
 
-                $studentTotalAvg += round($subjectAvg, 1);
+                $studentTotalAvg += round($subjectAvg, 2);
                 $studentSubjectCount++;
             }
 
@@ -2802,7 +2819,7 @@ class ResultsController extends Controller
                 return $item['abbr'] . $item['full_name'];
             })
             ->values()
-            ->keyBy('abbr'); // We key by abbreviation for easy lookup
+            ->keyBy('abbr');
 
         $verificationData = [
             'student_name' => trim(
@@ -2830,7 +2847,6 @@ class ResultsController extends Controller
             config('app.key')
         );
 
-
         $encryptedPayload = Crypt::encryptString(
             json_encode($verificationData)
         );
@@ -2839,7 +2855,6 @@ class ResultsController extends Controller
             'payload' => $encryptedPayload
         ]);
 
-
         $result = Builder::create()
             ->writer(new PngWriter())
             ->data($verificationUrl)
@@ -2847,9 +2862,7 @@ class ResultsController extends Controller
             ->margin(5)
             ->build();
 
-
         $qrPng = base64_encode($result->getString());
-
 
         $pdf = \PDF::loadView('generated_reports.compiled_report', compact(
             'finalData',
