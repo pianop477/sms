@@ -291,7 +291,7 @@
 
                                     <tbody>
                                         @foreach ($students as $student)
-                                        <tr>
+                                        <tr data-id="1">
                                             <td class="text-center">
                                                 <input type="checkbox" form="batchForm" name="student[]" value="{{ $student->id }}">
                                             </td>
