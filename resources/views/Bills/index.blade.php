@@ -465,48 +465,87 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // Initialize select2
-            $('#addTeacherModal').on('shown.bs.modal', function() {
-                // Load students via AJAX
+            let allStudents = []; // Store all students once
+
+            // Load ALL students once on page load
+            $(document).ready(function() {
                 $.ajax({
                     url: '{{ route('students.list') }}',
                     method: 'GET',
                     success: function(response) {
-                        const select = $('#studentSelect');
-                        select.empty();
-                        select.append('<option value="">--Select student name--</option>');
+                        if (response.success && response.students) {
+                            allStudents = response.students.map(student => ({
+                                id: student.id,
+                                text: `${student.first_name} ${student.middle_name} ${student.last_name}`
+                                    .toUpperCase(),
+                                firstName: student.first_name,
+                                middleName: student.middle_name,
+                                lastName: student.last_name,
+                                admissionNo: student.admission_number
+                            }));
 
-                        if (response.success && response.students && response.students.length >
-                            0) {
-                            response.students.forEach(student => {
-                                const name =
-                                    `${student.first_name} ${student.middle_name} ${student.last_name}`;
-                                select.append(
-                                    `<option value="${student.id}">${name.toUpperCase()}</option>`
-                                    );
-                            });
-                        } else {
-                            select.append(
-                                '<option value="" disabled>No students found</option>');
+                            console.log(`Loaded ${allStudents.length} students`);
                         }
-
-                        // Initialize Select2
-                        select.select2({
-                            placeholder: "Search Student...",
-                            allowClear: true,
-                            dropdownParent: $('#addTeacherModal'),
-                            width: '100%'
-                        });
                     },
                     error: function(xhr) {
                         console.error('Error loading students:', xhr);
-                        const select = $('#studentSelect');
-                        select.empty();
-                        select.append('<option value="">--Select student name--</option>');
-                        select.append(
-                            '<option value="" disabled class="text-danger">Error loading students</option>'
-                            );
                     }
                 });
+            });
+
+            // When modal opens, use Select2 with client-side search
+            $('#addTeacherModal').on('shown.bs.modal', function() {
+                $('#studentSelect').select2({
+                    placeholder: "Search student... (Type to filter)",
+                    allowClear: true,
+                    dropdownParent: $('#addTeacherModal'),
+                    width: '100%',
+                    data: [], // Start empty
+                    minimumInputLength: 0, // Show options immediately
+
+                    // CLIENT-SIDE SEARCH FUNCTION
+                    ajax: {
+                        transport: function(params, success, failure) {
+                            const term = params.data.term || '';
+                            const page = params.data.page || 1;
+                            const pageSize = 50; // Show 50 at a time
+
+                            // Filter students locally
+                            let filteredStudents = allStudents;
+
+                            if (term.trim() !== '') {
+                                const searchTerm = term.toLowerCase();
+                                filteredStudents = allStudents.filter(student =>
+                                    student.text.toLowerCase().includes(searchTerm) ||
+                                    (student.admissionNo && student.admissionNo
+                                    .toLowerCase().includes(searchTerm))
+                                );
+                            }
+
+                            // Implement pagination
+                            const startIndex = (page - 1) * pageSize;
+                            const endIndex = startIndex + pageSize;
+                            const paginatedStudents = filteredStudents.slice(startIndex,
+                                endIndex);
+
+                            // Simulate AJAX response
+                            setTimeout(function() {
+                                success({
+                                    results: paginatedStudents,
+                                    pagination: {
+                                        more: endIndex < filteredStudents.length
+                                    }
+                                });
+                            }, 300); // Small delay for better UX
+                        }
+                    }
+                });
+            }).on('hidden.bs.modal', function() {
+                // Cleanup
+                if ($('#studentSelect').hasClass("select2-hidden-accessible")) {
+                    $('#studentSelect').select2('destroy');
+                    $('#studentSelect').val('').trigger('change');
+                }
             });
 
             // Service amount & due date population - USE EVENT DELEGATION
@@ -714,7 +753,7 @@
                         });
                         billsTableSection.html(
                             '<div class="alert alert-danger">Error loading bills. Please try again.</div>'
-                            );
+                        );
                     },
                     complete: function() {
                         loadingSpinner.addClass('d-none');
@@ -864,7 +903,7 @@
                     amountInput.addClass('is-invalid');
                     amountInput.after(
                         '<div class="text-danger small">Please enter a valid amount (greater than 0)</div>'
-                        );
+                    );
                     return false;
                 }
 
@@ -1030,18 +1069,18 @@
                             </div>
 
                             ${response.payment_history.length > 0 ? `
-                                    <div style="max-height: 200px; overflow-y: auto;">
-                                        <table class="table table-sm table-borderless mb-0">
-                                            <thead>
-                                                <tr class="small text-muted border-bottom">
-                                                    <th class="ps-2">#</th>
-                                                    <th>Date</th>
-                                                    <th>Mode</th>
-                                                    <th class="text-end pe-2">Amount</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                ${response.payment_history.map((payment, index) => `
+                                        <div style="max-height: 200px; overflow-y: auto;">
+                                            <table class="table table-sm table-borderless mb-0">
+                                                <thead>
+                                                    <tr class="small text-muted border-bottom">
+                                                        <th class="ps-2">#</th>
+                                                        <th>Date</th>
+                                                        <th>Mode</th>
+                                                        <th class="text-end pe-2">Amount</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    ${response.payment_history.map((payment, index) => `
                                                 <tr class="small border-bottom">
                                                     <td class="ps-2">#${payment.installment}</td>
                                                     <td>${new Date(payment.approved_at).toLocaleDateString('en-GB')}</td>
@@ -1053,24 +1092,24 @@
                                                     </td>
                                                 </tr>
                                             `).join('')}
-                                                <!-- Total Row -->
-                                                <tr class="small border-top fw-bold bg-light">
-                                                    <td class="ps-2" colspan="3" style="font-weight:bold">Total Paid:</td>
-                                                    <td class="text-end pe-2 text-success" style="font-weight:bold">
-                                                        ${new Intl.NumberFormat().format(response.summary.total_paid)}
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                ` : `
-                                    <div class="text-center py-2">
-                                        <small class="text-muted">
-                                            <i class="fas fa-info-circle me-1"></i>
-                                            No payments recorded
-                                        </small>
-                                    </div>
-                                `}
+                                                    <!-- Total Row -->
+                                                    <tr class="small border-top fw-bold bg-light">
+                                                        <td class="ps-2" colspan="3" style="font-weight:bold">Total Paid:</td>
+                                                        <td class="text-end pe-2 text-success" style="font-weight:bold">
+                                                            ${new Intl.NumberFormat().format(response.summary.total_paid)}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    ` : `
+                                        <div class="text-center py-2">
+                                            <small class="text-muted">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                No payments recorded
+                                            </small>
+                                        </div>
+                                    `}
                         </div>
                     `);
                         } else {
