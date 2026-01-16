@@ -51,118 +51,131 @@
 </script>
 <script>
     $(document).ready(function() {
-        var table = $('#myTable').DataTable({
-            stateSave: true,
-            columnDefs: [{
-                orderable: false,
-                targets: 0
-            }],
-            // Safisha data zilizohifadhiwa kwenye state kabla ya kuinitialize
-            stateLoadParams: function(settings, data) {
-                // Safisha checked states zilizokuwepo kwenye saved state
-                if (data.checkedRows) {
-                    delete data.checkedRows;
-                }
+    var table = $('#myTable').DataTable({
+        stateSave: true,
+        columnDefs: [{
+            orderable: false,
+            targets: 0
+        }],
+        // Safisha data zilizohifadhiwa kwenye state kabla ya kuinitialize
+        stateLoadParams: function(settings, data) {
+            if (data.checkedRows) {
+                delete data.checkedRows;
             }
-        });
-
-        // Object ya kuhifadhi rows zilizochaguliwa (works across pagination)
-        var selectedRows = new Set();
-
-        // Handle select all checkbox
-        $('#selectAll').on('click', function() {
-            var isChecked = this.checked;
-
-            if (isChecked) {
-                // Get ALL rows (including those not on current page)
-                table.rows({
-                    search: 'applied'
-                }).every(function() {
-                    var rowId = this.id() || this.index();
-                    selectedRows.add(rowId);
-                });
-            } else {
-                // Clear all selections
-                selectedRows.clear();
-            }
-
-            // Update checkboxes on current page
-            table.rows({
-                page: 'current'
-            }).every(function() {
-                var rowId = this.id() || this.index();
-                var checkbox = $(this.node()).find('input[type="checkbox"]');
-                checkbox.prop('checked', isChecked);
-            });
-
-            // Optional: Show count of selected items
-            updateSelectedCount();
-        });
-
-        // Handle individual checkboxes
-        $('#myTable tbody').on('change', 'input[type="checkbox"]', function() {
-            var row = $(this).closest('tr');
-            var rowData = table.row(row);
-            var rowId = rowData.id() || rowData.index();
-
-            if (this.checked) {
-                selectedRows.add(rowId);
-            } else {
-                selectedRows.delete(rowId);
-                $('#selectAll').prop('checked', false);
-            }
-
-            // Optional: Show count of selected items
-            updateSelectedCount();
-        });
-
-        // Function to update selected count
-        function updateSelectedCount() {
-            $('#selectedCount').text(selectedRows.size + ' items selected');
         }
-
-        // IMPORTANT: Update checkboxes when page changes
-        table.on('draw', function() {
-            // Update checkboxes on current page based on selectedRows
-            table.rows({
-                page: 'current'
-            }).every(function() {
-                var rowId = this.id() || this.index();
-                var checkbox = $(this.node()).find('input[type="checkbox"]');
-                checkbox.prop('checked', selectedRows.has(rowId));
-            });
-
-            // Update selectAll checkbox state
-            var currentPageRows = table.rows({
-                page: 'current',
-                search: 'applied'
-            }).count();
-            var currentPageSelected = table.rows({
-                page: 'current',
-                search: 'applied'
-            }).nodes().to$().find('input[type="checkbox"]:checked').length;
-
-            if (currentPageSelected === currentPageRows && currentPageRows > 0) {
-                $('#selectAll').prop('checked', true);
-            } else {
-                $('#selectAll').prop('checked', false);
-            }
-
-            updateSelectedCount();
-        });
-
-        // Function to get all selected IDs (for your update/delete operations)
-        function getSelectedIds() {
-            // Convert Set to Array
-            return Array.from(selectedRows);
-        }
-
-        // Example: How to use when submitting
-        $('#updateButton').on('click', function() {
-            var selectedIds = getSelectedIds();
-            console.log('Updating records with IDs:', selectedIds);
-            // Send selectedIds to your server via AJAX
-        });
     });
+
+    // Object ya kuhifadhi rows zilizochaguliwa
+    var selectedRows = new Set();
+
+    // Handle select all checkbox
+    $('#selectAll').on('click', function() {
+        var isChecked = this.checked;
+
+        if (isChecked) {
+            // Get ALL rows (including those not on current page)
+            table.rows({ search: 'applied' }).every(function() {
+                var rowId = $(this.node()).find('input[name="student[]"]').val();
+                selectedRows.add(rowId);
+            });
+        } else {
+            // Clear all selections
+            selectedRows.clear();
+        }
+
+        // Update checkboxes on current page
+        table.rows({ page: 'current' }).every(function() {
+            var checkbox = $(this.node()).find('input[name="student[]"]');
+            var rowId = checkbox.val();
+            checkbox.prop('checked', isChecked);
+
+            // Update selectedRows set
+            if (isChecked) {
+                selectedRows.add(rowId);
+            } else if (selectedRows.has(rowId)) {
+                selectedRows.delete(rowId);
+            }
+        });
+
+        updateSelectedCount();
+        updateFormInputs();
+    });
+
+    // Handle individual checkboxes
+    $('#myTable tbody').on('change', 'input[name="student[]"]', function() {
+        var rowId = $(this).val();
+
+        if (this.checked) {
+            selectedRows.add(rowId);
+        } else {
+            selectedRows.delete(rowId);
+            $('#selectAll').prop('checked', false);
+        }
+
+        updateSelectedCount();
+        updateFormInputs();
+    });
+
+    // Function to update selected count
+    function updateSelectedCount() {
+        $('#selectedCount').text(selectedRows.size + ' students selected');
+    }
+
+    // Function to update hidden inputs in the form
+    function updateFormInputs() {
+        // Clear existing hidden inputs
+        $('#batchForm input[name="student[]"][type="hidden"]').remove();
+
+        // Add new hidden inputs for all selected rows
+        selectedRows.forEach(function(studentId) {
+            $('#batchForm').append(
+                $('<input>')
+                    .attr('type', 'hidden')
+                    .attr('name', 'student[]')
+                    .val(studentId)
+            );
+        });
+    }
+
+    // Update checkboxes when page changes
+    table.on('draw', function() {
+        // Update checkboxes on current page based on selectedRows
+        table.rows({ page: 'current' }).every(function() {
+            var checkbox = $(this.node()).find('input[name="student[]"]');
+            var rowId = checkbox.val();
+            checkbox.prop('checked', selectedRows.has(rowId));
+        });
+
+        // Update selectAll checkbox state
+        var currentPageRows = table.rows({ page: 'current', search: 'applied' }).count();
+        var currentPageSelected = table.rows({ page: 'current', search: 'applied' })
+            .nodes().to$().find('input[name="student[]"]:checked').length;
+
+        $('#selectAll').prop('checked',
+            currentPageSelected === currentPageRows && currentPageRows > 0
+        );
+
+        updateSelectedCount();
+    });
+
+    // Handle form submission
+    $('#batchForm').on('submit', function(e) {
+        if (selectedRows.size === 0) {
+            e.preventDefault();
+            alert('Please select at least one student');
+            return false;
+        }
+
+        // Confirm before submitting
+        if (!confirm(`Are you sure you want to update ${selectedRows.size} student(s)?`)) {
+            e.preventDefault();
+            return false;
+        }
+
+        // Update hidden inputs before submit
+        updateFormInputs();
+        return true;
+    });
+});
 </script>
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
