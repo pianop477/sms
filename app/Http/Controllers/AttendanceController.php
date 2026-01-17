@@ -52,10 +52,13 @@ class AttendanceController extends Controller
                         ->exists();
 
         // Pata wanafunzi lakini usiwafiche kabisa hata kama attendance ipo
-        $studentList = Student::where('class_id', '=', $student_class->id)
+        $studentList = Student::query()
+            ->join('grades', 'grades.id', '=', 'students.class_id')
+            ->select('students.*', 'grades.class_code')
+            ->where('class_id', '=', $student_class->id)
             ->where('group', '=', $myClass->group)
-            ->where('status', '=', 1)
-            ->where('school_id', '=', $user->school_id)
+            ->where('students.status', '=', 1)
+            ->where('students.school_id', '=', $user->school_id)
             ->where('graduated', 0)
             ->orderBy('gender', 'ASC')
             ->orderBy('first_name', 'ASC')

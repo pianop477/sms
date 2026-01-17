@@ -88,9 +88,9 @@
 {{-- Attendance Feedback / Form --}}
 @if ($attendanceExists)
     <div class="alert alert-success text-center mt-4">
-        <h5 class="mb-2"><i class="fas fa-check-circle"></i> Attendance Submitted</h5>
+        <h5 class="mb-2"><i class="fas fa-calendar-check"></i> Attendance Submitted</h5>
         <p>Attendance for <strong>{{ \Carbon\Carbon::parse($selectedDate)->format('d-m-Y') }}</strong> has already been submitted.</p>
-        <a href="{{ route('home') }}" class="btn btn-primary btn-sm mt-2"><i class="fas fa-home"></i> Go Back</a>
+        <a href="{{ route('home') }}" class="btn btn-primary btn-sm mt-2"><i class="fas fa-home"></i> Go to Dashboard</a>
     </div>
 @else
     <div id="attendanceFormContainer">
@@ -108,6 +108,7 @@
                                 <th>#</th>
                                 <th>Student Name</th>
                                 <th class="text-center">Gender</th>
+                                <th class="text-center">Class</th>
                                 <th class="text-center">Attendance Status</th>
                             </tr>
                         </thead>
@@ -127,6 +128,7 @@
                                             </a>
                                         </td>
                                         <td class="text-uppercase text-center">{{ $student->gender[0] }}</td>
+                                        <td class="text-center">{{strtoupper($student->class_code)}}-{{strtoupper($student->group)}}</td>
                                         <input type="hidden" name="group[{{ $student->id }}]" value="{{ $student->group }}">
                                         <td class="text-center status-radio">
                                             <label><input type="radio" name="attendance_status[{{ $student->id }}]" required value="present"> ✅ Present</label>
@@ -172,7 +174,7 @@
         preloader.style.justifyContent = "center";
         preloader.style.alignItems = "center";
         preloader.innerHTML = `<div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">Loading...</span>
+                                    <span class="visually-hidden">Loading, Please wait...</span>
                             </div>`;
         document.body.appendChild(preloader);
 
@@ -180,7 +182,7 @@
         function isWeekend(dateString) {
             const date = new Date(dateString);
             const day = date.getDay();
-            return day === 0 || day === 6; // 0 = Sunday, 6 = Saturday
+            return day === 0; // 0 = Sunday, 6 = Saturday
         }
 
         // Function kuonyesha alert ya weekend
@@ -190,7 +192,7 @@
             weekendAlertContainer.innerHTML = `
                 <div class="alert alert-danger text-center">
                     <h5 class="mb-2"><i class="fas fa-calendar-times"></i> Weekend Not Allowed</h5>
-                    <p>Attendance cannot be submitted for weekends (Saturday or Sunday).</p>
+                    <p>Attendance cannot be submitted for weekends (Sunday).</p>
                     <p>Selected date <strong>${attendanceDateInput.value}</strong> falls on a weekend.</p>
                     <a href="{{ route('home') }}" class="btn btn-primary btn-sm mt-2">
                         <i class="fas fa-home"></i> Go to Dashboard
