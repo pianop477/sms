@@ -193,7 +193,7 @@
                     <p>Attendance cannot be submitted for weekends (Saturday or Sunday).</p>
                     <p>Selected date <strong>${attendanceDateInput.value}</strong> falls on a weekend.</p>
                     <a href="{{ route('home') }}" class="btn btn-primary btn-sm mt-2">
-                        <i class="fas fa-home"></i> Go Back to Home
+                        <i class="fas fa-home"></i> Go to Dashboard
                     </a>
                 </div>
             `;

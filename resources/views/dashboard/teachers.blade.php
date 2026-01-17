@@ -347,8 +347,8 @@
                 <div class="alert alert-warning alert-custom" style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-left-color: #ffc107;">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <strong><i class="fas fa-bell me-2"></i> You are on Duty today!</strong>
-                            Collect school report to document today's activities.
+                            <strong><i class="fas fa-bell me-2"></i> You are on duty this week!</strong>
+                            Please, collect school report to document today's activities.
                         </div>
                         <a href="{{route('tod.report.create')}}" class="btn btn-warning btn-sm" onclick="return confirm('Are you sure you want to fill the daily report?')">
                             <i class="fas fa-file-pen me-1"></i> Collect Report
