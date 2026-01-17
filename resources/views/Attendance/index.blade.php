@@ -80,6 +80,11 @@
     </div>
 </div>
 
+{{-- Weekend Alert Container --}}
+<div id="weekendAlertContainer" style="display: none;" class="mt-4">
+    <!-- Will be populated by JavaScript -->
+</div>
+
 {{-- Attendance Feedback / Form --}}
 @if ($attendanceExists)
     <div class="alert alert-success text-center mt-4">
@@ -88,67 +93,71 @@
         <a href="{{ route('home') }}" class="btn btn-primary btn-sm mt-2"><i class="fas fa-home"></i> Go Back</a>
     </div>
 @else
-    <div class="card mt-4 shadow-sm">
-        <div class="card-header bg-info text-white">
-            <strong><i class="fas fa-edit"></i> Complete Attendance for {{ \Carbon\Carbon::parse($selectedDate)->format('d-m-Y') }}</strong>
-        </div>
-        <form id="attendanceForm" action="{{ route('store.attendance', ['student_class' => Hashids::encode($student_class->id)]) }}" method="POST" class="needs-validation" novalidate>
-            @csrf
-            <input type="hidden" name="attendance_date" value="{{ $selectedDate }}">
-            <div class="table-responsive">
-                <table class="table table-hover table-striped align-middle mb-0 table-responsive-md">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Student Name</th>
-                            <th class="text-center">Gender</th>
-                            <th class="text-center">Attendance Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if ($studentList->isEmpty())
+    <div id="attendanceFormContainer">
+        <div class="card mt-4 shadow-sm">
+            <div class="card-header bg-info text-white">
+                <strong><i class="fas fa-edit"></i> Complete Attendance for {{ \Carbon\Carbon::parse($selectedDate)->format('d-m-Y') }}</strong>
+            </div>
+            <form id="attendanceForm" action="{{ route('store.attendance', ['student_class' => Hashids::encode($student_class->id)]) }}" method="POST" class="needs-validation" novalidate>
+                @csrf
+                <input type="hidden" name="attendance_date" value="{{ $selectedDate }}">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped align-middle mb-0 table-responsive-md">
+                        <thead>
                             <tr>
-                                <td colspan="4" class="text-center text-danger">No students enrolled to this class!</td>
+                                <th>#</th>
+                                <th>Student Name</th>
+                                <th class="text-center">Gender</th>
+                                <th class="text-center">Attendance Status</th>
                             </tr>
-                        @else
-                            @foreach ($studentList as $student)
+                        </thead>
+                        <tbody>
+                            @if ($studentList->isEmpty())
                                 <tr>
-                                    <input type="hidden" name="student_id[]" value="{{ $student->id }}">
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>
-                                        <a href="{{ route('class.teacher.student.profile', ['student' => Hashids::encode($student->id)]) }}" class="text-dark font-weight-bold">
-                                            {{ ucwords(strtolower($student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name)) }}
-                                        </a>
-                                    </td>
-                                    <td class="text-uppercase text-center">{{ $student->gender[0] }}</td>
-                                    <input type="hidden" name="group[{{ $student->id }}]" value="{{ $student->group }}">
-                                    <td class="text-center status-radio">
-                                        <label><input type="radio" name="attendance_status[{{ $student->id }}]" required value="present"> ✅ Present</label>
-                                        <label><input type="radio" name="attendance_status[{{ $student->id }}]" value="absent"> ❌ Absent</label>
-                                        <label><input type="radio" name="attendance_status[{{ $student->id }}]" value="permission"> 📝 Permission</label>
-                                        @error('attendance_status.' . $student->id)
-                                            <div class="text-danger small">{{ $message }}</div>
-                                        @enderror
-                                    </td>
+                                    <td colspan="4" class="text-center text-danger">No students enrolled to this class!</td>
                                 </tr>
-                            @endforeach
-                        @endif
-                    </tbody>
-                </table>
-            </div>
-            <div class="card-footer text-center">
-                <button type="submit" id="saveButton" class="btn btn-success" onclick="return confirm('Are you sure you want to submit? You won’t be able to make changes afterward.')">
-                    <i class="fas fa-save"></i> Submit Attendance
-                </button>
-            </div>
-        </form>
+                            @else
+                                @foreach ($studentList as $student)
+                                    <tr>
+                                        <input type="hidden" name="student_id[]" value="{{ $student->id }}">
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>
+                                            <a href="{{ route('class.teacher.student.profile', ['student' => Hashids::encode($student->id)]) }}" class="text-dark font-weight-bold">
+                                                {{ ucwords(strtolower($student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name)) }}
+                                            </a>
+                                        </td>
+                                        <td class="text-uppercase text-center">{{ $student->gender[0] }}</td>
+                                        <input type="hidden" name="group[{{ $student->id }}]" value="{{ $student->group }}">
+                                        <td class="text-center status-radio">
+                                            <label><input type="radio" name="attendance_status[{{ $student->id }}]" required value="present"> ✅ Present</label>
+                                            <label><input type="radio" name="attendance_status[{{ $student->id }}]" value="absent"> ❌ Absent</label>
+                                            <label><input type="radio" name="attendance_status[{{ $student->id }}]" value="permission"> 📝 Permission</label>
+                                            @error('attendance_status.' . $student->id)
+                                                <div class="text-danger small">{{ $message }}</div>
+                                            @enderror
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer text-center">
+                    <button type="submit" id="saveButton" class="btn btn-success" onclick="return confirm('Are you sure you want to submit? You won’t be able to make changes afterward.')">
+                        <i class="fas fa-save"></i> Submit Attendance
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 @endif
 
-{{-- Scripts (unchanged except polish done on Swal) --}}
+{{-- Scripts --}}
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const attendanceDateInput = document.getElementById("attendance_date");
+        const attendanceFormContainer = document.getElementById("attendanceFormContainer");
+        const weekendAlertContainer = document.getElementById("weekendAlertContainer");
 
         // Unda preloader kwa JavaScript ikiwa haipo
         let preloader = document.createElement("div");
@@ -159,7 +168,7 @@
         preloader.style.width = "100%";
         preloader.style.height = "100%";
         preloader.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
-        preloader.style.display = "none"; // Default hidden
+        preloader.style.display = "none";
         preloader.style.justifyContent = "center";
         preloader.style.alignItems = "center";
         preloader.innerHTML = `<div class="spinner-border text-primary" role="status">
@@ -167,30 +176,140 @@
                             </div>`;
         document.body.appendChild(preloader);
 
+        // Function kuangalia kama tarehe ni weekend
+        function isWeekend(dateString) {
+            const date = new Date(dateString);
+            const day = date.getDay();
+            return day === 0 || day === 6; // 0 = Sunday, 6 = Saturday
+        }
+
+        // Function kuonyesha alert ya weekend
+        function showWeekendAlert() {
+            if (!weekendAlertContainer) return;
+
+            weekendAlertContainer.innerHTML = `
+                <div class="alert alert-danger text-center">
+                    <h5 class="mb-2"><i class="fas fa-calendar-times"></i> Weekend Not Allowed</h5>
+                    <p>Attendance cannot be submitted for weekends (Saturday or Sunday).</p>
+                    <p>Selected date <strong>${attendanceDateInput.value}</strong> falls on a weekend.</p>
+                    <a href="{{ route('home') }}" class="btn btn-primary btn-sm mt-2">
+                        <i class="fas fa-home"></i> Go Back to Home
+                    </a>
+                </div>
+            `;
+            weekendAlertContainer.style.display = 'block';
+        }
+
+        // Function kuficha form ya attendance
+        function hideAttendanceForm() {
+            if (attendanceFormContainer) {
+                attendanceFormContainer.style.display = 'none';
+            }
+        }
+
+        // Function kuonyesha form ya attendance
+        function showAttendanceForm() {
+            if (attendanceFormContainer) {
+                attendanceFormContainer.style.display = 'block';
+            }
+            if (weekendAlertContainer) {
+                weekendAlertContainer.style.display = 'none';
+            }
+        }
+
+        // Angalia tarehe ya sasa wakati page inapakia
+        function checkCurrentDate() {
+            const currentDate = attendanceDateInput.value;
+
+            if (isWeekend(currentDate)) {
+                showWeekendAlert();
+                hideAttendanceForm();
+
+                // Reset date input to today if it's weekend
+                const today = new Date().toISOString().split("T")[0];
+                if (attendanceDateInput.value !== today) {
+                    attendanceDateInput.value = today;
+                }
+            } else {
+                showAttendanceForm();
+            }
+        }
+
+        // Run initial check
+        checkCurrentDate();
+
+        // Event listener kwa date change
         attendanceDateInput.addEventListener("change", function () {
-            preloader.style.display = "flex"; // Onyesha preloader
+            const selectedDate = this.value;
+
+            if (isWeekend(selectedDate)) {
+                // Onyesha alert kwa weekend
+                showWeekendAlert();
+                hideAttendanceForm();
+
+                // Reset date input to today
+                this.value = new Date().toISOString().split("T")[0];
+
+                // Show toast notification
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'error',
+                    title: 'Weekends are not allowed',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    toast: true
+                });
+
+                // Reload page with today's date
+                preloader.style.display = "flex";
+                setTimeout(() => {
+                    window.location.href = "?attendance_date=" + this.value;
+                }, 500);
+                return;
+            }
+
+            // Ikiwa sio weekend, endelea na page reload
+            preloader.style.display = "flex";
             setTimeout(() => {
-                window.location.href = "?attendance_date=" + this.value;
-            }, 500); // Chelewesha kidogo kwa UX bora
+                window.location.href = "?attendance_date=" + selectedDate;
+            }, 500);
         });
 
         // Zima preloader baada ya page kupakia
         window.addEventListener("load", function () {
             preloader.style.display = "none";
         });
+
+        // Validation ya form submission (block weekends)
+        const form = document.getElementById("attendanceForm");
+        if (form) {
+            form.addEventListener("submit", function (event) {
+                const attendanceDate = document.querySelector('input[name="attendance_date"]');
+                if (attendanceDate && isWeekend(attendanceDate.value)) {
+                    event.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Weekend Not Allowed',
+                        text: 'Attendance cannot be submitted for weekends.',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    });
+                    return false;
+                }
+            });
+        }
     });
 
-    // Disable button after form submission
+    // Existing form submission logic (unchanged)
     document.addEventListener("DOMContentLoaded", function () {
-        const form = document.getElementById("attendanceForm"); // Tumia ID ya form
+        const form = document.getElementById("attendanceForm");
         const submitButton = document.getElementById("saveButton");
 
         if (!form || !submitButton) return;
 
         form.addEventListener("submit", function (event) {
-            event.preventDefault(); // Zuia submission ya haraka
+            event.preventDefault();
 
-            // Thibitisha kuwa kila mwanafunzi ana radio button iliyochaguliwa
             let isValid = true;
             document.querySelectorAll("tbody tr").forEach((row) => {
                 const studentId = row.querySelector("input[name^='student_id']").value;
@@ -199,50 +318,23 @@
 
                 if (!checked) {
                     isValid = false;
-                    row.style.backgroundColor = "#f8d7da"; // Rangi nyekundu ikiwa haijachaguliwa
+                    row.style.backgroundColor = "#f8d7da";
                 } else {
-                    row.style.backgroundColor = ""; // Rudisha rangi ya kawaida
+                    row.style.backgroundColor = "";
                 }
             });
 
             if (!isValid) {
                 alert("Please select attendance status for all students.");
-                return; // Acha submission ikiwa kuna errors
+                return;
             }
 
-            // Lemaza button na badilisha maandishi
             submitButton.disabled = true;
             submitButton.innerHTML = `<span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span> Submitting...`;
 
-            // Endelea na submission baada ya kuchelewesha kidogo
             setTimeout(() => {
                 form.submit();
             }, 500);
-        });
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
-        const attendanceDateInput = document.getElementById("attendance_date");
-
-        attendanceDateInput.addEventListener("change", function () {
-            const selectedDate = new Date(this.value);
-            const day = selectedDate.getDay();
-
-            // Check if it's Saturday (6) or Sunday (0)
-            if (day === 0 || day === 6) {
-                // Use SweetAlert toast notification
-                Swal.fire({
-                    position: 'top-end',
-                    icon: 'error',
-                    title: 'Weekends are not allowed',
-                    showConfirmButton: false,
-                    timer: 5000,
-                    toast: true
-                });
-
-                // Reset the input value to today
-                this.value = new Date().toISOString().split("T")[0];
-            }
         });
     });
 </script>
