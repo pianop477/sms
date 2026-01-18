@@ -14,7 +14,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('contracts:update-expired-contract')->daily();
-        $schedule->command('school:update-status')->daily();
+        $schedule->command('school:check-active-school')->daily();
         $schedule->command('results:delete-expired')->everyMinute();
         $schedule->command('students:delete-graduated-students')->daily();
         $schedule->command('delete:old-exam-results')->daily();
@@ -25,7 +25,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('security:blocked-user-agents')->everyMinute();
         $schedule->command('cleanup:old-reports')->daily();
         $schedule->command('packages:deactivate-expired')->daily();
-        $schedule->command('opt:clean-expired-otps')->daily();
+        $schedule->command('otp:clean-expired-otps')->daily();
         $schedule->command('roster:update-rosters-status')->dailyAt('06:00');
         $schedule->command('parents:truncate-inactive-parents')->daily();
         $schedule->command('bills:update-statuses')->everySecond();

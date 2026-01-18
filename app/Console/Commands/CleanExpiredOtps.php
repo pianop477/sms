@@ -12,7 +12,7 @@ class CleanExpiredOtps extends Command
      *
      * @var string
      */
-    protected $signature = 'opt:clean-expired-otps';
+    protected $signature = 'otp:clean-expired-otps';
 
     /**
      * The console command description.
