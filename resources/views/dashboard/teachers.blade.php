@@ -589,27 +589,27 @@
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
                                             <h5 class="chart-title">
-                                                <i class="fas fa-calendar-check me-2"></i> Today's Attendance
+                                                <i class="fas fa-calendar-check me-2"></i> Today's Attendance Summary
                                             </h5>
                                             <p class="text-muted small mb-0">
-                                                {{ \Carbon\Carbon::today()->format('l, d F Y') }}</p>
+                                                {{ \Carbon\Carbon::today()->format('l, d F Y') }}
+                                            </p>
                                         </div>
                                         @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
-                                            <span class="badge bg-primary text-white">{{ count($attendanceByClassData) }}
-                                                Classes</span>
+                                            <span class="badge bg-primary text-white">
+                                                {{ count($attendanceByClassData) }} Streams
+                                            </span>
                                         @endif
                                     </div>
                                 </div>
 
-                                <div class="card-body p-0">
+                                <div class="card-body p-1">
                                     @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
                                         <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                                             <table class="table table-hover mb-0 table-sm">
                                                 <thead class="sticky-top" style="background: #f8f9fa; z-index: 1;">
                                                     <tr>
-                                                        <th class="border-0 py-3 ps-4">
-                                                            Class
-                                                        </th>
+                                                        <th class="border-0 py-3 ps-4">Classes</th>
                                                         <th class="border-0 py-3 text-center">
                                                             <span class="text-success">Pres</span>
                                                         </th>
@@ -619,12 +619,8 @@
                                                         <th class="border-0 py-3 text-center">
                                                             <span class="text-secondary">Perm</span>
                                                         </th>
-                                                        <th class="border-0 py-3 text-center pe-4">
-                                                            Total
-                                                        </th>
-                                                        <th class="border-0 py-3 text-center">
-                                                            Rate
-                                                        </th>
+                                                        <th class="border-0 py-3 text-center pe-4">Total</th>
+                                                        <th class="border-0 py-3 text-center">Rate</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -633,6 +629,16 @@
                                                         $totalAbsent = 0;
                                                         $totalPermission = 0;
                                                         $grandTotal = 0;
+                                                        $previousClass = null;
+                                                        $classGroupColors = [
+                                                            'A' => 'bg-success',
+                                                            'B' => 'bg-dark',
+                                                            'C' => 'bg-warning',
+                                                            'D' => 'bg-danger',
+                                                            'E' => 'bg-primary',
+                                                            'F' => 'bg-secondary',
+                                                            'G' => 'bg-info',
+                                                        ];
                                                     @endphp
 
                                                     @foreach ($attendanceByClassData as $classData)
@@ -653,16 +659,46 @@
                                                             $totalAbsent += $classData['absent'];
                                                             $totalPermission += $classData['permission'];
                                                             $grandTotal += $classTotal;
+
+                                                            $currentClass = $classData['original_class_name'];
+                                                            $showClassHeader = $previousClass !== $currentClass;
+                                                            $previousClass = $currentClass;
+
+                                                            // Determine badge color for stream
+                                                            $streamBadgeClass = 'bg-secondary';
+                                                            if (
+                                                                !empty($classData['class_stream']) &&
+                                                                isset(
+                                                                    $classGroupColors[
+                                                                        strtoupper($classData['class_stream'])
+                                                                    ],
+                                                                )
+                                                            ) {
+                                                                $streamBadgeClass =
+                                                                    $classGroupColors[
+                                                                        strtoupper($classData['class_stream'])
+                                                                    ];
+                                                            }
                                                         @endphp
                                                         <tr class="border-bottom">
                                                             <td class="ps-4">
                                                                 <div class="d-flex align-items-center">
-                                                                    <div class="class-badge mr-1"
-                                                                        style="width: 8px; height: 8px; background-color: #{{ substr(md5($classData['class_code']), 0, 6) }}; border-radius: 50%;">
+                                                                    <div>
+                                                                        @if (!empty($classData['class_stream']))
+                                                                            <div class="text-dark small">
+                                                                                <strong>{{ strtoupper($classData['class_code']) }}
+                                                                                    -
+                                                                                    <span
+                                                                                        class="badge {{ $streamBadgeClass }} text-white">{{ strtoupper($classData['class_stream']) }}</span></strong>
+                                                                            </div>
+                                                                        @else
+                                                                            <strong
+                                                                                class="text-dark">{{ $classData['class_name'] }}</strong>
+                                                                            <div class="text-muted small">
+                                                                                {{ $classData['class_code'] }}</div>
+                                                                        @endif
                                                                     </div>
-                                                                    <strong class="text-dark">
-                                                                        {{ strtoupper($classData['class_code']) }}</strong>
-                                                                    <small </div>
+                                                                </div>
                                                             </td>
                                                             <td class="text-center">
                                                                 <span class="px-3 py-1 text-success">
@@ -686,10 +722,10 @@
                                                                 <div class="progress"
                                                                     style="height: 6px; width: 80px; margin: 0 auto;">
                                                                     <div class="progress-bar
-                                                                        @if ($attendanceRate >= 90) bg-success
-                                                                        @elseif($attendanceRate >= 70) bg-info
-                                                                        @elseif($attendanceRate >= 50) bg-warning
-                                                                        @else bg-danger @endif"
+                                                                    @if ($attendanceRate >= 90) bg-success
+                                                                    @elseif($attendanceRate >= 70) bg-info
+                                                                    @elseif($attendanceRate >= 50) bg-warning
+                                                                    @else bg-danger @endif"
                                                                         role="progressbar"
                                                                         style="width: {{ min($attendanceRate, 100) }}%"
                                                                         aria-valuenow="{{ $attendanceRate }}"
@@ -702,17 +738,18 @@
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
+
                                                 @if (count($attendanceByClassData) > 1)
+                                                    @php
+                                                        $overallRate =
+                                                            $grandTotal > 0
+                                                                ? round(($totalPresent / $grandTotal) * 100, 1)
+                                                                : 0;
+                                                    @endphp
                                                     <tfoot class="bg-light">
-                                                        @php
-                                                            $overallRate =
-                                                                $grandTotal > 0
-                                                                    ? round(($totalPresent / $grandTotal) * 100, 1)
-                                                                    : 0;
-                                                        @endphp
                                                         <tr>
                                                             <th class="ps-4 py-3 border-top">
-                                                                <strong>School Total</strong>
+                                                                <strong>Total</strong>
                                                             </th>
                                                             <th class="text-center py-2 border-top">
                                                                 <span
@@ -735,16 +772,20 @@
                                                                     <div class="progress"
                                                                         style="height: 8px; width: 100px;">
                                                                         <div class="progress-bar
-                                                                    @if ($overallRate >= 90) bg-success
-                                                                    @elseif($overallRate >= 70) bg-info
-                                                                    @elseif($overallRate >= 50) bg-warning
-                                                                    @else bg-danger @endif"
+                                                    @if ($overallRate >= 90) bg-success
+                                                    @elseif($overallRate >= 70) bg-info
+                                                    @elseif($overallRate >= 50) bg-warning
+                                                    @else bg-danger @endif"
                                                                             role="progressbar"
                                                                             style="width: {{ min($overallRate, 100) }}%">
                                                                         </div>
                                                                     </div>
                                                                     <strong
-                                                                        class="ms-2 @if ($overallRate >= 90) text-success @elseif($overallRate >= 70) text-info @elseif($overallRate >= 50) text-warning @else text-danger @endif">
+                                                                        class="ms-2
+                                                @if ($overallRate >= 90) text-success
+                                                @elseif($overallRate >= 70) text-info
+                                                @elseif($overallRate >= 50) text-warning
+                                                @else text-danger @endif">
                                                                         {{ $overallRate }}%
                                                                     </strong>
                                                                 </div>
@@ -756,13 +797,9 @@
                                         </div>
 
                                         {{-- Summary Stats Cards --}}
-                                        <div class="row g-2 mt-2 mx-2">
+                                        <div class="row g-2 mt-1 mx-2">
                                             <div class="col-4">
                                                 <div class="border rounded p-1 text-center">
-                                                    <div class="text-success mb-1">
-                                                        <i class="fas fa-user-check fa-lg"></i>
-                                                    </div>
-                                                    <div class="h5 mb-0 text-success">{{ $totalPresent }}</div>
                                                     <small class="text-success">Present</small>
                                                     @if ($grandTotal > 0)
                                                         <div class="small text-success">
@@ -773,10 +810,6 @@
                                             </div>
                                             <div class="col-4">
                                                 <div class="border rounded p-1 text-center">
-                                                    <div class="text-danger mb-1">
-                                                        <i class="fas fa-user-slash fa-lg"></i>
-                                                    </div>
-                                                    <div class="h5 mb-0 text-danger">{{ $totalAbsent }}</div>
                                                     <small class="text-danger">Absent</small>
                                                     @if ($grandTotal > 0)
                                                         <div class="small text-danger">
@@ -787,10 +820,6 @@
                                             </div>
                                             <div class="col-4">
                                                 <div class="border rounded p-1 text-center">
-                                                    <div class="text-secondary mb-1">
-                                                        <i class="fas fa-user-tag fa-lg"></i>
-                                                    </div>
-                                                    <div class="h5 mb-0 text-secondary">{{ $totalPermission }}</div>
                                                     <small class="text-secondary">Permission</small>
                                                     @if ($grandTotal > 0)
                                                         <div class="small text-secondary">
@@ -806,8 +835,8 @@
                                                 <i class="fas fa-calendar-times fa-3x text-muted"></i>
                                             </div>
                                             <h5 class="text-muted mb-2">No Attendance Today</h5>
-                                            <p class="text-muted small">Attendance records will appear here once submitted
-                                                by teachers.
+                                            <p class="text-muted small">
+                                                Attendance records will appear here once submitted by teachers.
                                             </p>
                                         </div>
                                     @endif
@@ -1072,21 +1101,32 @@
                                                 <tr>
                                                     <td class="fw-semibold text-capitalize">
                                                         {{ ucwords(strtolower($course->course_name)) }}</td>
-                                                    <td class="fw-bold text-info text-uppercase">{{ strtoupper($course->class_code) }}
+                                                    <td class="fw-bold text-info text-uppercase">
+                                                        {{ strtoupper($course->class_code) }}
                                                     </td>
                                                     <td class="text-center">
+                                                        <style>
+                                                            .btn-score {
+                                                                background: var(--secondary-color);
+                                                                color: white;
+                                                            }
+                                                            .btn-result {
+                                                                background: var(--success-color);
+                                                                color: white;
+                                                            }
+                                                        </style>
                                                         @if ($course->status == 1)
                                                             <ul class="d-flex justify-content-center">
                                                                 <li class="mr-3">
                                                                     <a href="{{ route('score.prepare.form', ['id' => Hashids::encode($course->id)]) }}"
-                                                                        class="btn btn-xs btn-success"
+                                                                        class="btn btn-xs btn-score"
                                                                         style="border-radius: 10px;">
                                                                         <i class="fas fa-file-edit"></i> Score
                                                                     </a>
                                                                 </li>
                                                                 <li class="">
                                                                     <a href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}"
-                                                                        class="btn btn-xs btn-primary"
+                                                                        class="btn btn-xs btn-result"
                                                                         style="border-radius: 10px">
                                                                         <i class="fas fa-file-pdf"></i> Results
                                                                     </a>
@@ -1134,27 +1174,27 @@
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
                                             <h5 class="chart-title">
-                                                <i class="fas fa-calendar-check me-2"></i> Today's Attendance
+                                                <i class="fas fa-calendar-check me-2"></i> Today's Attendance Summary
                                             </h5>
                                             <p class="text-muted small mb-0">
-                                                {{ \Carbon\Carbon::today()->format('l, d F Y') }}</p>
+                                                {{ \Carbon\Carbon::today()->format('l, d F Y') }}
+                                            </p>
                                         </div>
                                         @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
-                                            <span class="badge bg-primary text-white">{{ count($attendanceByClassData) }}
-                                                Classes</span>
+                                            <span class="badge bg-primary text-white">
+                                                {{ count($attendanceByClassData) }} Streams
+                                            </span>
                                         @endif
                                     </div>
                                 </div>
 
-                                <div class="card-body p-0">
+                                <div class="card-body p-1">
                                     @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
                                         <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                                             <table class="table table-hover mb-0 table-sm">
                                                 <thead class="sticky-top" style="background: #f8f9fa; z-index: 1;">
                                                     <tr>
-                                                        <th class="border-0 py-3 ps-4">
-                                                            Class
-                                                        </th>
+                                                        <th class="border-0 py-3 ps-4">Classes</th>
                                                         <th class="border-0 py-3 text-center">
                                                             <span class="text-success">Pres</span>
                                                         </th>
@@ -1164,12 +1204,8 @@
                                                         <th class="border-0 py-3 text-center">
                                                             <span class="text-secondary">Perm</span>
                                                         </th>
-                                                        <th class="border-0 py-3 text-center pe-4">
-                                                            Total
-                                                        </th>
-                                                        <th class="border-0 py-3 text-center">
-                                                            Rate
-                                                        </th>
+                                                        <th class="border-0 py-3 text-center pe-4">Total</th>
+                                                        <th class="border-0 py-3 text-center">Rate</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -1178,6 +1214,16 @@
                                                         $totalAbsent = 0;
                                                         $totalPermission = 0;
                                                         $grandTotal = 0;
+                                                        $previousClass = null;
+                                                        $classGroupColors = [
+                                                            'A' => 'bg-success',
+                                                            'B' => 'bg-dark',
+                                                            'C' => 'bg-warning',
+                                                            'D' => 'bg-danger',
+                                                            'E' => 'bg-primary',
+                                                            'F' => 'bg-secondary',
+                                                            'G' => 'bg-info',
+                                                        ];
                                                     @endphp
 
                                                     @foreach ($attendanceByClassData as $classData)
@@ -1198,16 +1244,46 @@
                                                             $totalAbsent += $classData['absent'];
                                                             $totalPermission += $classData['permission'];
                                                             $grandTotal += $classTotal;
+
+                                                            $currentClass = $classData['original_class_name'];
+                                                            $showClassHeader = $previousClass !== $currentClass;
+                                                            $previousClass = $currentClass;
+
+                                                            // Determine badge color for stream
+                                                            $streamBadgeClass = 'bg-secondary';
+                                                            if (
+                                                                !empty($classData['class_stream']) &&
+                                                                isset(
+                                                                    $classGroupColors[
+                                                                        strtoupper($classData['class_stream'])
+                                                                    ],
+                                                                )
+                                                            ) {
+                                                                $streamBadgeClass =
+                                                                    $classGroupColors[
+                                                                        strtoupper($classData['class_stream'])
+                                                                    ];
+                                                            }
                                                         @endphp
                                                         <tr class="border-bottom">
                                                             <td class="ps-4">
                                                                 <div class="d-flex align-items-center">
-                                                                    <div class="class-badge mr-1"
-                                                                        style="width: 8px; height: 8px; background-color: #{{ substr(md5($classData['class_code']), 0, 6) }}; border-radius: 50%;">
+                                                                    <div>
+                                                                        @if (!empty($classData['class_stream']))
+                                                                            <div class="text-dark small">
+                                                                                <strong>{{ strtoupper($classData['class_code']) }}
+                                                                                    -
+                                                                                    <span
+                                                                                        class="badge {{ $streamBadgeClass }} text-white">{{ strtoupper($classData['class_stream']) }}</span></strong>
+                                                                            </div>
+                                                                        @else
+                                                                            <strong
+                                                                                class="text-dark">{{ $classData['class_name'] }}</strong>
+                                                                            <div class="text-muted small">
+                                                                                {{ $classData['class_code'] }}</div>
+                                                                        @endif
                                                                     </div>
-                                                                    <strong class="text-dark">
-                                                                        {{ strtoupper($classData['class_code']) }}</strong>
-                                                                    <small </div>
+                                                                </div>
                                                             </td>
                                                             <td class="text-center">
                                                                 <span class="px-3 py-1 text-success">
@@ -1231,10 +1307,10 @@
                                                                 <div class="progress"
                                                                     style="height: 6px; width: 80px; margin: 0 auto;">
                                                                     <div class="progress-bar
-                                                                        @if ($attendanceRate >= 90) bg-success
-                                                                        @elseif($attendanceRate >= 70) bg-info
-                                                                        @elseif($attendanceRate >= 50) bg-warning
-                                                                        @else bg-danger @endif"
+                                                                    @if ($attendanceRate >= 90) bg-success
+                                                                    @elseif($attendanceRate >= 70) bg-info
+                                                                    @elseif($attendanceRate >= 50) bg-warning
+                                                                    @else bg-danger @endif"
                                                                         role="progressbar"
                                                                         style="width: {{ min($attendanceRate, 100) }}%"
                                                                         aria-valuenow="{{ $attendanceRate }}"
@@ -1247,17 +1323,18 @@
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
+
                                                 @if (count($attendanceByClassData) > 1)
+                                                    @php
+                                                        $overallRate =
+                                                            $grandTotal > 0
+                                                                ? round(($totalPresent / $grandTotal) * 100, 1)
+                                                                : 0;
+                                                    @endphp
                                                     <tfoot class="bg-light">
-                                                        @php
-                                                            $overallRate =
-                                                                $grandTotal > 0
-                                                                    ? round(($totalPresent / $grandTotal) * 100, 1)
-                                                                    : 0;
-                                                        @endphp
                                                         <tr>
                                                             <th class="ps-4 py-3 border-top">
-                                                                <strong>School Total</strong>
+                                                                <strong>Total</strong>
                                                             </th>
                                                             <th class="text-center py-2 border-top">
                                                                 <span
@@ -1280,16 +1357,20 @@
                                                                     <div class="progress"
                                                                         style="height: 8px; width: 100px;">
                                                                         <div class="progress-bar
-                                                                    @if ($overallRate >= 90) bg-success
-                                                                    @elseif($overallRate >= 70) bg-info
-                                                                    @elseif($overallRate >= 50) bg-warning
-                                                                    @else bg-danger @endif"
+                                                    @if ($overallRate >= 90) bg-success
+                                                    @elseif($overallRate >= 70) bg-info
+                                                    @elseif($overallRate >= 50) bg-warning
+                                                    @else bg-danger @endif"
                                                                             role="progressbar"
                                                                             style="width: {{ min($overallRate, 100) }}%">
                                                                         </div>
                                                                     </div>
                                                                     <strong
-                                                                        class="ms-2 @if ($overallRate >= 90) text-success @elseif($overallRate >= 70) text-info @elseif($overallRate >= 50) text-warning @else text-danger @endif">
+                                                                        class="ms-2
+                                                @if ($overallRate >= 90) text-success
+                                                @elseif($overallRate >= 70) text-info
+                                                @elseif($overallRate >= 50) text-warning
+                                                @else text-danger @endif">
                                                                         {{ $overallRate }}%
                                                                     </strong>
                                                                 </div>
@@ -1301,13 +1382,9 @@
                                         </div>
 
                                         {{-- Summary Stats Cards --}}
-                                        <div class="row g-2 mt-2 mx-2">
+                                        <div class="row g-2 mt-1 mx-2">
                                             <div class="col-4">
                                                 <div class="border rounded p-1 text-center">
-                                                    <div class="text-success mb-1">
-                                                        <i class="fas fa-user-check fa-lg"></i>
-                                                    </div>
-                                                    <div class="h5 mb-0 text-success">{{ $totalPresent }}</div>
                                                     <small class="text-success">Present</small>
                                                     @if ($grandTotal > 0)
                                                         <div class="small text-success">
@@ -1318,10 +1395,6 @@
                                             </div>
                                             <div class="col-4">
                                                 <div class="border rounded p-1 text-center">
-                                                    <div class="text-danger mb-1">
-                                                        <i class="fas fa-user-slash fa-lg"></i>
-                                                    </div>
-                                                    <div class="h5 mb-0 text-danger">{{ $totalAbsent }}</div>
                                                     <small class="text-danger">Absent</small>
                                                     @if ($grandTotal > 0)
                                                         <div class="small text-danger">
@@ -1332,10 +1405,6 @@
                                             </div>
                                             <div class="col-4">
                                                 <div class="border rounded p-1 text-center">
-                                                    <div class="text-secondary mb-1">
-                                                        <i class="fas fa-user-tag fa-lg"></i>
-                                                    </div>
-                                                    <div class="h5 mb-0 text-secondary">{{ $totalPermission }}</div>
                                                     <small class="text-secondary">Permission</small>
                                                     @if ($grandTotal > 0)
                                                         <div class="small text-secondary">
@@ -1351,8 +1420,8 @@
                                                 <i class="fas fa-calendar-times fa-3x text-muted"></i>
                                             </div>
                                             <h5 class="text-muted mb-2">No Attendance Today</h5>
-                                            <p class="text-muted small">Attendance records will appear here once submitted
-                                                by teachers.
+                                            <p class="text-muted small">
+                                                Attendance records will appear here once submitted by teachers.
                                             </p>
                                         </div>
                                     @endif
@@ -1557,7 +1626,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-xl-6 mb-4">
                             <div class="chart-container">
                                 <div class="chart-header">
@@ -1580,21 +1648,33 @@
                                                 <tr>
                                                     <td class="fw-semibold text-capitalize">
                                                         {{ ucwords(strtolower($course->course_name)) }}</td>
-                                                    <td class="fw-bold text-info text-uppercase">{{ strtoupper($course->class_code) }}
+                                                    <td class="fw-bold text-info text-uppercase">
+                                                        {{ strtoupper($course->class_code) }}
                                                     </td>
                                                     <td class="text-center">
                                                         @if ($course->status == 1)
+                                                        <style>
+                                                            .btn-score {
+                                                                background: var(--secondary-color);
+                                                                color: white;
+                                                            }
+
+                                                            .btn-result {
+                                                                background: var(--secondary-color);
+                                                                color: white;
+                                                            }
+                                                        </style>
                                                             <ul class="d-flex justify-content-center">
                                                                 <li class="mr-3">
                                                                     <a href="{{ route('score.prepare.form', ['id' => Hashids::encode($course->id)]) }}"
-                                                                        class="btn btn-xs btn-success"
+                                                                        class="btn btn-xs btn-score"
                                                                         style="border-radius: 10px;">
                                                                         <i class="fas fa-file-edit"></i> Score
                                                                     </a>
                                                                 </li>
                                                                 <li class="">
                                                                     <a href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}"
-                                                                        class="btn btn-xs btn-primary"
+                                                                        class="btn btn-xs btn-result"
                                                                         style="border-radius: 10px">
                                                                         <i class="fas fa-file-pdf"></i> Results
                                                                     </a>
@@ -1604,159 +1684,172 @@
                                                             <span class="badge bg-danger">Blocked</span>
                                                         @endif
                                                     </td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="3" class="text-center py-4 text-muted">
-                                                    <i class="fas fa-book fa-2x mb-3 d-block opacity-50"></i>
-                                                    No subjects assigned to you
-                                                </td>
-                                            </tr>
-        @endforelse
-        </tbody>
-        </table>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-
-    <!-- Charts for Class Teacher -->
-    <div class="col-lg-12 mb-4">
-        <div class="row">
-            <div class="col-xl-6 mb-4">
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h5 class="chart-title">
-                            <i class="fas fa-venus-mars me-2"></i> Student Gender Distribution
-                        </h5>
-                        <p class="chart-subtitle">Male vs Female students in your class</p>
-                    </div>
-                    <div class="chart-wrapper">
-                        <canvas id="genderDistributionChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-xl-6 mb-4">
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h5 class="chart-title">
-                            <i class="fas fa-calendar-check me-2"></i> Today's Attendance
-                            @if (isset($classTeacherAttendance['has_data']) && $classTeacherAttendance['has_data'])
-                                <span class="badge bg-success text-white ms-2">Live</span>
-                            @else
-                                <span class="badge bg-secondary ms-2 text-white">No Data</span>
-                            @endif
-                        </h5>
-                        <p class="chart-subtitle">{{ \Carbon\Carbon::today()->format('d-m-Y') }}</p>
-                    </div>
-                    <div class="chart-wrapper" style="min-height: 250px;">
-                        @if (isset($classTeacherAttendance['has_data']) && $classTeacherAttendance['has_data'])
-                            <canvas id="attendanceChart"></canvas>
-                        @else
-                            <div
-                                class="no-data-placeholder d-flex flex-column align-items-center justify-content-center h-100 py-5">
-                                <i class="fas fa-calendar-times text-muted mb-3" style="font-size: 3rem;"></i>
-                                <p class="text-muted text-center mb-0">No attendance records for today</p>
-                                <small class="text-muted">Collect attendance now</small>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="3" class="text-center py-4 text-muted">
+                                                        <i class="fas fa-book fa-2x mb-3 d-block opacity-50"></i>
+                                                        No subjects assigned to you
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        @endif
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    </div>
-    @endif
 
-    <!-- Normal Teacher Dashboard -->
-    @if (Auth::user()->usertype == 3 &&
-            Auth::user()->teacher->role_id != 2 &&
-            Auth::user()->teacher->role_id != 3 &&
-            Auth::user()->teacher->role_id != 4)
-        <div class="row">
-            <!-- Stats Cards for Normal Teacher -->
-            <div class="col-lg-12 mb-4">
-                <div class="row">
-                    <div class="col-xl-4 col-md-6 mb-4">
-                        <div class="stat-card bg-my-courses text-white">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="card-title">My Courses</div>
-                                        <div class="card-value">{{ $courses->where('status', 1)->count() }}</div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="ti-book card-icon"></i>
-                                    </div>
+                <!-- Charts for Class Teacher -->
+                <div class="col-lg-12 mb-4">
+                    <div class="row">
+                        <div class="col-xl-6 mb-4">
+                            <div class="chart-container">
+                                <div class="chart-header">
+                                    <h5 class="chart-title">
+                                        <i class="fas fa-venus-mars me-2"></i> Student Gender Distribution
+                                    </h5>
+                                    <p class="chart-subtitle">Male vs Female students in your class</p>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="genderDistributionChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-6 mb-4">
+                            <div class="chart-container">
+                                <div class="chart-header">
+                                    <h5 class="chart-title">
+                                        <i class="fas fa-calendar-check me-2"></i> Today's Attendance
+                                        @if (isset($classTeacherAttendance['has_data']) && $classTeacherAttendance['has_data'])
+                                            <span class="badge bg-success text-white ms-2">Live</span>
+                                        @else
+                                            <span class="badge bg-secondary ms-2 text-white">No Data</span>
+                                        @endif
+                                    </h5>
+                                    <p class="chart-subtitle">{{ \Carbon\Carbon::today()->format('d-m-Y') }}</p>
+                                </div>
+                                <div class="chart-wrapper" style="min-height: 250px;">
+                                    @if (isset($classTeacherAttendance['has_data']) && $classTeacherAttendance['has_data'])
+                                        <canvas id="attendanceChart"></canvas>
+                                    @else
+                                        <div
+                                            class="no-data-placeholder d-flex flex-column align-items-center justify-content-center h-100 py-5">
+                                            <i class="fas fa-calendar-times text-muted mb-3" style="font-size: 3rem;"></i>
+                                            <p class="text-muted text-center mb-0">No attendance records for today</p>
+                                            <small class="text-muted">Collect attendance now</small>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        @endif
 
-            <!-- Teaching Subjects -->
-            <div class="col-lg-12 mb-4">
-                <div class="chart-container">
-                    <div class="chart-header">
-                        <h5 class="chart-title">
-                            <i class="fas fa-book me-2"></i> My Teaching Subjects
-                        </h5>
-                        <p class="chart-subtitle">Assigned courses and classes</p>
+        <!-- Normal Teacher Dashboard -->
+        @if (Auth::user()->usertype == 3 &&
+                Auth::user()->teacher->role_id != 2 &&
+                Auth::user()->teacher->role_id != 3 &&
+                Auth::user()->teacher->role_id != 4)
+            <div class="row">
+                <!-- Stats Cards for Normal Teacher -->
+                <div class="col-lg-12 mb-4">
+                    <div class="row">
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="stat-card bg-my-courses text-white">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="card-title">My Courses</div>
+                                            <div class="card-value">{{ $courses->where('status', 1)->count() }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="ti-book card-icon"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover progress-table mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Subject</th>
-                                    <th>Class</th>
-                                    <th class="text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($courses as $course)
+                </div>
+
+                <!-- Teaching Subjects -->
+                <div class="col-lg-12 mb-4">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h5 class="chart-title">
+                                <i class="fas fa-book me-2"></i> My Teaching Subjects
+                            </h5>
+                            <p class="chart-subtitle">Assigned courses and classes</p>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover progress-table mb-0">
+                                <thead>
                                     <tr>
-                                        <td class="fw-semibold text-capitalize">
-                                            {{ ucwords(strtolower($course->course_name)) }}</td>
-                                        <td class="fw-bold text-info text-uppercase">{{ strtoupper($course->class_code) }}</td>
-                                        <td class="text-center">
-                                            @if ($course->status == 1)
-                                                <ul class="d-flex justify-content-center">
-                                                    <li class="mr-3">
-                                                        <a href="{{ route('score.prepare.form', ['id' => Hashids::encode($course->id)]) }}"
-                                                            class="btn btn-xs btn-success" style="border-radius: 10px;">
-                                                            <i class="fas fa-file-edit"></i> Score
-                                                        </a>
-                                                    </li>
-                                                    <li class="">
-                                                        <a href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}"
-                                                            class="btn btn-xs btn-primary" style="border-radius: 10px">
-                                                            <i class="fas fa-file-pdf"></i> Results
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            @else
-                                                <span class="badge bg-danger">Blocked</span>
-                                            @endif
-                                        </td>
+                                        <th>Subject</th>
+                                        <th>Class</th>
+                                        <th class="text-center">Actions</th>
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="3" class="text-center py-4 text-muted">
-                                            <i class="fas fa-book fa-2x mb-3 d-block opacity-50"></i>
-                                            No subjects assigned to you
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @forelse ($courses as $course)
+                                        <tr>
+                                            <td class="fw-semibold text-capitalize">
+                                                {{ ucwords(strtolower($course->course_name)) }}</td>
+                                            <td class="fw-bold text-info text-uppercase">
+                                                {{ strtoupper($course->class_code) }}</td>
+                                            <td class="text-center">
+                                                @if ($course->status == 1)
+                                                    <ul class="d-flex justify-content-center">
+                                                        <style>
+                                                            .btn-score {
+                                                                background: var(--secondary-color);
+                                                                color: white;
+                                                            }
+                                                            .btn-result {
+                                                                background: var(--success-color);
+                                                                color: white;
+                                                            }
+                                                        </style>
+                                                        <li class="mr-3">
+                                                            <a href="{{ route('score.prepare.form', ['id' => Hashids::encode($course->id)]) }}"
+                                                                class="btn btn-xs btn-score"
+                                                                style="border-radius: 10px;">
+                                                                <i class="fas fa-file-edit"></i> Score
+                                                            </a>
+                                                        </li>
+                                                        <li class="">
+                                                            <a href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}"
+                                                                class="btn btn-xs btn-result"
+                                                                style="border-radius: 10px">
+                                                                <i class="fas fa-file-pdf"></i> Results
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                @else
+                                                    <span class="badge bg-danger">Blocked</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="3" class="text-center py-4 text-muted">
+                                                <i class="fas fa-book fa-2x mb-3 d-block opacity-50"></i>
+                                                No subjects assigned to you
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    @endif
+        @endif
     </div>
 
     <!-- JavaScript Libraries -->
@@ -1766,7 +1859,6 @@
     <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
     <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
     <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -2067,6 +2159,11 @@
                     classAttendanceCtx.style.display = 'none';
                 }
             }
+
+            // Authorization check
+            @if (Auth::user()->usertype != 3)
+                window.location.href = '/error-page';
+            @endif
         });
     </script>
 

@@ -1224,7 +1224,6 @@
             }
         });
 
-        // Data preparation functions
         // Data preparation functions - REPLACE THIS FUNCTION ONLY
         function prepareRecentTransactionsData() {
             @if (!empty($last7DaysExpenses))

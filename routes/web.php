@@ -175,7 +175,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     //1. SHARED ROUTES ACCESS MANAGER/HEAD TEACHER/ACADEMIC =======================================
     Route::middleware(['manager.head.academic', 'nida_and_form_four'])->group(function () {
         // teachers management
-        Route::get('Teachers-list', [TeachersController::class, 'showTeachersList'])->name('Teachers.index');
+        Route::get('/Teachers', [TeachersController::class, 'showTeachersList'])->name('Teachers.index');
         Route::post('Teachers-registration', [TeachersController::class, 'registerTeachers'])->name('Teachers.store');
         Route::put('{teachers}/Update-teachers', [TeachersController::class, 'updateTeachers'])->name('Update.teachers');
         Route::put('{teacher}/Block-teacher', [TeachersController::class, 'updateStatus'])->name('update.teacher.status');

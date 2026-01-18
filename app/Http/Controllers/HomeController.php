@@ -70,13 +70,14 @@ class HomeController extends Controller
 
             $today = Carbon::today();
 
-            // Get attendance by class (sawa na ile ya awali)
-            $attendanceByClass = DB::table('attendances')
+            // Get attendance by class stream (mkondo) - Updated query
+            $attendanceByClassStream = DB::table('attendances')
                 ->join('grades', 'grades.id', '=', 'attendances.class_id')
                 ->select(
                     'grades.class_name',
                     'grades.class_code',
                     'attendances.class_id',
+                    'attendances.class_group', // Add class_stream/class_group
                     DB::raw("COUNT(CASE WHEN attendances.attendance_status = 'present' THEN 1 END) as present_count"),
                     DB::raw("COUNT(CASE WHEN attendances.attendance_status = 'absent' THEN 1 END) as absent_count"),
                     DB::raw("COUNT(CASE WHEN attendances.attendance_status = 'permission' THEN 1 END) as permission_count"),
@@ -84,37 +85,35 @@ class HomeController extends Controller
                 )
                 ->where('attendances.school_id', $user->school_id)
                 ->whereDate('attendances.attendance_date', $today)
-                ->groupBy('grades.class_name', 'grades.class_code', 'attendances.class_id')
+                ->whereNotNull('attendances.class_group') // Optional: only include records with class_group
+                ->groupBy('grades.class_name', 'grades.class_code', 'attendances.class_id', 'attendances.class_group')
                 ->orderBy('grades.class_name', 'asc')
+                ->orderBy('attendances.class_group', 'asc') // Order by stream A, B, C, etc.
                 ->get();
 
             // Format data for view
             $attendanceByClassData = [];
-            foreach ($attendanceByClass as $class) {
+            foreach ($attendanceByClassStream as $classStream) {
+                $classLabel = $classStream->class_name;
+
+                // Add stream if exists
+                if (!empty($classStream->class_group)) {
+                    $classLabel .= ' ' . strtoupper($classStream->class_group);
+                }
+
                 $attendanceByClassData[] = [
-                    'class_id' => $class->class_id,
-                    'class_name' => $class->class_name,
-                    'class_code' => $class->class_code,
-                    'present' => $class->present_count,
-                    'absent' => $class->absent_count,
-                    'permission' => $class->permission_count,
-                    'total' => $class->total_attendance
+                    'class_id' => $classStream->class_id,
+                    'class_name' => $classLabel, // Now includes stream
+                    'original_class_name' => $classStream->class_name,
+                    'class_code' => $classStream->class_code,
+                    'class_stream' => $classStream->class_group, // Add stream separately
+                    'present' => $classStream->present_count,
+                    'absent' => $classStream->absent_count,
+                    'permission' => $classStream->permission_count,
+                    'total' => $classStream->total_attendance
                 ];
             }
 
-            // $today = Carbon::today();
-            // $attendanceData = DB::table('attendances')
-            //     ->select('attendance_status', DB::raw('count(*) as count'))
-            //     ->where('school_id', $user->school_id)
-            //     ->whereDate('attendance_date', $today)
-            //     ->groupBy('attendance_status')
-            //     ->get();
-
-            // $attendanceCounts = [
-            //     'present' => $attendanceData->where('attendance_status', 'present')->pluck('count')->first() ?? 0,
-            //     'absent' => $attendanceData->where('attendance_status', 'absent')->pluck('count')->first() ?? 0,
-            //     'permission' => $attendanceData->where('attendance_status', 'permission')->pluck('count')->first() ?? 0,
-            // ];
             $studentsByClass = Student::query()
                 ->join('grades', 'grades.id', '=', 'students.class_id')
                 ->select('grades.class_code', DB::raw('COUNT(students.id) as student_count'))
@@ -196,13 +195,15 @@ class HomeController extends Controller
         //teachers dashboard redirection ---------------------------------------------------------
         elseif ($user->usertype == 3) {
             $today = Carbon::today();
-            // NEW CODE - Get attendance by class
+
+            // NEW CODE - Get attendance by class stream (mkondo)
             $attendanceByClass = DB::table('attendances')
                 ->join('grades', 'grades.id', '=', 'attendances.class_id')
                 ->select(
                     'grades.class_name',
                     'grades.class_code',
                     'attendances.class_id',
+                    'attendances.class_group', // Add class_stream column
                     DB::raw("COUNT(CASE WHEN attendances.attendance_status = 'present' THEN 1 END) as present_count"),
                     DB::raw("COUNT(CASE WHEN attendances.attendance_status = 'absent' THEN 1 END) as absent_count"),
                     DB::raw("COUNT(CASE WHEN attendances.attendance_status = 'permission' THEN 1 END) as permission_count"),
@@ -210,17 +211,20 @@ class HomeController extends Controller
                 )
                 ->where('attendances.school_id', $user->school_id)
                 ->whereDate('attendances.attendance_date', $today)
-                ->groupBy('grades.class_name', 'grades.class_code', 'attendances.class_id')
+                ->groupBy('grades.class_name', 'grades.class_code', 'attendances.class_id', 'attendances.class_group') // Add class_stream to group by
                 ->orderBy('grades.class_name', 'asc')
+                ->orderBy('attendances.class_group', 'asc') // Order streams alphabetically
                 ->get();
 
-            // Pata classes zote zilizo na attendance
+            // Pata classes zote zilizo na attendance (now includes streams)
             $classesWithAttendance = [];
             foreach ($attendanceByClass as $class) {
                 $classesWithAttendance[] = [
                     'class_id' => $class->class_id,
                     'class_name' => $class->class_name,
+                    'original_class_name' => $class->class_name, // For grouping in view
                     'class_code' => $class->class_code,
+                    'class_stream' => $class->class_group, // Add stream to array
                     'present' => $class->present_count,
                     'absent' => $class->absent_count,
                     'permission' => $class->permission_count,

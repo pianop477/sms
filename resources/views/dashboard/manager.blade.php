@@ -436,7 +436,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h5 class="chart-title">
-                                            <i class="fas fa-calendar-check me-2"></i> Today's Attendance
+                                            <i class="fas fa-calendar-check me-2"></i> Today's Attendance Summary
                                         </h5>
                                         <p class="text-muted small mb-0">
                                             {{ \Carbon\Carbon::today()->format('l, d F Y') }}
@@ -444,19 +444,19 @@
                                     </div>
                                     @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
                                         <span class="badge bg-primary text-white">
-                                            {{ count($attendanceByClassData) }} Classes
+                                            {{ count($attendanceByClassData) }} Streams
                                         </span>
                                     @endif
                                 </div>
                             </div>
 
-                            <div class="card-body p-0">
+                            <div class="card-body p-1">
                                 @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
                                     <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                                         <table class="table table-hover mb-0 table-sm">
                                             <thead class="sticky-top" style="background: #f8f9fa; z-index: 1;">
                                                 <tr>
-                                                    <th class="border-0 py-3 ps-4">Class</th>
+                                                    <th class="border-0 py-3 ps-4">Classes</th>
                                                     <th class="border-0 py-3 text-center">
                                                         <span class="text-success">Pres</span>
                                                     </th>
@@ -476,6 +476,16 @@
                                                     $totalAbsent = 0;
                                                     $totalPermission = 0;
                                                     $grandTotal = 0;
+                                                    $previousClass = null;
+                                                    $classGroupColors = [
+                                                        'A' => 'bg-success',
+                                                        'B' => 'bg-dark',
+                                                        'C' => 'bg-warning',
+                                                        'D' => 'bg-danger',
+                                                        'E' => 'bg-primary',
+                                                        'F' => 'bg-secondary',
+                                                        'G' => 'bg-info',
+                                                    ];
                                                 @endphp
 
                                                 @foreach ($attendanceByClassData as $classData)
@@ -493,15 +503,44 @@
                                                         $totalAbsent += $classData['absent'];
                                                         $totalPermission += $classData['permission'];
                                                         $grandTotal += $classTotal;
+
+                                                        $currentClass = $classData['original_class_name'];
+                                                        $showClassHeader = $previousClass !== $currentClass;
+                                                        $previousClass = $currentClass;
+
+                                                        // Determine badge color for stream
+                                                        $streamBadgeClass = 'bg-secondary';
+                                                        if (
+                                                            !empty($classData['class_stream']) &&
+                                                            isset(
+                                                                $classGroupColors[
+                                                                    strtoupper($classData['class_stream'])
+                                                                ],
+                                                            )
+                                                        ) {
+                                                            $streamBadgeClass =
+                                                                $classGroupColors[
+                                                                    strtoupper($classData['class_stream'])
+                                                                ];
+                                                        }
                                                     @endphp
                                                     <tr class="border-bottom">
                                                         <td class="ps-4">
                                                             <div class="d-flex align-items-center">
-                                                                <div class="class-badge mr-1"
-                                                                    style="width: 8px; height: 8px; background-color: #{{ substr(md5($classData['class_code']), 0, 6) }}; border-radius: 50%;">
+                                                                <div>
+                                                                    @if (!empty($classData['class_stream']))
+                                                                        <div class="text-dark small">
+                                                                            <strong>{{ strtoupper($classData['class_code']) }}
+                                                                                -
+                                                                              <span class="badge {{ $streamBadgeClass }} text-white">{{ strtoupper($classData['class_stream']) }}</span></strong>
+                                                                        </div>
+                                                                    @else
+                                                                        <strong
+                                                                            class="text-dark">{{ $classData['class_name'] }}</strong>
+                                                                        <div class="text-muted small">
+                                                                            {{ $classData['class_code'] }}</div>
+                                                                    @endif
                                                                 </div>
-                                                                <strong
-                                                                    class="text-dark">{{ strtoupper($classData['class_code']) }}</strong>
                                                             </div>
                                                         </td>
                                                         <td class="text-center">
@@ -526,10 +565,10 @@
                                                             <div class="progress"
                                                                 style="height: 6px; width: 80px; margin: 0 auto;">
                                                                 <div class="progress-bar
-                                                @if ($attendanceRate >= 90) bg-success
-                                                @elseif($attendanceRate >= 70) bg-info
-                                                @elseif($attendanceRate >= 50) bg-warning
-                                                @else bg-danger @endif"
+                                                                    @if ($attendanceRate >= 90) bg-success
+                                                                    @elseif($attendanceRate >= 70) bg-info
+                                                                    @elseif($attendanceRate >= 50) bg-warning
+                                                                    @else bg-danger @endif"
                                                                     role="progressbar"
                                                                     style="width: {{ min($attendanceRate, 100) }}%"
                                                                     aria-valuenow="{{ $attendanceRate }}"
@@ -542,6 +581,7 @@
                                                     </tr>
                                                 @endforeach
                                             </tbody>
+
                                             @if (count($attendanceByClassData) > 1)
                                                 @php
                                                     $overallRate =
@@ -552,7 +592,7 @@
                                                 <tfoot class="bg-light">
                                                     <tr>
                                                         <th class="ps-4 py-3 border-top">
-                                                            <strong>School Total</strong>
+                                                            <strong>Total</strong>
                                                         </th>
                                                         <th class="text-center py-2 border-top">
                                                             <span
@@ -598,13 +638,9 @@
                                     </div>
 
                                     {{-- Summary Stats Cards --}}
-                                    <div class="row g-2 mt-2 mx-2">
+                                    <div class="row g-2 mt-1 mx-2">
                                         <div class="col-4">
                                             <div class="border rounded p-1 text-center">
-                                                <div class="text-success mb-1">
-                                                    <i class="fas fa-user-check fa-lg"></i>
-                                                </div>
-                                                <div class="h5 mb-0 text-success">{{ $totalPresent }}</div>
                                                 <small class="text-success">Present</small>
                                                 @if ($grandTotal > 0)
                                                     <div class="small text-success">
@@ -615,10 +651,6 @@
                                         </div>
                                         <div class="col-4">
                                             <div class="border rounded p-1 text-center">
-                                                <div class="text-danger mb-1">
-                                                    <i class="fas fa-user-slash fa-lg"></i>
-                                                </div>
-                                                <div class="h5 mb-0 text-danger">{{ $totalAbsent }}</div>
                                                 <small class="text-danger">Absent</small>
                                                 @if ($grandTotal > 0)
                                                     <div class="small text-danger">
@@ -629,10 +661,6 @@
                                         </div>
                                         <div class="col-4">
                                             <div class="border rounded p-1 text-center">
-                                                <div class="text-secondary mb-1">
-                                                    <i class="fas fa-user-tag fa-lg"></i>
-                                                </div>
-                                                <div class="h5 mb-0 text-secondary">{{ $totalPermission }}</div>
                                                 <small class="text-secondary">Permission</small>
                                                 @if ($grandTotal > 0)
                                                     <div class="small text-secondary">
@@ -757,7 +785,6 @@
     <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
     <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
     <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Student Registration Chart (ECharts)

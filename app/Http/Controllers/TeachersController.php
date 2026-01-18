@@ -47,7 +47,7 @@ class TeachersController extends Controller
             ->select('teachers.*', 'users.first_name', 'users.last_name', 'users.gender', 'users.phone', 'users.email', 'roles.role_name', 'users.image')
             ->where('teachers.school_id', '=', $userLogged->school_id)
             ->whereIn('teachers.status', [0, 1])
-            ->where('teachers.role_id', '!=', 2)
+            // ->where('teachers.role_id', '!=', 2)
             ->orderBy('users.first_name', 'ASC')
             ->get();
         return view('Teachers.index', ['teachers' => $teachers]);
