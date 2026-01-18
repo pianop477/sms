@@ -187,8 +187,14 @@
         /* Table Styles */
         .table-responsive {
             border-radius: 15px;
-            overflow: hidden;
+            overflow-x: auto !important;
+            /* Horizontal scrolling only */
+            overflow-y: visible !important;
+            /* Allow vertical overflow for dropdowns */
             box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+            position: relative;
+            /* Important for z-index */
+            z-index: 1;
         }
 
         .progress-table {
@@ -282,6 +288,12 @@
             .chart-wrapper {
                 min-height: 250px;
             }
+        }
+
+        .dropdown-menu {
+            z-index: 9999 !important;
+            /* Higher than table */
+            position: absolute !important;
         }
 
         .chart-container .dropdown-menu {
@@ -596,7 +608,7 @@
                                                 <thead class="sticky-top" style="background: #f8f9fa; z-index: 1;">
                                                     <tr>
                                                         <th class="border-0 py-3 ps-4">
-                                                         Class
+                                                            Class
                                                         </th>
                                                         <th class="border-0 py-3 text-center">
                                                             <span class="text-success">Pres</span>
@@ -608,10 +620,10 @@
                                                             <span class="text-secondary">Perm</span>
                                                         </th>
                                                         <th class="border-0 py-3 text-center pe-4">
-                                                             Total
+                                                            Total
                                                         </th>
                                                         <th class="border-0 py-3 text-center">
-                                                         Rate
+                                                            Rate
                                                         </th>
                                                     </tr>
                                                 </thead>
@@ -648,26 +660,22 @@
                                                                     <div class="class-badge mr-1"
                                                                         style="width: 8px; height: 8px; background-color: #{{ substr(md5($classData['class_code']), 0, 6) }}; border-radius: 50%;">
                                                                     </div>
-                                                                    <strong
-                                                                        class="text-dark"> {{ strtoupper($classData['class_code']) }}</strong>
-                                                                    <small
-                                                                </div>
+                                                                    <strong class="text-dark">
+                                                                        {{ strtoupper($classData['class_code']) }}</strong>
+                                                                    <small </div>
                                                             </td>
                                                             <td class="text-center">
-                                                                <span
-                                                                    class="px-3 py-1 text-success">
+                                                                <span class="px-3 py-1 text-success">
                                                                     {{ $classData['present'] }}
                                                                 </span>
                                                             </td>
                                                             <td class="text-center">
-                                                                <span
-                                                                    class="px-3 py-1 text-danger">
+                                                                <span class="px-3 py-1 text-danger">
                                                                     {{ $classData['absent'] }}
                                                                 </span>
                                                             </td>
                                                             <td class="text-center">
-                                                                <span
-                                                                    class="px-3 py-1 text-secondary">
+                                                                <span class="px-3 py-1 text-secondary">
                                                                     {{ $classData['permission'] }}
                                                                 </span>
                                                             </td>
@@ -1064,30 +1072,26 @@
                                                 <tr>
                                                     <td class="fw-semibold text-capitalize">
                                                         {{ ucwords(strtolower($course->course_name)) }}</td>
-                                                    <td class="fw-bold text-info text-uppercase">{{ $course->class_code }}
+                                                    <td class="fw-bold text-info text-uppercase">{{ strtoupper($course->class_code) }}
                                                     </td>
                                                     <td class="text-center">
                                                         @if ($course->status == 1)
-                                                            <div class="dropdown">
-                                                                <button class="btn btn-success btn-sm dropdown-toggle"
-                                                                    type="button" data-bs-toggle="dropdown">
-                                                                    <i class="fas fa-cog me-1"></i> Manage
-                                                                </button>
-                                                                <ul class="dropdown-menu">
-                                                                    <li>
-                                                                        <a class="dropdown-item"
-                                                                            href="{{ route('score.prepare.form', ['id' => Hashids::encode($course->id)]) }}">
-                                                                            <i class="ti-pencil-alt me-2"></i> Enter Scores
-                                                                        </a>
-                                                                    </li>
-                                                                    <li>
-                                                                        <a class="dropdown-item"
-                                                                            href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}">
-                                                                            <i class="ti-file me-2"></i> View Results
-                                                                        </a>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
+                                                            <ul class="d-flex justify-content-center">
+                                                                <li class="mr-3">
+                                                                    <a href="{{ route('score.prepare.form', ['id' => Hashids::encode($course->id)]) }}"
+                                                                        class="btn btn-xs btn-success"
+                                                                        style="border-radius: 10px;">
+                                                                        <i class="fas fa-file-edit"></i> Score
+                                                                    </a>
+                                                                </li>
+                                                                <li class="">
+                                                                    <a href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}"
+                                                                        class="btn btn-xs btn-primary"
+                                                                        style="border-radius: 10px">
+                                                                        <i class="fas fa-file-pdf"></i> Results
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
                                                         @else
                                                             <span class="badge bg-danger">Blocked</span>
                                                         @endif
@@ -1149,7 +1153,7 @@
                                                 <thead class="sticky-top" style="background: #f8f9fa; z-index: 1;">
                                                     <tr>
                                                         <th class="border-0 py-3 ps-4">
-                                                         Class
+                                                            Class
                                                         </th>
                                                         <th class="border-0 py-3 text-center">
                                                             <span class="text-success">Pres</span>
@@ -1161,10 +1165,10 @@
                                                             <span class="text-secondary">Perm</span>
                                                         </th>
                                                         <th class="border-0 py-3 text-center pe-4">
-                                                             Total
+                                                            Total
                                                         </th>
                                                         <th class="border-0 py-3 text-center">
-                                                         Rate
+                                                            Rate
                                                         </th>
                                                     </tr>
                                                 </thead>
@@ -1201,26 +1205,22 @@
                                                                     <div class="class-badge mr-1"
                                                                         style="width: 8px; height: 8px; background-color: #{{ substr(md5($classData['class_code']), 0, 6) }}; border-radius: 50%;">
                                                                     </div>
-                                                                    <strong
-                                                                        class="text-dark"> {{ strtoupper($classData['class_code']) }}</strong>
-                                                                    <small
-                                                                </div>
+                                                                    <strong class="text-dark">
+                                                                        {{ strtoupper($classData['class_code']) }}</strong>
+                                                                    <small </div>
                                                             </td>
                                                             <td class="text-center">
-                                                                <span
-                                                                    class="px-3 py-1 text-success">
+                                                                <span class="px-3 py-1 text-success">
                                                                     {{ $classData['present'] }}
                                                                 </span>
                                                             </td>
                                                             <td class="text-center">
-                                                                <span
-                                                                    class="px-3 py-1 text-danger">
+                                                                <span class="px-3 py-1 text-danger">
                                                                     {{ $classData['absent'] }}
                                                                 </span>
                                                             </td>
                                                             <td class="text-center">
-                                                                <span
-                                                                    class="px-3 py-1 text-secondary">
+                                                                <span class="px-3 py-1 text-secondary">
                                                                     {{ $classData['permission'] }}
                                                                 </span>
                                                             </td>
@@ -1580,193 +1580,183 @@
                                                 <tr>
                                                     <td class="fw-semibold text-capitalize">
                                                         {{ ucwords(strtolower($course->course_name)) }}</td>
-                                                    <td class="fw-bold text-info text-uppercase">{{ $course->class_code }}
+                                                    <td class="fw-bold text-info text-uppercase">{{ strtoupper($course->class_code) }}
                                                     </td>
                                                     <td class="text-center">
                                                         @if ($course->status == 1)
-                                                            <div class="dropdown">
-                                                                <button class="btn btn-success btn-sm dropdown-toggle"
-                                                                    type="button" data-bs-toggle="dropdown">
-                                                                    <i class="fas fa-cog me-1"></i> Manage
-                                                                </button>
-                                                                <ul class="dropdown-menu">
-                                                                    <li>
-                                                                        <a class="dropdown-item"
-                                                                            href="{{ route('score.prepare.form', ['id' => Hashids::encode($course->id)]) }}">
-                                                                            <i class="ti-pencil-alt me-2"></i> Enter Scores
-                                                                        </a>
-                                                                    </li>
-                                                                    <li>
-                                                                        <a class="dropdown-item"
-                                                                            href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}">
-                                                                            <i class="ti-file me-2"></i> View Results
-                                                                        </a>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
+                                                            <ul class="d-flex justify-content-center">
+                                                                <li class="mr-3">
+                                                                    <a href="{{ route('score.prepare.form', ['id' => Hashids::encode($course->id)]) }}"
+                                                                        class="btn btn-xs btn-success"
+                                                                        style="border-radius: 10px;">
+                                                                        <i class="fas fa-file-edit"></i> Score
+                                                                    </a>
+                                                                </li>
+                                                                <li class="">
+                                                                    <a href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}"
+                                                                        class="btn btn-xs btn-primary"
+                                                                        style="border-radius: 10px">
+                                                                        <i class="fas fa-file-pdf"></i> Results
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
                                                         @else
                                                             <span class="badge bg-danger">Blocked</span>
                                                         @endif
                                                     </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="3" class="text-center py-4 text-muted">
-                                                        <i class="fas fa-book fa-2x mb-3 d-block opacity-50"></i>
-                                                        No subjects assigned to you
-                                                    </td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="3" class="text-center py-4 text-muted">
+                                                    <i class="fas fa-book fa-2x mb-3 d-block opacity-50"></i>
+                                                    No subjects assigned to you
+                                                </td>
+                                            </tr>
+        @endforelse
+        </tbody>
+        </table>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Charts for Class Teacher -->
+    <div class="col-lg-12 mb-4">
+        <div class="row">
+            <div class="col-xl-6 mb-4">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h5 class="chart-title">
+                            <i class="fas fa-venus-mars me-2"></i> Student Gender Distribution
+                        </h5>
+                        <p class="chart-subtitle">Male vs Female students in your class</p>
                     </div>
-                </div>
-
-                <!-- Charts for Class Teacher -->
-                <div class="col-lg-12 mb-4">
-                    <div class="row">
-                        <div class="col-xl-6 mb-4">
-                            <div class="chart-container">
-                                <div class="chart-header">
-                                    <h5 class="chart-title">
-                                        <i class="fas fa-venus-mars me-2"></i> Student Gender Distribution
-                                    </h5>
-                                    <p class="chart-subtitle">Male vs Female students in your class</p>
-                                </div>
-                                <div class="chart-wrapper">
-                                    <canvas id="genderDistributionChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-xl-6 mb-4">
-                            <div class="chart-container">
-                                <div class="chart-header">
-                                    <h5 class="chart-title">
-                                        <i class="fas fa-calendar-check me-2"></i> Today's Attendance
-                                        @if (isset($classTeacherAttendance['has_data']) && $classTeacherAttendance['has_data'])
-                                            <span class="badge bg-success text-white ms-2">Live</span>
-                                        @else
-                                            <span class="badge bg-secondary ms-2 text-white">No Data</span>
-                                        @endif
-                                    </h5>
-                                    <p class="chart-subtitle">{{ \Carbon\Carbon::today()->format('d-m-Y') }}</p>
-                                </div>
-                                <div class="chart-wrapper" style="min-height: 250px;">
-                                    @if (isset($classTeacherAttendance['has_data']) && $classTeacherAttendance['has_data'])
-                                        <canvas id="attendanceChart"></canvas>
-                                    @else
-                                        <div
-                                            class="no-data-placeholder d-flex flex-column align-items-center justify-content-center h-100 py-5">
-                                            <i class="fas fa-calendar-times text-muted mb-3" style="font-size: 3rem;"></i>
-                                            <p class="text-muted text-center mb-0">No attendance records for today</p>
-                                            <small class="text-muted">Collect attendance now</small>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
+                    <div class="chart-wrapper">
+                        <canvas id="genderDistributionChart"></canvas>
                     </div>
                 </div>
             </div>
-        @endif
 
-        <!-- Normal Teacher Dashboard -->
-        @if (Auth::user()->usertype == 3 &&
-                Auth::user()->teacher->role_id != 2 &&
-                Auth::user()->teacher->role_id != 3 &&
-                Auth::user()->teacher->role_id != 4)
-            <div class="row">
-                <!-- Stats Cards for Normal Teacher -->
-                <div class="col-lg-12 mb-4">
-                    <div class="row">
-                        <div class="col-xl-4 col-md-6 mb-4">
-                            <div class="stat-card bg-my-courses text-white">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="card-title">My Courses</div>
-                                            <div class="card-value">{{ $courses->where('status', 1)->count() }}</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="ti-book card-icon"></i>
-                                        </div>
+            <div class="col-xl-6 mb-4">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h5 class="chart-title">
+                            <i class="fas fa-calendar-check me-2"></i> Today's Attendance
+                            @if (isset($classTeacherAttendance['has_data']) && $classTeacherAttendance['has_data'])
+                                <span class="badge bg-success text-white ms-2">Live</span>
+                            @else
+                                <span class="badge bg-secondary ms-2 text-white">No Data</span>
+                            @endif
+                        </h5>
+                        <p class="chart-subtitle">{{ \Carbon\Carbon::today()->format('d-m-Y') }}</p>
+                    </div>
+                    <div class="chart-wrapper" style="min-height: 250px;">
+                        @if (isset($classTeacherAttendance['has_data']) && $classTeacherAttendance['has_data'])
+                            <canvas id="attendanceChart"></canvas>
+                        @else
+                            <div
+                                class="no-data-placeholder d-flex flex-column align-items-center justify-content-center h-100 py-5">
+                                <i class="fas fa-calendar-times text-muted mb-3" style="font-size: 3rem;"></i>
+                                <p class="text-muted text-center mb-0">No attendance records for today</p>
+                                <small class="text-muted">Collect attendance now</small>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    @endif
+
+    <!-- Normal Teacher Dashboard -->
+    @if (Auth::user()->usertype == 3 &&
+            Auth::user()->teacher->role_id != 2 &&
+            Auth::user()->teacher->role_id != 3 &&
+            Auth::user()->teacher->role_id != 4)
+        <div class="row">
+            <!-- Stats Cards for Normal Teacher -->
+            <div class="col-lg-12 mb-4">
+                <div class="row">
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="stat-card bg-my-courses text-white">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="card-title">My Courses</div>
+                                        <div class="card-value">{{ $courses->where('status', 1)->count() }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="ti-book card-icon"></i>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Teaching Subjects -->
-                <div class="col-lg-12 mb-4">
-                    <div class="chart-container">
-                        <div class="chart-header">
-                            <h5 class="chart-title">
-                                <i class="fas fa-book me-2"></i> My Teaching Subjects
-                            </h5>
-                            <p class="chart-subtitle">Assigned courses and classes</p>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover progress-table mb-0">
-                                <thead>
+            <!-- Teaching Subjects -->
+            <div class="col-lg-12 mb-4">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h5 class="chart-title">
+                            <i class="fas fa-book me-2"></i> My Teaching Subjects
+                        </h5>
+                        <p class="chart-subtitle">Assigned courses and classes</p>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover progress-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Class</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($courses as $course)
                                     <tr>
-                                        <th>Subject</th>
-                                        <th>Class</th>
-                                        <th class="text-center">Actions</th>
+                                        <td class="fw-semibold text-capitalize">
+                                            {{ ucwords(strtolower($course->course_name)) }}</td>
+                                        <td class="fw-bold text-info text-uppercase">{{ strtoupper($course->class_code) }}</td>
+                                        <td class="text-center">
+                                            @if ($course->status == 1)
+                                                <ul class="d-flex justify-content-center">
+                                                    <li class="mr-3">
+                                                        <a href="{{ route('score.prepare.form', ['id' => Hashids::encode($course->id)]) }}"
+                                                            class="btn btn-xs btn-success" style="border-radius: 10px;">
+                                                            <i class="fas fa-file-edit"></i> Score
+                                                        </a>
+                                                    </li>
+                                                    <li class="">
+                                                        <a href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}"
+                                                            class="btn btn-xs btn-primary" style="border-radius: 10px">
+                                                            <i class="fas fa-file-pdf"></i> Results
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            @else
+                                                <span class="badge bg-danger">Blocked</span>
+                                            @endif
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($courses as $course)
-                                        <tr>
-                                            <td class="fw-semibold text-capitalize">
-                                                {{ ucwords(strtolower($course->course_name)) }}</td>
-                                            <td class="fw-bold text-info text-uppercase">{{ $course->class_code }}</td>
-                                            <td class="text-center">
-                                                @if ($course->status == 1)
-                                                    <div class="dropdown">
-                                                        <button class="btn btn-success btn-sm dropdown-toggle"
-                                                            type="button" data-bs-toggle="dropdown">
-                                                            <i class="fas fa-cog me-1"></i> Manage
-                                                        </button>
-                                                        <ul class="dropdown-menu">
-                                                            <li>
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('score.prepare.form', ['id' => Hashids::encode($course->id)]) }}">
-                                                                    <i class="ti-pencil-alt me-2"></i> Enter Scores
-                                                                </a>
-                                                            </li>
-                                                            <li>
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('results_byCourse', ['id' => Hashids::encode($course->id)]) }}">
-                                                                    <i class="ti-file me-2"></i> View Results
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                @else
-                                                    <span class="badge bg-danger">Blocked</span>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="3" class="text-center py-4 text-muted">
-                                                <i class="fas fa-book fa-2x mb-3 d-block opacity-50"></i>
-                                                No subjects assigned to you
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
+                                @empty
+                                    <tr>
+                                        <td colspan="3" class="text-center py-4 text-muted">
+                                            <i class="fas fa-book fa-2x mb-3 d-block opacity-50"></i>
+                                            No subjects assigned to you
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-        @endif
+        </div>
+    @endif
     </div>
 
     <!-- JavaScript Libraries -->
@@ -1776,6 +1766,7 @@
     <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
     <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
     <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
