@@ -102,7 +102,8 @@
             color: white;
         }
 
-        table th, table td {
+        table th,
+        table td {
             text-align: center;
             vertical-align: middle;
             padding: 1rem 0.5rem;
@@ -218,7 +219,8 @@
                 font-size: 1.1rem;
             }
 
-            table th, table td {
+            table th,
+            table td {
                 padding: 0.5rem 0.25rem;
                 font-size: 0.85rem;
             }
@@ -236,7 +238,7 @@
         <div class="report-header">
             <h3><i class="fas fa-clipboard-list me-2"></i> SCHOOL DAILY REPORT</h3>
             <p class="mb-0 text-white">School Routine Tracking System</p>
-            <a href="{{route('get.school.report')}}" class="btn btn-light back-button no-print">
+            <a href="{{ route('get.school.report') }}" class="btn btn-light back-button no-print">
                 <i class="fas fa-arrow-left me-1"></i> Back
             </a>
         </div>
@@ -249,7 +251,8 @@
                 </h3>
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i>
-                    Report for: <strong>{{ \Carbon\Carbon::parse($reportDetails->report_date)->format('l, F j, Y') }}</strong>
+                    Report for:
+                    <strong>{{ \Carbon\Carbon::parse($reportDetails->report_date)->format('l, F j, Y') }}</strong>
                 </div>
             </div>
 
@@ -262,30 +265,45 @@
                 @php
                     // Pata walimu walio assigned kwenye hii roster
                     $assignedTeachers = \App\Models\TodRoster::query()
-                                    ->join('teachers', 'tod_rosters.teacher_id', '=', 'teachers.id')
-                                    ->leftJoin('users', 'teachers.user_id', '=', 'users.id')
-                                    ->select('tod_rosters.*', 'users.first_name', 'users.last_name', 'users.image', 'teachers.member_id')
-                                    ->where('roster_id', $roster->roster_id)
-                                    ->get();
+                        ->join('teachers', 'tod_rosters.teacher_id', '=', 'teachers.id')
+                        ->leftJoin('users', 'teachers.user_id', '=', 'users.id')
+                        ->select(
+                            'tod_rosters.*',
+                            'users.first_name',
+                            'users.last_name',
+                            'users.image', 'users.gender',
+                            'teachers.member_id',
+                        )
+                        ->where('roster_id', $roster->roster_id)
+                        ->get();
                 @endphp
-
-                @if($assignedTeachers->count() > 0)
+                @if ($assignedTeachers->count() > 0)
                     <div class="row">
-                        @foreach($assignedTeachers as $detail)
+                        @foreach ($assignedTeachers as $detail)
                             <div class="col-md-6 col-lg-4">
                                 <div class="teacher-card">
                                     <div class="d-flex align-items-center">
                                         <div class="flex-shrink-0">
-                                            @if($detail->image)
-                                                <img src="{{ asset('assets/img/profile/' . $detail->image) }}" alt="Teacher Photo" width="60" height="60" class="rounded-circle">
-                                            @else
-                                                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-                                                    <i class="fas fa-user text-white"></i>
-                                                </div>
-                                            @endif
+                                            @php
+                                                $imageName = $detail->image;
+                                                $imagePath = storage_path('app/public/profile/' . $imageName);
+
+                                                if (!empty($imageName) && file_exists($imagePath)) {
+                                                    $avatarImage = asset('storage/profile/' . $imageName);
+                                                } else {
+                                                    $avatarImage = asset(
+                                                        'storage/profile/' .
+                                                            ($detail->gender == 'male'
+                                                                ? 'avatar.jpg'
+                                                                : 'avatar-female.jpg'),
+                                                    );
+                                                }
+                                            @endphp
+                                            <img src="{{ $avatarImage }}" alt="Teacher Avatar" class="rounded-circle" width="60" height="60">
                                         </div>
                                         <div class="flex-grow-1 ms-3">
-                                            <h5 class="mb-1 text-capitalize"> {{ $detail->first_name }} {{ $detail->last_name }}</h5>
+                                            <h5 class="mb-1 text-capitalize"> {{ $detail->first_name }}
+                                                {{ $detail->last_name }}</h5>
                                             <p class="mb-0 text-muted text-uppercase"> {{ $detail->member_id ?? 'N/A' }}</p>
                                         </div>
                                     </div>
@@ -317,10 +335,18 @@
                                 <th colspan="3">Permission</th>
                             </tr>
                             <tr>
-                                <th>Boys</th><th>Girls</th><th>Total</th>
-                                <th>Boys</th><th>Girls</th><th>Total</th>
-                                <th>Boys</th><th>Girls</th><th>Total</th>
-                                <th>Boys</th><th>Girls</th><th>Total</th>
+                                <th>Boys</th>
+                                <th>Girls</th>
+                                <th>Total</th>
+                                <th>Boys</th>
+                                <th>Girls</th>
+                                <th>Total</th>
+                                <th>Boys</th>
+                                <th>Girls</th>
+                                <th>Total</th>
+                                <th>Boys</th>
+                                <th>Girls</th>
+                                <th>Total</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -335,7 +361,7 @@
                                 $total_permission_girls = 0;
                             @endphp
 
-                            @foreach($dailyAttendance as $attendance)
+                            @foreach ($dailyAttendance as $attendance)
                                 @php
                                     $total_registered_boys += $attendance->registered_boys;
                                     $total_registered_girls += $attendance->registered_girls;
@@ -348,7 +374,8 @@
                                 @endphp
 
                                 <tr>
-                                    <td style="text-transform:uppercase">{{ $attendance->class_code }} {{ $attendance->group }}</td>
+                                    <td style="text-transform:uppercase">{{ $attendance->class_code }}
+                                        {{ $attendance->group }}</td>
                                     <td>{{ $attendance->registered_boys }}</td>
                                     <td>{{ $attendance->registered_girls }}</td>
                                     <td>{{ $attendance->registered_boys + $attendance->registered_girls }}</td>
@@ -386,7 +413,8 @@
             </div>
 
             <!-- Report Details Form -->
-            <form action="{{route('report.update', ['id' => Hashids::encode($reportDetails->id)])}}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('report.update', ['id' => Hashids::encode($reportDetails->id)]) }}" method="POST"
+                enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -425,7 +453,8 @@
                             <span class="edit-toggle" onclick="toggleEdit('teachers_attendance')">
                                 <i class="fas fa-pencil-alt"></i> Edit
                             </span>
-                            <div class="detail-label"><i class="fas fa-chalkboard-teacher me-2 mr-1"></i> Teachers Attendance</div>
+                            <div class="detail-label"><i class="fas fa-chalkboard-teacher me-2 mr-1"></i> Teachers
+                                Attendance</div>
                             <textarea class="form-control" id="teachers_attendance" name="teachers_attendance" rows="3" readonly>{{ $reportDetails->teachers_attendance }}</textarea>
                         </div>
 
@@ -434,55 +463,60 @@
                                 <i class="fas fa-pencil-alt"></i> Edit
                             </span>
                             <div class="detail-label"><i class="fas fa-calendar-plus me-2 mr-1"></i> Special Event</div>
-                            <textarea class="form-control" id="daily_new_event" name="daily_new_event" rows="3" readonly>{{ $reportDetails->daily_new_event ?? "N/A" }}</textarea>
+                            <textarea class="form-control" id="daily_new_event" name="daily_new_event" rows="3" readonly>{{ $reportDetails->daily_new_event ?? 'N/A' }}</textarea>
                         </div>
 
                         <div class="detail-item">
                             <span class="edit-toggle" onclick="toggleEdit('tod_remarks')">
                                 <i class="fas fa-pencil-alt"></i> Edit
                             </span>
-                            <div class="detail-label"><i class="fas fa-sticky-note me-2 mr-1"></i> Teacher on Duty Remarks</div>
+                            <div class="detail-label"><i class="fas fa-sticky-note me-2 mr-1"></i> Teacher on Duty Remarks
+                            </div>
                             <textarea class="form-control" id="tod_remarks" name="tod_remarks" rows="3" readonly>{{ $reportDetails->tod_remarks }}</textarea>
                         </div>
                     </div>
                 </div>
 
                 <!-- Approval Form -->
-                @if($reportDetails->status === 'pending')
-                <div class="mb-4 no-print">
-                    <h3 class="section-title">
-                        <i class="fas fa-check-circle"></i>Approve Report
-                    </h3>
+                @if ($reportDetails->status === 'pending')
+                    <div class="mb-4 no-print">
+                        <h3 class="section-title">
+                            <i class="fas fa-check-circle"></i>Approve Report
+                        </h3>
 
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Please review the report and approve if everything is correct.
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Please review the report and approve if everything is correct.
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="headteacher_comment" class="form-label">Headteacher/Academic Comments</label>
+                            <textarea class="form-control" id="headteacher_comment" name="headteacher_comment" rows="3"
+                                placeholder="Enter comments or feedback..." required></textarea>
+                        </div>
+
+                        <input type="hidden" name="status" value="approved">
+
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-approve"
+                                onclick="return confirm('Are you sure you want to approve this report?');">
+                                <i class="fas fa-check me-2"></i> Approve Report
+                            </button>
+                        </div>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="headteacher_comment" class="form-label">Headteacher/Academic Comments</label>
-                        <textarea class="form-control" id="headteacher_comment" name="headteacher_comment" rows="3" placeholder="Enter comments or feedback..." required></textarea>
-                    </div>
-
-                    <input type="hidden" name="status" value="approved">
-
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-approve" onclick="return confirm('Are you sure you want to approve this report?');">
-                            <i class="fas fa-check me-2"></i> Approve Report
-                        </button>
-                    </div>
-                </div>
                 @else
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle me-2"></i>
-                    This report has been approved on {{ \Carbon\Carbon::parse($reportDetails->updated_at)->format('F j, Y \\a\\t g:i A') }}
-                </div>
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        This report has been approved on
+                        {{ \Carbon\Carbon::parse($reportDetails->updated_at)->format('F j, Y \\a\\t g:i A') }}
+                    </div>
                 @endif
             </form>
         </div>
 
         <div class="report-footer">
-            <small><i class="fas fa-info-circle me-1"></i> Generated on {{ \Carbon\Carbon::now()->format('F j, Y \\a\\t g:i A') }}</small>
+            <small><i class="fas fa-info-circle me-1"></i> Generated on
+                {{ \Carbon\Carbon::now()->format('F j, Y \\a\\t g:i A') }}</small>
         </div>
     </div>
 

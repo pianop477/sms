@@ -504,7 +504,8 @@
                 @else
                     <div class="empty-state">
                         <i class="fas fa-clipboard-check empty-icon"></i>
-                        <h3>No Pending Reports were Found</h3>
+                        <h5>No Pending Reports were Found</h5>
+                        <p class="text-success">All reports has been processed successfully</p>
                     </div>
                 @endif
             </div>

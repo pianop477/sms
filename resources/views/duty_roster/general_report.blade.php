@@ -29,6 +29,7 @@
             font-size: 12px;
             line-height: 1;
             background-color: var(--cream-bg);
+            overflow-x: hidden;
         }
 
         .container {
@@ -298,17 +299,17 @@
 
         .status-badge {
             display: inline-block;
-            /* padding: 3px 6px; */
-            /* border-radius: 3px; */
+            padding: 3px 6px;
+            border-radius: 3px;
             font-size: 14px;
             font-weight: bold;
-            /* font-family: 'Helvetica', 'Arial', sans-serif; */
+            font-family: 'Helvetica', 'Arial', sans-serif;
         }
 
         .status-approved {
-            /* background-color: #d4edda; */
-            /* color: #155724; */
-            /* border: 1px solid #c3e6cb; */
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
 
         .attendance-high {
@@ -392,7 +393,7 @@
         @media print {
 
             * {
-                color: black;
+                color: black !important;
             }
             .action-buttons, .watermark {
                 display: none !important;
@@ -401,7 +402,11 @@
             body {
                 background-color: white;
                 font-size: 10px;
-                color: black; !important
+                color: black !important;
+            }
+
+            .header p {
+                color: black !important;
             }
 
             .container {
@@ -422,7 +427,11 @@
                 box-shadow: none;
             }
 
-            .table {
+            .table th {
+                border: 1px solid black;
+                /* border: none; */
+            }
+            th td {
                 border: 1px solid black;
             }
 
@@ -520,7 +529,7 @@
             <!-- Report Date Header with Attendance Rate -->
             <div class="report-date-header">
                 <div>
-                    <span style="font-size: 17px;">Report for: {{ \Carbon\Carbon::parse($report->report_date)->format('l, F j, Y') }}</span>
+                    <span style="font-size: 17px;">Report Date: {{ \Carbon\Carbon::parse($report->report_date)->format('l, F j, Y') }}</span>
                 </div>
                 <div class="attendance-rate {{ $rate_class }}">
                     Attendance Rate: {{ $attendance_rate }}%
@@ -552,7 +561,7 @@
             <!-- Attendance Summary -->
             <div class="section">
                 <h3 class="section-title">STUDENTS ATTENDANCE</h3>
-                <table class="table">
+                <table class="table table-responsive-md table-striped">
                     <thead>
                         <tr>
                             <th rowspan="2">Class</th>
