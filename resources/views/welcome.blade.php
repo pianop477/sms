@@ -284,7 +284,7 @@
                 </h1>
 
                 <p class="text-lg sm:text-xl md:text-1xl mb-6 sm:mb-8 text-blue-100" id="hero-description">
-                    Altimate solution to run your school efficiently and with top-level security.
+                    Ultimate solution to run your school efficiently and with top-level security.
                 </p>
 
                 <!-- Current Time Display -->
@@ -1178,7 +1178,7 @@
                 // Hero Section
                 'hero-title-1': 'Transform ',
                 'hero-title-2': 'Your School Management',
-                'hero-description': 'Altimate solution to run your school efficiently and with top-level security.',
+                'hero-description': 'Ultimate solution to run your school efficiently and with top-level security.',
                 'time-label-hours': 'Hours',
                 'time-label-minutes': 'Minutes',
                 'time-label-seconds': 'Seconds',
