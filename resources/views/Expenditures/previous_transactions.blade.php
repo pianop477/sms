@@ -567,11 +567,11 @@
                                                             <span class="text-muted">N/A</span>
                                                         @else
                                                             <div class="d-flex align-items-center">
-                                                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-1" style="width: 35px; height: 35px;">
+                                                                {{-- <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-1" style="width: 35px; height: 35px;">
                                                                     <span class="text-white fw-bold small">
                                                                         {{ strtoupper(substr($user->first_name, 0, 1)) }}{{ strtoupper(substr($user->last_name, 0, 1)) }}
                                                                     </span>
-                                                                </div>
+                                                                </div> --}}
                                                                 <span class="ms-2 fw-semibold">
                                                                     {{ ucwords(strtolower($user->first_name. '. '. $user->last_name[0]))}}
                                                                 </span>
