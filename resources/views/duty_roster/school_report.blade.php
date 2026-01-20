@@ -398,8 +398,9 @@
         <!-- Report Generator Card -->
         <div class="main-card animate-fadeIn">
             <div class="card-header">
-                <h3><i class="fas fa-file-export"></i> Generate Custom Report</h3>
+                <h3><i class="fas fa-file-export"></i> Custom Approved Reports</h3>
             </div>
+            <p class="p-4 alert alert-success">Filter by date here below to get approved reports</p>
             <div class="card-body">
                 <div class="date-range-form">
                     <form action="{{route('report.fetch.preview')}}" method="GET" target="">
@@ -416,7 +417,7 @@
                             <div class="col-md-2 mb-3">
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                     <button type="submit" name="action" value="view" class="btn btn-view">
-                                        <i class="fas fa-search"></i> Search Report
+                                        <i class="fas fa-search"></i> Search
                                     </button>
                                 </div>
                             </div>
