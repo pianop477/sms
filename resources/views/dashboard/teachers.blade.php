@@ -584,6 +584,9 @@
                         </div>
 
                         <div class="col-xl-5 mb-4">
+                            {{-- @php
+                                use App\Models\Student;
+                            @endphp --}}
                             <div class="card border-0 shadow-sm h-100">
                                 <div class="card-header bg-white border-0 pb-0">
                                     <div class="d-flex justify-content-between align-items-center">
@@ -605,10 +608,6 @@
 
                                 <div class="card-body p-1">
                                     @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
-                                        @php
-                                            use App\Models\Student;
-                                        @endphp
-
                                         <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                                             <table class="table table-hover mb-0 table-sm">
                                                 <thead class="sticky-top" style="background: #f8f9fa; z-index: 1;">
@@ -657,7 +656,7 @@
                                                             // Only query if class_id exists
                                                             if ($classId) {
                                                                 try {
-                                                                    $query = Student::where('class_id', $classId);
+                                                                    $query = \App\Models\Student::where('class_id', $classId);
 
                                                                     if (!empty($stream)) {
                                                                         $query->where('group', $stream);
@@ -1211,6 +1210,9 @@
                             </div>
                         </div>
                         <div class="col-xl-5 mb-4">
+                            {{-- @php
+                                use App\Models\Student;
+                            @endphp --}}
                             <div class="card border-0 shadow-sm h-100">
                                 <div class="card-header bg-white border-0 pb-0">
                                     <div class="d-flex justify-content-between align-items-center">
@@ -1232,10 +1234,6 @@
 
                                 <div class="card-body p-1">
                                     @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
-                                        @php
-                                            use App\Models\Student;
-                                        @endphp
-
                                         <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                                             <table class="table table-hover mb-0 table-sm">
                                                 <thead class="sticky-top" style="background: #f8f9fa; z-index: 1;">
@@ -1284,7 +1282,7 @@
                                                             // Only query if class_id exists
                                                             if ($classId) {
                                                                 try {
-                                                                    $query = Student::where('class_id', $classId);
+                                                                    $query = \App\Models\Student::where('class_id', $classId);
 
                                                                     if (!empty($stream)) {
                                                                         $query->where('group', $stream);
