@@ -472,10 +472,12 @@
                                             </thead>
                                             <tbody>
                                                 @php
+                                                    use App\Models\Student;
+
                                                     $totalPresent = 0;
                                                     $totalAbsent = 0;
                                                     $totalPermission = 0;
-                                                    $grandTotal = 0;
+                                                    $grandTotalStudents = 0; // Total registered students across all classes
                                                     $previousClass = null;
                                                     $classGroupColors = [
                                                         'A' => 'bg-success',
@@ -490,20 +492,43 @@
 
                                                 @foreach ($attendanceByClassData as $classData)
                                                     @php
+                                                        // Get total registered students for this class from Student model
+                                                        $registeredStudents = Student::where(
+                                                            'class_id',
+                                                            $classData['class_id'],
+                                                        )
+                                                            ->when(!empty($classData['class_stream']), function (
+                                                                $query,
+                                                            ) use ($classData) {
+                                                                return $query->where(
+                                                                    'group',
+                                                                    $classData['class_stream'],
+                                                                );
+                                                            })
+                                                            ->count();
+
+                                                        // Calculate attendance data
                                                         $classTotal =
                                                             $classData['present'] +
                                                             $classData['absent'] +
                                                             $classData['permission'];
+
+                                                        // Calculate attendance rate based on registered students
                                                         $attendanceRate =
-                                                            $classTotal > 0
-                                                                ? round(($classData['present'] / $classTotal) * 100, 1)
+                                                            $registeredStudents > 0
+                                                                ? round(
+                                                                    ($classData['present'] / $registeredStudents) * 100,
+                                                                    1,
+                                                                )
                                                                 : 0;
 
+                                                        // Update totals
                                                         $totalPresent += $classData['present'];
                                                         $totalAbsent += $classData['absent'];
                                                         $totalPermission += $classData['permission'];
-                                                        $grandTotal += $classTotal;
+                                                        $grandTotalStudents += $registeredStudents;
 
+                                                        // Determine if we need to show class header (for grouped classes)
                                                         $currentClass = $classData['original_class_name'];
                                                         $showClassHeader = $previousClass !== $currentClass;
                                                         $previousClass = $currentClass;
@@ -524,6 +549,7 @@
                                                                 ];
                                                         }
                                                     @endphp
+
                                                     <tr class="border-bottom">
                                                         <td class="ps-4">
                                                             <div class="d-flex align-items-center">
@@ -532,13 +558,23 @@
                                                                         <div class="text-dark small">
                                                                             <strong>{{ strtoupper($classData['class_code']) }}
                                                                                 -
-                                                                              <span class="badge {{ $streamBadgeClass }} text-white">{{ strtoupper($classData['class_stream']) }}</span></strong>
+                                                                                <span
+                                                                                    class="badge {{ $streamBadgeClass }} text-white">
+                                                                                    {{ strtoupper($classData['class_stream']) }}
+                                                                                </span>
+                                                                            </strong>
+                                                                            <div class="text-muted small">
+                                                                                Registered: {{ $registeredStudents }}
+                                                                            </div>
                                                                         </div>
                                                                     @else
                                                                         <strong
                                                                             class="text-dark">{{ $classData['class_name'] }}</strong>
                                                                         <div class="text-muted small">
-                                                                            {{ $classData['class_code'] }}</div>
+                                                                            {{ $classData['class_code'] }}
+                                                                            <br>
+                                                                            Registered: {{ $registeredStudents }}
+                                                                        </div>
                                                                     @endif
                                                                 </div>
                                                             </div>
@@ -559,16 +595,16 @@
                                                             </span>
                                                         </td>
                                                         <td class="text-center pe-4">
-                                                            <strong>{{ $classTotal }}</strong>
+                                                            <strong>{{ $registeredStudents }}</strong>
                                                         </td>
                                                         <td class="text-center">
                                                             <div class="progress"
                                                                 style="height: 6px; width: 80px; margin: 0 auto;">
                                                                 <div class="progress-bar
-                                                                    @if ($attendanceRate >= 90) bg-success
-                                                                    @elseif($attendanceRate >= 70) bg-info
-                                                                    @elseif($attendanceRate >= 50) bg-warning
-                                                                    @else bg-danger @endif"
+                        @if ($attendanceRate >= 90) bg-success
+                        @elseif($attendanceRate >= 70) bg-info
+                        @elseif($attendanceRate >= 50) bg-warning
+                        @else bg-danger @endif"
                                                                     role="progressbar"
                                                                     style="width: {{ min($attendanceRate, 100) }}%"
                                                                     aria-valuenow="{{ $attendanceRate }}"
@@ -584,9 +620,10 @@
 
                                             @if (count($attendanceByClassData) > 1)
                                                 @php
+                                                    // Calculate overall rate based on total registered students
                                                     $overallRate =
-                                                        $grandTotal > 0
-                                                            ? round(($totalPresent / $grandTotal) * 100, 1)
+                                                        $grandTotalStudents > 0
+                                                            ? round(($totalPresent / $grandTotalStudents) * 100, 1)
                                                             : 0;
                                                 @endphp
                                                 <tfoot class="bg-light">
@@ -607,26 +644,26 @@
                                                                 class="badge bg-secondary text-white px-3">{{ $totalPermission }}</span>
                                                         </th>
                                                         <th class="text-center pe-4 py-2 border-top">
-                                                            <strong class="text-dark">{{ $grandTotal }}</strong>
+                                                            <strong class="text-dark">{{ $grandTotalStudents }}</strong>
                                                         </th>
                                                         <th class="text-center py-2 border-top">
                                                             <div class="d-flex align-items-center justify-content-center">
                                                                 <div class="progress" style="height: 8px; width: 100px;">
                                                                     <div class="progress-bar
-                                                    @if ($overallRate >= 90) bg-success
-                                                    @elseif($overallRate >= 70) bg-info
-                                                    @elseif($overallRate >= 50) bg-warning
-                                                    @else bg-danger @endif"
+                            @if ($overallRate >= 90) bg-success
+                            @elseif($overallRate >= 70) bg-info
+                            @elseif($overallRate >= 50) bg-warning
+                            @else bg-danger @endif"
                                                                         role="progressbar"
                                                                         style="width: {{ min($overallRate, 100) }}%">
                                                                     </div>
                                                                 </div>
                                                                 <strong
                                                                     class="ms-2
-                                                @if ($overallRate >= 90) text-success
-                                                @elseif($overallRate >= 70) text-info
-                                                @elseif($overallRate >= 50) text-warning
-                                                @else text-danger @endif">
+                        @if ($overallRate >= 90) text-success
+                        @elseif($overallRate >= 70) text-info
+                        @elseif($overallRate >= 50) text-warning
+                        @else text-danger @endif">
                                                                     {{ $overallRate }}%
                                                                 </strong>
                                                             </div>
@@ -634,52 +671,50 @@
                                                     </tr>
                                                 </tfoot>
                                             @endif
-                                        </table>
-                                    </div>
 
-                                    {{-- Summary Stats Cards --}}
-                                    <div class="row g-2 mt-1 mx-2">
-                                        <div class="col-4">
-                                            <div class="border rounded p-1 text-center">
-                                                <small class="text-success">Present</small>
-                                                @if ($grandTotal > 0)
-                                                    <div class="small text-success">
-                                                        {{ round(($totalPresent / $grandTotal) * 100, 1) }}%
+                                            {{-- Summary Stats Cards --}}
+                                            <div class="row g-2 mt-1 mx-2">
+                                                <div class="col-4">
+                                                    <div class="border rounded p-1 text-center">
+                                                        <small class="text-success">Present</small>
+                                                        @if ($grandTotalStudents > 0)
+                                                            <div class="small text-success">
+                                                                {{ round(($totalPresent / $grandTotalStudents) * 100, 1) }}%
+                                                            </div>
+                                                        @endif
                                                     </div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="col-4">
-                                            <div class="border rounded p-1 text-center">
-                                                <small class="text-danger">Absent</small>
-                                                @if ($grandTotal > 0)
-                                                    <div class="small text-danger">
-                                                        {{ round(($totalAbsent / $grandTotal) * 100, 1) }}%
+                                                </div>
+                                                <div class="col-4">
+                                                    <div class="border rounded p-1 text-center">
+                                                        <small class="text-danger">Absent</small>
+                                                        @if ($grandTotalStudents > 0)
+                                                            <div class="small text-danger">
+                                                                {{ round(($totalAbsent / $grandTotalStudents) * 100, 1) }}%
+                                                            </div>
+                                                        @endif
                                                     </div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="col-4">
-                                            <div class="border rounded p-1 text-center">
-                                                <small class="text-secondary">Permission</small>
-                                                @if ($grandTotal > 0)
-                                                    <div class="small text-secondary">
-                                                        {{ round(($totalPermission / $grandTotal) * 100, 1) }}%
+                                                </div>
+                                                <div class="col-4">
+                                                    <div class="border rounded p-1 text-center">
+                                                        <small class="text-secondary">Permission</small>
+                                                        @if ($grandTotalStudents > 0)
+                                                            <div class="small text-secondary">
+                                                                {{ round(($totalPermission / $grandTotalStudents) * 100, 1) }}%
+                                                            </div>
+                                                        @endif
                                                     </div>
-                                                @endif
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                @else
-                                    <div class="text-center py-5">
-                                        <div class="mb-3">
-                                            <i class="fas fa-calendar-times fa-3x text-muted"></i>
-                                        </div>
-                                        <h5 class="text-muted mb-2">No Attendance Today</h5>
-                                        <p class="text-muted small">
-                                            Attendance records will appear here once submitted by teachers.
-                                        </p>
-                                    </div>
+                                        @else
+                                            <div class="text-center py-5">
+                                                <div class="mb-3">
+                                                    <i class="fas fa-calendar-times fa-3x text-muted"></i>
+                                                </div>
+                                                <h5 class="text-muted mb-2">No Attendance Today</h5>
+                                                <p class="text-muted small">
+                                                    Attendance records will appear here once submitted by teachers.
+                                                </p>
+                                            </div>
                                 @endif
                             </div>
 
