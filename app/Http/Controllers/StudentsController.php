@@ -1152,8 +1152,12 @@ class StudentsController extends Controller
             )
             ->where('students.status', 2)
             ->where('students.school_id', $user->school_id)
-            ->orderBy('first_name')
+            ->orderBy('students.first_name', 'asc')  // Use students. prefix
+            ->orderBy('students.middle_name', 'asc') // Add middle name
+            ->orderBy('students.last_name', 'asc')   // Add last name
+            ->orderBy('students.admission_no', 'asc') // For consistency
             ->get();
+
         return view('Students.trash', compact('students'));
     }
 
