@@ -472,7 +472,7 @@
                                             </thead>
                                             <tbody>
                                                 @php
-                                                    use App\Models\Student;
+                                                    // use App\Models\Student;
 
                                                     $totalPresent = 0;
                                                     $totalAbsent = 0;
@@ -493,7 +493,7 @@
                                                 @foreach ($attendanceByClassData as $classData)
                                                     @php
                                                         // Get total registered students for this class from Student model
-                                                        $registeredStudents = Student::where(
+                                                        $registeredStudents = \App\Models\Student::where(
                                                             'class_id',
                                                             $classData['class_id'],
                                                         )
