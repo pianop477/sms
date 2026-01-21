@@ -656,7 +656,7 @@
                                                             // Only query if class_id exists
                                                             if ($classId) {
                                                                 try {
-                                                                    $query = \App\Models\Student::where('class_id', $classId);
+                                                                    $query = \App\Models\Student::where('class_id', $classId)->where('status', 1);
 
                                                                     if (!empty($stream)) {
                                                                         $query->where('group', $stream);
@@ -1282,7 +1282,7 @@
                                                             // Only query if class_id exists
                                                             if ($classId) {
                                                                 try {
-                                                                    $query = \App\Models\Student::where('class_id', $classId);
+                                                                    $query = \App\Models\Student::where('class_id', $classId)->where('status', 1);
 
                                                                     if (!empty($stream)) {
                                                                         $query->where('group', $stream);
