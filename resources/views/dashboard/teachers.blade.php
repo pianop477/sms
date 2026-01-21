@@ -584,9 +584,6 @@
                         </div>
 
                         <div class="col-xl-5 mb-4">
-                            {{-- @php
-                                use App\Models\Student;
-                            @endphp --}}
                             <div class="card border-0 shadow-sm h-100">
                                 <div class="card-header bg-white border-0 pb-0">
                                     <div class="d-flex justify-content-between align-items-center">
@@ -633,6 +630,13 @@
                                                         $totalPermission = 0;
                                                         $grandTotalStudents = 0;
                                                         $previousClass = null;
+
+                                                        // Get total registered students for ALL classes in the school
+                                                        $totalRegisteredInSchool = \App\Models\Student::where(
+                                                            'status',
+                                                            1,
+                                                        )->count();
+
                                                         $classGroupColors = [
                                                             'A' => 'bg-success',
                                                             'B' => 'bg-dark',
@@ -656,7 +660,10 @@
                                                             // Only query if class_id exists
                                                             if ($classId) {
                                                                 try {
-                                                                    $query = \App\Models\Student::where('class_id', $classId)->where('status', 1);
+                                                                    $query = \App\Models\Student::where(
+                                                                        'class_id',
+                                                                        $classId,
+                                                                    )->where('status', 1);
 
                                                                     if (!empty($stream)) {
                                                                         $query->where('group', $stream);
@@ -678,7 +685,8 @@
                                                                     $classData['permission'];
                                                             }
 
-                                                            // Calculate attendance rate
+                                                            // Calculate attendance rate for this class
+                                                            // Use registeredStudents for CLASS rate
                                                             $attendanceRate =
                                                                 $registeredStudents > 0
                                                                     ? round(
@@ -692,7 +700,7 @@
                                                             $totalPresent += $classData['present'];
                                                             $totalAbsent += $classData['absent'];
                                                             $totalPermission += $classData['permission'];
-                                                            $grandTotalStudents += $registeredStudents;
+                                                            $grandTotalStudents += $registeredStudents; // This is for classes with attendance only
 
                                                             // Determine if we need to show class header
                                                             $currentClass = $classData['original_class_name'] ?? '';
@@ -761,10 +769,10 @@
                                                                 <div class="progress"
                                                                     style="height: 6px; width: 80px; margin: 0 auto;">
                                                                     <div class="progress-bar
-                                                @if ($attendanceRate >= 90) bg-success
-                                                @elseif($attendanceRate >= 70) bg-info
-                                                @elseif($attendanceRate >= 50) bg-warning
-                                                @else bg-danger @endif"
+                                                                    @if ($attendanceRate >= 90) bg-success
+                                                                    @elseif($attendanceRate >= 70) bg-info
+                                                                    @elseif($attendanceRate >= 50) bg-warning
+                                                                    @else bg-danger @endif"
                                                                         role="progressbar"
                                                                         style="width: {{ min($attendanceRate, 100) }}%"
                                                                         aria-valuenow="{{ $attendanceRate }}"
@@ -780,15 +788,25 @@
 
                                                 @if (count($attendanceByClassData) > 1)
                                                     @php
+                                                        // Overall rate for classes with attendance only
                                                         $overallRate =
                                                             $grandTotalStudents > 0
                                                                 ? round(($totalPresent / $grandTotalStudents) * 100, 1)
+                                                                : 0;
+
+                                                        // School-wide rate (for display if needed)
+                                                        $schoolWideRate =
+                                                            $totalRegisteredInSchool > 0
+                                                                ? round(
+                                                                    ($totalPresent / $totalRegisteredInSchool) * 100,
+                                                                    1,
+                                                                )
                                                                 : 0;
                                                     @endphp
                                                     <tfoot class="bg-light">
                                                         <tr>
                                                             <th class="ps-4 py-3 border-top">
-                                                                <strong>Total</strong>
+                                                                <strong>Total (Classes with Attendance)</strong>
                                                             </th>
                                                             <th class="text-center py-2 border-top">
                                                                 <span
@@ -812,20 +830,20 @@
                                                                     <div class="progress"
                                                                         style="height: 8px; width: 100px;">
                                                                         <div class="progress-bar
-                                                    @if ($overallRate >= 90) bg-success
-                                                    @elseif($overallRate >= 70) bg-info
-                                                    @elseif($overallRate >= 50) bg-warning
-                                                    @else bg-danger @endif"
+                                                                        @if ($overallRate >= 90) bg-success
+                                                                        @elseif($overallRate >= 70) bg-info
+                                                                        @elseif($overallRate >= 50) bg-warning
+                                                                        @else bg-danger @endif"
                                                                             role="progressbar"
                                                                             style="width: {{ min($overallRate, 100) }}%">
                                                                         </div>
                                                                     </div>
                                                                     <strong
                                                                         class="ms-2
-                                                    @if ($overallRate >= 90) text-success
-                                                    @elseif($overallRate >= 70) text-info
-                                                    @elseif($overallRate >= 50) text-warning
-                                                    @else text-danger @endif">
+                                                                        @if ($overallRate >= 90) text-success
+                                                                        @elseif($overallRate >= 70) text-info
+                                                                        @elseif($overallRate >= 50) text-warning
+                                                                        @else text-danger @endif">
                                                                         {{ $overallRate }}%
                                                                     </strong>
                                                                 </div>
@@ -835,36 +853,45 @@
                                                 @endif
                                             </table>
 
-                                            {{-- Summary Stats Cards --}}
+                                            {{-- Summary Stats Cards - Use $totalRegisteredInSchool for school-wide percentage --}}
                                             <div class="row g-2 mt-1 mx-2">
                                                 <div class="col-4">
                                                     <div class="border rounded p-1 text-center">
                                                         <small class="text-success">Present</small>
-                                                        @if ($grandTotalStudents > 0)
+                                                        @if ($totalRegisteredInSchool > 0)
                                                             <div class="small text-success">
-                                                                {{ round(($totalPresent / $grandTotalStudents) * 100, 1) }}%
+                                                                {{ round(($totalPresent / $totalRegisteredInSchool) * 100, 1) }}%
                                                             </div>
                                                         @endif
+                                                        <div class="text-muted small">
+                                                            {{ $totalPresent }}/{{ $totalRegisteredInSchool }}
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-4">
                                                     <div class="border rounded p-1 text-center">
                                                         <small class="text-danger">Absent</small>
-                                                        @if ($grandTotalStudents > 0)
+                                                        @if ($totalRegisteredInSchool > 0)
                                                             <div class="small text-danger">
-                                                                {{ round(($totalAbsent / $grandTotalStudents) * 100, 1) }}%
+                                                                {{ round(($totalAbsent / $totalRegisteredInSchool) * 100, 1) }}%
                                                             </div>
                                                         @endif
+                                                        <div class="text-muted small">
+                                                            {{ $totalAbsent }}/{{ $totalRegisteredInSchool }}
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-4">
                                                     <div class="border rounded p-1 text-center">
                                                         <small class="text-secondary">Permission</small>
-                                                        @if ($grandTotalStudents > 0)
+                                                        @if ($totalRegisteredInSchool > 0)
                                                             <div class="small text-secondary">
-                                                                {{ round(($totalPermission / $grandTotalStudents) * 100, 1) }}%
+                                                                {{ round(($totalPermission / $totalRegisteredInSchool) * 100, 1) }}%
                                                             </div>
                                                         @endif
+                                                        <div class="text-muted small">
+                                                            {{ $totalPermission }}/{{ $totalRegisteredInSchool }}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1210,9 +1237,6 @@
                             </div>
                         </div>
                         <div class="col-xl-5 mb-4">
-                            {{-- @php
-                                use App\Models\Student;
-                            @endphp --}}
                             <div class="card border-0 shadow-sm h-100">
                                 <div class="card-header bg-white border-0 pb-0">
                                     <div class="d-flex justify-content-between align-items-center">
@@ -1259,6 +1283,13 @@
                                                         $totalPermission = 0;
                                                         $grandTotalStudents = 0;
                                                         $previousClass = null;
+
+                                                        // Get total registered students for ALL classes in the school
+                                                        $totalRegisteredInSchool = \App\Models\Student::where(
+                                                            'status',
+                                                            1,
+                                                        )->count();
+
                                                         $classGroupColors = [
                                                             'A' => 'bg-success',
                                                             'B' => 'bg-dark',
@@ -1282,7 +1313,10 @@
                                                             // Only query if class_id exists
                                                             if ($classId) {
                                                                 try {
-                                                                    $query = \App\Models\Student::where('class_id', $classId)->where('status', 1);
+                                                                    $query = \App\Models\Student::where(
+                                                                        'class_id',
+                                                                        $classId,
+                                                                    )->where('status', 1);
 
                                                                     if (!empty($stream)) {
                                                                         $query->where('group', $stream);
@@ -1304,7 +1338,8 @@
                                                                     $classData['permission'];
                                                             }
 
-                                                            // Calculate attendance rate
+                                                            // Calculate attendance rate for this class
+                                                            // Use registeredStudents for CLASS rate
                                                             $attendanceRate =
                                                                 $registeredStudents > 0
                                                                     ? round(
@@ -1318,7 +1353,7 @@
                                                             $totalPresent += $classData['present'];
                                                             $totalAbsent += $classData['absent'];
                                                             $totalPermission += $classData['permission'];
-                                                            $grandTotalStudents += $registeredStudents;
+                                                            $grandTotalStudents += $registeredStudents; // This is for classes with attendance only
 
                                                             // Determine if we need to show class header
                                                             $currentClass = $classData['original_class_name'] ?? '';
@@ -1387,10 +1422,10 @@
                                                                 <div class="progress"
                                                                     style="height: 6px; width: 80px; margin: 0 auto;">
                                                                     <div class="progress-bar
-                                                @if ($attendanceRate >= 90) bg-success
-                                                @elseif($attendanceRate >= 70) bg-info
-                                                @elseif($attendanceRate >= 50) bg-warning
-                                                @else bg-danger @endif"
+                                                                    @if ($attendanceRate >= 90) bg-success
+                                                                    @elseif($attendanceRate >= 70) bg-info
+                                                                    @elseif($attendanceRate >= 50) bg-warning
+                                                                    @else bg-danger @endif"
                                                                         role="progressbar"
                                                                         style="width: {{ min($attendanceRate, 100) }}%"
                                                                         aria-valuenow="{{ $attendanceRate }}"
@@ -1406,15 +1441,25 @@
 
                                                 @if (count($attendanceByClassData) > 1)
                                                     @php
+                                                        // Overall rate for classes with attendance only
                                                         $overallRate =
                                                             $grandTotalStudents > 0
                                                                 ? round(($totalPresent / $grandTotalStudents) * 100, 1)
+                                                                : 0;
+
+                                                        // School-wide rate (for display if needed)
+                                                        $schoolWideRate =
+                                                            $totalRegisteredInSchool > 0
+                                                                ? round(
+                                                                    ($totalPresent / $totalRegisteredInSchool) * 100,
+                                                                    1,
+                                                                )
                                                                 : 0;
                                                     @endphp
                                                     <tfoot class="bg-light">
                                                         <tr>
                                                             <th class="ps-4 py-3 border-top">
-                                                                <strong>Total</strong>
+                                                                <strong>Total (Classes with Attendance)</strong>
                                                             </th>
                                                             <th class="text-center py-2 border-top">
                                                                 <span
@@ -1438,20 +1483,20 @@
                                                                     <div class="progress"
                                                                         style="height: 8px; width: 100px;">
                                                                         <div class="progress-bar
-                                                    @if ($overallRate >= 90) bg-success
-                                                    @elseif($overallRate >= 70) bg-info
-                                                    @elseif($overallRate >= 50) bg-warning
-                                                    @else bg-danger @endif"
+                                                                        @if ($overallRate >= 90) bg-success
+                                                                        @elseif($overallRate >= 70) bg-info
+                                                                        @elseif($overallRate >= 50) bg-warning
+                                                                        @else bg-danger @endif"
                                                                             role="progressbar"
                                                                             style="width: {{ min($overallRate, 100) }}%">
                                                                         </div>
                                                                     </div>
                                                                     <strong
                                                                         class="ms-2
-                                                    @if ($overallRate >= 90) text-success
-                                                    @elseif($overallRate >= 70) text-info
-                                                    @elseif($overallRate >= 50) text-warning
-                                                    @else text-danger @endif">
+                                                                        @if ($overallRate >= 90) text-success
+                                                                        @elseif($overallRate >= 70) text-info
+                                                                        @elseif($overallRate >= 50) text-warning
+                                                                        @else text-danger @endif">
                                                                         {{ $overallRate }}%
                                                                     </strong>
                                                                 </div>
@@ -1461,36 +1506,45 @@
                                                 @endif
                                             </table>
 
-                                            {{-- Summary Stats Cards --}}
+                                            {{-- Summary Stats Cards - Use $totalRegisteredInSchool for school-wide percentage --}}
                                             <div class="row g-2 mt-1 mx-2">
                                                 <div class="col-4">
                                                     <div class="border rounded p-1 text-center">
                                                         <small class="text-success">Present</small>
-                                                        @if ($grandTotalStudents > 0)
+                                                        @if ($totalRegisteredInSchool > 0)
                                                             <div class="small text-success">
-                                                                {{ round(($totalPresent / $grandTotalStudents) * 100, 1) }}%
+                                                                {{ round(($totalPresent / $totalRegisteredInSchool) * 100, 1) }}%
                                                             </div>
                                                         @endif
+                                                        <div class="text-muted small">
+                                                            {{ $totalPresent }}/{{ $totalRegisteredInSchool }}
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-4">
                                                     <div class="border rounded p-1 text-center">
                                                         <small class="text-danger">Absent</small>
-                                                        @if ($grandTotalStudents > 0)
+                                                        @if ($totalRegisteredInSchool > 0)
                                                             <div class="small text-danger">
-                                                                {{ round(($totalAbsent / $grandTotalStudents) * 100, 1) }}%
+                                                                {{ round(($totalAbsent / $totalRegisteredInSchool) * 100, 1) }}%
                                                             </div>
                                                         @endif
+                                                        <div class="text-muted small">
+                                                            {{ $totalAbsent }}/{{ $totalRegisteredInSchool }}
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-4">
                                                     <div class="border rounded p-1 text-center">
                                                         <small class="text-secondary">Permission</small>
-                                                        @if ($grandTotalStudents > 0)
+                                                        @if ($totalRegisteredInSchool > 0)
                                                             <div class="small text-secondary">
-                                                                {{ round(($totalPermission / $grandTotalStudents) * 100, 1) }}%
+                                                                {{ round(($totalPermission / $totalRegisteredInSchool) * 100, 1) }}%
                                                             </div>
                                                         @endif
+                                                        <div class="text-muted small">
+                                                            {{ $totalPermission }}/{{ $totalRegisteredInSchool }}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1587,7 +1641,8 @@
                                                                         <td class="fw-semibold text-capitalize">
                                                                             {{ ucwords(strtolower($teacher->gender)) }}
                                                                         </td>
-                                                                        <td class="text-end">{{ $teacher->teacher_count }}
+                                                                        <td class="text-end">
+                                                                            {{ $teacher->teacher_count }}
                                                                         </td>
                                                                     </tr>
                                                                 @endforeach

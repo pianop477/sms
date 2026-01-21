@@ -221,570 +221,609 @@
     </style>
 
     <div class="py-4">
-        <div class="col-12 mb-4">
-            <div class="row">
-                <!-- Teachers Card -->
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <a href="{{ route('Teachers.index') }}" class="text-decoration-none">
-                        <div class="stat-card bg-teacher text-white">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="card-title">Teachers</div>
-                                        <div class="card-value">
-                                            @if (count($teachers) > 99)
-                                                100+
-                                            @else
-                                                {{ count($teachers) }}
-                                            @endif
+        <div class="row">
+            <!-- Stats Cards for Head Teacher -->
+            <div class="col-lg-12 mb-4">
+                <div class="row">
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <a href="{{ route('Teachers.index') }}" class="text-decoration-none">
+                            <div class="stat-card bg-teacher text-white">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="card-title">Teachers</div>
+                                            <div class="card-value">
+                                                @if (count($teachers) > 99)
+                                                    100+
+                                                @else
+                                                    {{ count($teachers) }}
+                                                @endif
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-user-tie card-icon"></i>
+                                        <div class="col-auto">
+                                            <i class="fas fa-user-tie card-icon"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </a>
-                </div>
+                        </a>
+                    </div>
 
-                <!-- Parents Card -->
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <a href="{{ route('Parents.index') }}" class="text-decoration-none">
-                        <div class="stat-card bg-parent text-white">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="card-title">Parents</div>
-                                        <div class="card-value">
-                                            @if (count($parents) > 1999)
-                                                2000+
-                                            @else
-                                                {{ count($parents) }}
-                                            @endif
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <a href="{{ route('Parents.index') }}" class="text-decoration-none">
+                            <div class="stat-card bg-parent text-white">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="card-title">Parents</div>
+                                            <div class="card-value">
+                                                @if (count($parents) > 1999)
+                                                    2000+
+                                                @else
+                                                    {{ count($parents) }}
+                                                @endif
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-user-friends card-icon"></i>
+                                        <div class="col-auto">
+                                            <i class="fas fa-user-friends card-icon"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </a>
-                </div>
+                        </a>
+                    </div>
 
-                <!-- Students Card -->
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <a href="{{ route('classes.list') }}" class="text-decoration-none">
-                        <div class="stat-card bg-student text-white">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="card-title">Students</div>
-                                        <div class="card-value">
-                                            @if (count($students) > 1999)
-                                                2000+
-                                            @else
-                                                {{ count($students) }}
-                                            @endif
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <a href="{{ route('classes.list') }}" class="text-decoration-none">
+                            <div class="stat-card bg-student text-white">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="card-title">Students</div>
+                                            <div class="card-value">
+                                                @if (count($students) > 1999)
+                                                    2000+
+                                                @else
+                                                    {{ count($students) }}
+                                                @endif
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-user-graduate card-icon"></i>
+                                        <div class="col-auto">
+                                            <i class="fas fa-user-graduate card-icon"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            <div class="row">
-                <!-- Courses Card -->
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <a href="{{ route('courses.index') }}" class="text-decoration-none">
-                        <div class="stat-card bg-course text-white">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="card-title">Open Courses</div>
-                                        <div class="card-value">
-                                            @if (count($subjects) > 49)
-                                                50+
-                                            @else
-                                                {{ count($subjects) }}
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="ti-book card-icon"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
+                        </a>
+                    </div>
 
-                <!-- Classes Card -->
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <a href="{{ route('Classes.index') }}" class="text-decoration-none">
-                        <div class="stat-card bg-class text-white">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="card-title">Classes</div>
-                                        <div class="card-value">
-                                            @if (count($classes) > 49)
-                                                50+
-                                            @else
-                                                {{ count($classes) }}
-                                            @endif
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <a href="{{ route('courses.index') }}" class="text-decoration-none">
+                            <div class="stat-card bg-course text-white">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="card-title">Open Courses</div>
+                                            <div class="card-value">
+                                                @if (count($subjects) > 49)
+                                                    50+
+                                                @else
+                                                    {{ count($subjects) }}
+                                                @endif
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="ti-blackboard card-icon"></i>
+                                        <div class="col-auto">
+                                            <i class="ti-book card-icon"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </a>
-                </div>
+                        </a>
+                    </div>
 
-                <!-- School Buses Card -->
-                <div class="col-xl-4 col-md-6 mb-4">
-                    <a href="{{ route('Transportation.index') }}" class="text-decoration-none">
-                        <div class="stat-card bg-bus text-white">
-                            <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="card-title">School Buses</div>
-                                        <div class="card-value">
-                                            @if (count($buses) > 49)
-                                                50+
-                                            @else
-                                                {{ count($buses) }}
-                                            @endif
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <a href="{{ route('Classes.index') }}" class="text-decoration-none">
+                            <div class="stat-card bg-class text-white">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="card-title">Classes</div>
+                                            <div class="card-value">
+                                                @if (count($classes) > 49)
+                                                    50+
+                                                @else
+                                                    {{ count($classes) }}
+                                                @endif
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="fas fa-bus card-icon"></i>
+                                        <div class="col-auto">
+                                            <i class="ti-blackboard card-icon"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
+                        </a>
+                    </div>
 
-        <div class="col-12 mb-4">
-            <div class="row">
-                <!-- Student Registration Chart -->
-                <div class="col-xl-8 mb-4">
-                    <div class="chart-container">
-                        <div class="chart-header">
-                            <h5 class="chart-title">
-                                <i class="fas fa-chart-bar me-2"></i> Student Registration by Class & Gender
-                            </h5>
-                            <p class="chart-subtitle">Distribution of students across classes</p>
-                        </div>
-                        <div class="chart-wrapper">
-                            <div id="studentChart" class="chart-canvas"></div>
-                        </div>
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <a href="{{ route('Transportation.index') }}" class="text-decoration-none">
+                            <div class="stat-card bg-bus text-white">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="card-title">School Buses</div>
+                                            <div class="card-value">
+                                                @if (count($buses) > 49)
+                                                    50+
+                                                @else
+                                                    {{ count($buses) }}
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-bus card-icon"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
                     </div>
                 </div>
-                <!-- Teacher Qualifications Chart -->
-                <div class="col-xl-4 mb-4">
-                    <div class="chart-container">
-                        <div class="chart-header">
-                            <h5 class="chart-title">
-                                <i class="fas fa-chart-pie me-2"></i> Teacher Qualifications
-                            </h5>
-                            <p class="chart-subtitle">Educational background overview</p>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="col-lg-12 mb-4">
+                <div class="row">
+                    <div class="col-xl-8 mb-4">
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h5 class="chart-title">
+                                    <i class="fas fa-chart-bar me-2"></i> Student Registration by Class & Gender
+                                </h5>
+                                <p class="chart-subtitle">Distribution of students across classes</p>
+                            </div>
+                            <div class="chart-wrapper">
+                                <div id="studentChart" class="chart-canvas"></div>
+                            </div>
                         </div>
-                        <div class="chart-wrapper">
-                            <div id="qualificationChart" class="chart-canvas"></div>
+                    </div>
+
+                    <div class="col-xl-4 mb-4">
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h5 class="chart-title">
+                                    <i class="fas fa-chart-pie me-2"></i> Teacher Qualifications
+                                </h5>
+                                <p class="chart-subtitle">Educational background overview</p>
+                            </div>
+                            <div class="chart-wrapper">
+                                <div id="qualificationChart" class="chart-canvas"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="row">
-                <!-- Gender Distribution -->
-                <div class="col-xl-4 mb-4">
-                    <div class="chart-container">
-                        <div class="chart-header">
-                            <h5 class="chart-title">
-                                <i class="fas fa-venus-mars me-2"></i> Student Gender Distribution
-                            </h5>
-                            <p class="chart-subtitle">Male vs Female students ratio</p>
-                        </div>
-                        <div class="chart-wrapper">
-                            <canvas id="genderChart"></canvas>
+            <!-- Additional Analytics -->
+            <div class="col-lg-12 mb-4">
+                <div class="row">
+                    <div class="col-xl-4 mb-4">
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h5 class="chart-title">
+                                    <i class="fas fa-venus-mars me-2"></i> Student Gender Distribution
+                                </h5>
+                                <p class="chart-subtitle">Male vs Female students ratio</p>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="genderChart"></canvas>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-xl-5 mb-4">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-header bg-white border-0 pb-0">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h5 class="chart-title">
-                                        <i class="fas fa-calendar-check me-2"></i> Today's Attendance Summary
-                                    </h5>
-                                    <p class="text-muted small mb-0">
-                                        {{ \Carbon\Carbon::today()->format('l, d F Y') }}
-                                    </p>
+
+                    <div class="col-xl-5 mb-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-white border-0 pb-0">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="chart-title">
+                                            <i class="fas fa-calendar-check me-2"></i> Today's Attendance Summary
+                                        </h5>
+                                        <p class="text-muted small mb-0">
+                                            {{ \Carbon\Carbon::today()->format('l, d F Y') }}
+                                        </p>
+                                    </div>
+                                    @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
+                                        <span class="badge bg-primary text-white">
+                                            {{ count($attendanceByClassData) }} Streams
+                                        </span>
+                                    @endif
                                 </div>
+                            </div>
+
+                            <div class="card-body p-1">
                                 @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
-                                    <span class="badge bg-primary text-white">
-                                        {{ count($attendanceByClassData) }} Streams
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="card-body p-1">
-                            @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
-                                <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                                    <table class="table table-hover mb-0 table-sm">
-                                        <thead class="sticky-top" style="background: #f8f9fa; z-index: 1;">
-                                            <tr>
-                                                <th class="border-0 py-3 ps-4">Classes</th>
-                                                <th class="border-0 py-3 text-center">
-                                                    <span class="text-success">Pres</span>
-                                                </th>
-                                                <th class="border-0 py-3 text-center">
-                                                    <span class="text-danger">Abs</span>
-                                                </th>
-                                                <th class="border-0 py-3 text-center">
-                                                    <span class="text-secondary">Perm</span>
-                                                </th>
-                                                <th class="border-0 py-3 text-center pe-4">Total</th>
-                                                <th class="border-0 py-3 text-center">Rate</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @php
-                                                // use App\Models\Student;
-
-                                                $totalPresent = 0;
-                                                $totalAbsent = 0;
-                                                $totalPermission = 0;
-                                                $grandTotalStudents = 0; // Total registered students across all classes
-                                                $previousClass = null;
-                                                $classGroupColors = [
-                                                    'A' => 'bg-success',
-                                                    'B' => 'bg-dark',
-                                                    'C' => 'bg-warning',
-                                                    'D' => 'bg-danger',
-                                                    'E' => 'bg-primary',
-                                                    'F' => 'bg-secondary',
-                                                    'G' => 'bg-info',
-                                                ];
-                                            @endphp
-
-                                            @foreach ($attendanceByClassData as $classData)
+                                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                                        <table class="table table-hover mb-0 table-sm">
+                                            <thead class="sticky-top" style="background: #f8f9fa; z-index: 1;">
+                                                <tr>
+                                                    <th class="border-0 py-3 ps-4">Classes</th>
+                                                    <th class="border-0 py-3 text-center">
+                                                        <span class="text-success">Pres</span>
+                                                    </th>
+                                                    <th class="border-0 py-3 text-center">
+                                                        <span class="text-danger">Abs</span>
+                                                    </th>
+                                                    <th class="border-0 py-3 text-center">
+                                                        <span class="text-secondary">Perm</span>
+                                                    </th>
+                                                    <th class="border-0 py-3 text-center pe-4">Total</th>
+                                                    <th class="border-0 py-3 text-center">Rate</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
                                                 @php
-                                                    // Get total registered students for this class from Student model
-                                                    $registeredStudents = \App\Models\Student::where(
-                                                        'class_id',
-                                                        $classData['class_id'],
-                                                    )
-                                                        ->where('status', 1)
-                                                        ->when(!empty($classData['class_stream']), function (
-                                                            $query,
-                                                        ) use ($classData) {
-                                                            return $query->where('group', $classData['class_stream']);
-                                                        })
-                                                        ->count();
+                                                    $totalPresent = 0;
+                                                    $totalAbsent = 0;
+                                                    $totalPermission = 0;
+                                                    $grandTotalStudents = 0;
+                                                    $previousClass = null;
 
-                                                    // Calculate attendance data
-                                                    $classTotal =
-                                                        $classData['present'] +
-                                                        $classData['absent'] +
-                                                        $classData['permission'];
+                                                    // Get total registered students for ALL classes in the school
+                                                    $totalRegisteredInSchool = \App\Models\Student::where(
+                                                        'status',
+                                                        1,
+                                                    )->count();
 
-                                                    // Calculate attendance rate based on registered students
-                                                    $attendanceRate =
-                                                        $registeredStudents > 0
-                                                            ? round(
-                                                                ($classData['present'] / $registeredStudents) * 100,
-                                                                1,
-                                                            )
-                                                            : 0;
-
-                                                    // Update totals
-                                                    $totalPresent += $classData['present'];
-                                                    $totalAbsent += $classData['absent'];
-                                                    $totalPermission += $classData['permission'];
-                                                    $grandTotalStudents += $registeredStudents;
-
-                                                    // Determine if we need to show class header (for grouped classes)
-                                                    $currentClass = $classData['original_class_name'];
-                                                    $showClassHeader = $previousClass !== $currentClass;
-                                                    $previousClass = $currentClass;
-
-                                                    // Determine badge color for stream
-                                                    $streamBadgeClass = 'bg-secondary';
-                                                    if (
-                                                        !empty($classData['class_stream']) &&
-                                                        isset($classGroupColors[strtoupper($classData['class_stream'])])
-                                                    ) {
-                                                        $streamBadgeClass =
-                                                            $classGroupColors[strtoupper($classData['class_stream'])];
-                                                    }
+                                                    $classGroupColors = [
+                                                        'A' => 'bg-success',
+                                                        'B' => 'bg-dark',
+                                                        'C' => 'bg-warning',
+                                                        'D' => 'bg-danger',
+                                                        'E' => 'bg-primary',
+                                                        'F' => 'bg-secondary',
+                                                        'G' => 'bg-info',
+                                                    ];
                                                 @endphp
 
-                                                <tr class="border-bottom">
-                                                    <td class="ps-4">
-                                                        <div class="d-flex align-items-center">
-                                                            <div>
-                                                                @if (!empty($classData['class_stream']))
-                                                                    <div class="text-dark small">
-                                                                        <strong>{{ strtoupper($classData['class_code']) }}
-                                                                            -
-                                                                            <span
-                                                                                class="badge {{ $streamBadgeClass }} text-white">
-                                                                                {{ strtoupper($classData['class_stream']) }}
-                                                                            </span>
-                                                                        </strong>
+                                                @foreach ($attendanceByClassData as $classData)
+                                                    @php
+                                                        // Debug: Check if class_id exists
+                                                        $classId = $classData['class_id'] ?? null;
+                                                        $stream = $classData['class_stream'] ?? null;
+
+                                                        // Initialize registered students count
+                                                        $registeredStudents = 0;
+
+                                                        // Only query if class_id exists
+                                                        if ($classId) {
+                                                            try {
+                                                                $query = \App\Models\Student::where(
+                                                                    'class_id',
+                                                                    $classId,
+                                                                )->where('status', 1);
+
+                                                                if (!empty($stream)) {
+                                                                    $query->where('group', $stream);
+                                                                }
+
+                                                                $registeredStudents = $query->count();
+                                                            } catch (Exception $e) {
+                                                                // Fallback: use attendance data if query fails
+                                                                $registeredStudents =
+                                                                    $classData['present'] +
+                                                                    $classData['absent'] +
+                                                                    $classData['permission'];
+                                                            }
+                                                        } else {
+                                                            // If no class_id, use attendance data
+                                                            $registeredStudents =
+                                                                $classData['present'] +
+                                                                $classData['absent'] +
+                                                                $classData['permission'];
+                                                        }
+
+                                                        // Calculate attendance rate for this class
+                                                        // Use registeredStudents for CLASS rate
+                                                        $attendanceRate =
+                                                            $registeredStudents > 0
+                                                                ? round(
+                                                                    ($classData['present'] / $registeredStudents) * 100,
+                                                                    1,
+                                                                )
+                                                                : 0;
+
+                                                        // Update totals
+                                                        $totalPresent += $classData['present'];
+                                                        $totalAbsent += $classData['absent'];
+                                                        $totalPermission += $classData['permission'];
+                                                        $grandTotalStudents += $registeredStudents; // This is for classes with attendance only
+
+                                                        // Determine if we need to show class header
+                                                        $currentClass = $classData['original_class_name'] ?? '';
+                                                        $showClassHeader = $previousClass !== $currentClass;
+                                                        $previousClass = $currentClass;
+
+                                                        // Determine badge color for stream
+                                                        $streamBadgeClass = 'bg-secondary';
+                                                        if ($stream && isset($classGroupColors[strtoupper($stream)])) {
+                                                            $streamBadgeClass = $classGroupColors[strtoupper($stream)];
+                                                        }
+                                                    @endphp
+
+                                                    <tr class="border-bottom">
+                                                        <td class="ps-4">
+                                                            <div class="d-flex align-items-center">
+                                                                <div>
+                                                                    @if (!empty($stream))
+                                                                        <div class="text-dark small">
+                                                                            <strong>{{ strtoupper($classData['class_code'] ?? '') }}
+                                                                                -
+                                                                                <span
+                                                                                    class="badge {{ $streamBadgeClass }} text-white">
+                                                                                    {{ strtoupper($stream) }}
+                                                                                </span>
+                                                                            </strong>
+                                                                            <div class="text-muted small">
+                                                                                Registered: {{ $registeredStudents }}
+                                                                            </div>
+                                                                        </div>
+                                                                    @else
+                                                                        <strong
+                                                                            class="text-dark">{{ $classData['class_name'] ?? '' }}</strong>
                                                                         <div class="text-muted small">
+                                                                            {{ $classData['class_code'] ?? '' }}
+                                                                            <br>
                                                                             Registered: {{ $registeredStudents }}
                                                                         </div>
-                                                                    </div>
-                                                                @else
-                                                                    <strong
-                                                                        class="text-dark">{{ $classData['class_name'] }}</strong>
-                                                                    <div class="text-muted small">
-                                                                        {{ $classData['class_code'] }}
-                                                                        <br>
-                                                                        Registered: {{ $registeredStudents }}
-                                                                    </div>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <span class="px-3 py-1 text-success">
-                                                            {{ $classData['present'] }}
-                                                        </span>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <span class="px-3 py-1 text-danger">
-                                                            {{ $classData['absent'] }}
-                                                        </span>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <span class="px-3 py-1 text-secondary">
-                                                            {{ $classData['permission'] }}
-                                                        </span>
-                                                    </td>
-                                                    <td class="text-center pe-4">
-                                                        <strong>{{ $registeredStudents }}</strong>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <div class="progress"
-                                                            style="height: 6px; width: 80px; margin: 0 auto;">
-                                                            <div class="progress-bar
-                                                        @if ($attendanceRate >= 90) bg-success
-                                                        @elseif($attendanceRate >= 70) bg-info
-                                                        @elseif($attendanceRate >= 50) bg-warning
-                                                        @else bg-danger @endif"
-                                                                role="progressbar"
-                                                                style="width: {{ min($attendanceRate, 100) }}%"
-                                                                aria-valuenow="{{ $attendanceRate }}" aria-valuemin="0"
-                                                                aria-valuemax="100">
-                                                            </div>
-                                                        </div>
-                                                        <small
-                                                            class="text-muted d-block mt-1">{{ $attendanceRate }}%</small>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-
-                                        @if (count($attendanceByClassData) > 1)
-                                            @php
-                                                // Calculate overall rate based on total registered students
-                                                $overallRate =
-                                                    $grandTotalStudents > 0
-                                                        ? round(($totalPresent / $grandTotalStudents) * 100, 1)
-                                                        : 0;
-                                            @endphp
-                                            <tfoot class="bg-light">
-                                                <tr>
-                                                    <th class="ps-4 py-3 border-top">
-                                                        <strong>Total</strong>
-                                                    </th>
-                                                    <th class="text-center py-2 border-top">
-                                                        <span
-                                                            class="badge bg-success text-white px-3">{{ $totalPresent }}</span>
-                                                    </th>
-                                                    <th class="text-center py-2 border-top">
-                                                        <span
-                                                            class="badge bg-danger text-white px-3">{{ $totalAbsent }}</span>
-                                                    </th>
-                                                    <th class="text-center py-2 border-top">
-                                                        <span
-                                                            class="badge bg-secondary text-white px-3">{{ $totalPermission }}</span>
-                                                    </th>
-                                                    <th class="text-center pe-4 py-2 border-top">
-                                                        <strong class="text-dark">{{ $grandTotalStudents }}</strong>
-                                                    </th>
-                                                    <th class="text-center py-2 border-top">
-                                                        <div class="d-flex align-items-center justify-content-center">
-                                                            <div class="progress" style="height: 8px; width: 100px;">
-                                                                <div class="progress-bar
-                                                                @if ($overallRate >= 90) bg-success
-                                                                @elseif($overallRate >= 70) bg-info
-                                                                @elseif($overallRate >= 50) bg-warning
-                                                                @else bg-danger @endif"
-                                                                    role="progressbar"
-                                                                    style="width: {{ min($overallRate, 100) }}%">
+                                                                    @endif
                                                                 </div>
                                                             </div>
-                                                            <strong
-                                                                class="ms-2
-                                                        @if ($overallRate >= 90) text-success
-                                                        @elseif($overallRate >= 70) text-info
-                                                        @elseif($overallRate >= 50) text-warning
-                                                        @else text-danger @endif">
-                                                                {{ $overallRate }}%
-                                                            </strong>
-                                                        </div>
-                                                    </th>
-                                                </tr>
-                                            </tfoot>
-                                        @endif
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span class="px-3 py-1 text-success">
+                                                                {{ $classData['present'] }}
+                                                            </span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span class="px-3 py-1 text-danger">
+                                                                {{ $classData['absent'] }}
+                                                            </span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span class="px-3 py-1 text-secondary">
+                                                                {{ $classData['permission'] }}
+                                                            </span>
+                                                        </td>
+                                                        <td class="text-center pe-4">
+                                                            <strong>{{ $registeredStudents }}</strong>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <div class="progress"
+                                                                style="height: 6px; width: 80px; margin: 0 auto;">
+                                                                <div class="progress-bar
+                                                                    @if ($attendanceRate >= 90) bg-success
+                                                                    @elseif($attendanceRate >= 70) bg-info
+                                                                    @elseif($attendanceRate >= 50) bg-warning
+                                                                    @else bg-danger @endif"
+                                                                    role="progressbar"
+                                                                    style="width: {{ min($attendanceRate, 100) }}%"
+                                                                    aria-valuenow="{{ $attendanceRate }}"
+                                                                    aria-valuemin="0" aria-valuemax="100">
+                                                                </div>
+                                                            </div>
+                                                            <small
+                                                                class="text-muted d-block mt-1">{{ $attendanceRate }}%</small>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
 
-                                        {{-- Summary Stats Cards --}}
+                                            @if (count($attendanceByClassData) > 1)
+                                                @php
+                                                    // Overall rate for classes with attendance only
+                                                    $overallRate =
+                                                        $grandTotalStudents > 0
+                                                            ? round(($totalPresent / $grandTotalStudents) * 100, 1)
+                                                            : 0;
+
+                                                    // School-wide rate (for display if needed)
+                                                    $schoolWideRate =
+                                                        $totalRegisteredInSchool > 0
+                                                            ? round(($totalPresent / $totalRegisteredInSchool) * 100, 1)
+                                                            : 0;
+                                                @endphp
+                                                <tfoot class="bg-light">
+                                                    <tr>
+                                                        <th class="ps-4 py-3 border-top">
+                                                            <strong>Total (Classes with Attendance)</strong>
+                                                        </th>
+                                                        <th class="text-center py-2 border-top">
+                                                            <span
+                                                                class="badge bg-success text-white px-3">{{ $totalPresent }}</span>
+                                                        </th>
+                                                        <th class="text-center py-2 border-top">
+                                                            <span
+                                                                class="badge bg-danger text-white px-3">{{ $totalAbsent }}</span>
+                                                        </th>
+                                                        <th class="text-center py-2 border-top">
+                                                            <span
+                                                                class="badge bg-secondary text-white px-3">{{ $totalPermission }}</span>
+                                                        </th>
+                                                        <th class="text-center pe-4 py-2 border-top">
+                                                            <strong class="text-dark">{{ $grandTotalStudents }}</strong>
+                                                        </th>
+                                                        <th class="text-center py-2 border-top">
+                                                            <div class="d-flex align-items-center justify-content-center">
+                                                                <div class="progress" style="height: 8px; width: 100px;">
+                                                                    <div class="progress-bar
+                                                                        @if ($overallRate >= 90) bg-success
+                                                                        @elseif($overallRate >= 70) bg-info
+                                                                        @elseif($overallRate >= 50) bg-warning
+                                                                        @else bg-danger @endif"
+                                                                        role="progressbar"
+                                                                        style="width: {{ min($overallRate, 100) }}%">
+                                                                    </div>
+                                                                </div>
+                                                                <strong
+                                                                    class="ms-2
+                                                                        @if ($overallRate >= 90) text-success
+                                                                        @elseif($overallRate >= 70) text-info
+                                                                        @elseif($overallRate >= 50) text-warning
+                                                                        @else text-danger @endif">
+                                                                    {{ $overallRate }}%
+                                                                </strong>
+                                                            </div>
+                                                        </th>
+                                                    </tr>
+                                                </tfoot>
+                                            @endif
+                                        </table>
+
+                                        {{-- Summary Stats Cards - Use $totalRegisteredInSchool for school-wide percentage --}}
                                         <div class="row g-2 mt-1 mx-2">
                                             <div class="col-4">
                                                 <div class="border rounded p-1 text-center">
                                                     <small class="text-success">Present</small>
-                                                    @if ($grandTotalStudents > 0)
+                                                    @if ($totalRegisteredInSchool > 0)
                                                         <div class="small text-success">
-                                                            {{ round(($totalPresent / $grandTotalStudents) * 100, 1) }}%
+                                                            {{ round(($totalPresent / $totalRegisteredInSchool) * 100, 1) }}%
                                                         </div>
                                                     @endif
+                                                    <div class="text-muted small">
+                                                        {{ $totalPresent }}/{{ $totalRegisteredInSchool }}
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="col-4">
                                                 <div class="border rounded p-1 text-center">
                                                     <small class="text-danger">Absent</small>
-                                                    @if ($grandTotalStudents > 0)
+                                                    @if ($totalRegisteredInSchool > 0)
                                                         <div class="small text-danger">
-                                                            {{ round(($totalAbsent / $grandTotalStudents) * 100, 1) }}%
+                                                            {{ round(($totalAbsent / $totalRegisteredInSchool) * 100, 1) }}%
                                                         </div>
                                                     @endif
+                                                    <div class="text-muted small">
+                                                        {{ $totalAbsent }}/{{ $totalRegisteredInSchool }}
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="col-4">
                                                 <div class="border rounded p-1 text-center">
                                                     <small class="text-secondary">Permission</small>
-                                                    @if ($grandTotalStudents > 0)
+                                                    @if ($totalRegisteredInSchool > 0)
                                                         <div class="small text-secondary">
-                                                            {{ round(($totalPermission / $grandTotalStudents) * 100, 1) }}%
+                                                            {{ round(($totalPermission / $totalRegisteredInSchool) * 100, 1) }}%
                                                         </div>
                                                     @endif
+                                                    <div class="text-muted small">
+                                                        {{ $totalPermission }}/{{ $totalRegisteredInSchool }}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    @else
-                                        <div class="text-center py-5">
-                                            <div class="mb-3">
-                                                <i class="fas fa-calendar-times fa-3x text-muted"></i>
-                                            </div>
-                                            <h5 class="text-muted mb-2">No Attendance Today</h5>
-                                            <p class="text-muted small">
-                                                Attendance records will appear here once submitted by teachers.
-                                            </p>
+                                    </div>
+                                @else
+                                    <div class="text-center py-5">
+                                        <div class="mb-3">
+                                            <i class="fas fa-calendar-times fa-3x text-muted"></i>
                                         </div>
-                            @endif
-                        </div>
-
-                        @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
-                            <div class="card-footer bg-white border-0 pt-0">
-                                <div class="text-end">
-                                    <small class="text-muted">
-                                        <i class="fas fa-info-circle me-1"></i>
-                                        Updated: {{ now()->format('h:i A') }}
-                                    </small>
-                                </div>
+                                        <h5 class="text-muted mb-2">No Attendance Today</h5>
+                                        <p class="text-muted small">
+                                            Attendance records will appear here once submitted by teachers.
+                                        </p>
+                                    </div>
+                                @endif
                             </div>
-                        @endif
-                    </div>
-                </div>
-                <!-- Quick Stats Tables -->
-                <div class="col-xl-3 mb-4">
-                    <div class="chart-container">
-                        <div class="chart-header">
-                            <h5 class="chart-title">
-                                <i class="fas fa-table me-2"></i> Quick Overview
-                            </h5>
-                            <p class="chart-subtitle">Registration statistics</p>
-                        </div>
-                        <div class="row">
-                            <!-- Students by Class -->
-                            <div class="col-12 mb-3">
-                                <div class="card border-0 bg-light">
-                                    <div class="card-body p-3">
-                                        <h6 class="card-title text-center mb-3 text-primary">Students by Class</h6>
-                                        @if ($studentsByClass->isEmpty())
-                                            <p class="text-center text-muted mb-0">No records available</p>
-                                        @else
-                                            <div class="table-responsive">
-                                                <table class="table table-sm dashboard-table mb-0">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Class</th>
-                                                            <th class="text-end">Count</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach ($studentsByClass as $class)
-                                                            <tr>
-                                                                <td class="fw-semibold">
-                                                                    {{ strtoupper($class->class_code) }}</td>
-                                                                <td class="text-end">{{ $class->student_count }}</td>
-                                                            </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        @endif
+
+                            @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
+                                <div class="card-footer bg-white border-0 pt-0">
+                                    <div class="text-end">
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Updated: {{ now()->format('h:i A') }}
+                                        </small>
                                     </div>
                                 </div>
-                            </div>
+                            @endif
+                        </div>
+                    </div>
 
-                            <!-- Teachers by Gender -->
-                            <div class="col-md-12">
-                                <div class="card border-0 bg-light">
-                                    <div class="card-body p-3">
-                                        <h6 class="card-title text-center mb-3 text-primary">Teachers by Gender</h6>
-                                        @if ($teacherByGender->isEmpty())
-                                            <p class="text-center text-muted mb-0">No records available</p>
-                                        @else
-                                            <div class="table-responsive">
-                                                <table class="table table-sm dashboard-table mb-0">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Gender</th>
-                                                            <th class="text-end">Count</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach ($teacherByGender as $teacher)
+                    <!-- Quick Stats Tables -->
+                    <div class="col-xl-3 mb-4">
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h5 class="chart-title">
+                                    <i class="fas fa-table me-2"></i> Quick Overview
+                                </h5>
+                                <p class="chart-subtitle">Registration statistics</p>
+                            </div>
+                            <div class="row">
+                                <!-- Students by Class -->
+                                <div class="col-12 mb-3">
+                                    <div class="card border-0 bg-light">
+                                        <div class="card-body p-3">
+                                            <h6 class="card-title text-center mb-3 text-primary">Students by Class</h6>
+                                            @if ($studentsByClass->isEmpty())
+                                                <p class="text-center text-muted mb-0">No records available</p>
+                                            @else
+                                                <div class="table-responsive">
+                                                    <table class="table table-sm dashboard-table mb-0">
+                                                        <thead>
                                                             <tr>
-                                                                <td class="fw-semibold text-capitalize">
-                                                                    {{ ucwords(strtolower($teacher->gender)) }}</td>
-                                                                <td class="text-end">{{ $teacher->teacher_count }}
-                                                                </td>
+                                                                <th>Class</th>
+                                                                <th class="text-end">Count</th>
                                                             </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        @endif
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($studentsByClass as $class)
+                                                                <tr>
+                                                                    <td class="fw-semibold text-uppercase">
+                                                                        {{ $class->class_code }}</td>
+                                                                    <td class="text-end">
+                                                                        {{ strtoupper($class->student_count) }}</td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Teachers by Gender -->
+                                <div class="col-12">
+                                    <div class="card border-0 bg-light">
+                                        <div class="card-body p-3">
+                                            <h6 class="card-title text-center mb-3 text-primary">Teachers by Gender
+                                            </h6>
+                                            @if ($teacherByGender->isEmpty())
+                                                <p class="text-center text-muted mb-0">No records available</p>
+                                            @else
+                                                <div class="table-responsive">
+                                                    <table class="table table-sm dashboard-table mb-0">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Gender</th>
+                                                                <th class="text-end">Count</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach ($teacherByGender as $teacher)
+                                                                <tr>
+                                                                    <td class="fw-semibold text-capitalize">
+                                                                        {{ ucwords(strtolower($teacher->gender)) }}
+                                                                    </td>
+                                                                    <td class="text-end">{{ $teacher->teacher_count }}
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
                                 </div>
                             </div>
