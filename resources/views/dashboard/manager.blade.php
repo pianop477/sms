@@ -411,7 +411,7 @@
                 </div>
             </div>
             <!-- Additional Analytics Section -->
-            <div class="col-lg-12 mb-4">
+            <div class="col-12 mb-4">
                 <div class="row">
                     <!-- Gender Distribution -->
                     <div class="col-xl-4 mb-4">
@@ -769,7 +769,7 @@
                                 </div>
 
                                 <!-- Teachers by Gender -->
-                                <div class="col-12">
+                                <div class="col-md-12">
                                     <div class="card border-0 bg-light">
                                         <div class="card-body p-3">
                                             <h6 class="card-title text-center mb-3 text-primary">Teachers by Gender</h6>
