@@ -1155,7 +1155,6 @@ class StudentsController extends Controller
             ->orderBy('students.first_name', 'asc')  // Use students. prefix
             ->orderBy('students.middle_name', 'asc') // Add middle name
             ->orderBy('students.last_name', 'asc')   // Add last name
-            ->orderBy('students.admission_no', 'asc') // For consistency
             ->get();
 
         return view('Students.trash', compact('students'));
