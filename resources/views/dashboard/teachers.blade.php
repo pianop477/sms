@@ -630,7 +630,7 @@
                                                         $totalPresent = 0;
                                                         $totalAbsent = 0;
                                                         $totalPermission = 0;
-                                                        $grandTotalStudents = 0; // Total students registered
+                                                        $grandTotalStudents = 0;
                                                         $previousClass = null;
                                                         $classGroupColors = [
                                                             'A' => 'bg-success',
@@ -645,27 +645,39 @@
 
                                                     @foreach ($attendanceByClassData as $classData)
                                                         @php
-                                                            // Get total registered students for this class
-                                                            $registeredStudents = Student::where(
-                                                                'class_id',
-                                                                $classData['class_id'],
-                                                            )
-                                                                ->when(!empty($classData['class_stream']), function (
-                                                                    $query,
-                                                                ) use ($classData) {
-                                                                    return $query->where(
-                                                                        'group',
-                                                                        $classData['class_stream'],
-                                                                    );
-                                                                })
-                                                                ->count();
+                                                            // Debug: Check if class_id exists
+                                                            $classId = $classData['class_id'] ?? null;
+                                                            $stream = $classData['class_stream'] ?? null;
 
-                                                            $classTotal =
-                                                                $classData['present'] +
-                                                                $classData['absent'] +
-                                                                $classData['permission'];
+                                                            // Initialize registered students count
+                                                            $registeredStudents = 0;
 
-                                                            // Calculate attendance rate based on registered students
+                                                            // Only query if class_id exists
+                                                            if ($classId) {
+                                                                try {
+                                                                    $query = Student::where('class_id', $classId);
+
+                                                                    if (!empty($stream)) {
+                                                                        $query->where('group', $stream);
+                                                                    }
+
+                                                                    $registeredStudents = $query->count();
+                                                                } catch (Exception $e) {
+                                                                    // Fallback: use attendance data if query fails
+                                                                    $registeredStudents =
+                                                                        $classData['present'] +
+                                                                        $classData['absent'] +
+                                                                        $classData['permission'];
+                                                                }
+                                                            } else {
+                                                                // If no class_id, use attendance data
+                                                                $registeredStudents =
+                                                                    $classData['present'] +
+                                                                    $classData['absent'] +
+                                                                    $classData['permission'];
+                                                            }
+
+                                                            // Calculate attendance rate
                                                             $attendanceRate =
                                                                 $registeredStudents > 0
                                                                     ? round(
@@ -675,29 +687,25 @@
                                                                     )
                                                                     : 0;
 
+                                                            // Update totals
                                                             $totalPresent += $classData['present'];
                                                             $totalAbsent += $classData['absent'];
                                                             $totalPermission += $classData['permission'];
                                                             $grandTotalStudents += $registeredStudents;
 
-                                                            $currentClass = $classData['original_class_name'];
+                                                            // Determine if we need to show class header
+                                                            $currentClass = $classData['original_class_name'] ?? '';
                                                             $showClassHeader = $previousClass !== $currentClass;
                                                             $previousClass = $currentClass;
 
                                                             // Determine badge color for stream
                                                             $streamBadgeClass = 'bg-secondary';
                                                             if (
-                                                                !empty($classData['class_stream']) &&
-                                                                isset(
-                                                                    $classGroupColors[
-                                                                        strtoupper($classData['class_stream'])
-                                                                    ],
-                                                                )
+                                                                $stream &&
+                                                                isset($classGroupColors[strtoupper($stream)])
                                                             ) {
                                                                 $streamBadgeClass =
-                                                                    $classGroupColors[
-                                                                        strtoupper($classData['class_stream'])
-                                                                    ];
+                                                                    $classGroupColors[strtoupper($stream)];
                                                             }
                                                         @endphp
 
@@ -705,28 +713,26 @@
                                                             <td class="ps-4">
                                                                 <div class="d-flex align-items-center">
                                                                     <div>
-                                                                        @if (!empty($classData['class_stream']))
+                                                                        @if (!empty($stream))
                                                                             <div class="text-dark small">
-                                                                                <strong>{{ strtoupper($classData['class_code']) }}
+                                                                                <strong>{{ strtoupper($classData['class_code'] ?? '') }}
                                                                                     -
                                                                                     <span
                                                                                         class="badge {{ $streamBadgeClass }} text-white">
-                                                                                        {{ strtoupper($classData['class_stream']) }}
+                                                                                        {{ strtoupper($stream) }}
                                                                                     </span>
                                                                                 </strong>
                                                                                 <div class="text-muted small">
-                                                                                    Registered:
-                                                                                    {{ $registeredStudents }}
+                                                                                    Registered: {{ $registeredStudents }}
                                                                                 </div>
                                                                             </div>
                                                                         @else
                                                                             <strong
-                                                                                class="text-dark">{{ $classData['class_name'] }}</strong>
+                                                                                class="text-dark">{{ $classData['class_name'] ?? '' }}</strong>
                                                                             <div class="text-muted small">
-                                                                                {{ $classData['class_code'] }}
+                                                                                {{ $classData['class_code'] ?? '' }}
                                                                                 <br>
-                                                                                Registered:
-                                                                                {{ $registeredStudents }}
+                                                                                Registered: {{ $registeredStudents }}
                                                                             </div>
                                                                         @endif
                                                                     </div>
@@ -764,9 +770,8 @@
                                                                         aria-valuemin="0" aria-valuemax="100">
                                                                     </div>
                                                                 </div>
-                                                                <small class="text-muted d-block mt-1">
-                                                                    {{ $attendanceRate }}%
-                                                                </small>
+                                                                <small
+                                                                    class="text-muted d-block mt-1">{{ $attendanceRate }}%</small>
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -1248,7 +1253,7 @@
                                                         $totalPresent = 0;
                                                         $totalAbsent = 0;
                                                         $totalPermission = 0;
-                                                        $grandTotalStudents = 0; // Total students registered
+                                                        $grandTotalStudents = 0;
                                                         $previousClass = null;
                                                         $classGroupColors = [
                                                             'A' => 'bg-success',
@@ -1263,27 +1268,39 @@
 
                                                     @foreach ($attendanceByClassData as $classData)
                                                         @php
-                                                            // Get total registered students for this class
-                                                            $registeredStudents = Student::where(
-                                                                'class_id',
-                                                                $classData['class_id'],
-                                                            )
-                                                                ->when(!empty($classData['class_stream']), function (
-                                                                    $query,
-                                                                ) use ($classData) {
-                                                                    return $query->where(
-                                                                        'group',
-                                                                        $classData['class_stream'],
-                                                                    );
-                                                                })
-                                                                ->count();
+                                                            // Debug: Check if class_id exists
+                                                            $classId = $classData['class_id'] ?? null;
+                                                            $stream = $classData['class_stream'] ?? null;
 
-                                                            $classTotal =
-                                                                $classData['present'] +
-                                                                $classData['absent'] +
-                                                                $classData['permission'];
+                                                            // Initialize registered students count
+                                                            $registeredStudents = 0;
 
-                                                            // Calculate attendance rate based on registered students
+                                                            // Only query if class_id exists
+                                                            if ($classId) {
+                                                                try {
+                                                                    $query = Student::where('class_id', $classId);
+
+                                                                    if (!empty($stream)) {
+                                                                        $query->where('group', $stream);
+                                                                    }
+
+                                                                    $registeredStudents = $query->count();
+                                                                } catch (Exception $e) {
+                                                                    // Fallback: use attendance data if query fails
+                                                                    $registeredStudents =
+                                                                        $classData['present'] +
+                                                                        $classData['absent'] +
+                                                                        $classData['permission'];
+                                                                }
+                                                            } else {
+                                                                // If no class_id, use attendance data
+                                                                $registeredStudents =
+                                                                    $classData['present'] +
+                                                                    $classData['absent'] +
+                                                                    $classData['permission'];
+                                                            }
+
+                                                            // Calculate attendance rate
                                                             $attendanceRate =
                                                                 $registeredStudents > 0
                                                                     ? round(
@@ -1293,29 +1310,25 @@
                                                                     )
                                                                     : 0;
 
+                                                            // Update totals
                                                             $totalPresent += $classData['present'];
                                                             $totalAbsent += $classData['absent'];
                                                             $totalPermission += $classData['permission'];
                                                             $grandTotalStudents += $registeredStudents;
 
-                                                            $currentClass = $classData['original_class_name'];
+                                                            // Determine if we need to show class header
+                                                            $currentClass = $classData['original_class_name'] ?? '';
                                                             $showClassHeader = $previousClass !== $currentClass;
                                                             $previousClass = $currentClass;
 
                                                             // Determine badge color for stream
                                                             $streamBadgeClass = 'bg-secondary';
                                                             if (
-                                                                !empty($classData['class_stream']) &&
-                                                                isset(
-                                                                    $classGroupColors[
-                                                                        strtoupper($classData['class_stream'])
-                                                                    ],
-                                                                )
+                                                                $stream &&
+                                                                isset($classGroupColors[strtoupper($stream)])
                                                             ) {
                                                                 $streamBadgeClass =
-                                                                    $classGroupColors[
-                                                                        strtoupper($classData['class_stream'])
-                                                                    ];
+                                                                    $classGroupColors[strtoupper($stream)];
                                                             }
                                                         @endphp
 
@@ -1323,28 +1336,26 @@
                                                             <td class="ps-4">
                                                                 <div class="d-flex align-items-center">
                                                                     <div>
-                                                                        @if (!empty($classData['class_stream']))
+                                                                        @if (!empty($stream))
                                                                             <div class="text-dark small">
-                                                                                <strong>{{ strtoupper($classData['class_code']) }}
+                                                                                <strong>{{ strtoupper($classData['class_code'] ?? '') }}
                                                                                     -
                                                                                     <span
                                                                                         class="badge {{ $streamBadgeClass }} text-white">
-                                                                                        {{ strtoupper($classData['class_stream']) }}
+                                                                                        {{ strtoupper($stream) }}
                                                                                     </span>
                                                                                 </strong>
                                                                                 <div class="text-muted small">
-                                                                                    Wanafunzi waliosajiliwa:
-                                                                                    {{ $registeredStudents }}
+                                                                                    Registered: {{ $registeredStudents }}
                                                                                 </div>
                                                                             </div>
                                                                         @else
                                                                             <strong
-                                                                                class="text-dark">{{ $classData['class_name'] }}</strong>
+                                                                                class="text-dark">{{ $classData['class_name'] ?? '' }}</strong>
                                                                             <div class="text-muted small">
-                                                                                {{ $classData['class_code'] }}
+                                                                                {{ $classData['class_code'] ?? '' }}
                                                                                 <br>
-                                                                                Wanafunzi waliosajiliwa:
-                                                                                {{ $registeredStudents }}
+                                                                                Registered: {{ $registeredStudents }}
                                                                             </div>
                                                                         @endif
                                                                     </div>
@@ -1382,9 +1393,8 @@
                                                                         aria-valuemin="0" aria-valuemax="100">
                                                                     </div>
                                                                 </div>
-                                                                <small class="text-muted d-block mt-1">
-                                                                    {{ $attendanceRate }}%
-                                                                </small>
+                                                                <small
+                                                                    class="text-muted d-block mt-1">{{ $attendanceRate }}%</small>
                                                             </td>
                                                         </tr>
                                                     @endforeach
