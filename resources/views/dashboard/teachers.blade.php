@@ -803,7 +803,7 @@
                                                     <tfoot class="bg-light">
                                                         <tr>
                                                             <th class="ps-4 py-3 border-top">
-                                                                <strong>Total (Classes with Attendance)</strong>
+                                                                <strong>Total</strong>
                                                             </th>
                                                             <th class="text-center py-2 border-top">
                                                                 <span
@@ -1444,7 +1444,7 @@
                                                     <tfoot class="bg-light">
                                                         <tr>
                                                             <th class="ps-4 py-3 border-top">
-                                                                <strong>Total (Classes with Attendance)</strong>
+                                                                <strong>Total</strong>
                                                             </th>
                                                             <th class="text-center py-2 border-top">
                                                                 <span
