@@ -692,7 +692,7 @@
                                                                     ? round(
                                                                         ($classData['present'] / $registeredStudents) *
                                                                             100,
-                                                                        1,
+                                                                        2,
                                                                     )
                                                                     : 0;
 
@@ -731,9 +731,6 @@
                                                                                         {{ strtoupper($stream) }}
                                                                                     </span>
                                                                                 </strong>
-                                                                                <div class="text-muted small">
-                                                                                    Registered: {{ $registeredStudents }}
-                                                                                </div>
                                                                             </div>
                                                                         @else
                                                                             <strong
@@ -791,7 +788,7 @@
                                                         // Overall rate for classes with attendance only
                                                         $overallRate =
                                                             $grandTotalStudents > 0
-                                                                ? round(($totalPresent / $grandTotalStudents) * 100, 1)
+                                                                ? round(($totalPresent / $grandTotalStudents) * 100, 2)
                                                                 : 0;
 
                                                         // School-wide rate (for display if needed)
@@ -799,7 +796,7 @@
                                                             $totalRegisteredInSchool > 0
                                                                 ? round(
                                                                     ($totalPresent / $totalRegisteredInSchool) * 100,
-                                                                    1,
+                                                                    2,
                                                                 )
                                                                 : 0;
                                                     @endphp
@@ -860,12 +857,9 @@
                                                         <small class="text-success">Present</small>
                                                         @if ($totalRegisteredInSchool > 0)
                                                             <div class="small text-success">
-                                                                {{ round(($totalPresent / $totalRegisteredInSchool) * 100, 1) }}%
+                                                                {{ round(($totalPresent / $totalRegisteredInSchool) * 100, 2) }}%
                                                             </div>
                                                         @endif
-                                                        <div class="text-muted small">
-                                                            {{ $totalPresent }}/{{ $totalRegisteredInSchool }}
-                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-4">
@@ -873,12 +867,9 @@
                                                         <small class="text-danger">Absent</small>
                                                         @if ($totalRegisteredInSchool > 0)
                                                             <div class="small text-danger">
-                                                                {{ round(($totalAbsent / $totalRegisteredInSchool) * 100, 1) }}%
+                                                                {{ round(($totalAbsent / $totalRegisteredInSchool) * 100, 2) }}%
                                                             </div>
                                                         @endif
-                                                        <div class="text-muted small">
-                                                            {{ $totalAbsent }}/{{ $totalRegisteredInSchool }}
-                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-4">
@@ -886,12 +877,9 @@
                                                         <small class="text-secondary">Permission</small>
                                                         @if ($totalRegisteredInSchool > 0)
                                                             <div class="small text-secondary">
-                                                                {{ round(($totalPermission / $totalRegisteredInSchool) * 100, 1) }}%
+                                                                {{ round(($totalPermission / $totalRegisteredInSchool) * 100, 2) }}%
                                                             </div>
                                                         @endif
-                                                        <div class="text-muted small">
-                                                            {{ $totalPermission }}/{{ $totalRegisteredInSchool }}
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1345,7 +1333,7 @@
                                                                     ? round(
                                                                         ($classData['present'] / $registeredStudents) *
                                                                             100,
-                                                                        1,
+                                                                        2,
                                                                     )
                                                                     : 0;
 
@@ -1384,9 +1372,6 @@
                                                                                         {{ strtoupper($stream) }}
                                                                                     </span>
                                                                                 </strong>
-                                                                                <div class="text-muted small">
-                                                                                    Registered: {{ $registeredStudents }}
-                                                                                </div>
                                                                             </div>
                                                                         @else
                                                                             <strong
@@ -1444,7 +1429,7 @@
                                                         // Overall rate for classes with attendance only
                                                         $overallRate =
                                                             $grandTotalStudents > 0
-                                                                ? round(($totalPresent / $grandTotalStudents) * 100, 1)
+                                                                ? round(($totalPresent / $grandTotalStudents) * 100, 2)
                                                                 : 0;
 
                                                         // School-wide rate (for display if needed)
@@ -1452,7 +1437,7 @@
                                                             $totalRegisteredInSchool > 0
                                                                 ? round(
                                                                     ($totalPresent / $totalRegisteredInSchool) * 100,
-                                                                    1,
+                                                                    2,
                                                                 )
                                                                 : 0;
                                                     @endphp
@@ -1513,12 +1498,9 @@
                                                         <small class="text-success">Present</small>
                                                         @if ($totalRegisteredInSchool > 0)
                                                             <div class="small text-success">
-                                                                {{ round(($totalPresent / $totalRegisteredInSchool) * 100, 1) }}%
+                                                                {{ round(($totalPresent / $totalRegisteredInSchool) * 100, 2) }}%
                                                             </div>
                                                         @endif
-                                                        <div class="text-muted small">
-                                                            {{ $totalPresent }}/{{ $totalRegisteredInSchool }}
-                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-4">
@@ -1526,12 +1508,9 @@
                                                         <small class="text-danger">Absent</small>
                                                         @if ($totalRegisteredInSchool > 0)
                                                             <div class="small text-danger">
-                                                                {{ round(($totalAbsent / $totalRegisteredInSchool) * 100, 1) }}%
+                                                                {{ round(($totalAbsent / $totalRegisteredInSchool) * 100, 2) }}%
                                                             </div>
                                                         @endif
-                                                        <div class="text-muted small">
-                                                            {{ $totalAbsent }}/{{ $totalRegisteredInSchool }}
-                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-4">
@@ -1539,12 +1518,9 @@
                                                         <small class="text-secondary">Permission</small>
                                                         @if ($totalRegisteredInSchool > 0)
                                                             <div class="small text-secondary">
-                                                                {{ round(($totalPermission / $totalRegisteredInSchool) * 100, 1) }}%
+                                                                {{ round(($totalPermission / $totalRegisteredInSchool) * 100, 2) }}%
                                                             </div>
                                                         @endif
-                                                        <div class="text-muted small">
-                                                            {{ $totalPermission }}/{{ $totalRegisteredInSchool }}
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

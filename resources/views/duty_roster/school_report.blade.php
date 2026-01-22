@@ -388,10 +388,10 @@
             <div class="stat-card animate-fadeIn delay-6">
                 <i class="fas fa-chart-line stat-icon"></i>
                 @php
-                    $attendanceRate = $totalRegistered > 0 ? round(($allAttended / $totalRegistered) * 100, 1) : 0;
+                    $attendanceRate = $totalRegistered > 0 ? round(($allAttended / $totalRegistered) * 100, 2) : 0;
                 @endphp
                 <div class="stat-value">{{ $attendanceRate }}%</div>
-                <div class="stat-title">Students Attendance Rate</div>
+                <div class="stat-title">Attendance Rate</div>
             </div>
         </div>
 
@@ -443,7 +443,7 @@
                                     <th>Report Date</th>
                                     <th>Roster ID#</th>
                                     <th>Attended</th>
-                                    <th>Attended Rate</th>
+                                    <th>Attendance Rate</th>
                                     <th>Issued by</th>
                                     <th>Status</th>
                                     <th>Actions</th>
@@ -454,7 +454,7 @@
                                     @php
                                         $totalReg = $report->registered_boys + $report->registered_girls;
                                         $totalAtt = $report->present_boys + $report->present_girls;
-                                        $rate = $totalRegistered > 0 ? round(($totalAtt / $totalRegistered) * 100, 1) : 0;
+                                        $rate = $totalRegistered > 0 ? round(($totalAtt / $totalRegistered) * 100, 2) : 0;
 
                                         if ($rate >= 80) {
                                             $progressClass = 'bg-success';

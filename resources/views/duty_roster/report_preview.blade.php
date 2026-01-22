@@ -251,7 +251,7 @@
                 </h3>
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i>
-                    Report for:
+                    Report Date:
                     <strong>{{ \Carbon\Carbon::parse($reportDetails->report_date)->format('l, F j, Y') }}</strong>
                 </div>
             </div>
