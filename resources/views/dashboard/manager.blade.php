@@ -131,6 +131,13 @@
             flex-direction: column;
         }
 
+         .attendance-container {
+            height: 100%;
+            padding: 8px;
+            border: none;
+        }
+
+
         .chart-container:hover {
             transform: translateY(-5px);
             box-shadow: 0 0.75rem 2rem rgba(58, 59, 69, 0.15);
@@ -422,7 +429,7 @@
                     </div>
 
                     <div class="col-xl-5 mb-4">
-                        <div class="card border-0 shadow-sm h-100">
+                        <div class="card border-0 shadow-sm attendance-container">
                             <div class="card-header bg-white border-0 pb-0">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
