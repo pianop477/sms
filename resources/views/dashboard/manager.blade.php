@@ -131,7 +131,7 @@
             flex-direction: column;
         }
 
-         .attendance-container {
+        .attendance-container {
             height: 100%;
             padding: 8px;
             border: none;
@@ -429,25 +429,22 @@
                     </div>
 
                     <div class="col-xl-5 mb-4">
-                        <div class="card border-0 shadow-sm attendance-container">
-                            <div class="card-header bg-white border-0 pb-0">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h5 class="chart-title">
-                                            <i class="fas fa-calendar-check me-2"></i> Today's Attendance Summary
-                                        </h5>
-                                        <p class="text-muted small mb-0">
-                                            {{ \Carbon\Carbon::today()->format('l, d F Y') }}
-                                        </p>
-                                    </div>
-                                    @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
-                                        <span class="badge bg-primary text-white">
-                                            {{ count($attendanceByClassData) }} Streams
-                                        </span>
-                                    @endif
+                        <div class="chart-container">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="chart-title">
+                                        <i class="fas fa-calendar-check me-2"></i> Today's Attendance Summary
+                                    </h5>
+                                    <p class="text-muted small mb-0">
+                                        {{ \Carbon\Carbon::today()->format('l, d F Y') }}
+                                    </p>
                                 </div>
+                                @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
+                                    <span class="badge bg-primary text-white">
+                                        {{ count($attendanceByClassData) }} Streams
+                                    </span>
+                                @endif
                             </div>
-
                             <div class="card-body p-1">
                                 @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
                                     <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
