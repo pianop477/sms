@@ -33,6 +33,7 @@ class updateRostersStatus extends Command
     public function handle(): int
     {
         $today = Carbon::today();
+        $now = Carbon::now();
 
         // 1. ACTIVE → COMPLETED end_date ikipita
         $active = TodRoster::where('status', 'active')->get();
@@ -48,35 +49,49 @@ class updateRostersStatus extends Command
             }
         }
 
-        // 2. PENDING → ACTIVE (na SMS ya kuanza)
-        $pending = TodRoster::where('status', 'pending')->get();
-        $grouped = $pending->groupBy('roster_id');
+        // 2. Check for PENDING rosters that need reminder SMS (one day before start)
+        $pending = TodRoster::where('status', 'pending')
+            ->whereNotNull('start_date')
+            ->whereDate('start_date', '=', $today->copy()->addDay())
+            ->get();
+
+        foreach ($pending as $roster) {
+            // Check if reminder hasn't been sent yet
+            if (!$roster->reminder_sent && $now->hour >= 20) {
+                $this->sendReminderSms($roster);
+
+                // Mark reminder as sent
+                $roster->reminder_sent = true;
+                $roster->updated_by = 'system';
+                $roster->save();
+            }
+        }
+
+        // 3. PENDING → ACTIVE on actual start date
+        $pendingToActivate = TodRoster::where('status', 'pending')
+            ->whereNotNull('start_date')
+            ->whereDate('start_date', '<=', $today)
+            ->get();
+
+        $grouped = $pendingToActivate->groupBy('roster_id');
 
         foreach ($grouped as $rosterId => $records) {
             foreach ($records as $roster) {
-                if (!$roster->start_date) {
-                    continue;
-                }
+                // hakikisha hana roster nyingine active
+                $exists = TodRoster::where('teacher_id', $roster->teacher_id)
+                    ->where('status', 'active')
+                    ->exists();
 
-                $start = Carbon::parse($roster->start_date);
+                if (!$exists) {
+                    $roster->status     = 'active';
+                    $roster->updated_by = 'system';
+                    $roster->save();
 
-                if ($today->greaterThanOrEqualTo($start)) {
-                    // hakikisha hana roster nyingine active
-                    $exists = TodRoster::where('teacher_id', $roster->teacher_id)
-                        ->where('status', 'active')
-                        ->exists();
+                    $this->info("Roster {$roster->roster_id} imewekwa active kwa mwalimu {$roster->teacher_id}.");
+                    // Log::info("Roster {$roster->roster_id} imewekwa active kwa mwalimu {$roster->teacher_id}.");
 
-                    if (!$exists) {
-                        $roster->status     = 'active';
-                        $roster->updated_by = 'system';
-                        $roster->save();
-
-                        $this->info("Roster {$roster->roster_id} imewekwa active kwa mwalimu {$roster->teacher_id}.");
-                        // Log::info("Roster {$roster->roster_id} imewekwa active kwa mwalimu {$roster->teacher_id}.");
-
-                        // SMS ya kuanza tu
-                        $this->sendStartSms($roster);
-                    }
+                    // SMS ya kuanza (kwa siku hiyo ya kuanza)
+                    $this->sendStartSms($roster);
                 }
             }
         }
@@ -86,7 +101,61 @@ class updateRostersStatus extends Command
     }
 
     /**
-     * SMS ya kuanza kwa mwalimu mmoja
+     * SMS ya ukumbusho (siku moja kabla)
+     */
+    protected function sendReminderSms(TodRoster $roster): void
+    {
+        try {
+            $teacher = DB::table('teachers')
+                ->join('users', 'users.id', '=', 'teachers.user_id')
+                ->select('teachers.id as teacher_id', 'teachers.school_id', 'users.first_name', 'users.phone')
+                ->where('teachers.id', $roster->teacher_id)
+                ->first();
+
+            if (!$teacher || empty($teacher->phone)) {
+                return;
+            }
+
+            $phone = $teacher->phone;
+            $startDate = Carbon::parse($roster->start_date);
+            $endDate = Carbon::parse($roster->end_date);
+
+            $message = "Habari {$teacher->first_name}! Unakumbushwa kwamba utakuwa zamu kesho "
+                . $startDate->format('d/m/Y') . " hadi "
+                . $endDate->format('d/m/Y')
+                . ". Tafadhali jiandae kwa ajili ya kazi yako ya zamu.";
+
+            $school = school::findOrFail($teacher->school_id);
+            $nextSmsService = new NextSmsService();
+
+            $payload = [
+                'from' => $school->sender_id,
+                'to' => $this->formatPhoneNumber($phone),
+                'text' => $message,
+                'reference' => $roster->roster_id . '_reminder',
+            ];
+
+            $response = $nextSmsService->sendSmsByNext(
+                $payload['from'],
+                $payload['to'],
+                $payload['text'],
+                $payload['reference'],
+            );
+
+            if (!$response['success']) {
+                throw new \Exception($response['error']);
+            }
+
+            $this->info("SMS ya ukumbusho imetumwa kwa {$phone}");
+            // Log::info("SMS ya ukumbusho imetumwa kwa {$phone}");
+        } catch (\Exception $e) {
+            $this->error("Hitilafu ya kutuma SMS ya ukumbusho: " . $e->getMessage());
+            // Log::error("Hitilafu ya kutuma SMS ya ukumbusho: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * SMS ya kuanza (siku hiyo ya kuanza)
      */
     protected function sendStartSms(TodRoster $roster): void
     {
@@ -101,8 +170,11 @@ class updateRostersStatus extends Command
                 return;
             }
 
-            $phone   = $teacher->phone;
-            $message = "Habari {$teacher->first_name}! Utakuwa zamu wiki hii kuanzia ". Carbon::parse($roster->start_date)->format('d/m/Y') . " hadi ". Carbon::parse($roster->end_date)->format('d/m/Y') ."Ninakutakia uwajibikaji mwema.";
+            $phone = $teacher->phone;
+            $message = "Habari {$teacher->first_name}! Utakuwa zamu wiki hii kuanzia " .
+                Carbon::parse($roster->start_date)->format('d/m/Y') . " hadi " .
+                Carbon::parse($roster->end_date)->format('d/m/Y') .
+                " Ninakutakia uwajibikaji mwema.";
 
             $school = school::findOrFail($teacher->school_id);
             $nextSmsService = new NextSmsService();
@@ -121,13 +193,14 @@ class updateRostersStatus extends Command
                 $payload['reference'],
             );
 
-            if(!$response['success']) {
+            if (!$response['success']) {
                 throw new \Exception($response['error']);
             }
 
             $this->info("SMS ya kuanza imetumwa kwa {$phone}");
             // Log::info("SMS ya kuanza imetumwa kwa {$phone}");
         } catch (\Exception $e) {
+            $this->error("Hitilafu ya kutuma SMS: " . $e->getMessage());
             // Log::error("Hitilafu ya kutuma SMS: " . $e->getMessage());
         }
     }

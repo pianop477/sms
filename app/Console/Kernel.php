@@ -26,7 +26,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('cleanup:old-reports')->daily();
         $schedule->command('packages:deactivate-expired')->daily();
         $schedule->command('otp:clean-expired-otps')->daily();
-        $schedule->command('roster:update-rosters-status')->dailyAt('06:00');
+        $schedule->command('roster:update-rosters-status')->dailyAt('20:00');
         $schedule->command('parents:truncate-inactive-parents')->daily();
         $schedule->command('bills:update-statuses')->everySecond();
     }
