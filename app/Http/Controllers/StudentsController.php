@@ -566,6 +566,7 @@ class StudentsController extends Controller
 
                 $updated = Student::where('class_id', $classes->id)
                     ->where('school_id', $user->school_id)
+                    ->where('status', 1)
                     ->update([
                         'graduated' => true,
                         'graduated_at' => $request->graduation_year,
@@ -594,6 +595,7 @@ class StudentsController extends Controller
                 // Promote to next class
                 $updated = Student::where('class_id', $classes->id)
                     ->where('school_id', $user->school_id)
+                    ->where('status', 1)
                     ->update(['class_id' => $request->class_id]);
             }
 
@@ -602,8 +604,8 @@ class StudentsController extends Controller
             if ($updated) {
                 Alert()->toast(
                     $request->class_id == 0
-                        ? 'Students graduated batch saved successfully'
-                        : 'Students promoted and upgraded successfully',
+                        ? 'Students batch graduated batch saved successfully'
+                        : 'Students batch promoted and upgraded successfully',
                     'success'
                 );
             } else {
