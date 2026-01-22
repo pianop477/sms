@@ -468,6 +468,7 @@ class StudentsController extends Controller
         }
         //update status ------------
         $student->status = 2;
+        $student->updated_at = now();
         $student->save();
         // Show success message
         Alert()->toast('Student records deleted successfully', 'success');
@@ -1257,7 +1258,8 @@ class StudentsController extends Controller
          */
         $sixMonthsAgo = Carbon::now()->subMonths(6);
 
-        if ($student->updated_at > $sixMonthsAgo) {
+        if ($student->updated_at->diffInMonths(now()) < 6) {
+            // Ikiwa chini ya miezi 6 tangu aliposajiliwa
             Alert()->toast(
                 'This student is still in the grace period.',
                 'info'
