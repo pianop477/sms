@@ -744,8 +744,8 @@
                                     style="background: rgba(78, 84, 200, 0.05);">
                                     <div class="ms-3">
                                         <div class="fw-bold text-capitalize">
-                                            {{ ucwords(strtolower($teacher->first_name)) }}
-                                            {{ ucwords(strtolower($teacher->last_name)) }}</div>
+                                           ✅ {{ ucwords(strtolower($teacher->first_name)) }} {{ ucwords(strtolower($teacher->last_name)) }}
+                                        </div>
                                     </div>
                                 </div>
                             @endforeach
