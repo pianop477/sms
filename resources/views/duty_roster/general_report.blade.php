@@ -167,7 +167,7 @@
         .teacher-id {
             font-size: 11px;
             color: #6c757d;
-            font-style: italic;
+            /* font-style: italic; */
         }
 
         table {
@@ -544,8 +544,8 @@
                     <div class="teachers-container">
                         @foreach($assignedTeachers as $detail)
                             <div class="teacher-badge">
-                                <div class="teacher-name text-capitalize">{{ $detail->first_name }} {{ $detail->last_name }}</div>
-                                <div class="teacher-id text-uppercase">{{ $detail->member_id ?? 'N/A' }}</div>
+                                <div class="teacher-name text-capitalize">{{ ucwords(strtolower($detail->first_name)) }} {{ ucwords(strtolower($detail->last_name)) }}</div>
+                                <div class="teacher-id text-uppercase"><strong>{{ strtoupper($detail->member_id) ?? 'N/A' }}</strong></div>
                             </div>
                         @endforeach
                     </div>
