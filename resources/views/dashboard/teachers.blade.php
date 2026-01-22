@@ -201,7 +201,7 @@
         }
 
         .table {
-            height: auto;
+            height: 100%;
         }
 
         .progress-table th {

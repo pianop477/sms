@@ -204,7 +204,7 @@
         }
 
         .table {
-            height: auto;
+            height: 100%;
         }
 
         .status-badge {
