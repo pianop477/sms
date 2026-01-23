@@ -636,14 +636,14 @@
                     <div class="payment-detail"><strong>Bank:</strong> NMB Bank</div>
                     <div class="payment-detail"><strong>Account:</strong> 50510028891</div>
                     <div class="payment-detail"><strong>Name:</strong> Frank Mathias Masaka</div>
-                    <div class="payment-detail" style="margin-top: 15px;"><strong>Mixx by Yas:</strong> 15966786</div>
+                    {{-- <div class="payment-detail" style="margin-top: 15px;"><strong>Mixx by Yas Lipa:</strong> 15966786 Name: Piano Shop</div> --}}
                 </div>
 
                 <div class="terms-conditions">
                     <h4>Terms & Conditions</h4>
                     <div class="payment-detail">• Payment due within 30 days</div>
-                    <div class="payment-detail">• Late fees may apply after due date</div>
-                    <div class="payment-detail">• All amounts in Tanzanian Shillings</div>
+                    <div class="payment-detail">• Late payment may lead to service to be terminated</div>
+                    <div class="payment-detail">• Payment mode accepted Cash or Bank transfter</div>
                     <div class="payment-detail">• Contact for invoice queries</div>
                 </div>
             </div>
