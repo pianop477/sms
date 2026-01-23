@@ -310,7 +310,7 @@ class BillsController extends Controller
                 'student_id'     => $request->input('student_name'),
                 'service_id'     => $request->input('service'),
                 'amount'         => $request->input('amount'),
-                'due_date'       => $due_date,
+                'due_date'       => $request->due_date ?? $due_date,
                 'academic_year'  => $request->input('academic_year'),
                 'control_number' => $controlNumber,
                 'school_id'      => $user->school_id,
