@@ -642,7 +642,7 @@
                 <div class="terms-conditions">
                     <h4>Terms & Conditions</h4>
                     <div class="payment-detail">• Payment due within 30 days</div>
-                    <div class="payment-detail">• Late payment may lead to service to be terminated</div>
+                    <div class="payment-detail">• Late payment may result in service termination</div>
                     <div class="payment-detail">• Payment mode accepted Cash or Bank transfter</div>
                     <div class="payment-detail">• Contact for invoice queries</div>
                 </div>
@@ -666,7 +666,7 @@
     <!-- Action Buttons (Screen only) -->
     <div class="action-buttons">
         <button class="print-btn" onclick="generatePDF()" id="downloadPdfBtn">
-            📥 Download PDF Invoice
+            📥 Download Invoice
         </button>
         <a href="{{ route('admin.send.invoice', ['school' => Hashids::encode($schools->id)]) }}" class="print-btn"
             style="background: #4CAF50;">
