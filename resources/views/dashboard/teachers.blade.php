@@ -1468,6 +1468,9 @@
                                                             <th class="text-center py-2 border-top">
                                                                 <div
                                                                     class="d-flex align-items-center justify-content-center">
+                                                                    @php
+                                                                        $generalRate = round(($totalPresent / $totalRegisteredInSchool) * 100, 2);
+                                                                    @endphp
                                                                     <div class="progress"
                                                                         style="height: 8px; width: 100px;">
                                                                         <div class="progress-bar
@@ -1479,9 +1482,7 @@
                                                                             style="width: {{ min($generalRate, 100) }}%">
                                                                         </div>
                                                                     </div>
-                                                                    @php
-                                                                        $generalRate = round(($totalPresent / $totalRegisteredInSchool) * 100, 2);
-                                                                    @endphp
+
                                                                     <strong
                                                                         class="ms-2
                                                                         @if ($generalRate >= 90) text-success
