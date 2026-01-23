@@ -564,10 +564,75 @@
                 dropdownParent: $('#addStudentModal')
             });
 
+            // Variables for batch form
+            const batchForm = document.getElementById('batchForm');
+            const updateStreamBtn = document.getElementById('updateStreamBtn');
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const studentCheckboxes = document.querySelectorAll('.student-checkbox');
+            const selectedCountDiv = document.getElementById('selectedCount');
+
+            // Function to update selected count and button state
+            function updateSelectionState() {
+                const selectedStudents = document.querySelectorAll('.student-checkbox:checked');
+                const count = selectedStudents.length;
+
+                // Update counter display
+                selectedCountDiv.innerHTML = `<i class="fas fa-users me-1"></i> ${count} student(s) selected`;
+
+                // Enable/disable button
+                updateStreamBtn.disabled = count === 0;
+
+                // Update selectAll checkbox state
+                selectAllCheckbox.checked = count > 0 && count === studentCheckboxes.length;
+                selectAllCheckbox.indeterminate = count > 0 && count < studentCheckboxes.length;
+            }
+
             // Select all checkboxes
-            document.getElementById('selectAll').addEventListener('change', function() {
-                const checkboxes = document.querySelectorAll('input[name="student[]"]');
-                checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+            selectAllCheckbox.addEventListener('change', function() {
+                studentCheckboxes.forEach(checkbox => checkbox.checked = this.checked);
+                updateSelectionState();
+            });
+
+            // Individual checkbox changes
+            studentCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectionState);
+            });
+
+            // Handle form submission
+            batchForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const selectedStudents = document.querySelectorAll('.student-checkbox:checked');
+                const newStream = document.querySelector('select[name="new_stream"]').value;
+
+                if (selectedStudents.length === 0) {
+                    alert('Please select at least one student');
+                    return;
+                }
+
+                if (!newStream) {
+                    alert('Please select a stream to move students to');
+                    return;
+                }
+
+                // Confirm action
+                if (!confirm(
+                        `Are you sure you want to move ${selectedStudents.length} student(s) to Stream ${newStream}?`
+                        )) {
+                    return;
+                }
+
+                // Create hidden inputs for selected students
+                selectedStudents.forEach(checkbox => {
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'students[]';
+                    hiddenInput.value = checkbox.value;
+                    batchForm.appendChild(hiddenInput);
+                });
+
+                // Submit form
+                this.submit();
             });
 
             // Show/hide graduation year field and manage required attribute
@@ -609,6 +674,9 @@
                     form.classList.add('was-validated');
                 });
             });
+
+            // Initialize selection state
+            updateSelectionState();
         });
     </script>
 @endsection
