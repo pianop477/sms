@@ -89,10 +89,14 @@ class OtherStaffsController extends Controller
         ]);
 
          try {
-            $scanResult = $this->scanFileForViruses($request->file('image'));
-            if (!$scanResult['clean']) {
-                Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
-                return redirect()->back();
+
+         if($request->hasFile('image')) {
+                // Virus scan
+                $scanResult = $this->scanFileForViruses($request->file('image'));
+                if (! $scanResult['clean']) {
+                    Alert()->toast('File security check failed: ' . $scanResult['message'], 'error');
+                    return back();
+                }
             }
 
              $nin = preg_replace('/[^0-9]/', '', $request->nida);
