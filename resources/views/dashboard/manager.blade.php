@@ -653,22 +653,25 @@
                                                         <th class="text-center py-2 border-top">
                                                             <div class="d-flex align-items-center justify-content-center">
                                                                 <div class="progress" style="height: 8px; width: 100px;">
+                                                                    @php
+                                                                        $generalRate = round(($totalPresent / $totalRegisteredInSchool) * 100, 2);
+                                                                    @endphp
                                                                     <div class="progress-bar
-                                                                        @if ($overallRate >= 90) bg-success
-                                                                        @elseif($overallRate >= 70) bg-info
-                                                                        @elseif($overallRate >= 50) bg-warning
+                                                                        @if ($generalRate >= 90) bg-success
+                                                                        @elseif($generalRate >= 70) bg-info
+                                                                        @elseif($generalRate >= 50) bg-warning
                                                                         @else bg-danger @endif"
                                                                         role="progressbar"
-                                                                        style="width: {{ min($overallRate, 100) }}%">
+                                                                        style="width: {{ min($generalRate, 100) }}%">
                                                                     </div>
                                                                 </div>
                                                                 <strong
                                                                     class="ms-2
-                                                                        @if ($overallRate >= 90) text-success
-                                                                        @elseif($overallRate >= 70) text-info
-                                                                        @elseif($overallRate >= 50) text-warning
+                                                                        @if ($generalRate >= 90) text-success
+                                                                        @elseif($generalRate >= 70) text-info
+                                                                        @elseif($generalRate >= 50) text-warning
                                                                         @else text-danger @endif">
-                                                                    {{ $overallRate }}%
+                                                                    {{ $generalRate }}%
                                                                 </strong>
                                                             </div>
                                                         </th>
