@@ -189,6 +189,7 @@
                     </div>
                     <div>
                         <div class="text-xl sm:text-2xl font-bold text-blue-700">ShuleApp</div>
+                        <small class="text-mute"><i>Empowering Education</i></small>
                     </div>
                 </div>
 
@@ -800,9 +801,9 @@
                                     <div>
                                         <h4 class="font-bold text-base sm:text-lg" id="contact-location-label">
                                             Location</h4>
-                                        <p class="text-lg sm:text-xl">Kikuyu, Dodoma</p>
-                                        <p class="text-blue-100 mt-1 text-sm sm:text-base" id="contact-location-note">
-                                            Tanzania</p>
+                                        <p class="text-lg sm:text-xl">Dodoma, Tanzania</p>
+                                        {{-- <p class="text-blue-100 mt-1 text-sm sm:text-base" id="contact-location-note">
+                                            Tanzania</p> --}}
                                     </div>
                                 </div>
                             </div>
