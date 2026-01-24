@@ -188,8 +188,9 @@
                             class="w-full h-full object-contain">
                     </div>
                     <div>
-                        <div class="text-xl sm:text-2xl font-bold text-blue-700">ShuleApp</div>
-                        <span class="text-sm text-muted p-0 mt-0" style="font-size: 8px;"><i>Empowering Education</i></span>
+                        <div class="text-xl sm:text-2xl font-bold text-blue-700">ShuleApp
+                            <span class="text-sm text-muted" style="font-size: 9px;"><i>Empowering Education</i></span>
+                        </div>
                     </div>
                 </div>
 
