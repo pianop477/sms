@@ -444,7 +444,7 @@
                 <label class="remember-me">
                     <input type="checkbox" name="remember" id="remember" /> Remember me
                 </label>
-                <a href="{{ route('password.request') }}" class="forgot-password">Forgot password?</a>
+                <a href="{{ route('password.request') }}" class="forgot-password text-white">Forgot password?</a>
             </div>
 
             <button type="submit" class="btn btn-primary" id="loginBtn">
