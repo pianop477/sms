@@ -189,7 +189,7 @@
                     </div>
                     <div>
                         <div class="text-xl sm:text-2xl font-bold text-blue-700">ShuleApp
-                            <span class="text-sm text-muted" style="font-size: 9px;"><i>Empowering Education</i></span>
+                            <p class="text-sm text-muted" style="font-size: 9px;"><i>Empowering Education</i></p>
                         </div>
                     </div>
                 </div>
