@@ -108,7 +108,7 @@ class updateRostersStatus extends Command
         try {
             $teacher = DB::table('teachers')
                 ->join('users', 'users.id', '=', 'teachers.user_id')
-                ->select('teachers.id as teacher_id', 'teachers.school_id', 'users.first_name', 'users.phone')
+                ->select('teachers.id as teacher_id', 'teachers.school_id', 'users.first_name', 'users.last_name', 'users.phone')
                 ->where('teachers.id', $roster->teacher_id)
                 ->first();
 
@@ -119,11 +119,10 @@ class updateRostersStatus extends Command
             $phone = $teacher->phone;
             $startDate = Carbon::parse($roster->start_date);
             $endDate = Carbon::parse($roster->end_date);
+            $fullname = ucwords(strtolower($teacher->first_name . ', ' . $teacher->last_name[0]));
 
-            $message = "Habari {$teacher->first_name}! Unakumbushwa kwamba utakuwa zamu kesho "
-                . $startDate->format('d/m/Y') . " hadi "
-                . $endDate->format('d/m/Y')
-                . ". Tafadhali jiandae kwa ajili ya kazi yako ya zamu.";
+            $message = "Hello {$fullname}! Kindly be reminded that, your duty shift will commence tomorrow on "
+                . $startDate->format('d/m/Y') . ". Your cooperation is highly appreciated on this upcoming week.";
 
             $school = school::findOrFail($teacher->school_id);
             $nextSmsService = new NextSmsService();
