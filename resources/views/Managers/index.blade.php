@@ -475,14 +475,14 @@
                         @csrf
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="fname" class="form-label">First Name</label>
+                                <label for="fname" class="form-label">First Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control-custom" id="fname" name="fname" value="{{old('fname')}}" required placeholder="First Name">
                                 @error('fname')
                                     <div class="text-danger mt-1">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="lname" class="form-label">Last Name</label>
+                                <label for="lname" class="form-label">Last Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control-custom" id="lname" name="lname" value="{{old('lname')}}" required placeholder="Last Name">
                                 @error('lname')
                                     <div class="text-danger mt-1">{{ $message }}</div>
@@ -491,14 +491,14 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="phone" class="form-label">Phone Number</label>
+                                <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control-custom" id="phone" name="phone" value="{{old('phone')}}" required placeholder="Phone Number">
                                 @error('phone')
                                     <div class="text-danger mt-1">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email Address</label>
+                                <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
                                 <input type="email" class="form-control-custom" id="email" name="email" value="{{old('email')}}" required placeholder="Email Address">
                                 @error('email')
                                     <div class="text-danger mt-1">{{ $message }}</div>
@@ -507,7 +507,7 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="gender" class="form-label">Gender</label>
+                                <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
                                 <select class="form-select form-control-custom" id="gender" name="gender" required>
                                     <option value="">-- select gender --</option>
                                     <option value="male">Male</option>
@@ -518,7 +518,7 @@
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="parentSelect" class="form-label">School</label>
+                                <label for="parentSelect" class="form-label">School <span class="text-danger">*</span></label>
                                 <select name="school" id="" class="form-control-custom" required>
                                     <option value="">Select school</option>
                                     @if ($schools->isEmpty())

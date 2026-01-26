@@ -410,7 +410,7 @@
                         @csrf
                         @method('PUT')
                         <div class="mb-3">
-                            <label for="classSelect" class="form-label">Class Name</label>
+                            <label for="classSelect" class="form-label">Class Name <span class="text-danger">*</span></label>
                             <select name="class_id" id="classSelect" class="form-control-custom text-uppercase" required>
                                 <option value="">--Select Class--</option>
                                 @if ($classes->isEmpty())
@@ -425,7 +425,7 @@
                             </select>
                         </div>
                         <div class="mb-3" id="graduationYearField" style="display: none;">
-                            <label for="graduation_year" class="form-label">Graduation Year</label>
+                            <label for="graduation_year" class="form-label">Graduation Year <span class="text-danger">*</span></label>
                             <input type="number" name="graduation_year" id="graduation_year" placeholder="e.g 2025"
                                 class="form-control-custom" min="{{ date('Y') - 5 }}" max="{{ date('Y') }}"
                                 value="{{ old('graduation_year') }}">
@@ -460,17 +460,17 @@
                         @csrf
                         <div class="row">
                             <div class="col-md-4 mb-3">
-                                <label for="fname" class="form-label">First Name</label>
+                                <label for="fname" class="form-label">First Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control-custom" id="fname" name="fname"
                                     value="{{ old('fname') }}" required placeholder="First Name">
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label for="middle" class="form-label">Middle Name</label>
+                                <label for="middle" class="form-label">Middle Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control-custom" id="middle" name="middle"
                                     value="{{ old('middle') }}" required placeholder="Middle Name">
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label for="lname" class="form-label">Last Name</label>
+                                <label for="lname" class="form-label">Last Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control-custom" id="lname" name="lname"
                                     value="{{ old('lname') }}" required placeholder="Last Name">
                             </div>
@@ -478,7 +478,7 @@
 
                         <div class="row">
                             <div class="col-md-4 mb-3">
-                                <label for="gender" class="form-label">Gender</label>
+                                <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
                                 <select class="form-select form-control-custom" id="gender" name="gender" required>
                                     <option value="">-- select gender --</option>
                                     <option value="male">Male</option>
@@ -486,7 +486,7 @@
                                 </select>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label for="dob" class="form-label">Date of Birth</label>
+                                <label for="dob" class="form-label">Date of Birth <span class="text-danger">*</span></label>
                                 <input type="date" class="form-control-custom" id="dob" name="dob"
                                     value="{{ old('dob') }}" required
                                     min="{{ \Carbon\Carbon::now()->subYears(17)->format('Y-m-d') }}"
@@ -494,7 +494,7 @@
                                     placeholder="Date of Birth">
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label for="parentSelect" class="form-label">Parent/Guardian</label>
+                                <label for="parentSelect" class="form-label">Parent/Guardian <span class="text-danger">*</span></label>
                                 <select name="parent" id="parentSelect" class="form-select form-control-custom"
                                     required>
                                     <option value="">Select Parent</option>
@@ -515,7 +515,7 @@
 
                         <div class="row">
                             <div class="col-md-4 mb-3">
-                                <label for="group" class="form-label">Class Group</label>
+                                <label for="group" class="form-label">Class Group <span class="text-danger">*</span></label>
                                 <select class="form-select form-control-custom" id="group" name="group" required>
                                     <option value="">--Select Stream--</option>
                                     <option value="a">Stream A</option>

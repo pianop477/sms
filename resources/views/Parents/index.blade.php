@@ -413,7 +413,7 @@
                             <h6 class="section-title"><i class="fas fa-user me-2"></i> Parent/Guardian Information</h6>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="fname" class="form-label">First Name</label>
+                                    <label for="fname" class="form-label">First Name <span class="text-danger">*</span></label>
                                     <input type="text" name="fname" class="form-control-custom"
                                         value="{{ old('fname') }}" required placeholder="First Name">
                                     @error('fname')
@@ -421,7 +421,7 @@
                                     @enderror
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="lname" class="form-label">Last Name</label>
+                                    <label for="lname" class="form-label">Last Name <span class="text-danger">*</span></label>
                                     <input type="text" name="lname" class="form-control-custom"
                                         value="{{ old('lname') }}" required placeholder="Last Name">
                                     @error('lname')
@@ -432,7 +432,7 @@
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="gender" class="form-label">Gender</label>
+                                    <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
                                     <select name="gender" class="form-control-custom" required>
                                         <option value="">-- select Parent gender --</option>
                                         <option value="male">Male</option>
@@ -443,7 +443,7 @@
                                     @enderror
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="phone" class="form-label">Mobile Phone</label>
+                                    <label for="phone" class="form-label">Mobile Phone <span class="text-danger">*</span></label>
                                     <input type="text" name="phone" class="form-control-custom"
                                         value="{{ old('phone') }}" required placeholder="07XXXXXXXX">
                                     @error('phone')
@@ -464,7 +464,7 @@
                                     @enderror
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="street" class="form-label">Street/Village</label>
+                                    <label for="street" class="form-label">Street/Village <span class="text-danger">*</span></label>
                                     <input type="text" name="street" class="form-control-custom"
                                         value="{{ old('street') }}" required placeholder="Street or Village">
                                     @error('street')
@@ -479,7 +479,7 @@
                             <h6 class="section-title"><i class="fas fa-user-graduate me-2"></i> Student Information</h6>
                             <div class="row">
                                 <div class="col-md-4 mb-3">
-                                    <label for="student_first_name" class="form-label">First Name</label>
+                                    <label for="student_first_name" class="form-label">First Name <span class="text-danger">*</span></label>
                                     <input type="text" name="student_first_name" class="form-control-custom"
                                         value="{{ old('student_first_name') }}" required placeholder="First Name">
                                     @error('student_first_name')
@@ -487,7 +487,7 @@
                                     @enderror
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label for="student_middle_name" class="form-label">Middle Name</label>
+                                    <label for="student_middle_name" class="form-label">Middle Name <span class="text-danger">*</span></label>
                                     <input type="text" name="student_middle_name" class="form-control-custom"
                                         value="{{ old('student_middle_name') }}" required placeholder="Middle Name">
                                     @error('student_middle_name')
@@ -495,7 +495,7 @@
                                     @enderror
                                 </div>
                                 <div class="col-md-4 mb-3">
-                                    <label for="student_last_name" class="form-label">Last Name</label>
+                                    <label for="student_last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
                                     <input type="text" name="student_last_name" class="form-control-custom"
                                         value="{{ old('student_last_name') }}" required placeholder="Last Name">
                                     @error('student_last_name')
@@ -506,7 +506,7 @@
 
                             <div class="row">
                                 <div class="col-md-3 mb-3">
-                                    <label for="student_gender" class="form-label">Student Gender</label>
+                                    <label for="student_gender" class="form-label">Student Gender <span class="text-danger">*</span></label>
                                     <select name="student_gender" class="form-control-custom" required>
                                         <option value="">-- Select gender --</option>
                                         <option value="male">Male</option>
@@ -517,7 +517,7 @@
                                     @enderror
                                 </div>
                                 <div class="col-md-3 mb-3">
-                                    <label for="dob" class="form-label">Date of Birth</label>
+                                    <label for="dob" class="form-label">Date of Birth <span class="text-danger">*</span></label>
                                     <input type="date" name="dob" class="form-control-custom"
                                         value="{{ old('dob') }}" required
                                         min="{{ \Carbon\Carbon::now()->subYears(17)->format('Y-m-d') }}"
@@ -528,7 +528,7 @@
                                     @enderror
                                 </div>
                                 <div class="col-md-3 mb-3">
-                                    <label for="class" class="form-label">Student Class</label>
+                                    <label for="class" class="form-label">Student Class <span class="text-danger">*</span></label>
                                     <select name="class" class="form-control-custom" required>
                                         <option value="">-- Select Class --</option>
                                         @if ($classes->isEmpty())
@@ -544,7 +544,7 @@
                                     @enderror
                                 </div>
                                 <div class="col-md-3 mb-3">
-                                    <label for="group" class="form-label">Class Stream</label>
+                                    <label for="group" class="form-label">Class Stream <span class="text-danger">*</span></label>
                                     <select name="group" class="form-control-custom" required>
                                         <option value="">--Select Stream--</option>
                                         <option value="a">A</option>

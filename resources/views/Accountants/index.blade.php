@@ -272,14 +272,14 @@
                         @csrf
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="fname" class="form-label">First Name</label>
+                                <label for="fname" class="form-label">First Name <span class="text-danger">*</span></label>
                                 <input type="text" required name="fname" class="form-control-custom" id="fname" placeholder="First name" value="{{old('fname')}}">
                                 @error('fname')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="lname" class="form-label"> Surname</label>
+                                <label for="lname" class="form-label"> Surname <span class="text-danger">*</span></label>
                                 <input type="text" required name="lname" class="form-control-custom" id="lname" placeholder="Middle & Last name" value="{{old('lname')}}">
                                 @error('lname')
                                 <div class="text-danger small">{{$message}}</div>
@@ -297,7 +297,7 @@
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="gender" class="form-label">Gender</label>
+                                <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
                                 <select name="gender" id="gender" class="form-control-custom" required>
                                     <option value="">-- select gender --</option>
                                     <option value="male">Male</option>
@@ -311,7 +311,7 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="phone" class="form-label">Mobile Phone</label>
+                                <label for="phone" class="form-label">Mobile Phone <span class="text-danger">*</span></label>
                                 <input type="text" required name="phone" class="form-control-custom" id="phone" placeholder="Phone Number" value="{{old('phone')}}">
                                 @error('phone')
                                 <div class="text-danger small">{{$message}}</div>
