@@ -62,7 +62,7 @@ class OtherStaffsController extends Controller
             'street' => 'required|string|max:255',
             'joined' => 'required|date_format:Y',
             'job_title' => 'required|string|max:255',
-            'nida' => 'string|regex:/^\d{8}-?\d{5}-?\d{5}-?\d{2}$/',
+            'nida' => 'nullable|string|regex:/^\d{8}-?\d{5}-?\d{5}-?\d{2}$/',
             'image' => [
                     'nullable',
                     'file',
@@ -200,7 +200,7 @@ class OtherStaffsController extends Controller
             'joined'     => 'required|date_format:Y',
             'job_title'  => 'required|string|max:255',
             'image'      => ['nullable','file','mimetypes:image/jpeg,image/png,image/jpg','max:1024'],
-            'nida'       => 'string|regex:/^\d{8}-?\d{5}-?\d{5}-?\d{2}$/'
+            'nida'       => 'nullable|string|regex:/^\d{8}-?\d{5}-?\d{5}-?\d{2}$/'
         ];
 
         $extra = $type === 'driver'
