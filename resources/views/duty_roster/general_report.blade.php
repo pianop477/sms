@@ -728,7 +728,7 @@
 
             <!-- Footer for each report -->
             <div class="footer">
-                Page {{ $index + 1 }} of {{ count($reportsWithAttendance) }} - &copy {{ucwords(strtolower($schoolDetails->school_name))}}
+                Page {{ $index + 1 }} of {{ count($reportsWithAttendance) }} | &copy {{ucwords(strtolower($schoolDetails->school_name))}}
             </div>
         @endforeach
     </div>
