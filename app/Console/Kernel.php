@@ -26,7 +26,15 @@ class Kernel extends ConsoleKernel
         $schedule->command('cleanup:old-reports')->daily();
         $schedule->command('packages:deactivate-expired')->daily();
         $schedule->command('otp:clean-expired-otps')->daily();
-        $schedule->command('roster:update-rosters-status')->dailyAt('20:00');
+
+        $schedule->command('roster:update-rosters-status')
+            ->dailyAt('00:01')
+            ->description('Activate today\'s rosters at midnight');
+
+        // 2. Reminders za kesho - KILA SIKU saa 20:00 (jioni)
+        $schedule->command('roster:update-rosters-status')
+            ->dailyAt('20:00')
+            ->description('Send tomorrow reminders at 8PM');
         $schedule->command('parents:truncate-inactive-parents')->daily();
         $schedule->command('bills:update-statuses')->everySecond();
     }
@@ -36,7 +44,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }

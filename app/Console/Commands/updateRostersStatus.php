@@ -34,6 +34,7 @@ class updateRostersStatus extends Command
     {
         $today = Carbon::today();
         $now = Carbon::now();
+        $dayOfWeek = $today->dayOfWeek; // 1=Jumatatu, 0=Jumapili
 
         // 1. ACTIVE → COMPLETED end_date ikipita
         $active = TodRoster::where('status', 'active')->get();
@@ -45,7 +46,6 @@ class updateRostersStatus extends Command
                 $roster->save();
 
                 $this->info("Roster {$roster->roster_id} imewekwa completed.");
-                // Log::info("Roster {$roster->roster_id} imewekwa completed.");
             }
         }
 
@@ -68,32 +68,37 @@ class updateRostersStatus extends Command
         }
 
         // 3. PENDING → ACTIVE on actual start date
-        $pendingToActivate = TodRoster::where('status', 'pending')
-            ->whereNotNull('start_date')
-            ->whereDate('start_date', '<=', $today)
-            ->get();
+        // MUHIMU: Turekebishe hapa kwa kuangalia kama leo ni siku ya kazi
 
-        $grouped = $pendingToActivate->groupBy('roster_id');
+        if ($dayOfWeek >= 1 && $dayOfWeek <= 5) { // Jumatatu-Ijumaa pekee
+            $pendingToActivate = TodRoster::where('status', 'pending')
+                ->whereNotNull('start_date')
+                ->whereDate('start_date', '=', $today) // = LEO tu, sio <=
+                ->get();
 
-        foreach ($grouped as $rosterId => $records) {
-            foreach ($records as $roster) {
-                // hakikisha hana roster nyingine active
-                $exists = TodRoster::where('teacher_id', $roster->teacher_id)
-                    ->where('status', 'active')
-                    ->exists();
+            $grouped = $pendingToActivate->groupBy('roster_id');
 
-                if (!$exists) {
-                    $roster->status     = 'active';
-                    $roster->updated_by = 'system';
-                    $roster->save();
+            foreach ($grouped as $rosterId => $records) {
+                foreach ($records as $roster) {
+                    // hakikisha hana roster nyingine active
+                    $exists = TodRoster::where('teacher_id', $roster->teacher_id)
+                        ->where('status', 'active')
+                        ->exists();
 
-                    $this->info("Roster {$roster->roster_id} imewekwa active kwa mwalimu {$roster->teacher_id}.");
-                    // Log::info("Roster {$roster->roster_id} imewekwa active kwa mwalimu {$roster->teacher_id}.");
+                    if (!$exists) {
+                        $roster->status     = 'active';
+                        $roster->updated_by = 'system';
+                        $roster->save();
 
-                    // SMS ya kuanza (kwa siku hiyo ya kuanza)
-                    $this->sendStartSms($roster);
+                        $this->info("Roster {$roster->roster_id} imewekwa active kwa mwalimu {$roster->teacher_id}.");
+
+                        // SMS ya kuanza (kwa siku hiyo ya kuanza)
+                        $this->sendStartSms($roster);
+                    }
                 }
             }
+        } else {
+            $this->info("Leo ni weekend - hakuna activation ya rosters.");
         }
 
         $this->info('Usasishaji wa roster umekamilika.');
