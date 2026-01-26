@@ -341,14 +341,14 @@
                         @csrf
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="fname" class="form-label">First Name</label>
+                                <label for="fname" class="form-label">First Name <span class="text-danger">*</span></label>
                                 <input type="text" required name="fname" class="form-control-custom" id="fname" placeholder="First name" value="{{old('fname')}}">
                                 @error('fname')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="lname" class="form-label">Other Names</label>
+                                <label for="lname" class="form-label">Other Names <span class="text-danger">*</span></label>
                                 <input type="text" required name="lname" class="form-control-custom" id="lname" placeholder="Middle & Last name" value="{{old('lname')}}">
                                 @error('lname')
                                 <div class="text-danger small">{{$message}}</div>
@@ -367,7 +367,7 @@
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="gender" class="form-label">Gender</label>
+                                <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
                                 <select name="gender" id="gender" class="form-control-custom" required>
                                     <option value="">-- select gender --</option>
                                     <option value="male">Male</option>
@@ -381,14 +381,14 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="phone" class="form-label">Mobile Phone</label>
+                                <label for="phone" class="form-label">Mobile Phone <span class="text-danger">*</span></label>
                                 <input type="text" required name="phone" class="form-control-custom" id="phone" placeholder="Phone Number" value="{{old('phone')}}">
                                 @error('phone')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="qualification" class="form-label">Education Level</label>
+                                <label for="qualification" class="form-label">Education Level <span class="text-danger">*</span></label>
                                 <select name="education" id="education" class="form-control-custom" required>
                                     <option value="">-- Select --</option>
                                     <option value="university">University</option>
@@ -406,14 +406,14 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="dob" class="form-label">Date of Birth</label>
+                                <label for="dob" class="form-label">Date of Birth <span class="text-danger">*</span></label>
                                 <input type="date" required name="dob" class="form-control-custom" id="dob" value="{{old('dob')}}" min="{{\Carbon\Carbon::now()->subYears(60)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(18)->format('Y-m-d')}}">
                                 @error('dob')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="joined" class="form-label">Year Joined</label>
+                                <label for="joined" class="form-label">Year Joined <span class="text-danger">*</span></label>
                                 <select name="joined" id="joined" class="form-control-custom" required>
                                     <option value="">-- Select Year --</option>
                                     @for ($year = date('Y'); $year >= 2010; $year--)
@@ -427,14 +427,14 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="street" class="form-label">Street/Village</label>
+                                <label for="street" class="form-label">Street/Village <span class="text-danger">*</span></label>
                                 <input type="text" required name="street" class="form-control-custom" id="street" value="{{old('street')}}" placeholder="Street Address">
                                 @error('street')
                                 <div class="text-danger small">{{$message}}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="job_title" class="form-label">Job Title</label>
+                                <label for="job_title" class="form-label">Job Title <span class="text-danger">*</span></label>
                                 <select name="job_title" id="job_title" class="form-control-custom" required>
                                     <option value="">-- Select --</option>
                                     <option value="cooks">Cooks</option>
@@ -452,7 +452,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="nida">NIN (NIDA)</label>
-                                <input type="text" name="nida" class="form-control-custom" maxlength="23" required id="nin" value="{{old('nida')}}" placeholder="Enter NIDA">
+                                <input type="text" name="nida" class="form-control-custom" maxlength="23" id="nin" value="{{old('nida')}}" placeholder="Enter NIDA">
                                 @error('nida')
                                     <div class="text-danger small">{{$message}}</div>
                                 @enderror
