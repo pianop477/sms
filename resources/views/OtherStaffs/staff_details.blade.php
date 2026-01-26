@@ -447,7 +447,7 @@
                                         </div>
                                         <div class="col-md-4 mb-3">
                                                 <label for="profile_image" class="form-label">NIN (NIDA)</label>
-                                                <input type="text" required name="nida" class="form-control-custom" id="nin" value="{{old('nida', $staff->nida)}}" placeholder="Enter NIDA">
+                                                <input type="text" name="nida" class="form-control-custom" id="nin" value="{{old('nida', $staff->nida)}}" placeholder="Enter NIDA">
                                                 @error('nida')
                                                 <div class="text-danger small">{{$message}}</div>
                                                 @enderror
