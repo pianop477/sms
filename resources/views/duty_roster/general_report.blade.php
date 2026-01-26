@@ -689,7 +689,7 @@
 
                     <div class="detail-item">
                         <div class="detail-label">Students Attendance</div>
-                        <div class="detail-content"><strong>Students Attended at school is {{$total_present}} </strong> out of <strong>{{$total_registered}}</strong> which is Equivalent to <strong> {{$attendance_rate}}%</strong> of Attendance Performance rate for this day</div>
+                        <div class="detail-content">Students Attended at school is <strong>{{$total_present}} </strong> out of <strong>{{$total_registered}}</strong> which is Equivalent to <strong> {{$attendance_rate}}%</strong> of Attendance Performance rate for this day</div>
                     </div>
 
                     <div class="detail-item">
