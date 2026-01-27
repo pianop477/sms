@@ -302,8 +302,8 @@
                                             <img src="{{ $avatarImage }}" alt="Teacher Avatar" class="rounded-circle" width="60" height="60">
                                         </div>
                                         <div class="flex-grow-1 ms-3">
-                                            <h5 class="mb-1 text-capitalize"> {{ $detail->first_name }}
-                                                {{ $detail->last_name }}</h5>
+                                            <h5 class="mb-1 text-capitalize"> {{ ucwords(strtolower($detail->first_name)) }}
+                                                {{ ucwords(strtolower($detail->last_name)) }}</h5>
                                             <p class="mb-0 text-muted text-uppercase"> {{ $detail->member_id ?? 'N/A' }}</p>
                                         </div>
                                     </div>
