@@ -25,7 +25,7 @@ class TodRosterController extends Controller
     /**
      * Assign teachers to duty roster
      */
-    public function assignTeachers(Request $request)
+    public function assignTeachers(Request $request, $year)
     {
         $validated = $request->validate([
             'teacher_ids' => 'required|array|min:1',
@@ -69,16 +69,37 @@ class TodRosterController extends Controller
         }
 
         Alert()->toast('Teachers assigned successfully!', 'success');
-        return redirect()->route('tod.roster.index');
+        return redirect()->route('tod.roster.index', ['year' => Carbon::parse($request->start_date)->format('Y')]);
     }
 
-    public function index()
+    public function rosterByYear()
+    {
+        $authUser = Auth::user();
+        $schoolId = $authUser->school_id;
+
+        $rosters = TodRoster::query()
+                    ->join('teachers', 'teachers.id', '=', 'tod_rosters.teacher_id')
+                    ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+                    ->select('tod_rosters.*', 'users.first_name', 'users.last_name', 'users.email', 'teachers.id as teacher_id')
+                    ->where('teachers.school_id', $schoolId)
+                    ->orderBy('tod_rosters.updated_at', 'DESC')
+                    ->orderBy('tod_rosters.start_date', 'DESC')
+                    ->get()
+                    ->groupBy(function($item) {
+                    return Carbon::parse($item->start_date)->format('Y');
+                    });
+
+        return view('duty_roster.duty_by_year', compact('rosters'));
+    }
+
+    public function index($year)
     {
         $rosters = TodRoster::query()
                             ->join('teachers', 'teachers.id', '=', 'tod_rosters.teacher_id')
                             ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
                             ->select('tod_rosters.*', 'users.first_name', 'users.last_name', 'users.email', 'teachers.id as teacher_id')
                             ->orderBy('tod_rosters.updated_at', 'DESC')
+                            ->whereYear('tod_rosters.start_date', $year)
                             ->orderBy('tod_rosters.start_date', 'DESC')
                             ->get()
                             ->groupBy('start_date');
@@ -91,16 +112,16 @@ class TodRosterController extends Controller
                             ->where('teachers.status', 1)
                             ->orderBy('users.first_name')
                             ->get();
-        return view('duty_roster.index', compact('rosters', 'teachers'));
+        return view('duty_roster.index', compact('rosters', 'teachers', 'year'));
     }
 
-    public function destroy($id)
+    public function destroy($id, $year)
     {
         $roster = TodRoster::findOrFail($id);
 
         if($roster->status == 'active') {
             Alert()->toast('Cannot delete an active duty roster.', 'error');
-            return redirect()->route('tod.roster.index');
+            return redirect()->route('tod.roster.index', ['year' => $year]);
         }
 
         $rosterId = $roster->roster_id;
@@ -111,11 +132,11 @@ class TodRosterController extends Controller
             $row->delete();
         }
         Alert()->toast('Duty roster deleted successfully!', 'success');
-        return redirect()->route('tod.roster.index');
+        return redirect()->route('tod.roster.index', ['year' => $year]);
     }
 
 
-    public function activate($id)
+    public function activate($id, $year)
     {
         try {
             $roster = TodRoster::findOrFail($id);
@@ -125,7 +146,7 @@ class TodRosterController extends Controller
 
             if ($alreadyActive) {
                 Alert()->toast('There is active roster, deactivate it first', 'warning');
-                return redirect()->route('tod.roster.index');
+                return redirect()->route('tod.roster.index', ['year' => $year]);
             }
 
             // ✅ Since no active roster exists, activate all with the same roster_id
@@ -143,7 +164,30 @@ class TodRosterController extends Controller
             Alert()->toast('Error activating duty roster: ' . $e->getMessage(), 'error');
         }
 
-        return redirect()->route('tod.roster.index');
+        return redirect()->route('tod.roster.index', ['year' => $year]);
+    }
+
+    public function deactivate($id, $year)
+    {
+        try {
+            $roster = TodRoster::findOrFail($id);
+
+            // ✅ Deactivate all rosters with the same roster_id
+            $rosterId = $roster->roster_id;
+            $allRostersWithSameId = TodRoster::where('roster_id', $rosterId)->get();
+
+            foreach ($allRostersWithSameId as $row) {
+                $row->status = 'pending';
+                $row->updated_by = Auth::user()->first_name . ' ' . Auth::user()->last_name;
+                $row->save();
+            }
+
+            Alert()->toast('Duty roster deactivated successfully!', 'success');
+        } catch (Exception $e) {
+            Alert()->toast('Error deactivating duty roster: ' . $e->getMessage(), 'error');
+        }
+
+        return redirect()->route('tod.roster.index', ['year' => $year]);
     }
 
 

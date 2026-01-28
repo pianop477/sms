@@ -275,11 +275,12 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
 
         // daily school report routes
         Route::get('Daily-school-report', [TodRosterController::class, 'getSchoolReport'])->name('get.school.report');
+        Route::get('Teachers-on-duty/roster', [TodRosterController::class, 'rosterByYear'])->name('roster.by.year');
         Route::delete('Daily-school-report/{date}/delete', [TodRosterController::class, 'destroyReport'])->name('report.reject');
         Route::get('Daily-school-report/view', [TodRosterController::class, 'viewReport'])->name('report.fetch.preview');
 
         // roster management routes
-        Route::get('Teachers-roster', [TodRosterController::class, 'index'])->name('tod.roster.index');
+        Route::get('Teachers-roster/year/{year}', [TodRosterController::class, 'index'])->name('tod.roster.index');
 
         //password reset--------------------
         Route::get('Password-Reset', [RolesController::class, 'userPassword'])->name('users.lists');
@@ -418,9 +419,10 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::put('Daily-school-report/{id}/update', [TodRosterController::class, 'updateDailyReport'])->name('report.update');
 
         // roster management routes
-        Route::post('Submit-tod-roster', [TodRosterController::class, 'assignTeachers'])->name('tod.roster.store');
-        Route::delete('Delete-tod-roster/{id}', [TodRosterController::class, 'destroy'])->name('tod.roster.destroy');
-        Route::put('Activate-tod-roster/{id}', [TodRosterController::class, 'activate'])->name('tod.roster.activate');
+        Route::post('Submit-tod-roster/year/{year}', [TodRosterController::class, 'assignTeachers'])->name('tod.roster.store');
+        Route::delete('Delete-tod-roster/{id}/year/{year}', [TodRosterController::class, 'destroy'])->name('tod.roster.destroy');
+        Route::put('Activate-tod-roster/{id}/year/{year}', [TodRosterController::class, 'activate'])->name('tod.roster.activate');
+        Route::put('Deactivate-tod-roster/{id}/year/{year}', [TodRosterController::class, 'deactivate'])->name('tod.roster.deactivate');
     });
 
     //4. ROUTES ACCESS FOR ALL USERS ========================================================================================================

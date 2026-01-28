@@ -462,11 +462,18 @@
 
     <div class="">
         <!-- Assign Roster Button -->
-        <div class="text-right mb-4">
+        <div class="text-right mb-1 mt-4">
+            <a href="{{ route('roster.by.year') }}" class="btn btn-info-custom mr-3">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
             <button type="button" class="btn btn-primary-custom" data-toggle="modal" data-target="#assignRosterModal">
                 <i class="fas fa-plus me-2"></i> Assign Duty Roster
             </button>
         </div>
+        <div class="row">
+
+        </div>
+
 
         <!-- Main Content Card -->
         <div class="glass-card">
@@ -537,17 +544,39 @@
                                             </td>
                                             <td class="text-center">
                                                 <ul class="action-list">
-                                                    <li>
-                                                        <button type="button" class="btn btn-info-custom"
-                                                            data-toggle="modal"
-                                                            data-target="#rosterModal{{ $key }}">
-                                                            <i class="fas fa-eye me-1"></i> View
-                                                        </button>
-                                                    </li>
-                                                    @if ($firstRoster->status == 'pending')
+                                                    @if ($firstRoster->status == 'active')
+                                                        <li>
+                                                            <button type="button" class="btn btn-info-custom"
+                                                                data-toggle="modal"
+                                                                data-target="#rosterModal{{ $key }}">
+                                                                <i class="fas fa-eye me-1"></i> View
+                                                            </button>
+                                                        </li>
                                                         <li>
                                                             <form method="POST"
-                                                                action="{{ route('tod.roster.activate', $firstRoster->id) }}"
+                                                                action="{{ route('tod.roster.deactivate', ['id' => $firstRoster->id, 'year' => $year]) }}"
+                                                                class="d-inline">
+                                                                @csrf
+                                                                @method('PUT')
+                                                                <button class="btn btn-primary-custom" type="submit"
+                                                                    title="Activate"
+                                                                    onclick="return confirm('Deactivate this roster?');">
+                                                                    <i class="fas fa-check me-1"></i> Deactivate
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    @endif
+                                                    @if ($firstRoster->status == 'pending')
+                                                        <li>
+                                                            <button type="button" class="btn btn-info-custom"
+                                                                data-toggle="modal"
+                                                                data-target="#rosterModal{{ $key }}">
+                                                                <i class="fas fa-eye me-1"></i> View
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <form method="POST"
+                                                                action="{{ route('tod.roster.activate', ['id' => $firstRoster->id, 'year' => $year]) }}"
                                                                 class="d-inline">
                                                                 @csrf
                                                                 @method('PUT')
@@ -560,7 +589,7 @@
                                                         </li>
                                                         <li>
                                                             <form
-                                                                action="{{ route('tod.roster.destroy', $firstRoster->id) }}"
+                                                                action="{{ route('tod.roster.destroy', ['id' => $firstRoster->id, 'year' => $year]) }}"
                                                                 method="POST" class="d-inline">
                                                                 @csrf
                                                                 @method('DELETE')
@@ -570,6 +599,15 @@
                                                                     <i class="fas fa-trash me-1"></i> Delete
                                                                 </button>
                                                             </form>
+                                                        </li>
+                                                    @endif
+                                                    @if ($firstRoster->status == 'completed')
+                                                        <li>
+                                                            <button type="button" class="btn btn-info-custom"
+                                                                data-toggle="modal"
+                                                                data-target="#rosterModal{{ $key }}">
+                                                                <i class="fas fa-eye me-1"></i> View
+                                                            </button>
                                                         </li>
                                                     @endif
 
@@ -600,10 +638,9 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form class="needs-validation" novalidate action="{{ route('tod.roster.store') }}" method="POST"
-                        id="rosterForm">
+                    <form class="needs-validation" novalidate action="{{ route('tod.roster.store', ['year' => $year]) }}"
+                        method="POST" id="rosterForm">
                         @csrf
-
                         <div class="form-section">
                             <div class="row">
                                 <div class="col-md-12 mb-4">
@@ -612,7 +649,8 @@
                                         Select Teacher(s) <span class="required-star">*</span>
                                     </label>
                                     <select name="teacher_ids[]" id="teacher_ids" style="text-transform: capitalize"
-                                        class="form-control select2-multiple text-capitalize" multiple="multiple" required>
+                                        class="form-control select2-multiple text-capitalize" multiple="multiple"
+                                        required>
                                         @foreach ($teachers as $teacher)
                                             <option value="{{ $teacher->id }}"
                                                 {{ collect(old('teacher_ids'))->contains($teacher->id) ? 'selected' : '' }}>
@@ -670,7 +708,7 @@
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary-custom" data-dismiss="modal">Close</button>
                             <button class="btn btn-success-custom" id="saveButton" type="submit">
                                 <i class="fas fa-check me-2"></i> Assign Duty
                             </button>
@@ -744,7 +782,8 @@
                                     style="background: rgba(78, 84, 200, 0.05);">
                                     <div class="ms-3">
                                         <div class="fw-bold text-capitalize">
-                                           ✅ {{ ucwords(strtolower($teacher->first_name)) }} {{ ucwords(strtolower($teacher->last_name)) }}
+                                            ✅ {{ ucwords(strtolower($teacher->first_name)) }}
+                                            {{ ucwords(strtolower($teacher->last_name)) }}
                                         </div>
                                     </div>
                                 </div>
@@ -754,8 +793,8 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         @if ($firstRoster->status == 'pending')
-                            <form action="{{ route('tod.roster.activate', $firstRoster->id) }}" class="d-inline"
-                                method="POST">
+                            <form action="{{ route('tod.roster.activate', ['id' => $firstRoster->id, 'year' => $year]) }}"
+                                class="d-inline" method="POST">
                                 @csrf
                                 @method('PUT')
                                 <button class="btn btn-success-custom" type="submit"
@@ -763,8 +802,8 @@
                                     <i class="fas fa-check me-2"></i> Activate
                                 </button>
                             </form>
-                            <form action="{{ route('tod.roster.destroy', $firstRoster->id) }}" method="POST"
-                                class="d-inline">
+                            <form action="{{ route('tod.roster.destroy', ['id' => $firstRoster->id, 'year' => $year]) }}"
+                                method="POST" class="d-inline">
                                 @csrf
                                 @method('DELETE')
                                 <button class="btn btn-danger-custom" type="submit"
