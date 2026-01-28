@@ -311,7 +311,7 @@
                                         <tr>
                                             <th><i class="fas fa-phone me-2"></i> Phone</th>
                                             <td>
-                                                <a href="tel:{{ $students->parent_phone }}" class="text-decoration-none">
+                                                <a href="tel:{{ $students->phone }}" class="text-decoration-none">
                                                     {{ $students->phone }}
                                                 </a>
                                             </td>

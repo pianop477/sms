@@ -239,7 +239,9 @@
                                                         <span class="badge bg-secondary text-white">{{ucwords(strtolower($teacher->role_name))}}</span>
                                                     @endif
                                                 </td>
-                                                <td>{{$teacher->phone}}</td>
+                                                <td>
+                                                    <a href="tel:{{$teacher->phone}}">{{$teacher->phone}}</a>
+                                                </td>
                                                 <td>{{$teacher->joined}}</td>
                                                 <td>
                                                     @if ($teacher->status == 1)
