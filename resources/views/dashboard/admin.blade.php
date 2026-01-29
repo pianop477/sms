@@ -413,7 +413,7 @@
             <div class="col-lg-12 mb-4">
                 <div class="row">
                     <!-- Schools Growth Chart -->
-                    <div class="col-xl-8 mb-4">
+                    <div class="col-xl-6 mb-4">
                         <div class="chart-container">
                             <div class="chart-header">
                                 <h5 class="chart-title">
@@ -438,6 +438,23 @@
                             </div>
                             <div class="chart-wrapper">
                                 <canvas id="userDistributionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-2 mb-4">
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h5 class="chart-title">
+                                    <i class="fas fa-sms"></i> Account Information
+                                </h5>
+                                <p class="chart-subtitle"> NextSms Account Balance</p>
+                            </div>
+                            <div class="chart-wrapper">
+                                <div class="justify-content-center text-center">
+                                    <h6 class="">Internet SMS: </h6>
+                                    <p><span class="badge bg-success text-white">{{ $smsBalance }}</span></p>
+                                    <p class="text-muted">Available</p>
+                                </div>
                             </div>
                         </div>
                     </div>

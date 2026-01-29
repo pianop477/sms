@@ -54,4 +54,34 @@ class NextSmsService
         }
     }
 
+    public function checkBalance()
+    {
+        try {
+            $url = "https://messaging-service.co.tz/api/sms/v1/balance";
+
+            $response = Http::withHeaders([
+                'Authorization' => 'Basic ' . base64_encode($this->apiUsername . ':' . $this->apiPassword),
+                'Accept' => 'application/json',
+            ])->get($url);
+
+            if($response->failed()) {
+                return [
+                    'success' => false,
+                    'error' => $response->body()
+                ];
+            }
+
+            return [
+                'success' => true,
+                'data' => $response->json()
+            ];
+        }
+        catch (Exception $e) {
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
 }

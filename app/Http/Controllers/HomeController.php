@@ -14,6 +14,7 @@ use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\Transport;
 use App\Models\User;
+use App\Services\NextSmsService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -36,6 +37,7 @@ class HomeController extends Controller
      */
     public function index()
     {
+        $nextSmsService = new NextSmsService();
         $user = Auth::user();
         //system adminstrator dashboard redirection --------------------------------------------
         if ($user->usertype == 1) {
@@ -47,7 +49,14 @@ class HomeController extends Controller
             $subjects = Subject::where('status', '=', 1)->where('status', 1)->get();
             $buses = Transport::where('status', '=', 1)->where('status', 1)->get();
             // $school_details = school::orderBy('school_name')->get();
-            return view('home', compact('teachers', 'students', 'parents', 'classes', 'subjects', 'buses', 'schools'));
+
+            $response = $nextSmsService->checkBalance();
+            if ($response['success']) {
+                $smsBalance = $response['data']['sms_balance'] ?? 0;
+            } else {
+                $smsBalance = 'Error: ' . ($response['error'] ?? 'Unable to fetch balance');
+            }
+            return view('home', compact('teachers', 'smsBalance', 'students', 'parents', 'classes', 'subjects', 'buses', 'schools'));
         }
         //manager dashboard redirection --------------------------------------
         elseif ($user->usertype == 2) {
