@@ -36,7 +36,7 @@ class SmsController extends Controller
         $this->nextSmsService = $nextSmsService;
     }
 
-    public function smsForm ()
+    public function smsForm()
     {
         $user = auth()->user();
 
@@ -51,7 +51,20 @@ class SmsController extends Controller
             ->orderBy('class_code')
             ->get();
 
-        return view('profile.sms', compact('classes'));
+        // return recent sms logs
+        $nextSmsService = new NextSmsService();
+        $school = school::findOrFail($user->school_id);
+        $payload = [
+            "from" => $school->sender_id ?? 'SHULE APP',
+            "limit" => 10, // Ongeza kidogo kwa ajili ya datatable
+            "offset" => 0,
+        ];
+
+        $response = $nextSmsService->smsLogs($payload['from'], $payload['limit'], $payload['offset']);
+        $smsContents = $response['data']['results'] ?? [];
+        $smsCount = count($smsContents);
+
+        return view('profile.sms', compact('classes', 'smsContents', 'smsCount'));
     }
 
 
@@ -136,7 +149,6 @@ class SmsController extends Controller
             // Session::flash('success', 'Message sent successfully');
             Alert()->toast('Message sent successfully', 'success');
             return redirect()->back();
-
         } catch (Exception $e) {
             // Session::flash('error', $e->getMessage());
             Alert()->toast($e->getMessage(), 'error');
@@ -222,8 +234,7 @@ class SmsController extends Controller
 
             $recipientType = 'parents';
             $recipientId = 4; // User type ID for parents
-        }
-        elseif ($sendwithTransport) {
+        } elseif ($sendwithTransport) {
             $data = Student::query()
                 ->join('parents', 'parents.id', '=', 'students.parent_id')
                 ->leftJoin('users', 'users.id', '=', 'parents.user_id')
@@ -236,8 +247,7 @@ class SmsController extends Controller
 
             $recipientType = 'parents';
             $recipientId = 4; // User type ID for parents
-        }
-        elseif ($sendWithoutTransport) {
+        } elseif ($sendWithoutTransport) {
             $data = Student::query()
                 ->join('parents', 'parents.id', '=', 'students.parent_id')
                 ->leftJoin('users', 'users.id', '=', 'parents.user_id')
@@ -250,8 +260,7 @@ class SmsController extends Controller
 
             $recipientType = 'parents';
             $recipientId = 4; // User type ID for parents
-        }
-        elseif ($sendToTeachers) {
+        } elseif ($sendToTeachers) {
             $data = Teacher::query()
                 ->join('users', 'users.id', '=', 'teachers.user_id')
                 ->select('users.phone', 'teachers.*')
@@ -261,8 +270,7 @@ class SmsController extends Controller
 
             $recipientType = 'teachers';
             $recipientId = 3; // User type ID for teachers
-        }
-        elseif (!empty($selectedClasses)) {
+        } elseif (!empty($selectedClasses)) {
             // Fetch students and parents for the selected multiple classes
             $data = Student::query()
                 ->join('parents', 'parents.id', '=', 'students.parent_id')
@@ -276,22 +284,19 @@ class SmsController extends Controller
 
             $recipientType = 'parents';
             $recipientId = 4; // User type ID for parents
-        }
-        elseif($selectedStaffs) {
+        } elseif ($selectedStaffs) {
             $drivers = Transport::all();
             $others = other_staffs::all();
             $data = $drivers->concat($others);
 
             $recipientType = 'Other_staffs';
             $recipientId = 6;
-        }
-        elseif($selectedDrivers) {
+        } elseif ($selectedDrivers) {
             $data = Transport::where('school_id', $user->school_id)->get();
 
             $recipientType = 'Drivers';
             $recipientType = 7;
-        }
-        else {
+        } else {
             Alert()->toast('No recipient selection made', 'error');
             return back()->withInput();
         }
@@ -347,15 +352,14 @@ class SmsController extends Controller
             //     'message_length' => strlen($request->message_content)
             // ]);
 
-            if(!$response['success']) {
-                Alert()->toast('SMS failed: '.$response['error'], 'error');
+            if (!$response['success']) {
+                Alert()->toast('SMS failed: ' . $response['error'], 'error');
                 return back();
             }
 
             Alert()->toast('Message Sent Successfully to ' . $recipientCount . ' recipients', 'success');
             return redirect()->back();
-
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             Log::error('SMS sending failed', [
                 'error' => $e->getMessage(),
                 'school_id' => $user->school_id,

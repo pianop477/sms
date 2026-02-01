@@ -17,6 +17,9 @@ class TodRoster extends Model
         'created_by',
         'updated_by',
         'status',
+        'reminder_sent',
         'is_completed',
+        'created_at',
+        'updated_at',
     ];
 }

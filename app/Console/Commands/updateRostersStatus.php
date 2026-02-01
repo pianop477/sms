@@ -32,73 +32,80 @@ class updateRostersStatus extends Command
      */
     public function handle(): int
     {
-        $today = Carbon::today();
-        $now = Carbon::now();
-        $dayOfWeek = $today->dayOfWeek; // 1=Jumatatu, 0=Jumapili
+        $today     = Carbon::today();
+        $now       = Carbon::now();
+        $dayOfWeek = $today->dayOfWeek; // 0=Sun, 1=Mon
 
-        // 1. ACTIVE → COMPLETED end_date ikipita
-        $active = TodRoster::where('status', 'active')->get();
-        foreach ($active as $roster) {
+        /**
+         * 1. ACTIVE → COMPLETED (end_date ikipita)
+         */
+        $activeRosters = TodRoster::where('status', 'active')->get();
+
+        foreach ($activeRosters as $roster) {
             if ($roster->end_date && $today->gt(Carbon::parse($roster->end_date))) {
-                $roster->status       = 'completed';
-                $roster->is_completed = true;
-                $roster->updated_by   = 'system';
-                $roster->save();
+                $roster->update([
+                    'status'       => 'completed',
+                    'is_completed' => true,
+                    'updated_by'   => 'system',
+                ]);
 
-                $this->info("Roster {$roster->roster_id} imewekwa completed.");
+                $this->info("Roster {$roster->roster_id} imewekwa COMPLETED.");
             }
         }
 
-        // 2. Check for PENDING rosters that need reminder SMS (one day before start)
-        $pending = TodRoster::where('status', 'pending')
+        /**
+         * 2. REMINDER SMS (MOJA TU)
+         * - siku 1 kabla ya start_date
+         * - baada ya saa 20:00
+         * - reminder_sent = 0 → 1
+         */
+        $pendingForReminder = TodRoster::where('status', 'pending')
+            ->where('reminder_sent', 0)
             ->whereNotNull('start_date')
-            ->whereDate('start_date', '=', $today->copy()->addDay())
             ->get();
 
-        foreach ($pending as $roster) {
-            // Check if reminder hasn't been sent yet
-            if (!$roster->reminder_sent && $now->hour >= 20) {
+        foreach ($pendingForReminder as $roster) {
+            $startDate = Carbon::parse($roster->start_date);
+
+            // calendar-safe: siku 1 kabla
+            if ($today->diffInDays($startDate, false) === 1 && $now->hour >= 20) {
                 $this->sendReminderSms($roster);
 
-                // Mark reminder as sent
-                $roster->reminder_sent = true;
-                $roster->updated_by = 'system';
-                $roster->save();
+                $roster->update([
+                    'reminder_sent' => 1,
+                    'updated_by'    => 'system',
+                ]);
+
+                $this->info("Reminder SMS imetumwa kwa roster {$roster->roster_id}");
             }
         }
 
-        // 3. PENDING → ACTIVE on actual start date
-        // MUHIMU: Turekebishe hapa kwa kuangalia kama leo ni siku ya kazi
-
-        if ($dayOfWeek >= 1 && $dayOfWeek <= 5) { // Jumatatu-Ijumaa pekee
+        /**
+         * 3. PENDING → ACTIVE (SILENT)
+         * - siku ya kuanza TU
+         * - HAKUNA SMS
+         */
+        if ($dayOfWeek >= 1 && $dayOfWeek <= 5) { // Mon–Fri
             $pendingToActivate = TodRoster::where('status', 'pending')
-                ->whereNotNull('start_date')
-                ->whereDate('start_date', '=', $today) // = LEO tu, sio <=
+                ->whereDate('start_date', $today)
                 ->get();
 
-            $grouped = $pendingToActivate->groupBy('roster_id');
+            foreach ($pendingToActivate as $roster) {
+                $exists = TodRoster::where('teacher_id', $roster->teacher_id)
+                    ->where('status', 'active')
+                    ->exists();
 
-            foreach ($grouped as $rosterId => $records) {
-                foreach ($records as $roster) {
-                    // hakikisha hana roster nyingine active
-                    $exists = TodRoster::where('teacher_id', $roster->teacher_id)
-                        ->where('status', 'active')
-                        ->exists();
+                if (!$exists) {
+                    $roster->update([
+                        'status'     => 'active',
+                        'updated_by' => 'system',
+                    ]);
 
-                    if (!$exists) {
-                        $roster->status     = 'active';
-                        $roster->updated_by = 'system';
-                        $roster->save();
-
-                        $this->info("Roster {$roster->roster_id} imewekwa active kwa mwalimu {$roster->teacher_id}.");
-
-                        // SMS ya kuanza (kwa siku hiyo ya kuanza)
-                        $this->sendStartSms($roster);
-                    }
+                    $this->info("Roster {$roster->roster_id} imewekwa ACTIVE (silent).");
                 }
             }
         } else {
-            $this->info("Leo ni weekend - hakuna activation ya rosters.");
+            $this->info('Weekend: hakuna activation.');
         }
 
         $this->info('Usasishaji wa roster umekamilika.');
@@ -106,14 +113,19 @@ class updateRostersStatus extends Command
     }
 
     /**
-     * SMS ya ukumbusho (siku moja kabla)
+     * SMS YA UKUMBUSHO (SMS MOJA TU)
      */
     protected function sendReminderSms(TodRoster $roster): void
     {
         try {
             $teacher = DB::table('teachers')
                 ->join('users', 'users.id', '=', 'teachers.user_id')
-                ->select('teachers.id as teacher_id', 'teachers.school_id', 'users.first_name', 'users.last_name', 'users.phone')
+                ->select(
+                    'teachers.school_id',
+                    'users.first_name',
+                    'users.last_name',
+                    'users.phone'
+                )
                 ->where('teachers.id', $roster->teacher_id)
                 ->first();
 
@@ -121,91 +133,22 @@ class updateRostersStatus extends Command
                 return;
             }
 
-            $phone = $teacher->phone;
-            $startDate = Carbon::parse($roster->start_date);
-            $endDate = Carbon::parse($roster->end_date);
-            $fullname = ucwords(strtolower($teacher->first_name . ', ' . $teacher->last_name[0]));
+            $startDate = Carbon::parse($roster->start_date)->format('d/m/Y');
+            $fullname  = ucwords(strtolower($teacher->first_name));
 
-            $message = "Hello {$fullname}! Kindly be reminded that, your duty shift will commence tomorrow on "
-                . $startDate->format('d/m/Y') . ". Your cooperation is highly appreciated on this upcoming week.";
+            $message = "Hello {$fullname}! Kindly be reminded that your duty shift will commence tomorrow on {$startDate}. Your cooperation is highly appreciated.";
 
-            $school = school::findOrFail($teacher->school_id);
-            $nextSmsService = new NextSmsService();
+            $school = School::findOrFail($teacher->school_id);
+            $sms    = new NextSmsService();
 
-            $payload = [
-                'from' => $school->sender_id,
-                'to' => $this->formatPhoneNumber($phone),
-                'text' => $message,
-                'reference' => $roster->roster_id . '_reminder',
-            ];
-
-            $response = $nextSmsService->sendSmsByNext(
-                $payload['from'],
-                $payload['to'],
-                $payload['text'],
-                $payload['reference'],
+            $sms->sendSmsByNext(
+                $school->sender_id,
+                $this->formatPhoneNumber($teacher->phone),
+                $message,
+                $roster->roster_id . '_reminder'
             );
-
-            if (!$response['success']) {
-                throw new \Exception($response['error']);
-            }
-
-            $this->info("SMS ya ukumbusho imetumwa kwa {$phone}");
-            // Log::info("SMS ya ukumbusho imetumwa kwa {$phone}");
         } catch (\Exception $e) {
-            $this->error("Hitilafu ya kutuma SMS ya ukumbusho: " . $e->getMessage());
-            // Log::error("Hitilafu ya kutuma SMS ya ukumbusho: " . $e->getMessage());
-        }
-    }
-
-    /**
-     * SMS ya kuanza (siku hiyo ya kuanza)
-     */
-    protected function sendStartSms(TodRoster $roster): void
-    {
-        try {
-            $teacher = DB::table('teachers')
-                ->join('users', 'users.id', '=', 'teachers.user_id')
-                ->select('teachers.id as teacher_id', 'teachers.school_id', 'users.first_name', 'users.phone')
-                ->where('teachers.id', $roster->teacher_id)
-                ->first();
-
-            if (!$teacher || empty($teacher->phone)) {
-                return;
-            }
-
-            $phone = $teacher->phone;
-            $message = "Habari {$teacher->first_name}! Utakuwa zamu wiki hii kuanzia " .
-                Carbon::parse($roster->start_date)->format('d/m/Y') . " hadi " .
-                Carbon::parse($roster->end_date)->format('d/m/Y') .
-                " Ninakutakia uwajibikaji mwema.";
-
-            $school = school::findOrFail($teacher->school_id);
-            $nextSmsService = new NextSmsService();
-
-            $payload = [
-                'from' => $school->sender_id,
-                'to' => $this->formatPhoneNumber($phone),
-                'text' => $message,
-                'reference' => $roster->roster_id,
-            ];
-
-            $response = $nextSmsService->sendSmsByNext(
-                $payload['from'],
-                $payload['to'],
-                $payload['text'],
-                $payload['reference'],
-            );
-
-            if (!$response['success']) {
-                throw new \Exception($response['error']);
-            }
-
-            $this->info("SMS ya kuanza imetumwa kwa {$phone}");
-            // Log::info("SMS ya kuanza imetumwa kwa {$phone}");
-        } catch (\Exception $e) {
-            $this->error("Hitilafu ya kutuma SMS: " . $e->getMessage());
-            // Log::error("Hitilafu ya kutuma SMS: " . $e->getMessage());
+            $this->error('Hitilafu ya SMS ya ukumbusho: ' . $e->getMessage());
         }
     }
 
