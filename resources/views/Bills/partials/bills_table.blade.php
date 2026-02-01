@@ -50,7 +50,7 @@
                     </td>
                     <td>
                         @if ($row->due_date)
-                            {{ $row->due_date }}
+                            {{ \Carbon\Carbon::parse($row->due_date)->format('Y-m-d') }}
                         @else
                             N/A
                         @endif

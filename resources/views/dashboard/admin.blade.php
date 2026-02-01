@@ -452,7 +452,7 @@
                             <div class="chart-wrapper">
                                 <div class="justify-content-center text-center">
                                     <h6 class="">Internet SMS: </h6>
-                                    <p><span class="badge bg-success text-white">{{ $smsBalance }}</span></p>
+                                    <p style="font-size:16px"><span class="badge bg-success text-white">{{ $smsBalance }}</span></p>
                                     <p class="text-muted">Available</p>
                                 </div>
                             </div>

@@ -177,7 +177,19 @@
                             <div class="col-md-8">
                                 <h4 class="header-title">Recent Bills</h4>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-2">
+                                <div class="d-flex justify-content-end gap-2 flex-wrap">
+                                    <form id="remindAllForm" action="{{ route('bills.send-overdue-reminders') }}"
+                                        method="POST">
+                                        @csrf
+                                        <input type="hidden" name="year" value="{{ $selectedYear ?? date('Y') }}">
+                                        <button type="button" id="remindAllBtn" class="btn btn-success">
+                                            <i class="fas fa-sms me-1"></i> Send Reminder
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
                                 <div class="d-flex justify-content-end gap-2 flex-wrap">
                                     <button type="button" class="btn btn-info btn-action" data-bs-toggle="modal"
                                         data-bs-target="#addTeacherModal">
@@ -256,6 +268,33 @@
             </div>
         </div>
     </div>
+    <!-- Add this modal for confirmation -->
+    <div class="modal fade" id="reminderModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Send Reminders</h5>
+                    <button type="button" class="btn btn-danger btn-xs" data-bs-dismiss="modal"><i
+                            class="fas fa-close"></i></button>
+                </div>
+                <div class="modal-body">
+                    <p id="reminderSummary">Loading summary...</p>
+                    <p class="text-danger text-center" style="font-style: italic"><strong>Are you sure you want to send this reminder to parents?</strong></p>
+                    <div id="reminderProgress" style="display: none;">
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                                style="width: 0%"></div>
+                        </div>
+                        <p class="mt-2" id="progressText">Sending reminders...</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="confirmRemind">Send Reminders</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Add Teacher Modal -->
     <div class="modal fade" id="addTeacherModal" tabindex="-1" aria-labelledby="addTeacherModalLabel" aria-hidden="true">
@@ -263,8 +302,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="addTeacherModalLabel"> Register Bills</h5>
-                    <button type="button" class="btn btn-xs btn btn-danger" data-bs-dismiss="modal" aria-label="Close"><i
-                            class="fas fa-close"></i></button>
+                    <button type="button" class="btn btn-xs btn btn-danger" data-bs-dismiss="modal"
+                        aria-label="Close"><i class="fas fa-close"></i></button>
                 </div>
                 <div class="modal-body">
                     <form class="needs-validation" novalidate action="{{ route('bills.store') }}" method="POST"
@@ -293,8 +332,9 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="controlNumber" class="form-label">Control Number</label>
-                                <input type="text" name="control_number" class="form-control-custom" id="controlNumber"
-                                    placeholder="Enter Control Number" value="{{ old('control_number') }}">
+                                <input type="text" name="control_number" class="form-control-custom"
+                                    id="controlNumber" placeholder="Enter Control Number"
+                                    value="{{ old('control_number') }}">
                                 @error('control_number')
                                     <div class="text-danger small">{{ $message }}</div>
                                 @enderror
@@ -518,7 +558,7 @@
                                 filteredStudents = allStudents.filter(student =>
                                     student.text.toLowerCase().includes(searchTerm) ||
                                     (student.admissionNo && student.admissionNo
-                                    .toLowerCase().includes(searchTerm))
+                                        .toLowerCase().includes(searchTerm))
                                 );
                             }
 
@@ -1069,18 +1109,18 @@
                             </div>
 
                             ${response.payment_history.length > 0 ? `
-                                        <div style="max-height: 200px; overflow-y: auto;">
-                                            <table class="table table-sm table-borderless mb-0">
-                                                <thead>
-                                                    <tr class="small text-muted border-bottom">
-                                                        <th class="ps-2">#</th>
-                                                        <th>Date</th>
-                                                        <th>Mode</th>
-                                                        <th class="text-end pe-2">Amount</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    ${response.payment_history.map((payment, index) => `
+                                                        <div style="max-height: 200px; overflow-y: auto;">
+                                                            <table class="table table-sm table-borderless mb-0">
+                                                                <thead>
+                                                                    <tr class="small text-muted border-bottom">
+                                                                        <th class="ps-2">#</th>
+                                                                        <th>Date</th>
+                                                                        <th>Mode</th>
+                                                                        <th class="text-end pe-2">Amount</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    ${response.payment_history.map((payment, index) => `
                                                 <tr class="small border-bottom">
                                                     <td class="ps-2">#${payment.installment}</td>
                                                     <td>${new Date(payment.approved_at).toLocaleDateString('en-GB')}</td>
@@ -1092,24 +1132,24 @@
                                                     </td>
                                                 </tr>
                                             `).join('')}
-                                                    <!-- Total Row -->
-                                                    <tr class="small border-top fw-bold bg-light">
-                                                        <td class="ps-2" colspan="3" style="font-weight:bold">Total Paid:</td>
-                                                        <td class="text-end pe-2 text-success" style="font-weight:bold">
-                                                            ${new Intl.NumberFormat().format(response.summary.total_paid)}
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    ` : `
-                                        <div class="text-center py-2">
-                                            <small class="text-muted">
-                                                <i class="fas fa-info-circle me-1"></i>
-                                                No payments recorded
-                                            </small>
-                                        </div>
-                                    `}
+                                                                    <!-- Total Row -->
+                                                                    <tr class="small border-top fw-bold bg-light">
+                                                                        <td class="ps-2" colspan="3" style="font-weight:bold">Total Paid:</td>
+                                                                        <td class="text-end pe-2 text-success" style="font-weight:bold">
+                                                                            ${new Intl.NumberFormat().format(response.summary.total_paid)}
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    ` : `
+                                                        <div class="text-center py-2">
+                                                            <small class="text-muted">
+                                                                <i class="fas fa-info-circle me-1"></i>
+                                                                No payments recorded
+                                                            </small>
+                                                        </div>
+                                                    `}
                         </div>
                     `);
                         } else {
@@ -1223,6 +1263,203 @@
                 $(this).find('.btn-danger').prop('disabled', true)
                     .html('<span class="spinner-border spinner-border-sm me-2"></span>Cancelling...');
             });
+
+            // ============ REMIND ALL FUNCTIONALITY ============
+
+            // Simple version that works with real-time year filter
+            function showReminderModal() {
+                console.log('showReminderModal called');
+
+                const selectedYear = $('#yearFilter').val() || localStorage.getItem('selectedYear') ||
+                    "{{ date('Y') }}";
+                console.log('Using year:', selectedYear);
+
+                // Show modal immediately
+                $('#reminderModal').modal('show');
+                $('#reminderSummary').html(`
+            <div class="text-center py-3">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 mb-0 small">Loading summary for ${selectedYear}...</p>
+            </div>
+        `);
+
+                // Load summary
+                $.ajax({
+                    url: '{{ route('bills.get-overdue-summary') }}',
+                    method: 'GET',
+                    data: {
+                        year: selectedYear
+                    },
+                    success: function(response) {
+                        console.log('Summary response:', response);
+                        if (response.success) {
+                            const summary = response.summary;
+                            $('#reminderSummary').html(`
+                        <div class="alert alert-info">
+                            <p><strong>Summary for ${selectedYear}</strong></p>
+                            <hr>
+                            <div class="row">
+                                <div class="col-4 text-center">
+                                    <div class="h5 mb-0">${summary.total_bills}</div>
+                                    <small class="text-muted">Total Bills</small>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <div class="h5 mb-0">${summary.unique_parents}</div>
+                                    <small class="text-muted">Unique Parents</small>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <div class="h5 mb-0 text-danger">${summary.formatted_total_balance}</div>
+                                    <small class="text-muted">Total Unpaid</small>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                        } else {
+                            $('#reminderSummary').html(`
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            Error: ${response.message}
+                        </div>
+                    `);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading summary:', error);
+                        $('#reminderSummary').html(`
+                    <div class="alert alert-danger">
+                        <i class="fas fa-times-circle me-1"></i>
+                        Error loading summary. Please try again.
+                    </div>
+                `);
+                    }
+                });
+            }
+
+            function sendReminders() {
+                const $btn = $('#confirmRemind');
+                const $progress = $('#reminderProgress');
+                const $progressBar = $('#reminderProgress .progress-bar');
+                const $progressText = $('#progressText');
+
+                // Get current year
+                const selectedYear = $('#yearFilter').val() || localStorage.getItem('selectedYear') ||
+                    "{{ date('Y') }}";
+
+                // Update form with current year
+                $('#remindAllForm input[name="year"]').val(selectedYear);
+
+                $btn.prop('disabled', true);
+                $progress.show();
+                $progressBar.css('width', '10%');
+                $progressText.text('Preparing to send...');
+
+                $.ajax({
+                    url: $('#remindAllForm').attr('action'),
+                    method: 'POST',
+                    data: $('#remindAllForm').serialize(),
+                    xhr: function() {
+                        const xhr = new window.XMLHttpRequest();
+                        xhr.addEventListener('progress', function(e) {
+                            if (e.lengthComputable) {
+                                const percent = Math.min(90, (e.loaded / e.total) * 90);
+                                $progressBar.css('width', percent + '%');
+                                $progressText.text(`Sending... ${Math.round(percent)}%`);
+                            }
+                        });
+                        return xhr;
+                    },
+                    success: function(response) {
+                        console.log('Remind response:', response);
+                        $progressBar.css('width', '100%');
+                        $progressText.text('Completed!');
+
+                        setTimeout(function() {
+                            $('#reminderModal').modal('hide');
+
+                            // Show success message with stats
+                            let statsHtml = '';
+                            if (response.stats) {
+                                statsHtml = `
+                            <hr>
+                            <div class="text-start">
+                                <small>
+                                    <strong>Statistics:</strong><br>
+                                    - Total processed: ${response.stats.total}<br>
+                                    - Successful: ${response.stats.successful}<br>
+                                    - Failed: ${response.stats.failed}
+                                </small>
+                            </div>
+                        `;
+
+                                // Show failed details if any
+                                if (response.stats.failed > 0 && response.stats
+                                    .failed_details) {
+                                    statsHtml += `
+                                <hr>
+                                <div class="text-start">
+                                    <small>
+                                        <strong>Failed details:</strong><br>
+                                        ${response.stats.failed_details.slice(0, 3).map(detail => `- ${detail}<br>`).join('')}
+                                        ${response.stats.failed_details.length > 3 ? `... and ${response.stats.failed_details.length - 3} more` : ''}
+                                    </small>
+                                </div>
+                            `;
+                                }
+                            }
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Reminders Sent!',
+                                html: response.message + statsHtml,
+                                confirmButtonText: 'OK'
+                            });
+
+                            // Reset
+                            $btn.prop('disabled', false);
+                            $progress.hide();
+                            $progressBar.css('width', '0%');
+
+                            // Refresh the bills table to show updated status
+                            loadBillsData();
+
+                        }, 1000);
+                    },
+                    error: function(xhr) {
+                        console.error('AJAX Error:', xhr);
+                        $btn.prop('disabled', false);
+                        $progress.hide();
+
+                        let errorMsg = 'Error sending reminders. ';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMsg += xhr.responseJSON.message;
+                        } else if (xhr.status === 422) {
+                            errorMsg += 'Validation error. Please check the data.';
+                        } else if (xhr.status === 500) {
+                            errorMsg += 'Server error. Please try again later.';
+                        }
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: errorMsg,
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
+            }
+
+            // Reset modal when closed
+            $('#reminderModal').on('hidden.bs.modal', function() {
+                $('#confirmRemind').prop('disabled', false);
+                $('#reminderProgress').hide();
+                $('#reminderProgress .progress-bar').css('width', '0%');
+            });
+
+            // Bind events using event delegation
+            $(document).on('click', '#remindAllBtn', showReminderModal);
+            $(document).on('click', '#confirmRemind', sendReminders);
         });
     </script>
 

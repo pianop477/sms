@@ -205,7 +205,7 @@ class ManagerController extends Controller
             $school_info->update();
 
                 // Update the status of all users associated with the school
-                User::where('school_id', $school_info->id)->whereIn('usertype', [3,4])->update(['status' => $status]);
+                User::where('school_id', $school_info->id)->whereIn('usertype', [3,4,5])->update(['status' => $status]);
 
                 // Update the status of all teachers associated with the school
                 Teacher::where('school_id', $school_info->id)->update(['status' => $status]);
@@ -232,7 +232,8 @@ class ManagerController extends Controller
 
     }
 
-    public function activateStatus($school, Request $request) {
+    public function activateStatus($school, Request $request)
+    {
         $school_id = Hashids::decode($school)[0];
         $user_status = User::where('school_id', $school_id)->where('usertype', 2)->get();
         // $school_id = $user_status->school_id;
@@ -250,7 +251,7 @@ class ManagerController extends Controller
         $school_info->update();
 
             // Update the status of all users associated with the school
-            User::where('school_id', $school_info->id)->whereIn('usertype', [3,4])->update(['status' => $status]);
+            User::where('school_id', $school_info->id)->whereIn('usertype', [3,4,5])->update(['status' => $status]);
 
             // Update the status of all teachers associated with the school
             Teacher::where('school_id', $school_info->id)->update(['status' => $status]);

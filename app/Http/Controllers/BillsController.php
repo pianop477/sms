@@ -267,6 +267,7 @@ class BillsController extends Controller
         }
     }
 
+
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -1130,7 +1131,7 @@ class BillsController extends Controller
             $sendBillBySms = new NextSmsService();
             $user = Auth::user();
             $school = school::findOrFail($user->school_id);
-            $message = "Habari! Unakumbushwa kulipa {$service} ya {$studentName}, Tsh. {$formattedBalance}. {$account} kulipa kabla ya {$dueDate}. Tafadhali lipa kwa wakati!";
+            $message = "Habari! Unakumbushwa kulipa {$service} ya {$studentName}, Tsh. {$formattedBalance}. {$account} kulipa kabla ya {$dueDate}. Tafadhali lipa kwa wakati kuepuka usumbufu";
 
             $senderId = $school->sender_id ?? 'SHULE APP';
             $payload = [
@@ -1140,7 +1141,7 @@ class BillsController extends Controller
                 'reference' => uniqid(),
             ];
 
-            Log::info('Sending sms to ' . $studentName . ' with phone number ' . $payload['to'] . ' and message content is ' . $payload['text'] . ' from ' . $payload['from']);
+            // Log::info('Sending sms to ' . $studentName . ' with phone number ' . $payload['to'] . ' and message content is ' . $payload['text'] . ' from ' . $payload['from']);
 
             $response = $sendBillBySms->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
 
@@ -1155,6 +1156,215 @@ class BillsController extends Controller
             Log::error('Error ' . $e->getMessage());
             Alert()->toast('Error ' . $e->getMessage(), 'error');
             return back();
+        }
+    }
+
+    public function sendOverdueReminders(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            $school = School::findOrFail($user->school_id);
+
+            // Get all bills with balance > 0 for the current school and academic year
+            $bills = $this->getBillsWithBalance($request);
+
+            if ($bills->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No overdue bills found to send reminders.'
+                ]);
+            }
+
+            $successCount = 0;
+            $failedCount = 0;
+            $failedDetails = [];
+
+            // Initialize SMS service
+            $sendSmsService = new NextSmsService();
+            $senderId = $school->sender_id ?? 'SHULE APP';
+
+            foreach ($bills as $bill) {
+                try {
+                    // Skip if parent phone is not available
+                    if (empty($bill->parent_phone)) {
+                        $failedCount++;
+                        $failedDetails[] = "No phone number for {$bill->student_first_name} {$bill->student_last_name}";
+                        continue;
+                    }
+
+                    // Format the phone number
+                    $destinationPhone = $this->formatPhoneNumber($bill->parent_phone);
+
+                    if (empty($destinationPhone)) {
+                        $failedCount++;
+                        $failedDetails[] = "Invalid phone number for {$bill->student_first_name} {$bill->student_last_name}";
+                        continue;
+                    }
+
+                    // Prepare message content
+                    $studentName = strtoupper($bill->student_first_name . ' ' . $bill->student_last_name);
+                    $billedAmount = (float) $bill->amount;
+                    $paidAmount = (float) $bill->total_paid;
+                    $balance = $billedAmount - $paidAmount;
+                    $dueDate = Carbon::parse($bill->due_date)->format('d-m-Y');
+                    $service = strtoupper($bill->service_name);
+
+                    // Determine account/control number to use
+                    $account = '';
+                    if (!empty($bill->collection_account)) {
+                        $account = 'Tumia Account#: ' . strtoupper($bill->collection_account);
+                    } else {
+                        $account = 'Tumia Control#: ' . strtoupper($bill->control_number);
+                    }
+
+                    $formattedBalance = number_format($balance);
+                    $formattedBilledAmount = number_format($billedAmount);
+
+                    // Create message
+                    $message = "Habari! Unakumbushwa kulipa {$service} ya {$studentName}, ";
+                    $message .= "JUMLA YA BILI: Tsh. {$formattedBilledAmount}, ";
+                    $message .= "UMELIPA: Tsh." . number_format($paidAmount) . ", ";
+                    $message .= "DENI LAKO: Tsh. {$formattedBalance}. ";
+                    $message .= "{$account} kulipa kabla ya {$dueDate}. Tafadhali lipa kwa wakati kuepuka usumbufu";
+
+                    // Prepare SMS payload
+                    $payload = [
+                        'from' => $senderId,
+                        'to' => $destinationPhone,
+                        'text' => $message,
+                        'reference' => uniqid('reminder_'),
+                    ];
+
+                    // Log before sending
+                    // Log::info('Sending reminder to ' . $studentName . ' with phone ' . $destinationPhone . ', Balance: Tsh.' . $formattedBalance);
+                    // Log::info('SMS Payload:', $payload);
+
+                    // Send SMS
+                    $response = $sendSmsService->sendSmsByNext(
+                        $payload['from'],
+                        $payload['to'],
+                        $payload['text'],
+                        $payload['reference']
+                    );
+
+                    if ($response['success']) {
+                        $successCount++;
+
+                        // Log successful send
+                        // Log::info('Reminder sent successfully to ' . $studentName);
+                    } else {
+                        $failedCount++;
+                        $failedDetails[] = "Failed to send to {$studentName}: " . ($response['error'] ?? 'Unknown error');
+                        // Log::error('SMS failed for ' . $studentName . ': ' . ($response['error'] ?? 'Unknown error'));
+                    }
+
+                    // Add small delay to avoid rate limiting (optional)
+                    usleep(100000); // 100ms delay
+
+                } catch (\Exception $e) {
+                    $failedCount++;
+                    $failedDetails[] = "Error processing {$bill->student_first_name} {$bill->student_last_name}: " . $e->getMessage();
+                    // Log::error('Error processing reminder for student ID ' . $bill->id . ': ' . $e->getMessage());
+                }
+            }
+
+            // Prepare response message
+            $message = "Reminders sent successfully! ";
+            $message .= "Successful: {$successCount}, Failed: {$failedCount}";
+
+            if ($failedCount > 0) {
+                $message .= ". Check logs for details.";
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'stats' => [
+                    'total' => $bills->count(),
+                    'successful' => $successCount,
+                    'failed' => $failedCount,
+                    'failed_details' => $failedDetails
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in sendOverdueReminders: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'System error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function getBillsWithBalance(Request $request)
+    {
+        $user = Auth::user();
+
+        $query = DB::table('school_fees')
+            ->join('payment_services', 'payment_services.id', '=', 'school_fees.service_id')
+            ->leftJoin('students', 'students.id', '=', 'school_fees.student_id')
+            ->leftJoin('grades', 'grades.id', '=', 'students.class_id')
+            ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
+            ->leftJoin('users', 'users.id', '=', 'parents.user_id')
+            ->select(
+                'school_fees.id',
+                'school_fees.amount',
+                'school_fees.control_number',
+                'school_fees.due_date',
+                'school_fees.academic_year',
+                'payment_services.service_name',
+                'payment_services.collection_account',
+                'students.first_name as student_first_name',
+                'students.last_name as student_last_name',
+                'users.phone as parent_phone',
+                DB::raw('(SELECT COALESCE(SUM(amount), 0)
+                        FROM school_fees_payments
+                        WHERE student_fee_id = school_fees.id) AS total_paid'),
+                DB::raw('school_fees.amount - (SELECT COALESCE(SUM(amount), 0)
+                        FROM school_fees_payments
+                        WHERE student_fee_id = school_fees.id) AS balance')
+            )
+            ->where('school_fees.school_id', $user->school_id)
+            ->where('school_fees.status', 'active')
+            ->having('balance', '>', 0);
+
+        // Year filter
+        $currentYear = date('Y');
+        $selectedYear = $request->get('year', session('selected_year', $currentYear));
+
+        if (!empty($selectedYear)) {
+            $query->where('school_fees.academic_year', 'LIKE', "%{$selectedYear}%");
+        }
+
+        return $query->get();
+    }
+    public function getOverdueSummary(Request $request)
+    {
+        try {
+            $bills = $this->getBillsWithBalance($request);
+
+            $totalBalance = 0;
+            $totalBills = $bills->count();
+            $uniqueParents = $bills->unique('parent_phone')->count();
+
+            foreach ($bills as $bill) {
+                $totalBalance += ((float)$bill->amount - (float)$bill->total_paid);
+            }
+
+            return response()->json([
+                'success' => true,
+                'summary' => [
+                    'total_bills' => $totalBills,
+                    'unique_parents' => $uniqueParents,
+                    'total_balance' => number_format($totalBalance),
+                    'formatted_total_balance' => 'Tsh. ' . number_format($totalBalance)
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching summary: ' . $e->getMessage()
+            ]);
         }
     }
 
@@ -1268,6 +1478,8 @@ class BillsController extends Controller
             'service' => 'nullable|integer',
             'class' => 'nullable|integer',
             'export_format' => 'required|string|in:pdf,excel,csv,word',
+            'paid_status' => 'nullable|string|in:all,not_paid,custom',
+            'paid_amount' => 'nullable|numeric|min:0',
         ]);
 
         $user = Auth::user();
@@ -1279,8 +1491,12 @@ class BillsController extends Controller
         $class = $request->input('class');
         $export_format = $request->input('export_format');
 
-        // Query kuboreshwa kwa kuzingatia control number
-        $bills = DB::table('school_fees')
+        // New paid status filter
+        $paid_status = $request->input('paid_status', 'all');
+        $paid_amount = $request->input('paid_amount');
+
+        // Base query
+        $query = DB::table('school_fees')
             ->join('payment_services', 'payment_services.id', '=', 'school_fees.service_id')
             ->leftJoin('students', 'students.id', '=', 'school_fees.student_id')
             ->leftJoin('grades', 'grades.id', '=', 'students.class_id')
@@ -1296,22 +1512,40 @@ class BillsController extends Controller
                 'grades.class_code',
                 'users.phone as parent_phone',
                 DB::raw('(SELECT COALESCE(SUM(amount), 0)
-                        FROM school_fees_payments
-                        WHERE student_fee_id = school_fees.id) AS total_paid'),
+                    FROM school_fees_payments
+                    WHERE student_fee_id = school_fees.id) AS total_paid'),
                 DB::raw('(SELECT MAX(approved_at)
-                        FROM school_fees_payments
-                        WHERE student_fee_id = school_fees.id) AS latest_approved_at'),
+                    FROM school_fees_payments
+                    WHERE student_fee_id = school_fees.id) AS latest_approved_at'),
                 DB::raw('(SELECT MAX(updated_at)
-                        FROM school_fees_payments
-                        WHERE student_fee_id = school_fees.id) AS latest_payment_updated_at')
+                    FROM school_fees_payments
+                    WHERE student_fee_id = school_fees.id) AS latest_payment_updated_at')
             )
             ->where('school_fees.school_id', $school_id)
             ->whereBetween('school_fees.created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59'])
             ->when($status, fn($q) => $q->where('school_fees.status', $status))
             ->when($service, fn($q) => $q->where('school_fees.service_id', $service))
-            ->when($class, fn($q) => $q->where('school_fees.class_id', $class))
-            ->orderBy('students.first_name', 'asc')
-            ->get();
+            ->when($class, fn($q) => $q->where('school_fees.class_id', $class));
+
+        // Apply paid status filter
+        if ($paid_status !== 'all') {
+            switch ($paid_status) {
+                case 'not_paid':
+                    // Records with 0 paid amount
+                    $query->having('total_paid', '=', 0);
+                    break;
+
+                case 'custom':
+                    // Records with paid amount >= custom amount
+                    if ($paid_amount) {
+                        $query->having('total_paid', '>=', (float)$paid_amount);
+                    }
+                    break;
+            }
+        }
+
+        // Get the filtered results
+        $bills = $query->orderBy('students.first_name', 'asc')->get();
 
         // Calculate balances and prepare data for export
         $exportData = $bills->map(function ($bill) {
