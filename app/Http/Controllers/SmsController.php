@@ -54,8 +54,13 @@ class SmsController extends Controller
         // return recent sms logs
         $nextSmsService = new NextSmsService();
         $school = school::findOrFail($user->school_id);
+        if(empty($school->sender_id)){
+            $sender_id = 'SHULE APP';
+        } else {
+            $sender_id = $school->sender_id;
+        }
         $payload = [
-            "from" => $school->sender_id ?? 'SHULE APP',
+            "from" => $sender_id,
             "limit" => 10, // Ongeza kidogo kwa ajili ya datatable
             "offset" => 0,
         ];
