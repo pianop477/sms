@@ -200,8 +200,8 @@ class ExamController extends Controller
             }
 
             Alert::toast('Examination results has been saved to the draft', 'success');
-            return to_route('home');
-            // return to_route('score.prepare.form', Hashids::encode($request->course_id));
+            // return to_route('home');
+            return to_route('score.prepare.form', ['id' => Hashids::encode($request->course_id)]);
         }
 
         if ($action === 'submit') {
@@ -238,13 +238,13 @@ class ExamController extends Controller
             }
 
             Alert::toast('Examination results has been submitted successfully', 'success');
-            // return redirect()->route('score.prepare.form', Hashids::encode($request->course_id));
-            return redirect()->route('home');
+            return redirect()->route('score.prepare.form', ['id' => Hashids::encode($request->course_id)]);
+            // return redirect()->route('home');
         }
 
         // If action is not 'save' or 'submit'
         Alert::error('Invalid action', 'error');
-        return redirect()->route('score.prepare.form', Hashids::encode($request->course_id));
+        return redirect()->route('score.prepare.form', ['id' => Hashids::encode($request->course_id)]);
     }
 
 
@@ -834,8 +834,8 @@ class ExamController extends Controller
                 );
             }
             Alert()->toast('Results saved successfully, remember to submit before expiry date.', 'success');
-            // return redirect()->route('score.prepare.form', Hashids::encode($courseId));
-            return to_route('home');
+            return redirect()->route('score.prepare.form', ['id' => Hashids::encode($courseId)]);
+            // return to_route('home');
         } elseif ($action === 'submit') {
             // CHECK IF RESULTS ALREADY EXIST IN EXAMINATION_RESULT TABLE
             foreach ($scores as $studentId => $score) {
@@ -881,8 +881,8 @@ class ExamController extends Controller
             });
 
             Alert()->toast('Results submitted successfully. Editing is no longer allowed.', 'success');
-            // return redirect()->route('score.prepare.form', Hashids::encode($courseId));
-            return redirect()->route('home');
+            return redirect()->route('score.prepare.form', ['id' => Hashids::encode($courseId)]);
+            // return redirect()->route('home');
         }
 
         Alert()->toast('Invalid action.', 'error');
@@ -992,7 +992,8 @@ class ExamController extends Controller
 
         if ($results->isEmpty()) {
             Alert()->toast('No results found in draft box', 'info');
-            return redirect()->route('score.prepare.form', ['id' => $course]);
+            // return redirect()->route('score.prepare.form', ['id' => $course]);
+            return back();
         }
 
         // Delete all the matching records
@@ -1003,7 +1004,8 @@ class ExamController extends Controller
             ->delete();
 
         Alert()->toast('All results deleted successfully from the draft box', 'success');
-        return redirect()->route('score.prepare.form', ['id' => $course]);
+        // return redirect()->route('score.prepare.form', ['id' => $course]);
+        return back();
     }
 
     public function TeacherDeleteResults($course, $year, $examType, $month, $date)
