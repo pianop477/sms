@@ -10,7 +10,7 @@
                     You have pending results which are not submitted. Do you want to proceed with pending results?
                 </p>
                 @if(isset($saved_results))
-                <form action="{{ route('results.edit.draft') }}" method="POST" class="needs-validation" novalidate>
+                <form action="{{ route('results.edit.draft', ['id' => $id]) }}" method="POST" class="needs-validation" novalidate>
                     @csrf
                     <input type="hidden" name="course_id" value="{{ $saved_results->first()->course_id}}">
                     <input type="hidden" name="class_id" value="{{ $saved_results->first()->class_id}}">

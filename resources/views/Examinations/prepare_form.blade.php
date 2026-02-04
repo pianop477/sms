@@ -293,7 +293,7 @@
                         <h4 class="header-title text-white">
                             <i class="fas fa-clipboard-list me-2"></i> Results Submission Form
                         </h4>
-                        <p class="mb-0 text-white"> Pre-information section for examination results</p>
+                        <p class="mb-0 text-white"> Pre-information section form</p>
                     </div>
                     <div class="col-md-4 text-end">
                         <a href="{{ route('home') }}" class="btn btn-back float-right">
@@ -304,7 +304,7 @@
                 <i class="fas fa-graduation-cap floating-icons"></i>
             </div>
             <div class="card-body">
-                <form class="needs-validation" novalidate action="{{ route('score.captured.values') }}" method="POST">
+                <form class="needs-validation" novalidate action="{{ route('score.captured.values', ['id' => $id]) }}" method="POST">
                     @csrf
 
                     <!-- Hidden Fields -->
@@ -423,7 +423,8 @@
                                         'type' => $saved_results->first()->exam_type_id,
                                         'date' => $saved_results->first()->exam_date,
                                         'term' => $saved_results->first()->exam_term,
-                                        'style' => $saved_results->first()->marking_style
+                                        'style' => $saved_results->first()->marking_style,
+                                        'id' => $id
                                     ])}}" class="btn btn-warning-custom">
                                         <i class="fas fa-edit"></i> Edit Pending Results
                                     </a>
@@ -433,7 +434,8 @@
                                         'teacher' => Hashids::encode($class_course->teacher_id),
                                         'type' => $saved_results->first()->exam_type_id,
                                         'class' => Hashids::encode($class_course->class_id),
-                                        'date' => $saved_results->first()->exam_date
+                                        'date' => $saved_results->first()->exam_date,
+                                        'id' => $id
                                     ])}}"
                                     onclick="return confirm('Are you sure you want to permanently delete these pending results? This action cannot be undone.')"
                                     class="btn btn-danger-custom">

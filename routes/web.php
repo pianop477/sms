@@ -483,16 +483,14 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     // 7. ROUTE ACCESS FOR TEACHER WITH TEACHING SUBJECTS=================================================================================
     Route::middleware(['CheckUsertype:3', 'CheckRoleType:1,3,4'])->group(function () {
         // Insert examination score
-        Route::get('{id}/Prepare', [ExamController::class, 'prepare'])->name('score.prepare.form');
-        Route::post('Examination-result-create', [ExamController::class, 'captureValues'])->name('score.captured.values');
-        Route::post('Upload/results', [ExamController::class, 'storeScore'])->name('exams.store.score');
-        Route::get('/Results-saved/course/{course}/teacher/{teacher}/school/{school}/class/{class}/style/{style}/term/{term}/type/{type}/date/{date}', [ExamController::class, 'continuePendingResults'])->name('form.saved.values');
-        Route::get('Results/confirmation', function () {
-            return view('Examinations.confirm_results');
-        })->name('results.confirm');
-        Route::post('/results/edit-draft', [ExamController::class, 'editDraft'])->name('results.edit.draft');
-        Route::post('/results/update-draft', [ExamController::class, 'updateDraftResults'])->name('results.update.draft');
-        Route::get('/Delete/draft-results/course/{course}/teacher/{teacher}/type/{type}/class/{class}/date/{date}', [ExamController::class, 'deleteDraftResults'])->name('results.draft.delete');
+        Route::get('{id}/Pre-information-section', [ExamController::class, 'prepare'])->name('score.prepare.form');
+        Route::post('{id}/Examination-score-sheet', [ExamController::class, 'captureValues'])->name('score.captured.values');
+        Route::post('{id}/Upload/results', [ExamController::class, 'storeScore'])->name('exams.store.score');
+        Route::get('/Results-saved/course/{course}/teacher/{teacher}/school/{school}/class/{class}/style/{style}/term/{term}/type/{type}/date/{date}/{id}', [ExamController::class, 'continuePendingResults'])->name('form.saved.values');
+        Route::get('{id}/Results/confirm-pending-results', [ExamController::class, 'confirmPendingResults'])->name('results.confirm');
+        Route::post('{id}/results/pending-results', [ExamController::class, 'editDraft'])->name('results.edit.draft');
+        Route::post('{id}/results/update-pending-results', [ExamController::class, 'updateDraftResults'])->name('results.update.draft');
+        Route::get('/Delete/draft-results/course/{course}/teacher/{teacher}/type/{type}/class/{class}/date/{date}/{id}', [ExamController::class, 'deleteDraftResults'])->name('results.draft.delete');
 
         //teachers  examination results =============================
         Route::get('course/{id}/Results', [ExamController::class, 'courseResults'])->name('results_byCourse');

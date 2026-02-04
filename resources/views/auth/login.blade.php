@@ -15,395 +15,627 @@
     <link rel="icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon-192 x 192.png') }}">
     <link rel="icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon-512 x 512.png') }}">
     <style>
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --accent: #10b981;
-            --dark: #0f172a;
-            --light: #f8fafc;
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.15);
-        }
+    :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --accent: #10b981;
+        --dark: #0f172a;
+        --light: #f8fafc;
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.15);
+        /* Light mode variables */
+        --text-color: #0f172a;
+        --bg-color: #ffffff;
+        --card-bg: rgba(255, 255, 255, 0.9);
+        --card-border: rgba(0, 0, 0, 0.1);
+        --input-bg: rgba(0, 0, 0, 0.03);
+        --input-border: rgba(0, 0, 0, 0.15);
+        --shadow: rgba(0, 0, 0, 0.1);
+        /* Bio button colors */
+        --bio-bg: rgba(16, 185, 129, 0.1);
+        --bio-border: rgba(16, 185, 129, 0.2);
+        --bio-text: #10b981;
+    }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            color: var(--light);
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+    /* Light mode class */
+    body.light-mode {
+        --text-color: #0f172a;
+        --bg-color: #f8fafc;
+        --card-bg: rgba(255, 255, 255, 0.95);
+        --card-border: rgba(0, 0, 0, 0.08);
+        --input-bg: rgba(0, 0, 0, 0.02);
+        --input-border: rgba(0, 0, 0, 0.1);
+        --glass-bg: rgba(255, 255, 255, 0.8);
+        --glass-border: rgba(0, 0, 0, 0.1);
+        --shadow: rgba(0, 0, 0, 0.08);
+        --bio-bg: rgba(16, 185, 129, 0.15);
+        --bio-border: rgba(16, 185, 129, 0.3);
+        --bio-text: #059669;
+    }
 
-        .login-card {
-            width: 100%;
-            max-width: 320px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            border-radius: 14px;
-            border: 1px solid var(--glass-border);
-            padding: 26px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
+    body {
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        color: var(--light);
+        min-height: 100vh;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        transition: background 0.3s ease, color 0.3s ease;
+    }
 
-        .login-card:hover {
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-        }
+    /* Light mode specific */
+    body.light-mode {
+        background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+        color: var(--text-color);
+    }
 
-        .login-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+    .login-card {
+        width: 100%;
+        max-width: 320px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border-radius: 14px;
+        border: 1px solid var(--glass-border);
+        padding: 26px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
 
-        .login-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
+    body.light-mode .login-card {
+        box-shadow: 0 10px 30px var(--shadow);
+    }
 
-        .login-subtitle {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.6);
-        }
+    .login-card:hover {
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+    }
 
-        .form-group {
-            margin-bottom: 14px;
-        }
+    .brand-title {
+        color: white;
+        margin: 0;
+        font-size: 1.8rem;
+    }
 
-        .form-label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 13px;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.8);
-        }
+    body.light-mode .brand-title {
+        color: var(--text-color);
+    }
 
-        .form-control {
-            width: 93%;
-            padding: 9px 12px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            color: white;
-            font-size: 14px;
-        }
+    .brand-subtitle {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 0.25rem;
+    }
 
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-        }
+    body.light-mode .brand-subtitle {
+        color: rgba(0, 0, 0, 0.6);
+    }
 
-        .form-options {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 18px;
-            font-size: 13px;
-        }
+    .form-label {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 13px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.8);
+    }
 
-        .remember-me {
-            display: flex;
-            align-items: center;
-        }
+    body.light-mode .form-label {
+        color: rgba(0, 0, 0, 0.7);
+    }
 
-        .remember-me input {
-            margin-right: 6px;
-            accent-color: var(--primary);
-        }
+    .form-control {
+        width: 93%;
+        padding: 9px 12px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
 
-        .forgot-password {
-            color: var(--primary);
-            text-decoration: none;
-        }
+    body.light-mode .form-control {
+        background: var(--input-bg);
+        border: 1px solid var(--input-border);
+        color: var(--text-color);
+    }
 
-        .forgot-password:hover {
-            text-decoration: underline;
-        }
+    body.light-mode .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
 
-        .btn {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            border: none;
-        }
+    .forgot-password {
+        color: var(--primary);
+        text-decoration: none;
+    }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
+    body.light-mode .forgot-password {
+        color: var(--primary);
+    }
 
-        .btn-primary:hover {
-            background: var(--primary-dark);
-        }
+    .forgot-password:hover {
+        text-decoration: underline;
+    }
 
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 20px 0;
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 12px;
-        }
+    .divider {
+        display: flex;
+        align-items: center;
+        margin: 20px 0;
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 12px;
+    }
 
-        .divider::before,
-        .divider::after {
-            content: "";
-            flex: 1;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
+    body.light-mode .divider {
+        color: rgba(0, 0, 0, 0.4);
+    }
 
-        .divider::before {
-            margin-right: 10px;
-        }
+    .divider::before,
+    .divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
 
-        .divider::after {
-            margin-left: 10px;
-        }
+    body.light-mode .divider::before,
+    body.light-mode .divider::after {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
 
-        .bio-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 14px;
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--accent);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            cursor: pointer;
-        }
+    /* Biometric button styles */
+    .bio-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 14px;
+        background: var(--bio-bg);
+        color: var(--bio-text);
+        border: 1px solid var(--bio-border);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
 
-        .setup-bio {
-            display: block;
-            text-align: center;
-            margin-top: 14px;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.5);
-        }
+    body.light-mode .bio-btn {
+        background: var(--bio-bg);
+        color: var(--bio-text);
+        border: 1px solid var(--bio-border);
+    }
 
-        .setup-bio:hover {
-            color: var(--accent);
-        }
+    .bio-btn:hover {
+        background: rgba(10, 204, 139, 0.2);
+        transform: translateY(-1px);
+    }
 
-        .password-toggle {
-            position: absolute;
-            right: 0;
-            top: 32px;
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-        }
+    body.light-mode .bio-btn:hover {
+        background: rgba(10, 204, 139, 0.2);
+    }
 
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.3s ease;
-        }
+    .setup-bio {
+        display: block;
+        text-align: center;
+        margin-top: 14px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
 
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    body.light-mode .setup-bio {
+        color: rgba(0, 0, 0, 0.5);
+    }
 
-        .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s linear infinite;
-            margin-right: 6px;
-        }
+    .setup-bio:hover {
+        color: var(--accent);
+        text-decoration: underline;
+    }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
+    body.light-mode .setup-bio:hover {
+        color: var(--accent);
+    }
 
-        .footer {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 12px;
-            bottom: 0;
-            color: rgba(255, 255, 255, 0.4);
-        }
+    #clearBioBtn {
+        color: #f87171;
+    }
 
-        .footer a {
-            color: var(--primary);
-            text-decoration: none;
-        }
+    body.light-mode #clearBioBtn {
+        color: #dc2626;
+    }
 
-        .otp-digit {
-            width: 100%;
-            height: 48px;
-            text-align: center;
-            font-size: 18px;
-            border-radius: 8px;
-            border: 1px solid #334155;
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-        }
+    #clearBioBtn:hover {
+        color: #f87171;
+        text-decoration: underline;
+    }
 
-        .otp-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
+    body.light-mode #clearBioBtn:hover {
+        color: #dc2626;
+    }
 
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 42px;
-            height: 22px;
-        }
+    /* Biometric toggle label */
+    .form-group label[style*="color: rgba(255, 255, 255, 0.8)"] {
+        color: rgba(255, 255, 255, 0.8) !important;
+        transition: color 0.3s ease;
+    }
 
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+    body.light-mode .form-group label[style*="color: rgba(255, 255, 255, 0.8)"] {
+        color: rgba(0, 0, 0, 0.7) !important;
+    }
 
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(255, 255, 255, 0.2);
-            transition: .4s;
-            border-radius: 24px;
-        }
+    /* Home button styles */
+    .homeAction {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 5px;
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        margin-top: 15px;
+        transition: all 0.3s ease;
+    }
 
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
+    body.light-mode .homeAction {
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
 
-        input:checked+.slider {
-            background-color: var(--primary);
-        }
+    .home-button {
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 3px;
+        border-radius: 30px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
 
-        input:checked+.slider:before {
-            transform: translateX(20px);
-        }
+    body.light-mode .home-button {
+        color: var(--text-color);
+    }
 
-        .setup-bio {
-            display: block;
-            text-align: center;
-            margin-top: 14px;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-        }
+    .home-button:hover {
+        background: linear-gradient(45deg, #7c3aed, #4f46e5);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+        color: #fbbf24;
+        border-color: rgba(251, 191, 36, 0.3);
+    }
 
-        .setup-bio:hover {
-            color: var(--accent);
-        }
+    body.light-mode .home-button:hover {
+        color: #ffffff;
+    }
 
-        /* Style maalum kwa clear button */
-        #clearBioBtn:hover {
-            color: #f87171;
-            text-decoration: underline;
-        }
+    /* Footer styles */
+    .footer {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 12px;
+        bottom: 0;
+        color: rgba(255, 255, 255, 0.4);
+    }
 
-        /* Brand Section - Compact */
-        .brand-section {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            flex-shrink: 0;
-        }
+    body.light-mode .footer {
+        color: rgba(0, 0, 0, 0.5);
+    }
 
-        .logo {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: 14px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 0.75rem;
-            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
-        }
+    .footer a {
+        color: var(--primary);
+        text-decoration: none;
+    }
 
-        .logo i {
-            font-size: 1.6rem;
-            color: white;
-        }
+    /* Error message styles */
+    [style*="background: rgba(239, 68, 68, 0.1)"] {
+        background: rgba(239, 68, 68, 0.1) !important;
+        color: #fca5a5 !important;
+        border-left-color: #ef4444 !important;
+    }
 
-        .homeAction {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 5px;
-            /* padding: 15px; */
-            /* background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05)); */
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            margin-top: 15px;
-        }
+    body.light-mode [style*="background: rgba(239, 68, 68, 0.1)"] {
+        background: rgba(239, 68, 68, 0.15) !important;
+        color: #dc2626 !important;
+    }
 
-        .home-button {
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 4px 3px;
-            /* background: linear-gradient(45deg, #4f46e5, #7c3aed); */
-            border-radius: 30px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            text-align: center;
-            /* border: 2px solid rgba(255, 255, 255, 0.2); */
-        }
+    /* OTP modal styles */
+    body.light-mode #otpModal > div {
+        background: #ffffff !important;
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    }
 
-        .home-button:hover {
-            background: linear-gradient(45deg, #7c3aed, #4f46e5);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
-            color: #fbbf24;
-            border-color: rgba(251, 191, 36, 0.3);
-        }
+    body.light-mode #otpModal h3 {
+        color: var(--text-color) !important;
+    }
 
-        .home-button:active {
-            transform: translateY(0);
+    body.light-mode #otpModal p {
+        color: #64748b !important;
+    }
+
+    body.light-mode .otp-digit {
+        background: var(--input-bg) !important;
+        border: 1px solid var(--input-border) !important;
+        color: var(--text-color) !important;
+    }
+
+    /* Password toggle */
+    .password-toggle {
+        position: absolute;
+        right: 0;
+        top: 32px;
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+    }
+
+    body.light-mode .password-toggle {
+        color: rgba(0, 0, 0, 0.5);
+    }
+
+    /* Remember me checkbox */
+    .remember-me {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    body.light-mode .remember-me {
+        color: rgba(0, 0, 0, 0.7);
+    }
+
+    /* Toast notification */
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+    }
+
+    body.light-mode .toast {
+        background: rgba(0, 0, 0, 0.9);
+    }
+
+    /* Theme toggle button */
+    .color-mode-toggle {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 100;
+    }
+
+    .theme-toggle-btn {
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        color: var(--light);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    body.light-mode .theme-toggle-btn {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        color: var(--text-color);
+    }
+
+    .theme-toggle-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Add these missing styles */
+    .login-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .login-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .login-subtitle {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .form-group {
+        margin-bottom: 14px;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+
+    .form-options {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+        font-size: 13px;
+    }
+
+    .remember-me {
+        display: flex;
+        align-items: center;
+    }
+
+    .remember-me input {
+        margin-right: 6px;
+        accent-color: var(--primary);
+    }
+
+    .btn {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+    }
+
+    .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s linear infinite;
+        margin-right: 6px;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
         }
-    </style>
+    }
+
+    .otp-digit {
+        width: 100%;
+        height: 48px;
+        text-align: center;
+        font-size: 18px;
+        border-radius: 8px;
+        border: 1px solid #334155;
+        background: rgba(255, 255, 255, 0.05);
+        color: white;
+    }
+
+    .otp-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 42px;
+        height: 22px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255, 255, 255, 0.2);
+        transition: .4s;
+        border-radius: 24px;
+    }
+
+    body.light-mode .slider {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked+.slider {
+        background-color: var(--primary);
+    }
+
+    input:checked+.slider:before {
+        transform: translateX(20px);
+    }
+
+    /* Brand Section */
+    .brand-section {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .logo {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.75rem;
+        box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+    }
+
+    .logo i {
+        font-size: 1.6rem;
+        color: white;
+    }
+
+    .home-button:active {
+        transform: translateY(0);
+    }
+
+    /* Add these to fix specific inline styles */
+    body.light-mode .fa-settings.text-white {
+        color: var(--text-color) !important;
+    }
+
+    body.light-mode hr {
+        border-color: rgba(0, 0, 0, 0.1);
+    }
+</style>
 </head>
 
 <body>
@@ -413,6 +645,11 @@
       </div> --}}
         <h1 class="brand-title">ShuleApp</h1>
         <p class="brand-subtitle">Welcome back, please sign in</p>
+    </div>
+    <div class="color-mode-toggle">
+        <button id="themeToggle" class="theme-toggle-btn">
+            <i class="fas fa-moon"></i> Dark Mode
+        </button>
     </div>
     <div class="login-card">
         @if (session('error'))
@@ -472,7 +709,7 @@
             <div id="biometricActions" style="display: none; justify-content: center; gap: 10px; margin-top: 10px;">
                 <a href="#" id="setupBioBtn" class="setup-bio"><i class="fas fa-settings text-white"></i> Setup
                     biometric</a>
-                <a href="#" id="clearBioBtn" class="setup-bio" style="color: #f87171;">Clear Biometric</a>
+                <a href="#" id="clearBioBtn" class="setup-bio" style="color: #de2f2f;">Clear Biometric</a>
             </div>
         </div>
         <div class="homeAction">
@@ -499,6 +736,49 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = themeToggle.querySelector('i');
+
+            // Check for saved theme or prefer-color-scheme
+            const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+            const savedTheme = localStorage.getItem('theme');
+
+            function setTheme(theme) {
+                if (theme === 'dark') {
+                    document.body.classList.remove('light-mode');
+                    themeIcon.className = 'fas fa-moon';
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+                } else {
+                    document.body.classList.add('light-mode');
+                    themeIcon.className = 'fas fa-sun';
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+                }
+                localStorage.setItem('theme', theme);
+            }
+
+            // Initialize theme
+            if (savedTheme) {
+                setTheme(savedTheme);
+            } else if (prefersDarkScheme.matches) {
+                setTheme('dark');
+            } else {
+                setTheme('light');
+            }
+
+            // Toggle theme on button click
+            themeToggle.addEventListener('click', function() {
+                const currentTheme = localStorage.getItem('theme') ||
+                    (prefersDarkScheme.matches ? 'dark' : 'light');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                setTheme(newTheme);
+            });
+
+            // Listen for system theme changes
+            prefersDarkScheme.addEventListener('change', (e) => {
+                if (!localStorage.getItem('theme')) {
+                    setTheme(e.matches ? 'dark' : 'light');
+                }
+            });
             // Initialize biometric settings from localStorage
             const bioSettings = JSON.parse(localStorage.getItem('bioSettings') ||
                 '{"enabled":false,"registered":false,"username":null}');
@@ -666,12 +946,12 @@
                             <p style="color: #94a3b8; text-align: center; margin-bottom: 16px;">****-***-${otpData.phone.slice(-3)}</p>
                             <div class="otp-container">
                                 ${Array(5).fill().map((_, i) => `
-                                        <input type="text" id="otp-digit-${i}" class="otp-digit"
-                                            maxlength="1" inputmode="numeric" pattern="\\d*"
-                                            style="width: 100%; height: 48px; text-align: center;
-                                            font-size: 18px; border-radius: 8px; border: 1px solid #334155;
-                                            background: rgba(255,255,255,0.05); color: white;">
-                                    `).join('')}
+                                                            <input type="text" id="otp-digit-${i}" class="otp-digit"
+                                                                maxlength="1" inputmode="numeric" pattern="\\d*"
+                                                                style="width: 100%; height: 48px; text-align: center;
+                                                                font-size: 18px; border-radius: 8px; border: 1px solid #334155;
+                                                                background: rgba(255,255,255,0.05); color: white;">
+                                                        `).join('')}
                             </div>
                             <button id="verifyOtpBtn" style="width: 100%; padding: 12px; background: #6366f1;
                                 color: white; border: none; border-radius: 8px; cursor: pointer;">
@@ -824,17 +1104,17 @@
                             } catch (error) {
                                 // Fallback for PWA
                                 await fetch(window.location.origin +
-                                "/biometric/send-otp", {
-                                    method: 'POST',
-                                    headers: {
-                                        'X-CSRF-TOKEN': document.querySelector(
-                                            'meta[name="csrf-token"]').content,
-                                        'Content-Type': 'application/json',
-                                    },
-                                    body: JSON.stringify({
-                                        username
-                                    })
-                                });
+                                    "/biometric/send-otp", {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRF-TOKEN': document.querySelector(
+                                                'meta[name="csrf-token"]').content,
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({
+                                            username
+                                        })
+                                    });
                                 showToast('OTP resent successfully', 'success');
                             }
                         });

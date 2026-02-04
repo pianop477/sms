@@ -379,7 +379,7 @@
                     </div>
                 </div>
 
-                <form action="{{ route('results.update.draft') }}" method="POST" id="resultsForm" class="needs-validation" novalidate>
+                <form action="{{ route('results.update.draft', ['id' => $id]) }}" method="POST" id="resultsForm" class="needs-validation" novalidate>
                     @csrf
 
                     <div class="form-section">

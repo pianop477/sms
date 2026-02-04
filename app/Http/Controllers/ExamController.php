@@ -57,11 +57,11 @@ class ExamController extends Controller
             ->get();
         // return $savedResults;
         $exams = Examination::where('school_id', Auth::user()->school_id)->where('status', 1)->orderBy('exam_type')->get();
-        return view('Examinations.prepare_form', ['exams' => $exams, 'class_course' => $class_course, 'saved_results' => $savedResults]);
+        return view('Examinations.prepare_form', ['exams' => $exams, 'class_course' => $class_course, 'saved_results' => $savedResults, 'id' => $id]);
     }
 
     //capture values and send it to the next step===========================
-    public function captureValues(Request $request)
+    public function captureValues(Request $request, $id)
     {
         $dataValidation = $request->validate([
             'exam_type' => 'required|exists:examinations,id',
@@ -128,12 +128,13 @@ class ExamController extends Controller
             'courseName' => $courseName,
             'examName' => $examName,
             'marking_style' => $markingStyle,
-            'exams' => $exams
+            'exams' => $exams,
+            'id' => $id
         ]);
     }
 
 
-    public function storeScore(Request $request)
+    public function storeScore(Request $request, $id)
     {
         $validated = $request->validate([
             'course_id' => 'required|integer|exists:subjects,id',
@@ -168,7 +169,7 @@ class ExamController extends Controller
         if ($validator->fails()) {
             $errorMessages = implode(' ', $validator->errors()->all());
             Alert::error('Validation Error!', $errorMessages);
-            return to_route('score.prepare.form', Hashids::encode($request->course_id));
+            return to_route('score.prepare.form', ['id' => $id]);
         }
 
         $students = $request->input('students');
@@ -199,9 +200,9 @@ class ExamController extends Controller
                 );
             }
 
-            Alert::toast('Examination results has been saved to the draft', 'success');
-            return to_route('home');
-            // return to_route('score.prepare.form', ['id' => Hashids::encode($request->course_id)]);
+            Alert::toast('Results saved successfully, remember to submit before due date.', 'success');
+            // return to_route('home');
+            return to_route('score.prepare.form', ['id' => $id]);
         }
 
         if ($action === 'submit') {
@@ -218,8 +219,9 @@ class ExamController extends Controller
                     ->exists();
 
                 if ($existingRecord) {
-                    Alert::toast('Examination results already submitted for this Course', 'error');
-                    return redirect()->route('home');
+                    Alert::toast('Results already exist. Please check before submitting.', 'error');
+                    // return redirect()->route('home');
+                    return redirect()->route('score.prepare.form', ['id' => $id]);
                 }
 
                 // Insert the result into the examination_results table
@@ -237,15 +239,15 @@ class ExamController extends Controller
                 ]);
             }
 
-            Alert::toast('Examination results has been submitted successfully', 'success');
-            // return redirect()->route('score.prepare.form', ['id' => Hashids::encode($request->course_id)]);
-            return redirect()->route('home');
+            Alert::toast('Results submitted successfully. Editing is no longer allowed.', 'success');
+            return redirect()->route('score.prepare.form', ['id' => $id]);
+            // return redirect()->route('home');
         }
 
         // If action is not 'save' or 'submit'
         Alert::error('Invalid action', 'error');
-        // return redirect()->route('score.prepare.form', ['id' => Hashids::encode($request->course_id)]);
-        return redirect()->route('home');
+        return redirect()->route('score.prepare.form', ['id' => $id]);
+        // return redirect()->route('home');
     }
 
 
@@ -715,7 +717,12 @@ class ExamController extends Controller
         }
     }
 
-    public function editDraft(Request $request)
+    public function confirmPendingResults($id)
+    {
+        return view('Examinations.confirm_results', ['id' => $id]);
+    }
+
+    public function editDraft(Request $request, $id)
     {
         // Pata data zote kutoka request
         $courseId = $request->course_id;
@@ -738,8 +745,8 @@ class ExamController extends Controller
 
         if (!$exists) {
             Alert()->toast('You are not authorized to view this page', 'error');
-            return to_route('home');
-            // return to_route('score.prepare.form', Hashids::encode($courseId));
+            // return to_route('home');
+            return to_route('score.prepare.form', ['id' => $id]);
         }
 
         // Pata matokeo yaliyohifadhiwa kwenye draft
@@ -782,11 +789,12 @@ class ExamController extends Controller
             'examName' => $examName,
             'marking_style' => $markingStyle,
             'draftResults' => $draftResults,
-            'exams' => $exams
+            'exams' => $exams,
+            'id' => $id
         ]);
     }
 
-    public function updateDraftResults(Request $request)
+    public function updateDraftResults(Request $request, $id)
     {
         $courseId = $request->course_id;
         $classId = $request->class_id;
@@ -810,8 +818,8 @@ class ExamController extends Controller
 
         if (!$exists) {
             Alert()->toast('You are not authorized to view this page', 'error');
-            to_route('home');
-            // return to_route('score.prepare.form', Hashids::encode($courseId));
+            // to_route('home');
+            return to_route('score.prepare.form', ['id' => $id]);
         }
 
         if ($action === 'save') {
@@ -834,9 +842,9 @@ class ExamController extends Controller
                     ]
                 );
             }
-            Alert()->toast('Results saved successfully, remember to submit before expiry date.', 'success');
-            // return redirect()->route('score.prepare.form', ['id' => Hashids::encode($courseId)]);
-            return to_route('home');
+            Alert()->toast('Results saved successfully, remember to submit before due date.', 'success');
+            return redirect()->route('score.prepare.form', ['id' => $id]);
+            // return to_route('home');
 
         } elseif ($action === 'submit') {
             // CHECK IF RESULTS ALREADY EXIST IN EXAMINATION_RESULT TABLE
@@ -851,7 +859,8 @@ class ExamController extends Controller
                 if ($existingResult) {
                     // If result already exists, reject this submission
                     Alert()->toast('Results already exist. Please check before submitting.', 'error');
-                    return to_route('home');
+                    // return to_route('home');
+                    return redirect()->route('score.prepare.form', ['id' => $id]);
                 }
             }
 
@@ -883,16 +892,17 @@ class ExamController extends Controller
             });
 
             Alert()->toast('Results submitted successfully. Editing is no longer allowed.', 'success');
-            // return redirect()->route('score.prepare.form', ['id' => Hashids::encode($courseId)]);
-            return redirect()->route('home');
+            return redirect()->route('score.prepare.form', ['id' => $id]);
+            // return redirect()->route('home');
         }
 
         Alert()->toast('Invalid action.', 'error');
-        return to_route('home');
+        // return to_route('home');
+        return redirect()->route('score.prepare.form', ['id' => $id]);
     }
 
     //pending results outside button
-    public function continuePendingResults($course, $teacher, $school, $class, $style, $term, $type,   $date)
+    public function continuePendingResults($course, $teacher, $school, $class, $style, $term, $type,   $date, $id)
     {
         // Decode the Hashids and get the first element of the returned array
         $courseId = Hashids::decode($course)[0];  // Get the first element
@@ -958,12 +968,12 @@ class ExamController extends Controller
                 'courseName',
                 'className',
                 'students',
-                'saved_results'
+                'saved_results', 'id'
             )
         );
     }
 
-    public function deleteDraftResults($course, $teacher, $type, $class, $date)
+    public function deleteDraftResults($course, $teacher, $type, $class, $date, $id)
     {
         $course_id = Hashids::decode($course);
         $teacher_id = Hashids::decode($teacher);
@@ -981,8 +991,8 @@ class ExamController extends Controller
 
         if (!$exists) {
             Alert()->toast('You are not authorized to view this page', 'error');
-            // return to_route('score.prepare.form', Hashids::encode($course_id[0]));
-            return to_route('home');
+            return to_route('score.prepare.form', ['id' => $id]);
+            // return to_route('home');
         }
         // Check if there are any records that match the given parameters
         $results = temporary_results::where('course_id', $course_id[0])
@@ -995,8 +1005,7 @@ class ExamController extends Controller
 
         if ($results->isEmpty()) {
             Alert()->toast('No results found in draft box', 'info');
-            return redirect()->route('home');
-            return back();
+            return redirect()->route('score.prepare.form', ['id' => $id]);
         }
 
         // Delete all the matching records
@@ -1007,8 +1016,8 @@ class ExamController extends Controller
             ->delete();
 
         Alert()->toast('All results deleted successfully from the draft box', 'success');
-        return redirect()->route('home');
-        // return back();
+        // return redirect()->route('home');
+        return redirect()->route('score.prepare.form', ['id' => $id]);
     }
 
     public function TeacherDeleteResults($course, $year, $examType, $month, $date)

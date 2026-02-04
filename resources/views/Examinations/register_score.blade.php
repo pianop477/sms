@@ -409,7 +409,7 @@
                     <i class="fas fa-info-circle me-2"></i> Enter score from 0 to {{ $marking_style == 1 ? '50' : '100' }} correctly
                 </div>
 
-                <form id="scoreForm" action="{{ route('exams.store.score') }}" method="POST" class="needs-validation" novalidate>
+                <form id="scoreForm" action="{{ route('exams.store.score', ['id' => $id]) }}" method="POST" class="needs-validation" novalidate>
                     @csrf
 
                     <input type="hidden" name="course_id" value="{{$courseId}}">
