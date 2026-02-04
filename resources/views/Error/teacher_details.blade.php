@@ -20,7 +20,7 @@
 <div class="col-12">
     <div class="card mt-1">
         <div class="card-body">
-            <h4 class="header-title text-center p-3">Hello <strong>{{ucwords(strtolower($user->first_name))}}!</strong> Update your NIN and Four Four Details</h4>
+            <h4 class="header-title text-center p-3">Update NIN and Form Four Index Number</h4>
             <!-- Password Requirements Box -->
             <div class="alert alert-info mb-4">
                 <div class="row">
@@ -44,7 +44,7 @@
                 <div class="form-row">
                     <div class="col-md-6">
                         <label for="">Nationality</label>
-                        <select name="nationality" id="nationality" class="form-control-custom" required>
+                        <select name="nationality" id="nationality" class="form-control-custom">
                             <option value="">--Select--</option>
                             <option value="tanzania">Tanzanian, United Republic</option>
                             <option value="foreigner">Foreigner, Other Countries</option>
