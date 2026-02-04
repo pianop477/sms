@@ -258,8 +258,8 @@
     }
 
     /* Biometric toggle label */
-    .form-group label[style*="color: rgba(255, 255, 255, 0.8)"] {
-        color: rgba(255, 255, 255, 0.8) !important;
+    .form-group label[style*="color: rgba(246, 159, 159, 0.8)"] {
+        color: rgba(246, 159, 159, 0.8) !important;
         transition: color 0.3s ease;
     }
 
@@ -576,7 +576,7 @@
     }
 
     body.light-mode .slider {
-        background-color: rgba(0, 0, 0, 0.1);
+        background-color: rgba(121, 53, 53, 0.642);
     }
 
     .slider:before {
