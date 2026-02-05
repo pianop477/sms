@@ -362,7 +362,7 @@
             <div class="stat-card animate-fadeIn delay-2">
                 <i class="fas fa-users stat-icon"></i>
                 <div class="stat-value">{{ $totalRegistered }}</div>
-                <div class="stat-title">Registered  Students</div>
+                <div class="stat-title">Registered</div>
             </div>
             <div class="stat-card animate-fadeIn delay-3">
                 <i class="fas fa-user-check stat-icon"></i>
@@ -370,19 +370,19 @@
                     $allAttended = $reportSummary->sum('present_boys') + $reportSummary->sum('present_girls')
                 @endphp
                 <div class="stat-value">{{  $allAttended}}</div>
-                <div class="stat-title">Attended Students</div>
+                <div class="stat-title">Attended</div>
             </div>
 
             <div class="stat-card animate-fadeIn delay-4">
                 <i class="fas fa-user-xmark stat-icon"></i>
                 <div class="stat-value">{{ $reportSummary->sum('absent_boys') + $reportSummary->sum('absent_girls') }}</div>
-                <div class="stat-title">Absentees Students</div>
+                <div class="stat-title">Absentees</div>
             </div>
 
             <div class="stat-card animate-fadeIn delay-5">
                 <i class="fas fa-user-shield stat-icon"></i>
                 <div class="stat-value">{{ $reportSummary->sum('permission_boys') + $reportSummary->sum('permission_girls') }}</div>
-                <div class="stat-title">Permitted Students</div>
+                <div class="stat-title">Permitted</div>
             </div>
 
             <div class="stat-card animate-fadeIn delay-6">
