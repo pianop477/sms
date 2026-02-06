@@ -563,6 +563,7 @@ class ResultsController extends Controller
             ->select('generated_reports.*', 'users.first_name', 'users.last_name')
             ->where('generated_reports.school_id', $schools->id)
             ->where('generated_reports.class_id', $classes->id)
+            ->whereYear('generated_reports.created_at', $year)
             ->orderBy('generated_reports.created_at', 'desc')
             ->paginate(5);
 
