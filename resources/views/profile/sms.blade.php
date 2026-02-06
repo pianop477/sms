@@ -685,7 +685,7 @@
                             </div>
                             <div class="group-info">
                                 <h6> Non-Teaching Staff</h6>
-                                <small>Administrative and support staff</small>
+                                <small>All support staff</small>
                             </div>
                         </label>
 
