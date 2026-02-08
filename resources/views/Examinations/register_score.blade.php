@@ -347,7 +347,7 @@
                         <p class="mb-0 text-white-50"> Submit examination scores for students</p>
                     </div>
                     <div class="col-md-4 text-end">
-                        <a href="{{ route('home') }}" class="btn btn-back float-right">
+                        <a href="{{ route('score.prepare.form', ['id' => $id]) }}" class="btn btn-back float-right">
                             <i class="fas fa-arrow-circle-left me-1"></i> Back
                         </a>
                     </div>
