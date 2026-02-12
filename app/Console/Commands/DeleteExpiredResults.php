@@ -74,25 +74,25 @@ class DeleteExpiredResults extends Command
                 | SEND SMS NOTIFICATION (ONCE ONLY)
                 |--------------------------------------------------------------------------
                 */
-                try {
-                    $nextSmsService = new NextSmsService();
+                // try {
+                //     $nextSmsService = new NextSmsService();
 
-                    $payload = [
-                        'from'      => $school->sender_id ?? "SHULE APP",
-                        'to'        => $this->formatPhoneNumber($user->phone),
-                        'text'      => "Your pending results will expire in 6 hours. Please submit to avoid data loss. Regards, " . strtoupper($school->school_name),
-                        'reference' => uniqid(),
-                    ];
+                //     $payload = [
+                //         'from'      => $school->sender_id ?? "SHULE APP",
+                //         'to'        => $this->formatPhoneNumber($user->phone),
+                //         'text'      => "Your pending results will expire in 6 hours. Please submit to avoid data loss. Regards, " . strtoupper($school->school_name),
+                //         'reference' => uniqid(),
+                //     ];
 
-                    $nextSmsService->sendSmsByNext(
-                        $payload['from'],
-                        $payload['to'],
-                        $payload['text'],
-                        $payload['reference']
-                    );
-                } catch (\Exception $e) {
-                    // Log::error("SMS not sent for result {$result->id}: " . $e->getMessage());
-                }
+                //     $nextSmsService->sendSmsByNext(
+                //         $payload['from'],
+                //         $payload['to'],
+                //         $payload['text'],
+                //         $payload['reference']
+                //     );
+                // } catch (\Exception $e) {
+                //     // Log::error("SMS not sent for result {$result->id}: " . $e->getMessage());
+                // }
 
                 /*
                 |--------------------------------------------------------------------------
