@@ -88,10 +88,6 @@ class NextSmsService
     {
         $url = "https://messaging-service.co.tz/api/sms/v1/logs";
 
-        $limit = 0;
-        $offset = 0;
-        $from = '';
-
         try {
 
             $response = Http::withHeaders([
