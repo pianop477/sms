@@ -581,7 +581,7 @@
         </div>
 
         <!-- Main Grid -->
-        <form class="dashboard-grid" novalidate action="{{ route('Send.message.byNext') }}" method="POST">
+        <form class="dashboard-grid" id="smsForm" novalidate action="{{ route('Send.message.byNext') }}" method="POST">
             @csrf
 
             <!-- Left Column - Recipients -->
@@ -828,9 +828,9 @@
 
         <!-- Submit Button -->
         <div class="submit-section">
-            <button type="submit" class="send-btn" id="sendButton"
+            <button type="submit" form="smsForm" class="send-btn" id="sendButton"
                 onclick="return confirm('Are you sure you want to send this message?')">
-                <i class="fas fa-paper-plane me-2"></i> Send SMS Broadcast
+                <i class="fas fa-paper-plane me-2"></i> Broadcast SMS
             </button>
         </div>
     </div>

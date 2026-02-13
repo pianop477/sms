@@ -1165,12 +1165,12 @@
                                                     <td class="text-center">
                                                         <style>
                                                             .btn-score {
-                                                                background: var(--secondary-color);
+                                                                background: var(--success-color);
                                                                 color: white;
                                                             }
 
                                                             .btn-result {
-                                                                background: var(--success-color);
+                                                                background: var(--secondary-color);
                                                                 color: white;
                                                             }
                                                         </style>
@@ -1774,7 +1774,7 @@
                                                         @if ($course->status == 1)
                                                             <style>
                                                                 .btn-score {
-                                                                    background: var(--secondary-color);
+                                                                    background: var(--success-color);
                                                                     color: white;
                                                                 }
 
@@ -1926,12 +1926,12 @@
                                                     <ul class="d-flex justify-content-center">
                                                         <style>
                                                             .btn-score {
-                                                                background: var(--secondary-color);
+                                                                background: var(--success-color);
                                                                 color: white;
                                                             }
 
                                                             .btn-result {
-                                                                background: var(--success-color);
+                                                                background: var(--secondary-color);
                                                                 color: white;
                                                             }
                                                         </style>
