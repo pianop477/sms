@@ -720,7 +720,7 @@
                 <div class="message-container">
                     <textarea name="message_content" id="message_content"
                         class="message-textarea @error('message_content') is-invalid @enderror" placeholder="Type your message here..."
-                        required maxlength="306">{{ old('message_content') }}</textarea>
+                        required maxlength="459">{{ old('message_content') }}</textarea>
 
                     @error('message_content')
                         <div class="invalid-feedback d-block mt-2">{{ $message }}</div>
@@ -729,11 +729,11 @@
                     <div class="char-counter">
                         <div class="char-info">
                             <span class="char-count" id="charCount">0</span>
-                            <span class="text-muted">/ 306 characters</span>
+                            <span class="text-muted">/ 459 characters</span>
                         </div>
                         <div>
                             <span class="text-muted">
-                                <i class="fas fa-info-circle me-1"></i> Max 2 SMS
+                                <i class="fas fa-info-circle me-1"></i> Max 3 SMS
                             </span>
                         </div>
                     </div>
