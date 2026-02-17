@@ -902,7 +902,7 @@
             textarea.addEventListener('input', function() {
                 const currentLength = this.value.length;
                 charCount.textContent = currentLength;
-                charCount.style.color = currentLength > 256 ? '#e17055' : '#4e54c8';
+                charCount.style.color = currentLength > 450 ? '#e17055' : '#4e54c8';
             });
 
             // Initialize
@@ -972,9 +972,9 @@
                         block: 'center'
                     });
                     textarea.focus();
-                } else if (messageText.length > 306) {
+                } else if (messageText.length > 459) {
                     isValid = false;
-                    errorMessages.push('Message is too long. Maximum 306 characters allowed.');
+                    errorMessages.push('Message is too long. Maximum 459 characters allowed.');
 
                     textarea.style.border = '2px solid #e17055';
                     textarea.style.boxShadow = '0 0 0 3px rgba(225, 112, 85, 0.1)';
@@ -983,7 +983,7 @@
                     errorDiv.className = 'validation-error alert alert-danger mt-2';
                     errorDiv.innerHTML = `
                     <i class="fas fa-exclamation-circle me-2"></i>
-                    Message is too long (${messageText.length}/306 characters)
+                    Message is too long (${messageText.length}/459 characters)
                 `;
                     textarea.parentNode.insertBefore(errorDiv, textarea.nextSibling);
 
