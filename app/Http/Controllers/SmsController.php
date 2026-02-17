@@ -172,7 +172,7 @@ class SmsController extends Controller
         $validator = Validator::make($request->all(), [
             'classes' => 'nullable|array',
             'classes.*' => 'integer|exists:grades,id',
-            'message_content' => 'required|string|max:306',
+            'message_content' => 'required|string|max:459',
             'send_to_all' => 'sometimes|boolean',
             'send_with_transport' => 'sometimes|boolean',
             'send_without_transport' => 'sometimes|boolean',
@@ -184,7 +184,7 @@ class SmsController extends Controller
             'classes.*.integer' => 'Each class must be a valid integer',
             'classes.*.exists' => 'Selected class does not exist',
             'message_content.required' => 'Message content is required',
-            'message_content.max' => 'Message cannot exceed 306 characters',
+            'message_content.max' => 'Message cannot exceed 459 characters',
         ]);
 
         // Custom validation - at least one recipient option must be selected
