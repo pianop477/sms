@@ -393,7 +393,7 @@
     /* Toast notification */
     .toast {
         position: fixed;
-        top: 20px;
+        top: 50px;
         right: 20px;
         background: rgba(0, 0, 0, 0.8);
         color: white;
@@ -415,7 +415,7 @@
     /* Theme toggle button */
     .color-mode-toggle {
         position: absolute;
-        top: 20px;
+        top: 10px;
         right: 20px;
         z-index: 100;
     }
@@ -670,7 +670,7 @@
 
             <div class="form-group" style="position: relative;">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" id="password" name="password" class="form-control" placeholder="••••••••"
+                <input type="password" id="password" name="password" class="form-control" placeholder="********"
                     required />
                 <button type="button" class="password-toggle" id="togglePassword">
                     <i class="fas fa-eye"></i>

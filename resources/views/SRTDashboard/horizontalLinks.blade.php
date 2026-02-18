@@ -51,10 +51,10 @@
                             <li>
                                 <a href="javascript:void(0)"><i class="fas fa-university"></i><span>Academics</span></a>
                                 <ul class="submenu">
-                                    <li><a href="{{route('Classes.index')}}"><i class="fas fa-chalkboard-teacher"></i> Manage Classes</a></li>
-                                    <li><a href="{{route('courses.index')}}"><i class="fas fa-book-open"></i> Manage Courses</a></li>
+                                    <li><a href="{{route('Classes.index')}}"><i class="fas fa-chalkboard-teacher"></i> Classes</a></li>
+                                    <li><a href="{{route('courses.index')}}"><i class="fas fa-book-open"></i> Courses</a></li>
                                     <li><a href="{{route('exams.index')}}"><i class="fas fa-clipboard-list"></i> Assessments</a></li>
-                                    <li><a href="{{route('results.general', ['school' => Hashids::encode(Auth::user()->school_id)])}}"><i class="fas fa-chart-bar"></i> Manage Results</a></li>
+                                    <li><a href="{{route('results.general', ['school' => Hashids::encode(Auth::user()->school_id)])}}"><i class="fas fa-chart-bar"></i> Results</a></li>
                                 </ul>
                             </li>
 
@@ -74,7 +74,7 @@
                                 <a href="javascript:void(0)"><i class="fa fa-file-archive"></i><span>Staff & HR</span></a>
                                 <ul class="submenu">
                                     <li><a href="{{route('roster.by.year')}}"><i class="fas fa-file"></i> Duty Rosters</a></li>
-                                    <li><a href="{{route('contract.index')}}"><i class="fas fa-briefcase"></i> Manage Contracts</a></li>
+                                    <li><a href="{{route('contract.index')}}"><i class="fas fa-briefcase"></i> Contracts</a></li>
                                 </ul>
                             </li>
 
@@ -111,10 +111,10 @@
                             <li>
                                 <a href="javascript:void(0)"><i class="fas fa-university"></i><span>Academics</span></a>
                                 <ul class="submenu">
-                                    <li><a href="{{route('Classes.index')}}"><i class="fas fa-chalkboard-teacher"></i> Manage Classes</a></li>
-                                    <li><a href="{{route('courses.index')}}"><i class="fas fa-book-open"></i> Manage Courses</a></li>
+                                    <li><a href="{{route('Classes.index')}}"><i class="fas fa-chalkboard-teacher"></i> Classes</a></li>
+                                    <li><a href="{{route('courses.index')}}"><i class="fas fa-book-open"></i> Courses</a></li>
                                     <li><a href="{{route('exams.index')}}"><i class="fas fa-clipboard-list"></i> Assessments</a></li>
-                                    <li><a href="{{route('results.general', ['school' => Hashids::encode(Auth::user()->school_id)])}}"><i class="fas fa-chart-bar"></i> Manage Results</a></li>
+                                    <li><a href="{{route('results.general', ['school' => Hashids::encode(Auth::user()->school_id)])}}"><i class="fas fa-chart-bar"></i> Results</a></li>
                                 </ul>
                             </li>
 
@@ -145,7 +145,7 @@
                                 <ul class="submenu">
                                     <li><a href="{{route('OtherStaffs.index')}}"><i class="fas fa-user-group"></i> Staffs</a></li>
                                     <li><a href="{{route('roster.by.year')}}"><i class="fas fa-file"></i> Duty Rosters</a></li>
-                                    <li><a href="{{route('contract.management')}}"><i class="fas fa-briefcase"></i> Manage Contracts</a></li>
+                                    <li><a href="{{route('contract.management')}}"><i class="fas fa-briefcase"></i> Contracts</a></li>
                                 </ul>
                             </li>
 
@@ -162,7 +162,7 @@
                         {{-- Contract Requests (Other roles) --}}
                         @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 1 || Auth::user()->usertype ==3 && Auth::user()->teacher->role_id == 4)
                             <li>
-                                <a href="{{route('contract.index')}}"><i class="fas fa-briefcase"></i><span> Contracts Management</span></a>
+                                <a href="{{route('contract.index')}}"><i class="fas fa-briefcase"></i><span> Contracts</span></a>
                             </li>
                         @endif
                         {{-- Accountant Links --}}

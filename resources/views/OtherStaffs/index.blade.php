@@ -1,542 +1,1075 @@
 @extends('SRTDashboard.frame')
 
 @section('content')
-
     <style>
         :root {
-            --primary-color: #4e73df;
-            --secondary-color: #6f42c1;
-            --success-color: #1cc88a;
-            --info-color: #36b9cc;
-            --warning-color: #f6c23e;
-            --danger-color: #e74a3b;
-            --light-color: #f8f9fc;
-            --dark-color: #5a5c69;
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #f94144;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            background-color: #f8f9fc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-            margin-bottom: 20px;
-        }
-
-        .header-title {
-            color: var(--primary-color);
-            font-weight: 700;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        .btn-action {
-            border-radius: 5px;
-            padding: 8px 15px;
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-
-        .teacher-avatar {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 50%;
-            margin-right: 10px;
-            border: 2px solid #e3e6f0;
-        }
-
-        .table-responsive {
-            border-radius: 10px;
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
             overflow: hidden;
         }
 
-        .progress-table {
-            background-color: white;
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(circle at 70% 30%, rgba(67, 97, 238, 0.1) 0%, transparent 30%),
+                radial-gradient(circle at 30% 70%, rgba(63, 55, 201, 0.1) 0%, transparent 30%);
+            animation: rotate 60s linear infinite;
         }
 
-        .progress-table thead {
-            background-color: var(--primary-color);
-            color: white;
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
-        .progress-table th {
-            padding: 15px 10px;
-            font-weight: 600;
-            vertical-align: middle;
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
         }
 
-        .progress-table td {
-            padding: 15px 10px;
-            vertical-align: middle;
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: float 20s infinite;
         }
 
-        .badge-role {
-            padding: 0.5em 0.8em;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.75rem;
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(100px, -100px) scale(1.2); }
+            50% { transform: translate(200px, 0) scale(0.8); }
+            75% { transform: translate(100px, 100px) scale(1.1); }
         }
 
-        .action-buttons {
+        /* Main Container */
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 30px auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Modern Card */
+        .modern-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Card Header */
+        .card-header-modern {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            padding: 20px 25px;
+            position: relative;
+            overflow: visible;
+        }
+
+        .card-header-modern::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
+            /* animation: rotate 20s linear infinite; */
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
             display: flex;
-            gap: 8px;
-            justify-content: center;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
-        .action-buttons a, .action-buttons button {
-            width: 30px;
-            height: 30px;
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
+            color: white;
+            font-size: 22px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
-        .modal-header {
-            background-color: var(--primary-color);
+        .header-title {
+            color: white;
+            margin: 0;
+        }
+
+        .header-title h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .header-title p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Action Buttons */
+        .action-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 100;
+        }
+
+        .btn-modern {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            color: white;
+            white-space: nowrap;
+        }
+
+        .btn-export {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-export:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .btn-add {
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-add:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        /* Dropdown */
+        .dropdown-modern {
+            position: relative;
+        }
+
+        .dropdown-modern .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 5px;
+            min-width: 150px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            padding: 6px;
+            background: white;
+            z-index: 1050;
+        }
+
+        .dropdown-modern .dropdown-item {
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--dark);
+        }
+
+        .dropdown-modern .dropdown-item:hover {
+            background: var(--gradient-1);
             color: white;
         }
 
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        /* Stats Card */
+        .stats-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            color: white;
         }
-        .form-control-custom {
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            padding: 12px 15px;
-            font-size: 16px;
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stat-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            margin-bottom: 2px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        /* Card Body */
+        .card-body-modern {
+            padding: 25px;
+        }
+
+        /* Table Container */
+        .table-container-modern {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        /* Modern Table */
+        .table-modern {
             width: 100%;
-            transition: all 0.3s;
-            background-color: white;
+            border-collapse: collapse;
         }
 
-        .form-control-custom:focus {
+        .table-modern thead th {
+            background: linear-gradient(135deg, #2b3d5c 0%, #1a2a44 100%);
+            /* color: white; */
+            font-weight: 600;
+            padding: 12px 12px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            white-space: nowrap;
+        }
+
+        .table-modern tbody td {
+            padding: 12px 12px;
+            border-bottom: 1px solid #edf2f7;
+            color: #4a5568;
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+
+        .table-modern tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .table-modern tbody tr:hover {
+            background: #f7fafc;
+        }
+
+        /* Staff Info */
+        .staff-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .staff-avatar-modern {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .staff-name {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+
+        /* Staff ID Badge */
+        .staff-id-badge {
+            background: #edf2f7;
+            color: #4a5568;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: monospace;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        /* Gender Badge */
+        .gender-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .gender-male {
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        }
+
+        .gender-female {
+            background: linear-gradient(135deg, #e83e8c 0%, #c2185b 100%);
+        }
+
+        /* Job Title Badge */
+        .job-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            display: inline-block;
+            white-space: nowrap;
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        /* Phone Link */
+        .phone-link {
+            color: var(--dark);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        /* Year Badge */
+        .year-badge {
+            background: #e9ecef;
+            color: #495057;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .status-active {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-blocked {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        /* Action Icons */
+        .action-icons {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            flex-wrap: nowrap;
+        }
+
+        .action-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .action-icon.view {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .action-icon.warning {
+            background: linear-gradient(135deg, #f6c23e 0%, #f4b619 100%);
+        }
+
+        .action-icon.success {
+            background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+        }
+
+        .action-icon.danger {
+            background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%);
+        }
+
+        .action-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Empty State */
+        .empty-state-modern {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe69b 100%);
+            border-radius: 16px;
+            border: 2px dashed #ffc107;
+        }
+
+        .empty-state-modern i {
+            font-size: 50px;
+            color: #ffc107;
+            margin-bottom: 15px;
+        }
+
+        /* Modal Styles */
+        .modal-modern .modal-content {
+            border-radius: 20px;
+            border: none;
+            overflow: hidden;
+        }
+
+        .modal-modern .modal-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+        }
+
+        .modal-modern .modal-body {
+            padding: 20px;
+        }
+
+        .modal-modern .modal-footer {
+            border: none;
+            padding: 15px 20px;
+            background: #f8f9fa;
+        }
+
+        /* Form Controls - Compact */
+        .form-group-modern {
+            margin-bottom: 15px;
+        }
+
+        .form-label-modern {
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 4px;
+            font-size: 0.85rem;
+        }
+
+        .form-label-modern .required {
+            color: var(--danger);
+        }
+
+        .form-control-modern {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-control-modern:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+            outline: none;
         }
 
-        .dropdown-menu {
-            border-radius: 5px;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-        }
-
-        .dropdown-item {
-            padding: 0.5rem 1rem;
-        }
-
-        .dropdown-item i {
-            width: 20px;
-            margin-right: 5px;
-        }
-
-        @media (max-width: 768px) {
-            .action-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .table-responsive {
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .table-modern {
+                display: block;
                 overflow-x: auto;
             }
 
-            .btn-action {
-                margin-bottom: 10px;
+            .action-icons {
+                justify-content: flex-start;
             }
         }
-        .student-info-card {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-group {
+                justify-content: stretch;
+            }
+
+            .btn-modern {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .dropdown-modern .dropdown-menu {
+                right: auto;
+                left: 0;
+            }
+
+            .stat-item {
+                margin-bottom: 15px;
+            }
+        }
+
+        /* Dark Mode */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #1a1c2c 0%, #2a2d4a 100%);
+            }
+
+            .modern-card {
+                background: rgba(33, 37, 41, 0.95);
+            }
+
+            .table-modern tbody td {
+                color: #e9ecef;
+                border-bottom-color: #495057;
+            }
+
+            .table-modern tbody tr:hover {
+                background: #343a40;
+            }
+
+            .staff-name {
+                color: #e9ecef;
+            }
+
+            .staff-id-badge {
+                background: #495057;
+                color: #e9ecef;
+            }
+
+            .job-badge {
+                background: #495057;
+                color: #e9ecef;
+            }
+
+            .year-badge {
+                background: #495057;
+                color: #e9ecef;
+            }
+
+            .status-active {
+                background: #22543d;
+                color: #c6f6d5;
+            }
+
+            .status-blocked {
+                background: #742a2a;
+                color: #fed7d7;
+            }
+
+            .form-control-modern {
+                background: #2b3035;
+                border-color: #495057;
+                color: #e9ecef;
+            }
         }
     </style>
-    <div class="py-4">
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <!-- Header Section -->
-                        <div class="row mb-4">
-                            <div class="col-md-8">
-                                <h4 class="header-title">Registered Staffs</h4>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="d-flex justify-content-end gap-2 flex-wrap">
-                                    <div class="dropdown">
-                                        <button class="btn btn-primary btn-action dropdown-toggle mr-2" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="fas fa-cloud-arrow-down me-1"></i> Export
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="exportDropdown">
-                                            <li>
-                                                <a class="dropdown-item" href="{{route('export.other.staffs', ['format' => 'excel'])}}">
-                                                    <i class="fas fa-file-excel me-1 text-success"></i> Excel
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="dropdown-item" href="{{route('export.other.staffs', ['format' => 'pdf'])}}" target="">
-                                                    <i class="fas fa-file-pdf me-1 text-danger"></i> PDF
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <button type="button" class="btn btn-info btn-action" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
-                                        <i class="fas fa-user-plus me-1"></i> Register
-                                    </button>
+
+    <div class="animated-bg"></div>
+    <div class="particles"></div>
+    <div class="loading-spinner" id="loadingSpinner"></div>
+
+    <div class="dashboard-container">
+        <div class="modern-card">
+            <!-- Header -->
+            <div class="card-header-modern">
+                <div class="header-content">
+                    <div class="header-left">
+                        <div class="header-icon">
+                            <i class="fas fa-users-cog"></i>
+                        </div>
+                        <div class="header-title">
+                            <h3>Staff Management</h3>
+                        </div>
+                    </div>
+                    <div class="action-group">
+                        <!-- Export Dropdown -->
+                        <div class="dropdown dropdown-modern">
+                            <button class="btn-modern btn-export dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-download"></i>
+                                <span>Export</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="exportDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="{{route('export.other.staffs', ['format' => 'excel'])}}">
+                                        <i class="fas fa-file-excel text-success"></i> Excel
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{route('export.other.staffs', ['format' => 'pdf'])}}" target="">
+                                        <i class="fas fa-file-pdf text-danger"></i> PDF
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Register Button -->
+                        <button type="button" class="btn-modern btn-add" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Register Staff</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="card-body-modern">
+                <!-- Statistics Cards -->
+                <div class="stats-card">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div>
+                                    <div class="stat-label">Total Staff</div>
+                                    <div class="stat-value">{{ $combinedStaffs->count() }}</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="student-info-card">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-users fa-2x me-3 mr-2"></i>
-                                        <div>
-                                            <h6 class="mb-0"> Total Staffs</h6>
-                                            <h3 class="mb-0"> {{ $combinedStaffs->count() }}</h3>
-                                        </div>
-                                    </div>
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-male"></i>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-male fa-2x me-3 mr-2"></i>
-                                        <div>
-                                            <h6 class="mb-0"> Male</h6>
-                                            <h3 class="mb-0"> {{ $combinedStaffs->filter(fn($s) => strtolower($s->gender) === 'male')->count() }}</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-female fa-2x me-3 mr-2"></i>
-                                        <div>
-                                            <h6 class="mb-0"> Female</h6>
-                                            <h3 class="mb-0"> {{ $combinedStaffs->filter(fn($s)=> strtolower($s->gender) === 'female')->count() }}</h3>
-                                        </div>
-                                    </div>
+                                <div>
+                                    <div class="stat-label">Male</div>
+                                    <div class="stat-value">{{ $combinedStaffs->filter(fn($s) => strtolower($s->gender) === 'male')->count() }}</div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Teachers Table -->
-                        <div class="single-table">
-                            <div class="table-responsive">
-                                <table class="table table-hover progress-table table-responsive-md" id="myTable">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">#</th>
-                                            <th scope="col">Staff ID</th>
-                                            <th scope="col">Full Name</th>
-                                            <th scope="col">Gender</th>
-                                            <th scope="col">Job title</th>
-                                            <th scope="col">Phone</th>
-                                            <th scope="col">Joined</th>
-                                            <th scope="col">Status</th>
-                                            <th scope="col" class="text-center">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($combinedStaffs as $row)
-                                            <tr>
-                                                <td>{{$loop->iteration}}</td>
-                                                <td class="fw-bold">{{strtoupper($row->staff_id ?? 'n/a')}}</td>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        @php
-                                                            $imageName = $row->profile_image;
-                                                            $imagePath = storage_path('app/public/profile/' . $imageName);
-
-                                                            if (!empty($imageName) && file_exists($imagePath)) {
-                                                                $avatarImage = asset('storage/profile/' . $imageName);
-                                                            } else {
-                                                                $avatarImage = asset('storage/profile/' . ($row->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
-                                                            }
-                                                        @endphp
-                                                        <img src="{{ $avatarImage }}" alt="Avatar" class="teacher-avatar">
-                                                        @if (isset($row->driver_name))
-                                                            <span class="text-capitalize"> {{ucwords(strtolower($row->driver_name))}}</span>
-                                                        @else
-                                                            <span class="text-capitalize"> {{ucwords(strtolower($row->first_name . ' '. $row->last_name))}}</span>
-                                                        @endif
-
-                                                    </div>
-                                                </td>
-                                                <td class="text-capitalize">
-                                                    <span class="badge bg-info text-white">{{strtoupper($row->gender[0])}}</span>
-                                                </td>
-                                                <td>
-                                                    {{$row->job_title ?? 'N/A'}}
-                                                </td>
-                                                <td>{{$row->phone}}</td>
-                                                <td>{{$row->joining_year ?? "N/A"}}</td>
-                                                <td>
-                                                    @if ($row->status == 1)
-                                                        <span class="badge bg-success text-white">Active</span>
-                                                    @else
-                                                        <span class="badge bg-danger text-white">Blocked</span>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <div class="action-buttons">
-                                                        <a href="{{route('OtherStaffs.profile', ['type' => $row->job_title, 'id' => Hashids::encode($row->id)])}}" class="btn btn-sm btn-primary" title="View">
-                                                            <i class="fa fa-eye"></i>
-                                                        </a>
-
-                                                        @if ($row->status == 1)
-                                                            <form action="{{route('block.other.staffs', ['type' => $row->job_title, 'id' => Hashids::encode($row->id)])}}" method="POST">
-                                                                @csrf
-                                                                @method('PUT')
-                                                                <button type="submit" class="btn btn-sm btn-warning" title="Block" onclick="return confirm('Are you sure you want to Block {{strtoupper($row->first_name)}} {{strtoupper($row->last_name)}}?')">
-                                                                    <i class="fas fa-ban"></i>
-                                                                </button>
-                                                            </form>
-                                                        @else
-                                                            <form action="{{route('unblock.other.staffs', ['type' => $row->job_title, 'id' => Hashids::encode($row->id)])}}" method="POST">
-                                                                @csrf
-                                                                @method('PUT')
-                                                                <button type="submit" class="btn btn-sm btn-success" title="Unblock" onclick="return confirm('Are you sure you want to Unblock {{strtoupper($row->first_name)}} {{strtoupper($row->last_name)}}?')">
-                                                                    <i class="ti-reload"></i>
-                                                                </button>
-                                                            </form>
-                                                        @endif
-
-                                                        <form action="{{route('remove.other.staffs', ['type' => $row->job_title, 'id' => Hashids::encode($row->id)])}}" method="POST">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button class="btn btn-sm btn-danger" type="submit" title="Delete" onclick="return confirm('Are you sure you want to Delete {{ strtoupper($row->first_name) }} {{ strtoupper($row->last_name) }} Permanently?')">
-                                                                <i class="ti-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-female"></i>
+                                </div>
+                                <div>
+                                    <div class="stat-label">Female</div>
+                                    <div class="stat-value">{{ $combinedStaffs->filter(fn($s) => strtolower($s->gender) === 'female')->count() }}</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                @if ($combinedStaffs->isEmpty())
+                    <div class="empty-state-modern">
+                        <i class="fas fa-users-cog"></i>
+                        <h6>No Staff Found</h6>
+                        <p class="text-muted small">Click "Register Staff" to add your first staff member</p>
+                    </div>
+                @else
+                    <div class="table-container-modern">
+                        <table class="table-modern" id="myTable">
+                            <thead>
+                                <tr>
+                                    <th class="text-white">#</th>
+                                    <th>Staff ID</th>
+                                    <th>Staff</th>
+                                    <th>Gender</th>
+                                    <th>Job Title</th>
+                                    <th>Phone</th>
+                                    <th>Joined</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($combinedStaffs as $row)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>
+                                            <span class="staff-id-badge">{{ strtoupper($row->staff_id ?? 'N/A') }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="staff-info">
+                                                @php
+                                                    $imageName = $row->profile_image;
+                                                    $imagePath = storage_path('app/public/profile/' . $imageName);
+                                                    $avatarImage = (!empty($imageName) && file_exists($imagePath))
+                                                        ? asset('storage/profile/' . $imageName)
+                                                        : asset('storage/profile/' . ($row->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                                @endphp
+                                                <img src="{{ $avatarImage }}" alt="Avatar" class="staff-avatar-modern">
+                                                @if (isset($row->driver_name))
+                                                    <span class="staff-name">{{ ucwords(strtolower($row->driver_name)) }}</span>
+                                                @else
+                                                    <span class="staff-name">{{ ucwords(strtolower($row->first_name . ' ' . $row->last_name)) }}</span>
+                                                @endif
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="gender-badge {{ $row->gender == 'male' ? 'gender-male' : 'gender-female' }}">
+                                                {{ strtoupper(substr($row->gender, 0, 1)) }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="job-badge">{{ $row->job_title ?? 'N/A' }}</span>
+                                        </td>
+                                        <td>
+                                            <a href="tel:{{ $row->phone }}" class="phone-link">
+                                                <i class="fas fa-phone"></i>
+                                                {{ $row->phone }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <span class="year-badge">{{ $row->joining_year ?? 'N/A' }}</span>
+                                        </td>
+                                        <td>
+                                            @if ($row->status == 1)
+                                                <span class="status-badge status-active">
+                                                    <i class="fas fa-circle"></i> Active
+                                                </span>
+                                            @else
+                                                <span class="status-badge status-blocked">
+                                                    <i class="fas fa-circle"></i> Blocked
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="action-icons">
+                                                <a href="{{ route('OtherStaffs.profile', ['type' => $row->job_title, 'id' => Hashids::encode($row->id)]) }}"
+                                                   class="action-icon view"
+                                                   title="View Profile">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+
+                                                @if ($row->status == 1)
+                                                    <form action="{{ route('block.other.staffs', ['type' => $row->job_title, 'id' => Hashids::encode($row->id)]) }}"
+                                                          method="POST"
+                                                          class="d-inline"
+                                                          onsubmit="return confirm('Block {{ $row->first_name ?? $row->driver_name }}?')">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <button type="submit" class="action-icon warning" title="Block">
+                                                            <i class="fas fa-ban"></i>
+                                                        </button>
+                                                    </form>
+                                                @else
+                                                    <form action="{{ route('unblock.other.staffs', ['type' => $row->job_title, 'id' => Hashids::encode($row->id)]) }}"
+                                                          method="POST"
+                                                          class="d-inline"
+                                                          onsubmit="return confirm('Unblock {{ $row->first_name ?? $row->driver_name }}?')">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <button type="submit" class="action-icon success" title="Unblock">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    </form>
+                                                @endif
+
+                                                <form action="{{ route('remove.other.staffs', ['type' => $row->job_title, 'id' => Hashids::encode($row->id)]) }}"
+                                                      method="POST"
+                                                      class="d-inline"
+                                                      onsubmit="return confirm('Delete {{ $row->first_name ?? $row->driver_name }}? This cannot be undone.')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="action-icon danger" title="Delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
 
-    <!-- Add Teacher Modal -->
-    <div class="modal fade" id="addTeacherModal" tabindex="-1" aria-labelledby="addTeacherModalLabel" aria-hidden="true">
+    <!-- Register Staff Modal -->
+    <div class="modal fade modal-modern" id="addTeacherModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addTeacherModalLabel">Staff Registration Form</h5>
-                    <button type="button" class="btn-close btn btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
+                    <h5 class="modal-title">Staff Registration Form</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <form class="needs-validation" novalidate action="{{route('OtherStaffs.store')}}" method="POST" enctype="multipart/form-data">
-                        @csrf
+                <form class="needs-validation" novalidate action="{{ route('OtherStaffs.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="fname" class="form-label">First Name <span class="text-danger">*</span></label>
-                                <input type="text" required name="fname" class="form-control-custom" id="fname" placeholder="First name" value="{{old('fname')}}">
-                                @error('fname')
-                                <div class="text-danger small">{{$message}}</div>
-                                @enderror
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="lname" class="form-label">Other Names <span class="text-danger">*</span></label>
-                                <input type="text" required name="lname" class="form-control-custom" id="lname" placeholder="Middle & Last name" value="{{old('lname')}}">
-                                @error('lname')
-                                <div class="text-danger small">{{$message}}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <div class="input-group">
-                                    <input type="email" name="email" class="form-control-custom" id="email" placeholder="Email ID" value="{{old('email')}}">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">First Name <span class="required">*</span></label>
+                                    <input type="text" name="fname" class="form-control-modern" required>
                                 </div>
-                                @error('email')
-                                <div class="text-danger small">{{$message}}</div>
-                                @enderror
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
-                                <select name="gender" id="gender" class="form-control-custom" required>
-                                    <option value="">-- select gender --</option>
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
-                                </select>
-                                @error('gender')
-                                <div class="text-danger small">{{$message}}</div>
-                                @enderror
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Other Names <span class="required">*</span></label>
+                                    <input type="text" name="lname" class="form-control-modern" required>
+                                </div>
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="phone" class="form-label">Mobile Phone <span class="text-danger">*</span></label>
-                                <input type="text" required name="phone" class="form-control-custom" id="phone" placeholder="Phone Number" value="{{old('phone')}}">
-                                @error('phone')
-                                <div class="text-danger small">{{$message}}</div>
-                                @enderror
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Email</label>
+                                    <input type="email" name="email" class="form-control-modern">
+                                </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="qualification" class="form-label">Education Level <span class="text-danger">*</span></label>
-                                <select name="education" id="education" class="form-control-custom" required>
-                                    <option value="">-- Select --</option>
-                                    <option value="university">University</option>
-                                    <option value="college">College</option>
-                                    <option value="high_school">High school</option>
-                                    <option value="secondary">Secondary school</option>
-                                    <option value="primary">Primary school</option>
-                                    <option value="other">Other</option>
-                                </select>
-                                @error('education')
-                                <div class="text-danger small">{{$message}}</div>
-                                @enderror
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Gender <span class="required">*</span></label>
+                                    <select name="gender" class="form-control-modern" required>
+                                        <option value="">Select</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="dob" class="form-label">Date of Birth <span class="text-danger">*</span></label>
-                                <input type="date" required name="dob" class="form-control-custom" id="dob" value="{{old('dob')}}" min="{{\Carbon\Carbon::now()->subYears(60)->format('Y-m-d')}}" max="{{\Carbon\Carbon::now()->subYears(18)->format('Y-m-d')}}">
-                                @error('dob')
-                                <div class="text-danger small">{{$message}}</div>
-                                @enderror
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Phone <span class="required">*</span></label>
+                                    <input type="text" name="phone" class="form-control-modern" required>
+                                </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="joined" class="form-label">Year Joined <span class="text-danger">*</span></label>
-                                <select name="joined" id="joined" class="form-control-custom" required>
-                                    <option value="">-- Select Year --</option>
-                                    @for ($year = date('Y'); $year >= 2010; $year--)
-                                        <option value="{{ $year }}">{{ $year }}</option>
-                                    @endfor
-                                </select>
-                                @error('joined')
-                                <div class="text-danger small">{{$message}}</div>
-                                @enderror
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Education Level <span class="required">*</span></label>
+                                    <select name="education" class="form-control-modern" required>
+                                        <option value="">Select</option>
+                                        <option value="university">University</option>
+                                        <option value="college">College</option>
+                                        <option value="high_school">High school</option>
+                                        <option value="secondary">Secondary school</option>
+                                        <option value="primary">Primary school</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
+
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="street" class="form-label">Street/Village <span class="text-danger">*</span></label>
-                                <input type="text" required name="street" class="form-control-custom" id="street" value="{{old('street')}}" placeholder="Street Address">
-                                @error('street')
-                                <div class="text-danger small">{{$message}}</div>
-                                @enderror
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Date of Birth <span class="required">*</span></label>
+                                    <input type="date" name="dob" class="form-control-modern" required>
+                                </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="job_title" class="form-label">Job Title <span class="text-danger">*</span></label>
-                                <select name="job_title" id="job_title" class="form-control-custom" required>
-                                    <option value="">-- Select --</option>
-                                    <option value="cooks">Cooks</option>
-                                    <option value="matron">Matron</option>
-                                    <option value="patron">Patron</option>
-                                    <option value="cleaner">Cleaner</option>
-                                    <option value="security guard">Security guard</option>
-                                    <option value="other">Other</option>
-                                </select>
-                                @error('job_title')
-                                <div class="text-danger small">{{$message}}</div>
-                                @enderror
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Year Joined <span class="required">*</span></label>
+                                    <select name="joined" class="form-control-modern" required>
+                                        <option value="">Select</option>
+                                        @for ($year = date('Y'); $year >= 2010; $year--)
+                                            <option value="{{ $year }}">{{ $year }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
                             </div>
                         </div>
+
                         <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="nida">NIN (NIDA)</label>
-                                <input type="text" name="nida" class="form-control-custom" maxlength="23" id="nin" value="{{old('nida')}}" placeholder="Enter NIDA">
-                                @error('nida')
-                                    <div class="text-danger small">{{$message}}</div>
-                                @enderror
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Street/Village <span class="required">*</span></label>
+                                    <input type="text" name="street" class="form-control-modern" required>
+                                </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="profile_image" class="form-label">Profile Picture</label>
-                                <input type="file" name="image" class="form-control-custom" id="image" value="{{old('image')}}" placeholder="">
-                                @error('image')
-                                <div class="text-danger small">{{$message}}</div>
-                                @enderror
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Job Title <span class="required">*</span></label>
+                                    <select name="job_title" class="form-control-modern" required>
+                                        <option value="">Select</option>
+                                        <option value="cooks">Cooks</option>
+                                        <option value="matron">Matron</option>
+                                        <option value="patron">Patron</option>
+                                        <option value="cleaner">Cleaner</option>
+                                        <option value="security guard">Security guard</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" id="saveButton" class="btn btn-success">Save</button>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">NIN (NIDA)</label>
+                                    <input type="text" name="nida" class="form-control-modern" id="nin" maxlength="23" placeholder="Enter NIDA">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group-modern">
+                                    <label class="form-label-modern">Profile Picture</label>
+                                    <input type="file" name="image" class="form-control-modern">
+                                </div>
+                            </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success" id="saveButton">Save Staff</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
+            // Form handling
             const form = document.querySelector(".needs-validation");
             const submitButton = document.getElementById("saveButton");
 
-            if (!form || !submitButton) return;
+            if (form && submitButton) {
+                form.addEventListener("submit", function(event) {
+                    event.preventDefault();
 
-            form.addEventListener("submit", function (event) {
-                event.preventDefault();
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = 'Saving...';
 
-                // Disable button and show loading state
-                submitButton.disabled = true;
-                submitButton.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Saving...`;
+                    if (!form.checkValidity()) {
+                        form.classList.add("was-validated");
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = 'Save';
+                        return;
+                    }
 
-                if (!form.checkValidity()) {
-                    form.classList.add("was-validated");
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = "Save";
-                    return;
+                    setTimeout(() => {
+                        form.submit();
+                    }, 500);
+                });
+            }
+
+            // NIN formatting
+            document.getElementById('nin').addEventListener('input', function (e) {
+                let value = e.target.value.replace(/[^0-9]/g, '');
+                let formatted = '';
+
+                if (value.length > 0) {
+                    formatted += value.substring(0, 8);
+                }
+                if (value.length >= 8) {
+                    formatted += '-';
+                }
+                if (value.length > 8) {
+                    formatted += value.substring(8, 13);
+                }
+                if (value.length >= 13) {
+                    formatted += '-';
+                }
+                if (value.length > 13) {
+                    formatted += value.substring(13, 18);
+                }
+                if (value.length >= 18) {
+                    formatted += '-';
+                }
+                if (value.length > 18) {
+                    formatted += value.substring(18, 20);
                 }
 
-                setTimeout(() => {
-                    form.submit();
-                }, 500);
+                e.target.value = formatted;
             });
-        });
-
-        document.getElementById('nin').addEventListener('input', function (e) {
-            let value = e.target.value.replace(/[^0-9]/g, '');
-
-            let formatted = '';
-
-            if (value.length > 0) {
-                formatted += value.substring(0, 8);
-            }
-
-            // DASH ya kwanza — ionekane instantly baada ya digits 8
-            if (value.length >= 8) {
-                formatted += '-';
-            }
-
-            if (value.length > 8) {
-                formatted += value.substring(8, 13);
-            }
-
-            if (value.length >= 13) {
-                formatted += '-';
-            }
-
-            if (value.length > 13) {
-                formatted += value.substring(13, 18);
-            }
-
-            // DASH ya tatu — ionekane instantly baada ya digits 18
-            if (value.length >= 18) {
-                formatted += '-';
-            }
-
-            if (value.length > 18) {
-                formatted += value.substring(18, 20);
-            }
-
-            e.target.value = formatted;
         });
     </script>
 @endsection

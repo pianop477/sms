@@ -451,7 +451,7 @@
                             @endif
                             <li class="nav-item flex-fill text-center">
                                 <a class="nav-link" href="#package" data-bs-toggle="tab">
-                                    <i class="fas fa-layer-group me-1"></i> E-Learning
+                                    <i class="fas fa-layer-group me-1"></i> E-Library
                                 </a>
                             </li>
                             <li class="nav-item flex-fill text-center">

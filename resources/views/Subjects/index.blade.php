@@ -1,346 +1,1054 @@
 @extends('SRTDashboard.frame')
 
 @section('content')
-    <style>
-        :root {
-            --primary-color: #4e73df;
-            --secondary-color: #6f42c1;
-            --success-color: #1cc88a;
-            --info-color: #36b9cc;
-            --warning-color: #f6c23e;
-            --danger-color: #e74a3b;
-            --light-color: #f8f9fc;
-            --dark-color: #5a5c69;
+<style>
+    :root {
+        --primary: #4361ee;
+        --primary-dark: #3a56d4;
+        --secondary: #3f37c9;
+        --accent: #4895ef;
+        --success: #4cc9f0;
+        --warning: #f8961e;
+        --danger: #f94144;
+        --light: #f8f9fa;
+        --dark: #212529;
+        --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --shadow-sm: 0 5px 15px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 15px 35px rgba(0, 0, 0, 0.2);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+        font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    /* Animated Background */
+    .animated-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+    }
+
+    .animated-bg::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background:
+            radial-gradient(circle at 70% 30%, rgba(67, 97, 238, 0.1) 0%, transparent 30%),
+            radial-gradient(circle at 30% 70%, rgba(63, 55, 201, 0.1) 0%, transparent 30%);
+        animation: rotate 60s linear infinite;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* Floating Particles */
+    .particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    .particle {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        animation: float 20s infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        25% { transform: translate(100px, -100px) scale(1.2); }
+        50% { transform: translate(200px, 0) scale(0.8); }
+        75% { transform: translate(100px, 100px) scale(1.1); }
+    }
+
+    /* Main Container */
+    .dashboard-container {
+        max-width: 1400px;
+        margin: 30px auto;
+        padding: 0 20px;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Modern Card */
+    .modern-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 30px;
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        height: 100%;
+    }
+
+    .modern-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 30px 50px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Card Headers */
+    .card-header-modern {
+        padding: 25px 30px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        position: relative;
+        overflow: hidden;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .gradient-primary {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    }
+
+    .gradient-info {
+        background: linear-gradient(135deg, #36b9cc 0%, #1a8a9e 100%);
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .header-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .header-title {
+        color: white;
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 700;
+    }
+
+    .header-subtitle {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 5px;
+    }
+
+    /* Add Button */
+    .btn-add-modern {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 12px 25px;
+        border-radius: 50px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-add-modern::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .btn-add-modern:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-3px);
+        color: white;
+    }
+
+    .btn-add-modern:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    /* Card Body */
+    .card-body-modern {
+        padding: 30px;
+    }
+
+    /* Class List */
+    .class-list-modern {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .class-item-modern {
+        background: white;
+        border-radius: 15px;
+        margin-bottom: 12px;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .class-item-modern:hover {
+        transform: translateX(10px);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary);
+    }
+
+    .class-link-modern {
+        display: flex;
+        align-items: center;
+        padding: 15px 20px;
+        color: var(--dark);
+        text-decoration: none;
+        gap: 15px;
+    }
+
+    .class-icon {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+    }
+
+    .class-info {
+        flex: 1;
+    }
+
+    .class-name {
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 4px;
+        font-size: 1.1rem;
+    }
+
+    .class-meta {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+
+    .class-arrow {
+        color: var(--primary);
+        font-size: 1.2rem;
+        transition: transform 0.3s ease;
+    }
+
+    .class-item-modern:hover .class-arrow {
+        transform: translateX(5px);
+    }
+
+    /* Table Container */
+    .table-container-modern {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    /* Modern Table */
+    .table-modern {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table-modern thead th {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+        font-weight: 600;
+        padding: 18px 15px;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: none;
+    }
+
+    .table-modern tbody td {
+        padding: 18px 15px;
+        border-bottom: 1px solid #e9ecef;
+        color: #495057;
+        vertical-align: middle;
+    }
+
+    .table-modern tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .table-modern tbody tr:hover {
+        background: #f8f9fa;
+        transform: scale(1.01);
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* Subject Info */
+    .subject-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .subject-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 18px;
+    }
+
+    .subject-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .subject-name {
+        font-weight: 700;
+        color: var(--dark);
+    }
+
+    .subject-code {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+
+    /* Status Badge */
+    .badge-modern {
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-block;
+    }
+
+    .badge-success {
+        background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+        color: white;
+    }
+
+    .badge-danger {
+        background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%);
+        color: white;
+    }
+
+    /* Action Icons */
+    .action-icons {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .action-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    .action-icon.warning {
+        background: linear-gradient(135deg, #f6c23e 0%, #f4b619 100%);
+    }
+
+    .action-icon.success {
+        background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+    }
+
+    .action-icon.danger {
+        background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%);
+    }
+
+    .action-icon:hover {
+        transform: translateY(-3px) rotate(360deg);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Empty State */
+    .empty-state-modern {
+        text-align: center;
+        padding: 60px 20px;
+        background: linear-gradient(135deg, #fff3cd 0%, #ffe69b 100%);
+        border-radius: 20px;
+        border: 2px dashed #ffc107;
+    }
+
+    .empty-state-modern i {
+        font-size: 70px;
+        color: #ffc107;
+        margin-bottom: 20px;
+        animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+
+    /* Modal Modern */
+    .modal-modern .modal-content {
+        border-radius: 30px;
+        border: none;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+    }
+
+    .modal-modern .modal-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: white;
+        border: none;
+        padding: 25px 30px;
+    }
+
+    .modal-modern .modal-body {
+        padding: 30px;
+    }
+
+    .modal-modern .modal-footer {
+        border: none;
+        padding: 20px 30px;
+        background: #f8f9fa;
+    }
+
+    /* Form Controls */
+    .form-group-modern {
+        margin-bottom: 25px;
+    }
+
+    .form-label-modern {
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 8px;
+        display: block;
+        font-size: 0.95rem;
+    }
+
+    .form-control-modern {
+        width: 100%;
+        padding: 14px 18px;
+        border: 2px solid #e9ecef;
+        border-radius: 15px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .form-control-modern:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+        outline: none;
+    }
+
+    .error-message {
+        color: var(--danger);
+        font-size: 0.85rem;
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Modal Buttons */
+    .btn-modal-close {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .btn-modal-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: rotate(90deg);
+    }
+
+    .btn-modal-secondary {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-modal-secondary:hover {
+        background: #5a6268;
+        transform: translateY(-3px);
+    }
+
+    .btn-modal-success {
+        background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .btn-modal-success:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(28, 200, 138, 0.4);
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 70px;
+        height: 70px;
+        border: 5px solid #f3f3f3;
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        z-index: 9999;
+        display: none;
+    }
+
+    /* Toast Notification */
+    .toast-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: white;
+        border-radius: 15px;
+        padding: 15px 25px;
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        transform: translateX(400px);
+        transition: transform 0.3s ease;
+        z-index: 10000;
+        border-left: 5px solid;
+    }
+
+    .toast-notification.show {
+        transform: translateX(0);
+    }
+
+    .toast-success {
+        border-left-color: #28a745;
+    }
+
+    .toast-error {
+        border-left-color: var(--danger);
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .card-header-modern {
+            flex-direction: column;
+            text-align: center;
         }
 
-        body {
-            background-color: #f8f9fc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #333;
+        .header-left {
+            flex-direction: column;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-container {
+            margin: 15px auto;
         }
 
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-            margin-bottom: 20px;
-        }
-
-        .header-title {
-            color: var(--primary-color);
-            font-weight: 700;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        .btn-action {
-            border-radius: 5px;
-            padding: 8px 15px;
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-
-        .table-responsive {
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .table th {
-            padding: 15px 10px;
-            font-weight: 600;
-            vertical-align: middle;
-        }
-
-        .table td {
-            padding: 15px 10px;
-            vertical-align: middle;
-        }
-
-        .badge-status {
-            padding: 0.5em 0.8em;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.75rem;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-        }
-
-        .action-buttons a, .action-buttons button {
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-
-        .modal-header {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .form-control-custom {
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            padding: 12px 15px;
-            font-size: 16px;
-            width: 100%;
-            transition: all 0.3s;
-            background-color: white;
-        }
-
-        .form-control-custom:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.25);
-        }
-
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
-        }
-
-        .class-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .class-item {
-            border: 1px solid #e3e6f0;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .class-item:hover {
-            border-color: var(--primary-color);
-            box-shadow: 0 0.15rem 0.5rem 0 rgba(58, 59, 69, 0.1);
-        }
-
-        .class-link {
+        .table-modern {
             display: block;
-            padding: 12px 15px;
-            color: var(--dark-color);
-            text-decoration: none;
-            transition: all 0.3s ease;
+            overflow-x: auto;
         }
 
-        .class-link:hover {
-            background-color: #f8f9fc;
-            color: var(--primary-color);
+        .action-icons {
+            flex-wrap: wrap;
         }
 
-        .alert-warning {
-            background-color: #fff3cd;
-            border-color: #ffeaa7;
-            color: #856404;
-            border-radius: 8px;
+        .btn-add-modern {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    /* Dark Mode */
+    @media (prefers-color-scheme: dark) {
+        body {
+            background: linear-gradient(135deg, #1a1c2c 0%, #2a2d4a 100%);
         }
 
-        @media (max-width: 768px) {
-            .action-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .table-responsive {
-                overflow-x: auto;
-            }
-
-            .btn-action {
-                margin-bottom: 10px;
-            }
+        .modern-card {
+            background: rgba(33, 37, 41, 0.95);
         }
-    </style>
-    <div class="py-4">
-        <div class="row">
-            <!-- Classes List Section -->
-            <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="header-title text-center"> Subjects by Classes</h4>
-                        <p class="text-danger mb-3"><i class="fas fa-info-circle me-2"></i>Select class to view subjects</p>
 
-                        @if ($classes->isEmpty())
-                            <div class="alert alert-warning text-center py-4">
-                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                <p class="mb-0">No Classes records found!</p>
-                            </div>
-                        @else
-                            <ul class="class-list">
-                                @foreach ($classes as $class)
-                                <li class="class-item">
-                                    <a href="{{route('courses.view.class', ['id' => Hashids::encode($class->id)])}}" class="class-link">
-                                        <i class="fas fa-angle-double-right me-2 text-primary"></i>
-                                        <span class="fw-medium text-uppercase">{{$class->class_name}}</span>
-                                    </a>
-                                </li>
-                                @endforeach
-                            </ul>
-                        @endif
+        .class-item-modern {
+            background: #2b3035;
+            border-color: #495057;
+        }
+
+        .class-name {
+            color: #e9ecef;
+        }
+
+        .table-modern tbody td {
+            color: #e9ecef;
+            border-bottom-color: #495057;
+        }
+
+        .table-modern tbody tr:hover {
+            background: #343a40;
+        }
+
+        .subject-name {
+            color: #e9ecef;
+        }
+
+        .form-control-modern {
+            background: #2b3035;
+            border-color: #495057;
+            color: #e9ecef;
+        }
+
+        .modal-modern .modal-content {
+            background: rgba(33, 37, 41, 0.95);
+        }
+
+        .modal-modern .modal-footer {
+            background: #2b3035;
+        }
+
+        .form-label-modern {
+            color: #e9ecef;
+        }
+    }
+</style>
+
+<div class="animated-bg"></div>
+<div class="particles"></div>
+<div class="loading-spinner" id="loadingSpinner"></div>
+
+<div class="dashboard-container">
+    <div class="row">
+        <!-- Classes List Section -->
+        <div class="col-lg-4 mb-4">
+            <div class="modern-card">
+                <div class="card-header-modern gradient-primary">
+                    <div class="header-left">
+                        <div class="header-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div>
+                            <h3 class="header-title">Subjects by Classes</h3>
+                            <p class="header-subtitle">
+                                <i class="fas fa-info-circle"></i>
+                                Select class to view subjects
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Subjects List Section -->
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row mb-4">
-                            <div class="col-md-8">
-                                <h4 class="header-title"> All Registered Subjects</h4>
-                                <p class="text-success mb-0"><i class="fas fa-book me-2"></i> Registered subjects</p>
-                            </div>
-                            <div class="col-md-4 text-end">
-                                <button type="button" class="btn btn-primary btn-action float-right" data-bs-toggle="modal" data-bs-target="#addSubjectModal">
-                                    <i class="fas fa-plus me-1"></i> New Subject
-                                </button>
-                            </div>
+                <div class="card-body-modern">
+                    @if ($classes->isEmpty())
+                        <div class="empty-state-modern">
+                            <i class="fas fa-layer-group"></i>
+                            <h6 class="mt-4">No Classes Found</h6>
+                            <p class="text-muted">Please create classes first</p>
                         </div>
+                    @else
+                        <ul class="class-list-modern">
+                            @foreach ($classes as $class)
+                            <li class="class-item-modern">
+                                <a href="{{route('courses.view.class', ['id' => Hashids::encode($class->id)])}}" class="class-link-modern">
+                                    <div class="class-icon">
+                                        <i class="fas fa-graduation-cap"></i>
+                                    </div>
+                                    <div class="class-info">
+                                        <div class="class-name text-uppercase">{{strtoupper($class->class_name)}}</div>
+                                    </div>
+                                    <div class="class-arrow">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </div>
+                                </a>
+                            </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            </div>
+        </div>
 
-                        @if ($subjects->isEmpty())
-                            <div class="alert alert-warning text-center py-4">
-                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                <p class="mb-0 text-danger">No courses registered!</p>
-                            </div>
-                        @else
-                            <div class="table-responsive">
-                                <table class="table table-hover" id="myTable">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Course Name</th>
-                                            <th>Course Code</th>
-                                            <th>Status</th>
-                                            <th class="text-center">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($subjects as $course)
-                                            <tr>
-                                                <td>{{$loop->iteration}}</td>
-                                                <td class="text-uppercase fw-medium">{{$course->course_name}}</td>
-                                                <td class="text-uppercase fw-bold">{{$course->course_code}}</td>
-                                                <td class="text-center">
-                                                    @if ($course->status == 1)
-                                                        <span class="badge-status bg-success text-white">Active</span>
-                                                    @else
-                                                        <span class="badge-status bg-danger text-white">Blocked</span>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <div class="action-buttons">
-                                                        @if ($course->status == 1)
-                                                            <form action="{{route('courses.block', ['id' => Hashids::encode($course->id)])}}" method="POST">
-                                                                @csrf
-                                                                @method('PUT')
-                                                                <button type="submit" class="btn btn-sm btn-warning" title="Block" onclick="return confirm('Are you sure you want to Block {{strtoupper($course->course_name)}} Course?')">
-                                                                    <i class="ti-na"></i>
-                                                                </button>
-                                                            </form>
-                                                        @else
-                                                            <form action="{{route('courses.unblock', ['id' => Hashids::encode($course->id)])}}" method="POST">
-                                                                @csrf
-                                                                @method('PUT')
-                                                                <button type="submit" class="btn btn-sm btn-success" title="Unblock" onclick="return confirm('Are you sure you want to unblock {{strtoupper($course->course_name)}} Course?')">
-                                                                    <i class="ti-reload"></i>
-                                                                </button>
-                                                            </form>
-                                                            <form action="{{route('courses.destroy', ['id' => Hashids::encode($course->id)])}}" method="POST">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="btn btn-sm btn-danger" title="Delete" onclick="return confirm('Are you sure you want to Delete {{strtoupper($course->course_name)}} Course Permanently?')">
-                                                                    <i class="ti-trash"></i>
-                                                                </button>
-                                                            </form>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @endif
+        <!-- Subjects List Section -->
+        <div class="col-lg-8 mb-4">
+            <div class="modern-card">
+                <div class="card-header-modern gradient-info">
+                    <div class="header-left">
+                        <div class="header-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div>
+                            <h3 class="header-title">All Registered Subjects</h3>
+                            <p class="header-subtitle">
+                                <i class="fas fa-database"></i>
+                                Total: {{$subjects->count()}} subjects
+                            </p>
+                        </div>
                     </div>
+                    <button type="button" class="btn-add-modern" data-bs-toggle="modal" data-bs-target="#addSubjectModal">
+                        <i class="fas fa-plus"></i>
+                        <span>New Subject</span>
+                    </button>
+                </div>
+                <div class="card-body-modern">
+                    @if ($subjects->isEmpty())
+                        <div class="empty-state-modern">
+                            <i class="fas fa-book-open"></i>
+                            <h6 class="mt-4">No Subjects Registered</h6>
+                            <p class="text-muted">Click "New Subject" to add your first subject</p>
+                        </div>
+                    @else
+                        <div class="table-container-modern">
+                            <table class="table-modern" id="myTable">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Subject Information</th>
+                                        <th>Status</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($subjects as $course)
+                                        <tr>
+                                            <td><span class="fw-bold">{{$loop->iteration}}</span></td>
+                                            <td>
+                                                <div class="subject-info">
+                                                    <div class="subject-icon">
+                                                        <i class="fas fa-book"></i>
+                                                    </div>
+                                                    <div class="subject-details">
+                                                        <span class="subject-name text-uppercase">{{strtoupper($course->course_name)}}</span>
+                                                        <span class="subject-code">{{strtoupper($course->course_code)}}</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @if ($course->status == 1)
+                                                    <span class="badge-modern badge-success">
+                                                        <i class="fas fa-check-circle me-1"></i> Active
+                                                    </span>
+                                                @else
+                                                    <span class="badge-modern badge-danger">
+                                                        <i class="fas fa-ban me-1"></i> Blocked
+                                                    </span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <div class="action-icons">
+                                                    @if ($course->status == 1)
+                                                        <form action="{{route('courses.block', ['id' => Hashids::encode($course->id)])}}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <button type="submit"
+                                                                    class="action-icon warning"
+                                                                    title="Block Subject"
+                                                                    onclick="return confirm('⚠️ Are you sure you want to block {{strtoupper($course->course_name)}}?')">
+                                                                <i class="fas fa-ban"></i>
+                                                            </button>
+                                                        </form>
+                                                    @else
+                                                        <form action="{{route('courses.unblock', ['id' => Hashids::encode($course->id)])}}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <button type="submit"
+                                                                    class="action-icon success"
+                                                                    title="Unblock Subject"
+                                                                    onclick="return confirm('✅ Unblock {{strtoupper($course->course_name)}}?')">
+                                                                <i class="fas fa-check"></i>
+                                                            </button>
+                                                        </form>
+                                                        <form action="{{route('courses.destroy', ['id' => Hashids::encode($course->id)])}}" method="POST">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit"
+                                                                    class="action-icon danger"
+                                                                    title="Delete Permanently"
+                                                                    onclick="return confirm('⚠️ Delete {{strtoupper($course->course_name)}} permanently? This action cannot be undone.')">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Add Subject Modal -->
-    <div class="modal fade" id="addSubjectModal" tabindex="-1" aria-labelledby="addSubjectModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addSubjectModalLabel">Register New Subject</h5>
-                    <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
-                </div>
+<!-- Modern Modal -->
+<div class="modal fade modal-modern" id="addSubjectModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    Register New Subject
+                </h5>
+                <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="needs-validation" novalidate action="{{route('course.registration')}}" method="POST">
+                @csrf
+                <input type="hidden" name="school_id" value="{{Auth::user()->school_id}}">
+
                 <div class="modal-body">
-                    <form class="needs-validation" novalidate action="{{route('course.registration')}}" method="POST">
-                        @csrf
-                        <input type="hidden" name="school_id" value="{{Auth::user()->school_id}}">
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="sname" class="form-label">Subject Name</label>
-                                <input type="text" required name="sname" class="form-control-custom" id="sname" placeholder="Course Name" value="{{old('name')}}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">
+                                    <i class="fas fa-book me-2 text-primary"></i>
+                                    Subject Name
+                                </label>
+                                <input type="text"
+                                       name="sname"
+                                       class="form-control-modern @error('sname') is-invalid @enderror"
+                                       placeholder="e.g., Mathematics, English"
+                                       value="{{old('name')}}"
+                                       required>
                                 @error('sname')
-                                <div class="text-danger small">
-                                    {{$message}}
-                                </div>
-                                @enderror
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="scode" class="form-label">Subject Code</label>
-                                <input type="text" required name="scode" class="form-control-custom text-uppercase" id="scode" placeholder="Course Code" value="{{old('code')}}">
-                                @error('scode')
-                                <div class="text-danger small">
-                                   {{$message}}
-                                </div>
+                                    <div class="error-message">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        {{$message}}
+                                    </div>
                                 @enderror
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-group-modern">
+                                <label class="form-label-modern">
+                                    <i class="fas fa-barcode me-2 text-primary"></i>
+                                    Subject Code
+                                </label>
+                                <input type="text"
+                                       name="scode"
+                                       class="form-control-modern text-uppercase @error('scode') is-invalid @enderror"
+                                       placeholder="e.g., MATH, ENG"
+                                       value="{{old('code')}}"
+                                       required>
+                                @error('scode')
+                                    <div class="error-message">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        {{$message}}
+                                    </div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-2 text-info"></i>
+                            Subject code should be unique and short. Example: "MATH" for Mathematics, "ENG" for English.
+                        </small>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" id="saveButton" class="btn btn-success"> <i class="fas fa-save"></i> Save</button>
+                    <button type="button" class="btn-modal-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn-modal-success" id="saveButton">
+                        <i class="fas fa-save me-2"></i>
+                        Save Subject
+                    </button>
                 </div>
             </form>
-            </div>
         </div>
     </div>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const form = document.querySelector(".needs-validation");
-            const submitButton = document.getElementById("saveButton");
+</div>
 
-            if (!form || !submitButton) return;
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Create particles
+    createParticles();
 
-            form.addEventListener("submit", function (event) {
-                event.preventDefault();
+    // Form handling
+    const form = document.querySelector(".needs-validation");
+    const submitButton = document.getElementById("saveButton");
+    const loadingSpinner = document.getElementById('loadingSpinner');
 
-                // Disable button and show loading state
-                submitButton.disabled = true;
-                submitButton.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Saving...`;
+    if (form && submitButton) {
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
 
-                // Check form validity
-                if (!form.checkValidity()) {
-                    form.classList.add("was-validated");
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = "Save Subject";
-                    return;
+            // Show loading
+            loadingSpinner.style.display = 'block';
+
+            // Disable button
+            submitButton.disabled = true;
+            submitButton.innerHTML = `
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Saving...
+            `;
+
+            // Validate form
+            if (!form.checkValidity()) {
+                form.classList.add("was-validated");
+                loadingSpinner.style.display = 'none';
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fas fa-save me-2"></i>Save Subject';
+
+                showToast('Please fill all required fields', 'error');
+
+                // Scroll to first invalid
+                const firstInvalid = form.querySelector(':invalid');
+                if (firstInvalid) {
+                    firstInvalid.scrollIntoView({behavior: 'smooth', block: 'center'});
                 }
+                return;
+            }
 
-                // Delay submission to show loading state
-                setTimeout(() => {
-                    form.submit();
-                }, 500);
-            });
+            // Submit after delay
+            setTimeout(() => {
+                form.submit();
+            }, 500);
         });
-    </script>
+    }
+
+    // Create floating particles
+    function createParticles() {
+        const particlesContainer = document.querySelector('.particles');
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.width = Math.random() * 10 + 3 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = Math.random() * 10 + 15 + 's';
+            particlesContainer.appendChild(particle);
+        }
+    }
+
+    // Toast notification
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast-notification toast-${type}`;
+        toast.innerHTML = `
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} fa-2x"></i>
+            <span>${message}</span>
+        `;
+        document.body.appendChild(toast);
+
+        setTimeout(() => toast.classList.add('show'), 100);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // Auto uppercase for subject code
+    const codeInput = document.querySelector('input[name="scode"]');
+    if (codeInput) {
+        codeInput.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+    }
+
+    // Input animations
+    document.querySelectorAll('.form-control-modern').forEach(input => {
+        input.addEventListener('focus', () => {
+            input.style.transform = 'translateY(-2px)';
+        });
+        input.addEventListener('blur', () => {
+            input.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Reset button state on page show
+    window.addEventListener("pageshow", function() {
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-save me-2"></i>Save Subject';
+        }
+        if (loadingSpinner) {
+            loadingSpinner.style.display = 'none';
+        }
+    });
+});
+</script>
 @endsection

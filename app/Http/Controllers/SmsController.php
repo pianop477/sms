@@ -144,9 +144,11 @@ class SmsController extends Controller
             ];
         }
 
+        $content = $this->cleanSmsText($request->message_content);
+
         try {
             // Send SMS
-            $response = $beemSmsService->sendSms($sourceAddr, $request->message_content, $recipients);
+            $response = $beemSmsService->sendSms($sourceAddr, $content, $recipients);
 
             // Session::flash('success', 'Message sent successfully');
             Alert()->toast('Message sent successfully', 'success');
@@ -335,7 +337,7 @@ class SmsController extends Controller
         $payload = [
             "from" => $sender,
             "to" => $uniquePhones,
-            "text" => $request->message_content,
+            "text" => $this->cleanSmsText($request->message_content),
             "reference" => $reference
         ];
 
@@ -391,5 +393,23 @@ class SmsController extends Controller
         return $phone;
     }
 
-    //send sms to all parents
+    private function cleanSmsText($text)
+    {
+        // Badilisha baadhi ya Unicode kuwa ASCII
+        $replacements = [
+            '–' => '-',   // en dash
+            '—' => '-',   // em dash
+            '“' => '"',
+            '”' => '"',
+            '‘' => "'",
+            '’' => "'",
+        ];
+
+        $text = strtr($text, $replacements);
+
+        // Ruhusu: A-Z, a-z, 0-9, space, newline na alama za kawaida za GSM
+        $text = preg_replace('/[^A-Za-z0-9 @£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ!"#¤%&\'()*+,\-.\/:;<=>?¡ÄÖÑÜ§¿äöñüà]/u', '', $text);
+
+        return $text;
+    }
 }
