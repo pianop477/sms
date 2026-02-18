@@ -290,6 +290,52 @@
             font-size: 20px;
         }
 
+        /* Division Styling */
+        .division-i {
+            background-color: #75f430 !important;
+            color: black !important;
+            padding: 5px 15px !important;
+            border-radius: 20px !important;
+            font-weight: bold !important;
+        }
+        .division-ii {
+            background-color: #99faed !important;
+            color: black !important;
+            padding: 5px 15px !important;
+            border-radius: 20px !important;
+            font-weight: bold !important;
+        }
+        .division-iii {
+            background-color: #eddc71 !important;
+            color: black !important;
+            padding: 5px 15px !important;
+            border-radius: 20px !important;
+            font-weight: bold !important;
+        }
+        .division-iv {
+            background-color: #b6b0b0 !important;
+            color: black !important;
+            padding: 5px 15px !important;
+            border-radius: 20px !important;
+            font-weight: bold !important;
+        }
+        .division-zero {
+            background-color: #eb4b4b !important;
+            color: white !important;
+            padding: 5px 15px !important;
+            border-radius: 20px !important;
+            font-weight: bold !important;
+        }
+        .marking-style-badge {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
         @media (max-width: 768px) {
             .header {
                 padding: 20px 10px;
@@ -336,7 +382,7 @@
             <div class="logo">
                 <span class="logo-icon">✓</span>
             </div>
-            <h1>Report Verification</h1>
+            <h2>Report Verification System</h2>
         </div>
         <!-- Content Section -->
         <div class="content">
@@ -345,13 +391,14 @@
                 <div class="status-card valid">
                     <div class="status-header">
                         <div>
-                            <h2 class="status-title"> Verified Successfully</h2>
+                            <h2 class="status-title"> Verified Successfully
+                            </h2>
                         </div>
                     </div>
 
                     <!-- Details Grid -->
                     <div class="details-grid">
-                        <!-- Existing student info -->
+                        <!-- Student info -->
                         <div class="detail-item">
                             <div class="detail-label">Student Name</div>
                             <div class="detail-value">
@@ -366,7 +413,7 @@
                         </div>
 
                         <div class="detail-item">
-                            <div class="detail-label">Class & Stream</div>
+                            <div class="detail-label">Class</div>
                             <div class="detail-value"><strong>{{ strtoupper($data['class']) }}</strong></div>
                         </div>
 
@@ -377,7 +424,7 @@
 
                         <div class="detail-item">
                             <div class="detail-label">Academic Term</div>
-                            <div class="detail-value"><strong>{{ strtoupper($data['term']) }}</strong></div>
+                            <div class="detail-value"><strong>Term {{ strtoupper($data['term']) }}</strong></div>
                         </div>
 
                         <div class="detail-item">
@@ -387,7 +434,7 @@
 
                         <div class="detail-item">
                             <div class="detail-label">Issue Date</div>
-                            <div class="detail-value"><strong>{{ $data['report_date'] }}</strong></div>
+                            <div class="detail-value"><strong>{{ \Carbon\Carbon::parse($data['report_date'])->format('d-m-Y') }}</strong></div>
                         </div>
                     </div>
 
@@ -395,21 +442,65 @@
                     <div class="summary-section" style="margin-top:20px; border-top:1px solid #ccc; padding-top:15px;">
                         <h3>Performance Summary</h3>
                         <div class="details-grid">
-                            <div class="detail-item">
-                                <div class="detail-label">Total Score</div>
-                                <div class="detail-value"><strong>{{ number_format($data['total_score'], 2) }}</strong></div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">Average Score</div>
-                                <div class="detail-value"><strong>{{ number_format($data['average_score'], 2) }}</strong></div>
-                            </div>
+                            @if(isset($data['marking_style']) && $data['marking_style'] == 3)
+                                <!-- Marking Style 3 (Division System) -->
+                                <div class="detail-item">
+                                    <div class="detail-label">Aggregate Points</div>
+                                    <div class="detail-value">
+                                        <strong>{{ $data['aggregate_points'] ?? 'N/A' }} points</strong>
+                                    </div>
+                                </div>
+
+                                <div class="detail-item">
+                                    <div class="detail-label">Division</div>
+                                    <div class="detail-value">
+                                        @if(isset($data['division']))
+                                            @if($data['division'] == 'I')
+                                                <span class="division-i">DIVISION I</span>
+                                            @elseif($data['division'] == 'II')
+                                                <span class="division-ii">DIVISION II</span>
+                                            @elseif($data['division'] == 'III')
+                                                <span class="division-iii">DIVISION III</span>
+                                            @elseif($data['division'] == 'IV')
+                                                <span class="division-iv">DIVISION IV</span>
+                                            @else
+                                                <span class="division-zero">DIVISION 0</span>
+                                            @endif
+                                        @else
+                                            <strong>N/A</strong>
+                                        @endif
+                                    </div>
+                                </div>
+                            @else
+                                <!-- Marking Styles 1 & 2 -->
+                                <div class="detail-item">
+                                    <div class="detail-label">Total Score</div>
+                                    <div class="detail-value"><strong>{{ number_format($data['total_score'], 2) }}</strong></div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Average Score</div>
+                                    <div class="detail-value"><strong>{{ number_format($data['average_score'], 2) }}</strong></div>
+                                </div>
+                            @endif
+
+                            <!-- Position (common for all marking styles) -->
                             <div class="detail-item">
                                 <div class="detail-label">Position</div>
                                 <div class="detail-value">
-                                    <strong>{{ $data['student_rank'] }} out of {{ $data['total_students'] }}</strong>
+                                    <strong>{{ $data['student_rank'] ?? 'N/A' }} out of {{ $data['total_students'] ?? 'N/A' }}</strong>
                                 </div>
                             </div>
                         </div>
+
+                        @if(isset($data['marking_style']) && $data['marking_style'] == 3)
+                        <!-- Division System Explanation -->
+                        <div style="margin-top: 20px; background: #f8fafc; border-radius: 10px; padding: 15px; border: 1px solid #e5e7eb;">
+                            <h4 style="margin-bottom: 10px; color: #4f46e5;">Division System Information</h4>
+                            <div style="font-size: 14px; color: #6b7280;">
+                                <p><strong>Grade Points:</strong> A=1, B=2, C=3, D=4, F=5</p>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
             @else
@@ -464,8 +555,7 @@
         <!-- Footer Section -->
         <div class="footer">
             <div class="verification-meta">
-                {{-- <div>Verification ID: <span class="verification-id">{{ substr(md5(time()), 0, 12) }}</span></div> --}}
-                <div>&copy; {{ucwords(strtolower($data['school']))}} - All Rights Reserved</div>
+                <div>&copy; {{ucwords(strtolower($data['school'] ?? 'School'))}} - All Rights Reserved</div>
             </div>
         </div>
 

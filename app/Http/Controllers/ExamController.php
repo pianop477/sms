@@ -109,7 +109,7 @@ class ExamController extends Controller
 
         if ($existingSavedResults) {
             Alert()->toast('You have pending results, please submit or delete first', 'error');
-            return to_route('score.prepare.form', Hashids::encode($courseId));
+            return to_route('score.prepare.form', ['id' => $id]);
         }
 
         $exams = Examination::where('school_id', Auth::user()->school_id)->where('status', 1)->orderBy('exam_type')->get();
@@ -144,7 +144,7 @@ class ExamController extends Controller
             'exam_id' => 'required|integer|exists:examinations,id',
             'exam_date' => 'required|date|date_format:Y-m-d',
             'term' => 'required|in:i,ii',
-            'marking_style' => 'required|in:1,2',
+            'marking_style' => 'required|in:1,2,3',
         ], [
             'course_id.required' => 'Course is required',
             'class_id.required' => 'Class is required',
@@ -563,7 +563,8 @@ class ExamController extends Controller
             'B' => 0,
             'C' => 0,
             'D' => 0,
-            'E' => 0
+            'E' => 0,
+            'F' => 0
         ];
 
         // Calculate grades, positions, and average score
@@ -608,9 +609,9 @@ class ExamController extends Controller
                     $result->grade = 'E';
                     $gradeCounts['E']++;
                 } else {
-                    $result->grade = 'ABS';
+                    $result->grade = 'X';
                 }
-            } else {
+            } elseif($result->marking_style == 2) {
                 if ($result->score >= 80.5) {
                     $result->grade = 'A';
                     $gradeCounts['A']++;
@@ -627,7 +628,26 @@ class ExamController extends Controller
                     $result->grade = 'E';
                     $gradeCounts['E']++;
                 } else {
-                    $result->grade = 'ABS';
+                    $result->grade = 'X';
+                }
+            } else {
+                if($result->score >= 74.5) {
+                    $result->grade = 'A';
+                    $gradeCounts['A']++;
+                } elseif ($result->score >= 64.5) {
+                    $result->grade = 'B';
+                    $gradeCounts['B']++;
+                } elseif ($result->score >= 44.5) {
+                    $result->grade = 'C';
+                    $gradeCounts['C']++;
+                } elseif ($result->score >= 29.5) {
+                    $result->grade = 'D';
+                    $gradeCounts['D']++;
+                } elseif ($result->score >= 0.5) {
+                    $result->grade = 'F';
+                    $gradeCounts['F']++;
+                } else {
+                    $result->grade = 'X';
                 }
             }
 
@@ -698,9 +718,9 @@ class ExamController extends Controller
             } elseif ($score >= 0.5) {
                 return 'E';
             } else {
-                return 'ABS';
+                return 'X';
             }
-        } else {
+        } elseif($marking_style == 2) {
             if ($score >= 80.5) {
                 return 'A';
             } elseif ($score >= 60.5) {
@@ -712,7 +732,21 @@ class ExamController extends Controller
             } elseif ($score >= 0.5) {
                 return 'E';
             } else {
-                return 'ABS';
+                return 'X';
+            }
+        } else {
+            if ($score >= 74.5) {
+                return 'A';
+            } elseif ($score >= 64.5) {
+                return 'B';
+            } elseif ($score >= 44.5) {
+                return 'C';
+            } elseif ($score >= 29.5) {
+                return 'D';
+            } elseif ($score >= 0.5) {
+                return 'F';
+            } else {
+                return 'X';
             }
         }
     }

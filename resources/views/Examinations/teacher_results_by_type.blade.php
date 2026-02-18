@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Subject Results Report</title>
@@ -10,7 +11,8 @@
             color: #333;
             margin: 0;
             /* padding: 20px; */
-            padding-bottom: 50px; /* Ongeza padding chini kwa footer */
+            padding-bottom: 50px;
+            /* Ongeza padding chini kwa footer */
         }
 
         .header {
@@ -24,7 +26,9 @@
             height: auto;
         }
 
-        .header h3, .header h4, .header h5 {
+        .header h3,
+        .header h4,
+        .header h5 {
             margin: 2px;
             text-transform: uppercase;
             font-size: 16px;
@@ -36,15 +40,19 @@
             margin: 10px 0;
         }
 
-        .info, .summary, .grades {
+        .info,
+        .summary,
+        .grades {
             margin-bottom: 15px;
         }
 
-        .info p, .summary p {
+        .info p,
+        .summary p {
             margin: 2px 0;
         }
 
-        .summary-table, .results-table {
+        .summary-table,
+        .results-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 5px;
@@ -83,11 +91,26 @@
             font-weight: bold;
         }
 
-        .grade-A { background-color: #28a745; }
-        .grade-B { background-color: #17a2b8; }
-        .grade-C { background-color: #ffc107; color: #000; }
-        .grade-D { background-color: #fd7e14; }
-        .grade-E { background-color: #dc3545; }
+        .grade-A {
+            background-color: #28a745;
+        }
+
+        .grade-B {
+            background-color: #17a2b8;
+        }
+
+        .grade-C {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .grade-D {
+            background-color: #fd7e14;
+        }
+
+        .grade-E {
+            background-color: #dc3545;
+        }
 
         .absent {
             background-color: #dc3545;
@@ -95,18 +118,22 @@
             padding: 2px 6px;
             font-weight: bold;
         }
+
         @page {
             margin-top: 8mm;
-            margin-bottom: 12mm; /* Ongeza nafasi ya chini kwa footer */
+            margin-bottom: 12mm;
+            /* Ongeza nafasi ya chini kwa footer */
             margin-left: 8mm;
             margin-right: 8mm;
         }
+
         footer {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 4mm; /*urefu wa footer*/
+            height: 4mm;
+            /*urefu wa footer*/
             font-size: 10px;
             padding-top: 8px;
             border-top: 1px solid #ddd;
@@ -114,39 +141,47 @@
             background-color: white;
             z-index: 1000;
         }
+
         footer .page-number:after {
-        content: "Page " counter(page);
+            content: "Page " counter(page);
         }
+
         footer .copyright {
-        float: left;
-        margin-left: 10px;
+            float: left;
+            margin-left: 10px;
         }
+
         footer .printed {
-        float: right;
-        margin-right: 10px;
+            float: right;
+            margin-right: 10px;
         }
+
         /* Clear floats */
         footer:after {
-        content: "";
-        display: table;
-        clear: both;
+            content: "";
+            display: table;
+            clear: both;
         }
     </style>
 </head>
+
 <body>
     <div class="header">
         <img src="{{ storage_path('app/public/logo/' . Auth::user()->school->logo) }}" alt="logo">
         <h3>THE UNITED REPUBLIC OF TANZANIA</h3>
         <h4>THE PRESIDENT'S OFFICE - RALG</h4>
-        <h4>{{ Auth::user()->school->school_name }} - {{ Auth::user()->school->postal_address }}, {{ Auth::user()->school->postal_name }}</h4>
+        <h4>{{ Auth::user()->school->school_name }} - {{ Auth::user()->school->postal_address }},
+            {{ Auth::user()->school->postal_name }}</h4>
         <h5>{{ $results->first()->exam_type }} Results - {{ $month }} {{ $year }}</h5>
     </div>
 
     <hr>
 
     <div class="info">
-        <p><strong>Subject:</strong> {{ strtoupper($subjectCourse->course_name) }} - {{ strtoupper($subjectCourse->course_code) }}</p>
-        <p><strong>Teacher:</strong> {{ ucwords(strtolower($results->first()->teacher_firstname)) }} {{ strtoupper($results->first()->teacher_lastname[0]) }}.</p>
+        <p><strong>Subject:</strong> {{ strtoupper($subjectCourse->course_name) }} -
+            {{ strtoupper($subjectCourse->course_code) }}</p>
+        <p><strong>Teacher:</strong> {{ ucwords(strtolower($results->first()->teacher_firstname)) }}
+            {{ ucwords(strtolower($results->first()->teacher_lastname)) }}.</p>
         <p><strong>Exam Date:</strong> {{ \Carbon\Carbon::parse($results->first()->exam_date)->format('d F Y') }}</p>
         <p><strong>Term:</strong> {{ strtoupper($results->first()->Exam_term) }}</p>
     </div>
@@ -154,22 +189,41 @@
     <div class="grades">
         <p><strong>Performance Summary</strong></p>
         <table class="summary-table">
-            <tr>
-                <th>Grade</th>
-                <th>A</th>
-                <th>B</th>
-                <th>C</th>
-                <th>D</th>
-                <th>E</th>
-            </tr>
-            <tr>
-                <td><strong>Number</strong></td>
-                <td>{{ $gradeCounts['A'] }}</td>
-                <td>{{ $gradeCounts['B'] }}</td>
-                <td>{{ $gradeCounts['C'] }}</td>
-                <td>{{ $gradeCounts['D'] }}</td>
-                <td>{{ $gradeCounts['E'] }}</td>
-            </tr>
+            @if ($results->first()->marking_style == 1 || $results->first()->marking_style == 2)
+                <tr>
+                    <th>Grade</th>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>C</th>
+                    <th>D</th>
+                    <th>E</th>
+                </tr>
+                <tr>
+                    <td><strong>Number</strong></td>
+                    <td>{{ $gradeCounts['A'] }}</td>
+                    <td>{{ $gradeCounts['B'] }}</td>
+                    <td>{{ $gradeCounts['C'] }}</td>
+                    <td>{{ $gradeCounts['D'] }}</td>
+                    <td>{{ $gradeCounts['E'] }}</td>
+                </tr>
+            @else
+                <tr>
+                    <th>Grade</th>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>C</th>
+                    <th>D</th>
+                    <th>F</th>
+                </tr>
+                <tr>
+                    <td><strong>Number</strong></td>
+                    <td>{{ $gradeCounts['A'] }}</td>
+                    <td>{{ $gradeCounts['B'] }}</td>
+                    <td>{{ $gradeCounts['C'] }}</td>
+                    <td>{{ $gradeCounts['D'] }}</td>
+                    <td>{{ $gradeCounts['F'] }}</td>
+                </tr>
+            @endif
         </table>
     </div>
 
@@ -178,14 +232,27 @@
         <p><strong>Grade:</strong>
             <span class="grade-badge grade-{{ $averageGrade }}">{{ $averageGrade }} -
                 @php
-                    echo match($averageGrade) {
-                        'A' => 'Excellent',
-                        'B' => 'Good',
-                        'C' => 'Pass',
-                        'D' => 'Poor',
-                        'E' => 'Fail',
-                        default => 'N/A'
-                    };
+                    $markingStyle = $results->first()->marking_style;
+
+                    if ($markingStyle == 1 || $markingStyle == 2) {
+                        echo match ($averageGrade) {
+                            'A' => 'Excellent',
+                            'B' => 'Good',
+                            'C' => 'Pass',
+                            'D' => 'Poor',
+                            'E' => 'Fail',
+                            default => 'N/A',
+                        };
+                    } else {
+                        echo match ($averageGrade) {
+                            'A' => 'Excellent',
+                            'B' => 'Good',
+                            'C' => 'Pass',
+                            'D' => 'Poor',
+                            'F' => 'Fail',
+                            default => 'N/A',
+                        };
+                    }
                 @endphp
             </span>
         </p>
@@ -209,39 +276,42 @@
         </thead>
         <tbody>
             @foreach ($results as $result)
-            <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ strtoupper($result->admission_number) }}</td>
-                <td style="text-align: left">{{ ucwords(strtolower($result->first_name . ' ' . $result->middle_name . ' ' . $result->last_name)) }}</td>
-                <td>{{ ucfirst($result->gender[0]) }}</td>
-                <td>{{ strtoupper($result->group) }}</td>
-                <td>
-                    @if ($result->score === null)
-                        <span class="absent">X</span>
-                    @else
-                        {{ $result->score }}
-                    @endif
-                </td>
-                <td>{{ $result->grade }}</td>
-                <td>
-                    @if ($result->score === null)
-                        <span class="absent">X</span>
-                    @else
-                        {{ $result->position }}
-                    @endif
-                </td>
-            </tr>
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ strtoupper($result->admission_number) }}</td>
+                    <td style="text-align: left">
+                        {{ ucwords(strtolower($result->first_name . ' ' . $result->middle_name . ' ' . $result->last_name)) }}
+                    </td>
+                    <td>{{ ucfirst($result->gender[0]) }}</td>
+                    <td>{{ strtoupper($result->group) }}</td>
+                    <td>
+                        @if ($result->score === null)
+                            <span class="absent">X</span>
+                        @else
+                            {{ $result->score }}
+                        @endif
+                    </td>
+                    <td>{{ $result->grade }}</td>
+                    <td>
+                        @if ($result->score === null)
+                            <span class="absent">X</span>
+                        @else
+                            {{ $result->position }}
+                        @endif
+                    </td>
+                </tr>
             @endforeach
         </tbody>
     </table>
     <footer>
         <span class="copyright">
-        &copy; {{ ucwords(strtolower(Auth::user()->school->school_name)) }} – {{ date('Y') }}
+            &copy; {{ ucwords(strtolower(Auth::user()->school->school_name)) }} – {{ date('Y') }}
         </span>
         <span class="page-number"></span>
         <span class="printed">
-        Printed at: {{ now()->format('d-M-Y H:i') }}
+            Printed at: {{ now()->format('d-M-Y H:i') }}
         </span>
     </footer>
 </body>
+
 </html>

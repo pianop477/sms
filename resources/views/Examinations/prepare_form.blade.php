@@ -381,9 +381,10 @@
                                     Grading System <span class="required-star">*</span>
                                 </label>
                                 <select name="marking_style" id="marking_style" class="form-control-custom" required>
-                                    <option value="" disabled selected>-- Select Grading System --</option>
+                                    <option value="" selected>-- Select Grading System --</option>
                                     <option value="2" {{ old('marking_style') == '2' ? 'selected' : '' }}>Percentage (0-100%)</option>
-                                    <option value="1" {{ (old('marking_style') ?: '1') == '1' ? 'selected' : '' }}>Points (0-50)</option>
+                                    <option value="1" {{ old('marking_style') == '1' ? 'selected': '' }}>Points (0-50)</option>
+                                    <option value="3" {{ old('marking_style') == '3' ? 'selected' : '' }}>Division system</option>
                                 </select>
                                 <div class="invalid-feedback">
                                     Please select a grading system

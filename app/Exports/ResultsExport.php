@@ -18,6 +18,8 @@ class ResultsExport implements FromView
     protected $subjectGradesByGender;
     protected $date;
     protected $courses;
+    protected $marking_style;
+    protected $divisionAggregate;
 
     public function __construct(
         $results,
@@ -30,7 +32,9 @@ class ResultsExport implements FromView
         $sortedCourses,
         $subjectGradesByGender,
         $date,
-        $courses
+        $courses,
+        $marking_style = 1,
+        $divisionAggregate = []
     ) {
         $this->results = $results;
         $this->totalUniqueStudents = $totalUniqueStudents;
@@ -43,6 +47,8 @@ class ResultsExport implements FromView
         $this->subjectGradesByGender = $subjectGradesByGender;
         $this->date = $date;
         $this->courses = $courses;
+        $this->marking_style = $marking_style;
+        $this->divisionAggregate = $divisionAggregate;
     }
 
     public function view(): View
@@ -59,6 +65,8 @@ class ResultsExport implements FromView
             'subjectGradesByGender' => $this->subjectGradesByGender,
             'date' => $this->date,
             'courses' => $this->courses,
+            'marking_style' => $this->marking_style,
+            'divisionAggregate' => $this->divisionAggregate,
         ]);
     }
 }

@@ -20,26 +20,32 @@ class PackagesController extends Controller
 
     public function packagesByYear()
     {
-        $packages = holiday_package::where('school_id', Auth::user()->school_id)->orderBy('year', 'DESC')->get();
-        $groupedByYear = $packages->groupBy(function ($item) {
-            return Carbon::parse($item->year)->format('Y');
-        });
+        $packages = holiday_package::where('school_id', Auth::user()->school_id)
+            ->orderBy('year', 'DESC')
+            ->get();
+
+        // Group directly by year field without Carbon parsing
+        $groupedByYear = $packages->groupBy('year');
 
         $recentPackages = holiday_package::query()
-                                        ->join('grades', 'grades.id', '=', 'holiday_packages.class_id')
-                                        ->join('users', 'users.id', '=', 'holiday_packages.issued_by')
-                                        ->select(
-                                            'holiday_packages.*', 'grades.class_name', 'grades.class_code',
-                                            'users.first_name', 'users.last_name',
-                                        )
-                                        ->where('holiday_packages.school_id', Auth::user()->school_id)
-                                        ->orderBy('holiday_packages.created_at', 'DESC')
-                                        ->orderBy('holiday_packages.updated_at', 'DESC')
-                                        ->take(5)
-                                        ->get();
+            ->join('grades', 'grades.id', '=', 'holiday_packages.class_id')
+            ->join('users', 'users.id', '=', 'holiday_packages.issued_by')
+            ->select(
+                'holiday_packages.*',
+                'grades.class_name',
+                'grades.class_code',
+                'users.first_name',
+                'users.last_name',
+            )
+            ->where('holiday_packages.school_id', Auth::user()->school_id)
+            ->orderBy('holiday_packages.created_at', 'DESC')
+            ->orderBy('holiday_packages.updated_at', 'DESC')
+            ->take(5)
+            ->get();
+
         $classes = Grade::where('school_id', Auth::user()->school_id)
-                        ->orderBy('class_name', 'ASC')
-                        ->get();
+            ->orderBy('class_name', 'ASC')
+            ->get();
 
         return view('packages.package_by_year', compact('groupedByYear', 'recentPackages', 'classes'));
     }
@@ -47,14 +53,17 @@ class PackagesController extends Controller
     public function packageByClass($year)
     {
         $packages = holiday_package::query()
-                                    ->join('grades', 'grades.id', '=', 'holiday_packages.class_id')
-                                    ->select(
-                                        'holiday_packages.*', 'grades.class_name', 'grades.id as grade_id', 'grades.class_code',
-                                    )
-                                    ->where('holiday_packages.school_id', Auth::user()->school_id)
-                                    ->where('holiday_packages.year', $year)
-                                    ->orderBy('grades.class_code')
-                                    ->get();
+            ->join('grades', 'grades.id', '=', 'holiday_packages.class_id')
+            ->select(
+                'holiday_packages.*',
+                'grades.class_name',
+                'grades.id as grade_id',
+                'grades.class_code',
+            )
+            ->where('holiday_packages.school_id', Auth::user()->school_id)
+            ->where('holiday_packages.year', $year)
+            ->orderBy('grades.class_code')
+            ->get();
 
         $classGroups = $packages->groupBy('class_name');
 
@@ -65,18 +74,22 @@ class PackagesController extends Controller
     {
         $hashId = Hashids::decode($class);
         $packages = holiday_package::query()
-                                    ->join('grades', 'grades.id', '=', 'holiday_packages.class_id')
-                                    ->join('users', 'users.id', '=', 'holiday_packages.issued_by')
-                                    ->select(
-                                        'holiday_packages.*', 'grades.class_name', 'grades.class_code',
-                                        'users.first_name', 'users.last_name', 'users.phone',
-                                    )
-                                    ->where('holiday_packages.school_id', Auth::user()->school_id)
-                                    ->where('holiday_packages.class_id', $hashId[0])
-                                    ->where('holiday_packages.year', $year)
-                                    ->orderBy('holiday_packages.created_at', 'DESC')
-                                    ->orderBy('holiday_packages.updated_at', 'DESC')
-                                    ->get();
+            ->join('grades', 'grades.id', '=', 'holiday_packages.class_id')
+            ->join('users', 'users.id', '=', 'holiday_packages.issued_by')
+            ->select(
+                'holiday_packages.*',
+                'grades.class_name',
+                'grades.class_code',
+                'users.first_name',
+                'users.last_name',
+                'users.phone',
+            )
+            ->where('holiday_packages.school_id', Auth::user()->school_id)
+            ->where('holiday_packages.class_id', $hashId[0])
+            ->where('holiday_packages.year', $year)
+            ->orderBy('holiday_packages.created_at', 'DESC')
+            ->orderBy('holiday_packages.updated_at', 'DESC')
+            ->get();
 
         return view('packages.packages_list', compact('packages', 'year'));
     }
@@ -101,10 +114,10 @@ class PackagesController extends Controller
 
         // Check for existing package
         $existingPackage = holiday_package::where('title', $validated['title'])
-                                ->where('class_id', $validated['class'])
-                                ->where('term', $validated['term'])
-                                ->where('school_id', Auth::user()->school_id)
-                                ->exists();
+            ->where('class_id', $validated['class'])
+            ->where('term', $validated['term'])
+            ->where('school_id', Auth::user()->school_id)
+            ->exists();
         if ($existingPackage) {
             Alert()->toast('This package already exists in our records', 'error');
             return redirect()->back();
@@ -117,7 +130,7 @@ class PackagesController extends Controller
                 Storage::makeDirectory('packages', 0755, true);
             }
         } catch (\Exception $e) {
-            Alert()->toast('Failed to create storage directory: '.$e->getMessage(), 'error');
+            Alert()->toast('Failed to create storage directory: ' . $e->getMessage(), 'error');
             return redirect()->back();
         }
 
@@ -131,14 +144,14 @@ class PackagesController extends Controller
         // Process file upload
         try {
             $file = $request->file('package_file');
-            $fileName = Str::slug($validated['title']).'_'.time().'.'.$file->extension();
+            $fileName = Str::slug($validated['title']) . '_' . time() . '.' . $file->extension();
 
             // Store with visibility set to private
             $path = $file->storeAs('packages', $fileName, 'local');
 
             // Optional PDF compression
             if (extension_loaded('imagick')) {
-                $compressedPath = $this->compressPdf(storage_path('app/'.$path));
+                $compressedPath = $this->compressPdf(storage_path('app/' . $path));
                 if ($compressedPath) {
                     $path = str_replace(storage_path('app/'), '', $compressedPath);
                 }
@@ -159,10 +172,9 @@ class PackagesController extends Controller
             ]);
 
             // Set proper file permissions (even though stored privately)
-            chmod(storage_path('app/'.$path), 0644);
-
+            chmod(storage_path('app/' . $path), 0644);
         } catch (\Exception $e) {
-            Alert()->toast('File upload failed: '.$e->getMessage(), 'error');
+            Alert()->toast('File upload failed: ' . $e->getMessage(), 'error');
             return redirect()->back();
         }
 
@@ -177,13 +189,13 @@ class PackagesController extends Controller
             $apiKey = config('services.virustotal.key');
             try {
                 $response = Http::withHeaders(['x-apikey' => $apiKey])
-                            ->attach('file', fopen($file->path(), 'r'))
-                            ->post('https://www.virustotal.com/api/v3/files');
+                    ->attach('file', fopen($file->path(), 'r'))
+                    ->post('https://www.virustotal.com/api/v3/files');
 
                 if ($response->successful()) {
                     $scanId = $response->json()['data']['id'];
                     $analysis = Http::withHeaders(['x-apikey' => $apiKey])
-                                ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
+                        ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
 
                     return [
                         'clean' => $analysis->json()['data']['attributes']['stats']['malicious'] === 0,
@@ -193,7 +205,7 @@ class PackagesController extends Controller
             } catch (\Exception $e) {
                 return [
                     'clean' => false,
-                    'message' => 'Scan failed: '.$e->getMessage()
+                    'message' => 'Scan failed: ' . $e->getMessage()
                 ];
             }
         }
@@ -214,9 +226,9 @@ class PackagesController extends Controller
         try {
             // Method 1: Using Ghostscript (preferred)
             if (shell_exec('which gs')) {
-                $command = "gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 ".
-                        "-dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH ".
-                        "-sOutputFile=".escapeshellarg($outputPath)." ".escapeshellarg($filePath);
+                $command = "gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 " .
+                    "-dPDFSETTINGS=/ebook -dNOPAUSE -dQUIET -dBATCH " .
+                    "-sOutputFile=" . escapeshellarg($outputPath) . " " . escapeshellarg($filePath);
 
                 exec($command, $output, $returnCode);
 
@@ -239,7 +251,7 @@ class PackagesController extends Controller
                 }
             }
         } catch (\Exception $e) {
-            logger()->error('PDF compression failed: '.$e->getMessage());
+            logger()->error('PDF compression failed: ' . $e->getMessage());
         }
 
         return null;
@@ -282,7 +294,7 @@ class PackagesController extends Controller
 
         try {
 
-            if($package) {
+            if ($package) {
                 $package->update([
                     'release_date' => $releaseDate,
                     'due_date' => $dueDate,
@@ -294,8 +306,7 @@ class PackagesController extends Controller
             }
             Alert()->toast('Unable to fetch package record', 'error');
             return redirect()->back();
-        }
-        catch(Exception $e) {
+        } catch (Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
             return back();
         }
@@ -357,7 +368,7 @@ class PackagesController extends Controller
         }
 
         // For direct download
-        return Storage::download($package->file_path, $package->title.'.pdf');
+        return Storage::download($package->file_path, $package->title . '.pdf');
     }
 
     public function parentDownloadPackage($id)
@@ -383,7 +394,7 @@ class PackagesController extends Controller
 
         // 3. Check download limit using existing column
         if ($package->download_count >= $maxDownloads) {
-            Alert::info('info', 'You have reached your download limit for this package (max '.$maxDownloads.' downloads per 24 hours)');
+            Alert::info('info', 'You have reached your download limit for this package (max ' . $maxDownloads . ' downloads per 24 hours)');
             return back();
         }
 
@@ -411,6 +422,6 @@ class PackagesController extends Controller
                 ->header('Content-Disposition', 'inline; filename="' . $package->title . '.pdf"');
         }
 
-        return Storage::download($package->file_path, $package->title.'.pdf');
+        return Storage::download($package->file_path, $package->title . '.pdf');
     }
 }

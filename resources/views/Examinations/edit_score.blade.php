@@ -45,7 +45,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
             transform: rotate(30deg);
         }
 
@@ -326,7 +326,8 @@
                 font-size: 14px;
             }
 
-            .score-input, .grade-input {
+            .score-input,
+            .grade-input {
                 width: 100%;
             }
         }
@@ -339,9 +340,11 @@
             0% {
                 box-shadow: 0 0 0 0 rgba(78, 84, 200, 0.4);
             }
+
             70% {
                 box-shadow: 0 0 0 10px rgba(78, 84, 200, 0);
             }
+
             100% {
                 box-shadow: 0 0 0 0 rgba(78, 84, 200, 0);
             }
@@ -354,12 +357,13 @@
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <h4 class="header- text-white">
-                            <i class="fas fa-edit me-2"></i> Edit Results - {{ strtoupper($courseName) }} ({{ strtoupper($className) }})
+                            <i class="fas fa-edit me-2"></i> Edit Results - {{ strtoupper($courseName) }}
+                            ({{ strtoupper($className) }})
                         </h4>
                         <p class="mb-0 text-white-50 text-white"> Update examination scores for students</p>
                     </div>
                     <div class="col-md-4 text-end">
-                        <a href="{{route('home')}}" class="btn btn-back float-right">
+                        <a href="{{ route('home') }}" class="btn btn-back float-right">
                             <i class="fas fa-arrow-circle-left me-1"></i> Back
                         </a>
                     </div>
@@ -374,12 +378,14 @@
                             <strong><i class="fas fa-file-alt me-2"></i> Examination:</strong> {{ $examName }}
                         </div>
                         <div class="col-md-6">
-                            <strong><i class="fas fa-calendar-day me-2"></i> Exam Date:</strong> {{ \Carbon\Carbon::parse($examDate)->format('d F Y') }}
+                            <strong><i class="fas fa-calendar-day me-2"></i> Exam Date:</strong>
+                            {{ \Carbon\Carbon::parse($examDate)->format('d F Y') }}
                         </div>
                     </div>
                 </div>
 
-                <form action="{{ route('results.update.draft', ['id' => $id]) }}" method="POST" id="resultsForm" class="needs-validation" novalidate>
+                <form action="{{ route('results.update.draft', ['id' => $id]) }}" method="POST" id="resultsForm"
+                    class="needs-validation" novalidate>
                     @csrf
 
                     <div class="form-section">
@@ -390,10 +396,12 @@
                                     <i class="fas fa-file-alt text-primary"></i>
                                     Examination Type <span class="required-star">*</span>
                                 </label>
-                                <select name="exam_type_id" id="exam_type_id" class="form-control-custom text-capitalize" required>
+                                <select name="exam_type_id" id="exam_type_id" class="form-control-custom text-capitalize"
+                                    required>
                                     <option value="">-- Select Exam type --</option>
                                     @foreach ($exams as $exam)
-                                        <option value="{{ $exam->id }}" {{ $exam->id == $examTypeId ? 'selected' : '' }}>
+                                        <option value="{{ $exam->id }}"
+                                            {{ $exam->id == $examTypeId ? 'selected' : '' }}>
                                             {{ $exam->exam_type }}
                                         </option>
                                     @endforeach
@@ -410,9 +418,9 @@
                                     Exam Date <span class="required-star">*</span>
                                 </label>
                                 <input type="date" name="exam_date" class="form-control-custom" id="exam_date" required
-                                       value="{{ \Carbon\Carbon::parse($examDate)->format('Y-m-d') }}"
-                                       min="{{ \Carbon\Carbon::now()->subYears(1)->format('Y-m-d') }}"
-                                       max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                                    value="{{ \Carbon\Carbon::parse($examDate)->format('Y-m-d') }}"
+                                    min="{{ \Carbon\Carbon::now()->subYears(1)->format('Y-m-d') }}"
+                                    max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
                                 <div class="invalid-feedback">
                                     Please provide a valid exam date
                                 </div>
@@ -428,7 +436,8 @@
                     <input type="hidden" name="marking_style" value="{{ $marking_style }}">
 
                     <div class="instruction-text">
-                        <i class="fas fa-info-circle me-2"></i>Enter score from 0 to {{ $marking_style == 1 ? '50' : '100' }} correctly
+                        <i class="fas fa-info-circle me-2"></i>Enter score from 0 to
+                        {{ $marking_style == 1 ? '50' : '100' }} correctly
                     </div>
 
                     <div class="table-container">
@@ -443,7 +452,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($students as $index => $student)
+                                    @foreach ($students as $index => $student)
                                         @php
                                             $draftResult = $draftResults->where('student_id', $student->id)->first();
                                             $score = $draftResult ? $draftResult->score : '';
@@ -456,36 +465,36 @@
                                                     if ($score >= 41 && $score <= 50) {
                                                         $grade = 'A';
                                                         $bgColor = '#97e897';
-                                                    } else if ($score >= 31 && $score <= 40) {
+                                                    } elseif ($score >= 31 && $score <= 40) {
                                                         $grade = 'B';
                                                         $bgColor = '#4edcdc';
-                                                    } else if ($score >= 21 && $score <= 30) {
+                                                    } elseif ($score >= 21 && $score <= 30) {
                                                         $grade = 'C';
                                                         $bgColor = '#e9f0aa';
-                                                    } else if ($score >= 11 && $score <= 20) {
+                                                    } elseif ($score >= 11 && $score <= 20) {
                                                         $grade = 'D';
                                                         $bgColor = '#ef8f8f';
-                                                    } else if($score >= 0 && $score <= 10) {
+                                                    } elseif ($score >= 0 && $score <= 10) {
                                                         $grade = 'E';
                                                         $bgColor = '#ebc4f3';
                                                     } else {
                                                         $grade = 'Error';
                                                         $bgColor = 'red';
                                                     }
-                                                } else if ($marking_style == 2) {
+                                                } elseif ($marking_style == 2) {
                                                     if ($score >= 81 && $score <= 100) {
                                                         $grade = 'A';
                                                         $bgColor = '#97e897';
-                                                    } else if ($score >= 61 && $score <= 80) {
+                                                    } elseif ($score >= 61 && $score <= 80) {
                                                         $grade = 'B';
                                                         $bgColor = '#4edcdc';
-                                                    } else if ($score >= 41 && $score <= 60) {
+                                                    } elseif ($score >= 41 && $score <= 60) {
                                                         $grade = 'C';
                                                         $bgColor = '#e9f0aa';
-                                                    } else if ($score >= 21 && $score <= 40) {
+                                                    } elseif ($score >= 21 && $score <= 40) {
                                                         $grade = 'D';
                                                         $bgColor = '#ef8f8f';
-                                                    } else if($score >= 0 && $score <= 20) {
+                                                    } elseif ($score >= 0 && $score <= 20) {
                                                         $grade = 'E';
                                                         $bgColor = '#ebc4f3';
                                                     } else {
@@ -497,12 +506,18 @@
                                         @endphp
                                         <tr>
                                             <td class="text-center">{{ $index + 1 }}</td>
-                                            <td class="text-capitalize">{{ ucwords(strtolower($student->first_name))}} {{ucwords(strtolower($student->middle_name))}} {{ucwords(strtolower($student->last_name)) }}</td>
+                                            <td class="text-capitalize">{{ ucwords(strtolower($student->first_name)) }}
+                                                {{ ucwords(strtolower($student->middle_name)) }}
+                                                {{ ucwords(strtolower($student->last_name)) }}</td>
                                             <td class="text-center">
-                                                <input type="number" name="scores[{{ $student->id }}]" class="form-control score-input" value="{{ $score }}" min="0" max="{{ $marking_style == 1 ? '50' : '100' }}">
+                                                <input type="number" name="scores[{{ $student->id }}]"
+                                                    class="form-control score-input" value="{{ $score }}"
+                                                    min="0" max="{{ $marking_style == 1 ? '50' : '100' }}">
                                             </td>
                                             <td class="text-center">
-                                                <input type="text" class="form-control grade-input" value="{{ $grade }}" disabled style="background-color: {{ $bgColor }}; font-weight: bold;">
+                                                <input type="text" class="form-control grade-input"
+                                                    value="{{ $grade }}" disabled
+                                                    style="background-color: {{ $bgColor }}; font-weight: bold;">
                                             </td>
                                         </tr>
                                     @endforeach
@@ -518,7 +533,8 @@
                         </button>
 
                         <!-- Submit Final Results -->
-                        <button type="submit" class="btn btn-success-custom pulse-animation" name="action" value="submit" id="submitButton">
+                        <button type="submit" class="btn btn-success-custom pulse-animation" name="action" value="submit"
+                            id="submitButton">
                             <i class="fas fa-check"></i> Submit Final Results
                         </button>
                     </div>
@@ -558,75 +574,142 @@
             // Score input validation and grade calculation
             const scoreInputs = document.querySelectorAll('.score-input');
             const gradeInputs = document.querySelectorAll('.grade-input');
+            const markingStyle = {{ $marking_style }}; // Store marking style in variable
 
-            scoreInputs.forEach((input, index) => {
-                input.addEventListener('blur', () => {
-                    const score = parseFloat(input.value);
-                    let grade = '';
-                    let bgColor = '';
+            // Function to calculate grade based on score
+            function calculateGrade(score) {
+                let grade = '';
+                let bgColor = '';
 
-                    if (isNaN(score)) {
-                        grade = 'Abs';
-                        bgColor = 'orange';
-                    } else if ({{ $marking_style }} == 1) {
-                        if (score >= 41 && score <= 50) {
-                            grade = 'A';
-                            bgColor = '#97e897';
-                        } else if (score >= 31 && score <= 40) {
-                            grade = 'B';
-                            bgColor = '#4edcdc';
-                        } else if (score >= 21 && score <= 30) {
-                            grade = 'C';
-                            bgColor = '#e9f0aa';
-                        } else if (score >= 11 && score <= 20) {
-                            grade = 'D';
-                            bgColor = '#ef8f8f';
-                        } else if(score >= 0 && score <= 10) {
-                            grade = 'E';
-                            bgColor = '#ebc4f3';
-                        } else {
-                            grade = 'Error';
-                            bgColor = 'red';
-                        }
-                    } else if ({{ $marking_style }} == 2) {
-                        if (score >= 81 && score <= 100) {
-                            grade = 'A';
-                            bgColor = '#97e897';
-                        } else if (score >= 61 && score <= 80) {
-                            grade = 'B';
-                            bgColor = '#4edcdc';
-                        } else if (score >= 41 && score <= 60) {
-                            grade = 'C';
-                            bgColor = '#e9f0aa';
-                        } else if (score >= 21 && score <= 40) {
-                            grade = 'D';
-                            bgColor = '#ef8f8f';
-                        } else if(score >= 0 && score <= 20) {
-                            grade = 'E';
-                            bgColor = '#ebc4f3';
-                        } else {
-                            grade = 'Error';
-                            bgColor = 'red';
-                        }
+                if (isNaN(score)) {
+                    grade = 'X';
+                    bgColor = 'orange';
+                } else if (markingStyle == 1) {
+                    if (score >= 41 && score <= 50) {
+                        grade = 'A';
+                        bgColor = '#97e897';
+                    } else if (score >= 31 && score <= 40) {
+                        grade = 'B';
+                        bgColor = '#4edcdc';
+                    } else if (score >= 21 && score <= 30) {
+                        grade = 'C';
+                        bgColor = '#e9f0aa';
+                    } else if (score >= 11 && score <= 20) {
+                        grade = 'D';
+                        bgColor = '#ef8f8f';
+                    } else if (score >= 0 && score <= 10) {
+                        grade = 'E';
+                        bgColor = '#ebc4f3';
+                    } else {
+                        grade = 'Error';
+                        bgColor = 'red';
                     }
+                } else if (markingStyle == 2) {
+                    if (score >= 81 && score <= 100) {
+                        grade = 'A';
+                        bgColor = '#97e897';
+                    } else if (score >= 61 && score <= 80) {
+                        grade = 'B';
+                        bgColor = '#4edcdc';
+                    } else if (score >= 41 && score <= 60) {
+                        grade = 'C';
+                        bgColor = '#e9f0aa';
+                    } else if (score >= 21 && score <= 40) {
+                        grade = 'D';
+                        bgColor = '#ef8f8f';
+                    } else if (score >= 0 && score <= 20) {
+                        grade = 'E';
+                        bgColor = '#ebc4f3';
+                    } else {
+                        grade = 'Error';
+                        bgColor = 'red';
+                    }
+                } else if (markingStyle == 3) {
+                    if (score >= 75 && score <= 100) {
+                        grade = 'A';
+                        bgColor = '#97e897';
+                    } else if (score >= 65 && score <= 74) {
+                        grade = 'B';
+                        bgColor = '#4edcdc';
+                    } else if (score >= 45 && score <= 64) {
+                        grade = 'C';
+                        bgColor = '#e9f0aa';
+                    } else if (score >= 30 && score <= 44) {
+                        grade = 'D';
+                        bgColor = '#ef8f8f';
+                    } else if (score >= 0 && score <= 29) {
+                        grade = 'F';
+                        bgColor = '#ebc4f3';
+                    } else {
+                        grade = 'Error';
+                        bgColor = 'red';
+                    }
+                }
 
-                    gradeInputs[index].value = grade;
-                    gradeInputs[index].style.backgroundColor = bgColor;
+                return {
+                    grade,
+                    bgColor
+                };
+            }
+
+            // Function to update grade for specific input
+            function updateGrade(input, index) {
+                const score = parseFloat(input.value);
+                const {
+                    grade,
+                    bgColor
+                } = calculateGrade(score);
+
+                gradeInputs[index].value = grade;
+                gradeInputs[index].style.backgroundColor = bgColor;
+            }
+
+            // Process all score inputs
+            scoreInputs.forEach((input, index) => {
+                // Initialize grade on page load if score exists
+                if (input.value.trim() !== '') {
+                    updateGrade(input, index);
+                }
+
+                // Add realtime input event (updates as you type)
+                input.addEventListener('input', () => {
+                    updateGrade(input, index);
+
+                    // Optional: Enforce max value based on marking style
+                    const maxValue = markingStyle == 1 ? 50 : 100;
+                    if (input.value > maxValue) {
+                        input.value = maxValue;
+                        updateGrade(input, index);
+                    }
+                });
+
+                // Also update on blur (for when user leaves field)
+                input.addEventListener('blur', () => {
+                    updateGrade(input, index);
                 });
             });
 
-            // Add confirmation dialogs
-            document.querySelector('button[name="action"][value="save"]').addEventListener('click', function(e) {
-                if (!confirm('Are you sure you want to save results to draft?')) {
-                    e.preventDefault();
-                }
-            });
+            // Add confirmation dialogs with null checks
+            const saveButton = document.querySelector('button[name="action"][value="save"]');
+            const submitButton = document.querySelector('button[name="action"][value="submit"]');
 
-            document.querySelector('button[name="action"][value="submit"]').addEventListener('click', function(e) {
-                if (!confirm('Are you sure you want to submit final results? No editing will be allowed after submission.')) {
-                    e.preventDefault();
-                }
-            });
+            if (saveButton) {
+                saveButton.addEventListener('click', function(e) {
+                    if (!confirm('Are you sure you want to save results to draft?')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            if (submitButton) {
+                submitButton.addEventListener('click', function(e) {
+                    if (!confirm(
+                            'Are you sure you want to submit final results? No editing will be allowed after submission.'
+                            )) {
+                        e.preventDefault();
+                    }
+                });
+            }
         });
     </script>
 @endsection

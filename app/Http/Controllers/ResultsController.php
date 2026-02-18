@@ -270,19 +270,52 @@ class ResultsController extends Controller
             ->where('students.parent_id', $parent->id)
             ->get();
 
+        if ($results->isEmpty()) {
+            Alert()->toast('No results found for this student', 'info');
+            return redirect()->back();
+        }
+
+        // Get marking style
+        $marking_style = $results->first()->marking_style ?? 1;
+
         // Calculate the sum of all scores
         $totalScore = $results->sum('score');
         $averageScore = $results->count() > 0 ? $totalScore / $results->count() : 0;
 
+        // For marking style 3, calculate aggregate and division
+        if ($marking_style == 3) {
+            // Calculate aggregate points for division
+            $aggregatePoints = 0;
+            $gradePoints = [
+                'A' => 1,
+                'B' => 2,
+                'C' => 3,
+                'D' => 4,
+                'F' => 5,
+                'ABS' => 6
+            ];
+
+            foreach ($results as $result) {
+                $courseGrade = $this->calculateGrade($result->score, $marking_style);
+                $aggregatePoints += $gradePoints[$courseGrade] ?? 6;
+            }
+
+            // Calculate division based on aggregate points
+            $division = $this->calculateDivisionForStyle3($aggregatePoints, $results->count());
+        } else {
+            $aggregatePoints = null;
+            $division = null;
+        }
+
         // ==== REKEDISHA: Kupata class_id ya mtihani husika ====
         $examClassId = null;
         if ($results->isNotEmpty()) {
-            $examClassId = $results->first()->class_id; // Hii ni class_id iliyohifadhiwa wakati wa mtihani
+            $examClassId = $results->first()->class_id;
         }
 
         // Calculate rankings - tumia examClassId badala ya student->class_id
         $rankings = Examination_result::query()
-            ->where('examination_results.class_id', $examClassId) // TUMIA CLASS_ID YA MTIHANI
+            ->where('examination_results.class_id', $examClassId)
             ->whereDate('exam_date', Carbon::parse($date))
             ->where('examination_results.exam_type_id', $exam_id[0])
             ->where('examination_results.school_id', $user->school_id)
@@ -310,47 +343,56 @@ class ResultsController extends Controller
 
         // Add grades, remarks, and individual ranks to each result
         foreach ($results as $result) {
-            // Add grade and remarks (hii bado iko sawa)
-            if ($result->marking_style == 1) {
+            // Add grade and remarks
+            $gradeResult = $this->calculateGrade($result->score, $marking_style);
+            $result->grade = $gradeResult;
+
+            // Determine remarks based on grade and marking style
+            if ($marking_style == 1) {
                 if ($result->score >= 41) {
-                    $result->grade = 'A';
                     $result->remarks = 'Excellent';
                 } elseif ($result->score >= 31) {
-                    $result->grade = 'B';
                     $result->remarks = 'Good';
                 } elseif ($result->score >= 21) {
-                    $result->grade = 'C';
                     $result->remarks = 'Pass';
                 } elseif ($result->score >= 11) {
-                    $result->grade = 'D';
                     $result->remarks = 'Poor';
                 } else {
-                    $result->grade = 'E';
+                    $result->remarks = 'Fail';
+                }
+            } elseif ($marking_style == 2) {
+                if ($result->score >= 81) {
+                    $result->remarks = 'Excellent';
+                } elseif ($result->score >= 61) {
+                    $result->remarks = 'Good';
+                } elseif ($result->score >= 41) {
+                    $result->remarks = 'Pass';
+                } elseif ($result->score >= 21) {
+                    $result->remarks = 'Poor';
+                } else {
                     $result->remarks = 'Fail';
                 }
             } else {
-                if ($result->score >= 81) {
-                    $result->grade = 'A';
+                // For marking style 3
+                if ($gradeResult == 'A') {
                     $result->remarks = 'Excellent';
-                } elseif ($result->score >= 61) {
-                    $result->grade = 'B';
+                } elseif ($gradeResult == 'B') {
                     $result->remarks = 'Good';
-                } elseif ($result->score >= 41) {
-                    $result->grade = 'C';
+                } elseif ($gradeResult == 'C') {
                     $result->remarks = 'Pass';
-                } elseif ($result->score >= 21) {
-                    $result->grade = 'D';
-                    $result->remarks = 'Poor';
-                } else {
-                    $result->grade = 'E';
+                } elseif ($gradeResult == 'D') {
+                    $result->remarks = 'Unsatisfactory';
+                } elseif ($gradeResult == 'F') {
                     $result->remarks = 'Fail';
+                } else {
+                    $result->remarks = 'Absent';
                 }
             }
 
             // ==== REKEDISHA: Course ranking - tumia examClassId ====
             $courseRankings = Examination_result::query()
                 ->where('course_id', $result->course_id)
-                ->where('examination_results.class_id', $examClassId) // TUMIA CLASS_ID YA MTIHANI
+                ->where('examination_results.class_id', $examClassId)
                 ->whereDate('exam_date', Carbon::parse($date))
                 ->where('examination_results.exam_type_id', $exam_id[0])
                 ->where('examination_results.school_id', $user->school_id)
@@ -363,7 +405,7 @@ class ResultsController extends Controller
             // Hakikisha wanafunzi wenye score sawa wanashirikiana rank
             $rank = 1;
             $previousScore = null;
-            $courseRanks = []; // Badilisha jina ili usiwe na conflict
+            $courseRanks = [];
 
             foreach ($courseRankings as $key => $ranking) {
                 if ($previousScore !== null && $ranking->total_score < $previousScore) {
@@ -392,7 +434,14 @@ class ResultsController extends Controller
             'average_score' => $averageScore,
             'student_rank' => $studentRank,
             'total_students' => $rankings->count(),
+            'marking_style' => $marking_style,
         ];
+
+        // Add division info for marking style 3
+        if ($marking_style == 3) {
+            $verificationData['division'] = $division;
+            $verificationData['aggregate_points'] = $aggregatePoints;
+        }
 
         $verificationData['signature'] = hash_hmac('sha256', json_encode($verificationData), config('app.key'));
         $encryptedPayload = Crypt::encryptString(json_encode($verificationData));
@@ -408,7 +457,23 @@ class ResultsController extends Controller
         $qrPng = base64_encode($resultQr->getString());
 
         // Generate the PDF
-        $pdf = \PDF::loadView('Results.parent_results', compact('results', 'year', 'qrPng', 'studentId', 'type', 'student', 'month', 'date', 'totalScore', 'averageScore', 'studentRank', 'rankings'));
+        $pdf = \PDF::loadView('Results.parent_results', compact(
+            'results',
+            'year',
+            'qrPng',
+            'studentId',
+            'type',
+            'student',
+            'month',
+            'date',
+            'totalScore',
+            'averageScore',
+            'studentRank',
+            'rankings',
+            'marking_style',
+            'aggregatePoints',
+            'division'
+        ));
 
         // Generate filename using timestamp
         $timestamp = Carbon::now()->timestamp;
@@ -427,7 +492,19 @@ class ResultsController extends Controller
         $fileUrl = asset('reports/' . $fileName);
 
         // Return the view with the file URL to be used in the iframe
-        return view('Results.parent_academic_reports', compact('fileUrl', 'fileName', 'exam_id', 'results', 'year', 'studentId', 'type', 'student', 'month', 'date'));
+        return view('Results.parent_academic_reports', compact(
+            'fileUrl',
+            'fileName',
+            'exam_id',
+            'results',
+            'year',
+            'studentId',
+            'type',
+            'student',
+            'month',
+            'date',
+            'marking_style'
+        ));
     }
 
     //general results are intialized here ====================================
@@ -627,329 +704,6 @@ class ResultsController extends Controller
         return view('Results.months_by_exam_type', compact('schools', 'results', 'year', 'classes', 'exams', 'class_id', 'exam_id', 'groupedByMonth'));
     }
 
-    public function resultsByMonth($school, $year, $class, $examType, $month, $date, Request $request)
-    {
-        $school_id = Hashids::decode($school);
-        $class_id = Hashids::decode($class);
-        $exam_id = Hashids::decode($examType);
-
-        $user = Auth::user();
-
-        $schools = School::find($school_id[0]);
-
-        if ($user->school_id != $schools->id) {
-            Alert()->toast('You are not authorized to view this page', 'error');
-            return redirect()->route('error.page');
-        }
-
-        // Map month names to numbers
-        $monthsArray = [
-            'January' => 1,
-            'February' => 2,
-            'March' => 3,
-            'April' => 4,
-            'May' => 5,
-            'June' => 6,
-            'July' => 7,
-            'August' => 8,
-            'September' => 9,
-            'October' => 10,
-            'November' => 11,
-            'December' => 12,
-        ];
-
-        $monthNumber = $monthsArray[$month];
-
-        // Query for the examination results
-        $results = Examination_result::query()
-            ->join('students', 'students.id', '=', 'examination_results.student_id')
-            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
-            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
-            ->select(
-                'examination_results.*',
-                'students.first_name',
-                'students.middle_name',
-                'students.last_name',
-                'students.gender',
-                'students.id as student_id',
-                'students.group',
-                'students.admission_number',
-                'grades.class_name',
-                'students.status',
-                'examinations.exam_type',
-                'subjects.course_name',
-                'subjects.course_code'
-            )
-            ->where('examination_results.school_id', $schools->id)
-            ->where('examination_results.class_id', $class_id[0])
-            ->where('examination_results.exam_type_id', $exam_id[0])
-            // ->where('students.status', 1) // Only active students
-            ->whereDate('examination_results.exam_date', $date)
-            ->get();
-
-        if ($results->isEmpty()) {
-            Alert()->toast('No results found for this selection', 'info');
-            return redirect()->route('results.general', ['school' => $school]);
-        }
-        // Filter students by class_id
-        $studentsByClass = $results->where('class_id', $class_id[0])->groupBy('student_id');
-
-        $totalMaleStudents = $studentsByClass->filter(fn($student) => $student->first()->gender === 'male')->count();
-        $totalFemaleStudents = $studentsByClass->filter(fn($student) => $student->first()->gender === 'female')->count();
-
-        // Average score per course with grade and course name
-        $averageScoresByCourse = $results->groupBy('course_id')->map(function ($courseResults) {
-            $averageScore = $courseResults->avg('score');
-            return [
-                'course_name' => $courseResults->first()->course_name,
-                'course_code' => $courseResults->first()->course_code,
-                'average_score' => $averageScore,
-                'grade' => $this->calculateGrade($averageScore, $courseResults->first()->marking_style)
-            ];
-        });
-
-        // Sum of all course averages
-        $sumOfCourseAverages = $averageScoresByCourse->sum('average_score');
-
-        // Sort courses by average score to determine position
-        $sortedCourses = $averageScoresByCourse->sortByDesc('average_score')->values()->all();
-        foreach ($sortedCourses as $index => &$course) {
-            $course['position'] = $index + 1;
-        }
-
-        // Evaluation score table
-        $evaluationScores = $results->groupBy('course_id')->map(function ($courseResults) {
-            $grades = [
-                'A' => 0,
-                'B' => 0,
-                'C' => 0,
-                'D' => 0,
-                'E' => 0,
-                'ABS' => 0,
-            ];
-
-            foreach ($courseResults as $result) {
-                $grade = $this->calculateGrade($result->score, $result->marking_style);
-                $grades[$grade]++;
-            }
-
-            return $grades;
-        });
-
-        $courses = Subject::all(); // Assuming 'Subject' is your model for courses
-        // Total average of all courses
-        $totalAverageScore = $results->avg('score');
-
-        // Student results with total marks, average, grade, and position
-        $studentsResults = $results->groupBy('student_id')->map(function ($studentResults) {
-            $totalMarks = $studentResults->sum('score');
-            $average = $studentResults->avg('score');
-            $grade = $average == 0 ? 'ABS' : $this->calculateGrade($average, $studentResults->first()->marking_style);
-
-            return [
-                'student_id' => $studentResults->first()->student_id,
-                'admission_number' => $studentResults->first()->admission_number,
-                'student_name' => $studentResults->first()->first_name . ' ' . $studentResults->first()->middle_name . ' ' . $studentResults->first()->last_name,
-                'gender' => $studentResults->first()->gender,
-                'courses' => $studentResults->map(function ($result) {
-                    return [
-                        'course_name' => $result->course_name,
-                        'score' => $result->score,
-                        'grade' => $this->calculateGrade($result->score, $result->marking_style),
-                    ];
-                }),
-                'group' => $studentResults->first()->group,
-                'total_marks' => $totalMarks,
-                'average' => $average,
-                'grade' => $grade,
-            ];
-        });
-
-        // Sort students by total marks to determine position
-        $sortedStudentsResults = $studentsResults->sortByDesc('total_marks')->values()->all();
-
-        $lastTotal = null;
-        $position = 0;
-        $counter = 0;
-
-        foreach ($sortedStudentsResults as $index => &$studentResult) {
-            $counter++;
-
-            if ($studentResult['total_marks'] !== $lastTotal) {
-                $position = $counter;
-                $lastTotal = $studentResult['total_marks'];
-            }
-
-            $studentResult['position'] = $position;
-        }
-
-
-        $totalUniqueStudents = $studentsByClass->count();
-
-        // Count grades by gender based on overall student performance
-        $gradesByGender = $studentsResults->groupBy('gender')->map(function ($group) {
-            $grades = ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0, 'ABS' => 0, 'ABS' => 0];
-            foreach ($group as $student) {
-                $grades[$student['grade']]++; // Count the grade calculated for the student
-            }
-            return $grades;
-        });
-
-        // Separate counts for male and female grades
-        $totalMaleGrades = $gradesByGender->get('male', ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0, 'ABS' => 0]);
-        $totalFemaleGrades = $gradesByGender->get('female', ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0, 'ABS' => 0]);
-
-        // Count unique students
-        $totalUniqueStudents = $results->pluck('student_id')->unique()->count();
-
-        //total subjects added in the results
-        $totalSubjects = $results->pluck('course_id')->unique()->count();
-
-        //class total average
-        $generalClassAvg = $sumOfCourseAverages / $totalSubjects;
-        // Count grades by subject and gender (A, B, C, D, E)
-        $subjectGradesByGender = $results->groupBy('course_id')->map(function ($courseResults) {
-            $grades = [
-                'A' => ['male' => 0, 'female' => 0],
-                'B' => ['male' => 0, 'female' => 0],
-                'C' => ['male' => 0, 'female' => 0],
-                'D' => ['male' => 0, 'female' => 0],
-                'E' => ['male' => 0, 'female' => 0],
-                'ABS' => ['male' => 0, 'female' => 0],
-            ];
-
-            foreach ($courseResults as $result) {
-                $grade = $this->calculateGrade($result->score, $result->marking_style);
-
-                // Increment the count for the respective grade and gender
-                if ($result->gender == 'male') {
-                    $grades[$grade]['male']++;
-                } else {
-                    $grades[$grade]['female']++;
-                }
-            }
-
-            return $grades;
-        });
-
-        if ($request->has('export_excel')) {
-            return Excel::download(
-                new ResultsExport(
-                    $results,
-                    $totalUniqueStudents,
-                    $sumOfCourseAverages,
-                    $generalClassAvg,
-                    $totalFemaleGrades,
-                    $totalMaleGrades,
-                    $sortedStudentsResults,
-                    $sortedCourses,
-                    $subjectGradesByGender,
-                    $date,
-                    $courses,
-                ),
-                'examination results.xlsx'
-            );
-        }
-
-        $teachersWithCourses = Examination_result::query()
-            ->where('examination_results.school_id', $schools->id)
-            ->where('examination_results.class_id', $class_id[0])
-            ->where('examination_results.exam_type_id', $exam_id[0])
-            ->whereDate('examination_results.exam_date', $date)
-            ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
-            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
-            ->select(
-                'teachers.id as teacher_id',
-                'users.first_name',
-                'users.last_name',
-                'examination_results.course_id',
-                'subjects.course_name',
-                'subjects.course_code'
-            )
-            ->get()
-            ->groupBy('teacher_id');
-
-        // Format for teachers dropdown - CORRECTED:
-        $teachers = $teachersWithCourses->map(function ($teacherResults, $teacherId) {
-            $firstRecord = $teacherResults->first();
-            return [
-                'id' => Hashids::encode($teacherId),
-                'name' => $firstRecord->first_name . ' ' . $firstRecord->last_name, // REMOVED middle_name
-                'courses' => $teacherResults->map(function ($result) {
-                    return [
-                        'id' => Hashids::encode($result->course_id),
-                        'name' => $result->course_name . ' (' . $result->course_code . ')'
-                    ];
-                })->unique('id')->values()
-            ];
-        })->values();
-
-        // If there's only one teacher, prepare their courses
-        $firstTeacherCourses = $teachers->isNotEmpty() ? $teachers->first()['courses'] : [];
-
-
-        // Generate the PDF
-        $pdf = \PDF::loadView('Results.results_by_month', compact(
-            'school',
-            'year',
-            'class',
-            'examType',
-            'month',
-            'results',
-            'totalMaleStudents',
-            'totalFemaleStudents',
-            'totalMaleGrades',
-            'totalFemaleGrades',
-            'averageScoresByCourse',
-            'evaluationScores',
-            'totalAverageScore',
-            'date',
-            'sortedStudentsResults',
-            'sumOfCourseAverages',
-            'sortedCourses',
-            'totalUniqueStudents',
-            'subjectGradesByGender',
-            'courses',
-            'generalClassAvg',
-        ));
-        $pdf->setOption('isHtml5ParserEnabled', true);
-        $pdf->setOption('isPhpEnabled', true);
-
-        // Generate filename using timestamp
-        $timestamp = Carbon::now()->timestamp;
-        $fileName = "results_{$school}_{$year}_{$class}_{$examType}_{$month}_{$timestamp}.pdf"; // Use dynamic filename format
-        $folderPath = public_path('reports'); // Folder path in public directory
-
-        // Make sure the directory exists
-        if (!File::exists($folderPath)) {
-            File::makeDirectory($folderPath, 0755, true);
-        }
-
-        // Save the PDF to the 'reports' folder
-        $pdf->save($folderPath . '/' . $fileName);
-
-        // Generate the URL for accessing the saved PDF
-        $fileUrl = asset('reports/' . $fileName);
-
-        // Return the view with the file URL to be used in the iframe
-        return view('Results.class_pdf_results', compact(
-            'fileUrl',
-            'fileName',
-            'results',
-            'date',
-            'schools',
-            'exam_id',
-            'class_id',
-            'month',
-            'year',
-            'teachers',
-            // 'availableCourses',
-            'firstTeacherCourses'
-        ));
-    }
-
     public function getCoursesByTeacher(Request $request)
     {
         try {
@@ -1007,6 +761,454 @@ class ResultsController extends Controller
         }
     }
 
+    public function resultsByMonth($school, $year, $class, $examType, $month, $date, Request $request)
+    {
+        // Decode the IDs
+        $school_id = Hashids::decode($school);
+        $class_id = Hashids::decode($class);
+        $exam_id = Hashids::decode($examType);
+
+        // Get authenticated user
+        $user = Auth::user();
+
+        // Get school
+        $schools = School::find($school_id[0]);
+
+        // Authorization check
+        if ($user->school_id != $schools->id) {
+            Alert()->toast('You are not authorized to view this page', 'error');
+            return redirect()->route('error.page');
+        }
+
+        // Map month names to numbers
+        $monthsArray = [
+            'January' => 1,
+            'February' => 2,
+            'March' => 3,
+            'April' => 4,
+            'May' => 5,
+            'June' => 6,
+            'July' => 7,
+            'August' => 8,
+            'September' => 9,
+            'October' => 10,
+            'November' => 11,
+            'December' => 12,
+        ];
+
+        $monthNumber = $monthsArray[$month];
+
+        // Get marking style for this exam
+        $marking_style = Examination_result::query()
+            ->where('school_id', $schools->id)
+            ->where('class_id', $class_id[0])
+            ->where('exam_type_id', $exam_id[0])
+            ->whereDate('exam_date', $date)
+            ->value('marking_style') ?? 1;
+
+        // Query for the examination results
+        $results = Examination_result::query()
+            ->join('students', 'students.id', '=', 'examination_results.student_id')
+            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+            ->join('grades', 'grades.id', '=', 'examination_results.class_id')
+            ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
+            ->select(
+                'examination_results.*',
+                'students.first_name',
+                'students.middle_name',
+                'students.last_name',
+                'students.gender',
+                'students.id as student_id',
+                'students.group',
+                'students.admission_number',
+                'grades.class_name',
+                'students.status',
+                'examinations.exam_type',
+                'subjects.course_name',
+                'subjects.course_code'
+            )
+            ->where('examination_results.school_id', $schools->id)
+            ->where('examination_results.class_id', $class_id[0])
+            ->where('examination_results.exam_type_id', $exam_id[0])
+            ->whereDate('examination_results.exam_date', $date)
+            ->get();
+
+        if ($results->isEmpty()) {
+            Alert()->toast('No results found for this selection', 'info');
+            return redirect()->route('results.general', ['school' => $school]);
+        }
+
+        // Filter students by class_id
+        $studentsByClass = $results->where('class_id', $class_id[0])->groupBy('student_id');
+
+        $totalMaleStudents = $studentsByClass->filter(fn($student) => strtolower($student->first()->gender) === 'male')->count();
+        $totalFemaleStudents = $studentsByClass->filter(fn($student) => strtolower($student->first()->gender) === 'female')->count();
+
+        // Average score per course with grade and course name
+        $averageScoresByCourse = $results->groupBy('course_id')->map(function ($courseResults) use ($marking_style) {
+            $averageScore = $courseResults->avg('score');
+            return [
+                'course_name' => $courseResults->first()->course_name,
+                'course_code' => $courseResults->first()->course_code,
+                'average_score' => $averageScore,
+                'grade' => $this->calculateGrade($averageScore, $marking_style)
+            ];
+        });
+
+        // Sum of all course averages
+        $sumOfCourseAverages = $averageScoresByCourse->sum('average_score');
+
+        // Sort courses by average score to determine position
+        $sortedCourses = $averageScoresByCourse->sortByDesc('average_score')->values()->all();
+        foreach ($sortedCourses as $index => &$course) {
+            $course['position'] = $index + 1;
+        }
+
+        // Initialize division aggregate for marking style 3
+        $divisionAggregate = [];
+        if ($marking_style == 3) {
+            $divisionAggregate = [
+                'I' => 0,
+                'II' => 0,
+                'III' => 0,
+                'IV' => 0,
+                '0' => 0
+            ];
+        }
+
+        // Evaluation score table
+        $evaluationScores = $results->groupBy('course_id')->map(function ($courseResults) use ($marking_style) {
+            $grades = [
+                'A' => 0,
+                'B' => 0,
+                'C' => 0,
+                'D' => 0,
+                'E' => 0,
+                'F' => 0,
+                'ABS' => 0,
+            ];
+
+            foreach ($courseResults as $result) {
+                $grade = $this->calculateGrade($result->score, $marking_style);
+                $grades[$grade]++;
+            }
+
+            return $grades;
+        });
+
+        $courses = Subject::all();
+
+        // Total average of all courses
+        $totalAverageScore = $results->avg('score');
+
+        // Student results with total marks, average, grade, and position
+        $studentsResults = $results->groupBy('student_id')->map(function ($studentResults) use ($marking_style, &$divisionAggregate) {
+            $totalMarks = $studentResults->sum('score');
+            $average = $studentResults->avg('score');
+
+            // Normalize gender to lowercase
+            $gender = strtolower($studentResults->first()->gender);
+
+            // For marking style 3
+            if ($marking_style == 3) {
+                $grade = $average == 0 ? 'ABS' : $this->calculateGrade($average, $marking_style);
+
+                // Calculate aggregate points for division
+                $aggregatePoints = 0;
+                $gradePoints = [
+                    'A' => 1,
+                    'B' => 2,
+                    'C' => 3,
+                    'D' => 4,
+                    'F' => 5,
+                    'ABS' => 6
+                ];
+
+                foreach ($studentResults as $result) {
+                    $courseGrade = $this->calculateGrade($result->score, $marking_style);
+                    $aggregatePoints += $gradePoints[$courseGrade] ?? 6;
+                }
+
+                // Calculate division based on aggregate points
+                $division = $this->calculateDivisionForStyle3($aggregatePoints, $studentResults->count());
+
+                // HAPA NDIO TUNAHESABU DIVISION - MARA MOJA TU!
+                if (isset($divisionAggregate[$division])) {
+                    $divisionAggregate[$division]++;
+                }
+
+                return [
+                    'student_id' => $studentResults->first()->student_id,
+                    'admission_number' => $studentResults->first()->admission_number,
+                    'student_name' => trim($studentResults->first()->first_name . ' ' .
+                        $studentResults->first()->middle_name . ' ' .
+                        $studentResults->first()->last_name),
+                    'gender' => $gender, // Tumia gender iliyorekebishwa
+                    'courses' => $studentResults->map(function ($result) use ($marking_style) {
+                        return [
+                            'course_id' => $result->course_id,
+                            'course_name' => $result->course_name,
+                            'score' => $result->score,
+                            'grade' => $this->calculateGrade($result->score, $marking_style),
+                        ];
+                    }),
+                    'group' => $studentResults->first()->group,
+                    'total_marks' => $totalMarks,
+                    'average' => $average,
+                    'grade' => $grade,
+                    'aggregate_points' => $aggregatePoints,
+                    'division' => $division,
+                ];
+            }
+            // For marking styles 1 and 2
+            else {
+                $grade = $average == 0 ? 'ABS' : $this->calculateGrade($average, $marking_style);
+
+                return [
+                    'student_id' => $studentResults->first()->student_id,
+                    'admission_number' => $studentResults->first()->admission_number,
+                    'student_name' => trim($studentResults->first()->first_name . ' ' .
+                        $studentResults->first()->middle_name . ' ' .
+                        $studentResults->first()->last_name),
+                    'gender' => $gender, // Tumia gender iliyorekebishwa
+                    'courses' => $studentResults->map(function ($result) use ($marking_style) {
+                        return [
+                            'course_id' => $result->course_id,
+                            'course_name' => $result->course_name,
+                            'score' => $result->score,
+                            'grade' => $this->calculateGrade($result->score, $marking_style),
+                        ];
+                    }),
+                    'group' => $studentResults->first()->group,
+                    'total_marks' => $totalMarks,
+                    'average' => $average,
+                    'grade' => $grade,
+                    'aggregate_points' => null,
+                    'division' => null,
+                ];
+            }
+        });
+
+        // Sort students based on marking style
+        if ($marking_style == 3) {
+            $sortedStudentsResults = $studentsResults->sortBy(function ($student) {
+                return $student['aggregate_points'];
+            })->values()->all();
+        } else {
+            $sortedStudentsResults = $studentsResults->sortByDesc('total_marks')->values()->all();
+        }
+
+        // Calculate positions
+        $lastValue = null;
+        $position = 0;
+        $counter = 0;
+
+        foreach ($sortedStudentsResults as $index => &$studentResult) {
+            $counter++;
+
+            if ($marking_style == 3) {
+                if ($studentResult['aggregate_points'] !== $lastValue) {
+                    $position = $counter;
+                    $lastValue = $studentResult['aggregate_points'];
+                }
+            } else {
+                if ($studentResult['total_marks'] !== $lastValue) {
+                    $position = $counter;
+                    $lastValue = $studentResult['total_marks'];
+                }
+            }
+
+            $studentResult['position'] = $position;
+        }
+
+        $totalUniqueStudents = $studentsByClass->count();
+
+        // Count grades by gender based on overall student performance
+        $gradesByGender = $studentsResults->groupBy('gender')->map(function ($group) use ($marking_style) {
+            if ($marking_style == 1 || $marking_style == 2) {
+                $grades = ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0];
+            } else {
+                $grades = ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'E' => 0, 'F' => 0, 'ABS' => 0];
+            }
+
+            foreach ($group as $student) {
+                $studentGrade = $student['grade'];
+
+                if ($marking_style == 1 || $marking_style == 2) {
+                    if (in_array($studentGrade, ['A', 'B', 'C', 'D', 'E'])) {
+                        $grades[$studentGrade]++;
+                    }
+                } else {
+                    if (isset($grades[$studentGrade])) {
+                        $grades[$studentGrade]++;
+                    }
+                }
+            }
+            return $grades;
+        });
+
+        // Separate counts for male and female grades
+        $totalMaleGrades = $gradesByGender->get('male', []);
+        $totalFemaleGrades = $gradesByGender->get('female', []);
+
+        // Count unique students
+        $totalUniqueStudents = $results->pluck('student_id')->unique()->count();
+
+        // Total subjects added in the results
+        $totalSubjects = $results->pluck('course_id')->unique()->count();
+
+        // Class total average
+        $generalClassAvg = $totalSubjects > 0 ? $sumOfCourseAverages / $totalSubjects : 0;
+
+        // Count grades by subject and gender
+        $subjectGradesByGender = $results->groupBy('course_id')->map(function ($courseResults) use ($marking_style) {
+            $grades = [
+                'A' => ['male' => 0, 'female' => 0],
+                'B' => ['male' => 0, 'female' => 0],
+                'C' => ['male' => 0, 'female' => 0],
+                'D' => ['male' => 0, 'female' => 0],
+                'E' => ['male' => 0, 'female' => 0],
+                'F' => ['male' => 0, 'female' => 0],
+                'ABS' => ['male' => 0, 'female' => 0],
+            ];
+
+            foreach ($courseResults as $result) {
+                $grade = $this->calculateGrade($result->score, $marking_style);
+                $gender = strtolower($result->gender);
+
+                if ($gender == 'male') {
+                    $grades[$grade]['male']++;
+                } else {
+                    $grades[$grade]['female']++;
+                }
+            }
+
+            return $grades;
+        });
+
+        // Convert to excel
+        if ($request->has('export_excel')) {
+            return Excel::download(
+                new ResultsExport(
+                    $results,
+                    $totalUniqueStudents,
+                    $sumOfCourseAverages,
+                    $generalClassAvg,
+                    $totalFemaleGrades,
+                    $totalMaleGrades,
+                    $sortedStudentsResults,
+                    $sortedCourses,
+                    $subjectGradesByGender,
+                    $date,
+                    $courses,
+                    $marking_style,
+                    $divisionAggregate
+                ),
+                'examination results.xlsx'
+            );
+        }
+
+        // Get teachers with courses
+        $teachersWithCourses = Examination_result::query()
+            ->where('examination_results.school_id', $schools->id)
+            ->where('examination_results.class_id', $class_id[0])
+            ->where('examination_results.exam_type_id', $exam_id[0])
+            ->whereDate('examination_results.exam_date', $date)
+            ->join('teachers', 'teachers.id', '=', 'examination_results.teacher_id')
+            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+            ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
+            ->select(
+                'teachers.id as teacher_id',
+                'users.first_name',
+                'users.last_name',
+                'examination_results.course_id',
+                'subjects.course_name',
+                'subjects.course_code'
+            )
+            ->get()
+            ->groupBy('teacher_id');
+
+        // Format for teachers dropdown
+        $teachers = $teachersWithCourses->map(function ($teacherResults, $teacherId) {
+            $firstRecord = $teacherResults->first();
+            return [
+                'id' => Hashids::encode($teacherId),
+                'name' => $firstRecord->first_name . ' ' . $firstRecord->last_name,
+                'courses' => $teacherResults->map(function ($result) {
+                    return [
+                        'id' => Hashids::encode($result->course_id),
+                        'name' => $result->course_name . ' (' . $result->course_code . ')'
+                    ];
+                })->unique('id')->values()
+            ];
+        })->values();
+
+        // If there's only one teacher, prepare their courses
+        $firstTeacherCourses = $teachers->isNotEmpty() ? $teachers->first()['courses'] : [];
+
+        // Generate the PDF
+        $pdf = \PDF::loadView('Results.results_by_month', compact(
+            'school',
+            'year',
+            'class',
+            'examType',
+            'month',
+            'results',
+            'totalMaleStudents',
+            'totalFemaleStudents',
+            'totalMaleGrades',
+            'totalFemaleGrades',
+            'averageScoresByCourse',
+            'evaluationScores',
+            'totalAverageScore',
+            'date',
+            'sortedStudentsResults',
+            'sumOfCourseAverages',
+            'sortedCourses',
+            'totalUniqueStudents',
+            'subjectGradesByGender',
+            'courses',
+            'generalClassAvg',
+            'marking_style',
+            'divisionAggregate'
+        ));
+
+        $pdf->setOption('isHtml5ParserEnabled', true);
+        $pdf->setOption('isPhpEnabled', true);
+
+        // Generate filename using timestamp
+        $timestamp = Carbon::now()->timestamp;
+        $fileName = "results_{$timestamp}.pdf";
+        $folderPath = public_path('reports');
+
+        // Make sure the directory exists
+        if (!File::exists($folderPath)) {
+            File::makeDirectory($folderPath, 0755, true);
+        }
+
+        // Save the PDF to the 'reports' folder
+        $pdf->save($folderPath . '/' . $fileName);
+
+        // Generate the URL for accessing the saved PDF
+        $fileUrl = asset('reports/' . $fileName);
+
+        // Return the view with the file URL
+        return view('Results.class_pdf_results', compact(
+            'fileUrl',
+            'fileName',
+            'results',
+            'date',
+            'schools',
+            'exam_id',
+            'class_id',
+            'month',
+            'year',
+            'teachers',
+            'firstTeacherCourses',
+            'marking_style'
+        ));
+    }
+
     private function calculateGrade($score, $marking_style)
     {
         if ($marking_style == 1) {
@@ -1018,12 +1220,12 @@ class ResultsController extends Controller
                 return 'C';
             } elseif ($score >= 10.5) {
                 return 'D';
-            } elseif ($score >= 0.5) {
+            } elseif ($score >= 0.1) {
                 return 'E';
             } else {
                 return 'ABS';
             }
-        } else {
+        } elseif ($marking_style == 2) {
             if ($score >= 80.5) {
                 return 'A';
             } elseif ($score >= 60.5) {
@@ -1032,16 +1234,63 @@ class ResultsController extends Controller
                 return 'C';
             } elseif ($score >= 20.5) {
                 return 'D';
-            } elseif ($score >= 0.5) {
+            } elseif ($score >= 0.1) {
                 return 'E';
             } else {
                 return 'ABS';
             }
+        } elseif ($marking_style == 3) {
+            // For division marking style
+            if ($score >= 74.5) {
+                return 'A';
+            } elseif ($score >= 64.5) {
+                return 'B';
+            } elseif ($score >= 44.5) {
+                return 'C';
+            } elseif ($score >= 29.5) {
+                return 'D';
+            } elseif ($score >= 0.1) {
+                return 'F';
+            } else {
+                return 'ABS';
+            }
+        } else {
+            return 'ABS';
         }
     }
+
+    private function calculateDivisionForStyle3($aggregatePoints, $totalSubjects)
+    {
+        // Ensure minimum subjects requirement
+        if ($totalSubjects < 7) {
+            return '0'; // No division if subjects are less than 7
+        }
+
+        // Calculate average grade points
+        $averageGradePoint = $aggregatePoints / $totalSubjects;
+
+        // Convert to division scale of 7-35 by multiplying by 7
+        $divisionScore = $averageGradePoint * 7;
+
+        // Determine division based on division score
+        if ($divisionScore >= 7 && $divisionScore <= 17) {
+            return 'I';
+        } elseif ($divisionScore >= 18 && $divisionScore <= 22) {
+            return 'II';
+        } elseif ($divisionScore >= 23 && $divisionScore <= 25) {
+            return 'III';
+        } elseif ($divisionScore >= 26 && $divisionScore <= 32) {
+            return 'IV';
+        } elseif ($divisionScore >= 33 && $divisionScore <= 35) {
+            return '0';
+        } else {
+            return '0';
+        }
+    }
+
     //end of results in general ==============================================
 
-    //publishing results to be visible to parents and send sms via Beem api  ***************************************************
+    //publishing results to be visible to parents and send sms via api  ***************************************************
     public function publishResult(Request $request, $school, $year, $class, $examType, $month, $date)
     {
         try {
@@ -1056,24 +1305,32 @@ class ResultsController extends Controller
                 return response()->json(['success' => false, 'message' => 'You are not authorized to perform this action.', 'type' => 'error']);
             }
 
-            // ==== REKEDISHA: Update status in the database ====
+            // ==== GET MARKING STYLE FIRST ====
+            $marking_style = Examination_result::query()
+                ->where('school_id', $schools->id)
+                ->where('class_id', $class_id[0])
+                ->where('exam_type_id', $exam_id[0])
+                ->whereDate('exam_date', $date)
+                ->value('marking_style') ?? 1;
+
+            // ==== UPDATE status in the database ====
             $updatedRows = Examination_result::join('students', 'students.id', '=', 'examination_results.student_id')
                 ->where('examination_results.school_id', $schools->id)
-                ->where('examination_results.class_id', $class_id[0]) // Tumia class_id kutoka URL
+                ->where('examination_results.class_id', $class_id[0])
                 ->where('examination_results.exam_type_id', $exam_id[0])
-                ->where('students.status', 1) // only active students
+                ->where('students.status', 1)
                 ->whereDate('examination_results.exam_date', $date)
                 ->update(['examination_results.status' => 2]);
 
             if ($updatedRows > 0) {
-                // ==== REKEDISHA: Fetch all results for ranking calculation ====
+                // ==== FETCH all results for ranking calculation ====
                 $allStudentResults = Examination_result::query()
                     ->join('students', 'students.id', '=', 'examination_results.student_id')
                     ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
                     ->join('examinations', 'examinations.id', '=', 'examination_results.exam_type_id')
                     ->join('schools', 'schools.id', '=', 'examination_results.school_id')
-                    ->where('examination_results.class_id', $class_id[0]) // Tumia class_id kutoka URL
-                    ->where('students.status', 1) // only active students
+                    ->where('examination_results.class_id', $class_id[0])
+                    ->where('students.status', 1)
                     ->where('examination_results.school_id', $schools->id)
                     ->where('examination_results.exam_type_id', $exam_id[0])
                     ->whereDate('examination_results.exam_date', $date)
@@ -1095,16 +1352,52 @@ class ResultsController extends Controller
                 // Group results by student
                 $studentsGrouped = $allStudentResults->groupBy('student_id');
 
-                // Calculate total marks for each student
+                // ==== REKEDISHA: Calculate data based on marking style ====
                 $studentsData = collect();
                 foreach ($studentsGrouped as $studentId => $studentResults) {
                     $firstResult = $studentResults->first();
                     $totalMarks = $studentResults->sum('score');
                     $averageMarks = $studentResults->count() > 0 ? $totalMarks / $studentResults->count() : 0;
 
-                    // Prepare courses string
-                    $courses = $studentResults->map(function ($result) {
-                        return "{$result->course_code}={$result->score}";
+                    // ==== FOR MARKING STYLE 3: Calculate aggregate points and division ====
+                    $aggregatePoints = null;
+                    $division = null;
+                    $grade = null;
+
+                    if ($marking_style == 3) {
+                        $gradePoints = [
+                            'A' => 1,
+                            'B' => 2,
+                            'C' => 3,
+                            'D' => 4,
+                            'F' => 5,
+                            'ABS' => 6
+                        ];
+
+                        $aggregatePoints = 0;
+                        foreach ($studentResults as $result) {
+                            $courseGrade = $this->calculateGrade($result->score, $marking_style);
+                            $aggregatePoints += $gradePoints[$courseGrade] ?? 6;
+                        }
+
+                        $division = $this->calculateDivisionForStyle3($aggregatePoints, $studentResults->count());
+                        $grade = $this->calculateGrade($averageMarks, $marking_style);
+                    } else {
+                        // For marking styles 1 & 2
+                        $grade = $this->calculateGrade($averageMarks, $marking_style);
+                    }
+
+                    // Prepare courses string - REKEDISHA kuwa na grade kwa style 3
+                    $courses = $studentResults->map(function ($result) use ($marking_style) {
+                        $grade = $this->calculateGrade($result->score, $marking_style);
+
+                        if ($marking_style == 3) {
+                            // For style 3, show score and grade
+                            return "{$result->course_code}={$result->score}{$grade}";
+                        } else {
+                            // For styles 1 & 2, show score only
+                            return "{$result->course_code}={$result->score}";
+                        }
                     })->implode("\n");
 
                     $studentsData->push([
@@ -1117,25 +1410,47 @@ class ResultsController extends Controller
                         'average_marks' => $averageMarks,
                         'courses' => $courses,
                         'exam_type' => $firstResult->exam_type,
+                        'aggregate_points' => $aggregatePoints,
+                        'division' => $division,
+                        'grade' => $grade,
+                        'marking_style' => $marking_style,
                     ]);
                 }
 
-                // Sort by total marks descending
-                $sortedStudents = $studentsData->sortByDesc('total_marks')->values();
+                // ==== REKEDISHA: Sort based on marking style ====
+                if ($marking_style == 3) {
+                    // For style 3, sort by aggregate points (lower is better)
+                    $sortedStudents = $studentsData->sortBy('aggregate_points')->values();
+                } else {
+                    // For styles 1 & 2, sort by total marks (higher is better)
+                    $sortedStudents = $studentsData->sortByDesc('total_marks')->values();
+                }
 
-                // Calculate ranks with tie handling
+                // ==== REKEDISHA: Calculate ranks with tie handling ====
                 $rank = 1;
-                $previousScore = null;
+                $previousValue = null;
                 $previousRank = null;
                 $rankedStudents = collect();
 
                 foreach ($sortedStudents as $index => $student) {
-                    if ($previousScore !== null && $student['total_marks'] < $previousScore) {
-                        $rank = $index + 1;
+                    $currentValue = ($marking_style == 3) ? $student['aggregate_points'] : $student['total_marks'];
+
+                    if ($previousValue !== null) {
+                        if ($marking_style == 3) {
+                            // For style 3, lower aggregate points is better
+                            if ($currentValue > $previousValue) {
+                                $rank = $index + 1;
+                            }
+                        } else {
+                            // For styles 1 & 2, higher total marks is better
+                            if ($currentValue < $previousValue) {
+                                $rank = $index + 1;
+                            }
+                        }
                     }
 
-                    if ($previousScore !== null && $student['total_marks'] == $previousScore) {
-                        // Same score, same rank
+                    if ($previousValue !== null && $currentValue == $previousValue) {
+                        // Same score/points, same rank
                         $student['rank'] = $previousRank;
                     } else {
                         $student['rank'] = $rank;
@@ -1143,16 +1458,16 @@ class ResultsController extends Controller
                     }
 
                     $rankedStudents->push($student);
-                    $previousScore = $student['total_marks'];
+                    $previousValue = $currentValue;
                 }
 
                 $totalStudents = $rankedStudents->count();
                 $url = "https://shuleapp.tech";
-                $dateFormat = Carbon::parse($date)->format('d-m-Y');
+                $dateFormat = Carbon::parse($date)->format('d/m/Y');
                 $nextSmsService = new NextSmsService();
                 $sender = $schools->sender_id ?? "SHULE APP";
 
-                // ==== REKEDISHA: Track SMS sending results ====
+                // Track SMS sending results
                 $successCount = 0;
                 $failCount = 0;
                 $failedStudents = [];
@@ -1160,11 +1475,9 @@ class ResultsController extends Controller
                 // Loop through ranked students and send SMS
                 foreach ($rankedStudents as $student) {
                     try {
-                        // ==== REKEDISHA: Fetch parent and phone information ====
                         $parent = Parents::find($student['parent_id']);
 
                         if (!$parent) {
-                            // Log::warning("Parent not found for student ID: {$student['student_id']}");
                             $failCount++;
                             $failedStudents[] = $student['first_name'] . ' ' . $student['last_name'];
                             continue;
@@ -1173,7 +1486,6 @@ class ResultsController extends Controller
                         $user = User::find($parent->user_id);
 
                         if (!$user || empty($user->phone)) {
-                            // Log::warning("User or phone not found for parent ID: {$parent->id}");
                             $failCount++;
                             $failedStudents[] = $student['first_name'] . ' ' . $student['last_name'];
                             continue;
@@ -1182,39 +1494,50 @@ class ResultsController extends Controller
                         $phoneNumber = $this->formatPhoneNumber($user->phone);
 
                         if (!$phoneNumber) {
-                            // Log::warning("Invalid phone number format: {$user->phone}");
                             $failCount++;
                             $failedStudents[] = $student['first_name'] . ' ' . $student['last_name'];
                             continue;
                         }
 
-                        // ==== REKEDISHA: Create better formatted message ====
+                        // ==== REKEDISHA: Create message based on marking style ====
                         $fullname = $student['first_name'] . ' ' . $student['last_name'];
-                        $message = "MATOKEO YA " . strtoupper($fullname) . "\n";
-                        $message .= "==========================\n";
-                        $message .= "Mtihani: " . strtoupper($student['exam_type']) . "\n";
-                        $message .= "Tarehe: {$dateFormat}\n";
-                        $message .= "==========================\n";
-                        $message .= "MATOKEO YA MASOMO:\n";
 
-                        // Parse courses string and format better
-                        $coursesArray = explode("\n", $student['courses']);
-                        foreach ($coursesArray as $course) {
-                            $message .= strtoupper($course) . "\n";
+                        if ($marking_style == 3) {
+                            // Message for Division Style (Style 3)
+                            $message = "Habari, Matokeo ya " . strtoupper($fullname) . "\n";
+                            $message .= "Mtihani wa: " . strtoupper($student['exam_type']) . "\n";
+                            $message .= "wa Tarehe: {$dateFormat} ni:\n";
+                            // Parse courses string
+                            $coursesArray = explode("\n", $student['courses']);
+                            foreach ($coursesArray as $course) {
+                                $message .= strtoupper($course) . "\n";
+                            }
+                            $message .= "Jumla ya Pointi: {$student['aggregate_points']}\n";
+                            $message .= "Divisheni: {$student['division']}\n";
+                            $message .= "Nafasi: {$student['rank']} kati ya {$totalStudents}\n";
+                            $message .= "Pakua ripoti hapa: {$url}\n";
+                            $message .= "Asante kwa kuchagua " . strtoupper($schools->school_name);
+                        } else {
+                            // Message for Standard Grades (Styles 1 & 2)
+                            $message = "Habari, Matokeo ya " . strtoupper($fullname) . "\n";
+                            $message .= "Mtihani wa: " . strtoupper($student['exam_type']) . "\n";
+                            $message .= "wa Tarehe: {$dateFormat} ni:\n";
+                            // Parse courses string
+                            $coursesArray = explode("\n", $student['courses']);
+                            foreach ($coursesArray as $course) {
+                                $message .= strtoupper($course) . "\n";
+                            }
+                            $message .= "Jumla: {$student['total_marks']}\n";
+                            $message .= "Wastani: " . number_format($student['average_marks'], 1) . "\n";
+                            $message .= "Daraja: {$student['grade']}\n";
+                            $message .= "Nafasi: {$student['rank']} kati ya {$totalStudents}\n";
+                            $message .= "Pakua ripoti hapa: {$url}\n";
+                            $message .= "Asante kwa kuchagua " . strtoupper($schools->school_name);
                         }
 
-                        $message .= "==========================\n";
-                        $message .= "Jumla: {$student['total_marks']}\n";
-                        $message .= "Wastani: " . number_format($student['average_marks'], 1) . "\n";
-                        $message .= "Nafasi: {$student['rank']} kati ya {$totalStudents}\n";
-                        $message .= "==========================\n";
-                        $message .= "Pakua ripoti: {$url}";
+                        $message = $this->cleanSmsText($message);
 
-                        // Check message length
-                        if (strlen($message) > 480) {
-                            $message = substr($message, 0, 477) . "...";
-                        }
-
+                        // Log::info("Prepared SMS for {$fullname} ({$phoneNumber}):\n{$message}");
                         // Send SMS
                         $response = $nextSmsService->sendSmsByNext(
                             $sender,
@@ -1225,11 +1548,9 @@ class ResultsController extends Controller
 
                         if ($response['success']) {
                             $successCount++;
-                            // Log::info("SMS sent successfully to {$phoneNumber} for {$fullname}");
                         } else {
                             $failCount++;
                             $failedStudents[] = $fullname;
-                            // Log::error("SMS failed for {$fullname}: {$response['error']}");
                         }
 
                         // Add small delay to avoid rate limiting
@@ -1238,12 +1559,11 @@ class ResultsController extends Controller
                     } catch (\Exception $e) {
                         $failCount++;
                         $failedStudents[] = $student['first_name'] . ' ' . $student['last_name'];
-                        // Log::error("Error sending SMS for student ID {$student['student_id']}: " . $e->getMessage());
                         continue;
                     }
                 }
 
-                // ==== REKEDISHA: Show appropriate message ====
+                // Show appropriate message
                 if ($successCount == 0 && $failCount > 0) {
                     Alert()->toast("Results published but failed to send SMS to all {$failCount} parents", 'error');
                 } elseif ($failCount > 0) {
@@ -1564,9 +1884,42 @@ class ResultsController extends Controller
             ->where('examination_results.exam_date', $date)
             ->get();
 
+        if ($results->isEmpty()) {
+            Alert()->toast('No results found for this student', 'info');
+            return redirect()->back();
+        }
+
+        // Get marking style
+        $marking_style = $results->first()->marking_style ?? 1;
+
         // Calculate scores
         $totalScore = $results->sum('score');
         $averageScore = $results->count() > 0 ? $totalScore / $results->count() : 0;
+
+        // For marking style 3, calculate aggregate and division
+        if ($marking_style == 3) {
+            // Calculate aggregate points for division
+            $aggregatePoints = 0;
+            $gradePoints = [
+                'A' => 1,
+                'B' => 2,
+                'C' => 3,
+                'D' => 4,
+                'F' => 5,
+                'ABS' => 6
+            ];
+
+            foreach ($results as $result) {
+                $courseGrade = $this->calculateGrade($result->score, $marking_style);
+                $aggregatePoints += $gradePoints[$courseGrade] ?? 6;
+            }
+
+            // Calculate division based on aggregate points
+            $division = $this->calculateDivisionForStyle3($aggregatePoints, $results->count());
+        } else {
+            $aggregatePoints = null;
+            $division = null;
+        }
 
         // ==== REKEDISHA 1: Ranking query - tumia class_id[0] badala ya studentId->class_id ====
         $rankings = Examination_result::query()
@@ -1599,39 +1952,48 @@ class ResultsController extends Controller
         // Add grades, remarks, and individual ranks to each result
         foreach ($results as $result) {
             // Calculate the grade and remarks based on marking_style
-            if ($result->marking_style == 1) {
+            $gradeResult = $this->calculateGrade($result->score, $marking_style);
+            $result->grade = $gradeResult;
+
+            // Determine remarks based on grade and marking style
+            if ($marking_style == 1) {
                 if ($result->score >= 41) {
-                    $result->grade = 'A';
                     $result->remarks = 'Excellent';
                 } elseif ($result->score >= 31) {
-                    $result->grade = 'B';
                     $result->remarks = 'Good';
                 } elseif ($result->score >= 21) {
-                    $result->grade = 'C';
                     $result->remarks = 'Pass';
                 } elseif ($result->score >= 11) {
-                    $result->grade = 'D';
                     $result->remarks = 'Poor';
                 } else {
-                    $result->grade = 'E';
+                    $result->remarks = 'Fail';
+                }
+            } elseif ($marking_style == 2) {
+                if ($result->score >= 81) {
+                    $result->remarks = 'Excellent';
+                } elseif ($result->score >= 61) {
+                    $result->remarks = 'Good';
+                } elseif ($result->score >= 41) {
+                    $result->remarks = 'Pass';
+                } elseif ($result->score >= 21) {
+                    $result->remarks = 'Poor';
+                } else {
                     $result->remarks = 'Fail';
                 }
             } else {
-                if ($result->score >= 81) {
-                    $result->grade = 'A';
+                // For marking style 3
+                if ($gradeResult == 'A') {
                     $result->remarks = 'Excellent';
-                } elseif ($result->score >= 61) {
-                    $result->grade = 'B';
+                } elseif ($gradeResult == 'B') {
                     $result->remarks = 'Good';
-                } elseif ($result->score >= 41) {
-                    $result->grade = 'C';
+                } elseif ($gradeResult == 'C') {
                     $result->remarks = 'Pass';
-                } elseif ($result->score >= 21) {
-                    $result->grade = 'D';
-                    $result->remarks = 'Poor';
-                } else {
-                    $result->grade = 'E';
+                } elseif ($gradeResult == 'D') {
+                    $result->remarks = 'Unsatisfactory';
+                } elseif ($gradeResult == 'F') {
                     $result->remarks = 'Fail';
+                } else {
+                    $result->remarks = 'Absent';
                 }
             }
 
@@ -1697,7 +2059,14 @@ class ResultsController extends Controller
             'average_score' => round($averageScore, 2),
             'student_rank' => $studentRank,
             'total_students' => $rankings->count(),
+            'marking_style' => $marking_style,
         ];
+
+        // Add division info for marking style 3
+        if ($marking_style == 3) {
+            $verificationData['division'] = $division;
+            $verificationData['aggregate_points'] = $aggregatePoints;
+        }
 
         // Sign and encrypt
         $verificationData['signature'] = hash_hmac('sha256', json_encode($verificationData), config('app.key'));
@@ -1715,10 +2084,27 @@ class ResultsController extends Controller
         $qrPng = base64_encode($resultQr->getString());
 
         // Pass the calculated data to the view
-        $pdf = \PDF::loadView('Results.parent_results', compact('results', 'year', 'date', 'examType', 'studentId', 'student', 'month', 'totalScore', 'averageScore', 'studentRank', 'rankings', 'qrPng'));
+        $pdf = \PDF::loadView('Results.parent_results', compact(
+            'results',
+            'year',
+            'date',
+            'examType',
+            'studentId',
+            'student',
+            'month',
+            'totalScore',
+            'averageScore',
+            'studentRank',
+            'rankings',
+            'qrPng',
+            'marking_style',
+            'aggregatePoints',
+            'division'
+        ));
 
         return $pdf->stream($results->isNotEmpty() ? $results->first()->first_name . ' Results ' . $month . ' ' . $year . '.pdf' : 'Report_' . $year . '.pdf');
     }
+
 
     //Re-send sms results individually
     public function sendResultSms($school, $year, $class, $examType, $month, $student_id, $date)
@@ -1757,6 +2143,14 @@ class ResultsController extends Controller
             ];
             $monthValue = $monthsArray[$month];
 
+            // ==== REKEDISHA: Get marking style first ====
+            $marking_style = Examination_result::query()
+                ->where('school_id', $schools->id)
+                ->where('class_id', $class_id[0])
+                ->where('exam_type_id', $exam_id[0])
+                ->whereDate('exam_date', $date)
+                ->value('marking_style') ?? 1;
+
             $results = Examination_result::query()
                 ->join('students', 'students.id', '=', 'examination_results.student_id')
                 ->join('subjects', 'subjects.id', '=', 'examination_results.course_id')
@@ -1776,7 +2170,7 @@ class ResultsController extends Controller
                 )
                 ->where('examination_results.student_id', $studentInfo->id)
                 ->where('examination_results.exam_type_id', $exam_id[0])
-                ->where('examination_results.class_id', $class_id[0]) // Tumia class_id kutoka URL
+                ->where('examination_results.class_id', $class_id[0])
                 ->where('students.status', 1)
                 ->where('examination_results.school_id', $schools->id)
                 ->whereDate('examination_results.exam_date', $date)
@@ -1793,69 +2187,137 @@ class ResultsController extends Controller
             $totalScore = $results->sum('score');
             $averageScore = $results->count() > 0 ? $totalScore / $results->count() : 0;
 
-            // ==== REKEDISHA: Determine the student's overall rank ====
-            // Tumia class_id[0] badala ya studentInfo->class_id
-            $rankings = Examination_result::query()
-                ->where('examination_results.class_id', $class_id[0]) // TUMIA CLASS_ID KUTOKA URL
-                ->whereDate('exam_date', Carbon::parse($date))
-                ->where('examination_results.exam_type_id', $exam_id[0])
-                ->where('examination_results.school_id', $schools->id)
-                ->join('students', 'students.id', '=', 'examination_results.student_id')
-                ->select('student_id', DB::raw('SUM(score) as total_score'))
-                ->groupBy('student_id')
-                ->orderByDesc('total_score')
-                ->get();
+            // ==== REKEDISHA: Calculate aggregate points for marking style 3 ====
+            $aggregatePoints = null;
+            $division = null;
+            $grade = null;
 
-            // Kutengeneza mfumo wa tie ranking
-            $rank = 1;
-            $previousScore = null;
-            $ranks = [];
+            if ($marking_style == 3) {
+                $gradePoints = [
+                    'A' => 1,
+                    'B' => 2,
+                    'C' => 3,
+                    'D' => 4,
+                    'F' => 5,
+                    'ABS' => 6
+                ];
 
-            foreach ($rankings as $key => $ranking) {
-                if ($previousScore !== null && $ranking->total_score < $previousScore) {
-                    $rank = $key + 1;
+                $aggregatePoints = 0;
+                foreach ($results as $result) {
+                    $courseGrade = $this->calculateGrade($result->score, $marking_style);
+                    $aggregatePoints += $gradePoints[$courseGrade] ?? 6;
                 }
-                $ranks[$ranking->student_id] = $rank;
-                $previousScore = $ranking->total_score;
+
+                $division = $this->calculateDivisionForStyle3($aggregatePoints, $results->count());
+                $grade = $this->calculateGrade($averageScore, $marking_style);
+            } else {
+                $grade = $this->calculateGrade($averageScore, $marking_style);
             }
 
-            // Kupata rank ya mwanafunzi husika
+            // ==== REKEDISHA: Determine the student's overall rank based on marking style ====
+            if ($marking_style == 3) {
+                // For marking style 3, rank by aggregate points (lower is better)
+                $rankings = Examination_result::query()
+                    ->where('examination_results.class_id', $class_id[0])
+                    ->whereDate('exam_date', Carbon::parse($date))
+                    ->where('examination_results.exam_type_id', $exam_id[0])
+                    ->where('examination_results.school_id', $schools->id)
+                    ->join('students', 'students.id', '=', 'examination_results.student_id')
+                    ->select('student_id', DB::raw('SUM(score) as total_score'))
+                    ->groupBy('student_id')
+                    ->get();
+
+                // Calculate aggregate points for each student
+                $rankingsWithPoints = [];
+                foreach ($rankings as $ranking) {
+                    $studentResults = Examination_result::query()
+                        ->where('student_id', $ranking->student_id)
+                        ->where('exam_type_id', $exam_id[0])
+                        ->where('class_id', $class_id[0])
+                        ->whereDate('exam_date', $date)
+                        ->get();
+
+                    $points = 0;
+                    foreach ($studentResults as $result) {
+                        $courseGrade = $this->calculateGrade($result->score, $marking_style);
+                        $points += $gradePoints[$courseGrade] ?? 6;
+                    }
+
+                    $rankingsWithPoints[] = [
+                        'student_id' => $ranking->student_id,
+                        'aggregate_points' => $points
+                    ];
+                }
+
+                // Sort by aggregate points (ascending)
+                $sortedRankings = collect($rankingsWithPoints)->sortBy('aggregate_points')->values();
+
+                // Calculate ranks with tie handling
+                $rank = 1;
+                $previousPoints = null;
+                $ranks = [];
+
+                foreach ($sortedRankings as $key => $item) {
+                    if ($previousPoints !== null && $item['aggregate_points'] > $previousPoints) {
+                        $rank = $key + 1;
+                    }
+                    $ranks[$item['student_id']] = $rank;
+                    $previousPoints = $item['aggregate_points'];
+                }
+            } else {
+                // For marking styles 1 & 2, rank by total score (higher is better)
+                $rankings = Examination_result::query()
+                    ->where('examination_results.class_id', $class_id[0])
+                    ->whereDate('exam_date', Carbon::parse($date))
+                    ->where('examination_results.exam_type_id', $exam_id[0])
+                    ->where('examination_results.school_id', $schools->id)
+                    ->join('students', 'students.id', '=', 'examination_results.student_id')
+                    ->select('student_id', DB::raw('SUM(score) as total_score'))
+                    ->groupBy('student_id')
+                    ->orderByDesc('total_score')
+                    ->get();
+
+                // Calculate ranks with tie handling
+                $rank = 1;
+                $previousScore = null;
+                $ranks = [];
+
+                foreach ($rankings as $key => $ranking) {
+                    if ($previousScore !== null && $ranking->total_score < $previousScore) {
+                        $rank = $key + 1;
+                    }
+                    $ranks[$ranking->student_id] = $rank;
+                    $previousScore = $ranking->total_score;
+                }
+            }
+
+            // Get student rank
             $studentRank = $ranks[$studentInfo->id] ?? null;
 
-            // ==== REKEDISHA: Ongeza ukaguzi wa kama mwanafunzi alishiriki mtihani ====
-            // Ikiwa $studentRank ni null, labda mwanafunzi hakushiriki mtihani huo
+            // Check if student participated
             if ($studentRank === null) {
-                // Angalia kama mwanafunzi huyu yuko kwenye rankings
-                $studentInRankings = $rankings->contains('student_id', $studentInfo->id);
+                $studentInRankings = isset($rankings) && (($marking_style == 3 && collect($sortedRankings)->contains('student_id', $studentInfo->id)) ||
+                    ($marking_style != 3 && $rankings->contains('student_id', $studentInfo->id)));
 
                 if (!$studentInRankings) {
-                    // Mwanafunzi hakushiriki mtihani huo katika darasa hilo
                     $studentRank = 'N/A';
                     $totalStudents = 0;
                 } else {
-                    // Mwanafunzi yuko kwenye rankings lakini rank imekosekana
                     $studentRank = 'N/A';
-                    $totalStudents = $rankings->count();
+                    $totalStudents = ($marking_style == 3) ? count($sortedRankings) : $rankings->count();
                 }
             } else {
-                $totalStudents = $rankings->count();
+                $totalStudents = ($marking_style == 3) ? count($sortedRankings) : $rankings->count();
             }
 
-            // Prepare the message content
+            // Prepare basic info
             $fullName = $studentInfo->first_name . ' ' . $studentInfo->last_name;
             $examination = $results->first()->exam_type;
-            $term = $results->first()->Exam_term;
-            $schoolName = $results->first()->school_name;
-
-            $courseScores = [];
-            foreach ($results as $result) {
-                $courseScores[] = "{$result->course_code}={$result->score} \n";
-            }
-
+            $schoolName = strtoupper($results->first()->school_name);
             $url = 'https://shuleapp.tech';
-            $dateFormat = Carbon::parse($date)->format('d-m-Y');
+            $dateFormat = Carbon::parse($date)->format('d/m/Y');
 
-            // find the parent phone number
+            // Find parent phone
             $parent = Parents::where('id', $studentInfo->parent_id)->first();
 
             if (!$parent) {
@@ -1863,7 +2325,6 @@ class ResultsController extends Controller
                 return redirect()->back();
             }
 
-            // find phone related to parent in users table
             $users = User::where('id', $parent->user_id)->first();
 
             if (!$users || empty($users->phone)) {
@@ -1871,57 +2332,68 @@ class ResultsController extends Controller
                 return redirect()->back();
             }
 
-            // ==== REKEDISHA: Prepare message with better formatting ====
-            $messageContent = "Matokeo ya " . strtoupper($fullName) . "\n";
-            $messageContent .= "Mtihani: " . strtoupper($examination) . "\n";
-            $messageContent .= "Tarehe: {$dateFormat}\n";
-            $messageContent .= "--------------------------------\n";
+            // ==== REKEDISHA: Create message based on marking style ====
+            if ($marking_style == 3) {
+                // Message for Division Style (Style 3)
+                $messageContent = "Habari, Matokeo ya " . strtoupper($fullName) . "\n";
+                $messageContent .= "Mtihani wa: " . strtoupper($examination) . "\n";
+                $messageContent .= "wa Tarehe: {$dateFormat} ni:\n";
+                foreach ($results as $result) {
+                    $grade = $this->calculateGrade($result->score, $marking_style);
+                    $messageContent .= strtoupper($result->course_code) . ": {$result->score}{$grade}\n";
+                }
+                $messageContent .= "Jumla ya Pointi: {$aggregatePoints}\n";
+                $messageContent .= "Divisheni: {$division}\n";
+                $messageContent .= "Nafasi: {$studentRank}";
 
-            // Add course scores with better formatting
-            foreach ($results as $result) {
-                $messageContent .= strtoupper($result->course_code) . ": {$result->score}\n";
+                if ($totalStudents > 0) {
+                    $messageContent .= " kati ya {$totalStudents}\n";
+                } else {
+                    $messageContent .= "\n";
+                }
+                $messageContent .= "Pakua ripoti hapa: {$url}\n";
+                $messageContent .= "Asante kwa kuchagua . {$schoolName}";
+            } else {
+                $messageContent = "Habari, Matokeo ya " . strtoupper($fullName) . "\n";
+                $messageContent .= "Mtihani wa: " . strtoupper($examination) . "\n";
+                $messageContent .= "wa Tarehe: {$dateFormat} ni:\n";
+
+                foreach ($results as $result) {
+                    $messageContent .= strtoupper($result->course_code) . ": {$result->score}\n";
+                }
+
+                $messageContent .= "Jumla: {$totalScore}\n";
+                $messageContent .= "Wastani: " . number_format($averageScore, 1) . "\n";
+                $messageContent .= "Daraja: {$grade}\n";
+                $messageContent .= "Nafasi: {$studentRank}";
+
+                if ($totalStudents > 0) {
+                    $messageContent .= " kati ya {$totalStudents}\n";
+                } else {
+                    $messageContent .= "\n";
+                }
+                $messageContent .= "Pakua ripoti hapa: {$url}\n";
+                $messageContent .= "Asante kwa kuchagua " . $schoolName;
             }
 
-            $messageContent .= "--------------------------------\n";
-            $messageContent .= "Jumla: {$totalScore}\n";
-            $messageContent .= "Wastani: " . number_format($averageScore, 1) . "\n";
-            $messageContent .= "Nafasi: {$studentRank}";
+            $messageContent = $this->cleanSmsText($messageContent);
 
-            if ($totalStudents > 0) {
-                $messageContent .= " kati ya {$totalStudents}\n";
-            }
-
-            $messageContent .= "--------------------------------\n";
-            $messageContent .= "Pakua ripoti: {$url}";
-
-            // Check message length
-            $messageLength = strlen($messageContent);
-            if ($messageLength > 480) {
-                // Trim message if too long
-                $messageContent = substr($messageContent, 0, 477) . "...";
-            }
-
-            // send sms via NextSMS API
+            // Send SMS via NextSMS API
             $nextSmsService = new NextSmsService();
             $sender = $schools->sender_id ?? "SHULE APP";
             $destination = $this->formatPhoneNumber($users->phone);
             $reference = uniqid();
 
-            $payload = [
-                'from' => $sender,
-                'to' => $destination,
-                'text' => $messageContent,
-                'reference' => $reference
-            ];
-
-            $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+            $response = $nextSmsService->sendSmsByNext($sender, $destination, $messageContent, $reference);
 
             if (!$response['success']) {
                 Alert()->toast('SMS failed: ' . $response['error'], 'error');
                 return back();
             }
 
-            Alert()->toast('Results SMS has been Re-sent successfully', 'success');
+            // Log::info("SMS sent to {$destination}: {$messageContent}");
+
+            Alert()->toast('Results SMS has been sent successfully', 'success');
             return redirect()->back();
         } catch (Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
@@ -1970,12 +2442,10 @@ class ResultsController extends Controller
     //send compiled results to the table compiled_results table
     public function saveCompiledResults(Request $request, $school, $year, $class)
     {
-        // return "hello";
-        // dd($request->all());
         $request->validate([
             'exam_type' => 'required|string|max:255',
             'class_id' => 'required|integer',
-            'exam_dates' => 'required|array',
+            'exam_dates' => 'required|array|min:2', // Angalau mitihani miwili
             'combine_option' => 'required|in:sum,average,individual',
             'term' => 'required|string|in:i,ii',
         ]);
@@ -1983,36 +2453,135 @@ class ResultsController extends Controller
         $selectedDataSet = $request->input('exam_dates', []);
         $examType = $request->input('exam_type');
         $classId = $request->input('class_id');
-        $customExamType = $request->input('custom_exam_type'); // Capture custom exam type
+        $customExamType = $request->input('custom_exam_type');
         $combineMode = $request->input('combine_option');
         $reportTerm = $request->input('term');
+        $school_id = Auth::user()->school_id;
 
         if ($examType === 'custom' && !empty($customExamType)) {
             $examType = $customExamType;
         }
 
-        //check for duplicates
+        // ========== MARKING STYLE VALIDATION ==========
+        // Collect all marking styles from selected exam dates
+        $markingStyles = [];
+        $conflictingExams = [];
+
+        foreach ($selectedDataSet as $date) {
+            // Get exam_type_id from examination_results using date
+            $examInfo = Examination_result::where('school_id', $school_id)
+                ->where('class_id', $classId)
+                ->whereDate('exam_date', Carbon::parse($date))
+                ->select('exam_type_id', 'marking_style')
+                ->first();
+
+            if (!$examInfo) {
+                Alert()->toast('No results found for date: ' . Carbon::parse($date)->format('d/m/Y'), 'error');
+                return back()->withInput();
+            }
+
+            $markingStyle = $examInfo->marking_style;
+
+            // Get exam type name for better error message
+            $examTypeName = Examination::find($examInfo->exam_type_id)->exam_type ?? 'Unknown Exam';
+            $formattedDate = Carbon::parse($date)->format('d/m/Y');
+
+            // Store exam info for conflict checking
+            $examKey = $formattedDate . ' - ' . $examTypeName;
+
+            if (!isset($markingStyles[$markingStyle])) {
+                $markingStyles[$markingStyle] = [];
+            }
+
+            $markingStyles[$markingStyle][] = [
+                'date' => $formattedDate,
+                'exam_type' => $examTypeName,
+                'key' => $examKey
+            ];
+        }
+
+        // Check if there are multiple marking styles
+        if (count($markingStyles) > 1) {
+            $errorMessage = 'Cannot compile results: Selected exams have different Grading system.';
+
+            // Build detailed error message
+            $styleDescriptions = [
+                1 => 'Style 1 (Point system)',
+                2 => 'Style 2 (Percentage system)',
+                3 => 'Style 3 (Division System)'
+            ];
+
+            $errorMessage .= "\n\nDetails:\n";
+
+            foreach ($markingStyles as $style => $exams) {
+                $styleName = $styleDescriptions[$style] ?? "Style $style";
+                $errorMessage .= "\n$styleName:\n";
+
+                foreach ($exams as $exam) {
+                    $errorMessage .= "  - {$exam['date']}\n";
+                }
+            }
+
+            // Identify which specific exam has different marking style
+            if (count($markingStyles) == 2) {
+                // Find the minority style
+                $minorityStyle = null;
+                $minorityCount = PHP_INT_MAX;
+
+                foreach ($markingStyles as $style => $exams) {
+                    if (count($exams) < $minorityCount) {
+                        $minorityCount = count($exams);
+                        $minorityStyle = $style;
+                    }
+                }
+
+                if ($minorityStyle) {
+                    $styleName = $styleDescriptions[$minorityStyle] ?? "Style $minorityStyle";
+                    $errorMessage .= "\n\n⚠️ The exam(s) with $styleName cannot be combined with others.";
+
+                    // List the conflicting exams
+                    foreach ($markingStyles[$minorityStyle] as $exam) {
+                        $errorMessage .= "\n   → {$exam['date']}";
+                    }
+                }
+            }
+
+            Alert()->toast($errorMessage, 'error')->persistent(true);
+            return back()->withInput();
+        }
+
+        // Get the marking style being used (all should be same)
+        $primaryMarkingStyle = array_key_first($markingStyles);
+        $styleDescription = [
+            1 => 'Style 1 (Point system)',
+            2 => 'Style 2 (Percentage system)',
+            3 => 'Style 3 (Division System)'
+        ][$primaryMarkingStyle] ?? "Style $primaryMarkingStyle";
+
+        // Check for duplicates
         $alreadyExists = generated_reports::where('class_id', $classId)
-            ->where('school_id', auth()->user()->school_id)
+            ->where('school_id', $school_id)
             ->where('title', $examType)
             ->exists();
+
         if ($alreadyExists) {
             Alert()->toast('This results data set already exists', 'error');
             return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
         }
 
+        // Create report with marking style info
         $report = generated_reports::create([
             'title' => $examType,
             'class_id' => $classId,
-            'school_id' => Auth::user()->school_id,
+            'school_id' => $school_id,
             'exam_dates' => $selectedDataSet,
             'combine_option' => $combineMode,
             'created_by' => auth()->id(),
             'term' => $reportTerm,
+            'marking_style' => $primaryMarkingStyle, // Store the marking style used
         ]);
 
-        // return redirect()->route('generated-reports.show', $report->id)->with('success', 'Report generated successfully.');
-        Alert()->toast('Report generated successfully.', 'success');
+        Alert()->toast("Report generated successfully using $styleDescription.", 'success');
         return to_route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class]);
     }
 
@@ -4054,5 +4623,29 @@ class ResultsController extends Controller
                 'message' => 'Error rolling back results: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Clean SMS text to use only GSM 03.38 character set
+     * This ensures SMS is counted as standard GSM (160 chars per segment)
+     */
+    private function cleanSmsText($text)
+    {
+        // Badilisha baadhi ya Unicode kuwa ASCII
+        $replacements = [
+            '–' => '-',   // en dash
+            '—' => '-',   // em dash
+            '“' => '"',
+            '”' => '"',
+            '‘' => "'",
+            '’' => "'",
+        ];
+
+        $text = strtr($text, $replacements);
+
+        // Ruhusu: A-Z, a-z, 0-9, space, newline na alama za kawaida za GSM
+        $text = preg_replace('/[^A-Za-z0-9 @£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ!"#¤%&\'()*+,\-.\/:;<=>?¡ÄÖÑÜ§¿äöñüà]/u', '', $text);
+
+        return $text;
     }
 }

@@ -45,7 +45,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
             transform: rotate(30deg);
         }
 
@@ -97,7 +97,7 @@
 
         .info-list li {
             padding: 10px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             display: flex;
             align-items: center;
         }
@@ -310,7 +310,8 @@
                 font-size: 14px;
             }
 
-            .score-input, .grade-input {
+            .score-input,
+            .grade-input {
                 width: 100%;
             }
 
@@ -327,9 +328,11 @@
             0% {
                 box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4);
             }
+
             70% {
                 box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
             }
+
             100% {
                 box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
             }
@@ -361,12 +364,12 @@
                         <div class="col-md-6">
                             <ul class="info-list">
                                 <li>
-                                    <i class="fas fa-chalkboard-teacher text-primary me-2"></i>
+                                    <i class="fas fa-chalkboard-teacher text-primary mr-2"></i>
                                     <strong> Class Code:</strong>
                                     <span class="text-uppercase">{{ $className }}</span>
                                 </li>
                                 <li>
-                                    <i class="fas fa-book text-primary me-2"></i>
+                                    <i class="fas fa-book text-primary mr-2"></i>
                                     <strong> Course Code:</strong>
                                     <span class="text-uppercase">{{ $courseName }}</span>
                                 </li>
@@ -375,17 +378,18 @@
                         <div class="col-md-6">
                             <ul class="info-list">
                                 <li>
-                                    <i class="fas fa-file-alt text-primary me-2"></i>
+                                    <i class="fas fa-file-alt text-primary mr-2"></i>
                                     <strong> Exam Type:</strong>
                                     <span class="text-uppercase">{{ $examName }}</span>
                                 </li>
                                 <li>
-                                    <i class="fas fa-calendar-day text-primary me-2"></i>
+                                    <i class="fas fa-calendar-day text-primary mr-2"></i>
                                     <strong> Exam Date:</strong>
-                                    <span class="text-uppercase">{{ \Carbon\Carbon::parse($examDate)->format('d-M-Y') }}</span>
+                                    <span
+                                        class="text-uppercase">{{ \Carbon\Carbon::parse($examDate)->format('d-M-Y') }}</span>
                                 </li>
                                 <li>
-                                    <i class="fas fa-calendar-alt text-primary me-2"></i>
+                                    <i class="fas fa-calendar-alt text-primary mr-2"></i>
                                     <strong> Term:</strong>
                                     <span class="text-uppercase">{{ $term }}</span>
                                 </li>
@@ -406,18 +410,20 @@
                 @endif
 
                 <div class="instruction-text">
-                    <i class="fas fa-info-circle me-2"></i> Enter score from 0 to {{ $marking_style == 1 ? '50' : '100' }} correctly
+                    <i class="fas fa-info-circle me-2"></i> Enter score from 0 to {{ $marking_style == 1 ? '50' : '100' }}
+                    correctly
                 </div>
 
-                <form id="scoreForm" action="{{ route('exams.store.score', ['id' => $id]) }}" method="POST" class="needs-validation" novalidate>
+                <form id="scoreForm" action="{{ route('exams.store.score', ['id' => $id]) }}" method="POST"
+                    class="needs-validation" novalidate>
                     @csrf
 
-                    <input type="hidden" name="course_id" value="{{$courseId}}">
-                    <input type="hidden" name="class_id" value="{{$classId}}">
-                    <input type="hidden" name="teacher_id" value="{{$teacherId}}">
-                    <input type="hidden" name="school_id" value="{{$schoolId}}">
-                    <input type="hidden" name="term" value="{{$term}}">
-                    <input type="hidden" name="marking_style" value="{{$marking_style}}">
+                    <input type="hidden" name="course_id" value="{{ $courseId }}">
+                    <input type="hidden" name="class_id" value="{{ $classId }}">
+                    <input type="hidden" name="teacher_id" value="{{ $teacherId }}">
+                    <input type="hidden" name="school_id" value="{{ $schoolId }}">
+                    <input type="hidden" name="term" value="{{ $term }}">
+                    <input type="hidden" name="marking_style" value="{{ $marking_style }}">
 
                     <div class="info-section">
                         <div class="row">
@@ -430,7 +436,8 @@
                                 <select name="exam_id" id="exam_id" class="form-control-custom text-capitalize" required>
                                     <option value="">-- Select Exam type --</option>
                                     @foreach ($exams as $exam)
-                                        <option value="{{ $exam->id }}" {{ $exam->id == $examTypeId ? 'selected' : '' }}>
+                                        <option value="{{ $exam->id }}"
+                                            {{ $exam->id == $examTypeId ? 'selected' : '' }}>
                                             {{ $exam->exam_type }}
                                         </option>
                                     @endforeach
@@ -447,9 +454,9 @@
                                     Uploading Date <span class="required-star">*</span>
                                 </label>
                                 <input type="date" name="exam_date" class="form-control-custom" id="exam_date" required
-                                       value="{{ \Carbon\Carbon::parse($examDate)->format('Y-m-d') }}"
-                                       min="{{ \Carbon\Carbon::now()->subYears(1)->format('Y-m-d') }}"
-                                       max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                                    value="{{ \Carbon\Carbon::parse($examDate)->format('Y-m-d') }}"
+                                    min="{{ \Carbon\Carbon::now()->subYears(1)->format('Y-m-d') }}"
+                                    max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
                                 <div class="invalid-feedback">
                                     Please provide a valid exam date
                                 </div>
@@ -472,32 +479,32 @@
                                     @forelse ($students as $student)
                                         <tr>
                                             <td class="text-center">{{ $loop->iteration }}</td>
-                                            <input type="hidden" name="students[{{ $loop->index }}][student_id]" value="{{ $student->id }}">
+                                            <input type="hidden" name="students[{{ $loop->index }}][student_id]"
+                                                value="{{ $student->id }}">
                                             <td class="text-capitalize">
                                                 {{-- <i class="fas fa-user-graduate me-2 text-primary"></i> --}}
                                                 {{ ucwords(strtolower($student->first_name)) }}
-                                                {{ucwords(strtolower($student->middle_name))}}
-                                                {{ucwords(strtolower($student->last_name))}}
+                                                {{ ucwords(strtolower($student->middle_name)) }}
+                                                {{ ucwords(strtolower($student->last_name)) }}
                                             </td>
                                             <td class="text-center">
                                                 <input type="number" class="form-control score-input"
-                                                       name="students[{{ $loop->index }}][score]"
-                                                       placeholder="Score"
-                                                       value="{{ old('students.'.$loop->index.'.score') }}"
-                                                       min="0"
-                                                       max="{{ $marking_style == 1 ? '50' : '100' }}">
+                                                    name="students[{{ $loop->index }}][score]" placeholder="Score"
+                                                    value="{{ old('students.' . $loop->index . '.score') }}"
+                                                    min="0" max="{{ $marking_style == 1 ? '50' : '100' }}">
                                             </td>
                                             <td class="text-center">
                                                 <input type="text" disabled
-                                                       name="students[{{ $loop->index }}][grade]"
-                                                       class="form-control grade-input">
+                                                    name="students[{{ $loop->index }}][grade]"
+                                                    class="form-control grade-input">
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
                                             <td colspan="4" class="text-center py-4">
                                                 <div class="alert alert-warning mb-0">
-                                                    <i class="fas fa-exclamation-triangle me-2"></i>No student records found!
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>No student records
+                                                    found!
                                                 </div>
                                             </td>
                                         </tr>
@@ -509,12 +516,14 @@
 
                     <div class="action-buttons">
                         <!-- Save to Draft -->
-                        <button type="submit" class="btn btn-warning-custom" name="action" value="save" id="saveButton">
+                        <button type="submit" class="btn btn-warning-custom" name="action" value="save"
+                            id="saveButton">
                             <i class="fas fa-save"></i> Save as Draft
                         </button>
 
                         <!-- Submit Final Results -->
-                        <button type="submit" class="btn btn-success-custom pulse-animation" name="action" value="submit" id="submitButton">
+                        <button type="submit" class="btn btn-success-custom pulse-animation" name="action"
+                            value="submit" id="submitButton">
                             <i class="fas fa-check"></i> Submit Final Results
                         </button>
                     </div>
@@ -551,10 +560,6 @@
                 }, false);
             })();
 
-            // Score input validation and grade calculation
-            const scoreInputs = document.querySelectorAll('.score-input');
-            const gradeInputs = document.querySelectorAll('.grade-input');
-
             function calculateGrade(score, markingStyle) {
                 let grade = '';
                 let bgColor = '';
@@ -575,7 +580,7 @@
                     } else if (score >= 11 && score <= 20) {
                         grade = 'D';
                         bgColor = '#ef8f8f';
-                    } else if(score >= 0 && score <= 10) {
+                    } else if (score >= 0 && score <= 10) {
                         grade = 'E';
                         bgColor = '#ebc4f3';
                     } else {
@@ -595,8 +600,28 @@
                     } else if (score >= 21 && score <= 40) {
                         grade = 'D';
                         bgColor = '#ef8f8f';
-                    } else if(score >= 0 && score <= 20) {
+                    } else if (score >= 0 && score <= 20) {
                         grade = 'E';
+                        bgColor = '#ebc4f3';
+                    } else {
+                        grade = 'Error';
+                        bgColor = 'red';
+                    }
+                } else if (markingStyle == 3) {
+                    if (score >= 75 && score <= 100) {
+                        grade = 'A';
+                        bgColor = '#97e897';
+                    } else if (score >= 65 && score <= 74) {
+                        grade = 'B';
+                        bgColor = '#4edcdc';
+                    } else if (score >= 45 && score <= 64) {
+                        grade = 'C';
+                        bgColor = '#e9f0aa';
+                    } else if (score >= 30 && score <= 44) {
+                        grade = 'D';
+                        bgColor = '#ef8f8f';
+                    } else if (score >= 0 && score <= 29) {
+                        grade = 'F';
                         bgColor = '#ebc4f3';
                     } else {
                         grade = 'Error';
@@ -604,39 +629,68 @@
                     }
                 }
 
-                return { grade, bgColor };
+                return {
+                    grade,
+                    bgColor
+                };
             }
 
+            // Score input validation and grade calculation - HII NI SEHEMU MPYA
+            const scoreInputs = document.querySelectorAll('.score-input');
+            const gradeInputs = document.querySelectorAll('.grade-input');
+            const markingStyle = {{ $marking_style }}; // Hii inatoka PHP
+
+            // Function to update grade
+            function updateGrade(input, index) {
+                const score = parseFloat(input.value);
+                const {
+                    grade,
+                    bgColor
+                } = calculateGrade(score, markingStyle);
+
+                gradeInputs[index].value = grade;
+                gradeInputs[index].style.backgroundColor = bgColor;
+            }
+
+            // Initialize grades on page load
             scoreInputs.forEach((input, index) => {
                 // Calculate grade on page load if value exists
                 if (input.value) {
-                    const score = parseFloat(input.value);
-                    const { grade, bgColor } = calculateGrade(score, {{ $marking_style }});
-                    gradeInputs[index].value = grade;
-                    gradeInputs[index].style.backgroundColor = bgColor;
+                    updateGrade(input, index);
                 }
 
-                input.addEventListener('blur', () => {
-                    const score = parseFloat(input.value);
-                    const { grade, bgColor } = calculateGrade(score, {{ $marking_style }});
+                // Realtime update on input (not just on blur)
+                input.addEventListener('input', () => {
+                    updateGrade(input, index);
+                });
 
-                    gradeInputs[index].value = grade;
-                    gradeInputs[index].style.backgroundColor = bgColor;
+                // Also update on blur (for compatibility)
+                input.addEventListener('blur', () => {
+                    updateGrade(input, index);
                 });
             });
 
             // Add confirmation dialogs
-            document.querySelector('button[name="action"][value="save"]').addEventListener('click', function(e) {
-                if (!confirm('Are you sure you want to save results temporarily?')) {
-                    e.preventDefault();
-                }
-            });
+            const saveButton = document.querySelector('button[name="action"][value="save"]');
+            const submitButton = document.querySelector('button[name="action"][value="submit"]');
 
-            document.querySelector('button[name="action"][value="submit"]').addEventListener('click', function(e) {
-                if (!confirm('Are you sure you want to submit the final results? No editing will be allowed after submission.')) {
-                    e.preventDefault();
-                }
-            });
+            if (saveButton) {
+                saveButton.addEventListener('click', function(e) {
+                    if (!confirm('Are you sure you want to save results temporarily?')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            if (submitButton) {
+                submitButton.addEventListener('click', function(e) {
+                    if (!confirm(
+                            'Are you sure you want to submit the final results? No editing will be allowed after submission.'
+                        )) {
+                        e.preventDefault();
+                    }
+                });
+            }
         });
     </script>
 @endsection

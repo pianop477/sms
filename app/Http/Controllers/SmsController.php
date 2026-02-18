@@ -56,6 +56,13 @@ class SmsController extends Controller
         $school = school::findOrFail($user->school_id);
 
         $sender_id = $school->sender_id;
+
+        if($sender_id == null) {
+            $sender_id = 'SHULE APP';
+        } else {
+            $sender_id = $school->sender_id;
+        }
+
         $payload = [
             "from" => $sender_id,
             "limit" => 10, // Ongeza kidogo kwa ajili ya datatable

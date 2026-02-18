@@ -754,8 +754,10 @@
                                 <thead>
                                     <tr>
                                         <th>Sent At</th>
+                                        <th>From</th>
                                         <th>To</th>
                                         <th>Message</th>
+                                        <th>Count</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>
@@ -770,6 +772,7 @@
                                                     {{ \Carbon\Carbon::parse($sms['sentAt'])->format('d/m/Y') }}
                                                 </div>
                                             </td>
+                                            <td>{{ $sms['from'] }}</td>
                                             <td style="white-space: nowrap;">
                                                 {{ substr($sms['to'], -4) }}...
                                             </td>
@@ -792,6 +795,7 @@
                                                     </div>
                                                 </div>
                                             </td>
+                                            <td>{{ $sms['smsCount'] }}</td>
                                             <td>
                                                 @if ($sms['delivery'] == 'DELIVERED')
                                                     <span class="status-badge status-delivered">
