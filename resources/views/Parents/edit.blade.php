@@ -202,7 +202,7 @@
                     <div class="profile-header text-center">
                         <div>
                             @if ($parents->image == Null)
-                                @if ($parents->gender == 'male')
+                                @if (strtolower($parents->gender) == 'male')
                                     <img src="{{asset('storage/profile/avatar.jpg')}}" alt="Parent Avatar" class="profile-img">
                                 @else
                                     <img src="{{asset('storage/profile/avatar-female.jpg')}}" alt="Parent Avatar" class="profile-img">

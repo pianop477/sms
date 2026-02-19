@@ -390,7 +390,7 @@
                 <div class="col-12 col-md-4 text-center">
                     @if (!empty($managers->first()))
                         @if ($managers->first()->image == NULL)
-                            @if ($managers->first()->gender == 'male')
+                            @if (strtolower($managers->first()->gender) == 'male')
                                 <img src="{{asset('storage/profile/avatar.jpg')}}"
                                     alt="Manager Avatar"
                                     class="profile-img bounce-in">

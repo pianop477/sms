@@ -82,6 +82,7 @@
         }
 
        @page {
+            size: A4 landscape;
             margin-top: 4mm;
             margin-bottom: 6mm; /* Ongeza nafasi ya chini kwa footer */
             margin-left: 4mm;
@@ -148,10 +149,15 @@
                         <th>Adm No</th>
                         <th>Gender</th>
                         <th>Stream</th>
-                        <th>Student Name</th>
+                        <th>First name</th>
+                        <th>Middle name</th>
+                        <th>Last name</th>
                         <th>DOB</th>
-                        <th>Address</th>
+                        <th>Parent Lirst name</th>
+                        <th>Parent Last name</th>
                         <th>Parent Phone</th>
+                        <th>Parent email</th>
+                        <th>Address</th>
                         <th>School Bus</th>
                     </tr>
                 </thead>
@@ -162,10 +168,15 @@
                         <td style="text-align: center;">{{ strtoupper($student->admission_number) }}</td>
                         <td style="text-align: center;">{{ strtoupper($student->gender[0]) }}</td>
                         <td style="text-align: center;">{{ strtoupper($student->group) }}</td>
-                        <td>{{ ucwords(strtolower($student->first_name.' '.$student->middle_name.' '.$student->last_name)) }}</td>
-                        <td style="text-align: center;">{{ $student->dob ? \Carbon\Carbon::parse($student->dob)->format('d/m/Y') : '' }}</td>
-                        <td>{{ ucwords(strtolower($student->address)) }}</td>
+                        <td>{{ ucwords(strtolower($student->first_name)) }}</td>
+                        <td>{{ ucwords(strtolower($student->middle_name)) }}</td>
+                        <td>{{ ucwords(strtolower($student->last_name)) }}</td>
+                        <td style="text-align: center;">{{ $student->dob ? \Carbon\Carbon::parse($student->dob)->format('Y-m-d') : '' }}</td>
+                        <td>{{ ucwords(strtolower($student->parent_first_name)) }}</td>
+                        <td>{{ ucwords(strtolower($student->parent_last_name)) }}</td>
+                        <td>{{ $student->parent_email }}</td>
                         <td>{{ $student->phone }}</td>
+                        <td>{{ ucwords(strtolower($student->address)) }}</td>
                         <td style="text-align: center;">
                             @if($student->transport_id == null)
                                 <span style="color: red; font-weight: bold;">No</span>

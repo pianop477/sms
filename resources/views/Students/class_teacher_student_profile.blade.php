@@ -264,7 +264,7 @@
                             <div class="tab-pane fade" id="parents">
                                 <h5 class="mb-4"><i class="fas fa-users me-2"></i> Parents/Guardian Details</h5>
                                 <table class="info-table">
-                                    @if ($students->parent_gender == 'male')
+                                    @if (strtolower($students->parent_gender) == 'male')
                                         <tr>
                                             <th colspan="2" class="text-primary fw-bold">Father's Information</th>
                                         </tr>

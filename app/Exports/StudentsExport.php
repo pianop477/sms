@@ -33,7 +33,8 @@ class StudentsExport implements FromCollection, WithMapping, WithHeadings, Shoul
                 'students.middle_name',
                 'students.last_name',
                 'students.dob',
-                'parents.address',
+                'parents.address', 'users.first_name as parent_first_name',
+                'users.last_name as parent_last_name', 'users.email as parent_email',
                 'users.phone',
                 'students.transport_id',
                 'grades.class_name',
@@ -50,12 +51,17 @@ class StudentsExport implements FromCollection, WithMapping, WithHeadings, Shoul
     {
         return [
             strtoupper($student->admission_number),
-            ucwords(strtolower($student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name)),
+            ucwords(strtolower($student->first_name)),
+            ucwords(strtolower($student->middle_name)),
+            ucwords(strtolower($student->last_name)),
             strtoupper(substr($student->gender, 0, 1)),
             strtoupper($student->class_code ?? ''),
             strtoupper($student->group ?? ''),
-            $student->dob ? \Carbon\Carbon::parse($student->dob)->format('d/m/Y') : '',
+            $student->dob ? \Carbon\Carbon::parse($student->dob)->format('Y-m-d') : '',
             ucwords(strtolower($student->address ?? '')),
+            $student->parent_first_name ?? '',
+            $student->parent_last_name ?? '',
+            $student->parent_email ?? '',
             $student->phone ?? '',
             $student->transport_id ? 'Yes' : 'No',
         ];
@@ -65,13 +71,18 @@ class StudentsExport implements FromCollection, WithMapping, WithHeadings, Shoul
     {
         return [
             'Admission No',
-            'Student Name',
+            'First name',
+            'Middle name',
+            'Last name',
             'Gender',
             'Class',
             'Stream',
             'DOB',
-            'Address',
+            'Parent First Name',
+            'Parent Last Name',
+            'Parent Email',
             'Parent Phone',
+            'Address',
             'School Bus',
         ];
     }

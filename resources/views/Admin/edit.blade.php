@@ -277,7 +277,7 @@
                                 $avatarImage = asset('storage/profile/' . $imageName);
                             } else {
                                 // Use default avatar based on gender
-                                $avatarImage = asset('storage/profile/' . ($user->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                $avatarImage = asset('storage/profile/' . (strtolower($user->gender) == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
                             }
                         @endphp
                         <img src="{{ $avatarImage }}" class="profile-avatar" alt="User Photo">
