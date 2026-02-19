@@ -155,6 +155,7 @@
                         <th>DOB</th>
                         <th>Parent Lirst name</th>
                         <th>Parent Last name</th>
+                        <th>Parent Gender</th>
                         <th>Parent Phone</th>
                         <th>Parent email</th>
                         <th>Address</th>
@@ -174,9 +175,10 @@
                         <td style="text-align: center;">{{ $student->dob ? \Carbon\Carbon::parse($student->dob)->format('Y-m-d') : '' }}</td>
                         <td>{{ ucwords(strtolower($student->parent_first_name)) }}</td>
                         <td>{{ ucwords(strtolower($student->parent_last_name)) }}</td>
+                        <td style="text-align: center;">{{ strtoupper(substr($student->parent_gender, 0, 1)) }}</td>
                         <td>{{ $student->parent_email }}</td>
                         <td>{{ $student->phone }}</td>
-                        <td>{{ ucwords(strtolower($student->address)) }}</td>
+                        <td>{{ ucwords(strtolower(substr($student->address, 0, 15))) }}</td>
                         <td style="text-align: center;">
                             @if($student->transport_id == null)
                                 <span style="color: red; font-weight: bold;">No</span>

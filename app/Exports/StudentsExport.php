@@ -35,7 +35,7 @@ class StudentsExport implements FromCollection, WithMapping, WithHeadings, Shoul
                 'students.dob',
                 'parents.address', 'users.first_name as parent_first_name',
                 'users.last_name as parent_last_name', 'users.email as parent_email',
-                'users.phone',
+                'users.phone', 'users.gender as parent_gender',
                 'students.transport_id',
                 'grades.class_name',
                 'grades.class_code'
@@ -58,11 +58,12 @@ class StudentsExport implements FromCollection, WithMapping, WithHeadings, Shoul
             strtoupper($student->class_code ?? ''),
             strtoupper($student->group ?? ''),
             $student->dob ? \Carbon\Carbon::parse($student->dob)->format('Y-m-d') : '',
-            ucwords(strtolower($student->address ?? '')),
             $student->parent_first_name ?? '',
             $student->parent_last_name ?? '',
+            strtoupper(substr($student->parent_gender, 0, 1) ?? ''),
             $student->parent_email ?? '',
             $student->phone ?? '',
+            ucwords(strtolower(substr($student->address ?? '', 0, 15))),
             $student->transport_id ? 'Yes' : 'No',
         ];
     }
@@ -80,6 +81,7 @@ class StudentsExport implements FromCollection, WithMapping, WithHeadings, Shoul
             'DOB',
             'Parent First Name',
             'Parent Last Name',
+            'Parent Gender',
             'Parent Email',
             'Parent Phone',
             'Address',

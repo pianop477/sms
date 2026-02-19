@@ -760,8 +760,8 @@ class StudentsController extends Controller
                 'schools.postal_name',
                 'schools.country',
                 'schools.abbriv_code',
-                'parents.address', 'users.first_name as parent_first_name', 'userslast_name. as parent_last_name',
-                'users.phone', 'users.email as parent_email'
+                'parents.address', 'users.first_name as parent_first_name', 'users.last_name as parent_last_name',
+                'users.phone', 'users.email as parent_email', 'users.gender as parent_gender'
             )
             ->where('students.class_id', $decoded_class[0])
             ->where('students.status', 1)
