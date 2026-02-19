@@ -830,6 +830,7 @@ class ResultsController extends Controller
             ->where('examination_results.school_id', $schools->id)
             ->where('examination_results.class_id', $class_id[0])
             ->where('examination_results.exam_type_id', $exam_id[0])
+            ->where('students.status', 1) // Only active students
             ->whereDate('examination_results.exam_date', $date)
             ->get();
 
