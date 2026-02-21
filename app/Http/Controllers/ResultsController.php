@@ -14,6 +14,7 @@ use App\Models\Parents;
 use App\Models\school;
 use App\Models\Student;
 use App\Models\Subject;
+use App\Models\Teacher;
 use App\Models\temporary_results;
 use App\Models\User;
 use App\Services\BeemSmsService;
@@ -4568,8 +4569,8 @@ class ResultsController extends Controller
             }
 
             // Start database transaction
-            DB::beginTransaction();
 
+            DB::beginTransaction();
             foreach ($results as $result) {
                 // Check if this result already exists in temporary_results
                 $existingTemp = temporary_results::where([
@@ -4601,6 +4602,33 @@ class ResultsController extends Controller
 
                 // Delete from examination_results
                 $result->delete();
+            }
+
+            $teacher = Teacher::find($teacher_id);
+            $user = User::find($teacher->user_id);
+
+            // send notification to teacher about rollback
+            if ($user) {
+                $course = Subject::find($result->course_id);
+                $examType = Examination::find($result->exam_type_id);
+                $message = "Dear " . strtoupper($user->first_name) .
+                    ", Your results for " . strtoupper($course->course_name). " ".
+                    strtoupper(($examType->exam_type)) . " - " . Carbon::parse($result->exam_date)->format('d M Y') .
+                    " have been reverted to temporary storage. Kindly review and resubmit before due date.";
+                $cleanMessage = $this->cleanSmsText($message);
+                $school = school::find($result->school_id);
+
+                $nextSmsService = new NextSmsService();
+                $payload = [
+                    'from' => $school->sender_id ?? 'SHULE APP',
+                    'to' => $this->formatPhoneNumber($user->phone),
+                    'text' => $cleanMessage,
+                    'reference' => 'rollback_notification_' . time()
+                ];
+
+                // Log::info("Sending rollback notification to teacher (User ID: {$user->id}) with payload: " . json_encode($payload));
+
+                $response = $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
             }
 
             DB::commit();
