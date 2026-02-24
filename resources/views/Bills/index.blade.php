@@ -21,6 +21,37 @@
             overflow-x: hidden;
         }
 
+        .btn-success {
+            background: var(--secondary-color);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .btn-remeinder {
+            background: var(--success-color);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .btn-success:hover {
+            background: #17a673;
+        }
+
+        .btn-success-custom {
+            background: var(--danger-color);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
         .card {
             border: none;
             border-radius: 10px;
@@ -183,7 +214,7 @@
                                         method="POST">
                                         @csrf
                                         <input type="hidden" name="year" value="{{ $selectedYear ?? date('Y') }}">
-                                        <button type="button" id="remindAllBtn" class="btn btn-success">
+                                        <button type="button" id="remindAllBtn" class="btn-remeinder">
                                             <i class="fas fa-sms me-1"></i> Send Reminder
                                         </button>
                                     </form>
@@ -191,7 +222,8 @@
                             </div>
                             <div class="col-md-2">
                                 <div class="d-flex justify-content-end gap-2 flex-wrap">
-                                    <button type="button" class="btn btn-info btn-action" data-bs-toggle="modal"
+                                    <button type="button" style="background: var(--primary-color); color: white;"
+                                        class="btn btn-info btn-action" data-bs-toggle="modal"
                                         data-bs-target="#addTeacherModal">
                                         <i class="fas fa-plus-circle me-1"></i> New Bill
                                     </button>
@@ -219,7 +251,7 @@
                                         @endfor
                                     </select>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-4 mb-3">
                                     <form id="searchForm" method="GET" data-no-preloader>
                                         <div class="input-group">
                                             <input type="text" name="search" id="searchInput" class="form-control"
@@ -236,6 +268,11 @@
                                             @endif
                                         </div>
                                     </form>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <button type="button" class="btn-success" id="syncClassesBtn">
+                                        <i class="fas fa-sync-alt"></i> Sync Classes
+                                    </button>
                                 </div>
                             </div>
 
@@ -279,7 +316,8 @@
                 </div>
                 <div class="modal-body">
                     <p id="reminderSummary">Loading summary...</p>
-                    <p class="text-danger text-center" style="font-style: italic"><strong>Are you sure you want to send this reminder to parents?</strong></p>
+                    <p class="text-danger text-center" style="font-style: italic"><strong>Are you sure you want to send this
+                            reminder to parents?</strong></p>
                     <div id="reminderProgress" style="display: none;">
                         <div class="progress">
                             <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
@@ -290,14 +328,53 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-success" id="confirmRemind">Send Reminders</button>
+                    <button type="button" class="btn-remeinder" id="confirmRemind">Send Reminders</button>
                 </div>
             </div>
         </div>
     </div>
+    <!-- Sync Classes Confirmation Modal -->
+    <div class="modal fade" id="syncClassesModal" tabindex="-1" aria-labelledby="syncClassesModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="syncClassesModalLabel">
+                        <i class="fas fa-sync-alt me-2"></i>
+                        Sync Classes - Year <span id="syncYearDisplay"></span>
+                    </h5>
+                    <button type="button" class="btn btn-danger btn-xs" data-bs-dismiss="modal" aria-label="Close"><i
+                            class="fas fa-close"></i></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Loading State -->
+                    <div id="syncLoading" class="text-center py-4">
+                        <div class="spinner-border text-primary mb-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="text-muted">Analyzing bills that need class update...</p>
+                    </div>
 
+                    <!-- Preview Content -->
+                    <div id="syncPreviewContent" style="display: none;"></div>
+
+                    <!-- Error Content -->
+                    <div id="syncErrorContent" style="display: none;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="button" class="btn-remeinder" id="confirmSyncBtn" disabled>
+                        <i class="fas fa-sync-alt"></i> Sync Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Add Teacher Modal -->
-    <div class="modal fade" id="addTeacherModal" tabindex="-1" aria-labelledby="addTeacherModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addTeacherModal" tabindex="-1" aria-labelledby="addTeacherModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -395,7 +472,9 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" id="saveButton" class="btn btn-success">Save Bill</button>
+                            <button type="submit" id="saveButton"
+                                style="background: var(--primary-color); color: white;" class="btn btn-info">Save
+                                Bill</button>
                         </div>
                     </form>
                 </div>
@@ -509,6 +588,222 @@
 
             // Load ALL students once on page load
             $(document).ready(function() {
+                // Sync button click - using event delegation
+                $(document).on('click', '#syncClassesBtn', function(e) {
+                    e.preventDefault(); //
+
+                    console.log('Sync button clicked'); // Debug log
+
+                    const selectedYear = $('#yearFilter').val() || localStorage.getItem(
+                        'selectedYear') || new Date().getFullYear();
+
+                    // Update modal title
+                    $('#syncYearDisplay').text(selectedYear);
+
+                    // Check if modal exists
+                    if ($('#syncClassesModal').length === 0) {
+                        // console.error('Modal #syncClassesModal haipo kwenye HTML!');
+                        // alert('Error: Sync modal haipo. Tafadhali wasiliana na developer.');
+                        return;
+                    }
+
+                    // Show modal with loading
+                    $('#syncClassesModal').modal('show');
+                    $('#syncLoading').show();
+                    $('#syncPreviewContent').hide().html('');
+                    $('#syncErrorContent').hide().html('');
+                    $('#confirmSyncBtn').prop('disabled', true);
+
+                    // Load preview
+                    $.ajax({
+                        url: '{{ route('bills.sync-classes.preview') }}',
+                        method: 'GET',
+                        data: {
+                            year: selectedYear
+                        },
+                        success: function(response) {
+                            $('#syncLoading').hide();
+
+                            if (response.success) {
+                                if (response.total > 0) {
+                                    // Build preview table
+                                    let html = `
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>${response.total}</strong> bill(s) will be updated for year <strong>${response.year}</strong>
+                            </div>
+                            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                                <table class="table table-sm table-bordered table-hover">
+                                    <thead class="table-light sticky-top">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Control Number</th>
+                                            <th>Student</th>
+                                            <th>Old Class</th>
+                                            <th>New Class</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                        `;
+
+                                    response.data.forEach((item, index) => {
+                                        html += `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td><span class="text-primary">${item.control_number.toUpperCase()}</span></td>
+                                    <td>${item.student_name.toUpperCase()}</td>
+                                    <td><span class="badge bg-secondary text-white">${item.old_class.toUpperCase()}</span></td>
+                                    <td><span class="badge bg-success text-white">${item.new_class.toUpperCase()}</span></td>
+                                </tr>
+                            `;
+                                    });
+
+                                    html += `
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="text-muted small mt-2 mb-0">
+                                <i class="fas fa-info-circle me-1"></i>
+                                All <strong>Bills </strong> statuses will be updated, It is safe 100%.
+                            </p>
+                        `;
+
+                                    $('#syncPreviewContent').html(html).show();
+                                    $('#confirmSyncBtn').prop('disabled', false);
+                                } else {
+                                    // No bills to update
+                                    $('#syncPreviewContent').html(`
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>
+                                <strong>No bills need class update for year ${response.year}!</strong>
+                                <p class="mb-0 mt-2">All Bills are already using the correct classes.</p>
+                            </div>
+                        `).show();
+                                }
+                            } else {
+                                $('#syncErrorContent').html(`
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            ${response.message || 'Error loading preview'}
+                        </div>
+                    `).show();
+                            }
+                        },
+                        error: function(xhr) {
+                            $('#syncLoading').hide();
+
+                            let errorMsg = 'Error loading preview. Please try again.';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMsg = xhr.responseJSON.message;
+                            }
+
+                            $('#syncErrorContent').html(`
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        ${errorMsg}
+                    </div>
+                `).show();
+                        }
+                    });
+                });
+
+                // Confirm Sync
+                $(document).on('click', '#confirmSyncBtn', function() {
+                    const $btn = $(this);
+                    const selectedYear = $('#yearFilter').val() || localStorage.getItem(
+                        'selectedYear') || new Date().getFullYear();
+
+                    // Disable button and show loading
+                    $btn.prop('disabled', true).html(
+                        '<span class="spinner-border spinner-border-sm me-2"></span>Syncing...');
+
+                    // Update preview content to show syncing
+                    $('#syncPreviewContent').html(`
+            <div class="text-center py-4">
+                <div class="spinner-border text-primary mb-3"></div>
+                <p class="text-muted">Updating classes... Please wait.</p>
+            </div>
+        `);
+
+                    $.ajax({
+                        url: '{{ route('bills.sync-classes') }}',
+                        method: 'PUT',
+                        data: {
+                            year: selectedYear,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                $('#syncPreviewContent').html(`
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <strong>Success!</strong>
+                            <p class="mb-0 mt-2">${response.message}</p>
+                        </div>
+                    `);
+
+                                // Show success message with SweetAlert
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Sync Completed!',
+                                    html: response.message,
+                                    confirmButtonText: 'OK',
+                                    timer: 3000
+                                });
+
+                                // Refresh the bills table after 2 seconds
+                                setTimeout(() => {
+                                    $('#syncClassesModal').modal('hide');
+                                    if (typeof loadBillsData === 'function') {
+                                        loadBillsData
+                                    (); // Call your existing function to refresh table
+                                    } else {
+                                        location.reload(); // Fallback
+                                    }
+                                }, 2000);
+                            } else {
+                                $('#syncPreviewContent').html(`
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            ${response.message}
+                        </div>
+                    `);
+
+                                // Re-enable button
+                                $btn.prop('disabled', false).html(
+                                    '<i class="fas fa-check"></i> Try Again');
+                            }
+                        },
+                        error: function(xhr) {
+                            let errorMsg = 'Error syncing classes. Please try again.';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMsg = xhr.responseJSON.message;
+                            }
+
+                            $('#syncPreviewContent').html(`
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        ${errorMsg}
+                    </div>
+                `);
+
+                            // Re-enable button
+                            $btn.prop('disabled', false).html(
+                                '<i class="fas fa-check"></i> Try Again');
+                        }
+                    });
+                });
+
+                // Reset modal when closed
+                $('#syncClassesModal').on('hidden.bs.modal', function() {
+                    $('#confirmSyncBtn').prop('disabled', true).html(
+                        '<i class="fas fa-sync-alt"></i> Sync Now');
+                    $('#syncLoading').show();
+                    $('#syncPreviewContent').hide().html('');
+                    $('#syncErrorContent').hide().html('');
+                });
+
+                // other ajax functionalities==========================
                 $.ajax({
                     url: '{{ route('students.list') }}',
                     method: 'GET',
@@ -1109,18 +1404,18 @@
                             </div>
 
                             ${response.payment_history.length > 0 ? `
-                                                        <div style="max-height: 200px; overflow-y: auto;">
-                                                            <table class="table table-sm table-borderless mb-0">
-                                                                <thead>
-                                                                    <tr class="small text-muted border-bottom">
-                                                                        <th class="ps-2">#</th>
-                                                                        <th>Date</th>
-                                                                        <th>Mode</th>
-                                                                        <th class="text-end pe-2">Amount</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    ${response.payment_history.map((payment, index) => `
+                                                                            <div style="max-height: 200px; overflow-y: auto;">
+                                                                                <table class="table table-sm table-borderless mb-0">
+                                                                                    <thead>
+                                                                                        <tr class="small text-muted border-bottom">
+                                                                                            <th class="ps-2">#</th>
+                                                                                            <th>Date</th>
+                                                                                            <th>Mode</th>
+                                                                                            <th class="text-end pe-2">Amount</th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        ${response.payment_history.map((payment, index) => `
                                                 <tr class="small border-bottom">
                                                     <td class="ps-2">#${payment.installment}</td>
                                                     <td>${new Date(payment.approved_at).toLocaleDateString('en-GB')}</td>
@@ -1132,24 +1427,24 @@
                                                     </td>
                                                 </tr>
                                             `).join('')}
-                                                                    <!-- Total Row -->
-                                                                    <tr class="small border-top fw-bold bg-light">
-                                                                        <td class="ps-2" colspan="3" style="font-weight:bold">Total Paid:</td>
-                                                                        <td class="text-end pe-2 text-success" style="font-weight:bold">
-                                                                            ${new Intl.NumberFormat().format(response.summary.total_paid)}
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    ` : `
-                                                        <div class="text-center py-2">
-                                                            <small class="text-muted">
-                                                                <i class="fas fa-info-circle me-1"></i>
-                                                                No payments recorded
-                                                            </small>
-                                                        </div>
-                                                    `}
+                                                                                        <!-- Total Row -->
+                                                                                        <tr class="small border-top fw-bold bg-light">
+                                                                                            <td class="ps-2" colspan="3" style="font-weight:bold">Total Paid:</td>
+                                                                                            <td class="text-end pe-2 text-success" style="font-weight:bold">
+                                                                                                ${new Intl.NumberFormat().format(response.summary.total_paid)}
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        ` : `
+                                                                            <div class="text-center py-2">
+                                                                                <small class="text-muted">
+                                                                                    <i class="fas fa-info-circle me-1"></i>
+                                                                                    No payments recorded
+                                                                                </small>
+                                                                            </div>
+                                                                        `}
                         </div>
                     `);
                         } else {

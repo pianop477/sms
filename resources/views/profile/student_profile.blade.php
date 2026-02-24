@@ -891,7 +891,7 @@
                                 @if ($packages->isEmpty())
                                     <div class="alert alert-warning text-center py-4">
                                         <i class="fas fa-exclamation-triangle me-2"></i>
-                                        No Data uploaded yet!
+                                        No Resources uploaded yet!
                                     </div>
                                 @else
                                     <div class="table-responsive table-responsive-md">

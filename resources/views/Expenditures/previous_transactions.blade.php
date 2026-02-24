@@ -506,7 +506,7 @@
                                         <tr>
                                             <th scope="col">#</th>
                                             <th scope="col">Reference #</th>
-                                            <th scope="col">Category</th>
+                                            <th scope="col">Account</th>
                                             <th scope="col">Description</th>
                                             <th scope="col">Amount</th>
                                             <th scope="col">Status</th>
@@ -655,18 +655,18 @@
                                 <div class="invalid-feedback">Please select a valid date</div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="editCategory" class="form-label">Category <span class="text-danger">*</span></label>
+                                <label for="editCategory" class="form-label">Account <span class="text-danger">*</span></label>
                                 <select name="category" id="editCategory" class="form-control-custom" required>
-                                    <option value="">--Select category--</option>
+                                    <option value="">--Select Account--</option>
                                     @if(empty($categories))
-                                        <option value="">No categories found</option>
+                                        <option value="">No accounts found</option>
                                     @else
                                         @foreach ($categories as $category)
                                             <option value="{{$category['id']}}">{{ucwords(strtolower($category['expense_type']))}}</option>
                                         @endforeach
                                     @endif
                                 </select>
-                                <div class="invalid-feedback">Please select a category</div>
+                                <div class="invalid-feedback">Please select an account</div>
                             </div>
                         </div>
 
@@ -815,7 +815,7 @@
                                     <div class="tab-pane fade show active" id="details{{$row['reference_number']}}" role="tabpanel">
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
-                                                <label class="form-label text-muted small mb-1">Category</label>
+                                                <label class="form-label text-muted small mb-1">Account</label>
                                                 <p class="fw-semibold">{{ucwords(strtolower($row['expense_type'] ?? 'N/A'))}}</p>
                                             </div>
                                             <div class="col-md-6 mb-3">
@@ -1005,7 +1005,7 @@
                                             <strong>Expense Details:</strong><br>
                                             Reference: {{strtoupper($row['reference_number'])}}<br>
                                             Amount: {{number_format($row['amount'])}}<br>
-                                            Category: {{ucwords(strtolower($row['expense_type'] ?? 'N/A'))}}
+                                            Account: {{ucwords(strtolower($row['expense_type'] ?? 'N/A'))}}
                                         </small>
                                     </div>
                                 </div>

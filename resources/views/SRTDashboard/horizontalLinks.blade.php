@@ -176,9 +176,9 @@
 
                             {{-- Academic Management --}}
                             <li>
-                                <a href="javascript:void(0)"><i class="fas fa-money-bill-trend-up"></i><span>Category & Expenses</span></a>
+                                <a href="javascript:void(0)"><i class="fas fa-money-bill-trend-up"></i><span>Accounts & Expenses</span></a>
                                 <ul class="submenu">
-                                    <li><a href="{{route('expenses.index')}}"><i class="fas fa-layer-group"></i> Categories</a></li>
+                                    <li><a href="{{route('expenses.index')}}"><i class="fas fa-layer-group"></i> Accounts</a></li>
                                     <li><a href="{{route('expenditure.index')}}"><i class="fas fa-sack-dollar"></i> Expenses</a></li>
                                 </ul>
                             </li>

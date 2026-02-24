@@ -388,7 +388,7 @@ class ExpenditureController extends Controller
         // =========================
         //  PROFESSIONAL TABLE HEADER
         // =========================
-        $headers = ['#', 'Date', 'Reference No.', 'Category', 'Description', 'Amount', 'Status', 'Payment Mode'];
+        $headers = ['#', 'Date', 'Reference No.', 'Accounts', 'Description', 'Amount', 'Status', 'Payment Mode'];
         $sheet->fromArray($headers, null, 'A' . $startRow, true);
 
         $headerRow = $startRow;
@@ -606,7 +606,7 @@ class ExpenditureController extends Controller
         $sheet->setCellValue("A{$row}", "Generated: " . \Carbon\Carbon::now()->format('d M Y H:i')); $row += 2; // space
 
         // Column headers
-        $headers = ['#', 'Date', 'Reference No.', 'Category', 'Description', 'Amount', 'Status', 'Payment Mode'];
+        $headers = ['#', 'Date', 'Reference No.', 'Accounts', 'Description', 'Amount', 'Status', 'Payment Mode'];
         $sheet->fromArray($headers, null, "A{$row}");
 
         // Style headers
@@ -717,7 +717,7 @@ class ExpenditureController extends Controller
             ]);
 
             // Table headers
-            $headers = ['#', 'Date', 'Reference', 'Category', 'Description', 'Amount', 'Status', 'Payment Mode'];
+            $headers = ['#', 'Date', 'Reference', 'Accounts', 'Description', 'Amount', 'Status', 'Payment Mode'];
             $table->addRow();
             foreach ($headers as $header) {
                 $table->addCell(1500)->addText($header, ['bold' => true, 'name' => 'Arial']);

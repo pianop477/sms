@@ -95,7 +95,7 @@ class BiometricController extends Controller
         ]);
 
         // Send SMS
-        $message = "Your biometric verification OTP is: $otp. Expires in 2 minutes. Do not share this code.";
+        $message = "SHULE APP: Your biometric verification OTP is $otp. It expires in 2 minutes. Dont share this code with anyone. If you did not request this, please ignore";
         (new NextSmsService())->sendSmsByNext(
             'SHULE APP',
             $this->formatPhoneNumber($user->phone),
@@ -103,18 +103,16 @@ class BiometricController extends Controller
             'otp-' . uniqid()
         );
 
-        Log::info('OTP sent for biometric registration', [
-            'user_id' => $user->id,
-            'ip'      => $request->ip()
-        ]);
+        // Log::info('OTP sent for biometric registration', [
+        //     'user_id' => $user->id,
+        //     'ip'      => $request->ip()
+        // ]);
 
         return response()->json([
             'success' => true,
             'phone'   => substr($user->phone, -3)
         ]);
     }
-
-
 
     private function formatPhoneNumber($phone)
     {

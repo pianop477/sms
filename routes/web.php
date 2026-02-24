@@ -602,6 +602,8 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::put('/Bills/update/{bill}', [BillsController::class, 'update']);
         Route::post('/bills/send-overdue-reminders', [BillsController::class, 'sendOverdueReminders'])->name('bills.send-overdue-reminders');
         Route::get('/Bills/overdue/summary', [BillsController::class, 'getOverdueSummary'])->name('bills.get-overdue-summary');
+        Route::get("/bills/sync-classes-preview", [BillsController::class, 'syncClassesPreview'])->name('bills.sync-classes.preview');
+        Route::put("/bills/sync-classes", [BillsController::class, 'syncClasses'])->name('bills.sync-classes');
 
         //manage payment batches
         Route::get('/Batches', [paymentBatchController::class, 'index'])->name('batches.index');

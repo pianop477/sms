@@ -730,7 +730,7 @@
                             <i class="fas fa-users"></i>
                         </div>
                         <div class="header-title">
-                            <h3>{{ $classId->class_name }} - {{ $classId->class_code }}</h3>
+                            <h3>{{ strtoupper($classId->class_name) }} - {{ strtoupper($classId->class_code) }}</h3>
                         </div>
                     </div>
                     <div class="action-group">

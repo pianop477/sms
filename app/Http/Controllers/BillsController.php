@@ -69,7 +69,7 @@ class BillsController extends Controller
         $query = DB::table('school_fees')
             ->join('payment_services', 'payment_services.id', '=', 'school_fees.service_id')
             ->leftJoin('students', 'students.id', '=', 'school_fees.student_id')
-            ->leftJoin('grades', 'grades.id', '=', 'students.class_id')
+            ->leftJoin('grades', 'grades.id', '=', 'school_fees.class_id')
             ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
             ->leftJoin('users', 'users.id', '=', 'parents.user_id')
             ->select(
@@ -2087,7 +2087,8 @@ class BillsController extends Controller
                 'school_fees.due_date',
                 'school_fees.status',
                 'school_fees.created_at',
-                'payment_services.service_name'
+                'payment_services.service_name',
+                'payment_services.collection_account'
             )
             ->where('school_fees.student_id', $students->id)
             ->where('school_fees.status', '!=', 'cancelled')
@@ -2111,10 +2112,10 @@ class BillsController extends Controller
         $paymentRecords = collect();
 
         foreach ($bills as $bill) {
-            // Add the bill itself as first record
             $paymentRecords->push([
                 'type' => 'invoice',
                 'control_number' => $bill->control_number,
+                'collection_account' => $bill->collection_account,
                 'academic_year' => $bill->academic_year,
                 'service_name' => $bill->service_name,
                 'amount' => $bill->billed_amount,
@@ -2131,6 +2132,7 @@ class BillsController extends Controller
                 $paymentRecords->push([
                     'type' => 'payment',
                     'control_number' => $bill->control_number,
+                    'collection_account' => $bill->collection_account,
                     'academic_year' => $bill->academic_year,
                     'service_name' => $bill->service_name,
                     'amount' => $payment->amount,
@@ -2138,7 +2140,7 @@ class BillsController extends Controller
                     'due_date' => $bill->due_date,
                     'status' => 'paid',
                     'payment_mode' => $payment->payment_mode,
-                    'installment' => $payment->installment
+                    'installment' => $payment->installment,
                 ]);
             }
         }
@@ -2148,13 +2150,18 @@ class BillsController extends Controller
         $totalPaid = $payments->sum('amount');
         $totalBalance = $totalBilled - $totalPaid;
 
+        $hasCollectionAccount = $bills->contains(function ($bill) {
+            return !empty($bill->collection_account);
+        });
+
         return view('Bills.student_bills', compact(
             'students',
             'paymentRecords',
             'totalBilled',
             'totalPaid',
             'totalBalance',
-            'selectedYear'
+            'selectedYear',
+            'hasCollectionAccount'
         ));
     }
 
@@ -2206,5 +2213,134 @@ class BillsController extends Controller
 
         Alert()->toast('Bill updated successfully', 'success');
         return back();
+    }
+
+    /**
+     * Preview classes that will be synced
+     */
+    public function syncClassesPreview(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            $targetYear = $request->get('year', date('Y'));
+
+            // Pata bills za mwaka husika ambazo hazijalipwa kabisa (active au partial)
+            $bills = DB::table('school_fees')
+                ->join('students', 'students.id', '=', 'school_fees.student_id')
+                ->leftJoin('grades as old_grade', 'old_grade.id', '=', 'school_fees.class_id')
+                ->leftJoin('grades as new_grade', 'new_grade.id', '=', 'students.class_id')
+                ->where('school_fees.school_id', $user->school_id)
+                ->where('school_fees.academic_year', 'LIKE', "%{$targetYear}%")
+                ->whereIn('school_fees.status', ['active', 'cancelled', 'full paid', 'overpaid', 'expired']) // Usiguse paid/cancelled
+                ->select(
+                    'school_fees.id',
+                    'school_fees.control_number',
+                    'school_fees.student_id',
+                    'school_fees.class_id as old_class_id',
+                    'students.class_id as new_class_id',
+                    'students.first_name',
+                    'students.middle_name',
+                    'students.last_name',
+                    'old_grade.class_code as old_class_code',
+                    'new_grade.class_code as new_class_code',
+                    'school_fees.academic_year'
+                )
+                ->get();
+
+            // Filter only bills where class has changed
+            $changes = [];
+            foreach ($bills as $bill) {
+                if ($bill->old_class_id != $bill->new_class_id) {
+                    $changes[] = [
+                        'id' => $bill->id,
+                        'control_number' => $bill->control_number,
+                        'student_name' => trim($bill->first_name . ' ' . $bill->middle_name . ' ' . $bill->last_name),
+                        'old_class' => $bill->old_class_code ?? 'Class ' . $bill->old_class_id,
+                        'new_class' => $bill->new_class_code ?? 'Class ' . $bill->new_class_id,
+                        'academic_year' => $bill->academic_year
+                    ];
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $changes,
+                'total' => count($changes),
+                'year' => $targetYear,
+                'message' => count($changes) . ' bill(s) need class update for year ' . $targetYear
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error loading preview: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Execute the class sync
+     */
+    public function syncClasses(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $user = Auth::user();
+            $targetYear = $request->get('year', date('Y'));
+
+            // Pata bills zote za mwaka husika
+            $bills = DB::table('school_fees')
+                ->join('students', 'students.id', '=', 'school_fees.student_id')
+                ->where('school_fees.school_id', $user->school_id)
+                ->where('school_fees.academic_year', 'LIKE', "%{$targetYear}%")
+                ->whereIn('school_fees.status', ['active', 'cancelled', 'full paid', 'overpaid', 'expired']) // Pata bills zote isipokuwa partial
+                ->select('school_fees.id', 'school_fees.student_id', 'school_fees.class_id as old_class', 'students.class_id as new_class')
+                ->get();
+
+            $updatedCount = 0;
+            $skippedCount = 0;
+            $errors = [];
+
+            foreach ($bills as $bill) {
+                // Skip kama class haijabadilika
+                if ($bill->old_class == $bill->new_class) {
+                    $skippedCount++;
+                    continue;
+                }
+
+                // Update class_id
+                $updated = DB::table('school_fees')
+                    ->where('id', $bill->id)
+                    ->update([
+                        'class_id' => $bill->new_class,
+                        'updated_at' => now()
+                    ]);
+
+                if ($updated) {
+                    $updatedCount++;
+                } else {
+                    $errors[] = "Failed to update bill ID: {$bill->id}";
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Classes synced successfully! Updated: {$updatedCount} bills, Skipped: {$skippedCount} bills",
+                'stats' => [
+                    'updated' => $updatedCount,
+                    'skipped' => $skippedCount,
+                    'errors' => $errors
+                ]
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error syncing classes: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

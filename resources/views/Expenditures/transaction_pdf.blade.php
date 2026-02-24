@@ -304,7 +304,7 @@
                 <th class="col-number">#</th>
                 <th class="col-date">Date</th>
                 <th class="col-reference">Reference No.</th>
-                <th class="col-category">Category</th>
+                <th class="col-category">Account</th>
                 <th class="col-description">Description</th>
                 <th class="col-amount text-right">Amount</th>
                 <th class="col-status">Status</th>
