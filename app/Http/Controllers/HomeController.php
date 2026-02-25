@@ -171,7 +171,13 @@ class HomeController extends Controller
                     'value' => $row->female_count,
                 ];
             }
-            return view('home', compact('teachers', 'attendanceByClassData', 'today', 'parents', 'totalMaleStudents', 'totalFemaleStudents', 'teacherByGender', 'students', 'studentsByClass', 'classes', 'subjects', 'buses', 'chartData', 'qualificationData'));
+
+            // return school service time count down
+            $school = school::findOrFail($user->school_id);
+            // return $teachers;
+            // return $school;
+
+            return view('home', compact('teachers', 'school', 'attendanceByClassData', 'today', 'parents', 'totalMaleStudents', 'totalFemaleStudents', 'teacherByGender', 'students', 'studentsByClass', 'classes', 'subjects', 'buses', 'chartData', 'qualificationData'));
         }
         //parents dashboard redirection ----------------------
         elseif ($user->usertype == 4) {

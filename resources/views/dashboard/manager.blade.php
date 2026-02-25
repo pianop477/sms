@@ -3,847 +3,832 @@
 @section('content')
     <style>
         :root {
-            --primary-color: #4e73df;
-            --secondary-color: #6f42c1;
-            --success-color: #1cc88a;
-            --info-color: #36b9cc;
-            --warning-color: #f6c23e;
-            --danger-color: #e74a3b;
-            --light-color: #f8f9fc;
-            --dark-color: #5a5c69;
+            --primary: #4e73df;
+            --primary-dark: #2e59d9;
+            --secondary: #6f42c1;
+            --success: #1cc88a;
+            --info: #36b9cc;
+            --warning: #f6c23e;
+            --danger: #e74a3b;
+            --light: #f8f9fc;
+            --dark: #5a5c69;
         }
 
         body {
-            background-color: #f8f9fc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #333;
+            background: #f8f9fc;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
         }
 
-        .card {
+        /* Modern Card Design */
+        .modern-card {
+            background: white;
             border: none;
-            border-radius: 15px;
-            box-shadow: 0 0.5rem 1.5rem 0 rgba(58, 59, 69, 0.1);
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
         }
 
-        .card:hover {
+        .modern-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 0.75rem 2rem 0 rgba(58, 59, 69, 0.15);
+            box-shadow: 0 20px 60px rgba(78, 115, 223, 0.15);
         }
 
-        /* Statistics Cards Styling */
-        .stat-card {
-            border-radius: 15px;
-            border: none;
+        /* Service Card Premium */
+        .service-card-premium {
+            background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
+            border: 1px solid rgba(78, 115, 223, 0.1);
             position: relative;
+            isolation: isolate;
+        }
+
+        .service-card-premium::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top right, rgba(78, 115, 223, 0.08), transparent 70%);
+            z-index: -1;
+        }
+
+        .service-icon-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 10px 20px rgba(78, 115, 223, 0.3);
+        }
+
+        /* Countdown Timer Premium */
+        .countdown-premium {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .countdown-item {
+            flex: 1;
+            min-width: 85px;
+            background: white;
+            border-radius: 16px;
+            padding: 16px 8px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+        }
+
+        .countdown-item:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 30px rgba(78, 115, 223, 0.1);
+        }
+
+        .countdown-item .number {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #2c3e50, #1e293b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+            font-family: 'Poppins', monospace;
+        }
+
+        .countdown-item .label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary);
+            opacity: 0.8;
+        }
+
+        .countdown-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20%;
+            right: 20%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            border-radius: 3px;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .countdown-item:hover::after {
+            transform: scaleX(1);
+        }
+
+        /* Stats Cards Premium */
+        .stat-card-premium {
+            position: relative;
+            border-radius: 20px;
             overflow: hidden;
-            transition: all 0.4s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
             min-height: 140px;
         }
 
-        .stat-card::before {
+        .stat-card-premium::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        .stat-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+        .stat-card-premium:hover::before {
+            opacity: 1;
         }
 
-        .stat-card .card-body {
+        .stat-card-premium .card-body {
             position: relative;
             z-index: 2;
-            padding: 1.5rem;
+            padding: 1.8rem 1.5rem;
         }
 
-        .stat-card .card-icon {
+        .stat-card-premium .card-icon {
             position: absolute;
             right: 20px;
-            top: 20px;
-            opacity: 0.2;
-            font-size: 4rem;
-            transition: all 0.3s ease;
+            bottom: 20px;
+            font-size: 4.5rem;
+            opacity: 0.15;
+            transition: all 0.5s ease;
+            color: white;
         }
 
-        .stat-card:hover .card-icon {
-            opacity: 0.3;
-            transform: scale(1.1);
+        .stat-card-premium:hover .card-icon {
+            transform: scale(1.2) rotate(5deg);
+            opacity: 0.25;
         }
 
-        .stat-card .card-title {
+        .stat-card-premium .card-title {
             font-size: 0.9rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             margin-bottom: 10px;
-            opacity: 0.9;
+            color: rgba(255, 255, 255, 0.9);
         }
 
-        .stat-card .card-value {
-            font-size: 2rem;
+        .stat-card-premium .card-value {
+            font-size: 2.5rem;
             font-weight: 800;
-            margin-bottom: 0;
+            color: white;
+            line-height: 1.2;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        /* Gradient Backgrounds for Cards */
-        .bg-teacher {
-            background: linear-gradient(135deg, #e176a6 0%, #d04a88 100%);
+        /* Gradient variations */
+        .bg-gradient-teacher {
+            background: linear-gradient(145deg, #e176a6, #b2457a);
         }
 
-        .bg-parent {
-            background: linear-gradient(135deg, #c84fe0 0%, #9c27b0 100%);
+        .bg-gradient-parent {
+            background: linear-gradient(145deg, #c84fe0, #8e24aa);
         }
 
-        .bg-student {
-            background: linear-gradient(135deg, #098ddf 0%, #0568a8 100%);
+        .bg-gradient-student {
+            background: linear-gradient(145deg, #098ddf, #0568a8);
         }
 
-        .bg-course {
-            background: linear-gradient(135deg, #9fbc71 0%, #689f38 100%);
+        .bg-gradient-course {
+            background: linear-gradient(145deg, #9fbc71, #558b2f);
         }
 
-        .bg-class {
-            background: linear-gradient(135deg, #bf950a 0%, #ff9800 100%);
+        .bg-gradient-class {
+            background: linear-gradient(145deg, #bf950a, #f57c00);
         }
 
-        .bg-bus {
-            background: linear-gradient(135deg, #329688 0%, #00796b 100%);
+        .bg-gradient-bus {
+            background: linear-gradient(145deg, #329688, #00695c);
         }
 
-        /* Chart Container Styles */
-        .chart-container {
+        /* Chart Container */
+        .chart-card {
             background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 0.5rem 1.5rem rgba(58, 59, 69, 0.1);
-            border: none;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.03);
             transition: all 0.3s ease;
             height: 100%;
-            display: flex;
-            flex-direction: column;
         }
 
-        .chart-container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0.75rem 2rem rgba(58, 59, 69, 0.15);
-        }
-
-        .chart-wrapper {
-            flex: 1;
-            min-height: 300px;
-            position: relative;
-            width: 100%;
-        }
-
-        .chart-wrapper canvas,
-        .chart-wrapper .chart-canvas {
-            width: 100% !important;
-            height: 100% !important;
+        .chart-card:hover {
+            box-shadow: 0 20px 40px rgba(78, 115, 223, 0.08);
         }
 
         .chart-header {
-            border-bottom: 2px solid #f8f9fc;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+            border-bottom: 2px solid #f1f4f9;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .chart-title {
             font-weight: 700;
-            color: var(--primary-color);
+            color: var(--primary);
             margin-bottom: 5px;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
-        .chart-subtitle {
-            color: #6c757d;
-            font-size: 0.875rem;
-        }
-
-        /* Table Styles */
-        .dashboard-table {
-            background: white;
-            border-radius: 10px;
+        /* Table Premium */
+        .table-premium {
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.02);
         }
 
-        .dashboard-table thead {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #2e59d9 100%);
-            color: white;
-        }
-
-        .dashboard-table th {
-            padding: 15px 12px;
+        .table-premium thead th {
+            background: linear-gradient(135deg, #f8faff, #f1f5ff);
+            color: var(--primary);
             font-weight: 700;
-            vertical-align: middle;
-            border: none;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .dashboard-table td {
-            padding: 12px 10px;
-            vertical-align: middle;
-            border-bottom: 1px solid #e3e6f0;
-        }
-
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: 600;
             font-size: 0.75rem;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 1rem;
+            border: none;
         }
 
-        /* Responsive Design */
+        .table-premium tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .table-premium tbody tr:hover {
+            background: #f8faff;
+            transform: scale(1.01);
+            box-shadow: 0 5px 15px rgba(78, 115, 223, 0.08);
+        }
+
+        /* Status Badges */
+        .badge-premium {
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* Animations */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(78, 115, 223, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 20px 5px rgba(78, 115, 223, 0.2);
+            }
+        }
+
+        .countdown-item {
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .stat-card .card-value {
-                font-size: 1.5rem;
+            .stat-card-premium .card-value {
+                font-size: 1.8rem;
             }
 
-            .stat-card .card-icon {
-                font-size: 2.5rem;
-            }
-
-            .chart-wrapper {
-                min-height: 250px;
+            .countdown-item .number {
+                font-size: 24px;
             }
         }
     </style>
 
     <div class="py-4">
-        <div class="row">
-            <!-- Stats Cards for Head Teacher -->
-            <div class="col-lg-12 mb-4">
-                <div class="row">
-                    <div class="col-xl-4 col-md-6 mb-4">
-                        <a href="{{ route('Teachers.index') }}" class="text-decoration-none">
-                            <div class="stat-card bg-teacher text-white">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="card-title">Teachers</div>
-                                            <div class="card-value">
-                                                @if (count($teachers) > 99)
-                                                    100+
-                                                @else
-                                                    {{ count($teachers) }}
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-user-tie card-icon"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
+        @php
+            $school = App\Models\school::find(Auth::user()->school_id);
+            $serviceStartDate = \Carbon\Carbon::parse($school->service_start_date);
+            $serviceEndDate = \Carbon\Carbon::parse($school->service_end_date);
+            $now = \Carbon\Carbon::now();
+            $daysRemaining = $now->diffInDays($serviceEndDate, false);
 
-                    <div class="col-xl-4 col-md-6 mb-4">
-                        <a href="{{ route('Parents.index') }}" class="text-decoration-none">
-                            <div class="stat-card bg-parent text-white">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="card-title">Parents</div>
-                                            <div class="card-value">
-                                                @if (count($parents) > 1999)
-                                                    2000+
-                                                @else
-                                                    {{ count($parents) }}
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-user-friends card-icon"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
+            // FIXED: Format dates properly for JavaScript
+            $jsEndDate = $serviceEndDate->format('Y-m-d H:i:s');
 
-                    <div class="col-xl-4 col-md-6 mb-4">
-                        <a href="{{ route('classes.list') }}" class="text-decoration-none">
-                            <div class="stat-card bg-student text-white">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="card-title">Students</div>
-                                            <div class="card-value">
-                                                @if (count($students) > 1999)
-                                                    2000+
-                                                @else
-                                                    {{ count($students) }}
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-user-graduate card-icon"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
+            // Calculate progress
+            $totalDays = $serviceStartDate->diffInDays($serviceEndDate);
+            $daysPassed = $serviceStartDate->diffInDays($now);
+            $progressPercentage = min(100, max(0, ($daysPassed / $totalDays) * 100));
 
-                    <div class="col-xl-4 col-md-6 mb-4">
-                        <a href="{{ route('courses.index') }}" class="text-decoration-none">
-                            <div class="stat-card bg-course text-white">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="card-title">Open Courses</div>
-                                            <div class="card-value">
-                                                @if (count($subjects) > 49)
-                                                    50+
-                                                @else
-                                                    {{ count($subjects) }}
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="ti-book card-icon"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
+            // Status colors and messages
+            if ($daysRemaining > 60) {
+                $statusColor = 'white';
+                $statusBg = 'var(--success)';
+                $statusText = 'Active';
+                $icon = 'fa-check-circle';
+                $progressColor = 'bg-success';
+            } elseif ($daysRemaining > 30) {
+                $statusColor = 'black';
+                $statusBg = 'var(--warning)';
+                $statusText = 'Expiring Soon';
+                $icon = 'fa-clock';
+                $progressColor = 'bg-warning';
+            } else {
+                $statusColor = 'black';
+                $statusBg = 'var(--danger)';
+                $statusText = 'Critical';
+                $icon = 'fa-exclamation-triangle';
+                $progressColor = 'bg-danger';
+            }
+        @endphp
 
-                    <div class="col-xl-4 col-md-6 mb-4">
-                        <a href="{{ route('Classes.index') }}" class="text-decoration-none">
-                            <div class="stat-card bg-class text-white">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="card-title">Classes</div>
-                                            <div class="card-value">
-                                                @if (count($classes) > 49)
-                                                    50+
-                                                @else
-                                                    {{ count($classes) }}
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="ti-blackboard card-icon"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
+        <!-- Service Status Card - Premium Compact -->
+        <div class="modern-card service-card-premium mb-4">
+            <div class="p-4">
+                <!-- Header with Status Bar -->
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="service-icon-circle float-animation mr-1">
+                            <i class="fas {{ $icon }}"></i>
+                        </div>
+                        <div>
+                            <span class="badge-premium" style="background: {{ $statusBg }}; color: {{ $statusColor }};">
+                                <i class="fas fa-circle me-1" style="font-size: 8px;"></i>
+                                {{ $statusText }}
+                            </span>
+                            <h5 class="mt-2 mb-0 fw-bold">{{ strtoupper($school->school_name) }}</h5>
+                        </div>
                     </div>
+                    <div class="text-end">
+                        <small class="text-muted d-block">Registration No.</small>
+                        <span class="fw-semibold">{{ strtoupper($school->school_reg_no) }}</span>
+                    </div>
+                </div>
 
-                    <div class="col-xl-4 col-md-6 mb-4">
-                        <a href="{{ route('Transportation.index') }}" class="text-decoration-none">
-                            <div class="stat-card bg-bus text-white">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="card-title">School Buses</div>
-                                            <div class="card-value">
-                                                @if (count($buses) > 49)
-                                                    50+
-                                                @else
-                                                    {{ count($buses) }}
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-bus card-icon"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
+                <!-- Progress Bar -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-1 small">
+                        <span class="text-muted">Service Period Status Bar</span>
+                        <span class="" style="color: var(--dark); font-weight:bold">{{ round($progressPercentage) }}%
+                            Used</span>
+                    </div>
+                    <div class="progress" style="height: 8px; border-radius: 10px;">
+                        <div class="progress-bar {{ $progressColor }}" role="progressbar"
+                            style="width: {{ $progressPercentage }}%; background: {{ $statusColor }};"
+                            aria-valuenow="{{ $progressPercentage }}" aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-1">
+                        <small class="text-muted">{{ $serviceStartDate->format('d M Y') }}</small>
+                        <small class="text-muted">{{ $serviceEndDate->format('d M Y') }}</small>
+                    </div>
+                </div>
+
+                <!-- Countdown Section - FIXED -->
+                <div class="countdown-premium">
+                    <div class="countdown-item">
+                        <span class="number" id="days">00</span>
+                        <span class="label">Days</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="number" id="hours">00</span>
+                        <span class="label">Hours</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="number" id="minutes">00</span>
+                        <span class="label">Minutes</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="number" id="seconds">00</span>
+                        <span class="label">Seconds</span>
                     </div>
                 </div>
             </div>
-
-            <!-- Charts Section -->
-            <div class="col-lg-12 mb-4">
-                <div class="row">
-                    <div class="col-xl-8 mb-4">
-                        <div class="chart-container">
-                            <div class="chart-header">
-                                <h5 class="chart-title">
-                                    <i class="fas fa-chart-bar me-2"></i> Student Registration by Class & Gender
-                                </h5>
-                                <p class="chart-subtitle">Distribution of students across classes</p>
-                            </div>
-                            <div class="chart-wrapper">
-                                <div id="studentChart" class="chart-canvas"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-xl-4 mb-4">
-                        <div class="chart-container">
-                            <div class="chart-header">
-                                <h5 class="chart-title">
-                                    <i class="fas fa-chart-pie me-2"></i> Teacher Qualifications
-                                </h5>
-                                <p class="chart-subtitle">Educational background overview</p>
-                            </div>
-                            <div class="chart-wrapper">
-                                <div id="qualificationChart" class="chart-canvas"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Additional Analytics -->
-            <div class="col-lg-12 mb-4">
-                <div class="row">
-                    <div class="col-xl-4 mb-4">
-                        <div class="chart-container">
-                            <div class="chart-header">
-                                <h5 class="chart-title">
-                                    <i class="fas fa-venus-mars me-2"></i> Student Gender Distribution
-                                </h5>
-                                <p class="chart-subtitle">Male vs Female students ratio</p>
-                            </div>
-                            <div class="chart-wrapper">
-                                <canvas id="genderChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-xl-5 mb-4">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-header bg-white border-0 pb-0">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h5 class="chart-title">
-                                            <i class="fas fa-calendar-check me-2"></i> Today's Attendance Summary
-                                        </h5>
-                                        <p class="text-muted small mb-0">
-                                            {{ \Carbon\Carbon::today()->format('l, d F Y') }}
-                                        </p>
-                                    </div>
-                                    @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
-                                        <span class="badge bg-primary text-white">
-                                            {{ count($attendanceByClassData) }} Streams
-                                        </span>
-                                    @endif
-                                </div>
-                            </div>
-
-                            <div class="card-body p-1">
-                                @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
-                                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                                        <table class="table table-hover mb-0 table-sm">
-                                            <thead class="sticky-top" style="background: #f8f9fa; z-index: 1;">
-                                                <tr>
-                                                    <th class="border-0 py-3 ps-4">Classes</th>
-                                                    <th class="border-0 py-3 text-center">
-                                                        <span class="text-success">Pres</span>
-                                                    </th>
-                                                    <th class="border-0 py-3 text-center">
-                                                        <span class="text-danger">Abs</span>
-                                                    </th>
-                                                    <th class="border-0 py-3 text-center">
-                                                        <span class="text-secondary">Perm</span>
-                                                    </th>
-                                                    <th class="border-0 py-3 text-center pe-4">Total</th>
-                                                    <th class="border-0 py-3 text-center">Rate</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @php
-                                                    $totalPresent = 0;
-                                                    $totalAbsent = 0;
-                                                    $totalPermission = 0;
-                                                    $grandTotalStudents = 0;
-                                                    $previousClass = null;
-
-                                                    // Get total registered students for ALL classes in the school
-                                                    $totalRegisteredInSchool = \App\Models\Student::where(
-                                                        'status',
-                                                        1,
-                                                    )->count();
-
-                                                    $classGroupColors = [
-                                                        'A' => 'bg-success',
-                                                        'B' => 'bg-dark',
-                                                        'C' => 'bg-warning',
-                                                        'D' => 'bg-danger',
-                                                        'E' => 'bg-primary',
-                                                        'F' => 'bg-secondary',
-                                                        'G' => 'bg-info',
-                                                    ];
-                                                @endphp
-
-                                                @foreach ($attendanceByClassData as $classData)
-                                                    @php
-                                                        // Debug: Check if class_id exists
-                                                        $classId = $classData['class_id'] ?? null;
-                                                        $stream = $classData['class_stream'] ?? null;
-
-                                                        // Initialize registered students count
-                                                        $registeredStudents = 0;
-
-                                                        // Only query if class_id exists
-                                                        if ($classId) {
-                                                            try {
-                                                                $query = \App\Models\Student::where(
-                                                                    'class_id',
-                                                                    $classId,
-                                                                )->where('status', 1);
-
-                                                                if (!empty($stream)) {
-                                                                    $query->where('group', $stream);
-                                                                }
-
-                                                                $registeredStudents = $query->count();
-                                                            } catch (Exception $e) {
-                                                                // Fallback: use attendance data if query fails
-                                                                $registeredStudents =
-                                                                    $classData['present'] +
-                                                                    $classData['absent'] +
-                                                                    $classData['permission'];
-                                                            }
-                                                        } else {
-                                                            // If no class_id, use attendance data
-                                                            $registeredStudents =
-                                                                $classData['present'] +
-                                                                $classData['absent'] +
-                                                                $classData['permission'];
-                                                        }
-
-                                                        // Calculate attendance rate for this class
-                                                        // Use registeredStudents for CLASS rate
-                                                        $attendanceRate =
-                                                            $registeredStudents > 0
-                                                                ? round(
-                                                                    ($classData['present'] / $registeredStudents) * 100,
-                                                                    1,
-                                                                )
-                                                                : 0;
-
-                                                        // Update totals
-                                                        $totalPresent += $classData['present'];
-                                                        $totalAbsent += $classData['absent'];
-                                                        $totalPermission += $classData['permission'];
-                                                        $grandTotalStudents += $registeredStudents; // This is for classes with attendance only
-
-                                                        // Determine if we need to show class header
-                                                        $currentClass = $classData['original_class_name'] ?? '';
-                                                        $showClassHeader = $previousClass !== $currentClass;
-                                                        $previousClass = $currentClass;
-
-                                                        // Determine badge color for stream
-                                                        $streamBadgeClass = 'bg-secondary';
-                                                        if ($stream && isset($classGroupColors[strtoupper($stream)])) {
-                                                            $streamBadgeClass = $classGroupColors[strtoupper($stream)];
-                                                        }
-                                                    @endphp
-
-                                                    <tr class="border-bottom">
-                                                        <td class="ps-4">
-                                                            <div class="d-flex align-items-center">
-                                                                <div>
-                                                                    @if (!empty($stream))
-                                                                        <div class="text-dark small">
-                                                                            <strong>{{ strtoupper($classData['class_code'] ?? '') }}
-                                                                                -
-                                                                                <span
-                                                                                    class="badge {{ $streamBadgeClass }} text-white">
-                                                                                    {{ strtoupper($stream) }}
-                                                                                </span>
-                                                                            </strong>
-                                                                        </div>
-                                                                    @else
-                                                                        <strong
-                                                                            class="text-dark">{{ $classData['class_name'] ?? '' }}</strong>
-                                                                        <div class="text-muted small">
-                                                                            {{ $classData['class_code'] ?? '' }}
-                                                                            <br>
-                                                                            Registered: {{ $registeredStudents }}
-                                                                        </div>
-                                                                    @endif
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <span class="px-3 py-1 text-success">
-                                                                {{ $classData['present'] }}
-                                                            </span>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <span class="px-3 py-1 text-danger">
-                                                                {{ $classData['absent'] }}
-                                                            </span>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <span class="px-3 py-1 text-secondary">
-                                                                {{ $classData['permission'] }}
-                                                            </span>
-                                                        </td>
-                                                        <td class="text-center pe-4">
-                                                            <strong>{{ $registeredStudents }}</strong>
-                                                        </td>
-                                                        <td class="text-center">
-                                                            <div class="progress"
-                                                                style="height: 6px; width: 80px; margin: 0 auto;">
-                                                                <div class="progress-bar
-                                                                    @if ($attendanceRate >= 90) bg-success
-                                                                    @elseif($attendanceRate >= 70) bg-info
-                                                                    @elseif($attendanceRate >= 50) bg-warning
-                                                                    @else bg-danger @endif"
-                                                                    role="progressbar"
-                                                                    style="width: {{ min($attendanceRate, 100) }}%"
-                                                                    aria-valuenow="{{ $attendanceRate }}"
-                                                                    aria-valuemin="0" aria-valuemax="100">
-                                                                </div>
-                                                            </div>
-                                                            <small
-                                                                class="text-muted d-block mt-1">{{ $attendanceRate }}%</small>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-
-                                            @if (count($attendanceByClassData) > 1)
-                                                @php
-                                                    // Overall rate for classes with attendance only
-                                                    $overallRate =
-                                                        $grandTotalStudents > 0
-                                                            ? round(($totalPresent / $grandTotalStudents) * 100, 2)
-                                                            : 0;
-
-                                                    // School-wide rate (for display if needed)
-                                                    $schoolWideRate =
-                                                        $totalRegisteredInSchool > 0
-                                                            ? round(($totalPresent / $totalRegisteredInSchool) * 100, 2)
-                                                            : 0;
-                                                @endphp
-                                                <tfoot class="bg-light">
-                                                    <tr>
-                                                        <th class="ps-4 py-3 border-top">
-                                                            <strong>Total</strong>
-                                                        </th>
-                                                        <th class="text-center py-2 border-top">
-                                                            <span
-                                                                class="badge bg-success text-white px-3">{{ $totalPresent }}</span>
-                                                        </th>
-                                                        <th class="text-center py-2 border-top">
-                                                            <span
-                                                                class="badge bg-danger text-white px-3">{{ $totalAbsent }}</span>
-                                                        </th>
-                                                        <th class="text-center py-2 border-top">
-                                                            <span
-                                                                class="badge bg-secondary text-white px-3">{{ $totalPermission }}</span>
-                                                        </th>
-                                                        <th class="text-center pe-4 py-2 border-top">
-                                                            <strong class="text-dark">{{ $grandTotalStudents }}</strong>
-                                                        </th>
-                                                        <th class="text-center py-2 border-top">
-                                                            <div class="d-flex align-items-center justify-content-center">
-                                                                <div class="progress" style="height: 8px; width: 100px;">
-                                                                    @php
-                                                                        $generalRate = round(($totalPresent / $totalRegisteredInSchool) * 100, 2);
-                                                                    @endphp
-                                                                    <div class="progress-bar
-                                                                        @if ($generalRate >= 90) bg-success
-                                                                        @elseif($generalRate >= 70) bg-info
-                                                                        @elseif($generalRate >= 50) bg-warning
-                                                                        @else bg-danger @endif"
-                                                                        role="progressbar"
-                                                                        style="width: {{ min($generalRate, 100) }}%">
-                                                                    </div>
-                                                                </div>
-                                                                <strong
-                                                                    class="ms-2
-                                                                        @if ($generalRate >= 90) text-success
-                                                                        @elseif($generalRate >= 70) text-info
-                                                                        @elseif($generalRate >= 50) text-warning
-                                                                        @else text-danger @endif">
-                                                                    {{ $generalRate }}%
-                                                                </strong>
-                                                            </div>
-                                                        </th>
-                                                    </tr>
-                                                </tfoot>
-                                            @endif
-                                        </table>
-
-                                        {{-- Summary Stats Cards - Use $totalRegisteredInSchool for school-wide percentage --}}
-                                        <div class="row g-2 mt-1 mx-2">
-                                            <div class="col-4">
-                                                <div class="border rounded p-1 text-center">
-                                                    <small class="text-success">Present</small>
-                                                    @if ($totalRegisteredInSchool > 0)
-                                                        <div class="small text-success">
-                                                            {{ round(($totalPresent / $totalRegisteredInSchool) * 100, 2) }}%
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                            <div class="col-4">
-                                                <div class="border rounded p-1 text-center">
-                                                    <small class="text-danger">Absent</small>
-                                                    @if ($totalRegisteredInSchool > 0)
-                                                        <div class="small text-danger">
-                                                            {{ round(($totalAbsent / $totalRegisteredInSchool) * 100, 2) }}%
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                            <div class="col-4">
-                                                <div class="border rounded p-1 text-center">
-                                                    <small class="text-secondary">Permission</small>
-                                                    @if ($totalRegisteredInSchool > 0)
-                                                        <div class="small text-secondary">
-                                                            {{ round(($totalPermission / $totalRegisteredInSchool) * 100, 2) }}%
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+        </div>
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <!-- Teachers Card -->
+            <div class="col-xl-4 col-md-4 col-6">
+                <a href="{{ route('Teachers.index') }}" class="text-decoration-none">
+                    <div class="stat-card-premium bg-gradient-teacher">
+                        <div class="card-body">
+                            <div class="card-title">Teachers</div>
+                            <div class="card-value">
+                                @if (count($teachers) > 99)
+                                    100+
                                 @else
-                                    <div class="text-center py-5">
-                                        <div class="mb-3">
-                                            <i class="fas fa-calendar-times fa-3x text-muted"></i>
-                                        </div>
-                                        <h5 class="text-muted mb-2">No Attendance Today</h5>
-                                        <p class="text-muted small">
-                                            Attendance records will appear here once submitted by teachers.
-                                        </p>
-                                    </div>
+                                    {{ count($teachers) }}
                                 @endif
                             </div>
+                            <i class="fas fa-user-tie card-icon"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
 
+            <!-- Parents Card -->
+            <div class="col-xl-4 col-md-4 col-6">
+                <a href="{{ route('Parents.index') }}" class="text-decoration-none">
+                    <div class="stat-card-premium bg-gradient-parent">
+                        <div class="card-body">
+                            <div class="card-title">Parents</div>
+                            <div class="card-value">
+                                @if (count($parents) > 1999)
+                                    2000+
+                                @else
+                                    {{ count($parents) }}
+                                @endif
+                            </div>
+                            <i class="fas fa-user-friends card-icon"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Students Card -->
+            <div class="col-xl-4 col-md-4 col-6">
+                <a href="{{ route('classes.list') }}" class="text-decoration-none">
+                    <div class="stat-card-premium bg-gradient-student">
+                        <div class="card-body">
+                            <div class="card-title">Students</div>
+                            <div class="card-value">
+                                @if (count($students) > 1999)
+                                    2000+
+                                @else
+                                    {{ count($students) }}
+                                @endif
+                            </div>
+                            <i class="fas fa-user-graduate card-icon"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <!-- Courses Card -->
+        <div class="row g-4 mb-4">
+            <div class="col-xl-4 col-md-4 col-6">
+                <a href="{{ route('courses.index') }}" class="text-decoration-none">
+                    <div class="stat-card-premium bg-gradient-course">
+                        <div class="card-body">
+                            <div class="card-title">Courses</div>
+                            <div class="card-value">
+                                @if (count($subjects) > 49)
+                                    50+
+                                @else
+                                    {{ count($subjects) }}
+                                @endif
+                            </div>
+                            <i class="ti-book card-icon"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Classes Card -->
+            <div class="col-xl-4 col-md-4 col-6">
+                <a href="{{ route('Classes.index') }}" class="text-decoration-none">
+                    <div class="stat-card-premium bg-gradient-class">
+                        <div class="card-body">
+                            <div class="card-title">Classes</div>
+                            <div class="card-value">
+                                @if (count($classes) > 49)
+                                    50+
+                                @else
+                                    {{ count($classes) }}
+                                @endif
+                            </div>
+                            <i class="ti-blackboard card-icon"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Buses Card -->
+            <div class="col-xl-4 col-md-4 col-6">
+                <a href="{{ route('Transportation.index') }}" class="text-decoration-none">
+                    <div class="stat-card-premium bg-gradient-bus">
+                        <div class="card-body">
+                            <div class="card-title">Buses</div>
+                            <div class="card-value">
+                                @if (count($buses) > 49)
+                                    50+
+                                @else
+                                    {{ count($buses) }}
+                                @endif
+                            </div>
+                            <i class="fas fa-bus card-icon"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row g-4 mb-4">
+            <!-- Student Registration Chart -->
+            <div class="col-xl-8">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h5 class="chart-title">
+                            <i class="fas fa-chart-bar me-2"></i> Student Registration by Class & Gender
+                        </h5>
+                        <p class="text-muted small mb-0">Distribution of students across classes</p>
+                    </div>
+                    <div style="height: 350px;" id="studentChart"></div>
+                </div>
+            </div>
+
+            <!-- Teacher Qualifications Chart -->
+            <div class="col-xl-4">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h5 class="chart-title">
+                            <i class="fas fa-chart-pie me-2"></i> Teacher Qualifications
+                        </h5>
+                        <p class="text-muted small mb-0">Educational background</p>
+                    </div>
+                    <div style="height: 350px;" id="qualificationChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Row -->
+        <div class="row g-4">
+            <!-- Gender Distribution -->
+            <div class="col-xl-4">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h5 class="chart-title">
+                            <i class="fas fa-venus-mars me-2"></i> Student Gender Distribution
+                        </h5>
+                        <p class="text-muted small mb-0">Male vs Female students ratio</p>
+                    </div>
+                    <div style="height: 350px;">
+                        <canvas id="genderChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Summary -->
+            <div class="col-xl-5">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="chart-title">
+                                    <i class="fas fa-calendar-check me-2"></i> Today's Attendance Summary
+                                </h5>
+                                <p class="text-muted small mb-0">{{ now()->format('l, d F Y') }}</p>
+                            </div>
                             @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
-                                <div class="card-footer bg-white border-0 pt-0">
-                                    <div class="text-end">
-                                        <small class="text-muted">
-                                            <i class="fas fa-info-circle me-1"></i>
-                                            Updated: {{ now()->format('h:i A') }}
-                                        </small>
-                                    </div>
-                                </div>
+                                <span class="badge-premium" style="background: var(--primary); color: white;">
+                                    {{ count($attendanceByClassData) }} Streams
+                                </span>
                             @endif
                         </div>
                     </div>
 
-                    <!-- Quick Stats Tables -->
-                    <div class="col-xl-3 mb-4">
-                        <div class="chart-container">
-                            <div class="chart-header">
-                                <h5 class="chart-title">
-                                    <i class="fas fa-table me-2"></i> Quick Overview
-                                </h5>
-                                <p class="chart-subtitle">Registration statistics</p>
-                            </div>
-                            <div class="row">
-                                <!-- Students by Class -->
-                                <div class="col-12 mb-3">
-                                    <div class="card border-0 bg-light">
-                                        <div class="card-body p-3">
-                                            <h6 class="card-title text-center mb-3 text-primary">Students by Class</h6>
-                                            @if ($studentsByClass->isEmpty())
-                                                <p class="text-center text-muted mb-0">No records available</p>
-                                            @else
-                                                <div class="table-responsive">
-                                                    <table class="table table-sm dashboard-table mb-0">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Class</th>
-                                                                <th class="text-end">Count</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach ($studentsByClass as $class)
-                                                                <tr>
-                                                                    <td class="fw-semibold text-uppercase">
-                                                                        {{ $class->class_code }}</td>
-                                                                    <td class="text-end">
-                                                                        {{ strtoupper($class->student_count) }}</td>
-                                                                </tr>
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
+                    @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
+                        <div class="table-responsive" style="max-height: 350px;">
+                            <table class="table table-premium">
+                                <thead>
+                                    <tr>
+                                        <th>Class</th>
+                                        <th class="text-center">Pres</th>
+                                        <th class="text-center">Abs</th>
+                                        <th class="text-center">Perm</th>
+                                        <th class="text-center">Rate</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                        $totalPresent = 0;
+                                        $totalStudents = 0;
+                                    @endphp
+                                    @foreach ($attendanceByClassData as $classData)
+                                        @php
+                                            $classId = $classData['class_id'] ?? null;
+                                            $stream = $classData['class_stream'] ?? null;
 
-                                <!-- Teachers by Gender -->
-                                <div class="col-12">
-                                    <div class="card border-0 bg-light">
-                                        <div class="card-body p-3">
-                                            <h6 class="card-title text-center mb-3 text-primary">Teachers by Gender
-                                            </h6>
-                                            @if ($teacherByGender->isEmpty())
-                                                <p class="text-center text-muted mb-0">No records available</p>
-                                            @else
-                                                <div class="table-responsive">
-                                                    <table class="table table-sm dashboard-table mb-0">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Gender</th>
-                                                                <th class="text-end">Count</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach ($teacherByGender as $teacher)
-                                                                <tr>
-                                                                    <td class="fw-semibold text-capitalize">
-                                                                        {{ ucwords(strtolower($teacher->gender)) }}
-                                                                    </td>
-                                                                    <td class="text-end">{{ $teacher->teacher_count }}
-                                                                    </td>
-                                                                </tr>
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
+                                            $registeredStudents = $classId
+                                                ? \App\Models\Student::where('class_id', $classId)
+                                                    ->when($stream, fn($q) => $q->where('group', $stream))
+                                                    ->where('status', 1)
+                                                    ->count()
+                                                : $classData['present'] +
+                                                    $classData['absent'] +
+                                                    $classData['permission'];
+
+                                            $attendanceRate =
+                                                $registeredStudents > 0
+                                                    ? round(($classData['present'] / $registeredStudents) * 100, 1)
+                                                    : 0;
+
+                                            $totalPresent += $classData['present'];
+                                            $totalStudents += $registeredStudents;
+                                        @endphp
+                                        <tr>
+                                            <td>
+                                                <span class="fw-semibold">{{ $classData['class_code'] ?? '' }}</span>
+                                                @if (!empty($stream))
+                                                    <span class="badge bg-primary bg-opacity-10 text-primary ms-1">
+                                                        {{ strtoupper($stream) }}
+                                                    </span>
+                                                @endif
+                                            </td>
+                                            <td class="text-center fw-bold text-success">{{ $classData['present'] }}</td>
+                                            <td class="text-center text-danger">{{ $classData['absent'] }}</td>
+                                            <td class="text-center text-secondary">{{ $classData['permission'] }}</td>
+                                            <td class="text-center">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="progress flex-grow-1" style="height: 6px;">
+                                                        <div class="progress-bar {{ $attendanceRate >= 70 ? 'bg-success' : ($attendanceRate >= 50 ? 'bg-warning' : 'bg-danger') }}"
+                                                            style="width: {{ $attendanceRate }}%"></div>
+                                                    </div>
+                                                    <small class="fw-semibold">{{ $attendanceRate }}%</small>
                                                 </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot class="bg-light">
+                                    <tr>
+                                        <th>Overall</th>
+                                        <th class="text-center text-success">{{ $totalPresent }}</th>
+                                        <th class="text-center text-danger">
+                                            {{ array_sum(array_column($attendanceByClassData, 'absent')) }}</th>
+                                        <th class="text-center text-secondary">
+                                            {{ array_sum(array_column($attendanceByClassData, 'permission')) }}</th>
+                                        <th class="text-center">
+                                            @php $overallRate = $totalStudents > 0 ? round(($totalPresent / $totalStudents) * 100, 1) : 0; @endphp
+                                            <span
+                                                class="badge-premium {{ $overallRate >= 70 ? 'bg-success' : ($overallRate >= 50 ? 'bg-warning' : 'bg-danger') }}"
+                                                style="color: white;">
+                                                {{ $overallRate }}%
+                                            </span>
+                                        </th>
+                                    </tr>
+                                </tfoot>
+                            </table>
                         </div>
+                    @else
+                        <div class="text-center py-5">
+                            <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                            <h6 class="text-muted">No Attendance Today</h6>
+                            <p class="text-muted small">Records will appear once submitted</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="col-xl-3">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h5 class="chart-title">
+                            <i class="fas fa-table me-2"></i> Quick Overview
+                        </h5>
+                    </div>
+
+                    <!-- Students by Class -->
+                    <div class="mb-4">
+                        <h6 class="text-muted small fw-bold mb-3">Students by Class</h6>
+                        @if ($studentsByClass->isEmpty())
+                            <p class="text-center text-muted small">No data</p>
+                        @else
+                            @foreach ($studentsByClass as $class)
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="small fw-semibold">{{ strtoupper($class->class_code) }}</span>
+                                    <span class="">
+                                        {{ $class->student_count }}
+                                    </span>
+                                </div>
+                            @endforeach
+                        @endif
+                    </div>
+
+                    <!-- Teachers by Gender -->
+                    <div>
+                        <h6 class="text-muted small fw-bold mb-3">Teachers by Gender</h6>
+                        @if ($teacherByGender->isEmpty())
+                            <p class="text-center text-muted small">No data</p>
+                        @else
+                            @foreach ($teacherByGender as $teacher)
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span
+                                        class="small fw-semibold text-capitalize">{{ ucfirst(strtolower($teacher->gender)) }}</span>
+                                    <span class="">
+                                        {{ $teacher->teacher_count }}
+                                    </span>
+                                </div>
+                            @endforeach
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript Libraries -->
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
     <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
     <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
     <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Student Registration Chart (ECharts)
-            var chartDom = document.getElementById('studentChart');
-            if (chartDom) {
-                var myChart = echarts.init(chartDom);
-                var chartData = @json($chartData);
+            // ========== FIXED COUNTDOWN TIMER ==========
+            function initializeCountdown() {
+                const endDateStr = '{{ $jsEndDate }}';
+                // Parse the date properly
+                const endDate = new Date(endDateStr.replace(' ', 'T')).getTime();
 
-                var groupedData = {};
+                function updateCountdown() {
+                    const now = new Date().getTime();
+                    const distance = endDate - now;
+
+                    // Get elements
+                    const daysEl = document.getElementById('days');
+                    const hoursEl = document.getElementById('hours');
+                    const minutesEl = document.getElementById('minutes');
+                    const secondsEl = document.getElementById('seconds');
+
+                    if (!daysEl || !hoursEl || !minutesEl || !secondsEl) return;
+
+                    if (distance <= 0) {
+                        daysEl.innerText = "00";
+                        hoursEl.innerText = "00";
+                        minutesEl.innerText = "00";
+                        secondsEl.innerText = "00";
+                        return;
+                    }
+
+                    // Calculate time units
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    // Format with leading zeros
+                    const format = (num) => num.toString().padStart(2, '0');
+
+                    // Update with animation
+                    updateNumberWithAnimation(daysEl, format(days));
+                    updateNumberWithAnimation(hoursEl, format(hours));
+                    updateNumberWithAnimation(minutesEl, format(minutes));
+                    updateNumberWithAnimation(secondsEl, format(seconds));
+                }
+
+                function updateNumberWithAnimation(element, newValue) {
+                    if (element.innerText !== newValue) {
+                        element.style.transform = 'scale(1.2)';
+                        element.style.transition = 'transform 0.2s ease';
+
+                        setTimeout(() => {
+                            element.innerText = newValue;
+                            element.style.transform = 'scale(1)';
+                        }, 100);
+                    }
+                }
+
+                // Initial call and set interval
+                updateCountdown();
+                setInterval(updateCountdown, 1000);
+            }
+
+            // Initialize countdown
+            initializeCountdown();
+
+            // ========== STUDENT CHART (ECharts) ==========
+            const chartDom = document.getElementById('studentChart');
+            if (chartDom) {
+                const myChart = echarts.init(chartDom);
+                const chartData = @json($chartData);
+
+                // Process data
+                const groupedData = {};
                 chartData.forEach(item => {
-                    var classCode = item.category.split(' (')[0];
-                    var gender = item.category.includes('Male') ? 'Male' : 'Female';
+                    const classCode = item.category.split(' (')[0];
+                    const gender = item.category.includes('Male') ? 'Male' : 'Female';
                     if (!groupedData[classCode]) {
                         groupedData[classCode] = {
                             Male: 0,
@@ -853,11 +838,11 @@
                     groupedData[classCode][gender] = item.value;
                 });
 
-                var classCodes = Object.keys(groupedData);
-                var maleData = classCodes.map(classCode => groupedData[classCode].Male);
-                var femaleData = classCodes.map(classCode => groupedData[classCode].Female);
+                const classCodes = Object.keys(groupedData);
+                const maleData = classCodes.map(code => groupedData[code].Male);
+                const femaleData = classCodes.map(code => groupedData[code].Female);
 
-                var option = {
+                const option = {
                     tooltip: {
                         trigger: 'axis',
                         axisPointer: {
@@ -888,38 +873,39 @@
                             name: 'Male',
                             type: 'bar',
                             stack: 'total',
-                            emphasis: {
-                                focus: 'series'
-                            },
-                            data: maleData
+                            data: maleData,
+                            itemStyle: {
+                                color: '#4e73df'
+                            }
                         },
                         {
                             name: 'Female',
                             type: 'bar',
                             stack: 'total',
-                            emphasis: {
-                                focus: 'series'
-                            },
-                            data: femaleData
+                            data: femaleData,
+                            itemStyle: {
+                                color: '#e74a3b'
+                            }
                         }
                     ]
                 };
                 myChart.setOption(option);
+                window.addEventListener('resize', () => myChart.resize());
             }
 
-            // Teacher Qualifications Chart (amCharts)
+            // ========== QUALIFICATION CHART (amCharts) ==========
             if (document.getElementById('qualificationChart')) {
                 am5.ready(function() {
-                    var root = am5.Root.new("qualificationChart");
+                    const root = am5.Root.new("qualificationChart");
                     root.setThemes([am5themes_Animated.new(root)]);
 
-                    var chart = root.container.children.push(
+                    const chart = root.container.children.push(
                         am5percent.PieChart.new(root, {
                             layout: root.verticalLayout
                         })
                     );
 
-                    var series = chart.series.push(
+                    const series = chart.series.push(
                         am5percent.PieSeries.new(root, {
                             valueField: "value",
                             categoryField: "category"
@@ -928,19 +914,19 @@
 
                     series.data.setAll([{
                             category: "Masters",
-                            value: {{ $qualificationData['masters'] }}
+                            value: {{ $qualificationData['masters'] ?? 0 }}
                         },
                         {
                             category: "Degree",
-                            value: {{ $qualificationData['bachelor'] }}
+                            value: {{ $qualificationData['bachelor'] ?? 0 }}
                         },
                         {
                             category: "Diploma",
-                            value: {{ $qualificationData['diploma'] }}
+                            value: {{ $qualificationData['diploma'] ?? 0 }}
                         },
                         {
                             category: "Certificate",
-                            value: {{ $qualificationData['certificate'] }}
+                            value: {{ $qualificationData['certificate'] ?? 0 }}
                         }
                     ]);
 
@@ -949,21 +935,19 @@
                 });
             }
 
-            // Gender Distribution Chart
+            // ========== GENDER CHART (Chart.js) ==========
             const genderCtx = document.getElementById('genderChart');
             if (genderCtx) {
-                const totalMaleStudents = @json($totalMaleStudents);
-                const totalFemaleStudents = @json($totalFemaleStudents);
-
                 new Chart(genderCtx, {
                     type: 'doughnut',
                     data: {
                         labels: ['Male Students', 'Female Students'],
                         datasets: [{
-                            data: [totalMaleStudents, totalFemaleStudents],
+                            data: [{{ $totalMaleStudents ?? 0 }},
+                                {{ $totalFemaleStudents ?? 0 }}
+                            ],
                             backgroundColor: ['#4e73df', '#e74a3b'],
-                            borderWidth: 2,
-                            borderColor: '#ffffff'
+                            borderWidth: 0
                         }]
                     },
                     options: {
@@ -975,20 +959,20 @@
                             },
                             tooltip: {
                                 callbacks: {
-                                    label: function(context) {
-                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                        const percentage = ((context.parsed / total) * 100).toFixed(1);
-                                        return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                    label: (ctx) => {
+                                        const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((ctx.parsed / total) * 100).toFixed(1);
+                                        return `${ctx.label}: ${ctx.parsed} (${percentage}%)`;
                                     }
                                 }
                             }
                         },
-                        cutout: '60%'
+                        cutout: '65%'
                     }
                 });
             }
 
-            // Authorization check
+            // ========== AUTHORIZATION CHECK ==========
             @if (Auth::user()->usertype != 2)
                 window.location.href = '/error-page';
             @endif

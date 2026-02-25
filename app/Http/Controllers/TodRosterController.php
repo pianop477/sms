@@ -27,25 +27,27 @@ class TodRosterController extends Controller
      */
     public function assignTeachers(Request $request, $year)
     {
-        $validated = $request->validate([
-            'teacher_ids' => 'required|array|min:1',
-            'teacher_ids.*' => 'exists:teachers,id',
-            'start_date' => 'required|date',
-            'end_date'   => 'required|date|after_or_equal:start_date',
-        ],
-        [
-            'teacher_ids.required' => 'Please select at least one teacher.',
-            'teacher_ids.array' => 'Invalid teacher selection.',
-            'teacher_ids.*.exists' => 'Selected teacher does not exist.',
-            'start_date.required' => 'Start date is required.',
-            'end_date.required' => 'End date is required.',
-            'end_date.after_or_equal' => 'End date must be after or equal to start date.',
-        ]);
+        $validated = $request->validate(
+            [
+                'teacher_ids' => 'required|array|min:1',
+                'teacher_ids.*' => 'exists:teachers,id',
+                'start_date' => 'required|date',
+                'end_date'   => 'required|date|after_or_equal:start_date',
+            ],
+            [
+                'teacher_ids.required' => 'Please select at least one teacher.',
+                'teacher_ids.array' => 'Invalid teacher selection.',
+                'teacher_ids.*.exists' => 'Selected teacher does not exist.',
+                'start_date.required' => 'Start date is required.',
+                'end_date.required' => 'End date is required.',
+                'end_date.after_or_equal' => 'End date must be after or equal to start date.',
+            ]
+        );
 
         // check for existing roster using start date
         $itExist = TodRoster::where('start_date', $request->start_date)->orWhere('end_date', $request->end_date)->exists();
 
-        if($itExist) {
+        if ($itExist) {
             Alert::error('Error', 'The selected start date or end date already exists in the roster');
             return back();
         }
@@ -56,16 +58,16 @@ class TodRosterController extends Controller
 
         $school = school::findOrFail($authUser->school_id);
         $randomNumber = rand(0, 1000);
-        $rosterId = $school->abbriv_code. '-'.  date('Y') . '-'. str_pad($randomNumber, 4, '0', STR_PAD_LEFT);
+        $rosterId = $school->abbriv_code . '-' .  date('Y') . '-' . str_pad($randomNumber, 4, '0', STR_PAD_LEFT);
         foreach ($validated['teacher_ids'] as $teacherId) {
-                $assignments[] = TodRoster::create([
-                    'roster_id' => $rosterId,
-                    'teacher_id' => $teacherId,
-                    'start_date' => $validated['start_date'],
-                    'end_date'   => $validated['end_date'],
-                    'created_by' => $authUser->first_name . ' ' . $authUser->last_name,
-                    'updated_by' => $authUser->first_name . ' ' . $authUser->last_name,
-                ]);
+            $assignments[] = TodRoster::create([
+                'roster_id' => $rosterId,
+                'teacher_id' => $teacherId,
+                'start_date' => $validated['start_date'],
+                'end_date'   => $validated['end_date'],
+                'created_by' => $authUser->first_name . ' ' . $authUser->last_name,
+                'updated_by' => $authUser->first_name . ' ' . $authUser->last_name,
+            ]);
         }
 
         Alert()->toast('Teachers assigned successfully!', 'success');
@@ -78,16 +80,16 @@ class TodRosterController extends Controller
         $schoolId = $authUser->school_id;
 
         $rosters = TodRoster::query()
-                    ->join('teachers', 'teachers.id', '=', 'tod_rosters.teacher_id')
-                    ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-                    ->select('tod_rosters.*', 'users.first_name', 'users.last_name', 'users.email', 'teachers.id as teacher_id')
-                    ->where('teachers.school_id', $schoolId)
-                    ->orderBy('tod_rosters.updated_at', 'DESC')
-                    ->orderBy('tod_rosters.start_date', 'DESC')
-                    ->get()
-                    ->groupBy(function($item) {
-                    return Carbon::parse($item->start_date)->format('Y');
-                    });
+            ->join('teachers', 'teachers.id', '=', 'tod_rosters.teacher_id')
+            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+            ->select('tod_rosters.*', 'users.first_name', 'users.last_name', 'users.email', 'teachers.id as teacher_id')
+            ->where('teachers.school_id', $schoolId)
+            ->orderBy('tod_rosters.updated_at', 'DESC')
+            ->orderBy('tod_rosters.start_date', 'DESC')
+            ->get()
+            ->groupBy(function ($item) {
+                return Carbon::parse($item->start_date)->format('Y');
+            });
 
         return view('duty_roster.duty_by_year', compact('rosters'));
     }
@@ -95,23 +97,23 @@ class TodRosterController extends Controller
     public function index($year)
     {
         $rosters = TodRoster::query()
-                            ->join('teachers', 'teachers.id', '=', 'tod_rosters.teacher_id')
-                            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-                            ->select('tod_rosters.*', 'users.first_name', 'users.last_name', 'users.email', 'teachers.id as teacher_id')
-                            ->orderBy('tod_rosters.updated_at', 'DESC')
-                            ->whereYear('tod_rosters.start_date', $year)
-                            ->orderBy('tod_rosters.start_date', 'DESC')
-                            ->get()
-                            ->groupBy('start_date');
+            ->join('teachers', 'teachers.id', '=', 'tod_rosters.teacher_id')
+            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+            ->select('tod_rosters.*', 'users.first_name', 'users.last_name', 'users.email', 'teachers.id as teacher_id')
+            ->orderBy('tod_rosters.updated_at', 'DESC')
+            ->whereYear('tod_rosters.start_date', $year)
+            ->orderBy('tod_rosters.start_date', 'DESC')
+            ->get()
+            ->groupBy('start_date');
         // return $rosters;
 
         $teachers = Teacher::query()
-                            ->join('users', 'users.id', '=', 'teachers.user_id')
-                            ->select('teachers.id', 'users.first_name', 'users.last_name')
-                            ->whereIn('role_id', [1, 4])
-                            ->where('teachers.status', 1)
-                            ->orderBy('users.first_name')
-                            ->get();
+            ->join('users', 'users.id', '=', 'teachers.user_id')
+            ->select('teachers.id', 'users.first_name', 'users.last_name')
+            ->whereIn('role_id', [1, 4])
+            ->where('teachers.status', 1)
+            ->orderBy('users.first_name')
+            ->get();
         return view('duty_roster.index', compact('rosters', 'teachers', 'year'));
     }
 
@@ -119,7 +121,7 @@ class TodRosterController extends Controller
     {
         $roster = TodRoster::findOrFail($id);
 
-        if($roster->status == 'active') {
+        if ($roster->status == 'active') {
             Alert()->toast('Cannot delete an active duty roster.', 'error');
             return redirect()->route('tod.roster.index', ['year' => $year]);
         }
@@ -206,7 +208,7 @@ class TodRosterController extends Controller
 
         // Step 1: Pata classes zote (grades) na group ya students, hata kama registered=0
         $classes = DB::table('grades')
-            ->leftJoin('students', function($join) use ($schoolId) {
+            ->leftJoin('students', function ($join) use ($schoolId) {
                 $join->on('students.class_id', '=', 'grades.id')
                     ->where('students.school_id', $schoolId)
                     ->where('students.status', 1);
@@ -356,12 +358,46 @@ class TodRosterController extends Controller
             'attendance'           => 'nullable|array',
         ]);
 
+        if (!$request->has('attendance') || empty($request->attendance)) {
+            Alert()->toast('No attendance data provided.', 'warning');
+            return back();
+        }
+
+        $invalidClasses = [];
+        foreach ($request->attendance as $key => $values) {
+            // Skip invalid keys
+            $keyParts = explode('_', $key);
+            if (count($keyParts) < 2) continue;
+
+            $classId = $keyParts[0];
+            $stream = $keyParts[1];
+
+            // Skip invalid class IDs
+            if ($classId === 'undefined' || $classId === 'total' || !is_numeric($classId)) continue;
+
+            // CHECK KAMA PRESENT IMEKUWA 0 KWA AIDHA BOYS AU GIRLS
+            $presentBoys = isset($values['present_boys']) ? (int)$values['present_boys'] : 0;
+            $presentGirls = isset($values['present_girls']) ? (int)$values['present_girls'] : 0;
+
+            if ($presentBoys === 0 || $presentGirls === 0) {
+                // Pata class name kwa ajili ya error message
+                $className = $this->getClassName($classId); // Unda method hii au tumia model
+                $invalidClasses[] = "Class {$className} ({$stream}) - Present Boys: {$presentBoys}, Present Girls: {$presentGirls}";
+            }
+        }
+
+        if (!empty($invalidClasses)) {
+            $message = "Attendance not collected for the following classes:\n" . implode("\n", $invalidClasses);
+            Alert()->toast($message, 'error');
+            return back()->withInput();
+        }
+
         DB::beginTransaction();
 
         try {
             // 1️⃣ Pata active tod_roster ya mwalimu aliye login
             $user = Auth::user();
-            if(!$user) {
+            if (!$user) {
                 Alert()->toast('User not authorized.', 'error');
                 return back();
             }
@@ -401,69 +437,58 @@ class TodRosterController extends Controller
             ]);
 
             // 3️⃣ Hifadhi attendance records ikiwa zipo
-            if ($request->has('attendance')) {
-                // \Log::info('Attendance data found: ' . json_encode($request->attendance));
+            foreach ($request->attendance as $key => $values) {
+                $keyParts = explode('_', $key);
+                if (count($keyParts) < 2) continue;
 
-                foreach ($request->attendance as $key => $values) {
-                    // Tenga class_id na stream kutoka kwenye key
-                    $keyParts = explode('_', $key);
+                $classId = $keyParts[0];
+                $stream = $keyParts[1];
 
-                    // Hakikisha key ina sehemu mbili (class_id na stream)
-                    if (count($keyParts) < 2) {
-                        // \Log::info('Skipping invalid key format: ' . $key);
-                        continue;
-                    }
+                if ($classId === 'undefined' || $classId === 'total' || !is_numeric($classId)) continue;
 
-                    $classId = $keyParts[0];
-                    $stream = $keyParts[1];
-
-                    // Skip rows with invalid class_id
-                    if ($classId === 'undefined' || $classId === 'total' || !is_numeric($classId)) {
-                        // \Log::info('Skipping invalid class ID: ' . $classId);
-                        continue;
-                    }
-
-                    // \Log::info('Processing class ID: ' . $classId . ', stream: ' . $stream . ' with values: ' . json_encode($values));
-
-                    try {
-                        $attendance = daily_report_attendance::create([
-                            'daily_report_id'  => $report->id,
-                            'class_id'         => (int)$classId,
-                            'group'            => $stream, // Tumia stream from the key
-                            'registered_boys'  => isset($values['registered_boys']) ? (int)$values['registered_boys'] : 0,
-                            'registered_girls' => isset($values['registered_girls']) ? (int)$values['registered_girls'] : 0,
-                            'present_boys'     => isset($values['present_boys']) ? (int)$values['present_boys'] : 0,
-                            'present_girls'    => isset($values['present_girls']) ? (int)$values['present_girls'] : 0,
-                            'absent_boys'      => isset($values['absent_boys']) ? (int)$values['absent_boys'] : 0,
-                            'absent_girls'     => isset($values['absent_girls']) ? (int)$values['absent_girls'] : 0,
-                            'permission_boys'  => isset($values['permission_boys']) ? (int)$values['permission_boys'] : 0,
-                            'permission_girls' => isset($values['permission_girls']) ? (int)$values['permission_girls'] : 0,
-                        ]);
-
-                        // \Log::info('Successfully saved attendance for class ID: ' . $classId . ', stream: ' . $stream);
-                    } catch (\Exception $e) {
-                        // \Log::error('Error saving attendance for class ID ' . $classId . ', stream: ' . $stream . ': ' . $e->getMessage());
-                        // Continue with other records instead of throwing error
-                        continue;
-                    }
+                try {
+                    $attendance = daily_report_attendance::create([
+                        'daily_report_id'  => $report->id,
+                        'class_id'         => (int)$classId,
+                        'group'            => $stream,
+                        'registered_boys'  => isset($values['registered_boys']) ? (int)$values['registered_boys'] : 0,
+                        'registered_girls' => isset($values['registered_girls']) ? (int)$values['registered_girls'] : 0,
+                        'present_boys'     => isset($values['present_boys']) ? (int)$values['present_boys'] : 0,
+                        'present_girls'    => isset($values['present_girls']) ? (int)$values['present_girls'] : 0,
+                        'absent_boys'      => isset($values['absent_boys']) ? (int)$values['absent_boys'] : 0,
+                        'absent_girls'     => isset($values['absent_girls']) ? (int)$values['absent_girls'] : 0,
+                        'permission_boys'  => isset($values['permission_boys']) ? (int)$values['permission_boys'] : 0,
+                        'permission_girls' => isset($values['permission_girls']) ? (int)$values['permission_girls'] : 0,
+                    ]);
+                } catch (\Exception $e) {
+                    // Log error but continue
+                    continue;
                 }
-            } else {
-                // \Log::info('No attendance data found in request');
-                Alert()->toast('No attendance data provided.', 'warning');
-                return back();
             }
 
             DB::commit();
-
             Alert()->toast('Daily report submitted successfully.', 'success');
             return redirect()->route('tod.report.create');
-
         } catch (\Exception $e) {
             DB::rollBack();
-            // Log::error('Failed to save report: ' . $e->getMessage());
             Alert()->toast('Failed to save report: ' . $e->getMessage(), 'error');
             return back();
         }
+    }
+
+    /**
+     * Helper method kupata class name kwa class ID
+     */
+    private function getClassName($classId)
+    {
+
+        try {
+            $class = Grade::find($classId);
+            return $class ? $class->name : 'Class ID: ' . $classId;
+        } catch (\Exception $e) {
+            return 'Class ID: ' . $classId;
+        }
+
     }
 
     public function getSchoolReport()
@@ -471,11 +496,11 @@ class TodRosterController extends Controller
         $today = Carbon::today()->format('Y-m-d');
         $pendingReports = daily_report_details::where('status', 'pending')->count();
         $reports = daily_report_attendance::query()
-                                ->join('daily_report_details', 'daily_report_attendances.daily_report_id', '=', 'daily_report_details.id')
-                                ->leftJoin('tod_rosters', 'daily_report_details.tod_roster_id', '=', 'tod_rosters.id')
-                                ->leftJoin('teachers', 'tod_rosters.teacher_id', '=', 'teachers.id')
-                                ->leftJoin('users', 'teachers.user_id', '=', 'users.id')
-                                ->selectRaw('
+            ->join('daily_report_details', 'daily_report_attendances.daily_report_id', '=', 'daily_report_details.id')
+            ->leftJoin('tod_rosters', 'daily_report_details.tod_roster_id', '=', 'tod_rosters.id')
+            ->leftJoin('teachers', 'tod_rosters.teacher_id', '=', 'teachers.id')
+            ->leftJoin('users', 'teachers.user_id', '=', 'users.id')
+            ->selectRaw('
                                     daily_report_details.report_date,
                                     SUM(daily_report_attendances.registered_boys) as registered_boys,
                                     SUM(daily_report_attendances.registered_girls) as registered_girls,
@@ -486,18 +511,18 @@ class TodRosterController extends Controller
                                     users.last_name,
                                     daily_report_details.status
                                 ')
-                                ->where('daily_report_details.status', 'pending')
-                                ->groupBy('tod_rosters.roster_id', 'users.first_name', 'users.last_name', 'daily_report_details.report_date', 'daily_report_details.status')
-                                ->orderBy('daily_report_details.report_date', 'desc')
-                                ->get();
+            ->where('daily_report_details.status', 'pending')
+            ->groupBy('tod_rosters.roster_id', 'users.first_name', 'users.last_name', 'daily_report_details.report_date', 'daily_report_details.status')
+            ->orderBy('daily_report_details.report_date', 'desc')
+            ->get();
 
         // return $reports;
         $totalRegistered = Student::where('status', 1)->count();
         $reportSummary = daily_report_attendance::query()
-                                    ->join('daily_report_details', 'daily_report_attendances.daily_report_id', '=', 'daily_report_details.id')
-                                    ->select('daily_report_attendances.*', 'daily_report_details.report_date')
-                                    ->where('daily_report_details.report_date', $today);
-        return view('duty_roster.school_report',compact('reports', 'totalRegistered', 'pendingReports', 'today', 'reportSummary'));
+            ->join('daily_report_details', 'daily_report_attendances.daily_report_id', '=', 'daily_report_details.id')
+            ->select('daily_report_attendances.*', 'daily_report_details.report_date')
+            ->where('daily_report_details.report_date', $today);
+        return view('duty_roster.school_report', compact('reports', 'totalRegistered', 'pendingReports', 'today', 'reportSummary'));
     }
 
 
@@ -509,29 +534,28 @@ class TodRosterController extends Controller
         // return $roster;
 
         $dailyAttendance = daily_report_attendance::query()
-                            ->join('grades', 'grades.id', '=', 'daily_report_attendances.class_id')
-                            ->select('daily_report_attendances.*', 'grades.class_code')
-                            ->where('daily_report_id', $reportDetails->id)
-                            ->orderBy('grades.class_code', 'ASC')
-                            ->orderBY('daily_report_attendances.group', 'ASC')
-                            ->get();
+            ->join('grades', 'grades.id', '=', 'daily_report_attendances.class_id')
+            ->select('daily_report_attendances.*', 'grades.class_code')
+            ->where('daily_report_id', $reportDetails->id)
+            ->orderBy('grades.class_code', 'ASC')
+            ->orderBY('daily_report_attendances.group', 'ASC')
+            ->get();
         $user = Auth::user();
         $school = school::findOrFail($user->school_id);
         return view('duty_roster.report_preview', compact('reportDetails', 'roster', 'dailyAttendance', 'school'));
-
     }
 
-    public function destroyReport ($date)
+    public function destroyReport($date)
     {
         $reportDetails = daily_report_details::where('report_date', $date)->first();
         // return $reportDetails;
-        if(!$reportDetails) {
+        if (!$reportDetails) {
             Alert()->toast('Failed to get report details', 'error');
             return back();
         }
         $dailyAttendance = daily_report_attendance::where('daily_report_id', $reportDetails->id)->get();
-        if($dailyAttendance) {
-            foreach($dailyAttendance as $row) {
+        if ($dailyAttendance) {
+            foreach ($dailyAttendance as $row) {
                 $row->delete();
             }
         }
@@ -547,7 +571,7 @@ class TodRosterController extends Controller
         $decode = Hashids::decode($id);
         $report = daily_report_details::findOrFail($decode[0]);
 
-        if(!$report) {
+        if (!$report) {
             Alert()->toast('Failed to get report details', 'error');
             return back();
         }
@@ -573,7 +597,7 @@ class TodRosterController extends Controller
             'tod_remarks' => $request->tod_remarks,
             'headteacher_comment' => $request->headteacher_comment,
             'status' => 'approved',
-            'approved_by' => $user->first_name . ' '. $user->last_name
+            'approved_by' => $user->first_name . ' ' . $user->last_name
         ]);
 
         Alert()->toast('Daily report has been approved and submitted successfully', 'success');
@@ -589,18 +613,18 @@ class TodRosterController extends Controller
 
         // Pata report zote kwenye date range
         $reports = daily_report_details::query()
-                    ->join('tod_rosters', 'tod_rosters.id', '=', 'daily_report_details.tod_roster_id')
-                    ->whereBetween('report_date', [$request->start_date, $request->end_date])
-                    ->where('daily_report_details.status', 'approved')
-                    ->select(
-                        'daily_report_details.*',
-                        'tod_rosters.roster_id',
-                        'tod_rosters.teacher_id',
-                        'tod_rosters.start_date',
-                        'tod_rosters.end_date'
-                    )
-                    ->orderBy('report_date', 'ASC')
-                    ->get();
+            ->join('tod_rosters', 'tod_rosters.id', '=', 'daily_report_details.tod_roster_id')
+            ->whereBetween('report_date', [$request->start_date, $request->end_date])
+            ->where('daily_report_details.status', 'approved')
+            ->select(
+                'daily_report_details.*',
+                'tod_rosters.roster_id',
+                'tod_rosters.teacher_id',
+                'tod_rosters.start_date',
+                'tod_rosters.end_date'
+            )
+            ->orderBy('report_date', 'ASC')
+            ->get();
 
         if ($reports->isEmpty()) {
             Alert::info('Info', 'No records were found for the selected dates');
@@ -611,20 +635,24 @@ class TodRosterController extends Controller
         // Group attendance per report_id
         $reportsWithAttendance = $reports->map(function ($report) {
             $attendance = daily_report_attendance::query()
-                            ->join('grades', 'grades.id', '=', 'daily_report_attendances.class_id')
-                            ->join('daily_report_details', 'daily_report_details.id', '=', 'daily_report_attendances.daily_report_id')
-                            ->leftJoin('tod_rosters', 'tod_rosters.id', '=', 'daily_report_details.tod_roster_id')
-                            ->leftJoin('teachers', 'teachers.id', '=', 'tod_rosters.teacher_id')
-                            ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
-                            ->select(
-                                'daily_report_attendances.*',
-                                'grades.class_name', 'grades.class_code',
-                                'tod_rosters.roster_id', 'tod_rosters.teacher_id',
-                                'teachers.member_id', 'users.first_name', 'users.last_name'
-                            )
-                            ->where('daily_report_id', $report->id)
-                            ->orderBy('class_id', 'ASC')
-                            ->get();
+                ->join('grades', 'grades.id', '=', 'daily_report_attendances.class_id')
+                ->join('daily_report_details', 'daily_report_details.id', '=', 'daily_report_attendances.daily_report_id')
+                ->leftJoin('tod_rosters', 'tod_rosters.id', '=', 'daily_report_details.tod_roster_id')
+                ->leftJoin('teachers', 'teachers.id', '=', 'tod_rosters.teacher_id')
+                ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
+                ->select(
+                    'daily_report_attendances.*',
+                    'grades.class_name',
+                    'grades.class_code',
+                    'tod_rosters.roster_id',
+                    'tod_rosters.teacher_id',
+                    'teachers.member_id',
+                    'users.first_name',
+                    'users.last_name'
+                )
+                ->where('daily_report_id', $report->id)
+                ->orderBy('class_id', 'ASC')
+                ->get();
 
             return [
                 'report'     => $report,
@@ -634,5 +662,4 @@ class TodRosterController extends Controller
 
         return view('duty_roster.general_report', compact('reportsWithAttendance'));
     }
-
 }

@@ -567,6 +567,7 @@
                             <th>Registration No</th>
                             <th>Logo</th>
                             <th>Status</th>
+                            <th>Expires at</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -587,16 +588,17 @@
                                 </td>
                                 <td>
                                     @if ($school->status == 1)
-                                        <span class="badge-modern bg-success">Open</span>
+                                        <span class="badge-modern bg-success text-white">Open</span>
                                     @elseif($school->status == 0)
-                                        <span class="badge-modern bg-danger">Closed</span>
+                                        <span class="badge-modern bg-danger text-white">Closed</span>
                                     @else
-                                        <span class="badge-modern bg-secondary">Inactive</span>
+                                        <span class="badge-modern bg-secondary text-white">Unpaid</span>
                                     @endif
                                 </td>
+                                <td>{{ \Carbon\Carbon::parse($school->service_end_date)->format('d M Y H:i') }}</td>
                                 <td>
                                     <div class="action-buttons">
-                                        @if ($school->status == 2)
+                                        @if ($school->status == 2 || $school->status == 0)
                                             <button class="btn-icon bg-success text-white"
                                                     data-toggle="modal"
                                                     data-target="#approveModal{{ $school->id }}"
@@ -623,7 +625,7 @@
 
     <!-- Modals -->
     @foreach ($schools as $school)
-        @if ($school->status == 2)
+        @if ($school->status == 2 || $school->status == 0)
             <!-- Approval Modal -->
             <div class="modal fade" id="approveModal{{ $school->id }}" tabindex="-1" role="dialog" aria-labelledby="approveModalLabel{{ $school->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">

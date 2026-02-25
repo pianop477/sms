@@ -460,6 +460,9 @@ class SchoolsController extends Controller
 
             //update users who disabled
             User::where('school_id', $schools->id)->where('status', 0)->update(['status' => 1]);
+            Teacher::where('school_id', $schools->id)->where('status', 0)->update(['status' => 1]);
+            // Student::where('school_id', $schools->id)->where('status', 0)->update(['status' => 1]);
+            Parents::where('school_id', $schools->id)->where('status', 0)->update(['status' => 1]);
 
             Alert()->toast('Service has been activated successfully', 'success');
             return back();

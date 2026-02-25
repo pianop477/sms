@@ -37,6 +37,10 @@ class Kernel extends ConsoleKernel
             ->description('Send tomorrow reminders at 8PM');
         $schedule->command('parents:truncate-inactive-parents')->daily();
         $schedule->command('bills:update-statuses')->everySecond();
+        $schedule->command('reminders:service-expiry')
+            ->dailyAt('08:00')
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/service-reminders.log'));
     }
 
     /**
