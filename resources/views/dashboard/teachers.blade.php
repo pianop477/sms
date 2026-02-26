@@ -525,6 +525,42 @@
     </style>
 
     <div class="py-4">
+        @php
+                $school = App\Models\school::find(Auth::user()->school_id);
+                $serviceStartDate = \Carbon\Carbon::parse($school->service_start_date);
+                $serviceEndDate = \Carbon\Carbon::parse($school->service_end_date);
+                $now = \Carbon\Carbon::now();
+                $daysRemaining = $now->diffInDays($serviceEndDate, false);
+
+                // FIXED: Format dates properly for JavaScript
+                $jsEndDate = $serviceEndDate->format('Y-m-d H:i:s');
+
+                // Calculate progress
+                $totalDays = $serviceStartDate->diffInDays($serviceEndDate);
+                $daysPassed = $serviceStartDate->diffInDays($now);
+                $progressPercentage = min(100, max(0, ($daysPassed / $totalDays) * 100));
+
+                // Status colors and messages
+                if ($daysRemaining > 60) {
+                    $statusColor = 'white';
+                    $statusBg = 'var(--success)';
+                    $statusText = 'Active';
+                    $icon = 'fa-check-circle';
+                    $progressColor = 'bg-success';
+                } elseif ($daysRemaining > 30) {
+                    $statusColor = 'black';
+                    $statusBg = 'var(--warning)';
+                    $statusText = 'Expiring Soon';
+                    $icon = 'fa-clock';
+                    $progressColor = 'bg-warning';
+                } else {
+                    $statusColor = 'black';
+                    $statusBg = 'var(--danger)';
+                    $statusText = 'Critical';
+                    $icon = 'fa-exclamation-triangle';
+                    $progressColor = 'bg-danger';
+                }
+            @endphp
         <!-- Contract Status Alert -->
         @if (Auth::user()->usertype == 3)
             <div class="row mb-4">
@@ -599,42 +635,7 @@
 
         <!-- Head Teacher Dashboard -->
         @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 2)
-            @php
-                $school = App\Models\school::find(Auth::user()->school_id);
-                $serviceStartDate = \Carbon\Carbon::parse($school->service_start_date);
-                $serviceEndDate = \Carbon\Carbon::parse($school->service_end_date);
-                $now = \Carbon\Carbon::now();
-                $daysRemaining = $now->diffInDays($serviceEndDate, false);
 
-                // FIXED: Format dates properly for JavaScript
-                $jsEndDate = $serviceEndDate->format('Y-m-d H:i:s');
-
-                // Calculate progress
-                $totalDays = $serviceStartDate->diffInDays($serviceEndDate);
-                $daysPassed = $serviceStartDate->diffInDays($now);
-                $progressPercentage = min(100, max(0, ($daysPassed / $totalDays) * 100));
-
-                // Status colors and messages
-                if ($daysRemaining > 60) {
-                    $statusColor = 'white';
-                    $statusBg = 'var(--success)';
-                    $statusText = 'Active';
-                    $icon = 'fa-check-circle';
-                    $progressColor = 'bg-success';
-                } elseif ($daysRemaining > 30) {
-                    $statusColor = 'black';
-                    $statusBg = 'var(--warning)';
-                    $statusText = 'Expiring Soon';
-                    $icon = 'fa-clock';
-                    $progressColor = 'bg-warning';
-                } else {
-                    $statusColor = 'black';
-                    $statusBg = 'var(--danger)';
-                    $statusText = 'Critical';
-                    $icon = 'fa-exclamation-triangle';
-                    $progressColor = 'bg-danger';
-                }
-            @endphp
 
             <!-- Service Status Card - Premium Compact -->
             <div class="modern-card service-card-premium mb-4">

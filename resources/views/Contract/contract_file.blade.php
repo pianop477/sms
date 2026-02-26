@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Approval Letter</title>
+    <title>Barua ya Kukubaliwa</title>
     <style>
          .logo {
             position: absolute;
@@ -50,8 +50,8 @@
             border-top: 1px solid #ddd;
             padding: 4px 15px;
             text-align: center;
-            background-color: white; /* Hakikisha footer ina background */
-            z-index: 1000; /* Hakikisha footer iko juu ya content */
+            background-color: white;
+            z-index: 1000;
         }
         footer .page-number:after {
             /* content: "Page " counter(page); */
@@ -73,7 +73,7 @@
     </style>
 </head>
 <body>
-    <!-- Letterhead / Header -->
+    <!-- Kichwa cha Barua / Header -->
     <div class="container">
         <div class="logo">
             <img src="{{storage_path('app/public/logo/'.$contract ['logo'])}}" alt="" style="max-width: 70px;">
@@ -82,51 +82,53 @@
             <h3>{{$contract['school_name']}}</h3>
             <h5>{{$contract ['postal_address']}} - {{$contract ['postal_name']}}</h5>
             <h5>{{$contract ['country']}}</h5>
-            {{-- <h5>Approval letter</h5> --}}
+            {{-- <h5>Barua ya Kukubaliwa</h5> --}}
         </div>
     </div>
-    <!-- Letter Content -->
+    <!-- Maudhui ya Barua -->
     <div class="content">
-        <p style="text-transform: capitalize; text-align:right">Date: <strong>{{ \Carbon\Carbon::parse($contract['approved_at'])->toFormattedDateString() }}</strong></p>
-        <p style="text-transform: capitalize">To: <strong>{{ $contract['first_name'] }} {{ $contract['last_name'] }}</strong></p>
-        <p style="text-transform: capitalize">Address: <strong>{{ $contract['address'] ?? 'N/A' }}</strong></p>
+        <p style="text-transform: capitalize; text-align:right">Tarehe: <strong>{{ \Carbon\Carbon::parse($contract['approved_at'])->toFormattedDateString() }}</strong></p>
+        <p style="text-transform: capitalize">Kwa: <strong>{{ $contract['first_name'] }} {{ $contract['last_name'] }}</strong></p>
+        <p style="text-transform: capitalize">Anuani: <strong>{{ $contract['address'] ?? 'Hajajazwa' }}</strong></p>
 
-        <p style="text-transform: uppercase; text-align:center">Re:
-            <span style="text-decoration: underline"><strong>Approval for Contract with
-            {{ $contract['school_name'] }}</strong></span></p> <p style="text-align: justify">Dear
-            <span style="text-transform: capitalize"><strong>{{ $contract['first_name'] }}
-            {{ $contract['last_name'] }}</strong></span>,</p> <p style="text-align: justify">
-            We are pleased to confirm the approval of your contract with <span style="text-transform: uppercase">
-            <strong>{{ $contract['school_name'] }}</strong></span>. This contract is valid for
-            <strong>{{ $contract['duration'] }} months</strong>, commencing on <strong>
+        <p style="text-transform: uppercase; text-align:center">YAH:
+            <span style="text-decoration: underline"><strong>KUINGIA MKATABA MPYA NA {{ strtoupper($contract['school_name']) }}</strong></span></p>
+        <p style="text-align: justify">Ndugu
+            <span style="text-transform: capitalize"><strong>{{ strtoupper($contract['first_name']) }} {{ strtoupper($contract['last_name']) }}</strong></span>,</p>
+        <p style="text-align: justify">
+            Tuna furaha kukuthibitishia idhini ya kuongeza mkataba wako na <span style="text-transform: uppercase">
+            <strong>{{ $contract['school_name'] }}</strong></span>. Mkataba huu ni halali kwa muda wa
+            <strong> mieze {{ $contract['duration'] }} </strong>, kuanzia tarehe <strong>
             {{ \Carbon\Carbon::parse($contract['start_date'])->format('d-m-Y H:i') }}</strong>
-            and expiring on <strong>{{ \Carbon\Carbon::parse($contract['end_date'])->format('d-m-Y H:i') }}</strong>.</p>
-            <p style="text-align: justify">This agreement signifies our mutual commitment to fulfilling the terms and conditions outlined in the contract.
-            Please ensure that all obligations are met in accordance with the stipulated timelines.</p> <p style="text-align: justify">
-            Should you have any questions or require further clarification, please do not hesitate to contact us directly at the head office.</p>
-            <p style="text-align: justify">Thank you for your cooperation and partnership. We look forward to a successful collaboration.
+            hadi tarehe <strong>{{ \Carbon\Carbon::parse($contract['end_date'])->format('d-m-Y H:i') }}</strong>.</p>
+            <p style="text-align: justify">Barua hii inaashiria dhamira yetu ya pamoja ya kutimiza masharti na kanuni zilizoelezwa katika mkataba.
+            Tafadhali hakikisha kuwa wajibu wote unatekelezwa kwa kufuata ratiba iliyowekwa.</p>
+            <p style="text-align: justify">
+            Endapo una maswali yoyote au unahitaji ufafanuzi zaidi, tafadhali wasiliana nasi moja kwa moja kupitia ofisi kuu.</p>
+            <p style="text-align: justify">Asante kwa ushirikiano wako. Tunatazamia ushirikiano wenye mafanikio.
         </p>
     </div>
 
-    <!-- Signature Section -->
+    <!-- Sehemu ya Sahihi -->
     <div class="signature">
-        <p>Sincerely,</p>
-        <p><strong>{{ $contract['authorized_person_name'] ?? 'AUTHORIZED REPRESENTATIVE' }}</strong></p>
-        {{-- <p>Position: <strong>{{ $contract['authorized_person_position'] ?? 'Manager' }}</strong></p> --}}
+        <p>Wako katika Kazi,</p>
+
+        <p><strong>{{ $contract['authorized_person_name'] ?? 'MWAKILISHI ALIYEIDHINISHWA' }}</strong></p>
+        {{-- <p>Wadhifa: <strong>{{ $contract['authorized_person_position'] ?? 'Meneja' }}</strong></p> --}}
     </div>
 
     <div class="qr-wrapper">
-        <img src="{{ $qrImage }}" alt="QR Code">
+        <img src="{{ $qrImage }}" alt="Msimbo wa QR">
         <div class="validation-text">Scan to verify</div>
     </div>
 
-    <!-- Footer -->
+    <!-- Kijachini / Footer -->
     <footer>
         <span class="copyright">
         &copy; {{ ucwords(strtolower(Auth::user()->school->school_name)) }} – {{ date('Y') }}
         </span>
         <span class="printed">
-        Printed at: {{ now()->format('d-M-Y H:i') }}
+        Imechapishwa: {{ now()->format('d-M-Y H:i') }}
         </span>
     </footer>
 </body>
