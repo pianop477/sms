@@ -87,6 +87,205 @@
             transform: scale(1.1);
         }
 
+        .modern-card {
+            background: white;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .modern-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(78, 115, 223, 0.15);
+        }
+
+        /* Service Card Premium */
+        .service-card-premium {
+            background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
+            border: 1px solid rgba(78, 115, 223, 0.1);
+            position: relative;
+            isolation: isolate;
+        }
+
+        .service-card-premium::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top right, rgba(78, 115, 223, 0.08), transparent 70%);
+            z-index: -1;
+        }
+
+        .service-icon-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 10px 20px rgba(78, 115, 223, 0.3);
+        }
+
+        /* Countdown Timer Premium */
+        .countdown-premium {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .countdown-item {
+            flex: 1;
+            min-width: 85px;
+            background: white;
+            border-radius: 16px;
+            padding: 16px 8px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+        }
+
+        .countdown-item:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 30px rgba(78, 115, 223, 0.1);
+        }
+
+        .countdown-item .number {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #2c3e50, #1e293b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+            font-family: 'Poppins', monospace;
+        }
+
+        .countdown-item .label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary);
+            opacity: 0.8;
+        }
+
+        .countdown-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20%;
+            right: 20%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            border-radius: 3px;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .countdown-item:hover::after {
+            transform: scaleX(1);
+        }
+
+        /* Stats Cards Premium */
+        .stat-card-premium {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            min-height: 140px;
+        }
+
+        .stat-card-premium::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card-premium:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card-premium .card-body {
+            position: relative;
+            z-index: 2;
+            padding: 1.8rem 1.5rem;
+        }
+
+        .stat-card-premium .card-icon {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            font-size: 4.5rem;
+            opacity: 0.15;
+            transition: all 0.5s ease;
+            color: white;
+        }
+
+        .stat-card-premium:hover .card-icon {
+            transform: scale(1.2) rotate(5deg);
+            opacity: 0.25;
+        }
+
+        .stat-card-premium .card-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .stat-card-premium .card-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            line-height: 1.2;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+         @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(78, 115, 223, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 20px 5px rgba(78, 115, 223, 0.2);
+            }
+        }
+
+        .countdown-item {
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+
         .stat-card .card-title {
             font-size: 0.9rem;
             font-weight: 600;
@@ -254,6 +453,15 @@
             text-decoration: none;
         }
 
+         .badge-premium {
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
         .action-buttons a:hover,
         .action-buttons button:hover {
             transform: translateY(-2px);
@@ -275,6 +483,14 @@
 
             .table-responsive {
                 overflow-x: auto;
+            }
+
+                        .stat-card-premium .card-value {
+                font-size: 1.8rem;
+            }
+
+            .countdown-item .number {
+                font-size: 24px;
             }
 
             .stat-card .card-value {
@@ -383,6 +599,108 @@
 
         <!-- Head Teacher Dashboard -->
         @if (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 2)
+            @php
+                $school = App\Models\school::find(Auth::user()->school_id);
+                $serviceStartDate = \Carbon\Carbon::parse($school->service_start_date);
+                $serviceEndDate = \Carbon\Carbon::parse($school->service_end_date);
+                $now = \Carbon\Carbon::now();
+                $daysRemaining = $now->diffInDays($serviceEndDate, false);
+
+                // FIXED: Format dates properly for JavaScript
+                $jsEndDate = $serviceEndDate->format('Y-m-d H:i:s');
+
+                // Calculate progress
+                $totalDays = $serviceStartDate->diffInDays($serviceEndDate);
+                $daysPassed = $serviceStartDate->diffInDays($now);
+                $progressPercentage = min(100, max(0, ($daysPassed / $totalDays) * 100));
+
+                // Status colors and messages
+                if ($daysRemaining > 60) {
+                    $statusColor = 'white';
+                    $statusBg = 'var(--success)';
+                    $statusText = 'Active';
+                    $icon = 'fa-check-circle';
+                    $progressColor = 'bg-success';
+                } elseif ($daysRemaining > 30) {
+                    $statusColor = 'black';
+                    $statusBg = 'var(--warning)';
+                    $statusText = 'Expiring Soon';
+                    $icon = 'fa-clock';
+                    $progressColor = 'bg-warning';
+                } else {
+                    $statusColor = 'black';
+                    $statusBg = 'var(--danger)';
+                    $statusText = 'Critical';
+                    $icon = 'fa-exclamation-triangle';
+                    $progressColor = 'bg-danger';
+                }
+            @endphp
+
+            <!-- Service Status Card - Premium Compact -->
+            <div class="modern-card service-card-premium mb-4">
+                <div class="p-4">
+                    <!-- Header with Status Bar -->
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="service-icon-circle float-animation mr-1">
+                                <i class="fas {{ $icon }}"></i>
+                            </div>
+                            <div>
+                                <span class="badge-premium"
+                                    style="background: {{ $statusBg }}; color: {{ $statusColor }};">
+                                    <i class="fas fa-circle me-1" style="font-size: 8px;"></i>
+                                    {{ $statusText }}
+                                </span>
+                                <h5 class="mt-2 mb-0 fw-bold">{{ strtoupper($school->school_name) }}</h5>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted d-block">Registration No.</small>
+                            <span class="fw-semibold">{{ strtoupper($school->school_reg_no) }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-1 small">
+                            <span class="text-muted">Service Period Status Bar</span>
+                            <span class=""
+                                style="color: var(--dark); font-weight:bold">{{ round($progressPercentage) }}%
+                                Used</span>
+                        </div>
+                        <div class="progress" style="height: 8px; border-radius: 10px;">
+                            <div class="progress-bar {{ $progressColor }}" role="progressbar"
+                                style="width: {{ $progressPercentage }}%; background: {{ $statusColor }};"
+                                aria-valuenow="{{ $progressPercentage }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-1">
+                            <small class="text-muted">{{ $serviceStartDate->format('d M Y') }}</small>
+                            <small class="text-muted">{{ $serviceEndDate->format('d M Y') }}</small>
+                        </div>
+                    </div>
+
+                    <!-- Countdown Section - FIXED -->
+                    <div class="countdown-premium">
+                        <div class="countdown-item">
+                            <span class="number" id="days">00</span>
+                            <span class="label">Days</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span class="number" id="hours">00</span>
+                            <span class="label">Hours</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span class="number" id="minutes">00</span>
+                            <span class="label">Minutes</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span class="number" id="seconds">00</span>
+                            <span class="label">Seconds</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="row">
                 <!-- Stats Cards for Head Teacher -->
                 <div class="col-lg-12 mb-4">
@@ -827,7 +1145,12 @@
                                                                     <div class="progress"
                                                                         style="height: 8px; width: 100px;">
                                                                         @php
-                                                                            $generalRate = round(($totalPresent / $totalRegisteredInSchool) * 100, 2);
+                                                                            $generalRate = round(
+                                                                                ($totalPresent /
+                                                                                    $totalRegisteredInSchool) *
+                                                                                    100,
+                                                                                2,
+                                                                            );
                                                                         @endphp
                                                                         <div class="progress-bar
                                                                         @if ($generalRate >= 90) bg-success
@@ -1469,7 +1792,11 @@
                                                                 <div
                                                                     class="d-flex align-items-center justify-content-center">
                                                                     @php
-                                                                        $generalRate = round(($totalPresent / $totalRegisteredInSchool) * 100, 2);
+                                                                        $generalRate = round(
+                                                                            ($totalPresent / $totalRegisteredInSchool) *
+                                                                                100,
+                                                                            2,
+                                                                        );
                                                                     @endphp
                                                                     <div class="progress"
                                                                         style="height: 8px; width: 100px;">
@@ -1980,6 +2307,67 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+
+            function initializeCountdown() {
+                const endDateStr = '{{ $jsEndDate }}';
+                // Parse the date properly
+                const endDate = new Date(endDateStr.replace(' ', 'T')).getTime();
+
+                function updateCountdown() {
+                    const now = new Date().getTime();
+                    const distance = endDate - now;
+
+                    // Get elements
+                    const daysEl = document.getElementById('days');
+                    const hoursEl = document.getElementById('hours');
+                    const minutesEl = document.getElementById('minutes');
+                    const secondsEl = document.getElementById('seconds');
+
+                    if (!daysEl || !hoursEl || !minutesEl || !secondsEl) return;
+
+                    if (distance <= 0) {
+                        daysEl.innerText = "00";
+                        hoursEl.innerText = "00";
+                        minutesEl.innerText = "00";
+                        secondsEl.innerText = "00";
+                        return;
+                    }
+
+                    // Calculate time units
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    // Format with leading zeros
+                    const format = (num) => num.toString().padStart(2, '0');
+
+                    // Update with animation
+                    updateNumberWithAnimation(daysEl, format(days));
+                    updateNumberWithAnimation(hoursEl, format(hours));
+                    updateNumberWithAnimation(minutesEl, format(minutes));
+                    updateNumberWithAnimation(secondsEl, format(seconds));
+                }
+
+                function updateNumberWithAnimation(element, newValue) {
+                    if (element.innerText !== newValue) {
+                        element.style.transform = 'scale(1.2)';
+                        element.style.transition = 'transform 0.2s ease';
+
+                        setTimeout(() => {
+                            element.innerText = newValue;
+                            element.style.transform = 'scale(1)';
+                        }, 100);
+                    }
+                }
+
+                // Initial call and set interval
+                updateCountdown();
+                setInterval(updateCountdown, 1000);
+            }
+
+            // Initialize countdown
+            initializeCountdown();
             // Initialize tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
