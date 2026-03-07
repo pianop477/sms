@@ -11,6 +11,7 @@ use App\Http\Controllers\CertificateGeneratorController;
 use App\Http\Controllers\CertificateTemplateController;
 use App\Http\Controllers\ClassesController;
 use App\Http\Controllers\ContractController;
+use App\Http\Controllers\ContractGatewayController;
 use App\Http\Controllers\CoursesController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\ExpenditureController;
@@ -325,13 +326,19 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         })->name('roles.cancelConfirmation');
         Route::post('/roles/confirmProceed', [RolesController::class, 'confirmProceed'])->name('roles.confirmProceed');
 
-        // contracts and legals management
+        // contracts and legals management (manager or head teacher)
         Route::get('Contracts-management', [ContractController::class, 'contractManager'])->name('contract.management');
         Route::get('{id}/Admin-preview-file', [ContractController::class, 'adminPreviewFile'])->name('contract.admin.preview');
-        Route::put('{id}/Approve-contract', [ContractController::class, 'approveContract'])->name('contract.approval');
-        Route::put('{id}/Reject-contract', [ContractController::class, 'rejectContract'])->name('contract.rejection');
         Route::get('year/{year}/Contracts-group', [ContractController::class, 'contractByMonths'])->name('contract.by.months');
-        Route::get('year/{year}/month/{month}/All-approved-contract', [ContractController::class, 'getAllApprovedContract'])->name('contract.approved.all');
+        Route::get('year/{year}/month/{month}/All-approved-contract', [ContractController::class, 'getAllActivatedContract'])->name('contract.activated.all');
+        Route::get('/contracts/manager', [ContractController::class, 'contractManager'])->name('contract.manager');
+        Route::get('/contract/letter/pdf/{id}', [ContractController::class, 'generateContractLetter'])->name('contract.letter.pdf');
+        Route::put('/contract/approve/{id}', [ContractController::class, 'approveContract'])->name('contract.approval');
+        Route::put('/contract/reject/{id}', [ContractController::class, 'rejectContract'])->name('contract.rejection');
+        Route::put('/contract/upload-signed/{id}', [ContractController::class, 'uploadSignedContract'])->name('contract.upload.signed');
+        Route::get('/contract/upload-signed-form/{id}', [ContractController::class, 'showUploadSignedForm'])->name('contract.upload.form');
+        Route::put('/contract/terminate/{id}', [ContractController::class, 'terminate'])->name('contract.terminate');
+        Route::get('/contract/history/{id}', [ContractController::class, 'showHistory'])->name('contract.history');
 
         //accountants routes management
         Route::get('Accountants', [AccountantsController::class, 'index'])->name('Accountants.index');
@@ -499,15 +506,6 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('/Results/course/{course}/&year/{year}/&examination/{examType}/&month/{month}/&date/{date}', [ExamController::class, 'resultByMonth'])->name('results.byMonth');
         Route::get('/Results/delete/course/{course}/&year/{year}/&examination/{examType}/&month/{month}/&date/{date}', [ExamController::class, 'TeacherDeleteResults'])->name('results.delete.byTeacher');
 
-        // contracts and legals management
-        Route::get('Contract-application', [ContractController::class, 'index'])->name('contract.index');
-        Route::post('Contract-submission', [ContractController::class, 'store'])->name('contract.store');
-        Route::get('{id}/Preview-application', [ContractController::class, 'previewMyApplication'])->name('preview.my.application');
-        Route::get('{id}/Edit-contract-application', [ContractController::class, 'edit'])->name('contract.edit');
-        Route::put('{id}/Update-contract-application', [ContractController::class, 'update'])->name('contract.update');
-        Route::get('{id}/Delete-contract-application', [ContractController::class, 'destroy'])->name('contract.destroy');
-        Route::get('{id}/Download-approved-contract', [ContractController::class, 'downloadContract'])->name('contract.download');
-
         // daily school report management routes
         Route::get('Daily-school-report/create', [TodRosterController::class, 'create'])->name('tod.report.create');
         Route::get('/api/attendance/fetch', [TodRosterController::class, 'fetchAttendance']);
@@ -614,4 +612,48 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('/Batches/download/batch/{batch}', [paymentBatchController::class, 'downloadBatch'])->name('batch.download');
         Route::get('/Students/list', [BillsController::class, 'studentsList'])->name('students.list');
     });
+
+    // end of auth
 });
+
+// ===== PUBLIC GATEWAY ROUTES (No Auth) =====
+Route::prefix('contract-gateway')->name('contract.gateway.')->group(function () {
+    Route::get('/', [ContractGatewayController::class, 'init'])->name('init');
+
+    Route::prefix('api')->name('api.')->group(function () {
+        Route::post('verify-staff', [ContractGatewayController::class, 'verifyStaffId'])->name('verify-staff');
+        Route::post('request-otp', [ContractGatewayController::class, 'requestOtp'])->name('request-otp');
+        Route::post('verify-otp', [ContractGatewayController::class, 'verifyOtp'])->name('verify-otp');
+        Route::post('resend-otp', [ContractGatewayController::class, 'resendOtp'])->name('resend-otp');
+        Route::post('logout', [ContractGatewayController::class, 'logout'])->name('logout');
+        Route::post('extend-session', [ContractGatewayController::class, 'extendSession'])->name('extend-session');
+    });
+});
+
+// ===== PROTECTED CONTRACT ROUTES =====
+Route::prefix('contracts')->name('contract.')->middleware(['contract.or.auth'])->group(function () {
+    // Main contract management (returns JSON for API, view for web)
+    Route::get('/', [ContractController::class, 'index'])->name('index');
+
+    // NON-TEACHING DASHBOARD VIEW (HTML)
+    Route::get('/dashboard', [ContractGatewayController::class, 'showDashboard'])->name('dashboard');
+
+    // API endpoint for dashboard data (JSON)
+    Route::get('/dashboard/data', [ContractGatewayController::class, 'dashboard'])->name('dashboard.data');
+
+    // Other contract routes
+    Route::get('/my-applications', [ContractController::class, 'contractManagement'])->name('my.applications');
+    Route::post('/store', [ContractController::class, 'store'])->name('store');
+    Route::get('/reapply/{id}', [ContractController::class, 'reapply'])->name('reapply');
+    Route::get('/profile/details', [ContractController::class, 'getProfileDetails'])->name('profile.details');
+
+    Route::prefix('{id}')->group(function () {
+        Route::get('/preview', [ContractController::class, 'previewMyApplication'])->name('preview');
+        Route::get('/edit', [ContractController::class, 'edit'])->name('edit');
+        Route::put('/update', [ContractController::class, 'update'])->name('update');
+        Route::delete('/delete', [ContractController::class, 'destroy'])->name('delete');
+        Route::get('/download', [ContractController::class, 'downloadContract'])->name('download');
+        Route::get('/approval-letter', [ContractController::class, 'generateApprovalLetter'])->name('approval.letter');
+    });
+});
+

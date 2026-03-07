@@ -4,11 +4,13 @@ namespace App\Console\Commands;
 
 use App\Models\Contract;
 use App\Models\school;
+use App\Models\school_constracts;
 use App\Models\Teacher;
 use App\Models\User;
 use App\Services\NextSmsService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class UpdateExpiredContract extends Command
 {
@@ -17,7 +19,7 @@ class UpdateExpiredContract extends Command
      *
      * @var string
      */
-    protected $signature = 'contracts:update-expired-contract';
+    protected $signature = 'contracts:manage';
 
     /**
      * The console command description.
@@ -36,70 +38,223 @@ class UpdateExpiredContract extends Command
      }
 
      public function handle()
-     {
-         try {
-             $now = Carbon::now();
+    {
+        $this->info('Starting contract management...');
 
-             // Pata mikataba yote iliyoisha muda
-             $expiredContracts = Contract::where('status', 'approved')
-                                         ->where('end_date', '<', $now)
-                                         ->get();
+        // 1. Update expired contracts
+        $this->updateExpiredContracts();
 
-             if ($expiredContracts->isEmpty()) {
-                 $this->info('No expired contracts found.');
-                 return;
-             }
+        // 2. Send expiry reminders (1 month before)
+        $this->sendExpiryReminders();
 
-             foreach ($expiredContracts as $contract) {
-                 // Badilisha status ya contract kuwa 'expired'
-                 $contract->update(['status' => 'expired']);
+        // 3. Send expiry warnings (1 week before)
+        $this->sendExpiryWarnings();
 
-                 $teacher = Teacher::find($contract->teacher_id);
-                 if (!$teacher) continue;
+        $this->info('Contract management completed successfully!');
+    }
 
-                 $user = User::find($teacher->user_id);
-                 if (!$user) continue;
+    /**
+     * Update contracts that have passed their end date
+     */
+    private function updateExpiredContracts()
+    {
+        $expiredContracts = school_constracts::where('status', 'activated')
+            ->where('is_active', true)
+            ->where('end_date', '<', now())
+            ->get();
 
-                 $school = School::find($user->school_id);
-                 if (!$school) continue;
+        $count = 0;
+        foreach ($expiredContracts as $contract) {
+            $contract->update([
+                'is_active' => false,
+                'status' => 'expired',
+                'expired_at' => now()
+            ]);
 
-                 // Tuma SMS notification
-                 $nextSmsService = new NextSmsService();
-                 $payload = [
-                     'from' => $school->sender_id ?? "SHULE APP",
-                     'to' => $this->formatPhoneNumber($user->phone),
-                     'text' => "Hello " . ucwords(strtolower($user->first_name)) . ", your contract has expired. Kindly apply for renewal via the system. Visit https://shuleapp.tech to apply.",
-                     'reference' => uniqid(),
-                 ];
+            // Log the expiry
+            // Log::info('Contract expired automatically', [
+            //     'contract_id' => $contract->id,
+            //     'applicant_id' => $contract->applicant_id,
+            //     'end_date' => $contract->end_date
+            // ]);
 
-                 $response = $nextSmsService->sendSmsByNext(
-                     $payload['from'],
-                     $payload['to'],
-                     $payload['text'],
-                     $payload['reference']
-                 );
-                 if(!$response['success']) {
-                    throw new \Exception($response['error']);
-                    // Alert()->toast('SMS failed: '.$response['error'], 'error');
-                    // return back();
+            $count++;
+        }
+
+        $this->info("Updated {$count} expired contracts.");
+    }
+
+    /**
+     * Send reminders for contracts expiring in 1 month
+     */
+    private function sendExpiryReminders()
+    {
+        $oneMonthFromNow = now()->addMonth();
+
+        $expiringContracts = school_constracts::where('status', 'activated')
+            ->where('is_active', true)
+            ->whereMonth('end_date', $oneMonthFromNow->month)
+            ->whereYear('end_date', $oneMonthFromNow->year)
+            ->get();
+
+        $smsService = new NextSmsService();
+        $count = 0;
+
+        foreach ($expiringContracts as $contract) {
+            // Get applicant details
+            $applicant = $this->resolveApplicantDetails($contract->applicant_id, $contract->school_id);
+
+            if (!empty($applicant['phone'])) {
+                try {
+                    $destination = $this->formatPhoneNumber($applicant['phone']);
+
+                    $message = "Habari {$applicant['first_name']}, mkataba wako wa ajira utaisha muda wake mwezi 1 kuanzia leo. Tafadhali wasiliana na ofisi ya shule kwa ajili ya mwendelezo.";
+
+                    $smsService->sendSmsByNext(
+                        "SHULE APP",
+                        $destination,
+                        $message,
+                        uniqid()
+                    );
+
+                    // Log::info('Expiry reminder sent', [
+                    //     'contract_id' => $contract->id,
+                    //     'phone' => $applicant['phone']
+                    // ]);
+
+                    $count++;
+                } catch (\Exception $e) {
+                    // Log::error('Failed to send expiry reminder', [
+                    //     'contract_id' => $contract->id,
+                    //     'error' => $e->getMessage()
+                    // ]);
                 }
+            }
+        }
 
-                //  Log::info("Contract expired for Teacher ID: {$teacher->id}, User: {$user->first_name}");
-             }
+        $this->info("Sent {$count} one-month expiry reminders.");
+    }
 
-             $this->info(count($expiredContracts) . ' contracts updated to expired status.');
-         } catch (\Exception $e) {
-            //  Log::error('Error in contracts:expire command: ' . $e->getMessage());
-             $this->error('An error occurred while expiring contracts.');
-         }
-     }
+    /**
+     * Send warnings for contracts expiring in 1 week
+     */
+    private function sendExpiryWarnings()
+    {
+        $oneWeekFromNow = now()->addWeek();
 
+        $expiringContracts = school_constracts::where('status', 'activated')
+            ->where('is_active', true)
+            ->whereDate('end_date', '<=', $oneWeekFromNow)
+            ->whereDate('end_date', '>', now())
+            ->get();
+
+        $smsService = new NextSmsService();
+        $count = 0;
+
+        foreach ($expiringContracts as $contract) {
+            $applicant = $this->resolveApplicantDetails($contract->applicant_id, $contract->school_id);
+
+            if (!empty($applicant['phone'])) {
+                try {
+                    $destination = $this->formatPhoneNumber($applicant['phone']);
+                    $daysLeft = now()->diffInDays($contract->end_date);
+
+                    $message = "Habari {$applicant['first_name']}, mkataba wako wa ajira utaisha muda wake siku {$daysLeft} zijazo. Tafadhali chukua hatua za haraka kwa ajili ya mwendelezo.";
+
+                    $smsService->sendSmsByNext(
+                        "SHULE APP",
+                        $destination,
+                        $message,
+                        uniqid()
+                    );
+
+                    // Log::info('Expiry warning sent', [
+                    //     'contract_id' => $contract->id,
+                    //     'days_left' => $daysLeft
+                    // ]);
+
+                    $count++;
+                } catch (\Exception $e) {
+                    // Log::error('Failed to send expiry warning', [
+                    //     'contract_id' => $contract->id,
+                    //     'error' => $e->getMessage()
+                    // ]);
+                }
+            }
+        }
+
+        $this->info("Sent {$count} one-week expiry warnings.");
+    }
+
+    /**
+     * Helper function to get applicant details
+     */
+    private function resolveApplicantDetails($applicantId, $schoolId)
+    {
+        // Try to find in TEACHERS table
+        $teacher = DB::table('teachers')
+            ->join('users', 'users.id', '=', 'teachers.user_id')
+            ->where('teachers.member_id', $applicantId)
+            ->where('teachers.school_id', $schoolId)
+            ->select(
+                'users.first_name',
+                'users.last_name',
+                'users.phone',
+                'teachers.member_id as staff_id'
+            )
+            ->first();
+
+        if ($teacher) {
+            return (array) $teacher;
+        }
+
+        // Try to find in TRANSPORT table
+        $transport = DB::table('transports')
+            ->where('transports.staff_id', $applicantId)
+            ->where('transports.school_id', $schoolId)
+            ->select(
+                'transports.driver_name as first_name',
+                DB::raw("'' as last_name"),
+                'transports.phone',
+                'transports.staff_id'
+            )
+            ->first();
+
+        if ($transport) {
+            return (array) $transport;
+        }
+
+        // Try to find in OTHER_STAFFS table
+        $otherStaff = DB::table('other_staffs')
+            ->where('other_staffs.staff_id', $applicantId)
+            ->where('other_staffs.school_id', $schoolId)
+            ->select(
+                'other_staffs.first_name',
+                'other_staffs.last_name',
+                'other_staffs.phone',
+                'other_staffs.staff_id'
+            )
+            ->first();
+
+        if ($otherStaff) {
+            return (array) $otherStaff;
+        }
+
+        return [
+            'first_name' => 'Unknown',
+            'last_name' => '',
+            'phone' => null,
+            'staff_id' => $applicantId
+        ];
+    }
+
+    /**
+     * Format phone number helper
+     */
     private function formatPhoneNumber($phone)
     {
-        // Remove any non-numeric characters
         $phone = preg_replace('/[^0-9]/', '', $phone);
 
-        // Ensure the number starts with the country code (e.g., 255 for Tanzania)
         if (strlen($phone) == 9) {
             $phone = '255' . $phone;
         } elseif (strlen($phone) == 10 && substr($phone, 0, 1) == '0') {

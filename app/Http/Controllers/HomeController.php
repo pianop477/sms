@@ -9,6 +9,7 @@ use App\Models\Contract;
 use App\Models\Grade;
 use App\Models\Parents;
 use App\Models\school;
+use App\Models\school_constracts;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Teacher;
@@ -255,7 +256,7 @@ class HomeController extends Controller
             $teachers = Teacher::where('user_id', $user->id)->first();
 
             //check for contract status
-            $contract = Contract::where('teacher_id', $teachers->id)->first();
+            $contract = school_constracts::where('applicant_id', $teachers->member_id)->first();
 
             //return class teachers course assigned-------------------
             $courses = class_learning_courses::query()

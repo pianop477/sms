@@ -84,5 +84,6 @@ class Kernel extends HttpKernel
         'apiSessionToken' => \App\Http\Middleware\ApiSessionTokenMiddleware::class,
         'conditional.api.token' => \App\Http\Middleware\ConditionalApiSessionToken::class,
         'nida_and_form_four' => \App\Http\Middleware\forceUpdateNidaAndIndexNumber::class,
+        'contract.or.auth' => \App\Http\Middleware\ContractOrAuth::class,
     ];
 }

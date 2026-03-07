@@ -706,18 +706,29 @@ class TeachersController extends Controller
     protected function getMemberId()
     {
         $user = Auth::user();
-        $schoolData = school::find($user->school_id);
+        $schoolData = School::find($user->school_id);
+
+        // Hakikisha school code ipo
+        $schoolCode = $schoolData->abbriv_code ?? $schoolData->school_code;
 
         do {
             // Tengeneza namba ya ID ya staff (4 digits)
             $staffIdNumber = str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
-            $fullStaffId = $schoolData->abbriv_code . '-' . $staffIdNumber;
+            $fullStaffId = $schoolCode . '-' . $staffIdNumber;
 
-            // Check kama ID ipo kwenye tables zote
+            // Angalia kama ID ipo kwenye table zote tatu
+            $existsInTeachers    = Teacher::where('member_id', $fullStaffId)->exists();
             $existsInOtherStaffs = other_staffs::where('staff_id', $fullStaffId)->exists();
             $existsInDrivers     = Transport::where('staff_id', $fullStaffId)->exists();
-            $existsInTeachers    = Teacher::where('member_id', $fullStaffId)->exists();
-        } while ($existsInOtherStaffs || $existsInDrivers || $existsInTeachers);
+
+            // Rudia kuzalisha ID mpya ikiwa ipo kwenye table yoyote kati ya hizo tatu
+            $idExists = $existsInTeachers || $existsInOtherStaffs || $existsInDrivers;
+
+            // Optional: Logging kwa debugging (unaweza kuiondoa baadaye)
+            if ($idExists) {
+                // Log::info("Member ID $fullStaffId imeshatumika, inatafuta nyingine...");
+            }
+        } while ($idExists);
 
         return $fullStaffId;
     }

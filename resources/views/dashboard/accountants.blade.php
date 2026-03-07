@@ -455,13 +455,13 @@
             $progressPercentage = min(100, max(0, ($daysPassed / $totalDays) * 100));
 
             // Status colors and messages
-            if ($daysRemaining > 60) {
+            if ($daysRemaining > 30) {
                 $statusColor = 'white';
                 $statusBg = 'var(--success)';
                 $statusText = 'Active';
                 $icon = 'fa-check-circle';
                 $progressColor = 'bg-success';
-            } elseif ($daysRemaining > 30) {
+            } elseif ($daysRemaining > 15) {
                 $statusColor = 'black';
                 $statusBg = 'var(--warning)';
                 $statusText = 'Expiring Soon';

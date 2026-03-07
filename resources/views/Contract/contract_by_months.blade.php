@@ -27,7 +27,7 @@
         }
 
         .card-header-custom {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            background: linear-gradient(135deg, var(--success-color) 0%, var(--primary-color) 100%);
             color: white;
             padding: 15px 20px;
             border-radius: 10px 10px 0 0;
@@ -48,7 +48,7 @@
 
         .list-group-item:hover {
             background-color: #f8f9fc;
-            border-color: var(--primary-color);
+            border-color: var(--success-color);
             transform: translateX(5px);
         }
 
@@ -80,11 +80,19 @@
         }
 
         .month-badge {
-            background-color: var(--primary-color);
+            background-color: var(--success-color);
             color: white;
             border-radius: 20px;
             padding: 4px 10px;
             font-size: 0.8rem;
+        }
+
+        .badge-activated {
+            background-color: var(--success-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
         }
 
         @media (max-width: 768px) {
@@ -103,11 +111,18 @@
         <!-- Header Section -->
         <div class="row mb-4">
             <div class="col-md-8">
-                <h4 class="text-primary fw-bold border-bottom pb-2">APPROVED CONTRACTS FOR {{ $year }}</h4>
+                <h4 class="text-primary fw-bold border-bottom pb-2">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    ACTIVATED CONTRACTS FOR {{ $year }}
+                </h4>
+                <p class="text-muted small">
+                    <span class="badge-activated me-2">Activated</span>
+                    Showing contracts that have been signed and activated
+                </p>
             </div>
             <div class="col-md-4 text-end">
-                <a href="{{route('contract.management')}}" class="btn btn-info btn-action float-right">
-                    <i class="fas fa-arrow-circle-left me-1"></i> Back
+                <a href="{{ route('contract.management') }}" class="btn btn-info btn-action float-right">
+                    <i class="fas fa-arrow-circle-left me-1"></i> Back to Dashboard
                 </a>
             </div>
         </div>
@@ -117,35 +132,63 @@
                 <div class="card">
                     <div class="card-header-custom">
                         <h5 class="header-title text-white text-center">
-                            <i class="fas fa-calendar-alt me-2"></i> Select Month
+                            <i class="fas fa-calendar-alt me-2"></i> Browse Activated Contracts by Month
                         </h5>
                     </div>
                     <div class="card-body">
                         @if ($contractsByMonth->isEmpty())
-                        <div class="alert alert-danger alert-custom text-center" role="alert">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            <strong>No Records Available</strong>
-                            <p class="mb-0 mt-2">There are no approved contracts for {{ $year }}</p>
+                        <div class="alert alert-warning alert-custom text-center" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>No Activated Contracts Found</strong>
+                            <p class="mb-0 mt-2">There are no activated contracts for the year {{ $year }}</p>
+                            <hr>
+                            <p class="mb-0 small">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Activated contracts are those that have been signed and fully executed.
+                            </p>
                         </div>
                         @else
                         <div class="mb-4">
-                            <p class="text-danger fw-bold mb-1">
-                                <i class="fas fa-info-circle me-1"></i> Select a month to view approved contracts
+                            <p class="text-success fw-bold mb-1">
+                                <i class="fas fa-info-circle me-1"></i> Select a month to view activated contracts
                             </p>
-                            <p class="text-muted small">Click on a month to view all contracts approved in that month</p>
+                            <p class="text-muted small">
+                                Total activated contracts for {{ $year }}:
+                                <span class="fw-bold">{{ $contractsByMonth->sum(function($month) { return $month->count(); }) }}</span>
+                            </p>
                         </div>
 
                         <div class="list-group">
                             @foreach ($contractsByMonth as $month => $contracts )
-                                <a href="{{route('contract.approved.all', ['year' => $year, 'month' => $month])}}"
+                                <a href="{{ route('contract.activated.all', ['year' => $year, 'month' => $month]) }}"
                                    class="list-group-item list-group-item-action">
                                     <div>
-                                        <i class="fas fa-folder-open me-2 text-primary"></i>
-                                        <span class="fw-bold">{{\Carbon\Carbon::parse($month)->format('F')}}</span>
+                                        <i class="fas fa-folder-open me-2 text-success"></i>
+                                        <span class="fw-bold">{{ $month }}</span>
                                     </div>
-                                    <span class="month-badge">{{$contracts->count()}} contracts</span>
+                                    <div>
+                                        <span class="month-badge me-2">{{ $contracts->count() }} contracts</span>
+                                        <i class="fas fa-chevron-right text-muted"></i>
+                                    </div>
                                 </a>
                             @endforeach
+                        </div>
+
+                        <!-- Summary Section -->
+                        <div class="mt-4 p-3 bg-light rounded">
+                            <h6 class="text-primary fw-bold mb-2">
+                                <i class="fas fa-chart-pie me-1"></i> Monthly Summary
+                            </h6>
+                            <div class="row">
+                                @foreach ($contractsByMonth as $month => $contracts)
+                                    <div class="col-md-4 col-sm-6 mb-2">
+                                        <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
+                                            <span class="text-muted">{{ substr($month, 0, 3) }}</span>
+                                            <span class="badge bg-success">{{ $contracts->count() }}</span>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                         @endif
                     </div>

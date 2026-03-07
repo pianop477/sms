@@ -30,7 +30,6 @@ class TransportController extends Controller
         // abort(404);
 
         return view('Transport.create');
-
     }
 
     /**
@@ -57,14 +56,13 @@ class TransportController extends Controller
         try {
 
             $existingRecord = Transport::where('phone', $request->phone)
-                                        ->where('school_id', Auth::user()->school_id)
-                                        ->exists();
+                ->where('school_id', Auth::user()->school_id)
+                ->exists();
 
             // If a record with the same combination exists, return validation error
             if ($existingRecord) {
                 Alert()->toast('A record with the same data already exists.', 'error');
                 return back();
-
             }
 
             $schoolBus = Transport::create([
@@ -79,7 +77,6 @@ class TransportController extends Controller
 
             Alert()->toast('School bus routine saved successfully', 'success');
             return back();
-
         } catch (\Exception $e) {
             Alert::error('Error', $e->getMessage());
             return back();
@@ -101,20 +98,20 @@ class TransportController extends Controller
         $user = Auth::user();
         $transport = Transport::findOrFail($id[0]);
 
-        if($transport->school_id != $user->school_id) {
+        if ($transport->school_id != $user->school_id) {
             Alert()->toast('You are not authorized to perform this action', 'error');
             return back();
         }
         //check for existing students in this bus routine
         $hasStudents = Student::where('transport_id', $transport->id)->where('status', 1)->where('graduated', 0)->exists();
 
-        if($hasStudents) {
+        if ($hasStudents) {
             Alert()->toast('This school bus already have active students, cannot be blocked', 'info');
             return back();
         }
         $transport->status = $request->input('status', 0);
         $transport->save();
-        if($transport) {
+        if ($transport) {
             Alert()->toast('Bus routine Blocked successfully', 'success');
             return back();
         }
@@ -126,17 +123,16 @@ class TransportController extends Controller
         $user = Auth::user();
         $transport = Transport::findOrFail($id[0]);
 
-        if($transport->school_id != $user->school_id) {
+        if ($transport->school_id != $user->school_id) {
             Alert()->toast('You are not authorized to perform this action', 'error');
             return back();
         }
         $transport->status = $request->input('status', 1);
         $transport->save();
-        if($transport) {
+        if ($transport) {
             Alert()->toast('Bus routine Unblocked successfully', 'success');
             return back();
         }
-
     }
 
     /**
@@ -149,22 +145,22 @@ class TransportController extends Controller
         $user = Auth::user();
         $transport = Transport::findOrFail($id[0]);
 
-        if($transport->school_id != $user->school_id) {
+        if ($transport->school_id != $user->school_id) {
             Alert()->toast('You are not authorized to perform this action', 'error');
             return back();
         }
         $hasStudentTake = Student::where('transport_id', $transport->id)->where('status', 1)->where('graduated', 0)->count();
 
-        if($hasStudentTake > 0) {
+        if ($hasStudentTake > 0) {
             Alert()->toast('Cannot delete this route because they have active students', 'info');
             return back();
         }
 
         $transport->delete();
-       if($transport) {
+        if ($transport) {
             Alert()->toast('School bus routine deleted successfully', 'success');
             return back();
-       }
+        }
     }
 
     public function Edit($trans)
@@ -174,7 +170,7 @@ class TransportController extends Controller
         $transport = Transport::findOrFail($id[0]);
         $allBuses = Transport::where('school_id', $user->school_id)->orderBy('bus_no')->get();
 
-        if($transport->school_id != $user->school_id) {
+        if ($transport->school_id != $user->school_id) {
             Alert()->toast('You are not authorized to perform this action', 'error');
             return back();
         }
@@ -188,7 +184,7 @@ class TransportController extends Controller
         $request->validate([
             'fullname' => 'required|string|max:255',
             'gender' => 'required|string|max:255',
-            'phone' => 'required|regex:/^[0-9]{10}$/|unique:transports,phone,'.$trans->id,
+            'phone' => 'required|regex:/^[0-9]{10}$/|unique:transports,phone,' . $trans->id,
             'bus_no' => 'required|string|max:255',
             'routine' => 'required|string|max:255'
         ], [
@@ -202,7 +198,7 @@ class TransportController extends Controller
 
         try {
             $user = Auth::user();
-            if($trans->school_id != $user->school_id) {
+            if ($trans->school_id != $user->school_id) {
                 Alert()->toast('You are not authorized to perform this action', 'error');
                 return back();
             }
@@ -227,52 +223,62 @@ class TransportController extends Controller
         $transport = Transport::find($id[0]);
         $user = Auth::user();
         $students = Student::query()
-                            ->join('grades', 'grades.id', '=', 'students.class_id')
-                            ->join('parents', 'parents.id', '=', 'students.parent_id')
-                            ->leftJoin('users as parent_user', 'parent_user.id', '=', 'parents.user_id')
-                            ->join('transports', 'transports.id', '=', 'students.transport_id')
-                            ->select(
-                                'students.*',
-                                'grades.id as class_id', 'grades.class_name', 'grades.class_code',
-                                'parents.address', 'parent_user.phone as parent_phone', // Hapa tumebadilisha alias ya phone
-                                'transports.driver_name', 'transports.phone', 'transports.bus_no'
-                            )
-                            ->where('students.transport_id', $transport->id)
-                            ->where('students.status', 1)
-                            ->where('students.school_id', $user->school_id)
-                            ->orderBy('students.first_name')
-                            ->get();
+            ->join('grades', 'grades.id', '=', 'students.class_id')
+            ->join('parents', 'parents.id', '=', 'students.parent_id')
+            ->leftJoin('users as parent_user', 'parent_user.id', '=', 'parents.user_id')
+            ->join('transports', 'transports.id', '=', 'students.transport_id')
+            ->select(
+                'students.*',
+                'grades.id as class_id',
+                'grades.class_name',
+                'grades.class_code',
+                'parents.address',
+                'parent_user.phone as parent_phone', // Hapa tumebadilisha alias ya phone
+                'transports.driver_name',
+                'transports.phone',
+                'transports.bus_no'
+            )
+            ->where('students.transport_id', $transport->id)
+            ->where('students.status', 1)
+            ->where('students.school_id', $user->school_id)
+            ->orderBy('students.first_name')
+            ->get();
         $AllBuses = Transport::where('school_id', $user->school_id)->where('status', 1)->where('id', '!=', $transport->id)->get();
         return view('Transport.students', compact('students', 'transport', 'AllBuses'));
     }
 
-    public function export ($trans)
+    public function export($trans)
     {
         // return response()->json($trans);
         $id = Hashids::decode($trans);
         $transport = Transport::find($id[0]);
         $user = Auth::user();
         $students = Student::query()
-                            ->join('grades', 'grades.id', '=', 'students.class_id')
-                            ->join('parents', 'parents.id', '=', 'students.parent_id')
-                            ->leftJoin('users as parent_user', 'parent_user.id', '=', 'parents.user_id')
-                            ->join('transports', 'transports.id', '=', 'students.transport_id')
-                            ->select(
-                                'students.*',
-                                'grades.id as class_id', 'grades.class_name', 'grades.class_code',
-                                'parents.address', 'parent_user.phone as parent_phone', // Hapa tumebadilisha alias ya phone
-                                'transports.driver_name', 'transports.phone', 'transports.bus_no'
-                            )
-                            ->where('students.transport_id', $transport->id)
-                            ->where('students.status', 1)
-                            ->where('students.school_id', $user->school_id)
-                            ->orderBy('students.first_name')
-                            ->get();
+            ->join('grades', 'grades.id', '=', 'students.class_id')
+            ->join('parents', 'parents.id', '=', 'students.parent_id')
+            ->leftJoin('users as parent_user', 'parent_user.id', '=', 'parents.user_id')
+            ->join('transports', 'transports.id', '=', 'students.transport_id')
+            ->select(
+                'students.*',
+                'grades.id as class_id',
+                'grades.class_name',
+                'grades.class_code',
+                'parents.address',
+                'parent_user.phone as parent_phone', // Hapa tumebadilisha alias ya phone
+                'transports.driver_name',
+                'transports.phone',
+                'transports.bus_no'
+            )
+            ->where('students.transport_id', $transport->id)
+            ->where('students.status', 1)
+            ->where('students.school_id', $user->school_id)
+            ->orderBy('students.first_name')
+            ->get();
         $pdf = \PDF::loadView('Transport.export', compact('students', 'transport'));
-        return $pdf->stream($transport->driver_name. ' students.pdf');
+        return $pdf->stream($transport->driver_name . ' students.pdf');
     }
 
-    public function transferStudentBus (Request $request)
+    public function transferStudentBus(Request $request)
     {
         try {
             $request->validate([
@@ -281,33 +287,31 @@ class TransportController extends Controller
             ]);
 
             Student::whereIn('id', $request->student)
-                    ->update(['transport_id' => $request->new_bus]);
+                ->update(['transport_id' => $request->new_bus]);
 
             Alert()->toast('Students School bus updated successfully', 'success');
             return back();
-       }
-       catch(\Exception $e) {
+        } catch (\Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
             return back();
-       }
+        }
     }
 
     protected function getStaffId()
     {
         $user = Auth::user();
-        $schoolData = school::find($user->school_id);
+        $schoolData = School::find($user->school_id);
 
         do {
-            // Tengeneza namba ya ID ya staff (4 digits)
             $staffIdNumber = str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
             $fullStaffId = $schoolData->abbriv_code . '-' . $staffIdNumber;
 
-            // Check kama ID ipo kwenye tables zote
-            $existsInOtherStaffs = other_staffs::where('staff_id', $fullStaffId)->exists();
-            $existsInDrivers     = Transport::where('staff_id', $fullStaffId)->exists();
-            $existsInTeachers    = Teacher::where('member_id', $fullStaffId)->exists();
-
-        } while ($existsInOtherStaffs || $existsInDrivers || $existsInTeachers);
+            // Angalia kama ID ipo kwenye database zote
+            $idExists =
+                Teacher::where('member_id', $fullStaffId)->exists() ||
+                other_staffs::where('staff_id', $fullStaffId)->exists() ||
+                Transport::where('staff_id', $fullStaffId)->exists();
+        } while ($idExists);
 
         return $fullStaffId;
     }

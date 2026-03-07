@@ -13,10 +13,23 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('contracts:update-expired-contract')->daily();
+        $schedule->command('contracts:manage')
+            ->dailyAt('00:00')
+            ->withoutOverlapping()
+            ->sendOutputTo(storage_path('logs/contract-scheduler.log'));
+
+        // Also run every hour for more frequent updates (optional)
+        $schedule->command('contracts:manage')
+            ->hourly()
+            ->withoutOverlapping()
+            ->runInBackground();
+        $schedule->command('otp:cleanup-expired')
+            ->hourly()
+            ->withoutOverlapping()
+            ->runInBackground();
         $schedule->command('school:check-active-school')->daily();
         $schedule->command('results:delete-expired')->everyMinute();
-        $schedule->command('students:delete-graduated-students')->daily();
+        // $schedule->command('students:delete-graduated-students')->daily();
         $schedule->command('delete:old-exam-results')->daily();
         $schedule->command('delete:old-attendance-reports')->daily();
         $schedule->command('delete:student-old-reports')->daily();

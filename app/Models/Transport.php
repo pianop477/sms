@@ -25,7 +25,7 @@ class Transport extends Model
         'status',
         'date_of_birth',
         'joining_year',
-        'profile_image', 'nida',
+        'profile_image', 'nida', 'bank_account_number', 'bank_account_name', 'bank_name', 'alternative_phone'
     ];
 
     protected $guarded = ['id', 'created_at', 'updated_at'];

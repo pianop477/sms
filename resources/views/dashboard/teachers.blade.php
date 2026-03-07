@@ -253,7 +253,7 @@
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-         @keyframes float {
+        @keyframes float {
 
             0%,
             100% {
@@ -453,7 +453,7 @@
             text-decoration: none;
         }
 
-         .badge-premium {
+        .badge-premium {
             padding: 6px 12px;
             border-radius: 30px;
             font-weight: 600;
@@ -485,7 +485,7 @@
                 overflow-x: auto;
             }
 
-                        .stat-card-premium .card-value {
+            .stat-card-premium .card-value {
                 font-size: 1.8rem;
             }
 
@@ -526,80 +526,88 @@
 
     <div class="py-4">
         @php
-                $school = App\Models\school::find(Auth::user()->school_id);
-                $serviceStartDate = \Carbon\Carbon::parse($school->service_start_date);
-                $serviceEndDate = \Carbon\Carbon::parse($school->service_end_date);
-                $now = \Carbon\Carbon::now();
-                $daysRemaining = $now->diffInDays($serviceEndDate, false);
+            $school = App\Models\school::find(Auth::user()->school_id);
+            $serviceStartDate = \Carbon\Carbon::parse($school->service_start_date);
+            $serviceEndDate = \Carbon\Carbon::parse($school->service_end_date);
+            $now = \Carbon\Carbon::now();
+            $daysRemaining = $now->diffInDays($serviceEndDate, false);
 
-                // FIXED: Format dates properly for JavaScript
-                $jsEndDate = $serviceEndDate->format('Y-m-d H:i:s');
+            // FIXED: Format dates properly for JavaScript
+            $jsEndDate = $serviceEndDate->format('Y-m-d H:i:s');
 
-                // Calculate progress
-                $totalDays = $serviceStartDate->diffInDays($serviceEndDate);
-                $daysPassed = $serviceStartDate->diffInDays($now);
-                $progressPercentage = min(100, max(0, ($daysPassed / $totalDays) * 100));
+            // Calculate progress
+            $totalDays = $serviceStartDate->diffInDays($serviceEndDate);
+            $daysPassed = $serviceStartDate->diffInDays($now);
+            $progressPercentage = min(100, max(0, ($daysPassed / $totalDays) * 100));
 
-                // Status colors and messages
-                if ($daysRemaining > 60) {
-                    $statusColor = 'white';
-                    $statusBg = 'var(--success)';
-                    $statusText = 'Active';
-                    $icon = 'fa-check-circle';
-                    $progressColor = 'bg-success';
-                } elseif ($daysRemaining > 30) {
-                    $statusColor = 'black';
-                    $statusBg = 'var(--warning)';
-                    $statusText = 'Expiring Soon';
-                    $icon = 'fa-clock';
-                    $progressColor = 'bg-warning';
-                } else {
-                    $statusColor = 'black';
-                    $statusBg = 'var(--danger)';
-                    $statusText = 'Critical';
-                    $icon = 'fa-exclamation-triangle';
-                    $progressColor = 'bg-danger';
-                }
-            @endphp
+            // Status colors and messages
+            if ($daysRemaining > 30) {
+                $statusColor = 'white';
+                $statusBg = 'var(--success)';
+                $statusText = 'Active';
+                $icon = 'fa-check-circle';
+                $progressColor = 'bg-success';
+            } elseif ($daysRemaining > 15) {
+                $statusColor = 'black';
+                $statusBg = 'var(--warning)';
+                $statusText = 'Expiring Soon';
+                $icon = 'fa-clock';
+                $progressColor = 'bg-warning';
+            } else {
+                $statusColor = 'black';
+                $statusBg = 'var(--danger)';
+                $statusText = 'Critical';
+                $icon = 'fa-exclamation-triangle';
+                $progressColor = 'bg-danger';
+            }
+        @endphp
         <!-- Contract Status Alert -->
         @if (Auth::user()->usertype == 3)
             <div class="row mb-4">
                 <div class="col-12">
                     @if ($contract == null)
                         <div class="alert alert-danger alert-custom alert-dismissible fade show">
-                            <strong><i class="fas fa-exclamation-triangle me-2"></i> Contract Status:</strong> Not applied.
+                            <strong><i class="fas fa-exclamation-triangle mr-2"></i> Contract Status:</strong> Not applied.
                             <a href="{{ route('contract.index') }}" class="alert-link fw-bold">Apply here</a>
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     @else
                         @if ($contract->status == 'expired')
                             <div class="alert alert-danger alert-custom alert-dismissible fade show">
-                                <strong><i class="fas fa-times-circle me-2"></i> Contract Status:</strong> Expired
+                                <strong><i class="fas fa-times-circle mr-2"></i> Contract Status:</strong> Expired
+                                <a href="{{ route('contract.index') }}" class="alert-link fw-bold">Apply here</a>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
                         @elseif ($contract->status == 'rejected')
                             <div class="alert alert-secondary alert-custom alert-dismissible fade show">
-                                <strong><i class="fas fa-times me-2"></i> Contract Status:</strong> Rejected |
+                                <strong><i class="fas fa-times mr-2"></i> Contract Status:</strong> Rejected |
                                 <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
-                        @elseif ($contract->status == 'approved' && $contract->end_date <= now()->addDays(30))
+                        @elseif ($contract->status == 'approved')
                             <div class="alert alert-warning alert-custom alert-dismissible fade show">
-                                <strong><i class="fas fa-exclamation-circle me-2"></i> Contract Status:</strong> Expiring
-                                soon ({{ \Carbon\Carbon::parse($contract->end_date)->format('d/m/Y') }})
+                                <strong><i class="fas fa-exclamation-circle mr-2"></i> Contract Status:</strong> Under
+                                Review |
+                                <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
                         @elseif ($contract->status == 'pending')
                             <div class="alert alert-info alert-custom alert-dismissible fade show">
-                                <strong><i class="fas fa-clock me-2"></i> Contract Status:</strong> Pending |
+                                <strong><i class="fas fa-clock mr-2"></i> Contract Status:</strong> Pending |
                                 <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
-                        @else
+                        @elseif ($contract->status == 'activated')
                             <div class="alert alert-success alert-custom alert-dismissible fade show">
-                                <strong><i class="fas fa-check-circle me-2"></i> Contract Status:</strong> Active (Expires:
+                                <strong><i class="fas fa-check-circle mr-2"></i> Contract Status:</strong> Active (Expires:
                                 {{ \Carbon\Carbon::parse($contract->end_date)->format('d/m/Y') }}) |
                                 <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View contract</a>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        @else
+                            <div class="alert alert-secondary alert-custom alert-dismissible fade show">
+                                <strong><i class="fas fa-ban mr-2"></i> Contract Status:</strong> Terminated |
+                                <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
                         @endif

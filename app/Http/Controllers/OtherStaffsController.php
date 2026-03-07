@@ -42,55 +42,58 @@ class OtherStaffsController extends Controller
 
         // Combine
         $combinedStaffs = $normalizedStaffs
-                            ->concat($normalizedDrivers)
-                            ->sortBy('full_name');
+            ->concat($normalizedDrivers)
+            ->sortBy('full_name');
 
         return view('OtherStaffs.index', compact('combinedStaffs'));
     }
 
 
-    public function addStaffInformation (Request $request)
+    public function addStaffInformation(Request $request)
     {
-        $this->validate($request, [
-            'fname' => 'required|string|max:255',
-            'lname' => 'required|string|max:255',
-            'gender' => 'required|string|in:male,female',
-            'phone' => 'required|regex:/^[0-9]{10}$/|unique:other_staffs,phone',
-            'email' => 'nullable|email|unique:other_staffs,email',
-            'education' => 'required|string|max:255',
-            'dob' => 'required|date|date_format:Y-m-d',
-            'street' => 'required|string|max:255',
-            'joined' => 'required|date_format:Y',
-            'job_title' => 'required|string|max:255',
-            'nida' => 'nullable|string|regex:/^\d{8}-?\d{5}-?\d{5}-?\d{2}$/',
-            'image' => [
+        $this->validate(
+            $request,
+            [
+                'fname' => 'required|string|max:255',
+                'lname' => 'required|string|max:255',
+                'gender' => 'required|string|in:male,female',
+                'phone' => 'required|regex:/^[0-9]{10}$/|unique:other_staffs,phone',
+                'email' => 'nullable|email|unique:other_staffs,email',
+                'education' => 'required|string|max:255',
+                'dob' => 'required|date|date_format:Y-m-d',
+                'street' => 'required|string|max:255',
+                'joined' => 'required|date_format:Y',
+                'job_title' => 'required|string|max:255',
+                'nida' => 'nullable|string|regex:/^\d{8}-?\d{5}-?\d{5}-?\d{2}$/',
+                'image' => [
                     'nullable',
                     'file',
                     'mimetypes:image/jpeg,image/png,image/jpg',
                     'max:1024'
                 ],
-        ],
-        [
-           'fname.required' => 'First name is required',
-            'lname.required' => 'Last name is required',
-            'dob.required' => 'Date of birth is required',
-            'phone.required' => 'Phone number is required',
-            'phone.regex' => 'Phone number must be 10 digits',
-            'education.required' => 'Qualification is required',
-            'street.required' => 'Street address is required',
-            'email.unique' => 'Email already exists',
-            'email.email' => 'Email must be a valid email address',
-            'joined.required' => 'Joined date is required',
-            'job_title.required' => 'Job title is required',
-            'image.file' => 'Image file must be a valid image file type',
-            'image.max' => 'file size is too large, maximum 1 MB',
-            // 'nida.required' => 'NIN must be filled',
-            'nida.regex' => 'Invalid NIN format',
-        ]);
+            ],
+            [
+                'fname.required' => 'First name is required',
+                'lname.required' => 'Last name is required',
+                'dob.required' => 'Date of birth is required',
+                'phone.required' => 'Phone number is required',
+                'phone.regex' => 'Phone number must be 10 digits',
+                'education.required' => 'Qualification is required',
+                'street.required' => 'Street address is required',
+                'email.unique' => 'Email already exists',
+                'email.email' => 'Email must be a valid email address',
+                'joined.required' => 'Joined date is required',
+                'job_title.required' => 'Job title is required',
+                'image.file' => 'Image file must be a valid image file type',
+                'image.max' => 'file size is too large, maximum 1 MB',
+                // 'nida.required' => 'NIN must be filled',
+                'nida.regex' => 'Invalid NIN format',
+            ]
+        );
 
-         try {
+        try {
 
-         if($request->hasFile('image')) {
+            if ($request->hasFile('image')) {
                 // Virus scan
                 $scanResult = $this->scanFileForViruses($request->file('image'));
                 if (! $scanResult['clean']) {
@@ -99,24 +102,30 @@ class OtherStaffsController extends Controller
                 }
             }
 
-             $nin = preg_replace('/[^0-9]/', '', $request->nida);
+            $nin = preg_replace('/[^0-9]/', '', $request->nida);
 
             // Check for existing student records
             $existingStaff = other_staffs::query()
-                                ->when($request->phone, fn ($q) =>
-                                    $q->where('phone', $request->phone)
-                                )
-                                ->when($nin, fn ($q) =>
-                                    $q->orWhere('nida', $nin)
-                                )
-                                ->when($request->email, fn ($q) =>
-                                    $q->orWhere('email', $request->email)
-                                )
-                                ->exists();
+                ->when(
+                    $request->phone,
+                    fn($q) =>
+                    $q->where('phone', $request->phone)
+                )
+                ->when(
+                    $nin,
+                    fn($q) =>
+                    $q->orWhere('nida', $nin)
+                )
+                ->when(
+                    $request->email,
+                    fn($q) =>
+                    $q->orWhere('email', $request->email)
+                )
+                ->exists();
 
             if ($existingStaff) {
-                    Alert()->toast('Staff with the same records already exists', 'error');
-                    return back();
+                Alert()->toast('Staff with the same records already exists', 'error');
+                return back();
             }
 
             $addStaff = other_staffs::create([
@@ -131,7 +140,8 @@ class OtherStaffsController extends Controller
                 'job_title' => $request->job_title,
                 'street_address' => $request->street,
                 'joining_year' => $request->joined,
-                'nida' => $nin
+                'nida' => $nin,
+                'school_id' => Auth::user()->school_id,
                 // 'profile_image' => $profile_img
             ]);
 
@@ -148,11 +158,10 @@ class OtherStaffsController extends Controller
 
             Alert()->toast('Staff information has been recorded successfully', 'success');
             return back();
-         } catch (Exception $e) {
+        } catch (Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
             return back();
-         }
-
+        }
     }
 
 
@@ -162,8 +171,7 @@ class OtherStaffsController extends Controller
 
         if ($type === 'driver') {
             $staff = Transport::findOrFail($decoded[0]);
-        }
-        else {
+        } else {
             $staff = other_staffs::findOrFail($decoded[0]);
         }
 
@@ -199,7 +207,7 @@ class OtherStaffsController extends Controller
             'street'     => 'required|string|max:255',
             'joined'     => 'required|date_format:Y',
             'job_title'  => 'required|string|max:255',
-            'image'      => ['nullable','file','mimetypes:image/jpeg,image/png,image/jpg','max:1024'],
+            'image'      => ['nullable', 'file', 'mimetypes:image/jpeg,image/png,image/jpg', 'max:1024'],
             'nida'       => 'nullable|string|regex:/^\d{8}-?\d{5}-?\d{5}-?\d{2}$/'
         ];
 
@@ -273,9 +281,8 @@ class OtherStaffsController extends Controller
 
             Alert()->toast('Staff information updated successfully', 'success');
             return back();
-
         } catch (\Throwable $e) {
-            Log::error('Error updating staff profile: '.$e->getMessage(), [
+            Log::error('Error updating staff profile: ' . $e->getMessage(), [
                 'staff_id' => $staff->id,
                 'type' => $type,
                 'payload' => $updateData,
@@ -285,18 +292,18 @@ class OtherStaffsController extends Controller
         }
     }
 
-    public function blockStatus($type, $id, Request $request, )
+    public function blockStatus($type, $id, Request $request,)
     {
         $decoded = Hashids::decode($id);
 
         try {
-            if($type == 'driver') {
+            if ($type == 'driver') {
                 $staff = Transport::findOrFail($decoded[0]);
             } else {
                 $staff = other_staffs::findOrFail($decoded[0]);
             }
 
-            if(! $staff) {
+            if (! $staff) {
                 Alert()->toast('failed to get staff information', 'error');
                 return back();
             }
@@ -318,13 +325,13 @@ class OtherStaffsController extends Controller
         $decoded = Hashids::decode($id);
 
         try {
-            if($type == 'driver') {
+            if ($type == 'driver') {
                 $staff = Transport::findOrFail($decoded[0]);
             } else {
                 $staff = other_staffs::findOrFail($decoded[0]);
             }
 
-            if(! $staff) {
+            if (! $staff) {
                 Alert()->toast('failed to get staff information', 'error');
                 return back();
             }
@@ -346,18 +353,18 @@ class OtherStaffsController extends Controller
         $decoded = Hashids::decode($id);
 
         try {
-            if($type == 'driver') {
+            if ($type == 'driver') {
                 $staff = Transport::findOrFail($decoded[0]);
             } else {
                 $staff = Other_staffs::findOrFail($decoded[0]);
             }
 
-            if($staff->status == 1) {
+            if ($staff->status == 1) {
                 Alert()->toast('Cannot delete active member, please block first', 'info');
                 return back();
             }
 
-            if($staff->bus_no != null) {
+            if ($staff->bus_no != null) {
                 Alert()->toast('This driver cannot be deleted because has a bus to drive', 'info');
                 return back();
             }
@@ -376,7 +383,7 @@ class OtherStaffsController extends Controller
 
         $combinedStaffs = $otherStaffs->concat($drivers)->sortBy('first_name');
 
-        switch($format) {
+        switch ($format) {
             case 'pdf':
                 return $this->generatePDF($user, $school, $combinedStaffs);
             case 'excel':
@@ -623,22 +630,51 @@ class OtherStaffsController extends Controller
     }
 
 
+    /**
+     * Generate unique staff ID across all staff tables (teachers, other_staffs, transports)
+     *
+     * @return string
+     * @throws \Exception
+     */
     protected function getStaffId()
     {
         $user = Auth::user();
-        $schoolData = school::find($user->school_id);
+        $schoolData = School::find($user->school_id);
+
+        // Validation: Hakikisha school code ipo
+        if (!$schoolData || empty($schoolData->abbriv_code)) {
+            throw new \Exception('School abbreviation code not found. Please configure school settings.');
+        }
+
+        $schoolCode = $schoolData->abbriv_code;
+        $maxAttempts = 100; // Kuzuia infinite loop (kinga)
+        $attempts = 0;
 
         do {
+            // Safety check - kuzuia infinite loop
+            if ($attempts >= $maxAttempts) {
+                throw new \Exception('Unable to generate unique staff ID after ' . $maxAttempts . ' attempts. Please try again.');
+            }
+
             // Tengeneza namba ya ID ya staff (4 digits)
             $staffIdNumber = str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
-            $fullStaffId = $schoolData->abbriv_code . '-' . $staffIdNumber;
+            $fullStaffId = $schoolCode . '-' . $staffIdNumber;
 
-            // Check kama ID ipo kwenye tables zote
+            $attempts++;
+
+            // Angalia kama ID ipo kwenye tables zote kwa njia safi
+            $existsInTeachers = Teacher::where('member_id', $fullStaffId)->exists();
             $existsInOtherStaffs = other_staffs::where('staff_id', $fullStaffId)->exists();
-            $existsInDrivers     = Transport::where('staff_id', $fullStaffId)->exists();
-            $existsInTeachers    = Teacher::where('member_id', $fullStaffId)->exists();
+            $existsInDrivers = Transport::where('staff_id', $fullStaffId)->exists();
 
-        } while ($existsInOtherStaffs || $existsInDrivers || $existsInTeachers);
+            // Combine checks kwa urahisi wa kusoma
+            $idExists = $existsInTeachers || $existsInOtherStaffs || $existsInDrivers;
+
+            // Optional: Logging kwa debugging (unaweza kuondoa baadaye)
+            if ($idExists && config('app.debug')) {
+                // \Log::info("Staff ID generation: {$fullStaffId} already exists (Attempt {$attempts})");
+            }
+        } while ($idExists);
 
         return $fullStaffId;
     }
@@ -650,13 +686,13 @@ class OtherStaffsController extends Controller
             $apiKey = config('services.virustotal.key');
             try {
                 $response = Http::withHeaders(['x-apikey' => $apiKey])
-                            ->attach('file', fopen($file->path(), 'r'))
-                            ->post('https://www.virustotal.com/api/v3/files');
+                    ->attach('file', fopen($file->path(), 'r'))
+                    ->post('https://www.virustotal.com/api/v3/files');
 
                 if ($response->successful()) {
                     $scanId = $response->json()['data']['id'];
                     $analysis = Http::withHeaders(['x-apikey' => $apiKey])
-                                ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
+                        ->get("https://www.virustotal.com/api/v3/analyses/{$scanId}");
 
                     return [
                         'clean' => $analysis->json()['data']['attributes']['stats']['malicious'] === 0,
@@ -666,7 +702,7 @@ class OtherStaffsController extends Controller
             } catch (\Exception $e) {
                 return [
                     'clean' => false,
-                    'message' => 'Scan failed: '.$e->getMessage()
+                    'message' => 'Scan failed: ' . $e->getMessage()
                 ];
             }
         }
@@ -678,7 +714,7 @@ class OtherStaffsController extends Controller
     private function handleProfileImageUpload($image, $oldImage = null)
     {
         $directory = 'profile'; // inside storage/app/public/profile
-        $imageFile = time() . '_'. uniqid() . '.' . $image->getClientOriginalExtension();
+        $imageFile = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
 
         // Delete old image if it is not one of the default ones
         if ($oldImage && !in_array($oldImage, ['avatar.jpg', 'female-avatar.jpg'])) {

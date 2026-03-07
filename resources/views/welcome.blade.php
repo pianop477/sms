@@ -876,6 +876,9 @@
                         <li><a href="{{ route('login') }}"
                                 class="text-gray-400 hover:text-white transition text-sm sm:text-base block py-1"
                                 id="footer-link-login">Login</a></li>
+                        <li><a href="{{ route('contract.gateway.init') }}"
+                                class="text-gray-400 hover:text-white transition text-sm sm:text-base block py-1"
+                                id="footer-link-contract">Contracts Gateway</a></li>
                     </ul>
                 </div>
 
@@ -1302,6 +1305,7 @@
                 'footer-link-features': 'Features',
                 'footer-link-contact': 'Contact Us',
                 'footer-link-login': 'Login',
+                'footer-link-contract': 'Contracts Gateway',
                 'footer-services-title': 'Our Services',
                 'footer-service-1': 'Academic Management',
                 'footer-service-2': 'Financial Management',
@@ -1448,6 +1452,7 @@
                 'footer-link-features': 'Vipengele',
                 'footer-link-contact': 'Wasiliana Nasi',
                 'footer-link-login': 'Ingia',
+                'footer-link-contract': 'Dirisha la Mikataba',
                 'footer-services-title': 'Huduma Zetu',
                 'footer-service-1': 'Usimamizi wa Masomo',
                 'footer-service-2': 'Usimamizi wa Fedha',
@@ -1571,12 +1576,14 @@
                     "Your School Management",
                     "Academic Performance",
                     "Financial Tracking",
-                    "Attendance Monitoring"
+                    "Attendance Monitoring",
+                    "Contracts Management",
                 ] : [
                     "Usimamizi wa Shule Yako",
                     "Utendaji wa Kimasomo",
                     "Ufuatiliaji wa Fedha",
-                    "Ufuatiliaji wa Mahudhurio"
+                    "Ufuatiliaji wa Mahudhurio",
+                    "Usimamizi wa Mikataba"
                 ];
 
                 let phraseIndex = 0;

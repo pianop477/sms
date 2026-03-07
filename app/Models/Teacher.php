@@ -15,7 +15,7 @@ class Teacher extends Model
         'qualification',
         'address',
         'role_id',
-        'member_id',
+        'member_id', 'bank_account_number', 'bank_account_name', 'bank_name', 'alternative_phone',
         'status', 'nida', 'form_four_index_number', 'form_four_completion_year',
     ];
 
