@@ -121,11 +121,11 @@
                         <!-- Header Section -->
                         <div class="row mb-4">
                             <div class="col-md-10">
-                                <h4 class="header-title">Expenses Categories</h4>
+                                <h4 class="header-title">Manage Expense Accounts</h4>
                             </div>
                             <div class="col-md-2 text-end">
                                 <button type="button" class="btn btn-primary btn-action float-right" data-bs-toggle="modal" data-bs-target="#addExamModal">
-                                    <i class="fas fa-circle-plus me-1"></i> Add Category
+                                    <i class="fas fa-circle-plus me-1"></i> Add Account
                                 </button>
                             </div>
                         </div>
@@ -137,7 +137,7 @@
                                     <thead>
                                         <tr>
                                             <th scope="col">#</th>
-                                            <th scope="col">Category Type</th>
+                                            <th scope="col">Account Type</th>
                                             <th scope="col" class="">Description</th>
                                             <th scope="col" class="text-center">Actions</th>
                                         </tr>
@@ -145,7 +145,7 @@
                                     <tbody>
                                         @if (empty($categories))
                                             <tr>
-                                                <td colspan="4" class="text-center">No Expense Categories Found.</td>
+                                                <td colspan="4" class="text-center">No Expense Accounts Found.</td>
                                             </tr>
                                         @else
                                             @foreach ($categories as $row)
@@ -164,7 +164,7 @@
                                                             <form action="{{route('expenses.destroy', ['expenseCategory' => Hashids::encode($row['id'])])}}" method="POST">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <button type="submit" class="btn btn-sm btn-danger text-center" title="Delete" style="border-radius: 15px" onclick="return confirm('Are you sure you want to delete this category?')">
+                                                                <button type="submit" class="btn btn-sm btn-danger text-center" title="Delete" style="border-radius: 15px" onclick="return confirm('Are you sure you want to delete this Account?')">
                                                                     <i class="ti-trash"></i> Delete
                                                                 </button>
                                                             </form>
@@ -191,7 +191,7 @@
         <div class="modal-dialog modal-md">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addExamModalLabel">Register New Expense</h5>
+                    <h5 class="modal-title" id="addExamModalLabel">Register New Expense Account</h5>
                     <button type="button" class="btn btn-xs btn btn-danger" data-bs-dismiss="modal" aria-label="Close"><i class="fas fa-close"></i></button>
                 </div>
                 <div class="modal-body">
@@ -199,8 +199,8 @@
                         @csrf
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="name" class="form-label">Expense Type</label>
-                                <input type="text" name="name" class="form-control" id="name" placeholder="Expense Type" required>
+                                <label for="name" class="form-label">Account Type</label>
+                                <input type="text" name="name" class="form-control" id="name" placeholder="Account Type" required>
                                 @error('name')
                                 <div class="text-danger small">
                                     {{$message}}
