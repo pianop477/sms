@@ -636,8 +636,8 @@
                                 <h6 class="text-muted mb-2"> Mikataba uliyoomba</h6>
                                 <h3 class="mb-0" id="total-contracts">0</h3>
                             </div>
-                            <div class="stats-icon bg-primary bg-opacity-10">
-                                <i class="fas fa-file-contract text-primary"></i>
+                            <div class="stats-icon bg-primary">
+                                <i class="fas fa-file-contract text-white"></i>
                             </div>
                         </div>
                     </div>
@@ -649,8 +649,8 @@
                                 <h6 class="text-muted mb-2"> Inayotumika</h6>
                                 <h3 class="mb-0" id="active-contracts">0</h3>
                             </div>
-                            <div class="stats-icon bg-success bg-opacity-10">
-                                <i class="fas fa-check-circle text-success"></i>
+                            <div class="stats-icon bg-success">
+                                <i class="fas fa-check-circle text-white"></i>
                             </div>
                         </div>
                     </div>
@@ -662,8 +662,8 @@
                                 <h6 class="text-muted mb-2"> Inayosubiri</h6>
                                 <h3 class="mb-0" id="pending-contracts">0</h3>
                             </div>
-                            <div class="stats-icon bg-warning bg-opacity-10">
-                                <i class="fas fa-clock text-warning"></i>
+                            <div class="stats-icon bg-warning">
+                                <i class="fas fa-clock text-warning text-white"></i>
                             </div>
                         </div>
                     </div>
@@ -675,8 +675,8 @@
                                 <h6 class="text-muted mb-2">Sitishwa/Kataliwa/Kwisha</h6>
                                 <h3 class="mb-0" id="terminated-contracts">0</h3>
                             </div>
-                            <div class="stats-icon bg-danger bg-opacity-10">
-                                <i class="fas fa-ban text-danger"></i>
+                            <div class="stats-icon bg-danger">
+                                <i class="fas fa-ban text-danger text-white"></i>
                             </div>
                         </div>
                     </div>
@@ -2124,6 +2124,7 @@
             }
         });
     </script>
+    @include('sweetalert::alert');
 </body>
 
 </html>
