@@ -618,8 +618,8 @@ class ContractGatewayController extends Controller
         $nextSmsService = new NextSmsService();
         $destination = $this->formatPhoneNumber($phone);
 
-        Log::info("OTP code: " . $message);
-        // return $nextSmsService->sendSmsByNext($senderId, $destination, $message, uniqid());
+        // Log::info("OTP code: " . $message);
+        return $nextSmsService->sendSmsByNext($senderId, $destination, $message, uniqid());
     }
 
     /**
