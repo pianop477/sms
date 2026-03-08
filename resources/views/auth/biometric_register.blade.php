@@ -4,6 +4,7 @@
 
 <button id="register-btn">Register Biometric</button>
 
+<script src="{{asset('assets/js/js.js')}}"></script>
 <script type="module">
 import { startRegistration } from '@simplewebauthn/browser';
 
