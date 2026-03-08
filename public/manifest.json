@@ -2,39 +2,45 @@
     "name": "ShuleApp",
     "short_name": "ShuleApp",
     "description": "Empowering Education",
-    "categories": ["education", "productivity", "school"],
+    "categories": [
+        "education",
+        "productivity",
+        "school"
+    ],
     "start_url": "/?v=2026.1",
     "display": "standalone",
-    "display_override": ["window-controls-overlay", "minimal-ui"],
+    "display_override": [
+        "window-controls-overlay",
+        "minimal-ui"
+    ],
     "background_color": "#ffffff",
     "theme_color": "#2C3E50",
     "color": "#2C3E50",
-    "orientation": "potrait",
+    "orientation": "portrait",
     "scope": "/",
     "id": "shuleapp-2026-1",
     "lang": "en",
     "dir": "auto",
     "icons": [
         {
-            "src" : "/icons/new_icon1.png",
+            "src": "/icons/new_icon1.png?v=2026.2",
             "sizes": "96x96",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/icons/new_icon2.png",
+            "src": "/icons/new_icon2.png?v=2026.2",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/icons/new_icon3.png",
+            "src": "/icons/new_icon3.png?v=2026.2",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
         }
     ],
-
     "prefer_related_applications": false,
     "related_applications": [],
     "features": [

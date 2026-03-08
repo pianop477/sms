@@ -1,39 +1,35 @@
-const CACHE_NAME = 'ShuleApp-cache-v2026.1'; // Increase/change version number
-const APP_VERSION = '2026.1'; // ⬅️ ADD SEPARATE VERSION VARIABLE
-const ASSETS_TO_CACHE = [
+const APP_VERSION = '2026.2';
+const CACHE_NAME = `shuleapp-cache-${APP_VERSION}`;
+
+const STATIC_ASSETS = [
+    '/',
+    '/offline.html',
     '/manifest.json',
     '/assets/css/styles.css',
     '/assets/js/scripts.js',
     '/icons/new_icon1.png',
     '/icons/new_icon2.png',
-    '/icons/new_icon3.png',
-    // '/icons/icon_4.png',
-    '/offline.html'
-].map(url => `${url}?v=${APP_VERSION}`); // Auto-add version parameter
+    '/icons/new_icon3.png'
+].map(url => `${url}?v=${APP_VERSION}`);
 
-// Install Event
-self.addEventListener('install', (event) => {
+// INSTALL
+self.addEventListener('install', event => {
+    self.skipWaiting();
+
     event.waitUntil(
         caches.open(CACHE_NAME)
-            .then((cache) => cache.addAll(ASSETS_TO_CACHE))
-            .then(() => self.skipWaiting())
+            .then(cache => cache.addAll(STATIC_ASSETS))
     );
 });
 
-self.addEventListener('message', (event) => {
-    if (event.data && event.data.type === 'SKIP_WAITING') {
-        self.skipWaiting();
-    }
-});
-
-// Activate Event - Cleanup old caches
-self.addEventListener('activate', (event) => {
+// ACTIVATE
+self.addEventListener('activate', event => {
     event.waitUntil(
-        caches.keys().then((cacheNames) => {
+        caches.keys().then(keys => {
             return Promise.all(
-                cacheNames.map((cache) => {
-                    if (cache !== CACHE_NAME) {
-                        return caches.delete(cache);
+                keys.map(key => {
+                    if (key !== CACHE_NAME) {
+                        return caches.delete(key);
                     }
                 })
             );
@@ -41,64 +37,66 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// Fetch Event - Network first with cache fallback for static assets
-self.addEventListener('fetch', (event) => {
-    const requestUrl = new URL(event.request.url);
+// FETCH
+self.addEventListener('fetch', event => {
 
-    // Skip non-GET requests and external URLs
-    if (event.request.method !== 'GET' ||
-        requestUrl.origin !== self.location.origin) return;
+    const url = new URL(event.request.url);
 
-    // ⚡ 3. SMART CACHE MATCHING - FIXED!
-    const requestWithoutQuery = requestUrl.pathname;
-    const isCacheableAsset = ASSETS_TO_CACHE.some(cachedAsset => {
-        const assetUrl = new URL(cachedAsset, self.location.origin);
-        return assetUrl.pathname === requestWithoutQuery;
-    });
-
-    if (isCacheableAsset) {
-        event.respondWith(
-            // ⚡ 4. NETWORK FIRST WITH STALE-WHILE-REVALIDATE
-            (async () => {
-                try {
-                    // Try network first
-                    const networkResponse = await fetch(event.request);
-
-                    // Update cache in background
-                    const cache = await caches.open(CACHE_NAME);
-                    await cache.put(event.request, networkResponse.clone());
-
-                    return networkResponse;
-                } catch (error) {
-                    // Network failed - try cache
-                    const cachedResponse = await caches.match(event.request);
-
-                    if (cachedResponse) {
-                        // ⚡ 5. BACKGROUND UPDATE IF CACHE IS OLD
-                        setTimeout(async () => {
-                            try {
-                                const freshResponse = await fetch(event.request);
-                                const cache = await caches.open(CACHE_NAME);
-                                await cache.put(event.request, freshResponse);
-                            } catch (e) {
-                                // Silent fail - we have cached version
-                            }
-                        }, 0);
-
-                        return cachedResponse;
-                    }
-
-                    // No cache - show offline page
-                    return caches.match(`/offline.html?v=${APP_VERSION}`);
-                }
-            })()
-        );
+    // ❗ IMPORTANT: NEVER CACHE API OR AUTH REQUESTS
+    if (
+        url.pathname.startsWith('/api/') ||
+        url.pathname.includes('login') ||
+        url.pathname.includes('logout') ||
+        url.pathname.includes('verify') ||
+        url.pathname.includes('otp') ||
+        url.pathname.includes('session')
+    ) {
+        event.respondWith(fetch(event.request));
         return;
     }
 
-    // ⚡ 6. FOR OTHER REQUESTS: NETWORK FIRST
+    // ONLY HANDLE GET
+    if (event.request.method !== 'GET') return;
+
+    // STATIC FILES STRATEGY (STALE WHILE REVALIDATE)
+    if (
+        url.pathname.startsWith('/assets/') ||
+        url.pathname.startsWith('/icons/') ||
+        url.pathname.endsWith('.css') ||
+        url.pathname.endsWith('.js') ||
+        url.pathname.endsWith('.png') ||
+        url.pathname.endsWith('.jpg') ||
+        url.pathname.endsWith('.svg')
+    ) {
+
+        event.respondWith(
+            caches.match(event.request).then(cached => {
+
+                const fetchPromise = fetch(event.request).then(networkResponse => {
+
+                    caches.open(CACHE_NAME).then(cache => {
+                        cache.put(event.request, networkResponse.clone());
+                    });
+
+                    return networkResponse;
+
+                }).catch(() => cached);
+
+                return cached || fetchPromise;
+
+            })
+        );
+
+        return;
+    }
+
+    // HTML PAGES → NETWORK FIRST
     event.respondWith(
+
         fetch(event.request)
-            .catch(() => caches.match(`/offline.html?v=${APP_VERSION}`))
+            .then(response => response)
+            .catch(() => caches.match('/offline.html?v=' + APP_VERSION))
+
     );
+
 });

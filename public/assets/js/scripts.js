@@ -355,7 +355,7 @@
         // Ujumbe ujifiche baada ya sekunde 10
         setTimeout(() => {
             message.remove();
-        }, 10000);
+        }, 3000);
     }
 
     // Angalia kama ni iOS
@@ -373,7 +373,9 @@
     function registerServiceWorker() {
         if (!('serviceWorker' in navigator)) return;
 
-        navigator.serviceWorker.register('/service-worker.js')
+        const SW_URL = '/service-worker.js?v=2026.2'; // version parameter
+
+        navigator.serviceWorker.register(SW_URL)
             .then((registration) => {
                 console.log('Service Worker registered:', registration);
 
@@ -384,13 +386,10 @@
 
                 // 2️⃣ Listen for new SW installation
                 registration.addEventListener('updatefound', () => {
-                    newWorker = registration.installing;
+                    const newWorker = registration.installing;
 
                     newWorker.addEventListener('statechange', () => {
-                        if (
-                            newWorker.state === 'installed' &&
-                            navigator.serviceWorker.controller
-                        ) {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                             showUpdateUI(newWorker);
                         }
                     });
@@ -407,7 +406,6 @@
     }
 
     function showUpdateUI(worker) {
-        // Avoid duplicate prompts
         if (document.getElementById('update-toast')) return;
 
         const toast = document.createElement('div');
@@ -445,5 +443,10 @@
             worker.postMessage({ type: 'SKIP_WAITING' });
         };
     }
+
+    // Auto-register on page load
+    window.addEventListener('load', () => {
+        registerServiceWorker();
+    });
 
 })(jQuery);

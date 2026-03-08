@@ -362,7 +362,7 @@
                     <i class="fas fa-id-card" id="current-icon"></i>
                 </div>
                 <h2 id="current-title">Contracts Gateway System</h2>
-                <p id="current-subtitle">Ingiza Namba ya Utambulisho kupata Msimbo</p>
+                <p id="current-subtitle">Mikataba Yako, Udhibiti Wako</p>
             </div>
 
             <!-- Alert Messages -->
@@ -442,6 +442,7 @@
         </div>
     </div>
 
+    <script src="{{asset('assets/js/scripts.js')}}"></script>
     <script>
         (function() {
             'use strict';
@@ -593,7 +594,7 @@
                     'staff-id': {
                         icon: 'fa-id-card',
                         title: 'Contracts Gateway System',
-                        subtitle: 'Ingiza Namba ya Utambulisho kupata Msimbo'
+                        subtitle: 'Mikataba Yako, Udhibiti Wako'
                     },
                     'otp': {
                         icon: 'fa-mobile-alt',
