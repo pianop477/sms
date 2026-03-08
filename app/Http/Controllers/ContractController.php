@@ -12,6 +12,7 @@ use App\Models\Teacher;
 use App\Models\Transport;
 use App\Models\User;
 use App\Services\NextSmsService;
+use App\Traits\ResolveApplicantTrait;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Exception;
@@ -31,33 +32,46 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 class ContractController extends Controller
 {
     //
+    use ResolveApplicantTrait;
 
     private function getCurrentApplicant(?Request $request = null)
     {
         $request = $request ?? request();
         $startTime = microtime(true);
 
-        // Log::info('🔐 AUTHENTICATION STARTED', [
-        //     'url' => $request->fullUrl(),
-        //     'method' => $request->method(),
-        //     'ip' => $request->ip(),
-        //     'user_agent' => $request->userAgent()
-        // ]);
+        Log::info('🔐 AUTHENTICATION STARTED', [
+            'url' => $request->fullUrl(),
+            'method' => $request->method(),
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent()
+        ]);
 
-        // ===== SECURITY CHECK 1: Rate limiting =====
+        // ===== SECURITY CHECK 1 =====
         $this->checkRateLimit($request);
 
-        // ===== SECURITY CHECK 2: Token harvesting protection =====
+        // ===== SECURITY CHECK 2 =====
         $this->protectAgainstTokenHarvesting($request);
 
-        // ===== CASE 1: Authenticated teacher =====
+        /*
+    |--------------------------------------------------------------------------
+    | CASE 1: AUTHENTICATED USER (TEACHER)
+    |--------------------------------------------------------------------------
+    */
+
         if (Auth::check()) {
+
             $user = Auth::user();
 
-            // Log::info('Auth check passed', ['user_id' => $user->id, 'usertype' => $user->usertype]);
+            Log::info('Auth check passed', [
+                'user_id' => $user->id,
+                'usertype' => $user->usertype
+            ]);
 
             if ($user->status != 1) {
-                // Log::warning('Inactive user attempted access', ['user_id' => $user->id]);
+                Log::warning('Inactive user attempted access', [
+                    'user_id' => $user->id
+                ]);
+
                 Auth::logout();
                 return null;
             }
@@ -67,14 +81,16 @@ class ContractController extends Controller
                 ->first();
 
             if ($user->usertype == 3 && $teacher && in_array($teacher->role_id, [1, 3, 4])) {
+
                 $applicant = $this->resolveApplicantDetails($user->id, $user->school_id);
 
                 if ($applicant && $applicant['staff_type'] !== 'Unknown') {
-                    // Log::info('✅ Authenticated as teacher', [
-                    //     'staff_id' => $applicant['staff_id'],
-                    //     'school_id' => $user->school_id,
-                    //     'time_ms' => round((microtime(true) - $startTime) * 1000, 2)
-                    // ]);
+
+                    Log::info('✅ Authenticated as teacher', [
+                        'staff_id' => $applicant['staff_id'],
+                        'school_id' => $user->school_id,
+                        'time_ms' => round((microtime(true) - $startTime) * 1000, 2)
+                    ]);
 
                     return [
                         'id' => $applicant['staff_id'],
@@ -89,17 +105,25 @@ class ContractController extends Controller
             }
         }
 
-        // ===== CASE 2: Non-teaching with OTP token =====
+        /*
+    |--------------------------------------------------------------------------
+    | CASE 2: OTP TOKEN AUTHENTICATION
+    |--------------------------------------------------------------------------
+    */
+
         $token = $this->extractTokenSecurely($request);
 
         if ($token) {
-            // Log::info('Token extracted', [
-            //     'token_prefix' => substr($token, 0, 10) . '...',
-            //     'source' => $this->getTokenSource($request)
-            // ]);
+
+            Log::info('Token extracted', [
+                'token_prefix' => substr($token, 0, 10) . '...',
+                'source' => $this->getTokenSource($request)
+            ]);
 
             if (!$this->isValidTokenFormat($token)) {
-                // Log::warning('Invalid token format detected', ['token_prefix' => substr($token, 0, 10)]);
+                Log::warning('Invalid token format detected', [
+                    'token_prefix' => substr($token, 0, 10)
+                ]);
                 return null;
             }
 
@@ -112,150 +136,34 @@ class ContractController extends Controller
                 ->first();
 
             if ($otpSession) {
-                // Log::info('Valid OTP session found', [
-                //     'session_id' => $otpSession->id,
-                //     'user_id' => $otpSession->user_id,
-                //     'expires_at' => $otpSession->expires_at
-                // ]);
+
+                Log::info('Valid OTP session found', [
+                    'session_id' => $otpSession->id,
+                    'user_id' => $otpSession->user_id,
+                    'expires_at' => $otpSession->expires_at
+                ]);
 
                 if ($otpSession->ip_address !== $request->ip()) {
-                    // Log::warning('🔴 SECURITY ALERT: Token used from different IP', [
-                    //     'original_ip' => $otpSession->ip_address,
-                    //     'current_ip' => $request->ip()
-                    // ]);
+
+                    Log::warning('🔴 SECURITY ALERT: Token used from different IP', [
+                        'original_ip' => $otpSession->ip_address,
+                        'current_ip' => $request->ip()
+                    ]);
+
                     return null;
                 }
 
-                $staffId = $otpSession->user_id; // Hii ni string kama "Ssc-0880" au "Sim-462"
+                $staffId = $otpSession->user_id;
 
-                // ===== DIRECT TEACHER LOOKUP - Kwa member_id =====
-                $directTeacher = DB::table('teachers')
-                    ->where('member_id', $staffId)
-                    ->first();
-
-                if ($directTeacher) {
-                    // Log::info('✅ Found teacher by member_id', [
-                    //     'member_id' => $directTeacher->member_id,
-                    //     'has_user_id' => isset($directTeacher->user_id) ? 'Yes' : 'No'
-                    // ]);
-
-                    // Pata user details kama zipo
-                    $userData = null;
-                    if (isset($directTeacher->user_id) && $directTeacher->user_id) {
-                        $userData = DB::table('users')->where('id', $directTeacher->user_id)->first();
-                    }
-
-                    $applicant = [
-                        'first_name' => $directTeacher->first_name ?? ($userData->name ?? 'Unknown'),
-                        'last_name' => $directTeacher->last_name ?? '',
-                        'gender' => $directTeacher->gender ?? 'male',
-                        'phone' => $directTeacher->phone ?? ($userData->phone ?? null),
-                        'email' => $userData->email ?? $directTeacher->email ?? null,
-                        'staff_id' => $directTeacher->member_id,
-                        'address' => $directTeacher->address ?? 'N/A',
-                        'staff_type' => 'Teacher',
-                        'staff_table_id' => $directTeacher->id,
-                        'school_id' => $directTeacher->school_id,
-                        'user_id' => $directTeacher->user_id ?? null,
-                        'profile_image' => $userData->image ?? null, // <-- ADD THIS
-                    ];
-
-                    $request->session()->put('contract_auth_token', $token);
-                    $request->session()->put('auth_time', now()->toDateTimeString());
-                    $request->session()->put('auth_ip', $request->ip());
-
-                    return [
-                        'id' => $applicant['staff_id'],
-                        'details' => $applicant,
-                        'auth_type' => 'non-teaching',
-                        'token' => $token,
-                        'school_id' => $applicant['school_id'],
-                        'otp_session' => $otpSession
-                    ];
-                }
-
-                // ===== DIRECT TRANSPORT LOOKUP - Kwa staff_id =====
-                $directTransport = DB::table('transports')
-                    ->where('staff_id', $staffId)
-                    ->first();
-
-                if ($directTransport) {
-                    // Log::info('✅ Found transport by staff_id', ['staff_id' => $directTransport->staff_id]);
-
-                    $applicant = [
-                        'first_name' => $directTransport->driver_name ?? 'Unknown',
-                        'last_name' => '',
-                        'gender' => $directTransport->gender ?? 'male',
-                        'phone' => $directTransport->phone ?? null,
-                        'email' => $directTransport->email ?? null,
-                        'staff_id' => $directTransport->staff_id,
-                        'address' => $directTransport->street_address ?? 'N/A',
-                        'staff_type' => 'Transport Staff',
-                        'staff_table_id' => $directTransport->id,
-                        'school_id' => $directTransport->school_id,
-                        'user_id' => null,
-                        'profile_image' => null, // <-- ADD THIS (transport haina profile image)
-                    ];
-
-                    $request->session()->put('contract_auth_token', $token);
-                    $request->session()->put('auth_time', now()->toDateTimeString());
-                    $request->session()->put('auth_ip', $request->ip());
-
-                    return [
-                        'id' => $applicant['staff_id'],
-                        'details' => $applicant,
-                        'auth_type' => 'non-teaching',
-                        'token' => $token,
-                        'school_id' => $applicant['school_id'],
-                        'otp_session' => $otpSession
-                    ];
-                }
-
-                // ===== DIRECT OTHER STAFF LOOKUP =====
-                $directOther = DB::table('other_staffs')
-                    ->where('staff_id', $staffId)
-                    ->first();
-
-                if ($directOther) {
-                    // Log::info('✅ Found other staff by staff_id', ['staff_id' => $directOther->staff_id]);
-
-                    $applicant = [
-                        'first_name' => $directOther->first_name ?? 'Unknown',
-                        'last_name' => $directOther->last_name ?? '',
-                        'gender' => $directOther->gender ?? 'Not Specified',
-                        'phone' => $directOther->phone ?? null,
-                        'email' => $directOther->email ?? null,
-                        'staff_id' => $directOther->staff_id,
-                        'address' => $directOther->street_address ?? 'N/A',
-                        'staff_type' => $directOther->staff_type ?? 'Other Staff',
-                        'staff_table_id' => $directOther->id,
-                        'school_id' => $directOther->school_id,
-                        'user_id' => $directOther->user_id ?? null,
-                        'profile_image' => null, // <-- ADD THIS (other_staffs haina profile image)
-                    ];
-
-                    $request->session()->put('contract_auth_token', $token);
-                    $request->session()->put('auth_time', now()->toDateTimeString());
-                    $request->session()->put('auth_ip', $request->ip());
-
-                    return [
-                        'id' => $applicant['staff_id'],
-                        'details' => $applicant,
-                        'auth_type' => 'non-teaching',
-                        'token' => $token,
-                        'school_id' => $applicant['school_id'],
-                        'otp_session' => $otpSession
-                    ];
-                }
-
-                // ===== FALLBACK: Tumia resolveApplicantDetails =====
+                // ===== SINGLE LOOKUP USING TRAIT =====
                 $applicant = $this->resolveApplicantDetails($staffId, null);
 
                 if ($applicant && $applicant['staff_type'] !== 'Unknown') {
-                    // Log::info('✅ Authenticated via resolveApplicantDetails', [
-                    //     'staff_id' => $applicant['staff_id'],
-                    //     'staff_type' => $applicant['staff_type']
-                    // ]);
+
+                    Log::info('✅ Authenticated via resolveApplicantDetails', [
+                        'staff_id' => $applicant['staff_id'],
+                        'staff_type' => $applicant['staff_type']
+                    ]);
 
                     $request->session()->put('contract_auth_token', $token);
                     $request->session()->put('auth_time', now()->toDateTimeString());
@@ -269,17 +177,20 @@ class ContractController extends Controller
                         'school_id' => $applicant['school_id'] ?? null,
                         'otp_session' => $otpSession
                     ];
-                } else {
-                    // Log::warning('Applicant details not found', ['user_id' => $staffId]);
                 }
+
+                Log::warning('Applicant details not found', [
+                    'user_id' => $staffId
+                ]);
             } else {
+
                 $this->logInvalidTokenReason($token, $request);
             }
         }
 
-        // Log::info('❌ Authentication failed', [
-        //     'time_ms' => round((microtime(true) - $startTime) * 1000, 2)
-        // ]);
+        Log::info('❌ Authentication failed', [
+            'time_ms' => round((microtime(true) - $startTime) * 1000, 2)
+        ]);
 
         return null;
     }
@@ -1151,163 +1062,6 @@ class ContractController extends Controller
         return $enrichedContracts;
     }
 
-    private function resolveApplicantDetails($identifier, $schoolId = null)
-    {
-        // Log::info('resolveApplicantDetails called', [
-        //     'identifier' => $identifier,
-        //     'schoolId' => $schoolId,
-        //     'identifier_type' => gettype($identifier)
-        // ]);
-
-        // ===== STRATEGY 1: Tafuta kwenye TEACHERS kwa member_id (BILA school_id) =====
-        // Hii ndio itampata "Ssc-0880"
-        // ===== STRATEGY 1: Tafuta kwenye TEACHERS kwa member_id =====
-        $teacher = DB::table('teachers')
-            ->join('users', 'users.id', '=', 'teachers.user_id')
-            ->where('teachers.member_id', $identifier)
-            ->select(
-                'users.first_name',
-                'users.last_name',
-                'users.gender',
-                'users.phone',
-                'users.email',
-                'users.image as profile_image', // <-- ADD THIS
-                'teachers.address',
-                'teachers.member_id as staff_id',
-                'teachers.nida',
-                'teachers.bank_account_number',
-                'teachers.bank_account_name',
-                'teachers.bank_name',
-                'teachers.dob',
-                'teachers.qualification',
-                DB::raw("'Teacher' as staff_type"),
-                'teachers.id as staff_table_id',
-                'teachers.school_id',
-                'users.id as user_id'
-            )
-            ->first();
-
-        if ($teacher) {
-            // Log::info('✅ Found teacher by member_id', ['staff_id' => $teacher->staff_id]);
-            return (array) $teacher;
-        }
-
-        // ===== STRATEGY 2: Tafuta kwenye TEACHERS kwa user_id (numeric) =====
-        if (is_numeric($identifier)) {
-            $teacherByUserId = DB::table('teachers')
-                ->join('users', 'users.id', '=', 'teachers.user_id')
-                ->where('teachers.user_id', $identifier)
-                ->select(
-                    'users.first_name',
-                    'users.last_name',
-                    'users.gender',
-                    'users.phone',
-                    'users.email',
-                    'teachers.address',
-                    'teachers.member_id as staff_id',
-                    'teachers.nida',
-                    'teachers.bank_account_number',
-                    'teachers.bank_account_name',
-                    'teachers.bank_name',
-                    'teachers.dob',
-                    'teachers.qualification',
-                    DB::raw("'Teacher' as staff_type"),
-                    'teachers.id as staff_table_id',
-                    'teachers.school_id',
-                    'users.id as user_id'
-                )
-                ->first();
-
-            if ($teacherByUserId) {
-                // Log::info('✅ Found teacher by user_id', ['staff_id' => $teacherByUserId->staff_id]);
-                return (array) $teacherByUserId;
-            }
-        }
-
-        // ===== STRATEGY 3: Tafuta kwenye TRANSPORT kwa staff_id =====
-        // ===== STRATEGY 3: Tafuta kwenye TRANSPORT kwa staff_id =====
-        $transport = DB::table('transports')
-            ->where('staff_id', $identifier)
-            ->select(
-                'driver_name as first_name',
-                DB::raw("'' as last_name"),
-                'gender',
-                'phone',
-                'email',
-                'staff_id',
-                'street_address as address',
-                'nida',
-                'bank_account_number',
-                'bank_account_name',
-                'bank_name',
-                'education_level as qualification',
-                'date_of_birth as dob',
-                DB::raw("'Transport Staff' as staff_type"),
-                'id as staff_table_id',
-                'school_id',
-                DB::raw("NULL as user_id"),
-                DB::raw("NULL as profile_image") // <-- ADD THIS (transport haina profile image)
-            )
-            ->first();
-
-        if ($transport) {
-            // Log::info('✅ Found transport staff by staff_id', ['staff_id' => $transport->staff_id]);
-            return (array) $transport;
-        }
-
-        // ===== STRATEGY 4: Tafuta kwenye OTHER_STAFFS kwa staff_id =====
-        // ===== STRATEGY 4: Tafuta kwenye OTHER_STAFFS kwa staff_id =====
-        $otherStaff = DB::table('other_staffs')
-            ->where('staff_id', $identifier)
-            ->select(
-                'first_name',
-                'last_name',
-                'gender',
-                'phone',
-                'email',
-                'staff_id',
-                'nida',
-                'bank_account_number',
-                'bank_account_name',
-                'bank_name',
-                'education_level as qualification',
-                'date_of_birth as dob',
-                'street_address as address',
-                'id as staff_table_id',
-                'school_id',
-                DB::raw("NULL as user_id"),
-                DB::raw("NULL as profile_image") // <-- ADD THIS (other_staffs haina profile image)
-            )
-            ->first();
-
-        if ($otherStaff) {
-            // Log::info('✅ Found other staff by staff_id', ['staff_id' => $otherStaff->staff_id]);
-            return (array) $otherStaff;
-        }
-
-        // ===== STRATEGY 5: Ikiwa identifier inaanza na "Ssc-", jaribu kuiondoa =====
-        if (strpos($identifier, 'Ssc-') === 0) {
-            $numericId = substr($identifier, 4);
-            // Log::info('Trying without prefix', ['numeric' => $numericId]);
-            return $this->resolveApplicantDetails($numericId, $schoolId);
-        }
-
-        // Log::warning('❌ No applicant found', ['identifier' => $identifier]);
-
-        return [
-            'first_name' => 'Unknown',
-            'last_name' => 'Staff',
-            'gender' => 'Not Specified',
-            'phone' => null,
-            'email' => null,
-            'staff_id' => $identifier,
-            'address' => null,
-            'staff_type' => 'Unknown',
-            'staff_table_id' => null,
-            'school_id' => $schoolId,
-            'user_id' => null
-        ];
-    }
     /**
      * Get single contract details with applicant info
      */

@@ -257,7 +257,7 @@ class HomeController extends Controller
 
             //check for contract status
             $contract = school_constracts::where('applicant_id', $teachers->member_id)->first();
-
+            // return $contract ?? "empty set";
             //return class teachers course assigned-------------------
             $courses = class_learning_courses::query()
                 ->join('grades', 'grades.id', '=', 'class_learning_courses.class_id')

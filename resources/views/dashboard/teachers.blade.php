@@ -524,6 +524,13 @@
         }
     </style>
 
+{{--
+    ROLES description
+    1. Normal teacher
+    2. Head teacher
+    3. Academic teacher
+    4. Class teacher
+--}}
     <div class="py-4">
         @php
             $school = App\Models\school::find(Auth::user()->school_id);

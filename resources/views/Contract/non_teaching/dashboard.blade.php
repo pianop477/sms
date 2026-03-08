@@ -1210,6 +1210,26 @@
                         <small class="text-muted d-block">Namba ya Simu</small>
                         <strong id="modal-profile-phone">-</strong>
                     </div>
+                    <div class="bg-light p-2 rounded mb-2">
+                        <small class="text-muted d-block">Namba ya NIDA</small>
+                        <strong id="modal-profile-nida">-</strong>
+                    </div>
+                    <div class="bg-light p-2 rounded mb-2">
+                        <small class="text-muted d-block">Tarehe ya Kuzaliwa</small>
+                        <strong id="modal-profile-dob">-</strong>
+                    </div>
+                    <div class="bg-light p-2 rounded mb-2">
+                        <small class="text-muted d-block">Benki Akaunti</small>
+                        <strong id="modal-profile-accountNumber" class="text-uppercase">-</strong>
+                    </div>
+                    <div class="bg-light p-2 rounded mb-2">
+                        <small class="text-muted d-block">Jina la Benki</small>
+                        <strong id="modal-profile-accountName" class="text-uppercase">-</strong>
+                    </div>
+                    <div class="bg-light p-2 rounded mb-2">
+                        <small class="text-muted d-block">Unapoishi</small>
+                        <strong id="modal-profile-address" class="text-uppercase">-</strong>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -1222,7 +1242,7 @@
     <!-- Session Warning -->
     <div id="session-warning" class="session-warning p-3 rounded-3" style="display: none;">
         <div class="d-flex align-items-center">
-            <i class="fas fa-exclamation-triangle text-warning fa-2x mr-3"></i>
+            <i class="fas fa-exclamation-triangle text-warning fa-2x mr-4"></i>
             <div>
                 <strong> Muda wa Session unaisha</strong>
                 <p class="mb-0" id="session-warning-text">...</p>
@@ -1434,7 +1454,12 @@
                         phone: data.data.phone || 'N/A',
                         profile_image: data.data.profile_image,
                         gender: data.data.gender || 'male',
-                        staff_type: data.data.staff_type || 'Staff'
+                        staff_type: data.data.staff_type || 'Staff',
+                        nida: data.data.nida || "N/A",
+                        dob: data.data.dob || "N/A",
+                        accountName: data.data.bank_name || "N/A",
+                        accountNumber: data.data.bank_account_number || "N/A",
+                        address: data.data.address || "N/A",
                     };
 
                     // console.log('Profile details loaded:', profileDetails);
@@ -1852,7 +1877,12 @@
                     phone: staffData.phone || 'N/A',
                     profile_image: staffData.profile_image,
                     gender: staffData.gender || 'male',
-                    staff_type: staffData.staff_type || 'Staff'
+                    staff_type: staffData.staff_type || 'Staff',
+                    nida: data.data.nida || "N/A",
+                    dob: data.data.dob || "N/A",
+                    accountNumber: data.data.bank_account_number || "N/A",
+                    accountName: data.data.bank_name || "N/A",
+                    address: data.data.address || "N/A",
                 };
 
                 populateSimpleProfileModal();
@@ -1885,6 +1915,11 @@
             document.getElementById('modal-profile-name').textContent = profileDetails.full_name || 'N/A';
             document.getElementById('modal-profile-id').textContent = profileDetails.staff_id || 'N/A';
             document.getElementById('modal-profile-phone').textContent = profileDetails.phone || 'N/A';
+            document.getElementById('modal-profile-nida').textContent = profileDetails.nida || 'N/A';
+            document.getElementById('modal-profile-dob').textContent = profileDetails.dob || 'N/A';
+            document.getElementById('modal-profile-accountNumber').textContent = profileDetails.accountNumber || 'N/A';
+            document.getElementById('modal-profile-accountName').textContent = profileDetails.accountName || 'N/A';
+            document.getElementById('modal-profile-address').textContent = profileDetails.address || 'N/A';
         }
 
         // Rename existing fetchProfileDetails to be modal-specific
@@ -1913,7 +1948,12 @@
                         phone: data.data.phone || 'N/A',
                         profile_image: data.data.profile_image,
                         gender: data.data.gender || 'male',
-                        staff_type: data.data.staff_type || 'Staff'
+                        staff_type: data.data.staff_type || 'Staff',
+                        nida: data.data.nida || "N/A",
+                        dob: data.data.dob || "N/A",
+                        accountNumber: data.data.bank_account_number || "N/A",
+                        accountName: data.data.bank_name || "N/A",
+
                     };
 
                     populateSimpleProfileModal();
@@ -2015,7 +2055,7 @@
 
         // Show session warning
         function showSessionWarning(minutesLeft) {
-            elements.sessionWarningText.textContent = `Muda wako utaisha baada ya dakika ${minutesLeft}`;
+            elements.sessionWarningText.textContent = `Muda wa Session utaisha baada ya dakika ${minutesLeft}`;
             elements.sessionWarning.style.display = 'block';
         }
 
