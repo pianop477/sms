@@ -22,15 +22,15 @@ class ContractOrAuth
     {
         $startTime = microtime(true);
 
-        Log::info('🛡️ MIDDLEWARE CHECK', [
-            'url' => $request->fullUrl(),
-            'ip' => $request->ip(),
-            'method' => $request->method()
-        ]);
+        // Log::info('🛡️ MIDDLEWARE CHECK', [
+        //     'url' => $request->fullUrl(),
+        //     'ip' => $request->ip(),
+        //     'method' => $request->method()
+        // ]);
 
         // ===== SECURITY: Check for blocked IPs =====
         if ($this->isIpBlocked($request->ip())) {
-            Log::warning('Blocked IP attempted access', ['ip' => $request->ip()]);
+            // Log::warning('Blocked IP attempted access', ['ip' => $request->ip()]);
             abort(403, 'Access denied');
         }
 
@@ -40,7 +40,7 @@ class ContractOrAuth
 
             // Verify user is active
             if ($user->status != 1) {
-                Log::warning('Inactive user', ['user_id' => $user->id]);
+                // Log::warning('Inactive user', ['user_id' => $user->id]);
                 Auth::logout();
 
                 if ($request->expectsJson()) {
@@ -54,10 +54,10 @@ class ContractOrAuth
                 ->first();
 
             if ($user->usertype == 3 && $teacher && in_array($teacher->role_id, [1, 2, 3, 4])) {
-                Log::info('✅ Middleware: Teacher authenticated', [
-                    'user_id' => $user->id,
-                    'time_ms' => round((microtime(true) - $startTime) * 1000, 2)
-                ]);
+                // Log::info('✅ Middleware: Teacher authenticated', [
+                //     'user_id' => $user->id,
+                //     'time_ms' => round((microtime(true) - $startTime) * 1000, 2)
+                // ]);
                 return $next($request);
             }
         }
@@ -71,10 +71,10 @@ class ContractOrAuth
         if ($token) {
             // Validate token format
             if (strlen($token) < 20 || !preg_match('/^[a-zA-Z0-9]+$/', $token)) {
-                Log::warning('Invalid token format in middleware', [
-                    'ip' => $request->ip(),
-                    'token_prefix' => substr($token, 0, 10)
-                ]);
+                // Log::warning('Invalid token format in middleware', [
+                //     'ip' => $request->ip(),
+                //     'token_prefix' => substr($token, 0, 10)
+                // ]);
 
                 if ($request->expectsJson()) {
                     return response()->json(['success' => false, 'message' => 'Invalid token format'], 401);
@@ -93,11 +93,11 @@ class ContractOrAuth
                 ->first();
 
             if ($otpValidation) {
-                Log::info('✅ Middleware: Token authenticated', [
-                    'user_id' => $otpValidation->user_id,
-                    'session_id' => $otpValidation->id,
-                    'time_ms' => round((microtime(true) - $startTime) * 1000, 2)
-                ]);
+                // Log::info('✅ Middleware: Token authenticated', [
+                //     'user_id' => $otpValidation->user_id,
+                //     'session_id' => $otpValidation->id,
+                //     'time_ms' => round((microtime(true) - $startTime) * 1000, 2)
+                // ]);
 
                 // Store in session for this request
                 $request->session()->put('contract_auth_token', $token);
@@ -113,11 +113,11 @@ class ContractOrAuth
         }
 
         // ===== AUTHENTICATION FAILED =====
-        Log::warning('❌ Middleware: Authentication failed', [
-            'ip' => $request->ip(),
-            'url' => $request->fullUrl(),
-            'time_ms' => round((microtime(true) - $startTime) * 1000, 2)
-        ]);
+        // Log::warning('❌ Middleware: Authentication failed', [
+        //     'ip' => $request->ip(),
+        //     'url' => $request->fullUrl(),
+        //     'time_ms' => round((microtime(true) - $startTime) * 1000, 2)
+        // ]);
 
         // Track failed attempts
         $this->trackFailedAttempt($request);
@@ -145,21 +145,21 @@ class ContractOrAuth
         $tokenRecord = contract_otp_validation::where('auth_token', $token)->first();
 
         if (!$tokenRecord) {
-            Log::warning('Middleware: Token not found', ['ip' => $request->ip()]);
+            // Log::warning('Middleware: Token not found', ['ip' => $request->ip()]);
         } elseif (!$tokenRecord->is_verified) {
-            Log::warning('Middleware: Token not verified', ['id' => $tokenRecord->id]);
+            // Log::warning('Middleware: Token not verified', ['id' => $tokenRecord->id]);
         } elseif ($tokenRecord->is_used) {
-            Log::warning('Middleware: Token already used', ['id' => $tokenRecord->id]);
+            // Log::warning('Middleware: Token already used', ['id' => $tokenRecord->id]);
         } elseif (!$tokenRecord->is_active) {
-            Log::warning('Middleware: Token inactive', ['id' => $tokenRecord->id]);
+            // Log::warning('Middleware: Token inactive', ['id' => $tokenRecord->id]);
         } elseif ($tokenRecord->is_expired || $tokenRecord->expires_at <= now()) {
-            Log::warning('Middleware: Token expired', ['id' => $tokenRecord->id]);
+            // Log::warning('Middleware: Token expired', ['id' => $tokenRecord->id]);
         } elseif ($tokenRecord->ip_address !== $request->ip()) {
-            Log::warning('🔴 MIDDLEWARE SECURITY: Token IP mismatch', [
-                'id' => $tokenRecord->id,
-                'token_ip' => $tokenRecord->ip_address,
-                'request_ip' => $request->ip()
-            ]);
+            // Log::warning('🔴 MIDDLEWARE SECURITY: Token IP mismatch', [
+            //     'id' => $tokenRecord->id,
+            //     'token_ip' => $tokenRecord->ip_address,
+            //     'request_ip' => $request->ip()
+            // ]);
         }
     }
 

@@ -62,7 +62,7 @@ class ContractGatewayController extends Controller
             $applicant = $this->resolveApplicantDetails($user->id, $user->school_id);
 
             if ($applicant['staff_type'] !== 'Unknown') {
-                Log::info('User authenticated as: ' . $applicant['staff_type']);
+                // Log::info('User authenticated as: ' . $applicant['staff_type']);
                 return [
                     'id' => $applicant['staff_id'],
                     'details' => $applicant,
@@ -308,7 +308,7 @@ class ContractGatewayController extends Controller
             // Delete the OTP record if SMS fails
             $otpRecord->delete();
 
-            Log::error('OTP SMS failed: ' . $e->getMessage());
+            // Log::error('OTP SMS failed: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,

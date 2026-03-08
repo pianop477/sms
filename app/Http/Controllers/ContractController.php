@@ -39,12 +39,12 @@ class ContractController extends Controller
         $request = $request ?? request();
         $startTime = microtime(true);
 
-        Log::info('🔐 AUTHENTICATION STARTED', [
-            'url' => $request->fullUrl(),
-            'method' => $request->method(),
-            'ip' => $request->ip(),
-            'user_agent' => $request->userAgent()
-        ]);
+        // Log::info('🔐 AUTHENTICATION STARTED', [
+        //     'url' => $request->fullUrl(),
+        //     'method' => $request->method(),
+        //     'ip' => $request->ip(),
+        //     'user_agent' => $request->userAgent()
+        // ]);
 
         // ===== SECURITY CHECK 1 =====
         $this->checkRateLimit($request);
@@ -62,15 +62,15 @@ class ContractController extends Controller
 
             $user = Auth::user();
 
-            Log::info('Auth check passed', [
-                'user_id' => $user->id,
-                'usertype' => $user->usertype
-            ]);
+            // Log::info('Auth check passed', [
+            //     'user_id' => $user->id,
+            //     'usertype' => $user->usertype
+            // ]);
 
             if ($user->status != 1) {
-                Log::warning('Inactive user attempted access', [
-                    'user_id' => $user->id
-                ]);
+                // Log::warning('Inactive user attempted access', [
+                //     'user_id' => $user->id
+                // ]);
 
                 Auth::logout();
                 return null;
@@ -86,11 +86,11 @@ class ContractController extends Controller
 
                 if ($applicant && $applicant['staff_type'] !== 'Unknown') {
 
-                    Log::info('✅ Authenticated as teacher', [
-                        'staff_id' => $applicant['staff_id'],
-                        'school_id' => $user->school_id,
-                        'time_ms' => round((microtime(true) - $startTime) * 1000, 2)
-                    ]);
+                    // Log::info('✅ Authenticated as teacher', [
+                    //     'staff_id' => $applicant['staff_id'],
+                    //     'school_id' => $user->school_id,
+                    //     'time_ms' => round((microtime(true) - $startTime) * 1000, 2)
+                    // ]);
 
                     return [
                         'id' => $applicant['staff_id'],
@@ -115,15 +115,15 @@ class ContractController extends Controller
 
         if ($token) {
 
-            Log::info('Token extracted', [
-                'token_prefix' => substr($token, 0, 10) . '...',
-                'source' => $this->getTokenSource($request)
-            ]);
+            // Log::info('Token extracted', [
+            //     'token_prefix' => substr($token, 0, 10) . '...',
+            //     'source' => $this->getTokenSource($request)
+            // ]);
 
             if (!$this->isValidTokenFormat($token)) {
-                Log::warning('Invalid token format detected', [
-                    'token_prefix' => substr($token, 0, 10)
-                ]);
+                // Log::warning('Invalid token format detected', [
+                //     'token_prefix' => substr($token, 0, 10)
+                // ]);
                 return null;
             }
 
@@ -137,18 +137,18 @@ class ContractController extends Controller
 
             if ($otpSession) {
 
-                Log::info('Valid OTP session found', [
-                    'session_id' => $otpSession->id,
-                    'user_id' => $otpSession->user_id,
-                    'expires_at' => $otpSession->expires_at
-                ]);
+                // Log::info('Valid OTP session found', [
+                //     'session_id' => $otpSession->id,
+                //     'user_id' => $otpSession->user_id,
+                //     'expires_at' => $otpSession->expires_at
+                // ]);
 
                 if ($otpSession->ip_address !== $request->ip()) {
 
-                    Log::warning('🔴 SECURITY ALERT: Token used from different IP', [
-                        'original_ip' => $otpSession->ip_address,
-                        'current_ip' => $request->ip()
-                    ]);
+                    // Log::warning('🔴 SECURITY ALERT: Token used from different IP', [
+                    //     'original_ip' => $otpSession->ip_address,
+                    //     'current_ip' => $request->ip()
+                    // ]);
 
                     return null;
                 }
@@ -160,10 +160,10 @@ class ContractController extends Controller
 
                 if ($applicant && $applicant['staff_type'] !== 'Unknown') {
 
-                    Log::info('✅ Authenticated via resolveApplicantDetails', [
-                        'staff_id' => $applicant['staff_id'],
-                        'staff_type' => $applicant['staff_type']
-                    ]);
+                    // Log::info('✅ Authenticated via resolveApplicantDetails', [
+                    //     'staff_id' => $applicant['staff_id'],
+                    //     'staff_type' => $applicant['staff_type']
+                    // ]);
 
                     $request->session()->put('contract_auth_token', $token);
                     $request->session()->put('auth_time', now()->toDateTimeString());
@@ -179,18 +179,18 @@ class ContractController extends Controller
                     ];
                 }
 
-                Log::warning('Applicant details not found', [
-                    'user_id' => $staffId
-                ]);
+                // Log::warning('Applicant details not found', [
+                //     'user_id' => $staffId
+                // ]);
             } else {
 
                 $this->logInvalidTokenReason($token, $request);
             }
         }
 
-        Log::info('❌ Authentication failed', [
-            'time_ms' => round((microtime(true) - $startTime) * 1000, 2)
-        ]);
+        // Log::info('❌ Authentication failed', [
+        //     'time_ms' => round((microtime(true) - $startTime) * 1000, 2)
+        // ]);
 
         return null;
     }
@@ -1168,11 +1168,11 @@ class ContractController extends Controller
 
                 if (!$response['success']) {
                     // Log SMS failure but don't stop the process
-                    Log::warning('SMS failed for contract activation', [
-                        'contract_id' => $contract->id,
-                        'applicant_id' => $contract->applicant_id,
-                        'error' => $response['error'] ?? 'Unknown error'
-                    ]);
+                    // Log::warning('SMS failed for contract activation', [
+                    //     'contract_id' => $contract->id,
+                    //     'applicant_id' => $contract->applicant_id,
+                    //     'error' => $response['error'] ?? 'Unknown error'
+                    // ]);
 
                     Alert()->toast('Contract approved successfully! SMS sending failed: ' . ($response['error'] ?? 'Unknown error'), 'warning');
                     return redirect()->back();
@@ -1181,10 +1181,10 @@ class ContractController extends Controller
                 Alert()->toast("Contract approved successfully! SMS sent to {$applicant['first_name']}", 'success');
             } catch (\Exception $e) {
                 // Log exception but don't break the contract activation
-                Log::error('SMS exception for contract activation', [
-                    'contract_id' => $contract->id,
-                    'error' => $e->getMessage()
-                ]);
+                // Log::error('SMS exception for contract activation', [
+                //     'contract_id' => $contract->id,
+                //     'error' => $e->getMessage()
+                // ]);
 
                 Alert()->toast('Contract activated successfully! SMS could not be sent.', 'warning');
             }
@@ -1262,11 +1262,11 @@ class ContractController extends Controller
 
                 if (!$response['success']) {
                     // Log SMS failure but don't stop the process
-                    Log::warning('SMS failed for contract rejection', [
-                        'contract_id' => $contract->id,
-                        'applicant_id' => $contract->applicant_id,
-                        'error' => $response['error'] ?? 'Unknown error'
-                    ]);
+                    // Log::warning('SMS failed for contract rejection', [
+                    //     'contract_id' => $contract->id,
+                    //     'applicant_id' => $contract->applicant_id,
+                    //     'error' => $response['error'] ?? 'Unknown error'
+                    // ]);
 
                     Alert()->toast("Contract rejected successfully! SMS sending failed: " . ($response['error'] ?? 'Unknown error'), 'warning');
                     return redirect()->back();
@@ -1275,10 +1275,10 @@ class ContractController extends Controller
                 Alert()->toast("Contract rejected successfully! SMS sent to {$applicant['first_name']}", 'info');
             } catch (\Exception $e) {
                 // Log exception but don't break the contract rejection
-                Log::error('SMS exception for contract rejection', [
-                    'contract_id' => $contract->id,
-                    'error' => $e->getMessage()
-                ]);
+                // Log::error('SMS exception for contract rejection', [
+                //     'contract_id' => $contract->id,
+                //     'error' => $e->getMessage()
+                // ]);
 
                 Alert()->toast('Contract rejected successfully! SMS could not be sent.', 'warning');
             }
@@ -1386,11 +1386,11 @@ class ContractController extends Controller
 
                 if (!$response['success']) {
                     // Log SMS failure but don't stop the process
-                    Log::warning('SMS failed for contract activation', [
-                        'contract_id' => $contract->id,
-                        'applicant_id' => $contract->applicant_id,
-                        'error' => $response['error'] ?? 'Unknown error'
-                    ]);
+                    // Log::warning('SMS failed for contract activation', [
+                    //     'contract_id' => $contract->id,
+                    //     'applicant_id' => $contract->applicant_id,
+                    //     'error' => $response['error'] ?? 'Unknown error'
+                    // ]);
 
                     Alert()->toast('Contract activated successfully! SMS sending failed: ' . ($response['error'] ?? 'Unknown error'), 'warning');
                     return redirect()->back();
@@ -1399,10 +1399,10 @@ class ContractController extends Controller
                 Alert()->toast("Contract activated successfully! SMS sent to {$applicant['first_name']}", 'success');
             } catch (\Exception $e) {
                 // Log exception but don't break the contract activation
-                Log::error('SMS exception for contract activation', [
-                    'contract_id' => $contract->id,
-                    'error' => $e->getMessage()
-                ]);
+                // Log::error('SMS exception for contract activation', [
+                //     'contract_id' => $contract->id,
+                //     'error' => $e->getMessage()
+                // ]);
 
                 Alert()->toast('Contract activated successfully! SMS could not be sent.', 'warning');
             }
