@@ -568,8 +568,7 @@
     <nav class="navbar navbar-custom">
         <div class="container-fluid">
             <div class="d-flex align-items-center">
-                <img src="" alt="Logo" class="school-logo"
-                    id="school-logo">
+                <img src="" alt="Logo" class="school-logo" id="school-logo">
                 <div class="school-info">
                     <span class="school-name" id="school-name">...</span>
                     <span class="school-address" id="school-address">...</span>
@@ -870,7 +869,8 @@
                                         <div class="col-12">
                                             <div class="detail-card" style="border-left-color: #dc3545;">
                                                 <div class="detail-label text-danger">Sababu ya Kukataliwa</div>
-                                                <div class="detail-value">{{ $contract->remarks ?? 'Hakuna sababu iliyotolewa' }}</div>
+                                                <div class="detail-value">
+                                                    {{ $contract->remarks ?? 'Hakuna sababu iliyotolewa' }}</div>
                                             </div>
                                         </div>
                                     @endif
@@ -912,7 +912,8 @@
                                         <div class="detail-card">
                                             <div class="detail-label">Hali</div>
                                             <div class="detail-value">
-                                                <span class="badge {{ $config['badge'] }}">{{ $config['title'] }}</span>
+                                                <span
+                                                    class="badge {{ $config['badge'] }}">{{ $config['title'] }}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -964,10 +965,10 @@
                     <div class="modal-footer">
                         @if ($contract->status == 'pending')
                             <form action="{{ route('contract.delete', ['id' => Hashids::encode($contract->id)]) }}"
-                                method="POST" class="d-inline">
+                                method="POST" class="d-inline delete-form" data-contract-id="{{ $contract->id }}"
+                                onsubmit="return deleteContract(event, this)">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="btn btn-danger"
-                                    onclick="return confirm('Una uhakika unataka kufuta ombi hili?')">
+                                <button type="submit" class="btn btn-danger">
                                     <i class="fas fa-trash mr-2"></i> Futa Ombi
                                 </button>
                             </form>
@@ -990,7 +991,8 @@
     @endforeach
 
     <!-- Profile Modal -->
-    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-md">
             <div class="modal-content">
                 <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
@@ -998,7 +1000,8 @@
                         <i class="fas fa-user-circle mr-2"></i>
                         Taarifa Zako
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4 text-center">
                     <img src="" alt="Profile" class="rounded-circle border border-3 border-primary p-1 mb-3"
@@ -1130,7 +1133,8 @@
                     headers: {
                         'Authorization': `Bearer ${authToken}`,
                         'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                            'content')
                     }
                 });
 
@@ -1149,7 +1153,7 @@
 
                     updateHeader();
                     updateStats();
-                    renderContractsTable();
+                    renderContractsTable(); // This will re-render with new data
                     showContent();
                     checkSessionExpiry();
 
@@ -1173,7 +1177,8 @@
                     headers: {
                         'Authorization': `Bearer ${authToken}`,
                         'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute(
+                            'content')
                     }
                 });
 
@@ -1181,7 +1186,8 @@
 
                 if (data.success) {
                     profileDetails = {
-                        full_name: data.data.full_name || `${data.data.first_name || ''} ${data.data.last_name || ''}`.trim(),
+                        full_name: data.data.full_name ||
+                            `${data.data.first_name || ''} ${data.data.last_name || ''}`.trim(),
                         first_name: data.data.first_name,
                         last_name: data.data.last_name,
                         staff_id: data.data.staff_id || data.data.member_id || 'N/A',
@@ -1242,7 +1248,8 @@
 
             elements.profileName.textContent = profileDetails.full_name || 'Mjumbe';
             elements.profileRole.textContent = profileDetails.staff_type || 'Staff';
-            elements.welcomeMessage.textContent = `Karibu, ${profileDetails.first_name || profileDetails.full_name || 'Mjumbe'}!`;
+            elements.welcomeMessage.textContent =
+                `Karibu, ${profileDetails.first_name || profileDetails.full_name || 'Mjumbe'}!`;
 
             let imagePath;
             if (profileDetails.profile_image && profileDetails.profile_image !== 'null') {
@@ -1320,29 +1327,29 @@
                 }
 
                 html += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>
-                            <span class="font-weight-bold text-capitalize">
-                                ${contract.contract_type === 'provision' ? 'Mkataba wa Matazamio' : 'Mkataba Mpya'}
-                            </span>
-                        </td>
-                        <td class="text-capitalize">${contract.job_title || 'N/A'}</td>
-                        <td>${appliedDate}</td>
-                        <td>
-                            <span class="badge ${statusClass}">
-                                ${statusText}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-manage" onclick="viewContractDetails(${contract.id})">
-                                    <i class="fas fa-eye"></i> Angalia
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
+            <tr>
+                <td>${index + 1}</td>
+                <td>
+                    <span class="font-weight-bold text-capitalize">
+                        ${contract.contract_type === 'provision' ? 'Mkataba wa Matazamio' : 'Mkataba Mpya'}
+                    </span>
+                </td>
+                <td class="text-capitalize">${contract.job_title || 'N/A'}</td>
+                <td>${appliedDate}</td>
+                <td>
+                    <span class="badge ${statusClass}">
+                        ${statusText}
+                    </span>
+                </td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn btn-manage" onclick="viewContractDetails(${contract.id})">
+                            <i class="fas fa-eye"></i> Angalia
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
             });
 
             elements.contractsTableBody.innerHTML = html;
@@ -1520,7 +1527,8 @@
                     headers: {
                         'Authorization': `Bearer ${authToken}`,
                         'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute(
+                            'content')
                     }
                 });
 
@@ -1528,7 +1536,8 @@
 
                 if (data.success) {
                     profileDetails = {
-                        full_name: data.data.full_name || `${data.data.first_name || ''} ${data.data.last_name || ''}`.trim(),
+                        full_name: data.data.full_name ||
+                            `${data.data.first_name || ''} ${data.data.last_name || ''}`.trim(),
                         first_name: data.data.first_name,
                         last_name: data.data.last_name,
                         staff_id: data.data.staff_id || data.data.member_id || 'N/A',
@@ -1571,7 +1580,8 @@
                         headers: {
                             'Authorization': `Bearer ${authToken}`,
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                'content')
                         }
                     });
                 } finally {
@@ -1588,7 +1598,8 @@
                     headers: {
                         'Authorization': `Bearer ${authToken}`,
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                            'content')
                     }
                 });
 
@@ -1610,6 +1621,93 @@
                 console.error('Failed to extend session', err);
             }
         }
+
+        // Delete contract function
+        async function deleteContract(event, form) {
+            event.preventDefault();
+
+            // Show confirmation dialog
+            const result = await Swal.fire({
+                title: 'Una uhakika?',
+                text: 'Unakaribia kufuta ombi hili la mkataba',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ndio, Futa',
+                cancelButtonText: 'Ghairi'
+            });
+
+            if (!result.isConfirmed) {
+                return false;
+            }
+
+            // Show loading
+            Swal.fire({
+                title: 'Inafuta...',
+                text: 'Tafadhali subiri',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            try {
+                const formData = new FormData(form);
+
+                const response = await fetch(form.action, {
+                    method: 'POST', // Laravel uses POST with _method=DELETE
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                            'content'),
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Close the modal
+                    const modalElement = document.getElementById(`contractModal${form.dataset.contractId}`);
+                    if (modalElement) {
+                        const modal = bootstrap.Modal.getInstance(modalElement);
+                        if (modal) modal.hide();
+                    }
+
+                    // Show success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Imefanikiwa!',
+                        text: data.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        // Refresh the dashboard data
+                        fetchDashboard();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hitilafu!',
+                        text: data.message || 'Imeshindwa kufuta ombi',
+                        confirmButtonColor: '#dc2626'
+                    });
+                }
+            } catch (err) {
+                console.error('Delete error:', err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hitilafu!',
+                    text: 'Imeshindwa kuwasiliana na seva',
+                    confirmButtonColor: '#dc2626'
+                });
+            }
+
+            return false;
+        }
+
 
         function startSessionCheck() {
             sessionCheckInterval = setInterval(() => {

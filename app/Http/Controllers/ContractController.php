@@ -912,12 +912,24 @@ class ContractController extends Controller
         $decode = Hashids::decode($id);
 
         if (empty($decode)) {
+            if (request()->wantsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid contract ID'
+                ], 400);
+            }
             return redirect()->back()->with('error', 'Invalid contract ID');
         }
 
         $contract = school_constracts::find($decode[0]);
 
         if (!$contract) {
+            if (request()->wantsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No such contract found'
+                ], 404);
+            }
             return redirect()->back()->with('error', 'No such contract found');
         }
 
@@ -943,18 +955,33 @@ class ContractController extends Controller
 
             $contract->delete();
 
-            // Set flash message based on auth type
+            // Check if request expects JSON (AJAX request)
+            if (request()->wantsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $authType === 'teacher'
+                        ? 'Application has been deleted successfully'
+                        : 'Ombi limefutwa kikamilifu!',
+                    'auth_type' => $authType,
+                    'token' => $token
+                ]);
+            }
+
+            // Regular form submission (non-AJAX)
             if ($authType === 'teacher') {
-                // For teachers, use Alert and redirect to contract.index
                 Alert()->toast('Application has been deleted successfully', 'success');
                 return redirect()->route('contract.index');
             } else {
-                // For non-teaching, use session flash and redirect to dashboard
                 return redirect()->route('contract.dashboard', ['auth_token' => $token])
                     ->with('success', 'Ombi limefutwa kikamilifu!');
             }
         } catch (\Exception $e) {
-            // Log::error('Contract delete error: ' . $e->getMessage());
+            if (request()->wantsJson() || request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Hitilafu imetokea: ' . $e->getMessage()
+                ], 500);
+            }
 
             if (Auth::check()) {
                 Alert::error('Error', $e->getMessage());
