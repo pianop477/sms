@@ -1028,6 +1028,10 @@
                         <small class="text-muted d-block">Tarehe ya Kuzaliwa</small>
                         <strong id="modal-profile-dob">-</strong>
                     </div>
+                    <div class="bg-light p-2 rounded mb-2">
+                        <small class="text-muted d-block">Unapoishi</small>
+                        <strong id="modal-profile-address" class="text-uppercase">-</strong>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -1196,7 +1200,8 @@
                         gender: data.data.gender || 'male',
                         staff_type: data.data.staff_type || 'Staff',
                         nida: data.data.nida || "N/A",
-                        dob: data.data.dob || "N/A"
+                        dob: data.data.dob || "N/A",
+                        address: data.data.address || "N/A",
                     };
 
                     updateHeaderFromProfileDetails();
@@ -1489,7 +1494,8 @@
                     gender: staffData.gender || 'male',
                     staff_type: staffData.staff_type || 'Staff',
                     nida: staffData.nida || "N/A",
-                    dob: staffData.dob || "N/A"
+                    dob: staffData.dob || "N/A",
+                    address: staffData.address || "N/A",
                 };
 
                 populateProfileModal();
@@ -1519,6 +1525,7 @@
             document.getElementById('modal-profile-phone').textContent = profileDetails.phone || 'N/A';
             document.getElementById('modal-profile-nida').textContent = profileDetails.nida || 'N/A';
             document.getElementById('modal-profile-dob').textContent = profileDetails.dob || 'N/A';
+            document.getElementById('modal-profile-address').textContent = profileDetails.address || 'N/A';
         }
 
         async function fetchProfileDetailsForModal() {
@@ -1546,7 +1553,8 @@
                         gender: data.data.gender || 'male',
                         staff_type: data.data.staff_type || 'Staff',
                         nida: data.data.nida || "N/A",
-                        dob: data.data.dob || "N/A"
+                        dob: data.data.dob || "N/A",
+                        address: data.data.address || "N/A",
                     };
 
                     populateProfileModal();
