@@ -576,46 +576,46 @@
                         <div class="alert alert-danger alert-custom alert-dismissible fade show">
                             <strong><i class="fas fa-exclamation-triangle mr-2"></i> Contract Status:</strong> Not applied.
                             <a href="{{ route('contract.index') }}" class="alert-link fw-bold">Apply here</a>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
                         </div>
                     @else
                         @if ($contract->status == 'expired')
                             <div class="alert alert-danger alert-custom alert-dismissible fade show">
                                 <strong><i class="fas fa-times-circle mr-2"></i> Contract Status:</strong> Expired
                                 <a href="{{ route('contract.index') }}" class="alert-link fw-bold">Apply here</a>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
                             </div>
                         @elseif ($contract->status == 'rejected')
                             <div class="alert alert-secondary alert-custom alert-dismissible fade show">
                                 <strong><i class="fas fa-times mr-2"></i> Contract Status:</strong> Rejected |
                                 <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
                             </div>
                         @elseif ($contract->status == 'approved')
                             <div class="alert alert-warning alert-custom alert-dismissible fade show">
                                 <strong><i class="fas fa-exclamation-circle mr-2"></i> Contract Status:</strong> Under
                                 Review |
                                 <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
                             </div>
                         @elseif ($contract->status == 'pending')
                             <div class="alert alert-info alert-custom alert-dismissible fade show">
                                 <strong><i class="fas fa-clock mr-2"></i> Contract Status:</strong> Pending |
                                 <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
                             </div>
                         @elseif ($contract->status == 'activated')
                             <div class="alert alert-success alert-custom alert-dismissible fade show">
                                 <strong><i class="fas fa-check-circle mr-2"></i> Contract Status:</strong> Active (Expires:
                                 {{ \Carbon\Carbon::parse($contract->end_date)->format('d/m/Y') }}) |
                                 <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View contract</a>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
                             </div>
                         @else
                             <div class="alert alert-secondary alert-custom alert-dismissible fade show">
                                 <strong><i class="fas fa-ban mr-2"></i> Contract Status:</strong> Terminated |
                                 <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
                             </div>
                         @endif
                     @endif
@@ -1515,7 +1515,7 @@
                                                         </style>
                                                         @if ($course->status == 1)
                                                             <ul class="d-flex justify-content-center">
-                                                                <li class="mr-3">
+                                                                <li class="mr-4">
                                                                     <a href="{{ route('score.prepare.form', ['id' => Hashids::encode($course->id)]) }}"
                                                                         class="btn btn-xs btn-score"
                                                                         style="border-radius: 10px;">
@@ -2127,7 +2127,7 @@
                                                                 }
                                                             </style>
                                                             <ul class="d-flex justify-content-center">
-                                                                <li class="mr-3">
+                                                                <li class="mr-4">
                                                                     <a href="{{ route('score.prepare.form', ['id' => Hashids::encode($course->id)]) }}"
                                                                         class="btn btn-xs btn-score"
                                                                         style="border-radius: 10px;">
@@ -2278,7 +2278,7 @@
                                                                 color: white;
                                                             }
                                                         </style>
-                                                        <li class="mr-3">
+                                                        <li class="mr-4">
                                                             <a href="{{ route('score.prepare.form', ['id' => Hashids::encode($course->id)]) }}"
                                                                 class="btn btn-xs btn-score" style="border-radius: 10px;">
                                                                 <i class="fas fa-file-edit"></i> Score
