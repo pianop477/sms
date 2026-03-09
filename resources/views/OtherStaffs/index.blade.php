@@ -723,7 +723,7 @@
                                 </div>
                                 <div>
                                     <div class="stat-label">Total Staff</div>
-                                    <div class="stat-value">{{ $combinedStaffs->count() }}</div>
+                                    <div class="stat-value">{{ $combinedStaffs->filter(fn($s) => $s->status === 1)->count() }}</div>
                                 </div>
                             </div>
                         </div>
@@ -734,7 +734,7 @@
                                 </div>
                                 <div>
                                     <div class="stat-label">Male</div>
-                                    <div class="stat-value">{{ $combinedStaffs->filter(fn($s) => strtolower($s->gender) === 'male')->count() }}</div>
+                                    <div class="stat-value">{{ $combinedStaffs->filter(fn($s) => strtolower($s->gender) === 'male' && $s->status == 1)->count() }}</div>
                                 </div>
                             </div>
                         </div>
@@ -745,7 +745,7 @@
                                 </div>
                                 <div>
                                     <div class="stat-label">Female</div>
-                                    <div class="stat-value">{{ $combinedStaffs->filter(fn($s) => strtolower($s->gender) === 'female')->count() }}</div>
+                                    <div class="stat-value">{{ $combinedStaffs->filter(fn($s) => strtolower($s->gender) === 'female' && $s->status == 1)->count() }}</div>
                                 </div>
                             </div>
                         </div>

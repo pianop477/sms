@@ -368,6 +368,18 @@ class OtherStaffsController extends Controller
                 Alert()->toast('This driver cannot be deleted because has a bus to drive', 'info');
                 return back();
             }
+            // delete staff image
+            if (!empty($staff->profile_image)) {
+                $staffImagePath = storage_path('app/public/profile/' . $staff->profile_image);
+                if (file_exists($staffImagePath)) {
+                    unlink($staffImagePath);
+                }
+            }
+            // delete staff records
+            $staff->delete();
+
+            Alert()->toast('Staff has been deleted successfully', 'success');
+            return back();
         } catch (Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
             return back();
