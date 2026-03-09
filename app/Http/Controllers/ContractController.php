@@ -80,7 +80,7 @@ class ContractController extends Controller
                 ->where('status', 1)
                 ->first();
 
-            if ($user->usertype == 3 && $teacher && in_array($teacher->role_id, [1, 3, 4])) {
+            if ($user->usertype == 3 && $teacher && in_array($teacher->role_id, [1, 2, 3, 4])) {
 
                 $applicant = $this->resolveApplicantDetails($user->id, $user->school_id);
 

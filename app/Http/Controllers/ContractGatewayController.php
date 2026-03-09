@@ -41,7 +41,7 @@ class ContractGatewayController extends Controller
             $teacher = Teacher::where('user_id', $user->id)->first();
 
             // Check if user is teacher (usertype 3) with appropriate role from teachers table
-            if ($user->usertype == 3 && $teacher && in_array($teacher->role_id, [1, 3, 4])) {
+            if ($user->usertype == 3 && $teacher && in_array($teacher->role_id, [1, 2, 3, 4])) {
 
                 $applicant = $this->resolveApplicantDetails($user->id, $user->school_id);
 
