@@ -733,7 +733,6 @@
         <i class="fas fa-check-circle"></i>
         <span id="toastMessage">Message here</span>
     </div>
-    <script src="{{asset('assets/js/js.js')}}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const themeToggle = document.getElementById('themeToggle');

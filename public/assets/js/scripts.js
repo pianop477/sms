@@ -81,18 +81,6 @@
     });
 
     /*================================
-    Service Worker Registration
-    ==================================*/
-    document.addEventListener('DOMContentLoaded', () => {
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker
-                .register('/service-worker.js')
-                .then(() => console.log('Service Worker Registered'))
-                .catch((error) => console.error('Service Worker Registration Failed:', error));
-        }
-    });
-
-    /*================================
     Sticky Header
     ==================================*/
     document.addEventListener('DOMContentLoaded', () => {
@@ -261,4 +249,113 @@
             });
         }
     });
+
+    /*================================
+    PWA Service Worker + Update System
+    =================================*/
+
+    (function () {
+
+        if (!('serviceWorker' in navigator)) return;
+
+        let refreshing = false;
+
+        window.addEventListener('load', () => {
+
+            const SW_URL = '/service-worker.js?v=2026.2';
+
+            navigator.serviceWorker.register(SW_URL)
+                .then((registration) => {
+
+                    console.log('Service Worker registered');
+
+                    /* If update already waiting */
+                    if (registration.waiting) {
+                        showUpdateUI(registration.waiting);
+                    }
+
+                    /* Detect new update */
+                    registration.addEventListener('updatefound', () => {
+
+                        const newWorker = registration.installing;
+
+                        newWorker.addEventListener('statechange', () => {
+
+                            if (
+                                newWorker.state === 'installed' &&
+                                navigator.serviceWorker.controller
+                            ) {
+                                showUpdateUI(newWorker);
+                            }
+
+                        });
+
+                    });
+
+                })
+                .catch((error) => {
+                    console.error('Service Worker registration failed:', error);
+                });
+
+        });
+
+        /* Reload page once when new SW activates */
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+
+            if (refreshing) return;
+
+            refreshing = true;
+
+            window.location.reload();
+
+        });
+
+        /* Update notification UI */
+        function showUpdateUI(worker) {
+
+            if (document.getElementById('update-toast')) return;
+
+            const toast = document.createElement('div');
+
+            toast.id = 'update-toast';
+
+            toast.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #0d6efd;
+        color: #fff;
+        padding: 14px 22px;
+        border-radius: 8px;
+        box-shadow: 0 6px 20px rgba(0,0,0,.2);
+        z-index: 9999;
+        font-family: sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        `;
+
+            toast.innerHTML = `
+            <span>New update available</span>
+            <button id="update-app-btn" style="
+                background:#fff;
+                color:#0d6efd;
+                border:none;
+                padding:6px 14px;
+                border-radius:5px;
+                cursor:pointer;
+                font-weight:600;
+            ">Update</button>
+        `;
+
+            document.body.appendChild(toast);
+
+            document.getElementById('update-app-btn').onclick = () => {
+                worker.postMessage({ type: 'SKIP_WAITING' });
+            };
+
+        }
+
+    })();
 })(jQuery);

@@ -442,7 +442,7 @@
         </div>
     </div>
 
-    <script src="{{asset('assets/js/js.js')}}"></script>
+    {{-- <script src="{{asset('assets/js/js.js')}}"></script> --}}
     <script>
         (function() {
             'use strict';
