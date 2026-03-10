@@ -161,8 +161,8 @@
         }
 
         .profile-avatar {
-            width: 40px !important;
-            height: 40px !important;
+            width: 38px !important;
+            height: 38px !important;
         }
     }
 
@@ -176,8 +176,8 @@
         }
 
         .profile-avatar {
-            width: 45px !important;
-            height: 45px !important;
+            width: 40px !important;
+            height: 40px !important;
             border-width: 2px;
         }
     }
@@ -191,8 +191,8 @@
         }
 
         .profile-avatar {
-            width: 50px !important;
-            height: 50px !important;
+            width: 45% !important;
+            height: 45px !important;
         }
     }
 
@@ -205,8 +205,8 @@
         }
 
         .profile-avatar {
-            width: 60px !important;
-            height: 60px !important;
+            width: 50px !important;
+            height: 50px !important;
         }
     }
 
