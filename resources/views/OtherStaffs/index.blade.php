@@ -837,22 +837,20 @@
                                                 @if ($row->status == 1)
                                                     <form action="{{ route('block.other.staffs', ['type' => $row->job_title, 'id' => Hashids::encode($row->id)]) }}"
                                                           method="POST"
-                                                          class="d-inline"
-                                                          onsubmit="return confirm('Block {{ $row->first_name ?? $row->driver_name }}?')">
+                                                          class="d-inline">
                                                         @csrf
                                                         @method('PUT')
-                                                        <button type="submit" class="action-icon warning" title="Block">
+                                                        <button type="submit" onclick="return confirm('Block {{ $row->first_name ?? $row->driver_name }}?')" class="action-icon warning" title="Block">
                                                             <i class="fas fa-ban"></i>
                                                         </button>
                                                     </form>
                                                 @else
                                                     <form action="{{ route('unblock.other.staffs', ['type' => $row->job_title, 'id' => Hashids::encode($row->id)]) }}"
                                                           method="POST"
-                                                          class="d-inline"
-                                                          onsubmit="return confirm('Unblock {{ $row->first_name ?? $row->driver_name }}?')">
+                                                          class="d-inline">
                                                         @csrf
                                                         @method('PUT')
-                                                        <button type="submit" class="action-icon success" title="Unblock">
+                                                        <button type="submit" onclick="return confirm('Unblock {{ $row->first_name ?? $row->driver_name }}?')" class="action-icon success" title="Unblock">
                                                             <i class="fas fa-check"></i>
                                                         </button>
                                                     </form>
@@ -860,11 +858,10 @@
 
                                                 <form action="{{ route('remove.other.staffs', ['type' => $row->job_title, 'id' => Hashids::encode($row->id)]) }}"
                                                       method="POST"
-                                                      class="d-inline"
-                                                      onsubmit="return confirm('Delete {{ $row->first_name ?? $row->driver_name }}? This cannot be undone.')">
+                                                      class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="action-icon danger" title="Delete">
+                                                    <button type="submit" onclick="return confirm('Delete {{ $row->first_name ?? $row->driver_name }}? This cannot be undone.')" class="action-icon danger" title="Delete">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
