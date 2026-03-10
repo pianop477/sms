@@ -134,8 +134,8 @@
     /* Reduced Image Sizes */
     .school-logo-img {
         transition: all 0.3s ease;
-        width: 35px;
-        height: 35px;
+        width: 70px;
+        height: 70px;
         object-fit: cover;
         border-radius: 8px;
         border: 1.5px solid #e9ecef;
@@ -156,28 +156,28 @@
     /* Small Mobile Devices */
     @media (min-width: 481px) {
         .school-logo-img {
-            width: 38px !important;
-            height: 38px !important;
+            width: 45% !important;
+            height: 45px !important;
         }
 
         .profile-avatar {
-            width: 38px !important;
-            height: 38px !important;
+            width: 40px !important;
+            height: 40px !important;
         }
     }
 
     /* Tablets */
     @media (min-width: 768px) {
         .school-logo-img {
-            width: 42px !important;
-            height: 42px !important;
+            width: 50px !important;
+            height: 50px !important;
             border-radius: 10px;
             border-width: 2px;
         }
 
         .profile-avatar {
-            width: 42px !important;
-            height: 42px !important;
+            width: 45px !important;
+            height: 45px !important;
             border-width: 2px;
         }
     }
@@ -185,28 +185,28 @@
     /* Laptops/Desktops */
     @media (min-width: 992px) {
         .school-logo-img {
-            width: 45px !important;
-            height: 45px !important;
+            width: 60px !important;
+            height: 60px !important;
             border-radius: 12px;
         }
 
         .profile-avatar {
-            width: 45px !important;
-            height: 45px !important;
+            width: 50px !important;
+            height: 50px !important;
         }
     }
 
     /* Large Screens */
     @media (min-width: 1200px) {
         .school-logo-img {
-            width: 48px !important;
-            height: 48px !important;
+            width: 70px !important;
+            height: 70px !important;
             border-radius: 12px;
         }
 
         .profile-avatar {
-            width: 48px !important;
-            height: 48px !important;
+            width: 60px !important;
+            height: 60px !important;
         }
     }
 

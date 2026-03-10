@@ -1032,6 +1032,18 @@
                         <small class="text-muted d-block">Unapoishi</small>
                         <strong id="modal-profile-address" class="text-uppercase">-</strong>
                     </div>
+                    <div class="bg-light p-2 rounded mb-2">
+                        <small class="text-muted d-block">Akaunti ya Benki</small>
+                        <strong id="modal-profile-account-number" class="text-uppercase">-</strong>
+                    </div>
+                    <div class="bg-light p-2 rounded mb-2">
+                        <small class="text-muted d-block">Jina la Akaunti</small>
+                        <strong id="modal-profile-account-name" class="text-uppercase">-</strong>
+                    </div>
+                    <div class="bg-light p-2 rounded mb-2">
+                        <small class="text-muted d-block">Jina la Benki</small>
+                        <strong id="modal-profile-bank-name" class="text-uppercase">-</strong>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -1496,6 +1508,9 @@
                     nida: staffData.nida || "N/A",
                     dob: staffData.dob || "N/A",
                     address: staffData.address || "N/A",
+                    accountNumber: staffData.bank_account_number || "N/A",
+                    accountName: staffData.bank_account_name || "N/A",
+                    bankName: staffData.bank_name || "N/A",
                 };
 
                 populateProfileModal();
@@ -1526,6 +1541,9 @@
             document.getElementById('modal-profile-nida').textContent = profileDetails.nida || 'N/A';
             document.getElementById('modal-profile-dob').textContent = profileDetails.dob || 'N/A';
             document.getElementById('modal-profile-address').textContent = profileDetails.address || 'N/A';
+            document.getElementById('modal-profile-account-number').textContent = profileDetails.accountNumber || 'N/A';
+            document.getElementById('modal-profile-account-name').textContent = profileDetails.accountName || 'N/A';
+            document.getElementById('modal-profile-bank-name').textContent = profileDetails.bankName || 'N/A';
         }
 
         async function fetchProfileDetailsForModal() {
@@ -1555,6 +1573,9 @@
                         nida: data.data.nida || "N/A",
                         dob: data.data.dob || "N/A",
                         address: data.data.address || "N/A",
+                        accountNumber: data.data.bank_account_number || "N/A",
+                        accountName: data.data.bank_account_name || "N/A",
+                        bankName: data.data.bank_name || "N/A",
                     };
 
                     populateProfileModal();
