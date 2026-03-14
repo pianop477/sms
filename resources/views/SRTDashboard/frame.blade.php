@@ -17,16 +17,16 @@
         <!-- main header area start -->
 
         <!-- main header area end -->
-           <div class="no-print">
+        <div class="no-print">
             @include('SRTDashboard.topnavigation')
-           </div>
+        </div>
         <!-- header area start -->
 
 
         <div class="header-area header-bottom no-print">
 
             {{-- navigation links start here --}}
-                @include('SRTDashboard.horizontalLinks')
+            @include('SRTDashboard.horizontalLinks')
             {{-- navigation links end here --}}
         </div>
 
@@ -47,19 +47,23 @@
         </div>
         <!-- main content area end -->
         <!-- footer area start-->
-            <div class="no-print">
-                @include('SRTDashboard.footer')
-            </div>
+        <div class="no-print">
+            @include('SRTDashboard.footer')
+        </div>
         <!-- footer area end-->
     </div>
 
     <!-- main wrapper start -->
     <!-- offset area start -->
-        @include('SRTDashboard.offset')
+    @include('SRTDashboard.offset')
     <!-- offset area end -->
 
     <!-- jquery latest version -->
     @include('SRTDashboard.script')
+
+    @if (Auth::check())
+        @include('profile.bank-details-modal')
+    @endif
 
 
     @include('sweetalert::alert')

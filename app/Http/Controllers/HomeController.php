@@ -17,6 +17,7 @@ use App\Models\Transport;
 use App\Models\User;
 use App\Services\NextSmsService;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -27,6 +28,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
+use Vinkla\Hashids\Facades\Hashids;
 
 class HomeController extends Controller
 {
@@ -570,7 +572,8 @@ class HomeController extends Controller
                 'teachers.address as teacher_address',
                 'teachers.member_id',
                 'teachers.qualification',
-                'parents.address as parent_address',
+                'parents.address as parent_address', 'teachers.bank_account_number',
+                'teachers.bank_account_name', 'teachers.bank_name', 'teachers.alternative_phone',
                 'roles.role_name'
             )
             ->findOrFail($user->id);
@@ -631,7 +634,7 @@ class HomeController extends Controller
         // Update user data
         $userData->first_name = $request->fname;
         $userData->last_name = $request->lname;
-        $userData->phone = $request->phone;
+        $userData->phone = $this->formatPhoneNumber($request->phone);
         $userData->email = $request->email;
         $userData->gender = $request->gender;
 
@@ -666,6 +669,118 @@ class HomeController extends Controller
 
         Alert()->toast('Profile Updated successfully', 'success');
         return back();
+    }
+
+    public function bankDetails(Request $request, $id)
+    {
+        $decoded = Hashids::decode($id);
+        $teacher = Teacher::find($decoded[0]);
+        $banks = [
+            ['code' => 'NMB', 'name' => 'NMB Bank'],
+            ['code' => 'CRDB', 'name' => 'CRDB Bank'],
+            ['code' => 'NBC', 'name' => 'NBC Bank'],
+            ['code' => 'ABSA', 'name' => 'ABSA Bank Tanzania'],
+            ['code' => 'SCB', 'name' => 'Standard Chartered Bank Tanzania'],
+            ['code' => 'EXIM', 'name' => 'Exim Bank Tanzania'],
+            ['code' => 'ECOBANK', 'name' => 'Ecobank Tanzania'],
+            ['code' => 'AKIBA', 'name' => 'Akiba Commercial Bank'],
+            ['code' => 'AMANA', 'name' => 'Amana Bank'],
+            ['code' => 'AZANIA', 'name' =>'Azania Bank'],
+            ['code' => 'DCB', 'name' => 'DCB Commercial Bank'],
+            ['code' => 'TCB', 'name' => 'Tanzania Commercial Bank'],
+            ['code' => 'UBA', 'name' => 'United Bank for Africa Tanzania'],
+        ];
+
+        return view('profile.bank', compact('banks', 'teacher'));
+    }
+
+    public function updateBankDetails(Request $request, $id)
+    {
+        $this->validate($request, [
+            'bank_name' => 'required|string|max:30',
+            'account_number' => 'required|string|max:16',
+            'account_name' => 'required|string|max:100',
+        ],
+        [
+            'bank_name.required' => 'Select bank name from the list',
+            'account_number.required' => 'Account number must be filled',
+            'account_name.required' => 'Account name must be filled',
+        ]);
+
+        $decoded = Hashids::decode($id);
+
+        $teacher = Teacher::find($decoded[0]);
+
+        if(! $teacher) {
+            Alert()->toast('Invalid user detected', 'error');
+            return back();
+        }
+
+        try {
+            $teacher->update([
+                'bank_account_number' => $request->account_number,
+                'bank_account_name' => $request->account_name,
+                'bank_name' => $request->bank_name,
+            ]);
+
+            Alert()->toast('Bank details updated successfully', 'success');
+            return to_route('show.profile', );
+        }
+        catch (Exception $e) {
+            Alert()->toast($e->getMessage(), 'error');
+            return back();
+        }
+
+    }
+
+    public function addAlternativePhone (Request $request, $id)
+    {
+        $this->validate($request, [
+            'phone' => 'required|string|max:15',
+        ]);
+
+        $decoded = Hashids::decode($id);
+        $teacher = Teacher::where('user_id', $decoded[0])->first();
+
+        if(! $teacher) {
+            Alert()->toast('Invalid user detected', 'error');
+            return back();
+        }
+
+        try {
+            $teacher->update([
+                'alternative_phone' => $this->formatPhoneNumber($request->phone),
+            ]);
+
+            Alert()->toast('Alternative phone saved successfully', 'success');
+            return back();
+
+        } catch (Exception $e) {
+            Alert()->toast($e->getMessage(), 'error');
+            return back();
+        }
+
+    }
+
+    private function formatPhoneNumber($phone)
+    {
+       // Ondoa character zisizo namba
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+
+        // 1. Kama iko kwa muundo wa 255XXXXXXXXX
+        if (strlen($phone) === 12 && str_starts_with($phone, '255')) {
+            return '0' . substr($phone, 3);
+        }
+        // 2. Kama iko kwa muundo wa +255XXXXXXXXX
+        elseif(strlen($phone) === 13 && str_starts_with($phone, '+255')) {
+            return '0'. substr($phone, 4);
+        }
+        // 3. Kama iko kwa muundo wa XXXXXXXX (9 tarakimu)
+        elseif (strlen($phone) === 9) {
+            return '0' . $phone;
+        }
+
+        return $phone;
     }
 
     private function scanFileForViruses($file): array

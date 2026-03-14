@@ -386,6 +386,81 @@ class OtherStaffsController extends Controller
         }
     }
 
+    public function bankDetails(Request $request, $type, $id)
+    {
+        $decoded = Hashids::decode($id);
+
+        if ($type == 'driver') {
+            $staff = Transport::findOrFail($decoded[0]);
+        } else {
+            $staff = Other_staffs::findOrFail($decoded[0]);
+        }
+
+        $banks = [
+            ['code' => 'NMB', 'name' => 'NMB Bank'],
+            ['code' => 'CRDB', 'name' => 'CRDB Bank'],
+            ['code' => 'NBC', 'name' => 'NBC Bank'],
+            ['code' => 'ABSA', 'name' => 'ABSA Bank Tanzania'],
+            ['code' => 'SCB', 'name' => 'Standard Chartered Bank Tanzania'],
+            ['code' => 'EXIM', 'name' => 'Exim Bank Tanzania'],
+            ['code' => 'ECOBANK', 'name' => 'Ecobank Tanzania'],
+            ['code' => 'AKIBA', 'name' => 'Akiba Commercial Bank'],
+            ['code' => 'AMANA', 'name' => 'Amana Bank'],
+            ['code' => 'AZANIA', 'name' => 'Azania Bank'],
+            ['code' => 'DCB', 'name' => 'DCB Commercial Bank'],
+            ['code' => 'TCB', 'name' => 'Tanzania Commercial Bank'],
+            ['code' => 'UBA', 'name' => 'United Bank for Africa Tanzania'],
+        ];
+
+        return view('OtherStaffs.bank-details', compact('banks', 'staff', 'type'));
+    }
+
+    public function updateStaffBankDetails(Request $request, $type, $id)
+    {
+        $this->validate(
+            $request,
+            [
+                'bank_name' => 'required|string|max:30',
+                'account_number' => 'required|string|max:16',
+                'account_name' => 'required|string|max:100',
+            ],
+            [
+                'bank_name.required' => 'Select bank name from the list',
+                'account_number.required' => 'Account number must be filled',
+                'account_name.required' => 'Account name must be filled',
+            ]
+        );
+
+        $decoded = Hashids::decode($id);
+
+        if ($type == 'driver') {
+            $staff = Transport::findOrFail($decoded[0]);
+        } else {
+            $staff = Other_staffs::findOrFail($decoded[0]);
+        }
+
+
+        if (! $staff) {
+            Alert()->toast('Invalid user detected', 'error');
+            return back();
+        }
+
+        try {
+            $staff->update([
+                'bank_account_number' => $request->account_number,
+                'bank_account_name' => $request->account_name,
+                'bank_name' => $request->bank_name,
+            ]);
+
+            Alert()->toast('Bank details updated successfully', 'success');
+            return to_route('OtherStaffs.profile', ['type' => $type, 'id' => $id]);
+        } catch (Exception $e) {
+            Alert()->toast($e->getMessage(), 'error');
+            return back();
+        }
+    }
+
+
     public function exportStaffReport(Request $request, $format)
     {
         $user = Auth::user();
@@ -404,6 +479,59 @@ class OtherStaffsController extends Controller
                 Alert()->toast('Invalid file format has been detected, please try again', 'error');
                 return back();
         }
+    }
+
+    public function addStaffAlternativePhone(Request $request, $type, $id)
+    {
+        $this->validate($request, [
+            'phone' => 'required|string|max:15',
+        ]);
+
+        $decoded = Hashids::decode($id);
+        if ($type == 'driver') {
+            $staff = Transport::findOrFail($decoded[0]);
+        } else {
+            $staff = Other_staffs::findOrFail($decoded[0]);
+        }
+
+
+        if (! $staff) {
+            Alert()->toast('Invalid user detected', 'error');
+            return back();
+        }
+
+        try {
+            $staff->update([
+                'alternative_phone' => $this->formatPhoneNumber($request->phone),
+            ]);
+
+            Alert()->toast('Alternative phone saved successfully', 'success');
+            return back();
+        } catch (Exception $e) {
+            Alert()->toast($e->getMessage(), 'error');
+            return back();
+        }
+    }
+
+    private function formatPhoneNumber($phone)
+    {
+        // Ondoa character zisizo namba
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+
+        // 1. Kama iko kwa muundo wa 255XXXXXXXXX
+        if (strlen($phone) === 12 && str_starts_with($phone, '255')) {
+            return '0' . substr($phone, 3);
+        }
+        // 2. Kama iko kwa muundo wa +255XXXXXXXXX
+        elseif (strlen($phone) === 13 && str_starts_with($phone, '+255')) {
+            return '0' . substr($phone, 4);
+        }
+        // 3. Kama iko kwa muundo wa XXXXXXXX (9 tarakimu)
+        elseif (strlen($phone) === 9) {
+            return '0' . $phone;
+        }
+
+        return $phone;
     }
 
     protected function generatePDF($user, $school, $combinedStaffs)

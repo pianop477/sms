@@ -164,7 +164,7 @@
                 <h4 class="text-primary fw-bold border-bottom pb-2">Account Profile</h4>
             </div>
             <div class="col-md-2 text-end">
-                <a href="{{route('home')}}" class="btn btn-info btn-action float-right">
+                <a href="{{ route('home') }}" class="btn btn-info btn-action float-right">
                     <i class="fas fa-arrow-circle-left me-1"></i> Back
                 </a>
             </div>
@@ -185,11 +185,15 @@
                                 $avatarImage = asset('storage/profile/' . $imageName);
                             } else {
                                 // Use default avatar based on gender
-                                $avatarImage = asset('storage/profile/' . (strtolower($user->gender) == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                $avatarImage = asset(
+                                    'storage/profile/' .
+                                        (strtolower($user->gender) == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'),
+                                );
                             }
                         @endphp
                         <img src="{{ $avatarImage }}" class="profile-img" alt="User Photo">
-                        <h5 class="profile-name mb-1" style="color:gold">{{ucwords(strtolower($user->first_name. ' '. $user->last_name))}}</h5>
+                        <h5 class="profile-name mb-1" style="color:gold">
+                            {{ ucwords(strtolower($user->first_name . ' ' . $user->last_name)) }}</h5>
                         <p class="mb-0 text-white">
                             @if ($user->usertype == 1)
                                 System Administrator
@@ -207,35 +211,36 @@
 
                     <div class="card-body">
                         <div class="d-flex justify-content-center mb-3">
-                            <a href="javascript:void(0)" data-photo="{{ $avatarImage }}" class="btn btn-outline-danger mr-1 btn-action me-2 view-photo">
+                            <a href="javascript:void(0)" data-photo="{{ $avatarImage }}"
+                                class="btn btn-outline-danger mr-1 btn-action mr-2 view-photo">
                                 <i class="fas fa-image me-1"></i> View Photo
                             </a>
                         </div>
 
                         <div class="profile-detail">
                             @if ($user->usertype == 3)
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-muted">Staff ID</span>
-                                <span class="text-uppercase fw-bold">{{$user->member_id}}</span>
-                            </div>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-muted">Staff ID</span>
+                                    <span class="text-uppercase fw-bold">{{ $user->member_id }}</span>
+                                </div>
                             @endif
 
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="text-muted">Role</span>
                                 @if ($user->usertype == 1 || $user->usertype == 2)
-                                    <span class="" style="font-weight: bold">Admin</span>
+                                    <span class="" style="font-weight: bold">Manager</span>
                                 @elseif ($user->usertype == 3)
-                                    <span class="text-capitalize" style="font-weight: bold">{{$user->role_name}}</span>
+                                    <span class="text-capitalize" style="font-weight: bold">{{ $user->role_name }}</span>
                                 @elseif ($user->usertype == 4)
                                     <span class="" style="font-weight: bold">Parent</span>
                                 @else
-                                   <span class="" style="font-weight: bold">Accountant</span>
+                                    <span class="" style="font-weight: bold">Accountant</span>
                                 @endif
                             </div>
 
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="text-muted">Gender</span>
-                                <span class="text-capitalize fw-bold" style="font-weight: bold">{{$user->gender}}</span>
+                                <span class="text-capitalize fw-bold" style="font-weight: bold">{{ $user->gender }}</span>
                             </div>
 
                             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -257,19 +262,26 @@
                         <ul class="nav nav-pills flex-column flex-lg-row">
                             <li class="nav-item flex-fill text-center">
                                 <a class="nav-link active" href="#profile" data-bs-toggle="tab">
-                                    <i class="fas fa-user me-1"></i> Profile
+                                    <i class="fas fa-user mr-2"></i> Profile
                                 </a>
                             </li>
                             @if ($user->usertype == 3)
-                            <li class="nav-item flex-fill text-center">
-                                <a class="nav-link" href="#NIN" data-bs-toggle="tab">
-                                    <i class="fas fa-list me-1"></i> Other Details
-                                </a>
-                            </li>
+                                <li class="nav-item flex-fill text-center">
+                                    <a class="nav-link" href="#NIN" data-bs-toggle="tab">
+                                        <i class="fas fa-list mr-2"></i> Other Details
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($user->usertype == 3)
+                                <li class="nav-item flex-fill text-center">
+                                    <a class="nav-link" href="#bank" data-bs-toggle="tab">
+                                        <i class="fas fa-bank mr-2"></i> Bank Details
+                                    </a>
+                                </li>
                             @endif
                             <li class="nav-item flex-fill text-center">
                                 <a class="nav-link" href="#edit" data-bs-toggle="tab">
-                                    <i class="fas fa-user-pen me-1"></i> Edit Account
+                                    <i class="fas fa-user-pen mr-2"></i> Edit Account
                                 </a>
                             </li>
                         </ul>
@@ -279,11 +291,11 @@
                         <div class="tab-content">
                             <!-- Profile Tab -->
                             <div class="tab-pane fade show active" id="profile">
-                                <h5 class="mb-4"><i class="fas fa-info-circle me-2"></i> Account Information</h5>
+                                <h5 class="mb-4"><i class="fas fa-info-circle mr-2"></i> Account Information</h5>
                                 <table class="info-table">
                                     @if ($user->usertype == 3)
                                         <tr>
-                                            <th><i class="fas fa-award me-2"></i> Qualification</th>
+                                            <th><i class="fas fa-award mr-2"></i> Qualification</th>
                                             @if ($user->qualification == 1)
                                                 <td><span class="badge bg-success text-white">Masters Degree</span></td>
                                             @elseif ($user->qualification == 2)
@@ -298,21 +310,21 @@
                                         </tr>
                                     @endif
                                     <tr>
-                                        <th><i class="fas fa-phone me-2"></i> Phone</th>
+                                        <th><i class="fas fa-phone-alt mr-2"></i> Phone</th>
                                         <td>
-                                            <a href="tel:{{$user->phone}}" class="text-decoration-none">
-                                                {{$user->phone}}
+                                            <a href="tel:{{ $user->phone }}" class="text-decoration-none">
+                                                {{ $user->phone }}
                                             </a>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th><i class="fas fa-envelope me-2"></i> Email</th>
+                                        <th><i class="fas fa-envelope mr-2"></i> Email</th>
                                         <td>
-                                            @if ($user->email == NULL)
+                                            @if ($user->email == null)
                                                 <span class="text-muted">N/A</span>
                                             @else
-                                                <a href="mailto:{{$user->email}}" class="text-decoration-none">
-                                                    {{$user->email}}
+                                                <a href="mailto:{{ $user->email }}" class="text-decoration-none">
+                                                    {{ $user->email }}
                                                 </a>
                                             @endif
                                         </td>
@@ -320,59 +332,145 @@
                                     <tr>
                                         <th><i class="fas fa-calendar-alt"></i> Registration Date</th>
                                         <td>
-                                            @if ($user->created_at == Null)
+                                            @if ($user->created_at == null)
                                                 Unknown
                                             @else
-                                                {{\Carbon\Carbon::parse($user->created_at)->format('d-m-Y')}}
+                                                {{ \Carbon\Carbon::parse($user->created_at)->format('d-m-Y') }}
                                             @endif
                                         </td>
                                     </tr>
+                                    @if ($user->usertype == 3)
+                                        <tr>
+                                            <th><i class="fas fa-phone-alt"></i> Alternative Phone</th>
+                                            <td>
+                                                @if ($user->alternative_phone == null)
+                                                    Unknown
+                                                @else
+                                                    {{ $user->alternative_phone }}
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endif
                                     @if ($user->usertype == 3 || $user->usertype == 4)
-                                    <tr>
-                                        <th><i class="fas fa-location-dot me-2"></i> Street Address</th>
-                                        <td class="text-capitalize">{{$user->teacher_address ?? $user->parent_address}}</td>
-                                    </tr>
+                                        <tr>
+                                            <th><i class="fas fa-location-dot mr-2"></i> Street Address</th>
+                                            <td class="text-capitalize">
+                                                {{ $user->teacher_address ?? $user->parent_address }}</td>
+                                        </tr>
                                     @endif
                                 </table>
+                                @if ($user->usertype == 3)
+                                    @php
+                                        if (empty($user->alternative_phone)) {
+                                            $btn_name = '<i class="fas fa-plus-circle"></i> Add Alternative Phone';
+                                        } else {
+                                            $btn_name = '<i class="fas fa-pencil"></i> Update Alternative Phone';
+                                        }
+                                        // return $btn_name;
+                                    @endphp
+                                    <div class="container py-2">
+                                        <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#phone-modal"
+                                            data-phone="{{ $user->alternative_phone }}"
+                                            class="btn btn-primary mr-2 btn-action mr-2 float-end">
+                                             {!!$btn_name!!}
+                                        </a>
+                                    </div>
+                                @endif
                             </div>
 
                             {{-- NIN and form IV index number tab --}}
                             @if ($user->usertype == 3)
                                 <div class="tab-pane fade" id="NIN">
-                                <h5 class="mb-4"><i class="me-2"></i> NIN & Form Four Details</h5>
-                                @php
-                                    $teacher = \App\Models\Teacher::where('user_id', $user->id)->first();
-                                @endphp
-                                <table class="info-table">
-                                    <tr>
-                                        <th>NIN</th>
-                                        <td>{{$teacher->nida ?? 'N/A'}}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Form Four Index#</th>
-                                        <td>
-                                            {{$teacher->form_four_index_number ?? 'N/A'}}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>Completed at</th>
-                                        <td>
-                                            {{$teacher->form_four_completion_year ?? 'N/A'}}
-                                        </td>
-                                    </tr>
-                                </table>
-                                <div class="align-items-center mt-4">
-                                    <a href="{{route('get.nida.form.four')}}" class="btn btn-primary">
-                                        <i class="fas fa-pencil"></i> Edit
-                                    </a>
+                                    <h5 class="mb-4"><i class="fas fa-id-card mr-2"></i> NIN & Form Four Details</h5>
+                                    @php
+                                        $teacher = \App\Models\Teacher::where('user_id', $user->id)->first();
+                                    @endphp
+                                    <table class="info-table">
+                                        <tr>
+                                            <th>NIN</th>
+                                            <td>{{ $teacher->nida ?? 'N/A' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Form Four Index#</th>
+                                            <td>
+                                                {{ $teacher->form_four_index_number ?? 'N/A' }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Completed at</th>
+                                            <td>
+                                                {{ $teacher->form_four_completion_year ?? 'N/A' }}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    @php
+                                        if (
+                                            empty($teacher->nida) ||
+                                            empty($teacher->form_four_index_number) ||
+                                            empty($teacher->form_four_completion_year)
+                                        ) {
+                                            $btn_name = '<i class="fas fa-plus-circle"></i> Add Nida & Form Four Details';
+                                        } else {
+                                            $btn_name = '<i class="fas fa-pencil"></i> Update Nida & Form Four Details';
+                                        }
+                                    @endphp
+                                    <div class="align-items-center mt-4 float-end">
+                                        <a href="{{ route('get.nida.form.four') }}" class="btn btn-primary">
+                                            {!! $btn_name !!}
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
+                            {{-- bank details tab --}}
+                            @if ($user->usertype == 3)
+                                <div class="tab-pane fade" id="bank">
+                                    <h5 class="mb-4"><i class="fas fa-credit-card"></i> Bank account details</h5>
+                                    @php
+                                        $teacher = \App\Models\Teacher::where('user_id', $user->id)->first();
+                                    @endphp
+                                    <table class="info-table">
+                                        <tr>
+                                            <th>Account Number#</th>
+                                            <td>{{ $teacher->bank_account_number ?? 'N/A' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Account Name</th>
+                                            <td>
+                                                {{ $teacher->bank_account_name ?? 'N/A' }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Bank Name</th>
+                                            <td>
+                                                {{ $teacher->bank_name ?? 'N/A' }}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    @php
+                                        if (
+                                            empty($teacher->bank_account_number) ||
+                                            empty($teacher->bank_account_name) ||
+                                            empty($teacher->bank_name)
+                                        ) {
+                                            $btn_name = '<i class="fas fa-plus-circle"></i> Add Bank Details';
+                                        } else {
+                                            $btn_name = '<i class="fas fa-pencil"></i> Update Bank Details';
+                                        }
+                                    @endphp
+                                    <div class="align-items-center mt-4 float-end">
+                                        <a href="{{ route('bank.details', ['id' => Hashids::encode($teacher->id)]) }}"
+                                            class="btn btn-primary">
+                                            {!! $btn_name !!}
+                                        </a>
+                                    </div>
+                                </div>
                             @endif
                             <!-- Edit Account Tab -->
                             <div class="tab-pane fade" id="edit">
-                                <h5 class="mb-4"><i class="fas fa-user-pen me-2"></i> Edit Account Information</h5>
+                                <h5 class="mb-4"><i class="fas fa-user-pen mr-2"></i> Edit Account Information</h5>
 
-                                <form action="{{route('update.profile', $user->id)}}" method="POST" enctype="multipart/form-data" novalidate class="needs-validation">
+                                <form action="{{ route('update.profile', $user->id) }}" method="POST"
+                                    enctype="multipart/form-data" novalidate class="needs-validation">
                                     @csrf
                                     @method('PUT')
 
@@ -380,18 +478,20 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">First Name</label>
-                                                <input type="text" name="fname" class="form-control-custom" value="{{$user->first_name}}" required>
+                                                <input type="text" name="fname" class="form-control-custom"
+                                                    value="{{ $user->first_name }}" required>
                                                 @error('fname')
-                                                    <div class="text-danger text-sm mt-1">{{$message}}</div>
+                                                    <div class="text-danger text-sm mt-1">{{ $message }}</div>
                                                 @enderror
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">Last Name</label>
-                                                <input type="text" name="lname" class="form-control-custom" value="{{$user->last_name}}" required>
+                                                <input type="text" name="lname" class="form-control-custom"
+                                                    value="{{ $user->last_name }}" required>
                                                 @error('lname')
-                                                    <div class="text-danger text-sm mt-1">{{$message}}</div>
+                                                    <div class="text-danger text-sm mt-1">{{ $message }}</div>
                                                 @enderror
                                             </div>
                                         </div>
@@ -401,18 +501,20 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">Phone</label>
-                                                <input type="text" name="phone" class="form-control-custom" value="{{$user->phone}}" required>
+                                                <input type="text" name="phone" class="form-control-custom"
+                                                    value="{{ $user->phone }}" required>
                                                 @error('phone')
-                                                    <div class="text-danger text-sm mt-1">{{$message}}</div>
+                                                    <div class="text-danger text-sm mt-1">{{ $message }}</div>
                                                 @enderror
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="form-label">Email</label>
-                                                <input type="email" name="email" class="form-control-custom" value="{{$user->email}}">
+                                                <input type="email" name="email" class="form-control-custom"
+                                                    value="{{ $user->email }}">
                                                 @error('email')
-                                                    <div class="text-danger text-sm mt-1">{{$message}}</div>
+                                                    <div class="text-danger text-sm mt-1">{{ $message }}</div>
                                                 @enderror
                                             </div>
                                         </div>
@@ -423,36 +525,39 @@
                                             <div class="form-group">
                                                 <label class="form-label">Gender</label>
                                                 <select name="gender" class="form-control-custom text-capitalize">
-                                                    <option value="{{$user->gender}}" selected>{{$user->gender}}</option>
+                                                    <option value="{{ $user->gender }}" selected>{{ $user->gender }}
+                                                    </option>
                                                     <option value="male">Male</option>
                                                     <option value="female">Female</option>
                                                 </select>
                                                 @error('gender')
-                                                    <div class="text-danger text-sm mt-1">{{$message}}</div>
+                                                    <div class="text-danger text-sm mt-1">{{ $message }}</div>
                                                 @enderror
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label class="form-label">Photo <span class="text-danger text-sm">(Max 1MB)</span></label>
+                                                <label class="form-label">Photo <span class="text-danger text-sm">(Max
+                                                        1MB)</span></label>
                                                 <input type="file" name="image" class="form-control-custom">
                                                 @error('image')
-                                                    <div class="text-danger text-sm mt-1">{{$message}}</div>
+                                                    <div class="text-danger text-sm mt-1">{{ $message }}</div>
                                                 @enderror
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row mb-4">
                                         @if ($user->usertype == 3 || $user->usertype == 4)
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label class="form-label">Address</label>
-                                                <input type="text" name="address" class="form-control-custom" value="{{$user->parent_address ?? $user->teacher_address}}">
-                                                @error('address')
-                                                    <div class="text-danger text-sm mt-1">{{$message}}</div>
-                                                @enderror
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="form-label">Address</label>
+                                                    <input type="text" name="address" class="form-control-custom"
+                                                        value="{{ $user->parent_address ?? $user->teacher_address }}">
+                                                    @error('address')
+                                                        <div class="text-danger text-sm mt-1">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
                                             </div>
-                                        </div>
                                         @endif
                                     </div>
 
@@ -467,17 +572,44 @@
             </div>
         </div>
     </div>
-
+    {{-- add phone modal --}}
+    <div class="modal fade" id="phone-modal" tabindex="-1" aria-labelledby="userPhoneModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="phone-modal">Add Alternative Phone</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('add.alternative.phone', ['id' => Hashids::encode($user->id)]) }}" method="POST"
+                    enctype="multipart/form-data">
+                    <div class="modal-body">
+                        @csrf
+                        @method('PUT')
+                        <label for="phoneNumber">Phone Number</label>
+                        <input type="text" name="phone" class="form-control-custom" id="phoneNumber"
+                            value="{{ old('phone', $user->alternative_phone) }}" maxlength="15"
+                            placeholder="Enter Phone">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save Number</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <!-- Photo Modal -->
-    <div class="modal fade" id="userPhotoModal" tabindex="-1" aria-labelledby="userPhotoModalLabel" aria-hidden="true">
+    <div class="modal fade" id="userPhotoModal" tabindex="-1" aria-labelledby="userPhotoModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="userPhotoModalLabel">Profile Photo</h5>
-                    <button type="button" class="btn-close btn btn-danger" data-dismiss="modal" aria-label="Close">Close</button>
+                    <button type="button" class="btn-close btn btn-danger" data-dismiss="modal"
+                        aria-label="Close">Close</button>
                 </div>
                 <div class="modal-body text-center">
-                    <h6 class="text-primary mb-3">{{strtoupper($user->first_name .' '. $user->last_name)}}</h6>
+                    <h6 class="text-primary mb-3">{{ strtoupper($user->first_name . ' ' . $user->last_name) }}</h6>
                     <img id="user-photo" src="" alt="User Photo" class="photo-modal img-fluid">
                 </div>
                 <div class="modal-footer">
@@ -501,7 +633,7 @@
 
             // Activate tabs
             const triggerTabList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tab"]'))
-            triggerTabList.forEach(function (triggerEl) {
+            triggerTabList.forEach(function(triggerEl) {
                 new bootstrap.Tab(triggerEl)
             });
 
@@ -510,12 +642,13 @@
             const submitButton = document.getElementById("saveButton");
 
             if (form && submitButton) {
-                form.addEventListener("submit", function (event) {
+                form.addEventListener("submit", function(event) {
                     event.preventDefault();
 
                     // Disable button and show loading state
                     submitButton.disabled = true;
-                    submitButton.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Saving...`;
+                    submitButton.innerHTML =
+                        `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Saving...`;
 
                     // Validate form
                     if (!form.checkValidity()) {

@@ -19,7 +19,7 @@ class AccountantMiddleware
         if(Auth::check()) {
             $user = Auth::user();
 
-            if($user->usertype == 5) {
+            if($user->usertype == 5 || $user->usertype == 2) {
                 return $next($request);
             }
             return to_route('error.page');

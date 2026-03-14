@@ -94,12 +94,13 @@ class LoginController extends Controller
 
             $user = Auth::user();
 
-            if ($user->usertype == 5) {
+            if ($user->usertype == 5 || $user->usertype == 2) {
                 $tokenService = new FinanceTokenService();
 
                 $debugUrl = $tokenService->debugConnection();
 
                  $token = $tokenService->ensureValidToken();
+                //  Log::info("Token acquisition result: " . ($token ? "SUCCESS" : "FAILED"));
 
                 if (!$token) {
                     $sessionId = Session::getId();

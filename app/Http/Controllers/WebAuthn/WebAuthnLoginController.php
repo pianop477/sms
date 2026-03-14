@@ -61,7 +61,7 @@ class WebAuthnLoginController extends Controller
         auth()->login($user);
 
         // Only proceed with Finance API token if usertype == 5
-        if ($user->usertype == 5) {
+        if ($user->usertype == 5 || $user->usertype == 2) {
             try {
                 $tokenService = new FinanceTokenService();
 

@@ -362,7 +362,7 @@
                     <i class="fas fa-id-card" id="current-icon"></i>
                 </div>
                 <h2 id="current-title">Contracts Gateway System</h2>
-                <p id="current-subtitle">Mikataba Yako, Udhibiti Wako</p>
+                <p id="current-subtitle" style="font-weight: bold; color:#1155a9; font-style:italic;">Mikataba Yako, Udhibiti ni Wako</p>
             </div>
 
             <!-- Alert Messages -->
@@ -594,7 +594,7 @@
                     'staff-id': {
                         icon: 'fa-id-card',
                         title: 'Contracts Gateway System',
-                        subtitle: 'Mikataba Yako, Udhibiti Wako'
+                        subtitle: 'Mikataba Yako, Udhibiti ni Wako'
                     },
                     'otp': {
                         icon: 'fa-mobile-alt',

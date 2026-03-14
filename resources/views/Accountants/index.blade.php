@@ -602,7 +602,7 @@
                                         </td>
                                         <td>
                                             <a href="tel:{{ $row->phone }}" class="phone-link">
-                                                <i class="fas fa-phone"></i>
+                                                <i class="fas fa-phone-alt"></i>
                                                 {{ $row->phone }}
                                             </a>
                                         </td>

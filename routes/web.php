@@ -120,7 +120,7 @@ Route::post('/webauthn/login/verify', [WebAuthnLoginController::class, 'loginVer
 Route::post('/webauthn/delete-credentials', [BiometricController::class, 'deleteCredentials']);
 
 // MIDDLEWARE FILTERING STARTS HERE **************************************************************************************
-Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 'block.ip', 'user.agent')->group(function () {
+Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 'block.ip', 'user.agent', 'check.bank.details')->group(function () {
     /*
         =======================MPANGILIO WA ROUTES ZOTE UKO HAPA KULINGANA NA MAHITAJI YA MFUMO NA=========================================
         =================================AINA YA USER, PERMISSION NA ROLE YAKE KATIKA MFUMO================================================
@@ -345,7 +345,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::post('Accountants-registration', [AccountantsController::class, 'registerAccountants'])->name('Accountants.store');
         Route::put('Accountants/block/{id}', [AccountantsController::class, 'blockAccountants'])->name('Accountants.block');
         Route::put('Accountants/unblock/{id}', [AccountantsController::class, 'unBlockAccountants'])->name('Accountants.unblock');
-        Route::get('Accountants/profilee/{id}', [AccountantsController::class, 'accountantProfile'])->name('Accountants.profile');
+        Route::get('Accountants/profile/{id}', [AccountantsController::class, 'accountantProfile'])->name('Accountants.profile');
         Route::put('Accountants/update/{id}', [AccountantsController::class, 'updateAccountants'])->name('Accountants.update');
         Route::delete('Accountants/delete/{id}', [AccountantsController::class, 'deleteAccountants'])->name('Accountants.delete');
 
@@ -358,6 +358,9 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::put('/Staff/unblock/status/type/{type}/{id}', [OtherStaffsController::class, 'unblockStatus'])->name('unblock.other.staffs');
         Route::delete('Staff/remove/staff/type/{type}/{id}', [OtherStaffsController::class, 'removeStaff'])->name('remove.other.staffs');
         Route::get('/Staff/export/format/{format}', [OtherStaffsController::class, 'exportStaffReport'])->name('export.other.staffs');
+        Route::get('/Staff/bank-details/stype/{type}/{id}', [OtherStaffsController::class, 'bankDetails'])->name('update.staff.bank.details');
+        Route::put('/Staff/update-bank-details/stype/{type}/{id}', [OtherStaffsController::class, 'updateStaffBankDetails'])->name('save.staff.bank');
+        Route::put('/Staff/update/alternative-phone/stype/{type}/{id}', [OtherStaffsController::class, 'addStaffAlternativePhone'])->name('staff.add.phone');
     });
 
     //3. ROUTE ACCESS FOR EITHER HEAD TEACHER OR ACADEMIC ONLY ============================================================================
@@ -441,6 +444,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::middleware('nida_and_form_four')->get('Personal-details', [HomeController::class, 'showProfile'])->name('show.profile');
         Route::put('{user}/Personal-details', [HomeController::class, 'updateProfile'])->name('update.profile');
         Route::get('/student-profile-picture/{student}', [StudentsController::class, 'downloadProfilePicture'])->name('student.profile.picture');
+        Route::put('{id}/Add/alternative-phone', [HomeController::class, 'addAlternativePhone'])->name('add.alternative.phone');
     });
 
     // 5. ROUTE ACCESS FOR PARENTS ONLY ===================================================================================================
@@ -657,3 +661,24 @@ Route::prefix('contracts')->name('contract.')->middleware(['contract.or.auth'])-
     });
 });
 
+// Route ya kuona form (hii haitakiwi kuwa na check.bank.details middleware)
+Route::get('{id}/Bank-information', [HomeController::class, 'bankDetails'])
+    ->name('bank.details')
+    ->middleware('auth'); // AUTH TU, SI CHECK.BANK.DETAILS
+
+// Route ya update (POST/PUT)
+Route::put('{id}/Update-bank-details', [HomeController::class, 'updateBankDetails'])
+    ->name('update.bank.details')
+    ->middleware('auth');
+
+// Routes za AJAX requests for modal
+Route::post('/bank/remind-later', function () {
+    session(['bank_modal_last_shown' => time()]);
+    session()->forget(['show_bank_modal', 'teacher_id_for_modal']);
+    return response()->json(['success' => true]);
+})->name('bank.remind.later')->middleware('auth');
+
+Route::post('/bank/modal-closed', function () {
+    session(['bank_modal_last_shown' => time()]);
+    return response()->json(['success' => true]);
+})->name('bank.modal.closed')->middleware('auth');

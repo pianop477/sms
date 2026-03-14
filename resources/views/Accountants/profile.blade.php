@@ -272,7 +272,7 @@
                                 <h5 class="mb-4"><i class="fas fa-info-circle me-2"></i> Personal Particulars</h5>
                                 <table class="info-table">
                                     <tr>
-                                        <th><i class="fas fa-phone me-2"></i> Phone</th>
+                                        <th><i class="fas fa-phone-alt me-2"></i> Phone</th>
                                         <td>
                                             <a href="tel:{{$user->phone}}" class="text-decoration-none">
                                                 {{$user->phone}}

@@ -118,10 +118,13 @@
             padding-bottom: 10px;
             margin-bottom: 20px;
         }
-        .form-control:focus, .form-select:focus {
+
+        .form-control:focus,
+        .form-select:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
         }
+
         .form-control-custom {
             border: 2px solid #e9ecef;
             border-radius: 10px;
@@ -178,7 +181,7 @@
                 <h4 class="text-primary fw-bold border-bottom pb-2">Profile Information</h4>
             </div>
             <div class="col-md-2 text-end">
-                <a href="{{route('OtherStaffs.index')}}" class="btn btn-info btn-action float-right">
+                <a href="{{ route('OtherStaffs.index') }}" class="btn btn-info btn-action float-right">
                     <i class="fas fa-arrow-circle-left me-1"></i> Back
                 </a>
             </div>
@@ -199,17 +202,23 @@
                                 $avatarImage = asset('storage/profile/' . $imageName);
                             } else {
                                 // Use default avatar based on gender
-                                $avatarImage = asset('storage/profile/' . ($staff->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'));
+                                $avatarImage = asset(
+                                    'storage/profile/' .
+                                        ($staff->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg'),
+                                );
                             }
                         @endphp
                         <img src="{{ $avatarImage }}" class="profile-img" alt="Teacher Photo">
-                        <h5 class="profile-name mb-1" style="color:gold;">{{$type == 'driver' ? ucwords(strtolower($staff->driver_name)) : ucwords(strtolower($staff->first_name. ' '. $staff->last_name))}}</h5>
-                        <p class="mb-0 text-white text-uppercase">ID #: <strong>{{$staff->staff_id ?? 'n/a'}}</strong></p>
+                        <h5 class="profile-name mb-1" style="color:gold;">
+                            {{ $type == 'driver' ? ucwords(strtolower($staff->driver_name)) : ucwords(strtolower($staff->first_name . ' ' . $staff->last_name)) }}
+                        </h5>
+                        <p class="mb-0 text-white text-uppercase">ID #: <strong>{{ $staff->staff_id ?? 'n/a' }}</strong></p>
                     </div>
 
                     <div class="card-body">
                         <div class="d-flex justify-content-center mb-3">
-                            <a href="javascript:void(0)" data-photo="{{ $avatarImage }}" class="btn btn-outline-danger mr-1 btn-action me-2 view-photo">
+                            <a href="javascript:void(0)" data-photo="{{ $avatarImage }}"
+                                class="btn btn-outline-danger mr-1 btn-action me-2 view-photo">
                                 <i class="fas fa-image me-1"></i> View Photo
                             </a>
                         </div>
@@ -217,11 +226,11 @@
                         <div class="profile-detail">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="text-muted">Gender</span>
-                                <span class="text-capitalize fw-bold">{{$staff->gender}}</span>
+                                <span class="text-capitalize fw-bold">{{ $staff->gender }}</span>
                             </div>
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="text-muted">Job Title</span>
-                                <span class="text-capitalize fw-bold">{{$staff->job_title ?? 'N/A'}}</span>
+                                <span class="text-capitalize fw-bold">{{ $staff->job_title ?? 'N/A' }}</span>
                             </div>
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="text-muted">Status</span>
@@ -251,6 +260,11 @@
                                 </a>
                             </li>
                             <li class="nav-item flex-fill text-center">
+                                <a class="nav-link" href="#bank" data-bs-toggle="tab">
+                                    <i class="fas fa-bank me-1"></i> Bank Details
+                                </a>
+                            </li>
+                            <li class="nav-item flex-fill text-center">
                                 <a class="nav-link" href="#edit" data-bs-toggle="tab">
                                     <i class="fas fa-pencil me-1"></i> Edit Information
                                 </a>
@@ -265,48 +279,63 @@
                                 <h5 class="mb-4"><i class="fas fa-info-circle me-2"></i> Personal Particulars</h5>
                                 <table class="info-table">
                                     <tr>
-                                        <th><i class="fas fa-phone me-2"></i> Phone</th>
+                                        <th><i class="fas fa-phone-alt me-2"></i> Phone</th>
                                         <td>
-                                            <a href="tel:{{$staff->phone}}" class="text-decoration-none">
-                                                {{$staff->phone ?? 'N/A'}}
+                                            <a href="tel:{{ $staff->phone }}" class="text-decoration-none">
+                                                {{ $staff->phone ?? 'N/A' }}
                                             </a>
                                         </td>
                                     </tr>
                                     <tr>
                                         <th><i class="fas fa-envelope me-2"></i> Email</th>
                                         <td>
-                                            @if ($staff->email == NULL)
+                                            @if ($staff->email == null)
                                                 <span class="text-muted">N/A</span>
                                             @else
-                                                <a href="mailto:{{$staff->email}}" class="text-decoration-none">
-                                                    {{$staff->email}}
+                                                <a href="mailto:{{ $staff->email }}" class="text-decoration-none">
+                                                    {{ $staff->email }}
                                                 </a>
                                             @endif
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th> NIN</th>
-                                        <td>
-                                            {{$staff->nida ?? 'N/A'}}
-                                        </td>
+                                        <th><i class="fas fa-phone-alt me-2"></i> Alternative Phone</th>
+                                        <td> {{ $staff->alternative_phone ?? 'N/A' }}</td>
                                     </tr>
                                     <tr>
                                         <th>Date of Birth</th>
-                                        <td>{{\Carbon\Carbon::parse($staff->date_of_birth)->format('d-m-Y') ?? 'N/A'}}</td>
+                                        <td>{{ \Carbon\Carbon::parse($staff->date_of_birth)->format('d-m-Y') ?? 'N/A' }}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <th>Joined Since</th>
-                                        <td>{{$staff->joining_year ?? 'N/A'}}</td>
+                                        <td>{{ $staff->joining_year ?? 'N/A' }}</td>
                                     </tr>
                                     <tr>
                                         <th>Registration Date</th>
-                                        <td>{{\Carbon\Carbon::parse($staff->created_at)->format('d-m-Y') ?? 'N/A'}}</td>
+                                        <td>{{ \Carbon\Carbon::parse($staff->created_at)->format('d-m-Y') ?? 'N/A' }}</td>
                                     </tr>
                                     <tr>
                                         <th><i class="fas fa-location-dot me-2"></i> Street Address</th>
-                                        <td class="text-capitalize">{{ucwords(strtolower($staff->street_address)) ?? 'N/A'}}</td>
+                                        <td class="text-capitalize">
+                                            {{ ucwords(strtolower($staff->street_address)) ?? 'N/A' }}</td>
                                     </tr>
                                 </table>
+                                @php
+                                    if (empty($staff->alternative_phone)) {
+                                        $btn_name = '<i class="fas fa-plus-circle"></i> Add Alternative Phone';
+                                    } else {
+                                        $btn_name = '<i class="fas fa-pencil"></i> Update Alternative Phone';
+                                    }
+                                    // return $btn_name;
+                                @endphp
+                                <div class="container py-2">
+                                    <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#phone-modal"
+                                        data-phone="{{ $staff->alternative_phone }}"
+                                        class="btn btn-primary mr-2 btn-action mr-2 float-end">
+                                        {!! $btn_name !!}
+                                    </a>
+                                </div>
                             </div>
 
                             <!-- Qualification Tab -->
@@ -316,79 +345,133 @@
                                     <tr>
                                         <th>Qualification</th>
                                         <td>
-                                            {{ucwords(strtolower($staff->educational_level)) ?? 'N/A'}}
+                                            {{ ucwords(strtolower($staff->educational_level)) ?? 'N/A' }}
                                         </td>
                                     </tr>
                                 </table>
                             </div>
+                            {{-- bank details --}}
+                            <div class="tab-pane fade" id="bank">
+                                <h5 class="mb-4"><i class="fas fa-id-card me-2"></i> Bank Details</h5>
+                                <table class="info-table">
+                                    <tr>
+                                        <th> NIN</th>
+                                        <td>
+                                            {{ $staff->nida ?? 'N/A' }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Account Number</th>
+                                        <td>
+                                            {{ $staff->bank_account_number ?? 'N/A' }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Account Name</th>
+                                        <td>
+                                            {{ $staff->bank_account_name ?? 'N/A' }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Account Number</th>
+                                        <td>
+                                            {{ $staff->bank_name ?? 'N/A' }}
+                                        </td>
+                                    </tr>
+                                </table>
+                                @php
+                                    if (
+                                        empty($staff->bank_account_number) ||
+                                        empty($staff->bank_account_name) ||
+                                        empty($staff->bank_name)
+                                    ) {
+                                        $btn_name = '<i class="fas fa-plus-circle"></i> Add Bank Details';
+                                    } else {
+                                        $btn_name = '<i class="fas fa-pencil"></i> Update Bank Details';
+                                    }
+                                @endphp
 
+                                <div class="align-items-center mt-4 float-end">
+                                    <a href="{{ route('update.staff.bank.details', ['type' => $type, 'id' => Hashids::encode($staff->id)]) }}"
+                                        class="btn btn-primary">
+                                        {!! $btn_name !!}
+                                    </a>
+                                </div>
+                            </div>
                             <!-- Subjects Tab -->
                             <div class="tab-pane fade" id="edit">
                                 <h5 class="mb-4"><i class="fas fa-pencil me-2"></i> Edit Information</h5>
                                 {{-- edit form --}}
-                                <form action="{{route('OtherStaffs.update', ['type' => $type, 'id' => Hashids::encode($staff->id)])}}" method="POST" class="needs-validation" novalidate enctype="multipart/form-data">
+                                <form
+                                    action="{{ route('OtherStaffs.update', ['type' => $type, 'id' => Hashids::encode($staff->id)]) }}"
+                                    method="POST" class="needs-validation" novalidate enctype="multipart/form-data">
                                     @csrf
                                     @method('PUT')
                                     <div class="row">
                                         <div class="col-md-4 mb-3">
                                             <div class="form-group">
                                                 <label for="first-name">First Name</label>
-                                                <input type="text" name="fname" class="form-control-custom" value="{{$type == 'driver' ? old('fname', $staff->driver_name) : old('fname', $staff->first_name)}}">
+                                                <input type="text" name="fname" class="form-control-custom"
+                                                    value="{{ $type == 'driver' ? old('fname', $staff->driver_name) : old('fname', $staff->first_name) }}">
                                                 @error('fname')
-                                                    <span class="text-danger text-sm">{{$message}}</span>
+                                                    <span class="text-danger text-sm">{{ $message }}</span>
                                                 @enderror
                                             </div>
                                         </div>
                                         @if ($type != 'driver')
-                                                <div class="col-md-4 mb-3">
-                                                    <div class="form-group">
-                                                        <label for="last-name">Last Name</label>
-                                                        <input type="text" name="lname" class="form-control-custom" value="{{old('lname', $staff->last_name)}}">
-                                                        @error('lname')
-                                                            <span class="text-danger">{{$message}}</span>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-                                        @endif
-                                        <div class="col-md-4 mb-3">
+                                            <div class="col-md-4 mb-3">
                                                 <div class="form-group">
-                                                    <label for="gender">Gender</label>
-                                                    <select name="gender" id="gender" class="form-control-custom">
-                                                        <option value="{{$staff->gender}}">{{$staff->gender}}</option>
-                                                        <option value="male" >Male</option>
-                                                        <option value="female" >Female</option>
-                                                    </select>
-                                                    @error('gender')
-                                                        <span class="text-danger">{{$message}}</span>
+                                                    <label for="last-name">Last Name</label>
+                                                    <input type="text" name="lname" class="form-control-custom"
+                                                        value="{{ old('lname', $staff->last_name) }}">
+                                                    @error('lname')
+                                                        <span class="text-danger">{{ $message }}</span>
                                                     @enderror
                                                 </div>
+                                            </div>
+                                        @endif
+                                        <div class="col-md-4 mb-3">
+                                            <div class="form-group">
+                                                <label for="gender">Gender</label>
+                                                <select name="gender" id="gender" class="form-control-custom">
+                                                    <option value="{{ $staff->gender }}">{{ $staff->gender }}</option>
+                                                    <option value="male">Male</option>
+                                                    <option value="female">Female</option>
+                                                </select>
+                                                @error('gender')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-4 mb-3">
                                             <div class="form-group">
                                                 <label for="email">Email</label>
-                                                <input type="email" name="email" class="form-control-custom" value="{{old('email', $staff->email)}}">
+                                                <input type="email" name="email" class="form-control-custom"
+                                                    value="{{ old('email', $staff->email) }}" placeholder="Enter email">
                                                 @error('email')
-                                                    <span class="text-danger">{{$message}}</span>
+                                                    <span class="text-danger">{{ $message }}</span>
                                                 @enderror
                                             </div>
                                         </div>
                                         <div class="col-md-4 mb-3">
                                             <div class="form-group">
                                                 <label for="email">Phone Number</label>
-                                                <input type="text" name="phone" class="form-control-custom" value="{{old('phone', $staff->phone)}}">
+                                                <input type="text" name="phone" class="form-control-custom"
+                                                    value="{{ old('phone', $staff->phone) }}">
                                                 @error('phone')
-                                                    <span class="text-danger">{{$message}}</span>
+                                                    <span class="text-danger">{{ $message }}</span>
                                                 @enderror
                                             </div>
                                         </div>
                                         <div class="col-md-4 mb-3">
                                             <div class="form-group">
                                                 <label for="email">Date of Birth</label>
-                                                <input type="date" required name="dob" class="form-control-custom" value="{{ old('dob', \Carbon\Carbon::parse($staff->date_of_birth)->format('Y-m-d')) }}">
+                                                <input type="date" required name="dob" class="form-control-custom"
+                                                    value="{{ old('dob', \Carbon\Carbon::parse($staff->date_of_birth)->format('Y-m-d')) }}">
                                                 @error('dob')
-                                                    <span class="text-danger">{{$message}}</span>
+                                                    <span class="text-danger">{{ $message }}</span>
                                                 @enderror
                                             </div>
                                         </div>
@@ -397,7 +480,8 @@
                                         <div class="col-md-4 mb-3">
                                             <label for="education" class="form-label">Education Level</label>
                                             <select name="education" id="education" class="form-control-custom" required>
-                                                <option value="{{$staff->educational_level}}">{{$staff->educational_level}}</option>
+                                                <option value="{{ $staff->educational_level }}">
+                                                    {{ $staff->educational_level }}</option>
                                                 <option value="university">University</option>
                                                 <option value="college">College</option>
                                                 <option value="high_school">High school</option>
@@ -406,25 +490,26 @@
                                                 <option value="other">Other</option>
                                             </select>
                                             @error('education')
-                                            <div class="text-danger small">{{$message}}</div>
+                                                <div class="text-danger small">{{ $message }}</div>
                                             @enderror
                                         </div>
                                         <div class="col-md-4 mb-3">
                                             <label for="joined" class="form-label">Year Joined</label>
                                             <select name="joined" id="joined" class="form-control-custom" required>
-                                                <option value="{{$staff->joining_year}}" selected>{{$staff->joining_year}}</option>
+                                                <option value="{{ $staff->joining_year }}" selected>
+                                                    {{ $staff->joining_year }}</option>
                                                 @for ($year = date('Y'); $year >= 2010; $year--)
                                                     <option value="{{ $year }}">{{ $year }}</option>
                                                 @endfor
                                             </select>
                                             @error('joined')
-                                            <div class="text-danger small">{{$message}}</div>
+                                                <div class="text-danger small">{{ $message }}</div>
                                             @enderror
                                         </div>
                                         <div class="col-md-4 mb-3">
                                             <label for="job_title" class="form-label">Job Title</label>
                                             <select name="job_title" id="job_title" class="form-control-custom" required>
-                                                <option value="{{$staff->job_title}}">{{$staff->job_title}}</option>
+                                                <option value="{{ $staff->job_title }}">{{ $staff->job_title }}</option>
                                                 <option value="cooks">Cooks</option>
                                                 <option value="matron">Matron</option>
                                                 <option value="patron">Patron</option>
@@ -433,39 +518,42 @@
                                                 <option value="other">Other</option>
                                             </select>
                                             @error('job_title')
-                                            <div class="text-danger small">{{$message}}</div>
+                                                <div class="text-danger small">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-4 mb-3">
                                             <label for="street" class="form-label">Street/Village</label>
-                                            <input type="text" required name="street" class="form-control-custom" id="street" value="{{old('street', $staff->street_address)}}" placeholder="Street Address">
+                                            <input type="text" required name="street" class="form-control-custom"
+                                                id="street" value="{{ old('street', $staff->street_address) }}"
+                                                placeholder="Street Address">
                                             @error('street')
-                                            <div class="text-danger small">{{$message}}</div>
+                                                <div class="text-danger small">{{ $message }}</div>
                                             @enderror
                                         </div>
                                         <div class="col-md-4 mb-3">
-                                                <label for="profile_image" class="form-label">NIN (NIDA)</label>
-                                                <input type="text" name="nida" class="form-control-custom" id="nin" value="{{old('nida', $staff->nida)}}" placeholder="Enter NIDA">
-                                                @error('nida')
-                                                <div class="text-danger small">{{$message}}</div>
-                                                @enderror
+                                            <label for="profile_image" class="form-label">NIN (NIDA)</label>
+                                            <input type="text" name="nida" class="form-control-custom"
+                                                id="nin" value="{{ old('nida', $staff->nida) }}"
+                                                placeholder="Enter NIDA">
+                                            @error('nida')
+                                                <div class="text-danger small">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                         <div class="col-md-4 mb-3">
-                                                <label for="profile_image" class="form-label">Profile Picture</label>
-                                                <input type="file" name="image" class="form-control-custom" id="image" value="{{old('image')}}" placeholder="">
-                                                @error('image')
-                                                <div class="text-danger small">{{$message}}</div>
-                                                @enderror
+                                            <label for="profile_image" class="form-label">Profile Picture</label>
+                                            <input type="file" name="image" class="form-control-custom"
+                                                id="image" value="{{ old('image') }}" placeholder="">
+                                            @error('image')
+                                                <div class="text-danger small">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
-                                    <div class="row">
                                         <br>
                                         <button type="submit" class="btn btn-success float-right">
                                             <i class="fas fa-save"></i> Save Changes
                                         </button>
-                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -474,17 +562,47 @@
             </div>
         </div>
     </div>
+    {{-- add phone modal --}}
+    <div class="modal fade" id="phone-modal" tabindex="-1" aria-labelledby="userPhoneModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="phone-modal">Add Alternative Phone</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('staff.add.phone', ['type' => $type, 'id' => Hashids::encode($staff->id)]) }}"
+                    method="POST" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        @csrf
+                        @method('PUT')
+                        <label for="phoneNumber">Phone Number</label>
+                        <input type="text" name="phone" class="form-control-custom" id="phoneNumber"
+                            value="{{ old('phone', $staff->alternative_phone) }}" maxlength="15"
+                            placeholder="Enter Phone">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Save Number</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- Photo Modal -->
-    <div class="modal fade" id="teacherPhotoModal" tabindex="-1" aria-labelledby="teacherPhotoModalLabel" aria-hidden="true">
+    <div class="modal fade" id="teacherPhotoModal" tabindex="-1" aria-labelledby="teacherPhotoModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="teacherPhotoModalLabel">Profile Picture</h5>
-                    <button type="button" class="btn-close btn btn-danger" data-dismiss="modal" aria-label="Close">Close</button>
+                    <button type="button" class="btn-close btn btn-danger" data-dismiss="modal"
+                        aria-label="Close">Close</button>
                 </div>
                 <div class="modal-body text-center">
-                    <h6 class="text-primary mb-3">{{$type == 'driver' ? strtoupper($staff->driver_name) : strtoupper($staff->first_name .' '. $staff->last_name)}}</h6>
+                    <h6 class="text-primary mb-3">
+                        {{ $type == 'driver' ? strtoupper($staff->driver_name) : strtoupper($staff->first_name . ' ' . $staff->last_name) }}
+                    </h6>
                     <img id="teacher-photo" src="" alt="Teacher Photo" class="photo-modal img-fluid">
                 </div>
                 <div class="modal-footer">
@@ -508,13 +626,13 @@
 
             // Activate tabs
             const triggerTabList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tab"]'))
-            triggerTabList.forEach(function (triggerEl) {
+            triggerTabList.forEach(function(triggerEl) {
                 new bootstrap.Tab(triggerEl)
             });
         });
 
         //nida input
-        document.getElementById('nin').addEventListener('input', function (e) {
+        document.getElementById('nin').addEventListener('input', function(e) {
             let value = e.target.value.replace(/[^0-9]/g, '');
 
             let formatted = '';

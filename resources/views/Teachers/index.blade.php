@@ -749,7 +749,7 @@
                                         </td>
                                         <td>
                                             <a href="tel:{{ $teacher->phone }}" class="phone-link">
-                                                <i class="fas fa-phone"></i>
+                                                <i class="fas fa-phone-alt"></i>
                                                 {{ $teacher->phone }}
                                             </a>
                                         </td>

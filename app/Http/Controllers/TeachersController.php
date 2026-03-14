@@ -631,7 +631,7 @@ class TeachersController extends Controller
     {
         $rules = [
             'completion'  => 'required|integer|min:1985|max:' . date('Y'),
-            'nationality' => 'required|in:tanzania,foreigner',
+            'nationality' => 'nullable|in:tanzania,foreigner',
         ];
 
         if ($request->nationality === 'tanzania') {
@@ -666,7 +666,7 @@ class TeachersController extends Controller
         ]);
 
         Alert()->toast('Information has been updated successfully', 'success');
-        return to_route('home');
+        return to_route('show.profile');
     }
 
 

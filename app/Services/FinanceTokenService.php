@@ -11,9 +11,19 @@ class FinanceTokenService
 {
     public function ensureValidToken()
     {
-        if (!Auth::check() || Auth::user()->usertype != 5) {
-            return null; // Or throw exception
+        if (!Auth::check()) {
+            return null;
         }
+
+        $userType = Auth::user()->usertype;
+        // Log::info("ensureValidToken: User type {$userType} checking token");
+
+        // RUHUSU tu user type 5 AU 2
+        if ($userType != 5 && $userType != 2) {
+            return null; // Sio mhustahiki wa token
+        }
+
+        // Log::info("ensureValidToken: User type {$userType} is eligible, proceeding...");
 
         $token = Session::get('finance_api_token');
         $expiresAt = Session::get('finance_token_expires_at');
@@ -64,7 +74,6 @@ class FinanceTokenService
 
             Log::warning("Token refresh failed", ['response' => $response->json()]);
             return null;
-
         } catch (\Throwable $e) {
             Log::error("Token refresh error: " . $e->getMessage());
             return null;
@@ -76,7 +85,7 @@ class FinanceTokenService
         try {
             Log::info("Requesting new finance token");
 
-            $tokenUrl = rtrim(config('app.finance_api_base_url'). '/auth/token');
+            $tokenUrl = rtrim(config('app.finance_api_base_url') . '/auth/token');
             // $tokenUrl = $baseUrl . '/api/v1.0/auth/token';
 
             Log::info("Making request to:", ['url' => $tokenUrl]);
@@ -108,7 +117,6 @@ class FinanceTokenService
             }
 
             return null;
-
         } catch (\Throwable $e) {
             Log::error("Finance API connection failed: " . $e->getMessage());
             return null;
@@ -118,8 +126,8 @@ class FinanceTokenService
     private function storeToken($tokenData)
     {
         $expiresIn = is_numeric($tokenData['expires_in'] ?? null)
-                    ? (int) $tokenData['expires_in']
-                    : 3600;
+            ? (int) $tokenData['expires_in']
+            : 3600;
 
         Session::put([
             'finance_api_token' => $tokenData['token'],
@@ -144,7 +152,7 @@ class FinanceTokenService
 
     public function debugConnection()
     {
-        $fullUrl = rtrim(config('app.finance_api_base_url'). '/auth/token');
+        $fullUrl = rtrim(config('app.finance_api_base_url') . '/auth/token');
         // $fullUrl = $baseUrl . '/api/v1.0/auth/token';
 
         Log::info("Finance API Debug Info:", [

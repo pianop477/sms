@@ -51,7 +51,7 @@ class ParentStudentImport implements ToModel, WithValidation, WithHeadingRow
                     }
 
                     if (!$isValid) {
-                        $fail('Namba ya simu lazima iwe: 0712345678, 255712345678 au 712345678');
+                        $fail('Phone number format must be: 0712345678, 255712345678 or 712345678');
                     }
                 },
             ],

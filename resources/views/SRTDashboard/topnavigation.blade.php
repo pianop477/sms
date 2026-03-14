@@ -56,8 +56,13 @@
                         $roleDisplay = 'Manager';
                     } elseif($usertype == 3) {
                         $roleDisplay = 'Teacher';
-                    } else {
+                    } elseif($usertype == 4) {
                         $roleDisplay = 'Parent';
+                    } elseif ($usertype == 5) {
+                        # code...
+                        $roleDisplay = 'Accountant';
+                    } else {
+                        $roleDisplay == 'Unknown';
                     }
                 @endphp
 
