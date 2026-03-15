@@ -18,49 +18,95 @@
 
     body {
         background: #f5f7fb;
+        overflow-x: hidden; /* Prevent horizontal scroll */
     }
 
+    /* Improved Responsive Container */
+    .container-fluid {
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    /* Responsive Header */
     .password-page-header {
         background: var(--gradient-1);
         border-radius: 25px;
-        padding: 2rem;
-        margin-bottom: 2rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
         box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
         color: white;
         position: relative;
         overflow: hidden;
     }
 
+    @media (min-width: 768px) {
+        .password-page-header {
+            padding: 2rem;
+        }
+    }
+
     .password-page-header::before {
         content: '🔒';
-        font-size: 8rem;
+        font-size: 6rem;
         position: absolute;
-        right: 20px;
-        bottom: -20px;
+        right: 10px;
+        bottom: -10px;
         opacity: 0.2;
         transform: rotate(15deg);
     }
 
+    @media (min-width: 768px) {
+        .password-page-header::before {
+            font-size: 8rem;
+            right: 20px;
+            bottom: -20px;
+        }
+    }
+
     .password-page-header h4 {
-        font-size: 2rem;
+        font-size: 1.5rem;
         font-weight: 700;
         margin-bottom: 0.5rem;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        word-wrap: break-word;
+    }
+
+    @media (min-width: 768px) {
+        .password-page-header h4 {
+            font-size: 2rem;
+        }
     }
 
     .password-page-header p {
-        font-size: 1.1rem;
+        font-size: 0.95rem;
         opacity: 0.9;
         margin: 0;
     }
 
+    @media (min-width: 768px) {
+        .password-page-header p {
+            font-size: 1.1rem;
+        }
+    }
+
+    /* Modern Card */
     .modern-card {
         background: white;
-        border-radius: 25px;
+        border-radius: 20px;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
         border: none;
         overflow: hidden;
         transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+
+    @media (min-width: 768px) {
+        .modern-card {
+            border-radius: 25px;
+        }
     }
 
     .modern-card:hover {
@@ -68,72 +114,136 @@
         box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.2);
     }
 
+    /* Responsive Card Body */
     .card-body {
-        padding: 2.5rem;
+        padding: 1.5rem;
     }
 
+    @media (min-width: 576px) {
+        .card-body {
+            padding: 2rem;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .card-body {
+            padding: 2.5rem;
+        }
+    }
+
+    /* Requirements Card */
     .requirements-card {
         background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-        border-radius: 20px;
-        padding: 1.8rem;
-        margin-bottom: 2.5rem;
+        border-radius: 15px;
+        padding: 1.2rem;
+        margin-bottom: 1.8rem;
         border-left: 5px solid var(--primary);
         position: relative;
         overflow: hidden;
     }
 
+    @media (min-width: 768px) {
+        .requirements-card {
+            border-radius: 20px;
+            padding: 1.8rem;
+            margin-bottom: 2.5rem;
+        }
+    }
+
     .requirements-card::after {
         content: '⚡';
-        font-size: 4rem;
+        font-size: 3rem;
         position: absolute;
-        right: 20px;
+        right: 10px;
         top: 50%;
         transform: translateY(-50%);
         opacity: 0.1;
     }
 
+    @media (min-width: 768px) {
+        .requirements-card::after {
+            font-size: 4rem;
+            right: 20px;
+        }
+    }
+
     .requirements-title {
         display: flex;
         align-items: center;
-        gap: 10px;
-        font-size: 1.3rem;
+        gap: 8px;
+        font-size: 1.1rem;
         font-weight: 600;
         color: var(--dark);
-        margin-bottom: 1.2rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+
+    @media (min-width: 768px) {
+        .requirements-title {
+            gap: 10px;
+            font-size: 1.3rem;
+            margin-bottom: 1.2rem;
+        }
     }
 
     .requirements-title i {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
         color: var(--primary);
     }
 
+    /* Responsive Requirements List */
     .requirements-list {
         list-style: none;
         padding: 0;
         margin: 0;
         display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    @media (min-width: 480px) {
+        .requirements-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .requirements-list {
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: row;
+            gap: 1rem;
+        }
     }
 
     .requirements-list li {
         flex: 1 1 auto;
-        min-width: 250px;
-        padding: 0.8rem 1.2rem;
+        padding: 0.8rem 1rem;
         background: white;
-        border-radius: 12px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
-        gap: 10px;
-        font-size: 1rem;
+        gap: 8px;
+        font-size: 0.9rem;
         color: var(--dark);
         box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         border: 1px solid rgba(67, 97, 238, 0.1);
+        width: 100%;
+    }
+
+    @media (min-width: 768px) {
+        .requirements-list li {
+            min-width: 250px;
+            padding: 0.8rem 1.2rem;
+            font-size: 1rem;
+        }
     }
 
     .requirements-list li i {
-        font-size: 1.2rem;
-        color: var(--primary);
+        font-size: 1.1rem;
+        min-width: 20px;
     }
 
     .requirements-list li.valid {
@@ -141,119 +251,93 @@
         border-color: #28a745;
     }
 
-    .requirements-list li.valid i {
-        color: #28a745;
+    /* Form Grid - Responsive */
+    .row-custom {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
+        margin-bottom: 1.5rem;
     }
 
-    .password-strength-meter {
-        margin: 1.5rem 0;
-        background: #e9ecef;
-        border-radius: 30px;
-        height: 10px;
-        overflow: hidden;
-        position: relative;
+    @media (min-width: 576px) {
+        .row-custom {
+            gap: 1.5rem;
+        }
     }
 
-    .password-strength-fill {
-        height: 100%;
-        width: 0%;
-        background: linear-gradient(90deg, #f72585, #b5179e, #7209b7, #3f37c9, #4361ee);
-        border-radius: 30px;
-        transition: width 0.5s ease;
-        position: relative;
-        overflow: hidden;
+    @media (min-width: 992px) {
+        .row-custom {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
     }
 
-    .password-strength-fill::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-        animation: shimmer 2s infinite;
-    }
-
-    @keyframes shimmer {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(100%); }
-    }
-
-    .strength-text {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 0.5rem;
-        font-size: 0.9rem;
-        color: #6c757d;
-    }
-
-    .strength-badge {
-        padding: 0.3rem 1rem;
-        border-radius: 30px;
-        font-weight: 600;
-        font-size: 0.85rem;
-    }
-
-    .strength-badge.weak {
-        background: #f8d7da;
-        color: #721c24;
-    }
-
-    .strength-badge.medium {
-        background: #fff3cd;
-        color: #856404;
-    }
-
-    .strength-badge.strong {
-        background: #d4edda;
-        color: #155724;
-    }
-
-    .strength-badge.very-strong {
-        background: #c3e6cb;
-        color: #0b5e42;
-    }
-
+    /* Form Groups */
     .form-group-modern {
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
         position: relative;
+        width: 100%;
+    }
+
+    @media (min-width: 992px) {
+        .form-group-modern {
+            margin-bottom: 2rem;
+        }
     }
 
     .form-label-modern {
         display: block;
-        margin-bottom: 0.8rem;
+        margin-bottom: 0.5rem;
         font-weight: 600;
         color: var(--dark);
-        font-size: 0.95rem;
+        font-size: 0.85rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
 
-    .form-label-modern i {
-        margin-right: 8px;
-        color: var(--primary);
-        font-size: 1.1rem;
+    @media (min-width: 768px) {
+        .form-label-modern {
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+        }
     }
 
+    .form-label-modern i {
+        margin-right: 5px;
+        color: var(--primary);
+        font-size: 1rem;
+    }
+
+    /* Input Group - Fully Responsive */
     .input-group-modern {
         display: flex;
         align-items: stretch;
         position: relative;
+        width: 100%;
+        flex-wrap: wrap;
     }
 
     .input-group-modern .form-control-modern {
-        flex: 1;
-        padding: 1rem 1.2rem;
-        font-size: 1rem;
+        flex: 1 1 auto;
+        width: calc(100% - 50px);
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
         border: 2px solid #eef2f6;
-        border-radius: 15px 0 0 15px;
+        border-radius: 10px 0 0 10px;
         background-color: #fafbfc;
         transition: all 0.3s ease;
         color: var(--dark);
         font-family: 'Courier New', monospace;
-        letter-spacing: 2px;
+        letter-spacing: 1px;
+        min-width: 0; /* Prevent flex overflow */
+    }
+
+    @media (min-width: 768px) {
+        .input-group-modern .form-control-modern {
+            padding: 1rem 1.2rem;
+            font-size: 1rem;
+            letter-spacing: 2px;
+        }
     }
 
     .input-group-modern .form-control-modern:focus {
@@ -264,17 +348,24 @@
     }
 
     .input-group-modern .input-group-text-modern {
-        padding: 0 1.5rem;
+        padding: 0 1rem;
         background: white;
         border: 2px solid #eef2f6;
         border-left: none;
-        border-radius: 0 15px 15px 0;
+        border-radius: 0 10px 10px 0;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         transition: all 0.3s ease;
         color: #6c757d;
+        min-width: 45px;
+    }
+
+    @media (min-width: 768px) {
+        .input-group-modern .input-group-text-modern {
+            padding: 0 1.5rem;
+        }
     }
 
     .input-group-modern .input-group-text-modern:hover {
@@ -284,30 +375,52 @@
     }
 
     .input-group-modern .input-group-text-modern i {
-        font-size: 1.2rem;
+        font-size: 1rem;
     }
 
+    @media (min-width: 768px) {
+        .input-group-modern .input-group-text-modern i {
+            font-size: 1.2rem;
+        }
+    }
+
+    /* Password Feedback */
     .password-feedback {
         margin-top: 0.5rem;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         display: flex;
         align-items: center;
         gap: 5px;
+        word-wrap: break-word;
     }
 
-    .password-feedback.valid-feedback-custom {
-        color: #28a745;
+    @media (min-width: 768px) {
+        .password-feedback {
+            font-size: 0.85rem;
+        }
     }
 
-    .password-feedback.invalid-feedback-custom {
-        color: var(--danger);
+    /* Action Buttons - Responsive */
+    .d-flex.justify-content-end.gap-3.mt-5 {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem !important;
+        margin-top: 2rem !important;
+    }
+
+    @media (min-width: 480px) {
+        .d-flex.justify-content-end.gap-3.mt-5 {
+            flex-direction: row;
+            justify-content: flex-end;
+            gap: 1rem !important;
+        }
     }
 
     .btn-modern {
-        padding: 1rem 2.5rem;
-        border-radius: 15px;
+        padding: 0.8rem 1.5rem;
+        border-radius: 10px;
         font-weight: 600;
-        font-size: 1rem;
+        font-size: 0.9rem;
         letter-spacing: 0.5px;
         text-transform: uppercase;
         transition: all 0.3s ease;
@@ -316,9 +429,26 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 10px;
+        gap: 8px;
         position: relative;
         overflow: hidden;
+        width: 100%;
+        text-decoration: none;
+    }
+
+    @media (min-width: 480px) {
+        .btn-modern {
+            width: auto;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .btn-modern {
+            padding: 1rem 2.5rem;
+            border-radius: 15px;
+        }
     }
 
     .btn-modern::before {
@@ -345,112 +475,115 @@
         box-shadow: 0 10px 20px rgba(76, 201, 240, 0.3);
     }
 
-    .btn-success-modern:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 15px 30px rgba(76, 201, 240, 0.4);
-    }
-
-    .btn-success-modern:disabled {
-        opacity: 0.7;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    .floating-effect {
-        animation: float 3s ease-in-out infinite;
-    }
-
-    @keyframes float {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-5px); }
-    }
-
+    /* Error Toast - Responsive */
     .error-toast {
         position: fixed;
-        top: 20px;
-        right: 20px;
+        top: 10px;
+        right: 10px;
+        left: 10px;
         background: white;
-        border-radius: 15px;
+        border-radius: 10px;
         box-shadow: 0 15px 40px rgba(247, 37, 133, 0.15);
-        padding: 1rem 1.5rem;
+        padding: 0.8rem 1rem;
         border-left: 4px solid var(--danger);
         z-index: 9999;
         animation: slideIn 0.3s ease;
-        max-width: 350px;
+        max-width: none;
     }
 
-    @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
+    @media (min-width: 576px) {
+        .error-toast {
+            top: 20px;
+            right: 20px;
+            left: auto;
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            max-width: 350px;
         }
-        to {
-            transform: translateX(0);
-            opacity: 1;
+    }
+
+    /* Password Strength Meter */
+    .password-strength-meter {
+        margin: 1.2rem 0;
+        background: #e9ecef;
+        border-radius: 30px;
+        height: 8px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    @media (min-width: 768px) {
+        .password-strength-meter {
+            margin: 1.5rem 0;
+            height: 10px;
         }
     }
 
-    .error-toast .toast-content {
+    .strength-text {
         display: flex;
+        justify-content: space-between;
         align-items: center;
-        gap: 12px;
-    }
-
-    .error-toast .toast-icon {
-        width: 40px;
-        height: 40px;
-        background: var(--danger);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1.2rem;
-    }
-
-    .error-toast .toast-message {
-        flex: 1;
-        font-size: 0.95rem;
-        color: var(--dark);
-    }
-
-    .error-toast .toast-close {
-        cursor: pointer;
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
         color: #6c757d;
-        transition: color 0.3s ease;
+        flex-wrap: wrap;
+        gap: 5px;
     }
 
-    .error-toast .toast-close:hover {
-        color: var(--danger);
+    .strength-badge {
+        padding: 0.2rem 0.8rem;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        white-space: nowrap;
     }
 
-    .row-custom {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 1.5rem;
+    @media (min-width: 768px) {
+        .strength-badge {
+            padding: 0.3rem 1rem;
+            font-size: 0.85rem;
+        }
     }
 
-    @media (max-width: 768px) {
-        .card-body {
-            padding: 1.5rem;
+    /* Extra Small Devices (phones, 320px and down) */
+    @media (max-width: 360px) {
+        .password-page-header h4 {
+            font-size: 1.2rem;
         }
 
-        .password-page-header h4 {
-            font-size: 1.5rem;
+        .requirements-title {
+            font-size: 1rem;
         }
 
         .requirements-list li {
-            min-width: 100%;
+            font-size: 0.8rem;
+            padding: 0.7rem;
         }
 
         .btn-modern {
-            width: 100%;
+            padding: 0.7rem 1rem;
+            font-size: 0.85rem;
+        }
+    }
+
+    /* Landscape mode fix */
+    @media (max-height: 500px) and (orientation: landscape) {
+        .password-page-header {
+            padding: 1rem;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+        .requirements-card {
+            padding: 1rem;
         }
     }
 </style>
 
-<div class="container-fluid px-4 py-4">
+<!-- Rest of your HTML remains exactly the same -->
+<div class="container-fluid px-2 px-sm-3 px-md-4 py-3 py-md-4">
     <!-- Page Header -->
     <div class="password-page-header d-flex justify-content-between align-items-center">
         <div>
@@ -608,7 +741,7 @@
     </div>
 </div>
 
-<!-- JavaScript -->
+<!-- Your JavaScript remains exactly the same -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById("passwordForm");
