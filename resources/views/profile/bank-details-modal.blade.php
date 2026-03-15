@@ -32,11 +32,11 @@
                 </div>
 
                 <div class="d-flex justify-content-center gap-3 mt-4">
-                    <button type="button" class="btn btn-lg btn-outline-secondary px-4 py-2" id="remindLaterBtn" style="border-radius: 50px; font-weight: 600;">
-                        <i class="fas fa-clock mr-3"></i> Remind Later
+                    <button type="button" class="btn btn-lg btn-outline-secondary px-4 py-2 mr-3" id="remindLaterBtn" style="border-radius: 50px; font-weight: 600;">
+                        <i class="fas fa-clock mr-1"></i> Remind Later
                     </button>
                     <a href="{{ route('bank.details', ['id' => Hashids::encode($teacherId)]) }}" class="btn btn-lg px-4 py-2" id="updateNowBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 50px; font-weight: 600;">
-                        <i class="fas fa-arrow-right mr-3"></i> Update Now
+                        <i class="fas fa-arrow-right mr-1"></i> Update Now
                     </a>
                 </div>
             </div>
