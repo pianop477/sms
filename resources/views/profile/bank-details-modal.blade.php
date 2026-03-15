@@ -17,7 +17,7 @@
                     <i class="fas fa-university me-2"></i>
                     Bank Details Required
                 </h5>
-                <button type="button" class="btn" data-bs-dismiss="modal" aria-label="Close" id="closeModalBtn"></button>
+                <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close" id="closeModalBtn"><i class="fas fa-close"></i></button>
             </div>
             <div class="modal-body text-center p-4">
                 <div class="my-4">
