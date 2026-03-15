@@ -21,6 +21,6 @@ class daily_report_details extends Model
         'tod_remarks',
         'headteacher_comment',
         'status',
-        'approved_by'
+        'approved_by', 'submitted_by',
     ];
 }

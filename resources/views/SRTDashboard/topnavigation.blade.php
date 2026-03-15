@@ -69,7 +69,7 @@
                 <div class="profile-dropdown-container d-flex align-items-center">
                     {{-- Desktop Profile Info --}}
                     <div class="profile-text mr-2 d-none d-sm-block">
-                        <div class="profile-name fw-bold">
+                        <div class="profile-top-name fw-bold">
                             Hi, {{ ucwords(strtolower(Auth::user()->first_name)) }}
                         </div>
                         <div class="profile-role">
@@ -290,8 +290,8 @@
         max-width: 100px;
     }
 
-    .profile-name {
-        font-size: 0.75rem;
+    .profile-top-name {
+        font-size: 1rem;
         color: #2d3748;
         white-space: nowrap;
         overflow: hidden;
@@ -312,7 +312,7 @@
             max-width: 120px;
         }
 
-        .profile-name {
+        .profile-top-name {
             font-size: 0.85rem;
         }
 

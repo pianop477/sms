@@ -46,6 +46,7 @@
         .profile-name {
             font-weight: 500;
             margin-top: 10px;
+            font-size: 1.5rem;
         }
 
         .nav-pills .nav-link {

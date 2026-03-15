@@ -479,7 +479,7 @@
                                             </div>
                                             <span>{{ $rate }}%</span>
                                         </td>
-                                        <td class="text-capitalize">{{ $report->first_name }} {{ $report->last_name }}</td>
+                                        <td class="text-capitalize">{{ ucwords(strtolower($report->submitted_by)) }}</td>
                                         <td class="text-center">
                                             <span class="badge bg-danger text-white text-capitalize">{{$report->status}}</span>
                                         </td>

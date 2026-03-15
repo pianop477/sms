@@ -434,6 +434,7 @@ class TodRosterController extends Controller
                 'teachers_attendance'  => $request->teachers_attendance,
                 'daily_new_event'      => $request->daily_new_event,
                 'tod_remarks'          => $request->tod_remarks,
+                'submitted_by'         => Auth::user()->first_name. ' '. Auth::user()->last_name,
             ]);
 
             // 3️⃣ Hifadhi attendance records ikiwa zipo

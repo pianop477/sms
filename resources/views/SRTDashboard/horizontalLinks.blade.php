@@ -199,11 +199,13 @@
                             {{-- payment reports --}}
                             @if (Auth::user()->usertype == 2)
                                 <li>
-                                    <a href="javascript:void(0)"><i class="fas fa-exchange-alt"></i><span> Financial Transactions</span></a>
+                                    <a href="javascript:void(0)"><i class="fas fa-exchange-alt"></i><span> Financial
+                                            Transactions</span></a>
                                     <ul class="submenu">
-                                        <li><a href="{{ route('expenditure.all.transactions') }}"><span style="font-size: 1.2rem;">💶</span> Transactions</a></li>
+                                        <li><a href="{{ route('expenditure.all.transactions') }}"><span
+                                                    style="font-size: 1.2rem;">💶</span> Transactions</a></li>
                                         <li><a href="{{ route('payment.report') }}">
-                                            <span style="font-size: 1.2rem;">💳</span> Payment Bills</a></li>
+                                                <span style="font-size: 1.2rem;">💳</span> Payment Bills</a></li>
                                     </ul>
                                 </li>
                             @endif
@@ -278,13 +280,13 @@
 
                             {{-- Reports & Analytics --}}
                             <li>
-                                <a href="javascript:void(0)"><i class="fas fa-chart-pie"></i><span>Reports &
-                                        Analytics</span></a>
+                                <a href="javascript:void(0)"><i class="fas fa-exchange-alt"></i><span> Financial
+                                        Transactions</span></a>
                                 <ul class="submenu">
-                                    <li><a href="{{ route('expenditure.all.transactions') }}"><i
-                                                class="fas fa-sack-dollar"></i> Expenses</a></li>
-                                    <li><a href="{{ route('payment.report') }}"><i
-                                                class="fas fa-money-check-dollar"></i> Income</a></li>
+                                    <li><a href="{{ route('expenditure.all.transactions') }}"><span
+                                                style="font-size: 1.2rem;">💶</span> Transactions</a></li>
+                                    <li><a href="{{ route('payment.report') }}">
+                                            <span style="font-size: 1.2rem;">💳</span> Payment Bills</a></li>
                                 </ul>
                             </li>
                         @endif

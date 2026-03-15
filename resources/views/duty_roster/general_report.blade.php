@@ -706,6 +706,10 @@
                         <div class="detail-label">Teacher on Duty Remarks</div>
                         <div class="detail-content">{{ $report->tod_remarks ?? 'No remarks provided' }}</div>
                     </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Submitted by</div>
+                        <div class="detail-content">{{ ucwords(strtolower($report->submitted_by ?? 'Not specified' ))}}</div>
+                    </div>
 
                     @if($report->headteacher_comment)
                     <div class="detail-item">
