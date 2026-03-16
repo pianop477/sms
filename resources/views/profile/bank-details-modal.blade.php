@@ -33,10 +33,10 @@
 
                 <div class="d-flex flex-column flex-sm-row justify-content-center gap-2 gap-sm-3 mt-3 mt-sm-4">
                     <button type="button" class="btn btn-outline-secondary px-3 px-sm-4 py-2" id="remindLaterBtn" style="border-radius: 50px; font-weight: 600; font-size: clamp(0.85rem, 3vw, 1rem);">
-                        <i class="fas fa-clock me-1"></i> Remind Later
+                        <i class="fas fa-clock mr-1"></i> Later
                     </button>
                     <a href="{{ route('bank.details', ['id' => Hashids::encode($teacherId)]) }}" class="btn px-3 px-sm-4 py-2" id="updateNowBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 50px; font-weight: 600; font-size: clamp(0.85rem, 3vw, 1rem);">
-                        <i class="fas fa-arrow-right me-1"></i> Update Now
+                        <i class="fas fa-arrow-right mr-1"></i> Update Now
                     </a>
                 </div>
             </div>
