@@ -33,7 +33,7 @@
         }
 
         /* Header - CLEAN */
-        .dashboard-header {
+        .dashboard-header-sms {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             padding: 20px 30px;
             text-align: center;
@@ -526,7 +526,7 @@
                 padding: 10px;
             }
 
-            .dashboard-header {
+            .dashboard-header-sms {
                 padding: 15px 20px;
             }
 
@@ -550,6 +550,7 @@
         }
     </style>
 
+
     <!-- Session Alerts -->
     @if (session('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin: 15px; border-radius: 8px;">
@@ -571,7 +572,7 @@
     <!-- Main Dashboard -->
     <div class="sms-dashboard">
         <!-- Header -->
-        <div class="dashboard-header">
+        <div class="dashboard-header-sms">
             <h1 class="header-title">
                 <i class="fas fa-bullhorn me-2"></i> SMS Broadcast
             </h1>
