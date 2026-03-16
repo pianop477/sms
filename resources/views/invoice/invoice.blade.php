@@ -491,7 +491,7 @@
                             <div>{{ ucwords(strtolower(Auth::user()->first_name)) }}
                                 {{ ucwords(strtolower(Auth::user()->last_name)) }}</div>
                             <div>Email: {{ Auth::user()->email }}</div>
-                            <div>Phone: {{ Auth::user()->phone }}</div>
+                            <div>Phone: 0678669000</div>
                         </div>
                     </div>
                 </div>
