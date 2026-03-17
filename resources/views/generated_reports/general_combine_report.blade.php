@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,17 +14,25 @@
             padding: 0;
             background-color: white;
         }
+
         @media print {
             .no-print {
                 display: none;
             }
-            h1, h2, h4, h5, h6 {
+
+            h1,
+            h2,
+            h4,
+            h5,
+            h6 {
                 text-transform: uppercase;
                 text-align: center
             }
+
             .print-only {
                 display: block;
             }
+
             .footer {
                 position: fixed;
                 bottom: 0;
@@ -31,18 +40,23 @@
                 border-top: 1px solid #ddd;
                 padding-top: 20px;
             }
+
             thead {
                 display: table-header-group;
-                background-color: gray; /* Adds a gray background to thead */
+                background-color: gray;
+                /* Adds a gray background to thead */
             }
+
             tbody {
                 display: table-row-group;
             }
+
             .table {
                 border: 1px solid black;
                 border-collapse: collapse;
                 width: 100%;
             }
+
             .table th,
             .table td {
                 border: 1px solid black;
@@ -64,6 +78,7 @@
             top: 5px;
             color: inherit;
         }
+
         .header {
             text-align: center;
             position: relative;
@@ -75,90 +90,107 @@
             font-size: 24px;
             color: #343a40;
         }
+
         .summary-header {
             margin-top: 2px;
             text-align: center;
             text-transform: capitalize;
             font-size: 20px;
         }
+
         .summary-content {
             display: flex;
             flex-direction: row;
             text-transform: capitalize
         }
+
         .course-details {
             position: relative;
             left: 5px;
             width: 50%;
             line-height: 5px;
         }
+
         .grade-summary {
             position: absolute;
             width: 50%;
             left: 50%;
             top: 17%
         }
-        th, td {
+
+        th,
+        td {
             border: 1px solid black;
         }
+
         .table {
             width: 100%;
             border: 1px solid black;
             border-collapse: collapse;
             padding: 4px;
         }
+
         thead {
-                display: table-header-group;
-                /* background-color: gray; Adds a gray background to thead */
-            }
-            tbody {
-                display: table-row-group;
-            }
+            display: table-header-group;
+            /* background-color: gray; Adds a gray background to thead */
+        }
 
-            .table th {
-                /* background-color: #343a40; */
-                /* color: #fff; */
-                text-align: center;
-            }
-            .table th,
-            .table td {
-                /* border: 1px solid black; */
-                text-transform: capitalize;
-            }
+        tbody {
+            display: table-row-group;
+        }
 
-            .table td {
-                background-color: #fff;
-            }
+        .table th {
+            /* background-color: #343a40; */
+            /* color: #fff; */
+            text-align: center;
+        }
 
-            .details {
-                text-transform: uppercase;
-                line-height: 0.5mm;
-                padding: 0;
-                border-bottom: 2px dashed gray;
-            }
-            .total-summary {
-                padding: 2px;
-                border-bottom: 2px dashed gray;
-            }
-            .results {
-                font-size: 13px;
-                margin-top: 10px;
-            }
-            .final-summary {
-                text-transform: uppercase;
-            }
+        .table th,
+        .table td {
+            /* border: 1px solid black; */
+            text-transform: capitalize;
+        }
+
+        .table td {
+            background-color: #fff;
+        }
+
+        .details {
+            text-transform: uppercase;
+            line-height: 0.5mm;
+            padding: 0;
+            border-bottom: 2px dashed gray;
+        }
+
+        .total-summary {
+            padding: 2px;
+            border-bottom: 2px dashed gray;
+        }
+
+        .results {
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        .final-summary {
+            text-transform: uppercase;
+        }
+
         @page {
             margin-top: 6mm;
-            margin-bottom: 6mm; /* Ongeza nafasi ya chini kwa footer */
+            margin-bottom: 6mm;
+            /* Ongeza nafasi ya chini kwa footer */
             margin-left: 6mm;
             margin-right: 6mm;
         }
+
         footer {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 4mm; /*urefu wa footer*/
+            height: 4mm;
+            /*urefu wa footer*/
             font-size: 10px;
             /* padding-top: 3px; */
             border-top: 1px solid #ddd;
@@ -166,17 +198,21 @@
             background-color: white;
             z-index: 1000;
         }
+
         footer .page-number:after {
             content: "Page " counter(page);
         }
+
         footer .copyright {
             float: left;
             margin-left: 10px;
         }
+
         footer .printed {
             float: right;
             margin-right: 10px;
         }
+
         /* Clear floats */
         footer:after {
             content: "";
@@ -185,36 +221,46 @@
         }
     </style>
 </head>
+
 <body>
     <div class="col-md-12">
         <div class="card mt-2">
             <div class="card-body">
                 <div class="container">
                     <div class="logo">
-                        <img src="{{storage_path('app/public/logo/'. $schoolInfo->logo)}}" alt="" style="max-width: 80px;">
+                        <img src="{{ storage_path('app/public/logo/' . $schoolInfo->logo) }}" alt=""
+                            style="max-width: 80px;">
                     </div>
                     <div class="header">
                         <h3>the united republic of tanzania</h3>
                         <h4>the president's office - tamisemi</h4>
-                        <h4>{{$schoolInfo->school_name}}</h4>
+                        <h4>{{ $schoolInfo->school_name }}</h4>
+                        <p style="font-size:14px; text-transform:capitalize;"><b>Email:</b> <span
+                                style="text-transform: lowercase; text-align:center">{{ strtolower($schoolInfo->school_email ?? 'N/A') }}</span>
+                            |
+                            <b>Phone:</b> {{ $schoolInfo->school_phone ?? 'N/A' }} |
+                            {{ $schoolInfo->school_alternative_phone ?? 'N/A' }}
+                        </p>
                     </div>
                 </div>
                 <div class="details">
-                    <h4>{{$classInfo->class_name}} {{$reports->title}} Results - {{$year}}</h4>
-                    <h5 style="font-weight:normal">TERM: {{$results->first()->Exam_term}}</h5>
-                    <h5 style="font-weight:normal">NUMBER OF CANDIDATES: {{$totalCandidates}}</h5>
-                    <h5 style="font-weight:normal">CLASS AVERAGE: <strong>{{number_format($subjectAveragesSum, 4)}}</strong>
-                        @if($results->first()->marking_style == 1)
+                    <h4>{{ $classInfo->class_name }} {{ $reports->title }} Results - {{ $year }}</h4>
+                    <h5 style="font-weight:normal">TERM: {{ $results->first()->Exam_term }}</h5>
+                    <h5 style="font-weight:normal">NUMBER OF CANDIDATES: {{ $totalCandidates }}</h5>
+                    <h5 style="font-weight:normal">CLASS AVERAGE:
+                        <strong>{{ number_format($subjectAveragesSum, 4) }}</strong>
+                        @if ($results->first()->marking_style == 1)
                             @if ($overallTotalAverage >= 40.5)
-                                    <span style="background:rgb(117, 244, 48); padding:2px 10px; ">GRADE A (EXCELLENT)</span>
-                                @elseif ($overallTotalAverage >= 30.5)
-                                    <span style="background:rgb(153, 250, 237); padding:2px 10px;">GRADE B (GOOD)</span>
-                                @elseif ($overallTotalAverage >= 20.5)
-                                    <span style="background:rgb(237, 220, 113); padding:2px 10px;">GRADE C (PASS)</span>
-                                @elseif ($overallTotalAverage >= 10.5)
-                                    <span style="background:rgb(182, 176, 176); padding:2px 10px;"> GRADE D (POOR)</span>
-                                @elseif($overallTotalAverage <= 10.4)
-                                    <span style="background:rgb(235, 75, 75); padding:2px 10px;">GRADE E (FAIL)</span>
+                                <span style="background:rgb(117, 244, 48); padding:2px 10px; ">GRADE A
+                                    (EXCELLENT)</span>
+                            @elseif ($overallTotalAverage >= 30.5)
+                                <span style="background:rgb(153, 250, 237); padding:2px 10px;">GRADE B (GOOD)</span>
+                            @elseif ($overallTotalAverage >= 20.5)
+                                <span style="background:rgb(237, 220, 113); padding:2px 10px;">GRADE C (PASS)</span>
+                            @elseif ($overallTotalAverage >= 10.5)
+                                <span style="background:rgb(182, 176, 176); padding:2px 10px;"> GRADE D (POOR)</span>
+                            @elseif($overallTotalAverage <= 10.4)
+                                <span style="background:rgb(235, 75, 75); padding:2px 10px;">GRADE E (FAIL)</span>
                             @endif
                         @else
                             @if ($overallTotalAverage >= 80.5)
@@ -231,7 +277,8 @@
                         @endif
 
                     </h5>
-                    <h5 style="font-weight:normal">AVERAGE OF: <strong>{{number_format($overallTotalAverage, 2)}}</strong>
+                    <h5 style="font-weight:normal">AVERAGE OF:
+                        <strong>{{ number_format($overallTotalAverage, 2) }}</strong>
                 </div>
                 <div class="total-summary results">
                     <table class="table" style="text-align:center; width:80%">
@@ -240,14 +287,14 @@
                         </tr>
                         <tr style="text-align: center">
                             <th>Gender</th>
-                            @foreach(['A', 'B', 'C', 'D', 'E'] as $grade)
+                            @foreach (['A', 'B', 'C', 'D', 'E'] as $grade)
                                 <th>{{ $grade }}</th>
                             @endforeach
                         </tr>
-                        @foreach(['male' => 'Boys', 'female' => 'GIrls', 'total' => 'Total'] as $key => $label)
+                        @foreach (['male' => 'Boys', 'female' => 'GIrls', 'total' => 'Total'] as $key => $label)
                             <tr style="text-align: center">
                                 <td>{{ $label }}</td>
-                                @foreach(['A', 'B', 'C', 'D', 'E'] as $grade)
+                                @foreach (['A', 'B', 'C', 'D', 'E'] as $grade)
                                     <td>{{ $gradeSummary[$key][$grade] ?? 0 }}</td>
                                 @endforeach
                             </tr>
@@ -256,7 +303,8 @@
                 </div>
 
                 <div style="background: rgb(187, 163, 56);">
-                    <p style="text-align:center; font-size:14px; font-weight:bold" colspan="">STUDENTS WISE PERFORMANCE</p>
+                    <p style="text-align:center; font-size:14px; font-weight:bold" colspan="">STUDENTS WISE
+                        PERFORMANCE</p>
                 </div>
                 <table class="table results">
                     <thead>
@@ -265,7 +313,7 @@
                             <th>Adm.No.</th>
                             <th style="" class="">sex</th>
                             <th style="">Student Name</th>
-                             @foreach($subjectCodes as $code)
+                            @foreach ($subjectCodes as $code)
                                 <th style="text-transform: uppercase">{{ $code }}</th>
                             @endforeach
                             <th style="text-align:center;">Total</th>
@@ -275,33 +323,35 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($rankedStudents  as $student)
-                        <tr>
-                            <td style="text-align: center; text-transform:uppercase">{{ $student['admission_number'] }}</td>
-                            <td style="text-align: center">{{ $student['gender'][0] }}</td>
-                            <td style="text-transform:capitalize">{{ ucwords(strtolower($student['student_name'])) }}</td>
-                            @foreach($subjectCodes as $code)
+                        @foreach ($rankedStudents as $student)
+                            <tr>
+                                <td style="text-align: center; text-transform:uppercase">
+                                    {{ $student['admission_number'] }}</td>
+                                <td style="text-align: center">{{ $student['gender'][0] }}</td>
+                                <td style="text-transform:capitalize">
+                                    {{ ucwords(strtolower($student['student_name'])) }}</td>
+                                @foreach ($subjectCodes as $code)
+                                    <td style="text-align:center">
+                                        @if (isset($student['subject_averages'][$code]['score']))
+                                            {{ number_format($student['subject_averages'][$code]['score'], 1) }}
+                                        @else
+                                            <span style="background:rgb(235, 75, 75); padding:2px 10px ">X</span>
+                                        @endif
+                                    </td>
+                                @endforeach
+                                <td style="text-align:center">{{ number_format($student['total'], 2) }}</td>
+                                <td style="text-align:center">{{ number_format($student['average'], 3) }}</td>
+                                <td style="text-align:center; text-transform:uppercase">
+                                    {{ $student['grade'] === 'ABS' ? 'ABS' : $student['grade'] }}
+                                </td>
                                 <td style="text-align:center">
-                                    @if(isset($student['subject_averages'][$code]['score']))
-                                        {{ number_format($student['subject_averages'][$code]['score'], 1) }}
+                                    @if ($student['grade'] === 'ABS')
+                                        <span style="">-</span>
                                     @else
-                                        <span style="background:rgb(235, 75, 75); padding:2px 10px ">X</span>
+                                        {{ $student['rank'] }}
                                     @endif
                                 </td>
-                            @endforeach
-                            <td style="text-align:center">{{ number_format($student['total'],2 ) }}</td>
-                            <td style="text-align:center">{{ number_format($student['average'], 3) }}</td>
-                            <td style="text-align:center; text-transform:uppercase">
-                                {{ $student['grade'] === 'ABS' ? 'ABS' : $student['grade'] }}
-                            </td>
-                            <td style="text-align:center">
-                                @if ($student['grade'] === 'ABS')
-                                    <span style="">-</span>
-                                @else
-                                    {{ $student['rank'] }}
-                                @endif
-                            </td>
-                        </tr>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -318,23 +368,29 @@
                             <th style="text-align:center">position</th>
                             <th style="text-align:center">grade</th>
                         </tr>
-                        @foreach ($subjectPositions  as $subject)
+                        @foreach ($subjectPositions as $subject)
                             <tr>
                                 <td style="text-transform: uppercase">{{ $subject['subject_name'] }} </td>
-                                <td style="text-transform: uppercase; text-align:center">{{ $subject['subject_code'] }} </td>
+                                <td style="text-transform: uppercase; text-align:center">{{ $subject['subject_code'] }}
+                                </td>
                                 <td style="text-align:center">{{ number_format($subject['average'], 2) }}</td>
                                 <td style="text-align:center">{{ $subject['position'] }}</td>
-                                    @if ($subject['grade']=='A')
-                                        <td style="background:rgb(117, 244, 48); padding:2px 10px ">grade {{ $subject['grade']}} - <i>EXCELLENT</i></td>
-                                    @elseif ($subject['grade']=='B')
-                                        <td style="background:rgb(153, 250, 237); padding:2px 10px ">grade {{ $subject['grade']}} - <i>GOOD</i></td>
-                                    @elseif ($subject['grade']=='C')
-                                        <td style="background:rgb(237, 220, 113); padding:2px 10px ">grade {{ $subject['grade']}} - <i>PASS</i></td>
-                                    @elseif ($subject['grade']=='D')
-                                        <td style="background:rgb(182, 176, 176); padding:2px 10px ">grade {{ $subject['grade']}} - <i>POOR</i></td>
-                                    @else
-                                        <td style="background:rgb(235, 75, 75); padding:2px 10px ">grade {{ $subject['grade']}} - <i>FAIL</i></td>
-                                    @endif
+                                @if ($subject['grade'] == 'A')
+                                    <td style="background:rgb(117, 244, 48); padding:2px 10px ">grade
+                                        {{ $subject['grade'] }} - <i>EXCELLENT</i></td>
+                                @elseif ($subject['grade'] == 'B')
+                                    <td style="background:rgb(153, 250, 237); padding:2px 10px ">grade
+                                        {{ $subject['grade'] }} - <i>GOOD</i></td>
+                                @elseif ($subject['grade'] == 'C')
+                                    <td style="background:rgb(237, 220, 113); padding:2px 10px ">grade
+                                        {{ $subject['grade'] }} - <i>PASS</i></td>
+                                @elseif ($subject['grade'] == 'D')
+                                    <td style="background:rgb(182, 176, 176); padding:2px 10px ">grade
+                                        {{ $subject['grade'] }} - <i>POOR</i></td>
+                                @else
+                                    <td style="background:rgb(235, 75, 75); padding:2px 10px ">grade
+                                        {{ $subject['grade'] }} - <i>FAIL</i></td>
+                                @endif
                             </tr>
                         @endforeach
                     </table>
@@ -377,13 +433,16 @@
                                     <td style="text-transform: uppercase">{{ $subject['subject_code'] }}</td>
 
                                     @foreach (['A', 'B', 'C', 'D', 'E'] as $grade)
-                                        <td style="background:{{ $grade == 'A' ? 'rgb(117, 244, 48)' : ($grade == 'B' ? 'rgb(153, 250, 237)' : ($grade == 'C' ? 'rgb(237, 220, 113)' : ($grade == 'D' ? 'rgb(182, 176, 176)' : 'rgb(235, 75, 75)'))) }}">
+                                        <td
+                                            style="background:{{ $grade == 'A' ? 'rgb(117, 244, 48)' : ($grade == 'B' ? 'rgb(153, 250, 237)' : ($grade == 'C' ? 'rgb(237, 220, 113)' : ($grade == 'D' ? 'rgb(182, 176, 176)' : 'rgb(235, 75, 75)'))) }}">
                                             {{ $subject['male_grades'][$grade] ?? 0 }}
                                         </td>
-                                        <td style="background:{{ $grade == 'A' ? 'rgb(117, 244, 48)' : ($grade == 'B' ? 'rgb(153, 250, 237)' : ($grade == 'C' ? 'rgb(237, 220, 113)' : ($grade == 'D' ? 'rgb(182, 176, 176)' : 'rgb(235, 75, 75)'))) }}">
+                                        <td
+                                            style="background:{{ $grade == 'A' ? 'rgb(117, 244, 48)' : ($grade == 'B' ? 'rgb(153, 250, 237)' : ($grade == 'C' ? 'rgb(237, 220, 113)' : ($grade == 'D' ? 'rgb(182, 176, 176)' : 'rgb(235, 75, 75)'))) }}">
                                             {{ $subject['female_grades'][$grade] ?? 0 }}
                                         </td>
-                                        <td style="background:{{ $grade == 'A' ? 'rgb(117, 244, 48)' : ($grade == 'B' ? 'rgb(153, 250, 237)' : ($grade == 'C' ? 'rgb(237, 220, 113)' : ($grade == 'D' ? 'rgb(182, 176, 176)' : 'rgb(235, 75, 75)'))) }}">
+                                        <td
+                                            style="background:{{ $grade == 'A' ? 'rgb(117, 244, 48)' : ($grade == 'B' ? 'rgb(153, 250, 237)' : ($grade == 'C' ? 'rgb(237, 220, 113)' : ($grade == 'D' ? 'rgb(182, 176, 176)' : 'rgb(235, 75, 75)'))) }}">
                                             {{ ($subject['male_grades'][$grade] ?? 0) + ($subject['female_grades'][$grade] ?? 0) }}
                                         </td>
                                     @endforeach
@@ -397,12 +456,13 @@
     </div>
     <footer>
         <span class="copyright">
-        &copy; {{ ucwords(strtolower(Auth::user()->school->school_name)) }} – {{ date('Y') }}
+            &copy; {{ ucwords(strtolower(Auth::user()->school->school_name)) }} – {{ date('Y') }}
         </span>
         <span class="page-number"></span>
         <span class="printed">
-        Printed at: {{ now()->format('d-M-Y H:i') }}
+            Printed at: {{ now()->format('d-M-Y H:i') }}
         </span>
     </footer>
 </body>
+
 </html>

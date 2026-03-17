@@ -364,7 +364,7 @@
                                 <strong>Gender:</strong> {{ucwords(strtolower($managers->first()->gender ?? 'Not specified'))}}
                             </div>
                             <div class="info-item">
-                                <i class="fas fa-phone me-2 text-primary"></i>
+                                <i class="fas fa-phone-alt me-2 text-primary"></i>
                                 <strong>Phone:</strong> {{$managers->first()->phone ?? 'Not specified'}}
                             </div>
                         </div>

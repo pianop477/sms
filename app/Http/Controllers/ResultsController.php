@@ -258,7 +258,8 @@ class ResultsController extends Controller
                 'users.last_name as teacher_last_name',
                 'schools.school_name',
                 'schools.school_reg_no',
-                'schools.postal_address',
+                'schools.postal_address', 'schools.school_phone', 'schools.school_email',
+                'schools.school_alternative_phone',
                 'schools.postal_name',
                 'schools.logo',
                 'schools.country',
@@ -1876,7 +1877,8 @@ class ResultsController extends Controller
                 'schools.postal_address',
                 'schools.postal_name',
                 'schools.logo',
-                'schools.country',
+                'schools.country', 'schools.school_phone', 'schools.school_email',
+                'schools.school_alternative_phone',
                 'teachers.id as teacher_id' // ==== REKEDISHA: Ongeza teacher_id ====
             )
             ->where('examination_results.student_id', $studentId->id)
@@ -3235,7 +3237,8 @@ class ResultsController extends Controller
                 'schools.school_name',
                 'schools.school_reg_no',
                 'schools.postal_address',
-                'schools.postal_name',
+                'schools.postal_name', 'schools.school_email', 'schools.school_phone',
+                'schools.school_alternative_phone',
                 'schools.logo',
                 'schools.country',
                 'users.first_name as teacher_first_name',

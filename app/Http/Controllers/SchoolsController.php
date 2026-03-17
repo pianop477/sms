@@ -67,7 +67,10 @@ class SchoolsController extends Controller
             'email' => 'nullable|string|unique:users,email',
             'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone',
             'gender' => 'required|string|max:255',
-            'sender_name' => 'nullable|string|max:11'
+            'sender_name' => 'nullable|string|max:11',
+            'school_email' => 'required|string|email',
+            'school_phone' => 'required|string',
+            'alternative_phone' => 'nullable|string',
         ], [
             'name.required' => 'School name is required',
             'abbriv.required' => 'Abbreviation code is required',
@@ -80,6 +83,9 @@ class SchoolsController extends Controller
             'phone.required' => 'Phone number is required',
             'phone.regex' => 'Phone number must be 10 digits long',
             'phone.unique' => 'Phone number already exists',
+            'school_email.required' => 'School email field is required',
+            'school_email.email' => 'Invalid email provided',
+            'school_phone.required' => 'School phone is required',
         ]);
 
         try {
@@ -111,6 +117,9 @@ class SchoolsController extends Controller
             $school->postal_name = $request->postal_name;
             $school->status = 2;
             $school->country = $request->country;
+            $school->school_email = $request->school_email;
+            $school->school_phone = $this->formatDbPhoneNumber($request->school_phone);
+            $school->school_alternative_phone = $this->formatDbPhoneNumber($request->alternative_phone);
 
             if ($request->hasFile('logo')) {
 
@@ -280,9 +289,7 @@ class SchoolsController extends Controller
         $managers = User::query()->join('schools', 'schools.id', '=', 'users.school_id')
             ->select(
                 'users.*',
-                'schools.school_name',
-                'schools.school_reg_no',
-                'schools.logo'
+                'schools.*',
             )
             ->where('users.usertype', 2)
             ->where('users.school_id', $schools->id)
@@ -320,7 +327,10 @@ class SchoolsController extends Controller
             'postal' => 'required|string|max:255',
             'postal_name' => 'required|string|max:255',
             'country' => 'required|string',
-            'sender_name' => 'nullable|string|max:11'
+            'sender_name' => 'nullable|string|max:11',
+            'school_email' => 'required|string|email',
+            'school_phone' => 'required|string',
+            'alternative_phone' => 'nullable|string',
         ]);
 
         $school = School::findOrFail($decoded[0]);
@@ -331,6 +341,9 @@ class SchoolsController extends Controller
         $school->postal_name = $request->postal_name;
         $school->sender_id = $request->sender_name;
         $school->country = $request->country;
+        $school->school_email = $request->school_email;
+        $school->school_phone = $this->formatDbPhoneNumber($request->school_phone);
+        $school->school_alternative_phone = $this->formatDbPhoneNumber($request->alternative_phone);
 
         /**
          * AUTO GENERATE school_reg_no
@@ -546,9 +559,16 @@ class SchoolsController extends Controller
             $schoolInfo = school::findOrFail($school_id[0]);
             $managerInfo = User::findOrFail($manager_id[0]);
 
+            if($schoolInfo->school_phone == null) {
+                $phoneToSend = $managerInfo->phone;
+            }
+            else {
+                $phoneToSend = $schoolInfo->school_phone;
+            }
+
             $payload = [
                 'from' => 'SHULE APP',
-                'to' => $this->formatPhoneNumber($managerInfo->phone),
+                'to' => $this->formatPhoneNumber($phoneToSend),
                 'text' => "Habari,\n"
                     . "Ankara ya malipo ya mfumo wa ShuleApp "
                     . "Kuanzia " . Carbon::parse($schoolInfo->service_start_date)->format('d/m/Y')
@@ -557,7 +577,7 @@ class SchoolsController extends Controller
                     . "(Wanafunzi " . $studentCount . " @ TZS " . number_format($cost, 0, '.', ',') . ")\n"
                     . "Fanya Malipo kupitia: \n"
                     . "NMB# 50510028891 - Jina: FRANK M. MASAKA au \n"
-                    . "Mixx Lipa Namba #15966786 - Jina: PIANO SHOP\n"
+                    . "Mixx Lipa Namba 15966786 - Jina: PIANO SHOP\n"
                     . "Asante kwa kutumia shuleApp, endelea kufurahia huduma zetu.\n",
                 'reference' => uniqid()
             ];
@@ -615,5 +635,26 @@ class SchoolsController extends Controller
 
         // For local development, just mock a successful scan
         return ['clean' => true, 'message' => 'Development mode - scan bypassed'];
+    }
+
+    private function formatDbPhoneNumber($phone)
+    {
+       // Ondoa character zisizo namba
+        $phone = preg_replace('/[^0-9]/', '', $phone);
+
+        // 1. Kama iko kwa muundo wa 255XXXXXXXXX
+        if (strlen($phone) === 12 && str_starts_with($phone, '255')) {
+            return '0' . substr($phone, 3);
+        }
+        // 2. Kama iko kwa muundo wa +255XXXXXXXXX
+        elseif(strlen($phone) === 13 && str_starts_with($phone, '+255')) {
+            return '0'. substr($phone, 4);
+        }
+        // 3. Kama iko kwa muundo wa XXXXXXXX (9 tarakimu)
+        elseif (strlen($phone) === 9) {
+            return '0' . $phone;
+        }
+
+        return $phone;
     }
 }

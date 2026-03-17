@@ -533,8 +533,12 @@
                         <span class="detail-value">{{ ucwords(strtolower($schools->country)) }}</span>
                     </div>
                     <div class="detail-row">
+                        <span class="detail-label">Contact Phone:</span>
+                        <span class="detail-value">{{$schools->school_phone ?? "N/A"}}</span>
+                    </div>
+                    <div class="detail-row">
                         <span class="detail-label">Contact Email:</span>
-                        <span class="detail-value">{{ $managers->first()->email ?? 'N/A' }}</span>
+                        <span class="detail-value">{{$schools->school_email ?? "N/A"}}</span>
                     </div>
                 </div>
 
@@ -618,7 +622,7 @@
                 <div class="signature-box">
                     <div class="">------------------------------------</div>
                     <div class="signature-text">Signature</div>
-                    <div class="signature-title">Recieved/Approved by</div>
+                    <div class="signature-title">Recieved by</div>
                 </div>
 
                 <div class="stamp-box">
@@ -636,7 +640,7 @@
                     <div class="payment-detail"><strong>Bank:</strong> NMB Bank</div>
                     <div class="payment-detail"><strong>Account:</strong> 50510028891</div>
                     <div class="payment-detail"><strong>Name:</strong> Frank Mathias Masaka</div>
-                    {{-- <div class="payment-detail" style="margin-top: 15px;"><strong>Mixx by Yas Lipa:</strong> 15966786 Name: Piano Shop</div> --}}
+                    <div class="payment-detail"><strong>Mixx by Yas Lipa:</strong> 15966786 Name: Piano Shop</div>
                 </div>
 
                 <div class="terms-conditions">

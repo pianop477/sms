@@ -46,8 +46,8 @@
         .header-section {
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             color: white;
-            border-radius: 24px;
-            padding: 8px;
+            border-radius: 2px;
+            padding: 6px;
             margin-bottom: 4px;
             position: relative;
             overflow: hidden;
@@ -354,7 +354,7 @@
         <div class="glass-card header-section fade-in">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h1 class="display-5 fw-bold mb-2">🏫 School Registration</h1>
+                    <h3 class="display-5 fw-bold mb-2">🏫 School Registration</h3>
                     <p class="lead mb-0 opacity-90 text-white">Register new schools and manage existing institutions</p>
                 </div>
                 <div class="col-md-4 text-md-end">
@@ -377,7 +377,7 @@
 
                 <div class="row">
                     <!-- School Name -->
-                    <div class="col-md-6 form-group">
+                    <div class="col-md-4 form-group">
                         <label for="validationCustom01" class="form-label">
                             <i class="fas fa-school"></i>School Name <span class="text-danger">*</span>
                         </label>
@@ -389,9 +389,42 @@
                     </div>
 
                     <!-- Postal Address -->
-                    <div class="col-md-6 form-group">
+                    <div class="col-md-4 form-group">
+                        <label for="schoolEmail" class="form-label">
+                            <i class="fas fa-envelope"></i> School Email <span class="text-danger">*</span>
+                        </label>
+                        <input type="email" required name="school_email" class="form-control" id="schoolEmail"
+                               placeholder="Enter email" value="{{ old('school_email') }}">
+                        @error('school_email')
+                        <div class="text-danger small mt-2">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label for="schoolPhone" class="form-label">
+                            <i class="fas fa-phone-alt"></i>School Phone <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" required name="school_phone" class="form-control" id="schoolPhone"
+                               placeholder="P.O Box 123" value="{{ old('school_phone') }}">
+                        @error('school_phone')
+                        <div class="text-danger small mt-2">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label for="alternativePhone" class="form-label">
+                            <i class="fas fa-phone-alt"></i>Alternative Phone <span class="text-danger">(Optional)</span>
+                        </label>
+                        <input type="text" name="alternative_phone" class="form-control" id="alternativePhone"
+                               placeholder="P.O Box 123" value="{{ old('alternative_phone') }}">
+                        @error('alternative_phone')
+                        <div class="text-danger small mt-2">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-4 form-group">
                         <label for="postalAddress" class="form-label">
-                            <i class="fas fa-envelope"></i>Postal Address <span class="text-danger">*</span>
+                            <i class="fas fa-address-book"></i>Postal Address <span class="text-danger">*</span>
                         </label>
                         <input type="text" required name="postal" class="form-control" id="postalAddress"
                                placeholder="P.O Box 123" value="{{ old('postal') }}">
@@ -399,11 +432,8 @@
                         <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
-                </div>
-
-                <div class="row">
                     <!-- Address Name -->
-                    <div class="col-md-6 form-group">
+                    <div class="col-md-4 form-group">
                         <label for="addressName" class="form-label">
                             <i class="fas fa-map-marker-alt"></i>Address Name <span class="text-danger">*</span>
                         </label>
@@ -413,8 +443,11 @@
                         <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
+                </div>
+
+                <div class="row">
                     <!-- Abbreviation Code -->
-                    <div class="col-md-6 form-group">
+                    <div class="col-md-4 form-group">
                         <label for="abbreviationCode" class="form-label">
                             <i class="fas fa-code"></i>School Code (Admission Prefix) <span class="text-danger">*</span>
                         </label>
@@ -424,11 +457,8 @@
                         <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
-                </div>
-
-                <div class="row">
                     <!-- Sender ID -->
-                    <div class="col-md-6 form-group">
+                    <div class="col-md-4 form-group">
                         <label for="senderId" class="form-label">
                             <i class="fas fa-bullhorn"></i>Sender ID
                         </label>
@@ -441,7 +471,7 @@
                     </div>
 
                     <!-- Country -->
-                    <div class="col-md-6 form-group">
+                    <div class="col-md-4 form-group">
                         <label for="countrySelect" class="form-label">
                             <i class="fas fa-globe"></i>Country <span class="text-danger">*</span>
                         </label>
@@ -455,7 +485,7 @@
                 </div>
                 <div class="row">
                     <!-- School Logo -->
-                    <div class="col-md-6 form-group">
+                    <div class="col-md-4 form-group">
                         <label for="schoolLogo" class="form-label">
                             <i class="fas fa-image"></i>School Logo <span class="text-danger">*</span>
                         </label>
@@ -469,7 +499,7 @@
                 <div class="divider" style="height: 2px; background: linear-gradient(90deg, transparent, rgba(67, 97, 238, 0.3), transparent); margin: 2rem 0;"></div>
 
                 <h4 class="text-primary mb-4">
-                    <i class="fas fa-user-tie me-2"></i>School Administrator
+                    <i class="fas fa-user-tie me-2"></i>School Administrator Information
                 </h4>
 
                 <div class="row">
@@ -532,7 +562,7 @@
                     <!-- Phone -->
                     <div class="col-md-4 form-group">
                         <label for="phoneNumber" class="form-label">
-                            <i class="fas fa-phone"></i>Mobile Phone <span class="text-danger">*</span>
+                            <i class="fas fa-phone-alt"></i>Mobile Phone <span class="text-danger">*</span>
                         </label>
                         <input type="tel" name="phone" class="form-control" id="phoneNumber"
                                placeholder="+255 123 456 789" value="{{ old('phone') }}" required>

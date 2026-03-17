@@ -259,7 +259,14 @@
                 <h3 style="margin:0; padding:0;">PRESIDENT OFFICE - TAMISEMI</h3>
                 <h4 style="margin:0; padding:0;">{{ $results->first()->school_name }}</h4>
                 <h5 style="margin:0; padding:0;">{{ $results->first()->postal_address }} -
-                    {{ $results->first()->postal_name }}, {{ $results->first()->country }}</h5>
+                    {{ $results->first()->postal_name }}, {{ $results->first()->country }}
+                </h5>
+                <p style="font-size:14px; text-transform:capitalize; margin:0; padding:0;"><b>Email:</b> <span
+                        style="text-transform: lowercase; text-align:center">{{ strtolower($results->first()->school_email ?? 'N/A') }}</span>
+                    |
+                    <b>Phone:</b> {{ $results->first()->school_phone ?? 'N/A' }} |
+                    {{ $results->first()->school_alternative_phone ?? 'N/A'}}
+                </p>
             </td>
             <td width="15%" align="right">
                 @php
@@ -326,7 +333,8 @@
                     <td class="subject-name" style="text-transform: capitalize">
                         {{ ucwords(strtolower($result->course_name)) }}</td>
                     <td class="teacher-name">{{ ucwords(strtoupper($result->course_code)) }}</td>
-                    <td>{{ ucwords(strtolower($result->teacher_first_name . '. ' . $result->teacher_last_name[0])) }}</td>
+                    <td>{{ ucwords(strtolower($result->teacher_first_name . '. ' . $result->teacher_last_name[0])) }}
+                    </td>
                     <td>{{ $result->score ?? 'X' }}</td>
                     <td>{{ $result->score ? $result->grade : 'X' }}</td>
                     <td>{{ $result->score ? $result->courseRank : 'X' }}</td>

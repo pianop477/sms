@@ -25,7 +25,7 @@
         .dashboard-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 10px 5px;
+            padding: 12px 8px;
         }
 
         .glass-card {
@@ -47,7 +47,7 @@
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             color: white;
             border-radius: 24px;
-            padding: 8px;
+            padding: 10px;
             margin-bottom: 8px;
             position: relative;
             overflow: hidden;
@@ -66,8 +66,13 @@
         }
 
         @keyframes shimmer {
-            0% { transform: translateX(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) rotate(45deg); }
+            0% {
+                transform: translateX(-100%) rotate(45deg);
+            }
+
+            100% {
+                transform: translateX(100%) rotate(45deg);
+            }
         }
 
         .form-section {
@@ -122,7 +127,7 @@
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             border: none;
             border-radius: 16px;
-            padding: 5px 10px;
+            padding: 8px 12px;
             color: white;
             font-weight: 600;
             transition: all 0.4s ease;
@@ -160,7 +165,7 @@
             background: linear-gradient(135deg, #4cc9f0, #4895ef);
             border: none;
             border-radius: 12px;
-            padding: 6px 8px;
+            padding: 8px 12px;
             color: white;
             font-weight: 600;
             transition: all 0.3s ease;
@@ -199,11 +204,11 @@
 
         @media (max-width: 768px) {
             .dashboard-container {
-                padding: 6px;
+                padding: 8px;
             }
 
             .header-section {
-                padding: 4px;
+                padding: 6px;
             }
 
             .form-section {
@@ -230,6 +235,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -241,6 +247,7 @@
                 opacity: 0;
                 transform: translateX(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateX(0);
@@ -253,7 +260,7 @@
         <div class="glass-card header-section fade-in">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h1 class="display-5 fw-bold mb-2">🏫 Edit School Information</h1>
+                    <h3 class="display-5 fw-bold mb-2">🏫 Edit School Information</h3>
                     <p class="lead mb-0 opacity-90 text-white">Update details for {{ $schools->school_name }}</p>
                 </div>
                 <div class="col-md-4 text-md-end">
@@ -267,15 +274,16 @@
 
         <!-- Edit Form -->
         <div class="glass-card form-section fade-in">
-            <form class="needs-validation" novalidate action="{{ route('schools.update.school', ['school' => Hashids::encode($schools->id)]) }}" method="POST" enctype="multipart/form-data">
+            <form class="needs-validation" novalidate
+                action="{{ route('schools.update.school', ['school' => Hashids::encode($schools->id)]) }}" method="POST"
+                enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
                 <!-- Current Logo Display -->
                 <div class="current-logo mb-4">
-                    <img src="{{ asset('storage/logo/' . $schools->logo) }}"
-                         alt="{{ $schools->school_name }} Logo"
-                         class="school-logo-preview">
+                    <img src="{{ asset('storage/logo/' . $schools->logo) }}" alt="{{ $schools->school_name }} Logo"
+                        class="school-logo-preview">
                     <div>
                         <h6 class="text-primary mb-1">Current Logo</h6>
                         <small class="text-muted">Upload new logo to replace</small>
@@ -284,131 +292,158 @@
 
                 <div class="row">
                     <!-- School Name -->
-                    <div class="col-md-6 form-group">
+                    <div class="col-md-4 form-group">
                         <label for="schoolName" class="form-label">
                             <i class="fas fa-school"></i>School Name
                         </label>
                         <input type="text" name="name" class="form-control text-uppercase" id="schoolName"
-                               placeholder="Enter school name" value="{{ old('name', $schools->school_name) }}" required>
+                            placeholder="Enter school name" value="{{ old('name', $schools->school_name) }}" required>
                         @error('name')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <!-- Registration Number -->
-                    <div class="col-md-6 form-group">
+                    <div class="col-md-4 form-group">
                         <label for="regNumber" class="form-label">
                             <i class="fas fa-id-card"></i>Registration No
                         </label>
                         <input type="text" name="reg_no" class="form-control text-uppercase" id="regNumber" readonly
-                               placeholder="REG12345" value="{{ old('reg_no', $schools->school_reg_no) }}">
+                            placeholder="REG12345" value="{{ old('reg_no', $schools->school_reg_no) }}">
                         @error('reg_no')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label for="email" class="form-label">
+                            <i class="fas fa-envelope"></i>Email Address
+                        </label>
+                        <input type="email" name="school_email" class="form-control" id="email"
+                            placeholder="Enter email" value="{{ old('school_email', $schools->school_email) }}">
+                        @error('school_email')
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
 
                 <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label for="schoolPhone" class="form-label">
+                            <i class="fas fa-phone-alt"></i>Phone Number
+                        </label>
+                        <input type="text" name="school_phone" class="form-control" id="schoolPhone"
+                            placeholder="Enter Phone" value="{{ old('school_phone', $schools->school_phone) }}" required>
+                        @error('school_phone')
+                            <div class="text-danger small mt-2">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label for="alternativePhone" class="form-label">
+                            <i class="fas fa-phone-alt"></i>Alternative Phone
+                        </label>
+                        <input type="text" name="alternative_phone" class="form-control" id="schoolPhone"
+                            placeholder="Enter Alternative Phone"
+                            value="{{ old('alternative_phone', $schools->alternative_phone) }}">
+                        @error('alternative_phone')
+                            <div class="text-danger small mt-2">{{ $message }}</div>
+                        @enderror
+                    </div>
                     <!-- Postal Address -->
                     <div class="col-md-4 form-group">
                         <label for="postalAddress" class="form-label">
-                            <i class="fas fa-envelope"></i>Postal Address
+                            <i class="fas fa-address-book"></i>Postal Address
                         </label>
                         <input type="text" name="postal" class="form-control" id="postalAddress"
-                               placeholder="P.O Box 123" value="{{ old('postal', $schools->postal_address) }}" required>
+                            placeholder="P.O Box 123" value="{{ old('postal', $schools->postal_address) }}" required>
                         @error('postal')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
-
+                </div>
+                <div class="row">
                     <!-- Address Name -->
                     <div class="col-md-4 form-group">
                         <label for="addressName" class="form-label">
                             <i class="fas fa-map-marker-alt"></i>Address Name
                         </label>
                         <input type="text" name="postal_name" class="form-control text-capitalize" id="addressName"
-                               placeholder="Dodoma" value="{{ old('postal_name', $schools->postal_name) }}" required>
+                            placeholder="Dodoma" value="{{ old('postal_name', $schools->postal_name) }}" required>
                         @error('postal_name')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
-
                     <!-- Abbreviation Code -->
                     <div class="col-md-4 form-group">
                         <label for="abbreviationCode" class="form-label">
                             <i class="fas fa-code"></i>School Code (Admission Prefix)
                         </label>
                         <input type="text" name="abbriv" class="form-control" id="abbreviationCode"
-                               value="{{ old('abbriv', $schools->abbriv_code) }}" required>
+                            value="{{ old('abbriv', $schools->abbriv_code) }}" required>
                         @error('abbriv')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
-                </div>
-
-                <div class="row">
                     <!-- Sender ID -->
-                    <div class="col-md-6 form-group">
+                    <div class="col-md-4 form-group">
                         <label for="senderId" class="form-label">
                             <i class="fas fa-bullhorn"></i>Sender ID
                         </label>
                         <input type="text" name="sender_name" class="form-control" id="senderId"
-                               placeholder="Enter Sender ID" value="{{ old('sender_name', $schools->sender_id) }}">
+                            placeholder="Enter Sender ID" value="{{ old('sender_name', $schools->sender_id) }}">
                         <small class="text-muted">Enter sender ID name as it appears to your service provider</small>
                         @error('sender_name')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
-                    </div>
-
-                    <!-- Country -->
-                    <div class="col-md-3 form-group">
-                        <label for="countrySelect" class="form-label">
-                            <i class="fas fa-globe"></i>Country
-                        </label>
-                        <select name="country" id="countrySelect" class="form-select" required>
-                            <option value="{{ $schools->country }}" selected>{{ $schools->country }}</option>
-                        </select>
-                        @error('country')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- School Logo Upload -->
-                    <div class="col-md-3 form-group">
-                        <label class="form-label">
-                            <i class="fas fa-image"></i>Update Logo
-                        </label>
-                        <div class="file-upload">
-                            <button type="button" class="file-upload-btn">
-                                <i class="fas fa-upload me-2"></i>Choose File
-                            </button>
-                            <input type="file" name="logo" class="file-upload-input" id="logoUpload">
+                    </div </div>
+                    <div class="row">
+                        <!-- Country -->
+                        <div class="col-md-4 form-group">
+                            <label for="countrySelect" class="form-label">
+                                <i class="fas fa-globe"></i>Country
+                            </label>
+                            <select name="country" id="countrySelect" class="form-select" required>
+                                <option value="{{ $schools->country }}" selected>{{ $schools->country }}</option>
+                            </select>
+                            @error('country')
+                                <div class="text-danger small mt-2">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <small class="text-muted d-block mt-2" id="fileName">No file chosen</small>
-                        @error('logo')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
 
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <a href="{{ url()->previous() }}" class="btn btn-outline-primary">
-                                <i class="fas fa-arrow-left me-2"></i>Back
-                            </a>
-                            <button class="btn btn-modern btn-lg" id="saveButton" type="submit">
-                                <i class="fas fa-save me-2"></i> Save Changes
-                            </button>
+                        <!-- School Logo Upload -->
+                        <div class="col-md-4 form-group">
+                            <label class="form-label">
+                                <i class="fas fa-image"></i>Update Logo
+                            </label>
+                            <div class="file-upload">
+                                <button type="button" class="file-upload-btn">
+                                    <i class="fas fa-upload me-2"></i>Choose File
+                                </button>
+                                <input type="file" name="logo" class="file-upload-input" id="logoUpload">
+                            </div>
+                            <small class="text-muted d-block mt-2" id="fileName">No file chosen</small>
+                            @error('logo')
+                                <div class="text-danger small mt-2">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
-                </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="{{ url()->previous() }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-arrow-left me-2"></i>Back
+                                </a>
+                                <button class="btn btn-modern btn-lg" id="saveButton" type="submit">
+                                    <i class="fas fa-save me-2"></i> Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
             </form>
         </div>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const form = document.querySelector(".needs-validation");
             const submitButton = document.getElementById("saveButton");
             const fileInput = document.getElementById("logoUpload");
@@ -430,7 +465,7 @@
 
             if (!form || !submitButton) return;
 
-            form.addEventListener("submit", function (event) {
+            form.addEventListener("submit", function(event) {
                 event.preventDefault();
 
                 // Disable button and show loading state

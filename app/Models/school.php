@@ -21,7 +21,7 @@ class school extends Model
         'service_start_date',
         'service_end_date',
         'service_duration',
-        'sender_id'
+        'sender_id', 'school_email', 'school_phone', 'school_alternative_phone'
     ];
 
     protected $guarded = ['id', 'created_at', 'updated_at'];
