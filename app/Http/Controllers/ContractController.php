@@ -53,10 +53,10 @@ class ContractController extends Controller
         $this->protectAgainstTokenHarvesting($request);
 
         /*
-    |--------------------------------------------------------------------------
-    | CASE 1: AUTHENTICATED USER (TEACHER)
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | CASE 1: AUTHENTICATED USER (TEACHER)
+        |--------------------------------------------------------------------------
+        */
 
         if (Auth::check()) {
 
@@ -106,10 +106,10 @@ class ContractController extends Controller
         }
 
         /*
-    |--------------------------------------------------------------------------
-    | CASE 2: OTP TOKEN AUTHENTICATION
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | CASE 2: OTP TOKEN AUTHENTICATION
+        |--------------------------------------------------------------------------
+        */
 
         $token = $this->extractTokenSecurely($request);
 
@@ -1658,6 +1658,9 @@ class ContractController extends Controller
             $contractData = [
                 'school_name' => $school->school_name,
                 'postal_address' => $school->postal_address,
+                'school_email' => $school->school_email,
+                'school_phone' => $school->school_phone,
+                'school_alternative_phone' => $school->school_alternative_phone,
                 'postal_name' => $school->postal_name,
                 'country' => $school->country,
                 'logo' => $logoPath ? $this->imageToBase64($logoPath) : null,
@@ -1868,7 +1871,8 @@ class ContractController extends Controller
                 'teachers.address',
                 'schools.school_reg_no',
                 'schools.postal_address',
-                'schools.postal_name',
+                'schools.postal_name', 'schools.school_email', 'schools.school_phone',
+                'schools.school_alternative_phone',
                 'schools.logo',
                 'schools.country'
             )
@@ -2032,6 +2036,9 @@ class ContractController extends Controller
                 'school_name' => $school->school_name,
                 'postal_address' => $school->postal_address,
                 'postal_name' => $school->postal_name,
+                'school_email' => $school->school_email,
+                'school_phone' => $school->school_phone,
+                'school_alternative_phone' => $school->school_alternative_phone,
                 'country' => $school->country,
                 'logo' => $logoBase64,
                 'first_name' => $applicant['first_name'] ?? 'Unknown',
@@ -2349,7 +2356,7 @@ class ContractController extends Controller
                     'bank_account_number' => $teacherDetails->bank_account_number ?? null,
                     'bank_account_name' => $teacherDetails->bank_account_name ?? null,
                     'bank_name' => $teacherDetails->bank_name ?? null,
-                    'alternative_phone' => $teacherDetails->alternative_phone ?? null,
+                    'school_alternative_phone' => $teacherDetails->alternative_phone ?? null,
                     'form_four_index_number' => $teacherDetails->form_four_index_number ?? null,
                     'form_four_completion_year' => $teacherDetails->form_four_completion_year ?? null,
                     'dob' => $teacherDetails->dob ?? null,

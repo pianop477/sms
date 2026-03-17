@@ -103,7 +103,7 @@
 <body>
     <!-- Kichwa cha Barua / Header -->
     <div class="container">
-        @if($contract['logo'])
+        @if ($contract['logo'])
             <div class="logo">
                 <img src="{{ $contract['logo'] }}" alt="School Logo" class="logo" style="max-width: 80px;">
             </div>
@@ -112,6 +112,12 @@
             <h3>{{ $contract['school_name'] }}</h3>
             <h5>{{ $contract['postal_address'] }} - {{ $contract['postal_name'] }}</h5>
             <h5>{{ $contract['country'] }}</h5>
+            <p style="font-size:12px; text-transform:capitalize; margin:0; padding:0;"><b>Email:</b> <span
+                    style="text-transform: lowercase; text-align:center">{{ strtolower($contract['school_email'] ?? 'N/A') }}</span>
+                |
+                <b>Phone:</b> {{ $contract['school_phone'] ?? 'N/A' }} |
+                {{ $contract['school_alternative_phone'] ?? 'N/A' }}
+            </p>
             {{-- <h5>Barua ya Kukubaliwa</h5> --}}
         </div>
     </div>
@@ -131,7 +137,7 @@
         </p>
         <p>
             <strong>
-                {{ucfirst($contract['address'])}}
+                {{ ucfirst($contract['address']) }}
             </strong>
         </p>
 
@@ -149,7 +155,7 @@
         </p>
 
         <p style="text-align: justify">
-           Tafadhali, husika na kichwa cha barua hapo juu.
+            Tafadhali, husika na kichwa cha barua hapo juu.
         </p>
 
         <p style="text-align: justify">
@@ -172,15 +178,16 @@
 
         @if ($isProvision)
             <p style="text-align: justify">
-            Kwa kipindi hiki cha utumishi katika Taasisi hii, utalipwa kiasi cha
-            <strong>{{ number_format($contract['basic_salary'] + $contract['allowances']) }} TZS</strong>  kama Posho kwa kila mwezi.
-        </p>
+                Kwa kipindi hiki cha utumishi katika Taasisi hii, utalipwa kiasi cha
+                <strong>{{ number_format($contract['basic_salary'] + $contract['allowances']) }} TZS</strong> kama
+                Posho kwa kila mwezi.
+            </p>
         @else
-        <p style="text-align: justify">
-            Kwa kipindi hiki cha utumishi katika Taasisi hii, utalipwa kiasi cha
-            <strong>{{ number_format($contract['basic_salary'] + $contract['allowances']) }} TZS</strong>
-             kama Mshahara wa kila mwezi kabla ya makato.
-        </p>
+            <p style="text-align: justify">
+                Kwa kipindi hiki cha utumishi katika Taasisi hii, utalipwa kiasi cha
+                <strong>{{ number_format($contract['basic_salary'] + $contract['allowances']) }} TZS</strong>
+                kama Mshahara wa kila mwezi kabla ya makato.
+            </p>
         @endif
 
         @if ($isProvision)
@@ -197,7 +204,8 @@
             </p>
         @else
             <p style="text-align: justify">
-                Tafadhali hakikisha kuwa unazingatia vigezo na masharti ya Taasisi hii kama ilivyo elezwa kwenye Mkataba ulioweka sahihi yako.
+                Tafadhali hakikisha kuwa unazingatia vigezo na masharti ya Taasisi hii kama ilivyo elezwa kwenye Mkataba
+                ulioweka sahihi yako.
                 Tunakutakia mafanikio katika majukumu yako mapya.
             </p>
         @endif
