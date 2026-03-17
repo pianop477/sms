@@ -307,9 +307,10 @@
                             <table class="table table-hover mb-0 table-responsive-md">
                                 <thead>
                                     <tr>
-                                        <th>Control#</th>
                                         @if ($hasCollectionAccount)
                                             <th>Account#</th>
+                                        @else
+                                            <th>Control#</th>
                                         @endif
                                         <th>Year</th>
                                         <th>Receipt</th>
@@ -323,6 +324,7 @@
                                 <tbody>
                                     @php
                                         $currentControlNumber = null;
+                                        $displayAccountNumber = $hasCollectionAccount; // True = onyesha account number, False = onyesha control number
                                     @endphp
 
                                     @forelse($paymentRecords as $record)
@@ -332,10 +334,14 @@
                                             @endphp
                                             <!-- Invoice Row -->
                                             <tr class="invoice-row">
-                                                <td class="fw-bold text-uppercase">{{ $record['control_number'] }}</td>
-                                                @if ($hasCollectionAccount)
+                                                @if ($displayAccountNumber)
+                                                    <!-- Account Number (Collection Account) -->
                                                     <td>{{ $record['collection_account'] ?? 'N/A' }}</td>
+                                                @else
+                                                    <!-- Control Number -->
+                                                    <td class="fw-bold text-uppercase">{{ $record['control_number'] }}</td>
                                                 @endif
+
                                                 <td>{{ $record['academic_year'] }}</td>
                                                 <td>
                                                     <span class="invoice-badge">INVOICE</span>
@@ -365,12 +371,15 @@
                                         <!-- Payment Rows -->
                                         @if ($record['type'] == 'payment')
                                             <tr class="payment-row">
-                                                <td class="text-muted small text-uppercase">{{ $record['control_number'] }}
-                                                </td>
-                                                @if ($hasCollectionAccount)
+                                                <!-- Show appropriate number based on collection account availability -->
+                                                @if ($displayAccountNumber)
                                                     <td class="text-muted small">
                                                         {{ $record['collection_account'] ?? 'N/A' }}</td>
+                                                @else
+                                                    <td class="text-muted small text-uppercase">
+                                                        {{ $record['control_number'] }}</td>
                                                 @endif
+
                                                 <td class="text-muted small">{{ $record['academic_year'] }}</td>
                                                 <td>
                                                     <span class="payment-badge">PAYMENT</span>
@@ -389,7 +398,7 @@
                                         @endif
                                     @empty
                                         <tr>
-                                            <td colspan="{{ $hasCollectionAccount ? 9 : 8 }}" class="text-center py-4">
+                                            <td colspan="{{ $displayAccountNumber ? 8 : 8 }}" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="fas fa-receipt fa-2x mb-3"></i>
                                                     <p class="mb-0">
@@ -407,16 +416,18 @@
                                     <!-- Closing Summary -->
                                     @if ($paymentRecords->count() > 0)
                                         <tr class="table-secondary">
-                                            <td colspan="{{ $hasCollectionAccount ? 5 : 4 }}" class="text-end fw-bold">
-                                                CLOSING BALANCE:</td>
+                                            <td colspan="{{ $displayAccountNumber ? 5 : 4 }}" class="text-end fw-bold">
+                                                CLOSING BALANCE:
+                                            </td>
                                             <td class="amount-cell fw-bold">{{ number_format($totalBilled) }}</td>
                                             <td class="amount-cell fw-bold text-success">{{ number_format($totalPaid) }}
                                             </td>
-                                            <td colspan="3"></td>
+                                            <td colspan="2"></td>
                                         </tr>
                                         <tr class="table-light">
-                                            <td colspan="{{ $hasCollectionAccount ? 6 : 5 }}" class="text-end fw-bold">
-                                                OUTSTANDING BALANCE:</td>
+                                            <td colspan="{{ $displayAccountNumber ? 5 : 4 }}" class="text-end fw-bold">
+                                                OUTSTANDING BALANCE:
+                                            </td>
                                             <td
                                                 class="amount-cell fw-bold {{ $totalBalance > 0 ? 'text-danger' : 'text-success' }}">
                                                 {{ number_format($totalBalance) }}

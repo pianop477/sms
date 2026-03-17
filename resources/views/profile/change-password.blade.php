@@ -18,10 +18,10 @@
 
     body {
         background: #f5f7fb;
-        overflow-x: hidden; /* Prevent horizontal scroll */
+        overflow-x: hidden;
     }
 
-    /* Improved Responsive Container */
+    /* Container */
     .container-fluid {
         width: 100%;
         padding-right: 15px;
@@ -30,7 +30,7 @@
         margin-left: auto;
     }
 
-    /* Responsive Header */
+    /* Header */
     .password-page-header {
         background: var(--gradient-1);
         border-radius: 25px;
@@ -114,45 +114,45 @@
         box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.2);
     }
 
-    /* Responsive Card Body */
+    /* Card Body - REDUCED PADDING */
     .card-body {
-        padding: 1.5rem;
+        padding: 1rem; /* REDUCED from 1.5rem */
     }
 
     @media (min-width: 576px) {
         .card-body {
-            padding: 2rem;
+            padding: 1.2rem; /* REDUCED from 2rem */
         }
     }
 
     @media (min-width: 768px) {
         .card-body {
-            padding: 2.5rem;
+            padding: 1.5rem; /* REDUCED from 2.5rem */
         }
     }
 
-    /* Requirements Card */
+    /* ============= FIXED REQUIREMENTS CARD - MORE COMPACT ============= */
     .requirements-card {
         background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-        border-radius: 15px;
-        padding: 1.2rem;
-        margin-bottom: 1.8rem;
-        border-left: 5px solid var(--primary);
+        border-radius: 12px; /* REDUCED from 15px */
+        padding: 0.8rem; /* REDUCED from 1.2rem */
+        margin-bottom: 1rem; /* REDUCED from 1.8rem */
+        border-left: 4px solid var(--primary); /* REDUCED from 5px */
         position: relative;
         overflow: hidden;
     }
 
     @media (min-width: 768px) {
         .requirements-card {
-            border-radius: 20px;
-            padding: 1.8rem;
-            margin-bottom: 2.5rem;
+            border-radius: 15px; /* REDUCED from 20px */
+            padding: 1rem; /* REDUCED from 1.8rem */
+            margin-bottom: 1.2rem; /* REDUCED from 2.5rem */
         }
     }
 
     .requirements-card::after {
         content: '⚡';
-        font-size: 3rem;
+        font-size: 2.5rem; /* REDUCED from 3rem */
         position: absolute;
         right: 10px;
         top: 50%;
@@ -162,50 +162,50 @@
 
     @media (min-width: 768px) {
         .requirements-card::after {
-            font-size: 4rem;
-            right: 20px;
+            font-size: 3rem; /* REDUCED from 4rem */
+            right: 15px; /* REDUCED from 20px */
         }
     }
 
     .requirements-title {
         display: flex;
         align-items: center;
-        gap: 8px;
-        font-size: 1.1rem;
+        gap: 6px; /* REDUCED from 8px */
+        font-size: 0.9rem; /* REDUCED from 1.1rem */
         font-weight: 600;
         color: var(--dark);
-        margin-bottom: 1rem;
+        margin-bottom: 0.6rem; /* REDUCED from 1rem */
         flex-wrap: wrap;
     }
 
     @media (min-width: 768px) {
         .requirements-title {
-            gap: 10px;
-            font-size: 1.3rem;
-            margin-bottom: 1.2rem;
+            gap: 8px; /* REDUCED from 10px */
+            font-size: 1rem; /* REDUCED from 1.3rem */
+            margin-bottom: 0.8rem; /* REDUCED from 1.2rem */
         }
     }
 
     .requirements-title i {
-        font-size: 1.5rem;
+        font-size: 1.2rem; /* REDUCED from 1.5rem */
         color: var(--primary);
     }
 
-    /* Responsive Requirements List */
+    /* Requirements List - MORE COMPACT */
     .requirements-list {
         list-style: none;
         padding: 0;
         margin: 0;
         display: flex;
         flex-direction: column;
-        gap: 0.8rem;
+        gap: 0.4rem; /* REDUCED from 0.8rem */
     }
 
     @media (min-width: 480px) {
         .requirements-list {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
+            gap: 0.6rem; /* REDUCED from 1rem */
         }
     }
 
@@ -214,36 +214,36 @@
             display: flex;
             flex-wrap: wrap;
             flex-direction: row;
-            gap: 1rem;
+            gap: 0.6rem; /* REDUCED from 1rem */
         }
     }
 
     .requirements-list li {
         flex: 1 1 auto;
-        padding: 0.8rem 1rem;
+        padding: 0.5rem 0.8rem; /* REDUCED from 0.8rem 1rem */
         background: white;
-        border-radius: 10px;
+        border-radius: 8px; /* REDUCED from 10px */
         display: flex;
         align-items: center;
-        gap: 8px;
-        font-size: 0.9rem;
+        gap: 6px; /* REDUCED from 8px */
+        font-size: 0.8rem; /* REDUCED from 0.9rem */
         color: var(--dark);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        box-shadow: 0 3px 8px rgba(0,0,0,0.05); /* REDUCED shadow */
         border: 1px solid rgba(67, 97, 238, 0.1);
         width: 100%;
     }
 
     @media (min-width: 768px) {
         .requirements-list li {
-            min-width: 250px;
-            padding: 0.8rem 1.2rem;
-            font-size: 1rem;
+            min-width: 200px; /* REDUCED from 250px */
+            padding: 0.6rem 1rem; /* REDUCED from 0.8rem 1.2rem */
+            font-size: 0.85rem; /* REDUCED from 1rem */
         }
     }
 
     .requirements-list li i {
-        font-size: 1.1rem;
-        min-width: 20px;
+        font-size: 0.9rem; /* REDUCED from 1.1rem */
+        min-width: 16px; /* REDUCED from 20px */
     }
 
     .requirements-list li.valid {
@@ -251,92 +251,135 @@
         border-color: #28a745;
     }
 
+    /* Password Strength Meter - MORE COMPACT */
+    .password-strength-meter {
+        margin: 0.8rem 0 0.4rem 0; /* REDUCED from 1.2rem 0 */
+        background: #e9ecef;
+        border-radius: 30px;
+        height: 6px; /* REDUCED from 8px */
+        overflow: hidden;
+        position: relative;
+    }
+
+    @media (min-width: 768px) {
+        .password-strength-meter {
+            margin: 1rem 0 0.5rem 0; /* REDUCED from 1.5rem 0 */
+            height: 8px; /* REDUCED from 10px */
+        }
+    }
+
+    .strength-text {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 0.2rem; /* REDUCED from 0.5rem */
+        font-size: 0.75rem; /* REDUCED from 0.85rem */
+        color: #6c757d;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .strength-badge {
+        padding: 0.15rem 0.6rem; /* REDUCED from 0.2rem 0.8rem */
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 0.7rem; /* REDUCED from 0.8rem */
+        white-space: nowrap;
+    }
+
+    @media (min-width: 768px) {
+        .strength-badge {
+            padding: 0.2rem 0.8rem; /* REDUCED from 0.3rem 1rem */
+            font-size: 0.75rem; /* REDUCED from 0.85rem */
+        }
+    }
+
     /* Form Grid - Responsive */
     .row-custom {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 1.2rem;
-        margin-bottom: 1.5rem;
+        gap: 0.8rem; /* REDUCED from 1.2rem */
+        margin-bottom: 1rem; /* REDUCED from 1.5rem */
     }
 
     @media (min-width: 576px) {
         .row-custom {
-            gap: 1.5rem;
+            gap: 1rem; /* REDUCED from 1.5rem */
         }
     }
 
     @media (min-width: 992px) {
         .row-custom {
             grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
+            gap: 1rem; /* REDUCED from 1.5rem */
         }
     }
 
-    /* Form Groups */
+    /* Form Groups - MORE COMPACT */
     .form-group-modern {
-        margin-bottom: 1.5rem;
+        margin-bottom: 0.8rem; /* REDUCED from 1.5rem */
         position: relative;
         width: 100%;
     }
 
     @media (min-width: 992px) {
         .form-group-modern {
-            margin-bottom: 2rem;
+            margin-bottom: 1rem; /* REDUCED from 2rem */
         }
     }
 
     .form-label-modern {
         display: block;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.3rem; /* REDUCED from 0.5rem */
         font-weight: 600;
         color: var(--dark);
-        font-size: 0.85rem;
+        font-size: 0.75rem; /* REDUCED from 0.85rem */
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
 
     @media (min-width: 768px) {
         .form-label-modern {
-            margin-bottom: 0.8rem;
-            font-size: 0.95rem;
+            margin-bottom: 0.4rem; /* REDUCED from 0.8rem */
+            font-size: 0.8rem; /* REDUCED from 0.95rem */
         }
     }
 
     .form-label-modern i {
         margin-right: 5px;
         color: var(--primary);
-        font-size: 1rem;
+        font-size: 0.9rem; /* REDUCED from 1rem */
     }
 
-    /* Input Group - Fully Responsive */
+    /* Input Group - FIXED */
     .input-group-modern {
         display: flex;
         align-items: stretch;
         position: relative;
         width: 100%;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
     }
 
     .input-group-modern .form-control-modern {
-        flex: 1 1 auto;
-        width: calc(100% - 50px);
-        padding: 0.8rem 1rem;
-        font-size: 0.9rem;
+        flex: 1 1 0;
+        min-width: 0;
+        width: auto;
+        padding: 0.6rem 0.8rem; /* REDUCED from 0.8rem 1rem */
+        font-size: 0.85rem; /* REDUCED from 0.9rem */
         border: 2px solid #eef2f6;
-        border-radius: 10px 0 0 10px;
+        border-radius: 8px 0 0 8px; /* REDUCED from 10px 0 0 10px */
         background-color: #fafbfc;
         transition: all 0.3s ease;
         color: var(--dark);
         font-family: 'Courier New', monospace;
         letter-spacing: 1px;
-        min-width: 0; /* Prevent flex overflow */
     }
 
     @media (min-width: 768px) {
         .input-group-modern .form-control-modern {
-            padding: 1rem 1.2rem;
-            font-size: 1rem;
-            letter-spacing: 2px;
+            padding: 0.8rem 1rem; /* REDUCED from 1rem 1.2rem */
+            font-size: 0.9rem; /* REDUCED from 1rem */
+            letter-spacing: 1.5px; /* REDUCED from 2px */
         }
     }
 
@@ -344,27 +387,29 @@
         outline: none;
         border-color: var(--primary);
         background-color: white;
-        box-shadow: 0 5px 20px rgba(67, 97, 238, 0.1);
+        box-shadow: 0 3px 12px rgba(67, 97, 238, 0.1); /* REDUCED shadow */
     }
 
     .input-group-modern .input-group-text-modern {
-        padding: 0 1rem;
+        flex: 0 0 auto;
+        width: auto;
+        padding: 0 0.8rem; /* REDUCED from 0 1rem */
         background: white;
         border: 2px solid #eef2f6;
         border-left: none;
-        border-radius: 0 10px 10px 0;
+        border-radius: 0 8px 8px 0; /* REDUCED from 0 10px 10px 0 */
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         transition: all 0.3s ease;
         color: #6c757d;
-        min-width: 45px;
+        white-space: nowrap;
     }
 
     @media (min-width: 768px) {
         .input-group-modern .input-group-text-modern {
-            padding: 0 1.5rem;
+            padding: 0 1rem; /* REDUCED from 0 1.5rem */
         }
     }
 
@@ -375,52 +420,75 @@
     }
 
     .input-group-modern .input-group-text-modern i {
-        font-size: 1rem;
+        font-size: 0.9rem; /* REDUCED from 1rem */
     }
 
     @media (min-width: 768px) {
         .input-group-modern .input-group-text-modern i {
-            font-size: 1.2rem;
+            font-size: 1rem; /* REDUCED from 1.2rem */
         }
     }
 
-    /* Password Feedback */
+    /* Small screens */
+    @media (max-width: 400px) {
+        .input-group-modern {
+            flex-wrap: wrap;
+        }
+
+        .input-group-modern .form-control-modern {
+            width: 100%;
+            border-radius: 8px 8px 0 0;
+            border-right: 2px solid #eef2f6;
+        }
+
+        .input-group-modern .input-group-text-modern {
+            width: 100%;
+            border-radius: 0 0 8px 8px;
+            border-left: 2px solid #eef2f6;
+            border-top: none;
+            padding: 0.4rem;
+        }
+    }
+
+    /* Password Feedback - MORE COMPACT */
     .password-feedback {
-        margin-top: 0.5rem;
-        font-size: 0.8rem;
+        margin-top: 0.2rem; /* REDUCED from 0.5rem */
+        font-size: 0.7rem; /* REDUCED from 0.8rem */
         display: flex;
         align-items: center;
-        gap: 5px;
+        gap: 4px; /* REDUCED from 5px */
         word-wrap: break-word;
     }
 
     @media (min-width: 768px) {
         .password-feedback {
-            font-size: 0.85rem;
+            margin-top: 0.3rem; /* REDUCED from 0.5rem */
+            font-size: 0.75rem; /* REDUCED from 0.85rem */
         }
     }
 
-    /* Action Buttons - Responsive */
+    /* Action Buttons - MORE COMPACT */
     .d-flex.justify-content-end.gap-3.mt-5 {
         display: flex;
         flex-direction: column;
-        gap: 0.8rem !important;
-        margin-top: 2rem !important;
+        gap: 0.6rem !important; /* REDUCED from 0.8rem */
+        margin-top: 1rem !important; /* REDUCED from 2rem */
     }
 
     @media (min-width: 480px) {
         .d-flex.justify-content-end.gap-3.mt-5 {
             flex-direction: row;
             justify-content: flex-end;
-            gap: 1rem !important;
+            gap: 0.8rem !important; /* REDUCED from 1rem */
+            margin-top: 1.2rem !important; /* REDUCED from 2rem */
         }
     }
 
     .btn-modern {
-        padding: 0.8rem 1.5rem;
-        border-radius: 10px;
+        padding: 0.6rem 1.2rem; /* REDUCED from 0.8rem 1.5rem */
+        border-radius: 8px; /* REDUCED from 10px */
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.8rem; /* REDUCED from 0.9rem */
         letter-spacing: 0.5px;
         text-transform: uppercase;
         transition: all 0.3s ease;
@@ -429,7 +497,7 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 6px; /* REDUCED from 8px */
         position: relative;
         overflow: hidden;
         width: 100%;
@@ -439,15 +507,15 @@
     @media (min-width: 480px) {
         .btn-modern {
             width: auto;
-            padding: 1rem 2rem;
-            font-size: 1rem;
+            padding: 0.7rem 1.5rem; /* REDUCED from 1rem 2rem */
+            font-size: 0.85rem; /* REDUCED from 1rem */
         }
     }
 
     @media (min-width: 768px) {
         .btn-modern {
-            padding: 1rem 2.5rem;
-            border-radius: 15px;
+            padding: 0.8rem 2rem; /* REDUCED from 1rem 2.5rem */
+            border-radius: 10px; /* REDUCED from 15px */
         }
     }
 
@@ -465,26 +533,26 @@
     }
 
     .btn-modern:hover::before {
-        width: 300px;
-        height: 300px;
+        width: 250px; /* REDUCED from 300px */
+        height: 250px; /* REDUCED from 300px */
     }
 
     .btn-success-modern {
         background: linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%);
         color: white;
-        box-shadow: 0 10px 20px rgba(76, 201, 240, 0.3);
+        box-shadow: 0 8px 16px rgba(76, 201, 240, 0.3); /* REDUCED shadow */
     }
 
-    /* Error Toast - Responsive */
+    /* Error Toast */
     .error-toast {
         position: fixed;
         top: 10px;
         right: 10px;
         left: 10px;
         background: white;
-        border-radius: 10px;
-        box-shadow: 0 15px 40px rgba(247, 37, 133, 0.15);
-        padding: 0.8rem 1rem;
+        border-radius: 8px; /* REDUCED from 10px */
+        box-shadow: 0 10px 30px rgba(247, 37, 133, 0.15); /* REDUCED shadow */
+        padding: 0.6rem 0.8rem; /* REDUCED from 0.8rem 1rem */
         border-left: 4px solid var(--danger);
         z-index: 9999;
         animation: slideIn 0.3s ease;
@@ -496,93 +564,59 @@
             top: 20px;
             right: 20px;
             left: auto;
-            border-radius: 15px;
-            padding: 1rem 1.5rem;
-            max-width: 350px;
+            border-radius: 10px; /* REDUCED from 15px */
+            padding: 0.8rem 1.2rem; /* REDUCED from 1rem 1.5rem */
+            max-width: 320px; /* REDUCED from 350px */
         }
     }
 
-    /* Password Strength Meter */
-    .password-strength-meter {
-        margin: 1.2rem 0;
-        background: #e9ecef;
-        border-radius: 30px;
-        height: 8px;
-        overflow: hidden;
-        position: relative;
-    }
-
-    @media (min-width: 768px) {
-        .password-strength-meter {
-            margin: 1.5rem 0;
-            height: 10px;
-        }
-    }
-
-    .strength-text {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 0.5rem;
-        font-size: 0.85rem;
-        color: #6c757d;
-        flex-wrap: wrap;
-        gap: 5px;
-    }
-
-    .strength-badge {
-        padding: 0.2rem 0.8rem;
-        border-radius: 30px;
-        font-weight: 600;
-        font-size: 0.8rem;
-        white-space: nowrap;
-    }
-
-    @media (min-width: 768px) {
-        .strength-badge {
-            padding: 0.3rem 1rem;
-            font-size: 0.85rem;
-        }
-    }
-
-    /* Extra Small Devices (phones, 320px and down) */
+    /* Extra Small Devices */
     @media (max-width: 360px) {
         .password-page-header h4 {
             font-size: 1.2rem;
         }
 
         .requirements-title {
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
         .requirements-list li {
-            font-size: 0.8rem;
-            padding: 0.7rem;
+            font-size: 0.7rem;
+            padding: 0.5rem;
         }
 
         .btn-modern {
-            padding: 0.7rem 1rem;
-            font-size: 0.85rem;
+            padding: 0.6rem 0.9rem;
+            font-size: 0.75rem;
         }
     }
 
     /* Landscape mode fix */
     @media (max-height: 500px) and (orientation: landscape) {
         .password-page-header {
-            padding: 1rem;
+            padding: 0.8rem;
         }
 
         .card-body {
-            padding: 1rem;
+            padding: 0.8rem;
         }
 
         .requirements-card {
-            padding: 1rem;
+            padding: 0.6rem;
+        }
+    }
+
+    /* Optional: Sticky requirements on desktop */
+    @media (min-width: 992px) {
+        .requirements-card {
+            position: sticky;
+            top: 10px;
+            z-index: 10;
         }
     }
 </style>
 
-<!-- Rest of your HTML remains exactly the same -->
+<!-- HTML imebaki sawa kabisa -->
 <div class="container-fluid px-2 px-sm-3 px-md-4 py-3 py-md-4">
     <!-- Page Header -->
     <div class="password-page-header d-flex justify-content-between align-items-center">
@@ -607,15 +641,15 @@
                 <ul class="requirements-list" id="requirementsList">
                     <li id="reqLength">
                         <i class="fas fa-circle"></i>
-                        <span>Minimum 8 characters long</span>
+                        <span>Minimum 8 characters</span>
                     </li>
                     <li id="reqLetter">
                         <i class="fas fa-circle"></i>
-                        <span>Contains at least one letter</span>
+                        <span>At least one letter</span>
                     </li>
                     <li id="reqNumber">
                         <i class="fas fa-circle"></i>
-                        <span>Contains at least one number</span>
+                        <span>At least one number</span>
                     </li>
                     <li id="reqMatch">
                         <i class="fas fa-circle"></i>
@@ -625,7 +659,7 @@
 
                 <!-- Password Strength Meter -->
                 <div class="password-strength-meter">
-                    <div class="password-strength-fill" id="strengthFill"></div>
+                    <div class="password-strength-fill" id="strengthFill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #f72585, #b5179e); transition: width 0.3s ease;"></div>
                 </div>
                 <div class="strength-text">
                     <span>Password Strength:</span>
@@ -741,7 +775,7 @@
     </div>
 </div>
 
-<!-- Your JavaScript remains exactly the same -->
+<!-- JavaScript imebaki sawa kabisa -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById("passwordForm");
@@ -822,16 +856,24 @@ document.addEventListener('DOMContentLoaded', function () {
             strengthBadge.className = 'strength-badge';
         } else if (strength < 40) {
             strengthBadge.textContent = 'Weak';
-            strengthBadge.className = 'strength-badge weak';
+            strengthBadge.className = 'strength-badge';
+            strengthBadge.style.backgroundColor = '#f72585';
+            strengthBadge.style.color = 'white';
         } else if (strength < 70) {
             strengthBadge.textContent = 'Medium';
-            strengthBadge.className = 'strength-badge medium';
+            strengthBadge.className = 'strength-badge';
+            strengthBadge.style.backgroundColor = '#f8961e';
+            strengthBadge.style.color = 'white';
         } else if (strength < 90) {
             strengthBadge.textContent = 'Strong';
-            strengthBadge.className = 'strength-badge strong';
+            strengthBadge.className = 'strength-badge';
+            strengthBadge.style.backgroundColor = '#4cc9f0';
+            strengthBadge.style.color = 'white';
         } else {
             strengthBadge.textContent = 'Very Strong';
-            strengthBadge.className = 'strength-badge very-strong';
+            strengthBadge.className = 'strength-badge';
+            strengthBadge.style.backgroundColor = '#28a745';
+            strengthBadge.style.color = 'white';
         }
 
         // Update feedback
@@ -839,12 +881,15 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!hasLength) {
                 newPasswordFeedback.innerHTML = '<i class="fas fa-exclamation-circle"></i> Password too short';
                 newPasswordFeedback.className = 'password-feedback invalid-feedback-custom';
+                newPasswordFeedback.style.color = '#f72585';
             } else if (!hasLetter || !hasNumber) {
                 newPasswordFeedback.innerHTML = '<i class="fas fa-exclamation-circle"></i> Must contain letters and numbers';
                 newPasswordFeedback.className = 'password-feedback invalid-feedback-custom';
+                newPasswordFeedback.style.color = '#f72585';
             } else {
                 newPasswordFeedback.innerHTML = '<i class="fas fa-check-circle"></i> Password meets requirements';
                 newPasswordFeedback.className = 'password-feedback valid-feedback-custom';
+                newPasswordFeedback.style.color = '#28a745';
             }
         } else {
             newPasswordFeedback.innerHTML = '';
@@ -855,9 +900,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (hasMatch) {
                 confirmPasswordFeedback.innerHTML = '<i class="fas fa-check-circle"></i> Passwords match';
                 confirmPasswordFeedback.className = 'password-feedback valid-feedback-custom';
+                confirmPasswordFeedback.style.color = '#28a745';
             } else {
                 confirmPasswordFeedback.innerHTML = '<i class="fas fa-exclamation-circle"></i> Passwords do not match';
                 confirmPasswordFeedback.className = 'password-feedback invalid-feedback-custom';
+                confirmPasswordFeedback.style.color = '#f72585';
             }
         } else {
             confirmPasswordFeedback.innerHTML = '';
@@ -872,10 +919,12 @@ document.addEventListener('DOMContentLoaded', function () {
             element.classList.add('valid');
             icon.classList.remove('fa-circle');
             icon.classList.add('fa-check-circle');
+            icon.style.color = '#28a745';
         } else {
             element.classList.remove('valid');
             icon.classList.remove('fa-check-circle');
             icon.classList.add('fa-circle');
+            icon.style.color = '#6c757d';
         }
     }
 
@@ -942,15 +991,15 @@ document.addEventListener('DOMContentLoaded', function () {
         const toast = document.createElement('div');
         toast.className = 'error-toast';
         toast.innerHTML = `
-            <div class="toast-content">
-                <div class="toast-icon">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 30px; height: 30px; background: #f72585; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
                     <i class="fas fa-exclamation"></i>
                 </div>
-                <div class="toast-message">
-                    <strong>Validation Error</strong><br>
-                    <small>${message}</small>
+                <div style="flex: 1;">
+                    <strong style="color: #1e1e2f; font-size: 0.9rem;">Validation Error</strong>
+                    <div style="color: #6c757d; font-size: 0.8rem; margin-top: 2px;">${message}</div>
                 </div>
-                <div class="toast-close" onclick="this.parentElement.parentElement.remove()">
+                <div onclick="this.parentElement.parentElement.remove()" style="cursor: pointer; color: #6c757d;">
                     <i class="fas fa-times"></i>
                 </div>
             </div>
