@@ -72,7 +72,6 @@
             right: -50%;
             width: 200%;
             height: 200%;
-            /* background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent); */
             transform: rotate(45deg);
             transition: all 0.3s ease;
         }
@@ -97,6 +96,7 @@
             border-left: 4px solid var(--primary);
             transition: all 0.3s ease;
             cursor: pointer;
+            position: relative;
         }
 
         .feedback-card:hover {
@@ -179,10 +179,161 @@
 
         .message-preview {
             display: -webkit-box;
-            -webkit-line-clamp: 3;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             line-height: 1.6;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .read-more-indicator {
+            color: var(--primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .read-more-indicator:hover {
+            text-decoration: underline;
+        }
+
+        /* Modal Styles */
+        .message-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 2rem;
+            cursor: pointer;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .message-modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            cursor: default;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: modalSlideUp 0.3s ease;
+        }
+
+        @keyframes modalSlideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header-custom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.2s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close-btn:hover {
+            background: #f0f0f0;
+            color: var(--danger);
+            transform: rotate(90deg);
+        }
+
+        .message-content-box {
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 16px;
+            margin: 1rem 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.8;
+            font-size: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .modal-footer-custom {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .btn-modal {
+            padding: 10px 24px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-modal-primary {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+        }
+
+        .btn-modal-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-modal-secondary {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .btn-modal-secondary:hover {
+            background: #dee2e6;
+            transform: translateY(-2px);
+        }
+
+        .message-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .message-badge {
+            background: linear-gradient(135deg, #f72585, #b5179e);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
         }
 
         @media (max-width: 768px) {
@@ -203,11 +354,20 @@
             }
 
             .action-buttons {
-                flex-direction: column;
+                flex-direction: row;
             }
 
             .btn-icon {
-                width: 100%;
+                width: 35px;
+                height: 35px;
+            }
+
+            .message-modal-content {
+                padding: 1.5rem;
+            }
+
+            .message-content-box {
+                padding: 1rem;
             }
         }
 
@@ -266,7 +426,9 @@
                 <div class="d-flex align-items-center">
                     <div class="flex-grow-1">
                         <h6 class="text-uppercase text-white-50 mb-1">This Month</h6>
-                        <h3 class="text-white mb-0">-</h3>
+                        <h3 class="text-white mb-0">{{ $message->filter(function($item) {
+                            return $item->created_at->isCurrentMonth();
+                        })->count() }}</h3>
                     </div>
                     <div class="flex-shrink-0">
                         <i class="fas fa-calendar-alt fa-2x text-white-50"></i>
@@ -277,11 +439,11 @@
             <div class="glass-card stat-card" style="background: linear-gradient(135deg, #f72585, #b5179e);">
                 <div class="d-flex align-items-center">
                     <div class="flex-grow-1">
-                        <h6 class="text-uppercase text-white-50 mb-1">Response Rate</h6>
-                        <h3 class="text-white mb-0">-</h3>
+                        <h6 class="text-uppercase text-white-50 mb-1">Unread</h6>
+                        <h3 class="text-white mb-0">{{ $message->where('is_read', false)->count() }}</h3>
                     </div>
                     <div class="flex-shrink-0">
-                        <i class="fas fa-reply fa-2x text-white-50"></i>
+                        <i class="fas fa-envelope fa-2x text-white-50"></i>
                     </div>
                 </div>
             </div>
@@ -295,22 +457,31 @@
                 </div>
                 <h3 class="text-dark mb-3">No Feedback Yet</h3>
                 <p class="text-muted mb-4">Your feedback inbox is empty. New messages will appear here.</p>
-                <button class="btn btn-primary btn-lg">
+                <button class="btn btn-primary btn-lg" onclick="window.location.reload()">
                     <i class="fas fa-sync-alt me-2"></i>Refresh
                 </button>
             </div>
         @else
             <div class="feedback-grid">
                 @foreach ($message as $sms)
-                    <div class="glass-card feedback-card fade-in" style="animation-delay: {{ $loop->index * 0.1 }}s;">
+                    <div class="glass-card feedback-card fade-in"
+                         data-message-id="{{ $sms->id }}"
+                         data-full-message="{{ $sms->message }}"
+                         data-user-name="{{ $sms->name }}"
+                         data-user-email="{{ $sms->email }}"
+                         data-timestamp="{{ \Carbon\Carbon::parse($sms->created_at)->format('M d, Y · h:i A') }}"
+                         data-time-ago="{{ \Carbon\Carbon::parse($sms->created_at)->diffForHumans() }}"
+                         data-reply-url="{{ route('reply.post', ['sms' => Hashids::encode($sms->id)]) }}"
+                         style="animation-delay: {{ $loop->index * 0.1 }}s;">
+
                         <div class="d-flex align-items-start mb-3">
                             <div class="flex-grow-1">
-                                <div class="d-flex align-items-center mb-2 mr-1">
-                                    <div class="bg-primary rounded-circle p-2 me-3">
-                                        <i class="fas fa-user text-white"></i>
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="bg-primary rounded-circle p-2 me-3" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-user text-white fa-lg"></i>
                                     </div>
                                     <div>
-                                        <h6 class="mb-1 text-primary text-capitalize">{{ $sms->name }}</h6>
+                                        <h6 class="mb-1 text-primary text-capitalize fw-bold">{{ $sms->name }}</h6>
                                         <small class="text-muted">{{ $sms->email }}</small>
                                     </div>
                                 </div>
@@ -323,24 +494,30 @@
                             </div>
                         </div>
 
-                        <div class="message-preview mb-3 text-dark">
-                            {{ Str::limit($sms->message, 150) }}
+                        <div class="message-preview mb-2 text-dark">
+                            {{ Str::limit($sms->message, 120) }}
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="read-more-indicator mb-3">
+                            <i class="fas fa-chevron-circle-down me-1"></i> Click to read full message
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-2">
                             <small class="text-muted">
+                                <i class="fas fa-calendar-alt me-1"></i>
                                 {{ \Carbon\Carbon::parse($sms->created_at)->format('M d, Y · h:i A') }}
                             </small>
 
-                            <div class="action-buttons">
+                            <div class="action-buttons" onclick="event.stopPropagation()">
                                 <a href="{{ route('reply.post', ['sms' => Hashids::encode($sms->id)]) }}"
                                    class="btn-icon bg-success text-white"
-                                   title="Reply to feedback">
+                                   title="Reply to feedback"
+                                   onclick="event.stopPropagation()">
                                     <i class="fas fa-reply"></i>
                                 </a>
                                 <a href="{{ route('delete.post', ['sms' => Hashids::encode($sms->id)]) }}"
                                    class="btn-icon bg-danger text-white"
-                                   onclick="return confirm('Are you sure you want to delete this feedback?')"
+                                   onclick="event.stopPropagation(); return confirm('Are you sure you want to delete this feedback?')"
                                    title="Delete feedback">
                                     <i class="fas fa-trash"></i>
                                 </a>
@@ -353,7 +530,7 @@
 
         <!-- Pagination -->
         @if (!$message->isEmpty())
-            <div class="pagination-container slide-up">
+            <div class="pagination-container slide-up mt-4">
                 {{ $message->links('vendor.pagination.bootstrap-5') }}
             </div>
         @endif
@@ -361,75 +538,128 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Add click to expand message functionality
+            // Function to open modal with full message
+            function openMessageModal(messageData) {
+                // Remove any existing modal
+                const existingModal = document.querySelector('.message-modal-overlay');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+
+                // Create modal overlay
+                const overlay = document.createElement('div');
+                overlay.className = 'message-modal-overlay';
+
+                // Create modal content
+                const modalContent = document.createElement('div');
+                modalContent.className = 'message-modal-content';
+
+                // Build modal HTML
+                modalContent.innerHTML = `
+                    <div class="modal-header-custom">
+                        <div>
+                            <h3 class="text-primary mb-2" style="font-weight: 700;">${messageData.userName}</h3>
+                            <div class="message-meta">
+                                <small class="text-muted">
+                                    <i class="fas fa-envelope me-1"></i>${messageData.userEmail}
+                                </small>
+                                <span class="message-badge">
+                                    <i class="fas fa-clock me-1"></i>${messageData.timeAgo}
+                                </span>
+                            </div>
+                        </div>
+                        <button class="modal-close-btn" onclick="this.closest('.message-modal-overlay').remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <div class="message-content-box">
+                        ${messageData.fullMessage.replace(/\n/g, '<br>')}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar-alt me-1"></i>Received: ${messageData.timestamp}
+                        </small>
+                        <span class="badge bg-info text-white">
+                            <i class="fas fa-comment me-1"></i>${messageData.messageLength} characters
+                        </span>
+                    </div>
+
+                    <div class="modal-footer-custom">
+                        <button class="btn-modal btn-modal-secondary" onclick="this.closest('.message-modal-overlay').remove()">
+                            <i class="fas fa-times me-2"></i>Close
+                        </button>
+                        <a href="${messageData.replyUrl}" class="btn-modal btn-modal-primary" onclick="event.stopPropagation()">
+                            <i class="fas fa-reply me-2"></i>Reply to this message
+                        </a>
+                    </div>
+                `;
+
+                overlay.appendChild(modalContent);
+
+                // Close modal when clicking outside
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        overlay.remove();
+                    }
+                });
+
+                // Prevent closing when clicking inside modal
+                modalContent.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                });
+
+                document.body.appendChild(overlay);
+            }
+
+            // Add click event to all feedback cards
             const feedbackCards = document.querySelectorAll('.feedback-card');
             feedbackCards.forEach(card => {
                 card.addEventListener('click', function(e) {
-                    if (!e.target.closest('.action-buttons')) {
-                        const message = this.querySelector('.message-preview');
-                        const fullMessage = message.getAttribute('data-full') || message.textContent;
-
-                        // Create modal-like overlay
-                        const overlay = document.createElement('div');
-                        overlay.style.cssText = `
-                            position: fixed;
-                            top: 0;
-                            left: 0;
-                            width: 100%;
-                            height: 100%;
-                            background: rgba(0,0,0,0.8);
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            z-index: 9999;
-                            padding: 2rem;
-                            cursor: pointer;
-                        `;
-
-                        const modalContent = document.createElement('div');
-                        modalContent.style.cssText = `
-                            background: white;
-                            padding: 2rem;
-                            border-radius: 20px;
-                            max-width: 600px;
-                            max-height: 80vh;
-                            overflow-y: auto;
-                            cursor: default;
-                        `;
-
-                        modalContent.innerHTML = `
-                            <div class="mb-3">
-                                <h5 class="text-primary">Message from ${this.querySelector('h6').textContent}</h5>
-                                <small class="text-muted">${this.querySelector('small.text-muted').textContent}</small>
-                            </div>
-                            <p class="text-dark" style="line-height: 1.8;">${fullMessage}</p>
-                            <div class="text-end mt-3">
-                                <button class="btn btn-primary" onclick="this.closest('[style]').remove()">
-                                    Close
-                                </button>
-                            </div>
-                        `;
-
-                        overlay.appendChild(modalContent);
-                        overlay.addEventListener('click', (e) => {
-                            if (e.target === overlay) overlay.remove();
-                        });
-
-                        document.body.appendChild(overlay);
+                    // Don't open modal if clicking on action buttons or links
+                    if (e.target.closest('.action-buttons') || e.target.closest('a')) {
+                        return;
                     }
+
+                    // Collect message data from data attributes
+                    const messageData = {
+                        fullMessage: this.dataset.fullMessage,
+                        userName: this.dataset.userName,
+                        userEmail: this.dataset.userEmail,
+                        timestamp: this.dataset.timestamp,
+                        timeAgo: this.dataset.timeAgo,
+                        replyUrl: this.dataset.replyUrl,
+                        messageLength: this.dataset.fullMessage.length
+                    };
+
+                    openMessageModal(messageData);
                 });
             });
 
-            // Add hover effects with GSAP if available
-            if (typeof gsap !== 'undefined') {
-                gsap.from('.fade-in', {
-                    duration: 0.8,
-                    y: 50,
-                    opacity: 0,
-                    stagger: 0.1,
-                    ease: "power3.out"
-                });
+            // Add hover effects with animation
+            feedbackCards.forEach((card, index) => {
+                card.style.animation = `fadeIn 0.6s ease-in-out ${index * 0.1}s both`;
+            });
+
+            // Debug: Log full message for first card (useful for debugging)
+            if (feedbackCards.length > 0) {
+                console.log('Sample full message:', feedbackCards[0].dataset.fullMessage);
+                console.log('Message length:', feedbackCards[0].dataset.fullMessage.length);
             }
+
+            // Optional: Add keyboard support (Escape to close modal)
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    const modal = document.querySelector('.message-modal-overlay');
+                    if (modal) {
+                        modal.remove();
+                    }
+                }
+            });
         });
     </script>
+
+    <!-- Optional: Add Font Awesome if not already included -->
+    {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> --}}
 @endsection
