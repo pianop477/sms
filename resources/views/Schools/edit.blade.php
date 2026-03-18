@@ -343,7 +343,7 @@
                         </label>
                         <input type="text" name="alternative_phone" class="form-control" id="schoolPhone"
                             placeholder="Enter Alternative Phone"
-                            value="{{ old('alternative_phone', $schools->school->alternative_phone) }}">
+                            value="{{ old('alternative_phone', $schools->school_alternative_phone) }}">
                         @error('alternative_phone')
                             <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
