@@ -401,7 +401,7 @@
                 </div>
                 <div class="col-md-4 text-md-end">
                     <div class="badge bg-white text-primary p-3">
-                        <i class="fas fa-envelope-open me-2"></i>
+                        <i class="fas fa-envelope-open mr-2"></i>
                         {{ $message->total() }} Total Messages
                     </div>
                 </div>
@@ -458,7 +458,7 @@
                 <h3 class="text-dark mb-3">No Feedback Yet</h3>
                 <p class="text-muted mb-4">Your feedback inbox is empty. New messages will appear here.</p>
                 <button class="btn btn-primary btn-lg" onclick="window.location.reload()">
-                    <i class="fas fa-sync-alt me-2"></i>Refresh
+                    <i class="fas fa-sync-alt mr-2"></i> Refresh
                 </button>
             </div>
         @else
@@ -488,7 +488,7 @@
                             </div>
                             <div class="flex-shrink-0">
                                 <span class="badge bg-light text-dark">
-                                    <i class="fas fa-clock me-1"></i>
+                                    <i class="fas fa-clock mr-2"></i>
                                     {{ \Carbon\Carbon::parse($sms->created_at)->diffForHumans() }}
                                 </span>
                             </div>
@@ -499,12 +499,12 @@
                         </div>
 
                         <div class="read-more-indicator mb-3">
-                            <i class="fas fa-chevron-circle-down me-1"></i> Click to read full message
+                            <i class="fas fa-chevron-circle-down mr-2"></i> Read more
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mt-2">
                             <small class="text-muted">
-                                <i class="fas fa-calendar-alt me-1"></i>
+                                <i class="fas fa-calendar-alt mr-2"></i>
                                 {{ \Carbon\Carbon::parse($sms->created_at)->format('M d, Y · h:i A') }}
                             </small>
 
@@ -558,13 +558,13 @@
                 modalContent.innerHTML = `
                     <div class="modal-header-custom">
                         <div>
-                            <h3 class="text-primary mb-2" style="font-weight: 700;">${messageData.userName}</h3>
+                            <h3 class="text-primary mb-2" style="font-weight: 700;"> ${messageData.userName}</h3>
                             <div class="message-meta">
                                 <small class="text-muted">
-                                    <i class="fas fa-envelope me-1"></i>${messageData.userEmail}
+                                    <i class="fas fa-envelope mr-2"></i> ${messageData.userEmail}
                                 </small>
                                 <span class="message-badge">
-                                    <i class="fas fa-clock me-1"></i>${messageData.timeAgo}
+                                    <i class="fas fa-clock mr-2"></i> ${messageData.timeAgo}
                                 </span>
                             </div>
                         </div>
@@ -579,19 +579,19 @@
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <small class="text-muted">
-                            <i class="fas fa-calendar-alt me-1"></i>Received: ${messageData.timestamp}
+                            <i class="fas fa-calendar-alt mr-2"></i> Received: ${messageData.timestamp}
                         </small>
                         <span class="badge bg-info text-white">
-                            <i class="fas fa-comment me-1"></i>${messageData.messageLength} characters
+                            <i class="fas fa-comment mr-2"></i> ${messageData.messageLength} characters
                         </span>
                     </div>
 
                     <div class="modal-footer-custom">
                         <button class="btn-modal btn-modal-secondary" onclick="this.closest('.message-modal-overlay').remove()">
-                            <i class="fas fa-times me-2"></i>Close
+                            <i class="fas fa-times mr-2"></i> Close
                         </button>
                         <a href="${messageData.replyUrl}" class="btn-modal btn-modal-primary" onclick="event.stopPropagation()">
-                            <i class="fas fa-reply me-2"></i>Reply to this message
+                            <i class="fas fa-reply mr-2"></i> Reply to this message
                         </a>
                     </div>
                 `;
