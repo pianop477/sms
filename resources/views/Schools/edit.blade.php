@@ -394,50 +394,50 @@
                         @error('sender_name')
                             <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
-                    </div </div>
-                    <div class="row">
-                        <!-- Country -->
-                        <div class="col-md-4 form-group">
-                            <label for="countrySelect" class="form-label">
-                                <i class="fas fa-globe"></i>Country
-                            </label>
-                            <select name="country" id="countrySelect" class="form-select" required>
-                                <option value="{{ $schools->country }}" selected>{{ $schools->country }}</option>
-                            </select>
-                            @error('country')
-                                <div class="text-danger small mt-2">{{ $message }}</div>
-                            @enderror
+                    </div>
+                </div>
+                <div class="row">
+                    <!-- Country -->
+                    <div class="col-md-4 form-group">
+                        <label for="countrySelect" class="form-label">
+                            <i class="fas fa-globe"></i>Country
+                        </label>
+                        <select name="country" id="countrySelect" class="form-select" required>
+                            <option value="{{ $schools->country }}" selected>{{ $schools->country }}</option>
+                        </select>
+                        @error('country')
+                            <div class="text-danger small mt-2">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <!-- School Logo Upload -->
+                    <div class="col-md-4 form-group">
+                        <label class="form-label">
+                            <i class="fas fa-image"></i>Update Logo
+                        </label>
+                        <div class="file-upload">
+                            <button type="button" class="file-upload-btn">
+                                <i class="fas fa-upload me-2"></i>Choose File
+                            </button>
+                            <input type="file" name="logo" class="file-upload-input" id="logoUpload">
                         </div>
-
-                        <!-- School Logo Upload -->
-                        <div class="col-md-4 form-group">
-                            <label class="form-label">
-                                <i class="fas fa-image"></i>Update Logo
-                            </label>
-                            <div class="file-upload">
-                                <button type="button" class="file-upload-btn">
-                                    <i class="fas fa-upload me-2"></i>Choose File
-                                </button>
-                                <input type="file" name="logo" class="file-upload-input" id="logoUpload">
-                            </div>
-                            <small class="text-muted d-block mt-2" id="fileName">No file chosen</small>
-                            @error('logo')
-                                <div class="text-danger small mt-2">{{ $message }}</div>
-                            @enderror
+                        <small class="text-muted d-block mt-2" id="fileName">No file chosen</small>
+                        @error('logo')
+                            <div class="text-danger small mt-2">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{{ url()->previous() }}" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left me-2"></i>Back
+                            </a>
+                            <button class="btn btn-modern btn-lg" id="saveButton" type="submit">
+                                <i class="fas fa-save me-2"></i> Save Changes
+                            </button>
                         </div>
                     </div>
-                    <div class="row mt-4">
-                        <div class="col-12">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <a href="{{ url()->previous() }}" class="btn btn-outline-primary">
-                                    <i class="fas fa-arrow-left me-2"></i>Back
-                                </a>
-                                <button class="btn btn-modern btn-lg" id="saveButton" type="submit">
-                                    <i class="fas fa-save me-2"></i> Save Changes
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                </div>
             </form>
         </div>
     </div>
