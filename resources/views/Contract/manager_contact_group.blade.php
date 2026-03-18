@@ -632,7 +632,7 @@
                                             <td class="align-middle">
                                                 {{ \Carbon\Carbon::parse($contract->approved_at)->format('d-m-Y') }}
                                                 <br>
-                                                <small class="badge bg-light">{{ $contract->duration ?? 'N/A' }}
+                                                <small class="badge bg-light text-dark">{{ $contract->duration ?? 'N/A' }}
                                                     months</small>
                                             </td>
                                             <td class="align-middle">
@@ -732,8 +732,8 @@
                             <i class="fas fa-file-contract me-2"></i>
                             APPROVED CONTRACT DETAILS
                         </h5>
-                        <button type="button" class="close text-white" data-dismiss="modal">
-                            <span>&times;</span>
+                        <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal">
+                            <i class="fas fa-close"></i>
                         </button>
                     </div>
                     <div class="modal-body">
@@ -842,8 +842,8 @@
                             <i class="fas fa-file-signature me-2"></i>
                             UPLOAD SIGNED CONTRACT
                         </h5>
-                        <button type="button" class="close text-white" data-dismiss="modal">
-                            <span>&times;</span>
+                        <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal">
+                            <i class="fas fa-close"></i>
                         </button>
                     </div>
                     <div class="modal-body">
@@ -899,8 +899,8 @@
                             MANAGE CONTRACT: {{ ucwords(strtolower($row->first_name ?? 'Unknown')) }}
                             {{ ucwords(strtolower($row->last_name ?? 'Staff')) }}
                         </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                        <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal" aria-label="Close">
+                           <i class="fas fa-close"></i>
                         </button>
                     </div>
                     <div class="modal-body">

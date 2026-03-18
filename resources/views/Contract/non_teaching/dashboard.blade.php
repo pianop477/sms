@@ -709,7 +709,7 @@
                 <h5> Hujaomba Mikataba wowote</h5>
                 <p class="text-muted mb-4"> Bado hujaomba ombi la mkataba wowote.</p>
                 <button onclick="openApplyModal()" class="btn btn-primary">
-                    <i class="fas fa-plus-circle mr-2"></i> Omba Mkataba Wako wa Kwanza
+                    <i class="fas fa-plus-circle mr-2"></i> Omba Mkataba
                 </button>
             </div>
         </div>
@@ -759,236 +759,50 @@
         </div>
     </div>
 
-    <!-- Dynamic Contract Modals -->
-    @foreach ($contracts as $contract)
-        @php
-            $statusConfig = [
-                'pending' => [
-                    'gradient' => 'linear-gradient(135deg, #f6c23e 0%, #f8b500 100%)',
-                    'icon' => 'fa-clock',
-                    'title' => 'Inasubiri',
-                    'badge' => 'badge-warning',
-                ],
-                'rejected' => [
-                    'gradient' => 'linear-gradient(135deg, #6c757d 0%, #495057 100%)',
-                    'icon' => 'fa-times-circle',
-                    'title' => 'Imekataliwa',
-                    'badge' => 'badge-secondary',
-                ],
-                'approved' => [
-                    'gradient' => 'linear-gradient(135deg, #36b9cc 0%, #1e8a9e 100%)',
-                    'icon' => 'fa-check-circle',
-                    'title' => 'Imekubaliwa',
-                    'badge' => 'badge-info',
-                ],
-                'activated' => [
-                    'gradient' => 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
-                    'icon' => 'fa-check-circle',
-                    'title' => 'Inatumika',
-                    'badge' => 'badge-success',
-                ],
-                'expired' => [
-                    'gradient' => 'linear-gradient(135deg, #ffc107 0%, #e0a800 100%)',
-                    'icon' => 'fa-hourglass-end',
-                    'title' => 'Imeisha',
-                    'badge' => 'badge-warning',
-                ],
-                'terminated' => [
-                    'gradient' => 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)',
-                    'icon' => 'fa-ban',
-                    'title' => 'Imesitishwa',
-                    'badge' => 'badge-danger',
-                ],
-            ];
+    <!-- Dynamic Modals Container - Instead of static modals -->
+    <div id="dynamic-modals-container"></div>
 
-            $config = $statusConfig[$contract->status] ?? [
-                'gradient' => 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                'icon' => 'fa-file-contract',
-                'title' => ucfirst($contract->status),
-                'badge' => 'badge-secondary',
-            ];
-
-            $authToken = session('contract_auth_token') ?? ($authToken ?? null);
-        @endphp
-
-        <div class="modal fade" id="contractModal{{ $contract->id }}" tabindex="-1" aria-hidden="true">
+    <!-- Contract Modal Template -->
+    <template id="contract-modal-template">
+        <div class="modal fade" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
-                    <div class="modal-header" style="background: {{ $config['gradient'] }};">
+                    <div class="modal-header">
                         <h5 class="modal-title">
-                            <i class="fas {{ $config['icon'] }} mr-2"></i>
-                            Maelezo ya Mkataba - {{ $config['title'] }}
+                            <i class="fas fa-file-contract mr-2"></i>
+                            Maelezo ya Mkataba
                         </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-
                     <div class="modal-body">
-                        <ul class="nav nav-tabs mb-4" id="contractTab{{ $contract->id }}" role="tablist">
+                        <ul class="nav nav-tabs mb-4" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link active" id="details-tab{{ $contract->id }}" data-bs-toggle="tab"
-                                    href="#details{{ $contract->id }}" role="tab">
+                                <a class="nav-link active" data-bs-toggle="tab" href="#details-placeholder" role="tab">
                                     <i class="fas fa-info-circle mr-2"></i> Maelezo
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" id="documents-tab{{ $contract->id }}" data-bs-toggle="tab"
-                                    href="#documents{{ $contract->id }}" role="tab">
+                                <a class="nav-link" data-bs-toggle="tab" href="#documents-placeholder" role="tab">
                                     <i class="fas fa-file-alt mr-2"></i> Nyaraka
                                 </a>
                             </li>
-                            @if (in_array($contract->status, ['terminated', 'expired']) || isset($contract->terminated_at))
-                                <li class="nav-item">
-                                    <a class="nav-link" id="termination-tab{{ $contract->id }}" data-bs-toggle="tab"
-                                        href="#termination{{ $contract->id }}" role="tab">
-                                        <i class="fas fa-ban mr-2"></i> Umesitishwa
-                                    </a>
-                                </li>
-                            @endif
+                            <li class="nav-item termination-tab" style="display: none;">
+                                <a class="nav-link" data-bs-toggle="tab" href="#termination-placeholder" role="tab">
+                                    <i class="fas fa-ban mr-2"></i> Umesitishwa
+                                </a>
+                            </li>
                         </ul>
-
                         <div class="tab-content">
-                            <div class="tab-pane active" id="details{{ $contract->id }}" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="detail-card">
-                                            <div class="detail-label">Aina ya Mkataba</div>
-                                            <div class="detail-value">
-                                                {{ $contract->contract_type == 'provision' ? 'Mkataba wa Matazamio' : 'Mkataba Mpya' }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="detail-card">
-                                            <div class="detail-label">Wadhifa</div>
-                                            <div class="detail-value">{{ $contract->job_title ?? 'N/A' }}</div>
-                                        </div>
-                                    </div>
-
-                                    @if ($contract->status == 'rejected')
-                                        <div class="col-12">
-                                            <div class="detail-card" style="border-left-color: #dc3545;">
-                                                <div class="detail-label text-danger">Sababu ya Kukataliwa</div>
-                                                <div class="detail-value">
-                                                    {{ $contract->remarks ?? 'Hakuna sababu iliyotolewa' }}</div>
-                                            </div>
-                                        </div>
-                                    @endif
-
-                                    @if (in_array($contract->status, ['approved', 'activated', 'expired', 'terminated']))
-                                        <div class="col-md-6">
-                                            <div class="detail-card">
-                                                <div class="detail-label">Tarehe ya Kuanza</div>
-                                                <div class="detail-value">
-                                                    {{ \Carbon\Carbon::parse($contract->start_date)->format('d M Y') }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="detail-card">
-                                                <div class="detail-label">Tarehe ya Kuisha</div>
-                                                <div class="detail-value">
-                                                    {{ \Carbon\Carbon::parse($contract->end_date)->format('d M Y') }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="detail-card">
-                                                <div class="detail-label">Mshahara wa Msingi</div>
-                                                <div class="detail-value">
-                                                    {{ number_format($contract->basic_salary ?? 0, 2) }} TZS</div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="detail-card">
-                                                <div class="detail-label">Posho</div>
-                                                <div class="detail-value">
-                                                    {{ number_format($contract->allowances ?? 0, 2) }} TZS</div>
-                                            </div>
-                                        </div>
-                                    @endif
-
-                                    <div class="col-md-6">
-                                        <div class="detail-card">
-                                            <div class="detail-label">Hali</div>
-                                            <div class="detail-value">
-                                                <span
-                                                    class="badge {{ $config['badge'] }}">{{ $config['title'] }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="tab-pane fade" id="documents{{ $contract->id }}" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="detail-card">
-                                            <div class="detail-label mb-3">Nyaraka za Mkataba</div>
-                                            <div class="d-flex flex-wrap gap-2">
-                                                @if ($contract->applicant_file_path)
-                                                    <a href="{{ asset('storage/' . $contract->applicant_file_path) }}"
-                                                        class="btn btn-info mr-2 mb-2" target="_blank">
-                                                        <i class="fas fa-file-alt mr-2"></i> Barua ya Maombi
-                                                    </a>
-                                                @endif
-
-                                                @if ($contract->contract_file_path)
-                                                    <a href="{{ asset('storage/' . $contract->contract_file_path) }}"
-                                                        class="btn btn-primary mr-2 mb-2" target="_blank">
-                                                        <i class="fas fa-file-signature mr-2"></i> Mkataba Uliosainiwa
-                                                    </a>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            @if (in_array($contract->status, ['terminated', 'expired']) || isset($contract->terminated_at))
-                                <div class="tab-pane fade" id="termination{{ $contract->id }}" role="tabpanel">
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="detail-card" style="border-left-color: #dc3545;">
-                                                <div class="detail-label text-danger">Sababu ya Kusitishwa</div>
-                                                <div class="detail-value">
-                                                    {{ $contract->termination_reason ?? 'Hakuna sababu iliyotolewa' }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
+                            <div class="tab-pane active" id="details-placeholder" role="tabpanel"></div>
+                            <div class="tab-pane fade" id="documents-placeholder" role="tabpanel"></div>
+                            <div class="tab-pane fade" id="termination-placeholder" role="tabpanel"></div>
                         </div>
                     </div>
-
-                    <div class="modal-footer">
-                        @if ($contract->status == 'pending')
-                            <form action="{{ route('contract.delete', ['id' => Hashids::encode($contract->id)]) }}"
-                                method="POST" class="d-inline delete-form" data-contract-id="{{ $contract->id }}"
-                                onsubmit="return deleteContract(event, this)">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="btn btn-danger">
-                                    <i class="fas fa-trash mr-2"></i> Futa Ombi
-                                </button>
-                            </form>
-                        @endif
-
-                        @if ($contract->status == 'rejected')
-                            <a href="{{ route('contract.reapply', ['id' => Hashids::encode($contract->id)]) }}"
-                                class="btn btn-primary">
-                                <i class="fas fa-redo-alt mr-2"></i> Tuma Tena
-                            </a>
-                        @endif
-
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            <i class="fas fa-times mr-2"></i> Funga
-                        </button>
-                    </div>
+                    <div class="modal-footer"></div>
                 </div>
             </div>
         </div>
-    @endforeach
+    </template>
 
     <!-- Profile Modal -->
     <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel"
@@ -1149,8 +963,7 @@
                     headers: {
                         'Authorization': `Bearer ${authToken}`,
                         'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                            'content')
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     }
                 });
 
@@ -1165,11 +978,12 @@
                     staffData = data.data.applicant;
                     schoolData = data.data.school;
                     contracts = data.data.contracts || [];
-                    sessionExpiresAt = data.data.expires_at;
+
+                    console.log('Contracts data loaded:', contracts.length);
 
                     updateHeader();
                     updateStats();
-                    renderContractsTable(); // This will re-render with new data
+                    renderContractsTable();
                     showContent();
                     checkSessionExpiry();
 
@@ -1193,8 +1007,7 @@
                     headers: {
                         'Authorization': `Bearer ${authToken}`,
                         'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute(
-                            'content')
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
                     }
                 });
 
@@ -1296,6 +1109,286 @@
             elements.terminatedContracts.textContent = terminated;
         }
 
+        // ============= NEW FUNCTION: Create contract modal dynamically =============
+        function createContractModal(contract) {
+            // Clone template
+            const template = document.getElementById('contract-modal-template');
+            const modalDiv = template.content.cloneNode(true).firstElementChild;
+
+            // Set unique ID
+            const modalId = `contractModal${contract.id}`;
+            modalDiv.id = modalId;
+
+            // Find elements
+            const modalHeader = modalDiv.querySelector('.modal-header');
+            const modalTitle = modalDiv.querySelector('.modal-title');
+            const modalFooter = modalDiv.querySelector('.modal-footer');
+
+            // Status configurations
+            const statusConfig = {
+                pending: { gradient: 'linear-gradient(135deg, #f6c23e 0%, #f8b500 100%)', icon: 'fa-clock', title: 'Inasubiri', badge: 'badge-warning' },
+                rejected: { gradient: 'linear-gradient(135deg, #6c757d 0%, #495057 100%)', icon: 'fa-times-circle', title: 'Imekataliwa', badge: 'badge-secondary' },
+                approved: { gradient: 'linear-gradient(135deg, #36b9cc 0%, #1e8a9e 100%)', icon: 'fa-check-circle', title: 'Imekubaliwa', badge: 'badge-info' },
+                activated: { gradient: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)', icon: 'fa-check-circle', title: 'Inatumika', badge: 'badge-success' },
+                expired: { gradient: 'linear-gradient(135deg, #ffc107 0%, #e0a800 100%)', icon: 'fa-hourglass-end', title: 'Imeisha', badge: 'badge-warning' },
+                terminated: { gradient: 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)', icon: 'fa-ban', title: 'Imesitishwa', badge: 'badge-danger' }
+            };
+
+            const config = statusConfig[contract.status] || {
+                gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                icon: 'fa-file-contract',
+                title: contract.status.charAt(0).toUpperCase() + contract.status.slice(1),
+                badge: 'badge-secondary'
+            };
+
+            // Set header
+            modalHeader.style.background = config.gradient;
+            modalTitle.innerHTML = `<i class="fas ${config.icon} mr-2"></i> Maelezo ya Mkataba - ${config.title}`;
+
+            // Get tabs
+            const navTabs = modalDiv.querySelector('.nav');
+            const detailsTab = navTabs.querySelector('a[href="#details-placeholder"]');
+            const documentsTab = navTabs.querySelector('a[href="#documents-placeholder"]');
+            const terminationTab = navTabs.querySelector('.termination-tab');
+
+            // Update tab hrefs with contract ID
+            detailsTab.href = `#details${contract.id}`;
+            documentsTab.href = `#documents${contract.id}`;
+
+            // Get tab panes
+            const detailsPane = modalDiv.querySelector('#details-placeholder');
+            const documentsPane = modalDiv.querySelector('#documents-placeholder');
+            const terminationPane = modalDiv.querySelector('#termination-placeholder');
+
+            detailsPane.id = `details${contract.id}`;
+            documentsPane.id = `documents${contract.id}`;
+            terminationPane.id = `termination${contract.id}`;
+
+            // FILL DETAILS TAB
+            let detailsHtml = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="detail-card">
+                            <div class="detail-label">Aina ya Mkataba</div>
+                            <div class="detail-value">${contract.contract_type === 'provision' ? 'Mkataba wa Matazamio' : 'Mkataba Mpya'}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="detail-card">
+                            <div class="detail-label">Wadhifa</div>
+                            <div class="detail-value">${contract.job_title || 'N/A'}</div>
+                        </div>
+                    </div>
+            `;
+
+            if (contract.status === 'rejected') {
+                detailsHtml += `
+                    <div class="col-12">
+                        <div class="detail-card" style="border-left-color: #dc3545;">
+                            <div class="detail-label text-danger">Sababu ya Kukataliwa</div>
+                            <div class="detail-value">${contract.remarks || 'Hakuna sababu iliyotolewa'}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (['approved', 'activated', 'expired', 'terminated'].includes(contract.status)) {
+                detailsHtml += `
+                    <div class="col-md-6">
+                        <div class="detail-card">
+                            <div class="detail-label">Tarehe ya Kuanza</div>
+                            <div class="detail-value">${formatDate(contract.start_date)}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="detail-card">
+                            <div class="detail-label">Tarehe ya Kuisha</div>
+                            <div class="detail-value">${formatDate(contract.end_date)}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="detail-card">
+                            <div class="detail-label">Mshahara wa Msingi</div>
+                            <div class="detail-value">${Number(contract.basic_salary || 0).toLocaleString()} TZS</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="detail-card">
+                            <div class="detail-label">Posho</div>
+                            <div class="detail-value">${Number(contract.allowances || 0).toLocaleString()} TZS</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            detailsHtml += `
+                    <div class="col-md-6">
+                        <div class="detail-card">
+                            <div class="detail-label">Hali</div>
+                            <div class="detail-value">
+                                <span class="badge ${config.badge}">${config.title}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            detailsPane.innerHTML = detailsHtml;
+
+            // FILL DOCUMENTS TAB
+            let documentsHtml = `
+                <div class="row">
+                    <div class="col-12">
+                        <div class="detail-card">
+                            <div class="detail-label mb-3">Nyaraka za Mkataba</div>
+                            <div class="d-flex flex-wrap gap-2">
+            `;
+
+            if (contract.applicant_file_path) {
+                documentsHtml += `<a href="/storage/${contract.applicant_file_path}" class="btn btn-info mr-2 mb-2" target="_blank"><i class="fas fa-file-alt mr-2"></i> Barua ya Maombi</a>`;
+            }
+
+            if (contract.contract_file_path) {
+                // Use the same route pattern as before
+                const approvalUrl = contract.approval_letter_url || `/contracts/approval-letter/${btoa(contract.id)}`;
+                documentsHtml += `<a href="${approvalUrl}" class="btn btn-success mr-2 mb-2" target="_blank"><i class="fas fa-file-pdf mr-2"></i> Barua ya Ajira</a>`;
+                documentsHtml += `<a href="/storage/${contract.contract_file_path}" class="btn btn-primary mr-2 mb-2" target="_blank"><i class="fas fa-file-signature mr-2"></i> Mkataba Uliosainiwa</a>`;
+            }
+
+            documentsHtml += `
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            documentsPane.innerHTML = documentsHtml;
+
+            // CHECK FOR TERMINATION HISTORY
+            const terminationHistory = contract.status_histories?.find(h => h.new_status === 'terminated');
+
+            if (terminationHistory || contract.status === 'terminated' || contract.terminated_at) {
+                // Show termination tab
+                terminationTab.style.display = 'list-item';
+                terminationTab.querySelector('a').href = `#termination${contract.id}`;
+
+                const metadata = terminationHistory?.metadata || {};
+
+                let terminationHtml = `
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="detail-card" style="border-left-color: #dc3545;">
+                                <div class="detail-label text-danger">Sababu ya Kusitishwa</div>
+                                <div class="detail-value">${terminationHistory?.reason || contract.reason || 'Hakuna sababu iliyotolewa'}</div>
+                            </div>
+                        </div>
+                `;
+
+                // Add metadata if exists
+                if (Object.keys(metadata).length > 0) {
+                    if (metadata.termination_type) {
+                        terminationHtml += `
+                            <div class="col-md-6 mt-3">
+                                <div class="detail-card">
+                                    <div class="detail-label">Aina ya Kusitishwa</div>
+                                    <div class="detail-value">${metadata.termination_type}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    if (metadata.effective_date) {
+                        terminationHtml += `
+                            <div class="col-md-6 mt-3">
+                                <div class="detail-card">
+                                    <div class="detail-label">Tarehe ya Kusitishwa</div>
+                                    <div class="detail-value">${formatDate(metadata.effective_date)}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    // ===== IMPORTANT: DOCUMENT PATH FOR TERMINATION =====
+                    if (metadata.document_path) {
+                        terminationHtml += `
+                            <div class="col-12 mt-3">
+                                <div class="detail-card">
+                                    <div class="detail-label">Barua ya Kusitishwa</div>
+                                    <div class="detail-value">
+                                        <a href="/storage/${metadata.document_path}" class="btn btn-danger" target="_blank">
+                                            <i class="fas fa-file-pdf mr-2"></i> Pakua Barua ya Kusitishwa
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    if (metadata.notes) {
+                        terminationHtml += `
+                            <div class="col-12 mt-3">
+                                <div class="detail-card">
+                                    <div class="detail-label">Maelezo ya Ziada</div>
+                                    <div class="detail-value">${metadata.notes}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                if (terminationHistory?.changed_by) {
+                    terminationHtml += `
+                        <div class="col-12 mt-3">
+                            <div class="detail-card">
+                                <div class="detail-label">Umesitishwa na</div>
+                                <div class="detail-value">${terminationHistory.changed_by}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                if (terminationHistory?.created_at) {
+                    terminationHtml += `
+                        <div class="col-12 mt-2">
+                            <div class="detail-card">
+                                <div class="detail-label">Tarehe ya Kubadilisha</div>
+                                <div class="detail-value">${formatDate(terminationHistory.created_at)}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                terminationHtml += `</div>`;
+                terminationPane.innerHTML = terminationHtml;
+            }
+
+            // FILL FOOTER
+            let footerHtml = '';
+
+            if (contract.status === 'pending') {
+                footerHtml = `
+                    <form action="/contracts/${contract.id}" method="POST" class="d-inline delete-form" data-contract-id="${contract.id}" onsubmit="return deleteContract(event, this)">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').getAttribute('content')}">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash mr-2"></i> Futa Ombi
+                        </button>
+                    </form>
+                `;
+            }
+
+            if (contract.status === 'rejected') {
+                footerHtml = `<a href="/contracts/reapply/${btoa(contract.id)}" class="btn btn-primary"><i class="fas fa-redo-alt mr-2"></i> Tuma Tena</a>`;
+            }
+
+            footerHtml += `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times mr-2"></i> Funga</button>`;
+            modalFooter.innerHTML = footerHtml;
+
+            // Add to container
+            document.getElementById('dynamic-modals-container').appendChild(modalDiv);
+        }
+
+        // ============= UPDATED renderContractsTable =============
         function renderContractsTable() {
             if (!contracts || contracts.length === 0) {
                 elements.contractsTable.style.display = 'none';
@@ -1305,6 +1398,9 @@
 
             elements.contractsTable.style.display = 'table';
             elements.emptyState.style.display = 'none';
+
+            // Clear existing modals
+            document.getElementById('dynamic-modals-container').innerHTML = '';
 
             let html = '';
             contracts.forEach((contract, index) => {
@@ -1344,29 +1440,32 @@
                 }
 
                 html += `
-            <tr>
-                <td>${index + 1}</td>
-                <td>
-                    <span class="font-weight-bold text-capitalize">
-                        ${contract.contract_type === 'provision' ? 'Mkataba wa Matazamio' : 'Mkataba Mpya'}
-                    </span>
-                </td>
-                <td class="text-capitalize">${contract.job_title || 'N/A'}</td>
-                <td>${appliedDate}</td>
-                <td>
-                    <span class="badge ${statusClass}">
-                        ${statusText}
-                    </span>
-                </td>
-                <td>
-                    <div class="action-buttons">
-                        <button class="btn btn-manage" onclick="viewContractDetails(${contract.id})">
-                            <i class="fas fa-eye"></i> Angalia
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `;
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>
+                            <span class="font-weight-bold text-capitalize">
+                                ${contract.contract_type === 'provision' ? 'Mkataba wa Matazamio' : 'Mkataba Mpya'}
+                            </span>
+                        </td>
+                        <td class="text-capitalize">${contract.job_title || 'N/A'}</td>
+                        <td>${appliedDate}</td>
+                        <td>
+                            <span class="badge ${statusClass}">
+                                ${statusText}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-manage" onclick="viewContractDetails(${contract.id})">
+                                    <i class="fas fa-eye"></i> Angalia
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+
+                // Create modal for this contract
+                createContractModal(contract);
             });
 
             elements.contractsTableBody.innerHTML = html;
@@ -1552,8 +1651,7 @@
                     headers: {
                         'Authorization': `Bearer ${authToken}`,
                         'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute(
-                            'content')
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
                     }
                 });
 
@@ -1609,8 +1707,7 @@
                         headers: {
                             'Authorization': `Bearer ${authToken}`,
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                                'content')
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                         }
                     });
                 } finally {
@@ -1627,8 +1724,7 @@
                     headers: {
                         'Authorization': `Bearer ${authToken}`,
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                            'content')
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     }
                 });
 
@@ -1687,8 +1783,7 @@
                 const response = await fetch(form.action, {
                     method: 'POST', // Laravel uses POST with _method=DELETE
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                            'content'),
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
                     },
@@ -1736,7 +1831,6 @@
 
             return false;
         }
-
 
         function startSessionCheck() {
             sessionCheckInterval = setInterval(() => {

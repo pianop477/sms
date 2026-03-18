@@ -1871,7 +1871,9 @@ class ContractController extends Controller
                 'teachers.address',
                 'schools.school_reg_no',
                 'schools.postal_address',
-                'schools.postal_name', 'schools.school_email', 'schools.school_phone',
+                'schools.postal_name',
+                'schools.school_email',
+                'schools.school_phone',
                 'schools.school_alternative_phone',
                 'schools.logo',
                 'schools.country'
@@ -1923,6 +1925,7 @@ class ContractController extends Controller
 
             $contractId = $decodedId[0];
             $contract = school_constracts::findOrFail($contractId);
+            $terminationDetails = ContractStatusHistory::where('contract_id', $contract->id)->first();
 
             // ===== CRITICAL: Handle token from query string =====
             // If token is in query string, store it in session for this request
@@ -2031,7 +2034,15 @@ class ContractController extends Controller
             $authorized = User::find($contract->holder_id);
             $position = $this->getPositionTitle($authorized);
 
-            // ===== STEP 9: Prepare contract data =====
+            // ===== STEP 9: Get termination details ONLY if status is terminated =====
+            $terminationDetails = null;
+            if ($contract->status === 'terminated') {
+                $terminationDetails = ContractStatusHistory::where('contract_id', $contract->id)
+                    ->where('new_status', 'terminated')
+                    ->first();
+            }
+
+            // ===== STEP 10: Prepare contract data with conditional termination fields =====
             $contractData = [
                 'school_name' => $school->school_name,
                 'postal_address' => $school->postal_address,
@@ -2056,12 +2067,22 @@ class ContractController extends Controller
                 'authorized_person_name' => $contract->approved_by,
                 'position' => $position,
                 'status' => $contract->status,
-                'terminated_at' => $contract->terminated_at,
                 'is_active' => $contract->is_active ?? false,
                 'verification_token' => $contract->verify_token,
             ];
 
-            // ===== STEP 10: Generate PDF =====
+            // Add termination details ONLY if they exist
+            if ($terminationDetails) {
+                $contractData['changed_by'] = $terminationDetails->changed_by;
+                $contractData['reason'] = $terminationDetails->reason;
+                $contractData['notes'] = $terminationDetails->metadata['notes'] ?? null;
+                $contractData['termination_type'] = $terminationDetails->metadata['termination_type'] ?? null;
+                $contractData['effective_date'] = $terminationDetails->metadata['effective_date'] ?? null;
+                $contractData['document_path'] = $terminationDetails->metadata['document_path'] ?? null;
+                $contractData['terminated_by'] = $terminationDetails->metadata['terminated_by'] ?? null;
+            }
+
+            // ===== STEP 11: Generate PDF =====
             $pdf = PDF::loadView('Contract.contract_file', [
                 'contract' => $contractData,
                 'qrImage' => $qrImage
@@ -2074,7 +2095,7 @@ class ContractController extends Controller
                 'isHtml5ParserEnabled' => true
             ]);
 
-            // ===== STEP 11: Log success =====
+            // ===== STEP 12: Log success =====
             // Log::info('✅ Approval letter generated successfully', [
             //     'contract_id' => $contractId,
             //     'user_id' => $currentUserId,
@@ -2082,7 +2103,7 @@ class ContractController extends Controller
             //     'time_ms' => round((microtime(true) - $startTime) * 1000, 2)
             // ]);
 
-            // ===== STEP 12: Return PDF directly for ALL requests =====
+            // ===== STEP 13: Return PDF directly for ALL requests =====
             $filename = 'approval_letter_' . $contractData['first_name'] . '_' . $contractData['last_name'] . '.pdf';
 
             // Set proper headers for PDF download
@@ -2092,12 +2113,9 @@ class ContractController extends Controller
                 ->header('Cache-Control', 'private, max-age=0, must-revalidate')
                 ->header('Pragma', 'public');
         } catch (\Exception $e) {
-            // Log::error('❌ Approval letter generation error', [
-            //     'error' => $e->getMessage(),
-            //     'trace' => $e->getTraceAsString(),
-            //     'id' => $id ?? null,
-            //     'ip' => $request->ip() ?? null
-            // ]);
+            Log::error('❌ Approval letter generation error', [
+                'error' => $e->getMessage(),
+            ]);
 
             if ($request->expectsJson()) {
                 return response()->json([

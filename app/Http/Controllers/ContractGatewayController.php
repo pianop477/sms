@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
+use Vinkla\Hashids\Facades\Hashids;
 
 class ContractGatewayController extends Controller
 {
@@ -31,7 +32,7 @@ class ContractGatewayController extends Controller
         return view('Contract.gateway_spa');
     }
 
-     private function getCurrentApplicant()
+    private function getCurrentApplicant()
     {
         // ===== CASE 1: Authenticated teacher =====
         if (Auth::check()) {
@@ -426,42 +427,20 @@ class ContractGatewayController extends Controller
             ], 401);
         }
 
-        // Get contracts for this applicant
+        // Get contracts for this applicant - LOAD ALL DATA
         $contracts = school_constracts::where('applicant_id', $session['user_id'])
             ->with(['statusHistories' => function ($q) {
                 $q->orderBy('created_at', 'desc');
             }])
             ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($contract) {
-                // Get termination history if exists
-                $terminationHistory = $contract->statusHistories
-                    ->where('new_status', 'terminated')
-                    ->first();
+            ->get();
 
-                return [
-                    'id' => $contract->id,
-                    'contract_type' => $contract->contract_type,
-                    'job_title' => $contract->job_title,
-                    'status' => $contract->status,
-                    'applied_at' => $contract->applied_at,
-                    'approved_at' => $contract->approved_at,
-                    'activated_at' => $contract->activated_at,
-                    'duration' => $contract->duration,
-                    'start_date' => $contract->start_date,
-                    'end_date' => $contract->end_date,
-                    'basic_salary' => $contract->basic_salary,
-                    'allowances' => $contract->allowances,
-                    'is_active' => $contract->is_active,
-                    'terminated_at' => $terminationHistory?->created_at,
-                    'termination_reason' => $terminationHistory?->reason,
-                    'has_documents' => [
-                        'application' => !empty($contract->applicant_file_path),
-                        'contract' => !empty($contract->contract_file_path),
-                        'qr_code' => !empty($contract->qr_code_path),
-                    ]
-                ];
-            });
+        // Add approval URL to each contract
+        $contracts->each(function ($contract) {
+            $contract->approval_letter_url = route('contract.approval.letter', [
+                'id' => Hashids::encode($contract->id)
+            ]);
+        });
 
         return response()->json([
             'success' => true,
@@ -474,13 +453,12 @@ class ContractGatewayController extends Controller
                     'phone' => $session['staff_data']['phone'],
                 ],
                 'school' => $session['school'],
-                'contracts' => $contracts,
+                'contracts' => $contracts, // Sasa kila contract ina approval_letter_url
                 'auth_token' => $authToken,
                 'expires_at' => $session['expires_at']
             ]
         ]);
     }
-
     // ContractGatewayController.php
     public function showDashboard()
     {
@@ -618,8 +596,8 @@ class ContractGatewayController extends Controller
         $nextSmsService = new NextSmsService();
         $destination = $this->formatPhoneNumber($phone);
 
-        // Log::info("OTP code: " . $message);
-        return $nextSmsService->sendSmsByNext($senderId, $destination, $message, uniqid());
+        Log::info("OTP code: " . $message);
+        // return $nextSmsService->sendSmsByNext($senderId, $destination, $message, uniqid());
     }
 
     /**
