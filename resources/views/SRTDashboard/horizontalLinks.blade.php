@@ -215,7 +215,7 @@
                                 </ul>
                             </li>
                             {{-- payment reports --}}
-                            @if (Auth::user()->usertype == 2 && Auth::user()->school === null || Auth::user()->school->package == 'premium')
+                            @if ((Auth::user()->usertype == 2 && Auth::user()->school === null) || Auth::user()->school->package == 'premium')
                                 <li>
                                     <a href="javascript:void(0)"><i class="fas fa-exchange-alt"></i><span> Financial
                                             Transactions</span></a>
@@ -262,53 +262,58 @@
                             </li>
 
                             {{-- Academic Management --}}
-                            <li>
-                                <a href="javascript:void(0)"><i class="fas fa-money-bill-trend-up"></i><span>Accounts
-                                        & Expenses</span></a>
-                                <ul class="submenu">
-                                    <li><a href="{{ route('expenses.index') }}"><i class="fas fa-layer-group"></i>
-                                            Accounts</a></li>
-                                    <li><a href="{{ route('expenditure.index') }}"><i class="fas fa-sack-dollar"></i>
-                                            Expenses</a></li>
-                                </ul>
-                            </li>
-                            {{-- fess & bills --}}
-                            <li>
-                                <a href="javascript:void(0)"><i class="fas fa-money-bills"></i><span>Bills &
-                                        Payment</span></a>
-                                <ul class="submenu">
-                                    <li>
-                                        <a href="{{ route('bills.index') }}"><i
-                                                class="fas fa-money-bill-1"></i><span> Bills</span></a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ route('bills.transactions') }}"><i
-                                                class="fas fa-credit-card-alt"></i><span> Payments</span></a>
-                                    </li>
-                                </ul>
-                            </li>
-                            {{-- batch --}}
-                            <li>
-                                <a href="{{ route('batches.index') }}"><i class="fas fa-briefcase"></i><span>
-                                        Batches</span></a>
-                            </li>
-                            {{-- Services --}}
-                            <li>
-                                <a href="{{ route('services.index') }}"><i
-                                        class="fas fa-wrench"></i><span>Services</span></a>
-                            </li>
+                            @if (Auth::user()->school->package === 'premium')
+                                <li>
+                                    <a href="javascript:void(0)"><i
+                                            class="fas fa-money-bill-trend-up"></i><span>Accounts
+                                            & Expenses</span></a>
+                                    <ul class="submenu">
+                                        <li><a href="{{ route('expenses.index') }}"><i
+                                                    class="fas fa-layer-group"></i>
+                                                Accounts</a></li>
+                                        <li><a href="{{ route('expenditure.index') }}"><i
+                                                    class="fas fa-sack-dollar"></i>
+                                                Expenses</a></li>
+                                    </ul>
+                                </li>
+                                {{-- fess & bills --}}
+                                <li>
+                                    <a href="javascript:void(0)"><i class="fas fa-money-bills"></i><span>Bills &
+                                            Payment</span></a>
+                                    <ul class="submenu">
+                                        <li>
+                                            <a href="{{ route('bills.index') }}"><i
+                                                    class="fas fa-money-bill-1"></i><span> Bills</span></a>
+                                        </li>
+                                        <li>
+                                            <a href="{{ route('bills.transactions') }}"><i
+                                                    class="fas fa-credit-card-alt"></i><span> Payments</span></a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                {{-- batch --}}
+                                <li>
+                                    <a href="{{ route('batches.index') }}"><i class="fas fa-briefcase"></i><span>
+                                            Batches</span></a>
+                                </li>
+                                {{-- Services --}}
+                                <li>
+                                    <a href="{{ route('services.index') }}"><i
+                                            class="fas fa-wrench"></i><span>Services</span></a>
+                                </li>
 
-                            {{-- Reports & Analytics --}}
-                            <li>
-                                <a href="javascript:void(0)"><i class="fas fa-exchange-alt"></i><span> Financial
-                                        Transactions</span></a>
-                                <ul class="submenu">
-                                    <li><a href="{{ route('expenditure.all.transactions') }}"><span
-                                                style="font-size: 1.2rem;">💶</span> Transactions</a></li>
-                                    <li><a href="{{ route('payment.report') }}">
-                                            <span style="font-size: 1.2rem;">💳</span> Payment Bills</a></li>
-                                </ul>
-                            </li>
+                                {{-- Reports & Analytics --}}
+                                <li>
+                                    <a href="javascript:void(0)"><i class="fas fa-exchange-alt"></i><span> Financial
+                                            Transactions</span></a>
+                                    <ul class="submenu">
+                                        <li><a href="{{ route('expenditure.all.transactions') }}"><span
+                                                    style="font-size: 1.2rem;">💶</span> Transactions</a></li>
+                                        <li><a href="{{ route('payment.report') }}">
+                                                <span style="font-size: 1.2rem;">💳</span> Payment Bills</a></li>
+                                    </ul>
+                                </li>
+                            @endif
                         @endif
                     </ul>
                 </nav>
