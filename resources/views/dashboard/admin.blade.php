@@ -497,7 +497,15 @@
                                                 </a>
                                             </td>
                                             <td class="fw-bold text-info">{{ strtoupper($school->school_reg_no) }}</td>
-                                            <td class="fw-bold">{{ ucfirst($school->package) }}</td>
+                                            @php
+                                                $isBasic = $school->package == 'basic';
+                                            @endphp
+                                            <td class="fw-bold">
+                                                <span class="badge bg-{{$isBasic ? 'warning text-dark' : 'success text-white'}}">
+                                                    <i class="fas fa-{{$isBasic ? 'star' : 'crown'}}"></i>
+                                                    {{ ucfirst($school->package) }}
+                                                </span>
+                                            </td>
                                             <td class="text-muted">
                                                 {{ ucwords(strtolower($school->postal_address)) }} -
                                                 {{ ucwords(strtolower($school->postal_name)) }}
