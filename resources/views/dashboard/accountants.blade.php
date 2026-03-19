@@ -496,7 +496,7 @@
                     <div class="text-end">
                         <small class="text-muted d-block">Subscription Package.</small>
                         @if ($school->package == 'premium')
-                            <span class="fw-semibold badge bg-success"><i class="fas fa-crown"></i> {{ ucfirst($school->package) }}</span>
+                            <span class="fw-semibold badge bg-success text-white"><i class="fas fa-crown"></i> {{ ucfirst($school->package) }}</span>
                         @else
                             <span class="fw-semibold badge bg-warning text-dark"><i class="fas fa-star"></i> {{ ucfirst($school->package) }}</span>
                         @endif
