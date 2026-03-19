@@ -20,7 +20,7 @@ class school extends Model
         'reg_date',
         'service_start_date',
         'service_end_date',
-        'service_duration',
+        'service_duration', 'package',
         'sender_id', 'school_email', 'school_phone', 'school_alternative_phone'
     ];
 

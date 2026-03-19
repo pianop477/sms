@@ -718,10 +718,18 @@
                     </div>
                 </div>
 
+                <!-- Badili sehemu ya message container -->
                 <div class="message-container">
+                    @php
+                        $school = Auth::user()->school;
+                        $isBasicPackage = $school && $school->package === 'basic';
+                        $maxChars = $isBasicPackage ? 306 : 459; // 306 = SMS 2, 459 = SMS 3
+                        $smsCount = $isBasicPackage ? 2 : 3;
+                    @endphp
+
                     <textarea name="message_content" id="message_content"
                         class="message-textarea @error('message_content') is-invalid @enderror" placeholder="Type your message here..."
-                        required maxlength="459">{{ old('message_content') }}</textarea>
+                        required maxlength="{{ $maxChars }}">{{ old('message_content') }}</textarea>
 
                     @error('message_content')
                         <div class="invalid-feedback d-block mt-2">{{ $message }}</div>
@@ -730,11 +738,13 @@
                     <div class="char-counter">
                         <div class="char-info">
                             <span class="char-count" id="charCount">0</span>
-                            <span class="text-muted">/ 459 characters</span>
+                            <span class="text-muted">/ {{ $maxChars }} characters</span>
                         </div>
                         <div>
-                            <span class="text-muted">
-                                <i class="fas fa-info-circle me-1"></i> Max 3 SMS
+                            <span class="badge"
+                                style="background: {{ $isBasicPackage ? '#e17055' : '#4e54c8' }}; color: white; padding: 5px 10px; border-radius: 20px;">
+                                <i class="fas fa-{{ $isBasicPackage ? 'star' : 'crown' }} me-1"></i>
+                                {{ $isBasicPackage ? 'Basic Package' : 'Premium Package' }} - Max {{ $smsCount }} SMS
                             </span>
                         </div>
                     </div>
@@ -903,11 +913,32 @@
             const sendButton = document.getElementById('sendButton');
             const form = document.querySelector('form');
 
+            // Pata max length kutoka kwenye textarea attribute
+            const maxLength = parseInt(textarea.getAttribute('maxlength'));
+            const warningThreshold = maxLength - 50; // Onyo when 50 characters left
+
             // Character counter
             textarea.addEventListener('input', function() {
                 const currentLength = this.value.length;
                 charCount.textContent = currentLength;
-                charCount.style.color = currentLength > 450 ? '#e17055' : '#4e54c8';
+
+                // Badili rangi kulingana na package na remaining characters
+                if (currentLength > maxLength - 10) {
+                    charCount.style.color = '#e17055'; // Danger - almost full
+                } else if (currentLength > warningThreshold) {
+                    charCount.style.color = '#f39c12'; // Warning - yellow
+                } else {
+                    charCount.style.color = '#4e54c8'; // Normal
+                }
+
+                // Onyesha remaining characters
+                const remaining = maxLength - currentLength;
+                if (remaining <= 20) {
+                    // Add tooltip or visual indicator
+                    textarea.style.borderColor = remaining <= 10 ? '#e17055' : '#f39c12';
+                } else {
+                    textarea.style.borderColor = '';
+                }
             });
 
             // Initialize
@@ -923,7 +954,7 @@
                 let isValid = true;
                 let errorMessages = [];
 
-                // 1. Check recipients
+                // 1. Check recipients (same as before)
                 const classChecked = document.querySelectorAll('.class-checkbox:checked').length;
                 const groupChecked = document.querySelectorAll(
                     '.group-option input[type="checkbox"]:checked').length;
@@ -932,12 +963,11 @@
                     isValid = false;
                     errorMessages.push('Please select at least one recipient group or class.');
 
-                    // Highlight recipients section
+                    // Highlight recipients section (same as before)
                     const recipientsSection = document.querySelector('.dashboard-card:first-child');
                     recipientsSection.style.border = '2px solid #e17055';
                     recipientsSection.style.animation = 'shake 0.5s ease-in-out';
 
-                    // Add error message
                     const errorDiv = document.createElement('div');
                     errorDiv.className = 'validation-error alert alert-danger mt-2';
                     errorDiv.innerHTML = `
@@ -946,116 +976,123 @@
                 `;
                     recipientsSection.querySelector('.card-header').after(errorDiv);
                 } else {
-                    // Remove highlight if previously added
                     const recipientsSection = document.querySelector('.dashboard-card:first-child');
                     recipientsSection.style.border = '';
                     recipientsSection.style.animation = '';
                 }
 
-                // 2. Check message content
+                // 2. Check message content with dynamic max length
                 const messageText = textarea.value.trim();
+                const maxChars = parseInt(textarea.getAttribute('maxlength'));
+
                 if (messageText.length === 0) {
                     isValid = false;
                     errorMessages.push('Please enter a message to send.');
-
-                    // Highlight message area
-                    textarea.style.border = '2px solid #e17055';
-                    textarea.style.boxShadow = '0 0 0 3px rgba(225, 112, 85, 0.1)';
-
-                    // Add error message
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'validation-error alert alert-danger mt-2';
-                    errorDiv.innerHTML = `
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    Please enter a message
-                `;
-                    textarea.parentNode.insertBefore(errorDiv, textarea.nextSibling);
-
-                    // Scroll to message area
-                    textarea.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
-                    textarea.focus();
-                } else if (messageText.length > 459) {
+                    highlightMessageArea(textarea, 'Message cannot be empty');
+                } else if (messageText.length > maxChars) {
                     isValid = false;
-                    errorMessages.push('Message is too long. Maximum 459 characters allowed.');
+                    errorMessages.push(
+                        `Message is too long. Maximum ${maxChars} characters allowed (${getSMSCount(maxChars)} SMS).`
+                        );
 
-                    textarea.style.border = '2px solid #e17055';
-                    textarea.style.boxShadow = '0 0 0 3px rgba(225, 112, 85, 0.1)';
-
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'validation-error alert alert-danger mt-2';
-                    errorDiv.innerHTML = `
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    Message is too long (${messageText.length}/459 characters)
-                `;
-                    textarea.parentNode.insertBefore(errorDiv, textarea.nextSibling);
-
-                    textarea.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
-                    textarea.focus();
+                    const smsCount = getSMSCount(maxChars);
+                    highlightMessageArea(textarea,
+                        `Message is too long (${messageText.length}/${maxChars} characters). ` +
+                        `Maximum ${smsCount} SMS allowed.`
+                    );
                 } else {
-                    // Remove highlight if previously added
                     textarea.style.border = '';
                     textarea.style.boxShadow = '';
                 }
 
-                // If valid, proceed with confirmation and submission
+                // Helper function for SMS count
+                function getSMSCount(maxChars) {
+                    return maxChars === 306 ? 2 : 3;
+                }
+
+                // Helper function to highlight message area
+                function highlightMessageArea(textarea, errorMessage) {
+                    textarea.style.border = '2px solid #e17055';
+                    textarea.style.boxShadow = '0 0 0 3px rgba(225, 112, 85, 0.1)';
+
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'validation-error alert alert-danger mt-2';
+                    errorDiv.innerHTML = `
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    ${errorMessage}
+                `;
+                    textarea.parentNode.insertBefore(errorDiv, textarea.nextSibling);
+
+                    textarea.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                    textarea.focus();
+                }
+
+                // If valid, proceed with confirmation
                 if (isValid) {
-                    // Show confirmation dialog
+                    // Get package info for confirmation message
+                    const isBasic = {{ Auth::user()->school->package === 'basic' ? 'true' : 'false' }};
+                    const smsLimit = isBasic ? 2 : 3;
+                    const charLimit = isBasic ? 306 : 459;
+
                     const confirmed = confirm(
-                        'Are you sure you want to send this message to the selected recipients?');
+                        `Are you sure you want to send this message?\n\n` +
+                        `📊 Summary:\n` +
+                        `• Characters: ${messageText.length}/${charLimit}\n` +
+                        `• SMS Count: ${Math.ceil(messageText.length / 153)}/${smsLimit}\n` +
+                        `• Package: ${isBasic ? 'Basic' : 'Premium'}\n\n` +
+                        `Click OK to send.`
+                    );
 
                     if (confirmed) {
-                        // Disable button
                         sendButton.disabled = true;
                         sendButton.innerHTML = `
                         <span class="spinner-border spinner-border-sm me-2" role="status"></span>
                         Sending...
                     `;
-
-                        // Submit form
                         form.submit();
                     }
                 } else {
-                    // Show all error messages in a nice alert
-                    const errorAlert = document.createElement('div');
-                    errorAlert.className = 'alert alert-danger alert-dismissible fade show';
-                    errorAlert.style.position = 'fixed';
-                    errorAlert.style.top = '20px';
-                    errorAlert.style.right = '20px';
-                    errorAlert.style.zIndex = '9999';
-                    errorAlert.style.maxWidth = '400px';
-                    errorAlert.innerHTML = `
-                    <div class="d-flex align-items-start">
-                        <i class="fas fa-exclamation-triangle me-3 mt-1 fs-4"></i>
-                        <div>
-                            <h5 class="alert-heading mb-2">Please fix the following:</h5>
-                            <ul class="mb-1">
-                                ${errorMessages.map(msg => `<li>${msg}</li>`).join('')}
-                            </ul>
-                        </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                `;
-
-                    document.body.appendChild(errorAlert);
-
-                    // Auto-dismiss after 5 seconds
-                    setTimeout(() => {
-                        if (errorAlert.parentNode) {
-                            errorAlert.style.opacity = '0';
-                            errorAlert.style.transition = 'opacity 0.3s ease';
-                            setTimeout(() => errorAlert.remove(), 300);
-                        }
-                    }, 5000);
+                    // Show error alert (same as before)
+                    showErrorAlert(errorMessages);
                 }
             });
 
-            // Add shake animation for errors
+            // Helper function to show error alert
+            function showErrorAlert(messages) {
+                const errorAlert = document.createElement('div');
+                errorAlert.className = 'alert alert-danger alert-dismissible fade show';
+                errorAlert.style.position = 'fixed';
+                errorAlert.style.top = '20px';
+                errorAlert.style.right = '20px';
+                errorAlert.style.zIndex = '9999';
+                errorAlert.style.maxWidth = '400px';
+                errorAlert.innerHTML = `
+                <div class="d-flex align-items-start">
+                    <i class="fas fa-exclamation-triangle me-3 mt-1 fs-4"></i>
+                    <div>
+                        <h5 class="alert-heading mb-2">Please fix the following:</h5>
+                        <ul class="mb-1">
+                            ${messages.map(msg => `<li>${msg}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+                document.body.appendChild(errorAlert);
+
+                setTimeout(() => {
+                    if (errorAlert.parentNode) {
+                        errorAlert.style.opacity = '0';
+                        errorAlert.style.transition = 'opacity 0.3s ease';
+                        setTimeout(() => errorAlert.remove(), 300);
+                    }
+                }, 5000);
+            }
+
+            // Add shake animation
             const style = document.createElement('style');
             style.textContent = `
             @keyframes shake {
@@ -1069,31 +1106,50 @@
                 border-left: 4px solid #e17055;
             }
 
-            /* Real-time validation for textarea */
             .message-textarea.invalid {
                 border: 2px solid #e17055 !important;
                 background: rgba(225, 112, 85, 0.05) !important;
             }
 
-            /* Real-time validation for checkboxes */
             .class-label.invalid, .group-option.invalid {
                 border: 2px solid #e17055 !important;
                 background: rgba(225, 112, 85, 0.05) !important;
             }
+
+            /* Package indicator styles */
+            .package-badge {
+                display: inline-block;
+                padding: 3px 8px;
+                border-radius: 12px;
+                font-size: 0.75rem;
+                font-weight: 500;
+            }
+
+            .package-basic {
+                background: #ffeaa7;
+                color: #d35400;
+            }
+
+            .package-premium {
+                background: #74b9ff;
+                color: #2c3e50;
+            }
         `;
             document.head.appendChild(style);
 
-            // Real-time validation for textarea
+            // Real-time validation
             textarea.addEventListener('input', function() {
                 const text = this.value.trim();
-                if (text.length === 0) {
+                const maxChars = parseInt(this.getAttribute('maxlength'));
+
+                if (text.length === 0 || text.length > maxChars) {
                     this.classList.add('invalid');
                 } else {
                     this.classList.remove('invalid');
                 }
             });
 
-            // Real-time validation for checkboxes
+            // Real-time validation for checkboxes (same as before)
             const checkboxes = document.querySelectorAll('.class-checkbox, .group-option input[type="checkbox"]');
             checkboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', function() {
@@ -1103,12 +1159,10 @@
                         '.group-option input[type="checkbox"]:checked').length;
 
                     if (classChecked === 0 && groupChecked === 0) {
-                        // Highlight all recipient options
                         document.querySelectorAll('.class-label, .group-option').forEach(el => {
                             el.classList.add('invalid');
                         });
                     } else {
-                        // Remove highlight
                         document.querySelectorAll('.class-label, .group-option').forEach(el => {
                             el.classList.remove('invalid');
                         });
@@ -1116,7 +1170,7 @@
                 });
             });
 
-            // Modal functionality
+            // Modal functionality (same as before)
             document.querySelectorAll('.sms-preview-link').forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -1130,14 +1184,12 @@
                         deliveredAt: this.getAttribute('data-delivered-at')
                     };
 
-                    // Populate modal
                     document.getElementById('modalFullText').textContent = data.fullText;
                     document.getElementById('modalTo').textContent = data.to;
                     document.getElementById('modalFrom').textContent = data.from;
                     document.getElementById('modalSentAt').textContent = data.sentAt;
                     document.getElementById('modalDeliveredAt').textContent = data.deliveredAt;
 
-                    // Status
                     let statusHtml = '';
                     if (data.status === 'DELIVERED') {
                         statusHtml =
@@ -1153,7 +1205,7 @@
                 });
             });
 
-            // Copy SMS
+            // Copy SMS (same as before)
             document.getElementById('copySmsBtn')?.addEventListener('click', function() {
                 const text = document.getElementById('modalFullText').textContent;
                 navigator.clipboard.writeText(text).then(() => {
@@ -1168,10 +1220,9 @@
                 });
             });
 
-            // Prevent form submission on Enter key in textarea
+            // Prevent form submission on Enter
             textarea.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && e.ctrlKey) {
-                    // Allow Ctrl+Enter for new lines
                     return;
                 }
                 if (e.key === 'Enter') {

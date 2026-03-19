@@ -524,7 +524,7 @@
         }
     </style>
 
-{{--
+    {{--
     ROLES description
     1. Normal teacher
     2. Head teacher
@@ -571,80 +571,84 @@
         <!-- Contract Status Alert -->
         @if (Auth::user()->usertype == 3)
             <div class="row mb-4">
-                <div class="col-12">
-                    @if ($contract == null)
-                        <div class="alert alert-danger alert-custom alert-dismissible fade show">
-                            <strong><i class="fas fa-exclamation-triangle mr-2"></i> Contract Status:</strong> Not applied.
-                            <a href="{{ route('contract.index') }}" class="alert-link fw-bold">Apply here</a>
-                            {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
-                        </div>
-                    @else
-                        @if ($contract->status == 'expired')
+                @if (Auth::user()->school->package === 'premium')
+                    <div class="col-12">
+                        @if ($contract == null)
                             <div class="alert alert-danger alert-custom alert-dismissible fade show">
-                                <strong><i class="fas fa-times-circle mr-2"></i> Contract Status:</strong> Expired
+                                <strong><i class="fas fa-exclamation-triangle mr-2"></i> Contract Status:</strong> Not
+                                applied.
                                 <a href="{{ route('contract.index') }}" class="alert-link fw-bold">Apply here</a>
                                 {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
                             </div>
-                        @elseif ($contract->status == 'rejected')
-                            <div class="alert alert-secondary alert-custom alert-dismissible fade show">
-                                <strong><i class="fas fa-times mr-2"></i> Contract Status:</strong> Rejected |
-                                <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
-                                {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
-                            </div>
-                        @elseif ($contract->status == 'approved')
-                            <div class="alert alert-warning alert-custom alert-dismissible fade show">
-                                <strong><i class="fas fa-exclamation-circle mr-2"></i> Contract Status:</strong> Under
-                                Review |
-                                <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
-                                {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
-                            </div>
-                        @elseif ($contract->status == 'pending')
-                            <div class="alert alert-info alert-custom alert-dismissible fade show">
-                                <strong><i class="fas fa-clock mr-2"></i> Contract Status:</strong> Pending |
-                                <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
-                                {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
-                            </div>
-                        @elseif ($contract->status == 'activated')
-                            <div class="alert alert-success alert-custom alert-dismissible fade show">
-                                <strong><i class="fas fa-check-circle mr-2"></i> Contract Status:</strong> Active (Expires:
-                                {{ \Carbon\Carbon::parse($contract->end_date)->format('d/m/Y') }}) |
-                                <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View contract</a>
-                                {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
-                            </div>
                         @else
-                            <div class="alert alert-secondary alert-custom alert-dismissible fade show">
-                                <strong><i class="fas fa-ban mr-2"></i> Contract Status:</strong> Terminated |
-                                <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
-                                {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
+                            @if ($contract->status == 'expired')
+                                <div class="alert alert-danger alert-custom alert-dismissible fade show">
+                                    <strong><i class="fas fa-times-circle mr-2"></i> Contract Status:</strong> Expired
+                                    <a href="{{ route('contract.index') }}" class="alert-link fw-bold">Apply here</a>
+                                    {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
+                                </div>
+                            @elseif ($contract->status == 'rejected')
+                                <div class="alert alert-secondary alert-custom alert-dismissible fade show">
+                                    <strong><i class="fas fa-times mr-2"></i> Contract Status:</strong> Rejected |
+                                    <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
+                                    {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
+                                </div>
+                            @elseif ($contract->status == 'approved')
+                                <div class="alert alert-warning alert-custom alert-dismissible fade show">
+                                    <strong><i class="fas fa-exclamation-circle mr-2"></i> Contract Status:</strong> Under
+                                    Review |
+                                    <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
+                                    {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
+                                </div>
+                            @elseif ($contract->status == 'pending')
+                                <div class="alert alert-info alert-custom alert-dismissible fade show">
+                                    <strong><i class="fas fa-clock mr-2"></i> Contract Status:</strong> Pending |
+                                    <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
+                                    {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
+                                </div>
+                            @elseif ($contract->status == 'activated')
+                                <div class="alert alert-success alert-custom alert-dismissible fade show">
+                                    <strong><i class="fas fa-check-circle mr-2"></i> Contract Status:</strong> Active
+                                    (Expires:
+                                    {{ \Carbon\Carbon::parse($contract->end_date)->format('d/m/Y') }}) |
+                                    <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View contract</a>
+                                    {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
+                                </div>
+                            @else
+                                <div class="alert alert-secondary alert-custom alert-dismissible fade show">
+                                    <strong><i class="fas fa-ban mr-2"></i> Contract Status:</strong> Terminated |
+                                    <a href="{{ route('contract.index') }}" class="alert-link fw-bold">View details</a>
+                                    {{-- <button type="button" class="btn-close" data-bs-dismiss="alert"></button> --}}
+                                </div>
+                            @endif
+                        @endif
+
+                        <!-- TOD Duty Alert -->
+                        @php
+                            $today = \Carbon\Carbon::now()->format('Y-m-d');
+                            $user = auth()->user();
+                            $teacher = \App\Models\Teacher::where('user_id', $user->id)->first();
+                            $myDuty = \App\Models\TodRoster::where('teacher_id', $teacher->id)
+                                ->where('status', 'active')
+                                ->first();
+                        @endphp
+                        @if ($myDuty)
+                            <div class="alert alert-warning alert-custom"
+                                style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-left-color: #ffc107;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong><i class="fas fa-bell me-2"></i> You are on duty this week!</strong>
+                                        Please, collect school report to document today's activities.
+                                    </div>
+                                    <a href="{{ route('tod.report.create') }}" class="btn btn-warning btn-sm"
+                                        onclick="return confirm('Are you sure you want to fill the daily report?')">
+                                        <i class="fas fa-file-pen me-1"></i> Collect Report
+                                    </a>
+                                </div>
                             </div>
                         @endif
-                    @endif
-
-                    <!-- TOD Duty Alert -->
-                    @php
-                        $today = \Carbon\Carbon::now()->format('Y-m-d');
-                        $user = auth()->user();
-                        $teacher = \App\Models\Teacher::where('user_id', $user->id)->first();
-                        $myDuty = \App\Models\TodRoster::where('teacher_id', $teacher->id)
-                            ->where('status', 'active')
-                            ->first();
-                    @endphp
-                    @if ($myDuty)
-                        <div class="alert alert-warning alert-custom"
-                            style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-left-color: #ffc107;">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <strong><i class="fas fa-bell me-2"></i> You are on duty this week!</strong>
-                                    Please, collect school report to document today's activities.
-                                </div>
-                                <a href="{{ route('tod.report.create') }}" class="btn btn-warning btn-sm"
-                                    onclick="return confirm('Are you sure you want to fill the daily report?')">
-                                    <i class="fas fa-file-pen me-1"></i> Collect Report
-                                </a>
-                            </div>
-                        </div>
-                    @endif
-                </div>
+                    </div>
+                @endif
             </div>
         @endif
 
@@ -671,8 +675,14 @@
                             </div>
                         </div>
                         <div class="text-end">
-                            <small class="text-muted d-block">Registration No.</small>
-                            <span class="fw-semibold">{{ strtoupper($school->school_reg_no) }}</span>
+                            <small class="text-muted d-block">Subscription Package.</small>
+                            @if ($school->package == 'premium')
+                                <span class="fw-semibold badge bg-success"><i class="fas fa-crown"></i>
+                                    {{ ucfirst($school->package) }}</span>
+                            @else
+                                <span class="fw-semibold badge bg-warning text-dark"><i class="fas fa-star"></i>
+                                    {{ ucfirst($school->package) }}</span>
+                            @endif
                         </div>
                     </div>
 
@@ -1515,10 +1525,10 @@
                                                         </style>
                                                         @if ($course->status == 1)
                                                             <ul class="d-flex justify-content-center">
-                                                                <li class="mr-4">
+                                                                <li class="mr-3">
                                                                     <a href="{{ route('score.prepare.form', ['id' => Hashids::encode($course->id)]) }}"
                                                                         class="btn btn-xs btn-score"
-                                                                        style="border-radius: 10px;">
+                                                                        style="border-radius: 10px; margin-right: 5px;">
                                                                         <i class="fas fa-file-edit"></i> Score
                                                                     </a>
                                                                 </li>
@@ -2127,10 +2137,10 @@
                                                                 }
                                                             </style>
                                                             <ul class="d-flex justify-content-center">
-                                                                <li class="mr-4">
+                                                                <li class="mr-3">
                                                                     <a href="{{ route('score.prepare.form', ['id' => Hashids::encode($course->id)]) }}"
                                                                         class="btn btn-xs btn-score"
-                                                                        style="border-radius: 10px;">
+                                                                        style="border-radius: 10px; margin-right: 5px;">
                                                                         <i class="fas fa-file-edit"></i> Score
                                                                     </a>
                                                                 </li>
@@ -2278,9 +2288,10 @@
                                                                 color: white;
                                                             }
                                                         </style>
-                                                        <li class="mr-4">
+                                                        <li class="mr-3">
                                                             <a href="{{ route('score.prepare.form', ['id' => Hashids::encode($course->id)]) }}"
-                                                                class="btn btn-xs btn-score" style="border-radius: 10px;">
+                                                                class="btn btn-xs btn-score"
+                                                                style="border-radius: 10px; margin-right: 5px;">
                                                                 <i class="fas fa-file-edit"></i> Score
                                                             </a>
                                                         </li>

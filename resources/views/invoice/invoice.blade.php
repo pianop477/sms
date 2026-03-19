@@ -564,6 +564,14 @@
                         <span class="detail-label">No. of Students:</span>
                         <span class="detail-value"><strong>{{ count($students) }}</strong></span>
                     </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Subscription Package:</span>
+                        @if ($schools->package === 'premium')
+                            <span class="detail-value"><strong><i class="fas fa-crown"></i> {{ ucfirst($schools->package) }}</strong></span>
+                        @else
+                            <span class="detail-value"><strong><i class="fas fa-star"></i> {{ ucfirst($schools->package) }}</strong></span>
+                        @endif
+                    </div>
                 </div>
             </div>
 
@@ -598,8 +606,16 @@
                                 {{ count($students) }}
                             </td>
                             <td style="text-align: center;">
+                                @php
+                                    $package = $schools->package;
+                                    if($package == 'basic') {
+                                        $price = 5000;
+                                    } else {
+                                        $price = 8000;
+                                    }
+                                @endphp
                                 <input type="number" id="unit_cost" class="amount-input" placeholder="0" min="0"
-                                    value="" oninput="calculateTotal()">
+                                    value="{{$price}}" oninput="calculateTotal()">
                             </td>
                             <td style="text-align: center; font-weight: 600;" id="total_cost">
                                 0

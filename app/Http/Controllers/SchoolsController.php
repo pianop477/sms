@@ -456,8 +456,8 @@ class SchoolsController extends Controller
     {
         $decoded = Hashids::decode($school);
         $request->validate([
-            'school' => 'exists:schools,id',
             'service_duration' => 'required|integer',
+            'package' => 'required|string|in:basic,premium',
         ]);
         try {
 
@@ -465,11 +465,13 @@ class SchoolsController extends Controller
             $endDate = $startDate->copy()->addMonth($request->service_duration);
 
             $schools = school::findOrFail($decoded[0]);
-            $schools->service_start_date = $startDate;
-            $schools->service_end_date = $endDate;
-            $schools->service_duration = $request->service_duration;
-            $schools->status = 1;
-            $schools->save();
+            $schools->update([
+                'service_start_date' => $request->start_date?? $startDate,
+                'service_end_date' => $request->end_date ?? $endDate,
+                'service_duration' => $request->service_duration,
+                'package' => $request->package,
+                'status' => 1,
+            ]);
 
             //update users who disabled
             User::where('school_id', $schools->id)->where('status', 0)->update(['status' => 1]);
@@ -477,7 +479,7 @@ class SchoolsController extends Controller
             // Student::where('school_id', $schools->id)->where('status', 0)->update(['status' => 1]);
             Parents::where('school_id', $schools->id)->where('status', 0)->update(['status' => 1]);
 
-            Alert()->toast('Service has been activated successfully', 'success');
+            Alert()->toast('Changes has been saved successfully', 'success');
             return back();
         } catch (Exception $e) {
             Alert()->toast($e->getMessage(), 'error');

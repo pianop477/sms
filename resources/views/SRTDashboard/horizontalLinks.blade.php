@@ -79,8 +79,11 @@
                                 <ul class="submenu">
                                     <li><a href="{{ route('attendance.fill.form') }}"><i
                                                 class="fas fa-calendar-check"></i> Attendance Reports</a></li>
-                                    <li><a href="{{ route('get.school.report') }}"><i class="fas fa-book"></i> Daily
-                                            School Report</a></li>
+                                    @if (Auth::user()->school === null || Auth::user()->school->package == 'premium')
+                                        <li><a href="{{ route('get.school.report') }}"><i class="fas fa-book"></i>
+                                                Daily
+                                                School Report</a></li>
+                                    @endif
                                     <li><a href="{{ route('package.byYear') }}"><i class="fas fa-layer-group"></i>
                                             Holiday Packages</a></li>
                                     <li><a href="{{ route('graduate.students.by.year') }}"><i
@@ -89,16 +92,18 @@
                             </li>
 
                             {{-- Staff & HR --}}
-                            <li>
-                                <a href="javascript:void(0)"><i class="fa fa-file-archive"></i><span>Staff &
-                                        HR</span></a>
-                                <ul class="submenu">
-                                    <li><a href="{{ route('roster.by.year') }}"><i class="fas fa-file"></i> Duty
-                                            Rosters</a></li>
-                                    <li><a href="{{ route('contract.index') }}"><i class="fas fa-briefcase"></i>
-                                            Contracts</a></li>
-                                </ul>
-                            </li>
+                            @if (Auth::user()->school === null || Auth::user()->school->package == 'premium')
+                                <li>
+                                    <a href="javascript:void(0)"><i class="fa fa-file-archive"></i><span>Staff &
+                                            HR</span></a>
+                                    <ul class="submenu">
+                                        <li><a href="{{ route('roster.by.year') }}"><i class="fas fa-file"></i> Duty
+                                                Rosters</a></li>
+                                        <li><a href="{{ route('contract.index') }}"><i class="fas fa-briefcase"></i>
+                                                Contracts</a></li>
+                                    </ul>
+                                </li>
+                            @endif
 
                             {{-- System Administration --}}
                             <li>
@@ -132,8 +137,10 @@
                                             Students</a></li>
                                     <li><a href="{{ route('Parents.index') }}"><i class="fa fa-user-friends"></i>
                                             Parents</a></li>
-                                    <li><a href="{{ route('Accountants.index') }}"><i class="fa fa-users-line"></i>
-                                            Accountants</a></li>
+                                    @if (Auth::user()->school === null || Auth::user()->school->package == 'premium')
+                                        <li><a href="{{ route('Accountants.index') }}"><i class="fa fa-users-line"></i>
+                                                Accountants</a></li>
+                                    @endif
                                 </ul>
                             </li>
 
@@ -160,8 +167,11 @@
                                 <ul class="submenu">
                                     <li><a href="{{ route('attendance.fill.form') }}"><i
                                                 class="fas fa-calendar-check"></i> Attendance Reports</a></li>
-                                    <li><a href="{{ route('get.school.report') }}"><i class="fas fa-book"></i> Daily
-                                            School Report</a></li>
+                                    @if (Auth::user()->school === null || Auth::user()->school->package == 'premium')
+                                        <li><a href="{{ route('get.school.report') }}"><i class="fas fa-book"></i>
+                                                Daily
+                                                School Report</a></li>
+                                    @endif
                                     <li><a href="{{ route('package.byYear') }}"><i class="fas fa-layer-group"></i>
                                             Holiday Packages</a></li>
                                     <li><a href="{{ route('graduate.students.by.year') }}"><i
@@ -190,14 +200,22 @@
                                 <ul class="submenu">
                                     <li><a href="{{ route('OtherStaffs.index') }}"><i class="fas fa-user-group"></i>
                                             Staffs</a></li>
-                                    <li><a href="{{ route('roster.by.year') }}"><i class="fas fa-file"></i> Duty
-                                            Rosters</a></li>
-                                    <li><a href="{{ route('contract.management') }}"><i class="fas fa-briefcase"></i>
-                                            Contracts</a></li>
+                                    @if (Auth::user()->school === null || Auth::user()->school->package == 'premium')
+                                        <li>
+                                            <a href="{{ route('roster.by.year') }}"><i class="fas fa-file"></i> Duty
+                                                Rosters</a>
+                                        </li>
+                                        <li>
+                                            <a href="{{ route('contract.management') }}"><i
+                                                    class="fas fa-briefcase"></i>
+                                                Contracts
+                                            </a>
+                                        </li>
+                                    @endif
                                 </ul>
                             </li>
                             {{-- payment reports --}}
-                            @if (Auth::user()->usertype == 2)
+                            @if (Auth::user()->usertype == 2 && Auth::user()->school === null || Auth::user()->school->package == 'premium')
                                 <li>
                                     <a href="javascript:void(0)"><i class="fas fa-exchange-alt"></i><span> Financial
                                             Transactions</span></a>
@@ -223,13 +241,15 @@
                         @endif
 
                         {{-- Contract Requests (Other roles) --}}
-                        @if (
-                            (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 1) ||
-                                (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 4))
-                            <li>
-                                <a href="{{ route('contract.index') }}"><i class="fas fa-briefcase"></i><span>
-                                        Contracts</span></a>
-                            </li>
+                        @if (Auth::user()->school === null || Auth::user()->school->package == 'premium')
+                            @if (
+                                (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 1) ||
+                                    (Auth::user()->usertype == 3 && Auth::user()->teacher->role_id == 4))
+                                <li>
+                                    <a href="{{ route('contract.index') }}"><i class="fas fa-briefcase"></i><span>
+                                            Contracts</span></a>
+                                </li>
+                            @endif
                         @endif
                         {{-- Accountant Links --}}
                         @if (Auth::user()->usertype == 5)

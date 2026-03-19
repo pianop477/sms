@@ -384,6 +384,15 @@
                                     @endif
                                 @endif
                             </div>
+                            <div class="info-item">
+                                <i class="fas fa-circle me-2 text-primary"></i>
+                                <strong>Subscription:</strong>
+                                @if ($schools->package == 'basic')
+                                    <span class="badge-modern bg-warning text-dark"><i class="fas fa-star"></i> {{ucfirst($schools->package)}}</span>
+                                @else
+                                    <span class="badge-modern bg-success text-white"><i class="fas fa-crown"></i> {{ucfirst($schools->package)}}</span>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>

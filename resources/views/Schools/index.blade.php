@@ -66,8 +66,13 @@
         }
 
         @keyframes shimmer {
-            0% { transform: translateX(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) rotate(45deg); }
+            0% {
+                transform: translateX(-100%) rotate(45deg);
+            }
+
+            100% {
+                transform: translateX(100%) rotate(45deg);
+            }
         }
 
         .form-section {
@@ -331,6 +336,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -342,6 +348,7 @@
                 opacity: 0;
                 transform: translateX(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateX(0);
@@ -372,7 +379,8 @@
                 <i class="fas fa-info-circle me-2"></i>School Information
             </h4>
 
-            <form class="needs-validation" novalidate action="{{ route('Schools.store') }}" method="POST" enctype="multipart/form-data">
+            <form class="needs-validation" novalidate action="{{ route('Schools.store') }}" method="POST"
+                enctype="multipart/form-data">
                 @csrf
 
                 <div class="row">
@@ -381,10 +389,10 @@
                         <label for="validationCustom01" class="form-label">
                             <i class="fas fa-school"></i>School Name <span class="text-danger">*</span>
                         </label>
-                        <input type="text" required name="name" class="form-control text-uppercase" id="validationCustom01"
-                               placeholder="Enter school name" value="{{ old('name') }}">
+                        <input type="text" required name="name" class="form-control text-uppercase"
+                            id="validationCustom01" placeholder="Enter school name" value="{{ old('name') }}">
                         @error('name')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
 
@@ -394,9 +402,9 @@
                             <i class="fas fa-envelope"></i> School Email <span class="text-danger">*</span>
                         </label>
                         <input type="email" required name="school_email" class="form-control" id="schoolEmail"
-                               placeholder="Enter email" value="{{ old('school_email') }}">
+                            placeholder="Enter email" value="{{ old('school_email') }}">
                         @error('school_email')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="col-md-4 form-group">
@@ -404,9 +412,9 @@
                             <i class="fas fa-phone-alt"></i>School Phone <span class="text-danger">*</span>
                         </label>
                         <input type="text" required name="school_phone" class="form-control" id="schoolPhone"
-                               placeholder="P.O Box 123" value="{{ old('school_phone') }}">
+                            placeholder="P.O Box 123" value="{{ old('school_phone') }}">
                         @error('school_phone')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
@@ -417,9 +425,9 @@
                             <i class="fas fa-phone-alt"></i>Alternative Phone <span class="text-danger">(Optional)</span>
                         </label>
                         <input type="text" name="alternative_phone" class="form-control" id="alternativePhone"
-                               placeholder="P.O Box 123" value="{{ old('alternative_phone') }}">
+                            placeholder="P.O Box 123" value="{{ old('alternative_phone') }}">
                         @error('alternative_phone')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="col-md-4 form-group">
@@ -427,9 +435,9 @@
                             <i class="fas fa-address-book"></i>Postal Address <span class="text-danger">*</span>
                         </label>
                         <input type="text" required name="postal" class="form-control" id="postalAddress"
-                               placeholder="P.O Box 123" value="{{ old('postal') }}">
+                            placeholder="P.O Box 123" value="{{ old('postal') }}">
                         @error('postal')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
                     <!-- Address Name -->
@@ -438,9 +446,9 @@
                             <i class="fas fa-map-marker-alt"></i>Address Name <span class="text-danger">*</span>
                         </label>
                         <input type="text" required name="postal_name" class="form-control text-capitalize"
-                               id="addressName" placeholder="Dodoma" value="{{ old('postal_name') }}">
+                            id="addressName" placeholder="Dodoma" value="{{ old('postal_name') }}">
                         @error('postal_name')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
@@ -452,9 +460,9 @@
                             <i class="fas fa-code"></i>School Code (Admission Prefix) <span class="text-danger">*</span>
                         </label>
                         <input type="text" name="abbriv" class="form-control" id="abbreviationCode" placeholder="SHU"
-                               value="{{ old('abbriv') }}" required>
+                            value="{{ old('abbriv') }}" required>
                         @error('abbriv')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
                     <!-- Sender ID -->
@@ -463,10 +471,10 @@
                             <i class="fas fa-bullhorn"></i>Sender ID
                         </label>
                         <input type="text" name="sender_name" class="form-control" id="senderId"
-                               placeholder="Enter Sender ID" value="{{ old('sender_name') }}">
+                            placeholder="Enter Sender ID" value="{{ old('sender_name') }}">
                         <small class="text-muted">Enter sender ID name as it appears to your service provider</small>
                         @error('sender_name')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
 
@@ -479,7 +487,7 @@
                             <option value="Tanzania" selected>Tanzania</option>
                         </select>
                         @error('country')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
@@ -491,12 +499,14 @@
                         </label>
                         <input type="file" required name="logo" class="form-control" id="schoolLogo">
                         @error('logo')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
 
-                <div class="divider" style="height: 2px; background: linear-gradient(90deg, transparent, rgba(67, 97, 238, 0.3), transparent); margin: 2rem 0;"></div>
+                <div class="divider"
+                    style="height: 2px; background: linear-gradient(90deg, transparent, rgba(67, 97, 238, 0.3), transparent); margin: 2rem 0;">
+                </div>
 
                 <h4 class="text-primary mb-4">
                     <i class="fas fa-user-tie me-2"></i>School Administrator Information
@@ -509,9 +519,9 @@
                             <i class="fas fa-user"></i>First Name <span class="text-danger">*</span>
                         </label>
                         <input type="text" name="fname" class="form-control text-capitalize" id="firstName"
-                               placeholder="First name" value="{{ old('fname') }}" required>
+                            placeholder="First name" value="{{ old('fname') }}" required>
                         @error('fname')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
 
@@ -521,9 +531,9 @@
                             <i class="fas fa-user"></i>Last Name <span class="text-danger">*</span>
                         </label>
                         <input type="text" name="lname" class="form-control text-capitalize" id="lastName"
-                               placeholder="Last name" value="{{ old('lname') }}" required>
+                            placeholder="Last name" value="{{ old('lname') }}" required>
                         @error('lname')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
 
@@ -535,10 +545,10 @@
                         <div class="input-group">
                             <span class="input-group-text">@</span>
                             <input type="email" name="email" class="form-control" id="emailAddress"
-                                   placeholder="email@example.com" value="{{ old('email') }}" required>
+                                placeholder="email@example.com" value="{{ old('email') }}" required>
                         </div>
                         @error('email')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
@@ -555,7 +565,7 @@
                             <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female</option>
                         </select>
                         @error('gender')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
 
@@ -565,9 +575,9 @@
                             <i class="fas fa-phone-alt"></i>Mobile Phone <span class="text-danger">*</span>
                         </label>
                         <input type="tel" name="phone" class="form-control" id="phoneNumber"
-                               placeholder="+255 123 456 789" value="{{ old('phone') }}" required>
+                            placeholder="+255 123 456 789" value="{{ old('phone') }}" required>
                         @error('phone')
-                        <div class="text-danger small mt-2">{{ $message }}</div>
+                            <div class="text-danger small mt-2">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
@@ -605,7 +615,13 @@
                         @foreach ($schools as $school)
                             <tr class="slide-in" style="animation-delay: {{ $loop->index * 0.05 }}s;">
                                 <td class="fw-bold text-primary">{{ $loop->iteration }}</td>
-                                <td class="text-uppercase fw-bold">{{ $school->school_name }}</td>
+                                <td class="text-uppercase fw-bold">{{ $school->school_name }}
+                                    @if ($school->package === 'basic')
+                                        <span class="badge bg-warning text-dark">{{ ucfirst($school->package) }}</span>
+                                    @else
+                                        <span class="badge bg-success">{{ ucfirst($school->package) }}</span>
+                                    @endif
+                                </td>
                                 <td class="text-uppercase">
                                     {{ $school->sender_id ?? 'Not set' }}
                                 </td>
@@ -613,8 +629,7 @@
                                 <td class="text-uppercase">{{ $school->school_reg_no }}</td>
                                 <td class="text-center">
                                     <img src="{{ asset('storage/logo/' . $school->logo) }}"
-                                         alt="{{ $school->school_name }}"
-                                         class="school-logo">
+                                        alt="{{ $school->school_name }}" class="school-logo">
                                 </td>
                                 <td>
                                     @if ($school->status == 1)
@@ -625,21 +640,17 @@
                                         <span class="badge-modern bg-secondary text-white">Unpaid</span>
                                     @endif
                                 </td>
-                                <td>{{ \Carbon\Carbon::parse($school->service_end_date)->format('d M Y H:i') }}</td>
+                                <td>{{ \Carbon\Carbon::parse($school->service_end_date)->format('d M Y') }}</td>
                                 <td>
                                     <div class="action-buttons">
                                         @if ($school->status == 2 || $school->status == 0)
-                                            <button class="btn-icon bg-success text-white"
-                                                    data-toggle="modal"
-                                                    data-target="#approveModal{{ $school->id }}"
-                                                    title="Approve School">
+                                            <button class="btn-icon bg-success text-white" data-toggle="modal"
+                                                data-target="#approveModal{{ $school->id }}" title="Approve School">
                                                 <i class="fas fa-cog"></i>
                                             </button>
                                         @else
-                                            <button class="btn-icon bg-info text-white"
-                                                    data-toggle="modal"
-                                                    data-target="#viewModal{{ $school->id }}"
-                                                    title="View Details">
+                                            <button class="btn-icon bg-info text-white" data-toggle="modal"
+                                                data-target="#viewModal{{ $school->id }}" title="View Details">
                                                 <i class="fas fa-eye"></i>
                                             </button>
                                         @endif
@@ -657,12 +668,15 @@
     @foreach ($schools as $school)
         @if ($school->status == 2 || $school->status == 0)
             <!-- Approval Modal -->
-            <div class="modal fade" id="approveModal{{ $school->id }}" tabindex="-1" role="dialog" aria-labelledby="approveModalLabel{{ $school->id }}" aria-hidden="true">
+            <div class="modal fade" id="approveModal{{ $school->id }}" tabindex="-1" role="dialog"
+                aria-labelledby="approveModalLabel{{ $school->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content modal-glass">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="approveModalLabel{{ $school->id }}">Add Service Time Duration</h5>
-                            <button type="button" class="close btn-close-white" data-dismiss="modal" aria-label="Close">
+                            <h5 class="modal-title" id="approveModalLabel{{ $school->id }}">Add Service Time Duration
+                            </h5>
+                            <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal"
+                                aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -671,30 +685,54 @@
                                 <div class="col-md-12">
                                     <p class="text-center text-primary mb-3">School Details</p>
                                     <ul class="list-group">
-                                        <li class="list-group-item text-uppercase">School Name: <strong>{{ $school->school_name }}</strong></li>
-                                        <li class="list-group-item text-uppercase">Registration ID: <strong>{{ $school->school_reg_no }}</strong></li>
+                                        <li class="list-group-item text-uppercase">School Name:
+                                            <strong>{{ $school->school_name }}</strong>
+                                        </li>
+                                        <li class="list-group-item text-uppercase">Registration ID:
+                                            <strong>{{ $school->school_reg_no }}</strong>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
                             <hr class="my-4">
                             <p class="text-center text-primary mb-3">Complete Approval Actions</p>
-                            <form action="{{ route('approve.school.request', ['school' => Hashids::encode($school->id)]) }}" method="POST" novalidate class="needs-validation">
+                            <form
+                                action="{{ route('approve.school.request', ['school' => Hashids::encode($school->id)]) }}"
+                                method="POST" novalidate class="needs-validation">
                                 @csrf
                                 @method('PUT')
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label for="service_duration{{ $school->id }}" class="control-label">Set Months</label>
-                                            <input type="number" class="form-control" name="service_duration" id="service_duration{{ $school->id }}" required placeholder="Number of Months for Service" value="{{ old('service_duration') }}">
+                                            <label for="service_duration{{ $school->id }}" class="control-label">Set
+                                                Months</label>
+                                            <input type="number" class="form-control" name="service_duration"
+                                                id="service_duration{{ $school->id }}" required
+                                                placeholder="Number of Months for Service"
+                                                value="{{ old('service_duration') }}">
                                             @error('service_duration')
                                                 <span class="text-danger small">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="service_package{{ $school->id }}" class="control-label">Select
+                                                Package</label>
+                                            <select name="package" id="" class="form-control">
+                                                <option value="">--Select Package--</option>
+                                                <option value="basic">Basic Package</option>
+                                                <option value="premium">Premium Package</option>
+                                            </select>
+                                            @error('package')
+                                                <span class="text-danger">{{ $message }}</span>
                                             @enderror
                                         </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to send this request?')">Save Changes</button>
+                                    <button type="submit" class="btn btn-success"
+                                        onclick="return confirm('Are you sure you want to send this request?')">Save
+                                        Changes</button>
                                 </div>
                             </form>
                         </div>
@@ -703,12 +741,14 @@
             </div>
         @else
             <!-- View Details Modal -->
-            <div class="modal fade" id="viewModal{{ $school->id }}" tabindex="-1" role="dialog" aria-labelledby="viewModalLabel{{ $school->id }}" aria-hidden="true">
+            <div class="modal fade" id="viewModal{{ $school->id }}" tabindex="-1" role="dialog"
+                aria-labelledby="viewModalLabel{{ $school->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content modal-glass">
                         <div class="modal-header">
                             <h5 class="modal-title" id="viewModalLabel{{ $school->id }}">Payment Status</h5>
-                            <button type="button" class="close btn-close-white" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal"
+                                aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -717,16 +757,37 @@
                                 <div class="col-md-12">
                                     <p class="text-center text-primary mb-3">School Details</p>
                                     <ul class="list-group">
-                                        <li class="list-group-item text-capitalize">School Name: <strong>{{ $school->school_name }}</strong></li>
-                                        <li class="list-group-item text-capitalize">Registration ID: <strong>{{ $school->school_reg_no }}</strong></li>
-                                        <li class="list-group-item">Sender ID: <strong>{{ $school->sender_id ?? 'Not set' }}</strong></li>
-                                        <li class="list-group-item text-capitalize">Service Start Date: <strong>{{ $school->service_start_date }}</strong></li>
-                                        <li class="list-group-item text-capitalize">Service Expiry Date: <strong>{{ $school->service_end_date }}</strong></li>
-                                        <li class="list-group-item text-capitalize">Active Time Duration: <strong>{{ $school->service_duration }} Months</strong></li>
+                                        <li class="list-group-item text-capitalize">School Name:
+                                            <strong>{{ $school->school_name }}</strong>
+                                        </li>
+                                        <li class="list-group-item text-capitalize">Registration ID:
+                                            <strong>{{ $school->school_reg_no }}</strong>
+                                        </li>
+                                        <li class="list-group-item">Sender ID:
+                                            <strong>{{ $school->sender_id ?? 'Not set' }}</strong>
+                                        </li>
+                                        <li class="list-group-item text-capitalize">Service Start Date:
+                                            <strong>{{ $school->service_start_date }}</strong>
+                                        </li>
+                                        <li class="list-group-item text-capitalize">Service Expiry Date:
+                                            <strong>{{ $school->service_end_date }}</strong>
+                                        </li>
+                                        <li class="list-group-item text-capitalize">Active Time Duration:
+                                            <strong>{{ $school->service_duration }} Months</strong>
+                                        </li>
+                                        <li class="list-group-item text-capitalize">Subscription:
+                                            <strong>{{ ucfirst($school->package) }} Package</strong>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
                             <hr class="my-4">
+                            <div>
+                                <button class="btn btn-primary justify-items-center" data-toggle="modal"
+                                    data-target="#updatePackage{{ $school->id }}">
+                                    Change Package
+                                </button>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -735,16 +796,177 @@
                 </div>
             </div>
         @endif
+        <div class="modal fade" id="updatePackage{{ $school->id }}" tabindex="-1" role="dialog"
+            aria-labelledby="updatePackage{{ $school->id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content modal-glass">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="updatePackage{{ $school->id }}"> Change Subscription Package
+                        </h5>
+                        <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <p class="text-center text-primary mb-3">School Details</p>
+                                <ul class="list-group">
+                                    <li class="list-group-item text-uppercase">School Name:
+                                        <strong>{{ $school->school_name }}</strong>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <hr class="my-4">
+                        <p class="text-center text-primary mb-3">Update Subscription Package</p>
+                        <form action="{{ route('approve.school.request', ['school' => Hashids::encode($school->id)]) }}"
+                            method="POST" novalidate class="needs-validation">
+                            @csrf
+                            @method('PUT')
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="start_date{{ $school->id }}"
+                                                    class="control-label">Start
+                                                    Date</label>
+                                                <input type="date" class="form-control" name="start_date"
+                                                    id="start_date{{ $school->id }}" required placeholder=""
+                                                    value="{{ old('start_date', $school->service_start_date) }}">
+                                                @error('start_date')
+                                                    <span class="text-danger small">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="end_date{{ $school->id }}"
+                                                    class="control-label">End
+                                                    Date</label>
+                                                <input type="date" class="form-control" name="end_date"
+                                                    id="end_date{{ $school->id }}" required placeholder=""
+                                                    value="{{ old('end_date', $school->service_end_date) }}">
+                                                @error('end_date')
+                                                    <span class="text-danger small">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="service_duration{{ $school->id }}"
+                                            class="control-label">Months</label>
+                                        <input type="number" class="form-control" name="service_duration"
+                                            id="service_duration{{ $school->id }}" required
+                                            placeholder="Number of Months for Service"
+                                            value="{{ old('service_duration', $school->service_duration) }}">
+                                        @error('service_duration')
+                                            <span class="text-danger small">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="service_package{{ $school->id }}" class="control-label">Select
+                                            Package</label>
+                                        <select name="package" id="" class="form-control">
+                                            <option value="">--Select Package--</option>
+                                            <option value="basic">Basic Package</option>
+                                            <option value="premium">Premium Package</option>
+                                        </select>
+                                        @error('package')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure?')">
+                                    Subscribe </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     @endforeach
+    <div class="modal fade" id="updatePackage{{ $school->id }}" tabindex="-1" role="dialog"
+        aria-labelledby="updatePackage{{ $school->id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content modal-glass">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updatePackage{{ $school->id }}"> Change Subscription Package
+                    </h5>
+                    <button type="button" class="btn btn-xs btn-danger" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <p class="text-center text-primary mb-3">School Details</p>
+                            <ul class="list-group">
+                                <li class="list-group-item text-uppercase">School Name:
+                                    <strong>{{ $school->school_name }}</strong>
+                                </li>
+                                <li class="list-group-item text-uppercase">Registration ID:
+                                    <strong>{{ $school->school_reg_no }}</strong>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <hr class="my-4">
+                    <p class="text-center text-primary mb-3">Update Subscription Package</p>
+                    <form action="{{ route('approve.school.request', ['school' => Hashids::encode($school->id)]) }}"
+                        method="POST" novalidate class="needs-validation">
+                        @csrf
+                        @method('PUT')
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="service_duration{{ $school->id }}" class="control-label">Set
+                                        Months</label>
+                                    <input type="number" class="form-control" name="service_duration"
+                                        id="service_duration{{ $school->id }}" required
+                                        placeholder="Number of Months for Service" value="{{ old('service_duration') }}">
+                                    @error('service_duration')
+                                        <span class="text-danger small">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                                <div class="form-group">
+                                    <label for="service_package{{ $school->id }}" class="control-label">Select
+                                        Package</label>
+                                    <select name="package" id="" class="form-control">
+                                        <option value="">--Select Package--</option>
+                                        <option value="basic">Basic Package</option>
+                                        <option value="premium">Premium Package</option>
+                                    </select>
+                                    @error('package')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-success"
+                                onclick="return confirm('Are you sure you want to send this request?')">Save
+                                Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const form = document.querySelector(".needs-validation");
             const submitButton = document.getElementById("saveButton");
 
             if (!form || !submitButton) return;
 
-            form.addEventListener("submit", function (event) {
+            form.addEventListener("submit", function(event) {
                 event.preventDefault();
 
                 // Disable button and show loading state
@@ -767,7 +989,7 @@
             });
 
             // Fix modal backdrop issues
-            $('.modal').on('shown.bs.modal', function () {
+            $('.modal').on('shown.bs.modal', function() {
                 $('.modal-backdrop').css('z-index', '1040');
                 $(this).css('z-index', '1050');
             });

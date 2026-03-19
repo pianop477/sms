@@ -705,12 +705,14 @@
                                     <i class="fas fa-layer-group me-1"></i> E-Library
                                 </button>
                             </li>
-                            <li class="nav-item flex-fill text-center" role="presentation">
-                                <button class="nav-link" id="payment-tab" data-bs-toggle="pill"
-                                    data-bs-target="#payment" type="button" role="tab">
-                                    <i class="fas fa-credit-card me-1"></i> Payment
-                                </button>
-                            </li>
+                            @if (Auth::user()->school->package === 'premium')
+                                <li class="nav-item flex-fill text-center" role="presentation">
+                                    <button class="nav-link" id="payment-tab" data-bs-toggle="pill"
+                                        data-bs-target="#payment" type="button" role="tab">
+                                        <i class="fas fa-credit-card me-1"></i> Payment
+                                    </button>
+                                </li>
+                            @endif
                         </ul>
                     </div>
 
@@ -1242,356 +1244,360 @@
     </div>
 
     <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // Initialize components
-        initializeComponents();
+        document.addEventListener("DOMContentLoaded", function() {
+            // Initialize components
+            initializeComponents();
 
-        // Setup image modals
-        setupImageModals();
+            // Setup image modals
+            setupImageModals();
 
-        // Show any session messages as toasts
-        showSessionMessages();
+            // Show any session messages as toasts
+            showSessionMessages();
 
-        // Setup manual modal close handlers
-        setupManualModalClose();
-    });
-
-    // ============ MANUAL MODAL CLOSE HANDLERS (HAITEGEMEI BOOTSTRAP) ============
-    function setupManualModalClose() {
-        // Handle all close buttons
-        document.querySelectorAll('[data-bs-dismiss="modal"], .modal .btn-close, .modal .btn-secondary, .modal .btn-outline-secondary, .modal .btn-outline-light').forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                const modal = this.closest('.modal');
-                if (modal) {
-                    closeModal(modal);
-                }
-            });
+            // Setup manual modal close handlers
+            setupManualModalClose();
         });
 
-        // Handle backdrop click
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeModal(this);
-                }
-            });
-        });
-
-        // Handle ESC key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                const openModal = document.querySelector('.modal.show');
-                if (openModal) {
-                    closeModal(openModal);
-                }
-            }
-        });
-    }
-
-    // Function to close modal manually
-    function closeModal(modal) {
-        if (!modal) return;
-
-        // Remove show class
-        modal.classList.remove('show');
-
-        // Set aria-hidden
-        modal.setAttribute('aria-hidden', 'true');
-
-        // Hide modal
-        modal.style.display = 'none';
-
-        // Remove modal-open class from body
-        document.body.classList.remove('modal-open');
-
-        // Remove padding-right from body (Bootstrap adds this)
-        document.body.style.removeProperty('padding-right');
-
-        // Remove backdrop
-        const backdrop = document.querySelector('.modal-backdrop');
-        if (backdrop) {
-            backdrop.remove();
-        }
-
-        // Return focus to the element that opened the modal
-        setTimeout(() => {
-            const opener = document.querySelector('[onclick*="openTeacherModal"], [onclick*="openPhotoModal"], #profileImage');
-            if (opener) {
-                opener.focus();
-            }
-        }, 100);
-    }
-
-    // Function to open modal manually
-    function openModal(modal) {
-        if (!modal) return;
-
-        // Add show class
-        modal.classList.add('show');
-
-        // Remove aria-hidden
-        modal.setAttribute('aria-hidden', 'false');
-
-        // Show modal
-        modal.style.display = 'block';
-
-        // Add modal-open class to body
-        document.body.classList.add('modal-open');
-
-        // Create backdrop if not exists
-        if (!document.querySelector('.modal-backdrop')) {
-            const backdrop = document.createElement('div');
-            backdrop.className = 'modal-backdrop fade show';
-            document.body.appendChild(backdrop);
-        }
-
-        // Focus on modal title or close button
-        setTimeout(() => {
-            const title = modal.querySelector('.modal-title');
-            const closeBtn = modal.querySelector('.btn-close, [data-bs-dismiss="modal"]');
-            if (title) {
-                title.setAttribute('tabindex', '-1');
-                title.focus();
-            } else if (closeBtn) {
-                closeBtn.focus();
-            }
-        }, 100);
-    }
-
-    // ============ TEACHER IMAGE MODAL FUNCTIONS ============
-    let currentImageUrl = '';
-    let isZoomed = false;
-
-    window.openTeacherModal = function(imageUrl, teacherName, teacherRole) {
-        console.log('Opening teacher modal:', teacherName);
-
-        const modal = document.getElementById('teacherImageModal');
-        if (!modal) {
-            console.error('Teacher modal element not found!');
-            return;
-        }
-
-        currentImageUrl = imageUrl;
-
-        // Set modal content
-        const nameElement = document.getElementById('modalTeacherName');
-        const roleElement = document.getElementById('modalTeacherRole');
-        if (nameElement) nameElement.textContent = teacherName;
-        if (roleElement) roleElement.textContent = teacherRole;
-
-        // Show loading
-        const loadingEl = document.getElementById('imageLoading');
-        const errorEl = document.getElementById('imageError');
-        const imageEl = document.getElementById('modalTeacherImage');
-
-        if (loadingEl) loadingEl.style.display = 'block';
-        if (errorEl) errorEl.style.display = 'none';
-        if (imageEl) {
-            imageEl.style.display = 'none';
-            imageEl.src = ''; // Clear previous image
-        }
-
-        // Load image
-        const img = new Image();
-        img.onload = function() {
-            if (imageEl) {
-                imageEl.src = imageUrl;
-                imageEl.style.display = 'block';
-            }
-            if (loadingEl) loadingEl.style.display = 'none';
-            resetZoom();
-        };
-        img.onerror = function() {
-            if (loadingEl) loadingEl.style.display = 'none';
-            if (errorEl) errorEl.style.display = 'block';
-        };
-        img.src = imageUrl;
-
-        // Open modal
-        openModal(modal);
-    }
-
-    // ============ STUDENT PHOTO MODAL ============
-    window.openPhotoModal = function(imageUrl, studentName) {
-        console.log('Opening student photo modal:', studentName);
-
-        const modal = document.getElementById('studentPhotoModal');
-        if (!modal) {
-            console.error('Student photo modal element not found!');
-            return;
-        }
-
-        // Set image and name
-        const imageEl = document.getElementById('studentPhotoFull');
-        const nameEl = document.getElementById('studentPhotoName');
-
-        if (imageEl) imageEl.src = imageUrl;
-        if (nameEl) nameEl.textContent = studentName;
-
-        // Open modal
-        openModal(modal);
-    }
-
-    // ============ ZOOM FUNCTIONS ============
-    window.zoomCurrentImage = function() {
-        const image = document.getElementById('modalTeacherImage');
-        const zoomButton = document.getElementById('zoomButton');
-
-        if (!image) return;
-
-        if (!isZoomed) {
-            image.style.transform = 'scale(1.5)';
-            image.style.cursor = 'zoom-out';
-            if (zoomButton) {
-                zoomButton.innerHTML = '<i class="fas fa-search-minus me-2"></i>Reset';
-            }
-            isZoomed = true;
-        } else {
-            resetZoom();
-        }
-    }
-
-    function resetZoom() {
-        const image = document.getElementById('modalTeacherImage');
-        const zoomButton = document.getElementById('zoomButton');
-
-        if (image) {
-            image.style.transform = 'scale(1)';
-            image.style.cursor = 'zoom-in';
-        }
-        if (zoomButton) {
-            zoomButton.innerHTML = '<i class="fas fa-search-plus me-2"></i>Zoom';
-        }
-        isZoomed = false;
-    }
-
-    // ============ FULL SCREEN FUNCTION ============
-    window.openFullScreenModal = function() {
-        if (currentImageUrl) {
-            const fullScreenImage = document.getElementById('fullScreenImage');
-            if (fullScreenImage) {
-                fullScreenImage.src = currentImageUrl;
-            }
-
-            // Close teacher modal
-            const teacherModal = document.getElementById('teacherImageModal');
-            if (teacherModal && teacherModal.classList.contains('show')) {
-                closeModal(teacherModal);
-            }
-
-            // Open full screen modal
-            setTimeout(() => {
-                const fullScreenModal = document.getElementById('fullScreenImageModal');
-                if (fullScreenModal) {
-                    openModal(fullScreenModal);
-                }
-            }, 300);
-        }
-    }
-
-    // ============ CLOSE ALL MODALS ============
-    window.closeAllModals = function() {
-        document.querySelectorAll('.modal.show').forEach(modal => {
-            closeModal(modal);
-        });
-    }
-
-    // ============ INITIALIZE COMPONENTS ============
-    function initializeComponents() {
-        // Initialize tooltips (if using Bootstrap tooltips)
-        if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.forEach(function(tooltipTriggerEl) {
-                new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-        }
-
-        // Initialize tabs (if using Bootstrap tabs)
-        if (typeof bootstrap !== 'undefined' && bootstrap.Tab) {
-            var triggerTabList = [].slice.call(document.querySelectorAll('[data-bs-toggle="pill"]'));
-            triggerTabList.forEach(function(triggerEl) {
-                new bootstrap.Tab(triggerEl);
-            });
-        }
-
-        // Activate tab from URL hash if present
-        if (window.location.hash) {
-            const tab = document.querySelector(`[data-bs-target="${window.location.hash}"]`);
-            if (tab && typeof bootstrap !== 'undefined' && bootstrap.Tab) {
-                new bootstrap.Tab(tab).show();
-            }
-        }
-    }
-
-    // ============ SETUP IMAGE MODALS ACCESSIBILITY ============
-    function setupImageModals() {
-        // Make teacher images keyboard accessible
-        document.querySelectorAll('.teacher-avatar-container, .class-teacher-avatar-container').forEach(container => {
-            container.setAttribute('tabindex', '0');
-            container.setAttribute('role', 'button');
-            container.setAttribute('aria-label', 'Click to view teacher photo');
-
-            container.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' || e.key === ' ') {
+        // ============ MANUAL MODAL CLOSE HANDLERS (HAITEGEMEI BOOTSTRAP) ============
+        function setupManualModalClose() {
+            // Handle all close buttons
+            document.querySelectorAll(
+                '[data-bs-dismiss="modal"], .modal .btn-close, .modal .btn-secondary, .modal .btn-outline-secondary, .modal .btn-outline-light'
+                ).forEach(button => {
+                button.addEventListener('click', function(e) {
                     e.preventDefault();
-                    // Find the image and get details
-                    const img = this.querySelector('img');
-                    if (!img) return;
-
-                    // Try to find teacher name
-                    let name = '';
-                    let role = '';
-
-                    if (this.closest('td')) {
-                        // Subject teacher
-                        const nameSpan = this.closest('.d-flex')?.querySelector('span');
-                        name = nameSpan ? nameSpan.textContent.trim() : 'Teacher';
-                        role = 'Subject Teacher';
-                    } else if (this.closest('.teacher-card')) {
-                        // Class teacher
-                        const strongEl = this.closest('.teacher-card')?.querySelector('strong');
-                        name = strongEl ? strongEl.nextSibling?.textContent?.trim() || 'Class Teacher' : 'Class Teacher';
-                        role = 'Class Teacher';
+                    const modal = this.closest('.modal');
+                    if (modal) {
+                        closeModal(modal);
                     }
-
-                    openTeacherModal(img.src, name, role);
-                }
+                });
             });
-        });
 
-        // Make profile image accessible
-        const profileImage = document.getElementById('profileImage');
-        if (profileImage) {
-            profileImage.setAttribute('tabindex', '0');
-            profileImage.setAttribute('role', 'button');
-            profileImage.setAttribute('aria-label', 'Click to view student photo');
+            // Handle backdrop click
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal(this);
+                    }
+                });
+            });
 
-            profileImage.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    this.click();
+            // Handle ESC key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    const openModal = document.querySelector('.modal.show');
+                    if (openModal) {
+                        closeModal(openModal);
+                    }
                 }
             });
         }
-    }
 
-    // ============ TOAST NOTIFICATION SYSTEM ============
-    function showToast(type, title, message) {
-        const toastContainer = document.getElementById('toastContainer');
-        if (!toastContainer) return;
+        // Function to close modal manually
+        function closeModal(modal) {
+            if (!modal) return;
 
-        const toast = document.createElement('div');
-        toast.className = `toast-notification ${type}`;
+            // Remove show class
+            modal.classList.remove('show');
 
-        const icons = {
-            success: 'fa-check-circle',
-            error: 'fa-exclamation-circle',
-            warning: 'fa-exclamation-triangle',
-            info: 'fa-info-circle'
-        };
+            // Set aria-hidden
+            modal.setAttribute('aria-hidden', 'true');
 
-        toast.innerHTML = `
+            // Hide modal
+            modal.style.display = 'none';
+
+            // Remove modal-open class from body
+            document.body.classList.remove('modal-open');
+
+            // Remove padding-right from body (Bootstrap adds this)
+            document.body.style.removeProperty('padding-right');
+
+            // Remove backdrop
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+
+            // Return focus to the element that opened the modal
+            setTimeout(() => {
+                const opener = document.querySelector(
+                    '[onclick*="openTeacherModal"], [onclick*="openPhotoModal"], #profileImage');
+                if (opener) {
+                    opener.focus();
+                }
+            }, 100);
+        }
+
+        // Function to open modal manually
+        function openModal(modal) {
+            if (!modal) return;
+
+            // Add show class
+            modal.classList.add('show');
+
+            // Remove aria-hidden
+            modal.setAttribute('aria-hidden', 'false');
+
+            // Show modal
+            modal.style.display = 'block';
+
+            // Add modal-open class to body
+            document.body.classList.add('modal-open');
+
+            // Create backdrop if not exists
+            if (!document.querySelector('.modal-backdrop')) {
+                const backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade show';
+                document.body.appendChild(backdrop);
+            }
+
+            // Focus on modal title or close button
+            setTimeout(() => {
+                const title = modal.querySelector('.modal-title');
+                const closeBtn = modal.querySelector('.btn-close, [data-bs-dismiss="modal"]');
+                if (title) {
+                    title.setAttribute('tabindex', '-1');
+                    title.focus();
+                } else if (closeBtn) {
+                    closeBtn.focus();
+                }
+            }, 100);
+        }
+
+        // ============ TEACHER IMAGE MODAL FUNCTIONS ============
+        let currentImageUrl = '';
+        let isZoomed = false;
+
+        window.openTeacherModal = function(imageUrl, teacherName, teacherRole) {
+            console.log('Opening teacher modal:', teacherName);
+
+            const modal = document.getElementById('teacherImageModal');
+            if (!modal) {
+                console.error('Teacher modal element not found!');
+                return;
+            }
+
+            currentImageUrl = imageUrl;
+
+            // Set modal content
+            const nameElement = document.getElementById('modalTeacherName');
+            const roleElement = document.getElementById('modalTeacherRole');
+            if (nameElement) nameElement.textContent = teacherName;
+            if (roleElement) roleElement.textContent = teacherRole;
+
+            // Show loading
+            const loadingEl = document.getElementById('imageLoading');
+            const errorEl = document.getElementById('imageError');
+            const imageEl = document.getElementById('modalTeacherImage');
+
+            if (loadingEl) loadingEl.style.display = 'block';
+            if (errorEl) errorEl.style.display = 'none';
+            if (imageEl) {
+                imageEl.style.display = 'none';
+                imageEl.src = ''; // Clear previous image
+            }
+
+            // Load image
+            const img = new Image();
+            img.onload = function() {
+                if (imageEl) {
+                    imageEl.src = imageUrl;
+                    imageEl.style.display = 'block';
+                }
+                if (loadingEl) loadingEl.style.display = 'none';
+                resetZoom();
+            };
+            img.onerror = function() {
+                if (loadingEl) loadingEl.style.display = 'none';
+                if (errorEl) errorEl.style.display = 'block';
+            };
+            img.src = imageUrl;
+
+            // Open modal
+            openModal(modal);
+        }
+
+        // ============ STUDENT PHOTO MODAL ============
+        window.openPhotoModal = function(imageUrl, studentName) {
+            console.log('Opening student photo modal:', studentName);
+
+            const modal = document.getElementById('studentPhotoModal');
+            if (!modal) {
+                console.error('Student photo modal element not found!');
+                return;
+            }
+
+            // Set image and name
+            const imageEl = document.getElementById('studentPhotoFull');
+            const nameEl = document.getElementById('studentPhotoName');
+
+            if (imageEl) imageEl.src = imageUrl;
+            if (nameEl) nameEl.textContent = studentName;
+
+            // Open modal
+            openModal(modal);
+        }
+
+        // ============ ZOOM FUNCTIONS ============
+        window.zoomCurrentImage = function() {
+            const image = document.getElementById('modalTeacherImage');
+            const zoomButton = document.getElementById('zoomButton');
+
+            if (!image) return;
+
+            if (!isZoomed) {
+                image.style.transform = 'scale(1.5)';
+                image.style.cursor = 'zoom-out';
+                if (zoomButton) {
+                    zoomButton.innerHTML = '<i class="fas fa-search-minus me-2"></i>Reset';
+                }
+                isZoomed = true;
+            } else {
+                resetZoom();
+            }
+        }
+
+        function resetZoom() {
+            const image = document.getElementById('modalTeacherImage');
+            const zoomButton = document.getElementById('zoomButton');
+
+            if (image) {
+                image.style.transform = 'scale(1)';
+                image.style.cursor = 'zoom-in';
+            }
+            if (zoomButton) {
+                zoomButton.innerHTML = '<i class="fas fa-search-plus me-2"></i>Zoom';
+            }
+            isZoomed = false;
+        }
+
+        // ============ FULL SCREEN FUNCTION ============
+        window.openFullScreenModal = function() {
+            if (currentImageUrl) {
+                const fullScreenImage = document.getElementById('fullScreenImage');
+                if (fullScreenImage) {
+                    fullScreenImage.src = currentImageUrl;
+                }
+
+                // Close teacher modal
+                const teacherModal = document.getElementById('teacherImageModal');
+                if (teacherModal && teacherModal.classList.contains('show')) {
+                    closeModal(teacherModal);
+                }
+
+                // Open full screen modal
+                setTimeout(() => {
+                    const fullScreenModal = document.getElementById('fullScreenImageModal');
+                    if (fullScreenModal) {
+                        openModal(fullScreenModal);
+                    }
+                }, 300);
+            }
+        }
+
+        // ============ CLOSE ALL MODALS ============
+        window.closeAllModals = function() {
+            document.querySelectorAll('.modal.show').forEach(modal => {
+                closeModal(modal);
+            });
+        }
+
+        // ============ INITIALIZE COMPONENTS ============
+        function initializeComponents() {
+            // Initialize tooltips (if using Bootstrap tooltips)
+            if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltipTriggerList.forEach(function(tooltipTriggerEl) {
+                    new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            }
+
+            // Initialize tabs (if using Bootstrap tabs)
+            if (typeof bootstrap !== 'undefined' && bootstrap.Tab) {
+                var triggerTabList = [].slice.call(document.querySelectorAll('[data-bs-toggle="pill"]'));
+                triggerTabList.forEach(function(triggerEl) {
+                    new bootstrap.Tab(triggerEl);
+                });
+            }
+
+            // Activate tab from URL hash if present
+            if (window.location.hash) {
+                const tab = document.querySelector(`[data-bs-target="${window.location.hash}"]`);
+                if (tab && typeof bootstrap !== 'undefined' && bootstrap.Tab) {
+                    new bootstrap.Tab(tab).show();
+                }
+            }
+        }
+
+        // ============ SETUP IMAGE MODALS ACCESSIBILITY ============
+        function setupImageModals() {
+            // Make teacher images keyboard accessible
+            document.querySelectorAll('.teacher-avatar-container, .class-teacher-avatar-container').forEach(container => {
+                container.setAttribute('tabindex', '0');
+                container.setAttribute('role', 'button');
+                container.setAttribute('aria-label', 'Click to view teacher photo');
+
+                container.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        // Find the image and get details
+                        const img = this.querySelector('img');
+                        if (!img) return;
+
+                        // Try to find teacher name
+                        let name = '';
+                        let role = '';
+
+                        if (this.closest('td')) {
+                            // Subject teacher
+                            const nameSpan = this.closest('.d-flex')?.querySelector('span');
+                            name = nameSpan ? nameSpan.textContent.trim() : 'Teacher';
+                            role = 'Subject Teacher';
+                        } else if (this.closest('.teacher-card')) {
+                            // Class teacher
+                            const strongEl = this.closest('.teacher-card')?.querySelector('strong');
+                            name = strongEl ? strongEl.nextSibling?.textContent?.trim() || 'Class Teacher' :
+                                'Class Teacher';
+                            role = 'Class Teacher';
+                        }
+
+                        openTeacherModal(img.src, name, role);
+                    }
+                });
+            });
+
+            // Make profile image accessible
+            const profileImage = document.getElementById('profileImage');
+            if (profileImage) {
+                profileImage.setAttribute('tabindex', '0');
+                profileImage.setAttribute('role', 'button');
+                profileImage.setAttribute('aria-label', 'Click to view student photo');
+
+                profileImage.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.click();
+                    }
+                });
+            }
+        }
+
+        // ============ TOAST NOTIFICATION SYSTEM ============
+        function showToast(type, title, message) {
+            const toastContainer = document.getElementById('toastContainer');
+            if (!toastContainer) return;
+
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${type}`;
+
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+
+            toast.innerHTML = `
             <div class="toast-icon ${type}">
                 <i class="fas ${icons[type]}"></i>
             </div>
@@ -1604,41 +1610,41 @@
             </div>
         `;
 
-        toastContainer.appendChild(toast);
+            toastContainer.appendChild(toast);
 
-        setTimeout(() => {
-            if (toast.parentElement) {
-                toast.remove();
-            }
-        }, 5000);
-    }
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.remove();
+                }
+            }, 5000);
+        }
 
-    function showSessionMessages() {
-        @if (session('success'))
-            showToast('success', 'Success', '{{ session('success') }}');
+        function showSessionMessages() {
+            @if (session('success'))
+                showToast('success', 'Success', '{{ session('success') }}');
+            @endif
+
+            @if (session('error'))
+                showToast('error', 'Error', '{{ session('error') }}');
+            @endif
+
+            @if (session('warning'))
+                showToast('warning', 'Warning', '{{ session('warning') }}');
+            @endif
+
+            @if (session('info'))
+                showToast('info', 'Info', '{{ session('info') }}');
+            @endif
+        }
+
+        // ============ AUTHORIZATION CHECK ============
+        @if (Auth::user()->usertype != 4)
+            window.location.href = '/error-page';
         @endif
 
-        @if (session('error'))
-            showToast('error', 'Error', '{{ session('error') }}');
-        @endif
-
-        @if (session('warning'))
-            showToast('warning', 'Warning', '{{ session('warning') }}');
-        @endif
-
-        @if (session('info'))
-            showToast('info', 'Info', '{{ session('info') }}');
-        @endif
-    }
-
-    // ============ AUTHORIZATION CHECK ============
-    @if (Auth::user()->usertype != 4)
-        window.location.href = '/error-page';
-    @endif
-
-    // ============ PREVENT FORM RESUBMISSION ============
-    if (window.history.replaceState) {
-        window.history.replaceState(null, null, window.location.href);
-    }
-</script>
+        // ============ PREVENT FORM RESUBMISSION ============
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+    </script>
 @endsection

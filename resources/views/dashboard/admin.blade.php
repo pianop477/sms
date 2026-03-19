@@ -480,6 +480,7 @@
                                         <th>#</th>
                                         <th>Institute Name</th>
                                         <th>Admission #</th>
+                                        <th>Subscription</th>
                                         <th>Address</th>
                                         <th>Status</th>
                                         <th class="text-center">Actions</th>
@@ -496,6 +497,7 @@
                                                 </a>
                                             </td>
                                             <td class="fw-bold text-info">{{ strtoupper($school->school_reg_no) }}</td>
+                                            <td class="fw-bold">{{ ucfirst($school->package) }}</td>
                                             <td class="text-muted">
                                                 {{ ucwords(strtolower($school->postal_address)) }} -
                                                 {{ ucwords(strtolower($school->postal_name)) }}
