@@ -776,14 +776,20 @@
                                             <strong>{{ $school->service_duration }} Months</strong>
                                         </li>
                                         <li class="list-group-item text-capitalize">Subscription:
-                                            <strong>{{ ucfirst($school->package) }} Package</strong>
+                                            <strong>
+                                                <span class="badge bg-{{$school->package === 'basic' ? 'warning text-dark' : 'success text-white'}}">
+                                                    <i
+                                                        class="fas fa-{{ $school->package === 'basic' ? 'star' : 'crown' }}"></i>
+                                                    {{ ucfirst($school->package) }} Package</strong>
+                                            </span>
+
                                         </li>
                                     </ul>
                                 </div>
                             </div>
                             <hr class="my-4">
-                            <div>
-                                <button class="btn btn-primary justify-items-center" data-toggle="modal"
+                            <div class="d-flex justify-content-center">
+                                <button class="btn btn-primary" data-toggle="modal"
                                     data-target="#updatePackage{{ $school->id }}">
                                     Change Package
                                 </button>
@@ -829,8 +835,7 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="start_date{{ $school->id }}"
-                                                    class="control-label">Start
+                                                <label for="start_date{{ $school->id }}" class="control-label">Start
                                                     Date</label>
                                                 <input type="date" class="form-control" name="start_date"
                                                     id="start_date{{ $school->id }}" required placeholder=""
@@ -842,8 +847,7 @@
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="end_date{{ $school->id }}"
-                                                    class="control-label">End
+                                                <label for="end_date{{ $school->id }}" class="control-label">End
                                                     Date</label>
                                                 <input type="date" class="form-control" name="end_date"
                                                     id="end_date{{ $school->id }}" required placeholder=""
@@ -870,8 +874,8 @@
                                             Package</label>
                                         <select name="package" id="" class="form-control">
                                             <option value="">--Select Package--</option>
-                                            <option value="basic">Basic Package</option>
-                                            <option value="premium">Premium Package</option>
+                                            <option value="basic" {{ old('package', $school->package) == 'basic' ? 'selected' : '' }}>Basic Package</option>
+                                            <option value="premium" {{ old('package', $school->package) == 'premium' ? 'selected' : '' }}>Premium Package</option>
                                         </select>
                                         @error('package')
                                             <span class="text-danger">{{ $message }}</span>
