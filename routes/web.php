@@ -624,7 +624,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
 Route::prefix('contract-gateway')->name('contract.gateway.')->group(function () {
     Route::get('/', [ContractGatewayController::class, 'init'])->name('init');
 
-    Route::prefix('api')->name('api.')->group(function () {
+    Route::prefix('api')->name('api.')->middleware('subscribed.package')->group(function () {
         Route::post('verify-staff', [ContractGatewayController::class, 'verifyStaffId'])->name('verify-staff');
         Route::post('request-otp', [ContractGatewayController::class, 'requestOtp'])->name('request-otp');
         Route::post('verify-otp', [ContractGatewayController::class, 'verifyOtp'])->name('verify-otp');

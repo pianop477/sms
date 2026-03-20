@@ -371,7 +371,7 @@
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-         .badge-premium {
+        .badge-premium {
             padding: 6px 12px;
             border-radius: 30px;
             font-weight: 600;
@@ -496,9 +496,11 @@
                     <div class="text-end">
                         <small class="text-muted d-block">Subscription Package.</small>
                         @if ($school->package == 'premium')
-                            <span class="fw-semibold badge bg-success text-white"><i class="fas fa-crown"></i> {{ ucfirst($school->package) }}</span>
+                            <span class="fw-semibold badge bg-success text-white"><i class="fas fa-crown"></i>
+                                {{ ucfirst($school->package) }}</span>
                         @else
-                            <span class="fw-semibold badge bg-warning text-dark"><i class="fas fa-star"></i> {{ ucfirst($school->package) }}</span>
+                            <span class="fw-semibold badge bg-warning text-dark"><i class="fas fa-star"></i>
+                                {{ ucfirst($school->package) }}</span>
                         @endif
                     </div>
                 </div>
@@ -695,18 +697,20 @@
                         <div class="col-md-8">
                             <h4 class="header-title mb-0">Recent Expense Transactions</h4>
                         </div>
-                        <div class="col-md-2">
-                            <button type="button" class="btn btn-info btn-action btn-sm" data-bs-toggle="modal"
-                                data-bs-target="#addTeacherModal">
-                                <i class="fas fa-plus me-1"></i> New Bill
-                            </button>
-                        </div>
-                        <div class="col-md-2">
-                            <a href="{{ route('expenditure.all.transactions') }}"
-                                class="btn btn-primary btn-sm float-right">
-                                <i class="fas fa-list me-1"></i> View All
-                            </a>
-                        </div>
+                        @if (Auth::user()->school->package == 'premium')
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-info btn-action btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#addTeacherModal">
+                                    <i class="fas fa-plus me-1"></i> New Bill
+                                </button>
+                            </div>
+                            <div class="col-md-2">
+                                <a href="{{ route('expenditure.all.transactions') }}"
+                                    class="btn btn-primary btn-sm float-right">
+                                    <i class="fas fa-list me-1"></i> View All
+                                </a>
+                            </div>
+                        @endif
                     </div>
                     <div class="table-responsive">
                         <table class="table table-hover progress-table table-centered mb-0 table-responsive-md"
