@@ -434,7 +434,7 @@ class TodRosterController extends Controller
                 'teachers_attendance'  => $request->teachers_attendance,
                 'daily_new_event'      => $request->daily_new_event,
                 'tod_remarks'          => $request->tod_remarks,
-                'submitted_by'         => Auth::user()->first_name. ' '. Auth::user()->last_name,
+                'submitted_by'         => Auth::user()->first_name . ' ' . Auth::user()->last_name,
             ]);
 
             // 3️⃣ Hifadhi attendance records ikiwa zipo
@@ -489,7 +489,6 @@ class TodRosterController extends Controller
         } catch (\Exception $e) {
             return 'Class ID: ' . $classId;
         }
-
     }
 
     public function getSchoolReport()
@@ -503,6 +502,7 @@ class TodRosterController extends Controller
             ->leftJoin('users', 'teachers.user_id', '=', 'users.id')
             ->selectRaw('
                                     daily_report_details.report_date,
+                                    daily_report_details.submitted_by,
                                     SUM(daily_report_attendances.registered_boys) as registered_boys,
                                     SUM(daily_report_attendances.registered_girls) as registered_girls,
                                     SUM(daily_report_attendances.present_boys) as present_boys,
