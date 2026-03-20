@@ -513,7 +513,7 @@ class TodRosterController extends Controller
                                     daily_report_details.status
                                 ')
             ->where('daily_report_details.status', 'pending')
-            ->groupBy('tod_rosters.roster_id', 'users.first_name', 'users.last_name', 'daily_report_details.report_date', 'daily_report_details.status')
+            ->groupBy('tod_rosters.roster_id', 'users.first_name', 'users.last_name', 'daily_report_details.report_date', 'daily_report_details.status', 'daily_report_details.submitted_by')
             ->orderBy('daily_report_details.report_date', 'desc')
             ->get();
 
