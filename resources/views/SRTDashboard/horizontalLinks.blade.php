@@ -225,7 +225,7 @@
                                             <li><a href="{{ route('expenditure.all.transactions') }}"><span
                                                         style="font-size: 1.2rem;">💶</span> Transactions</a></li>
                                             <li><a href="{{ route('payment.report') }}">
-                                                    <span style="font-size: 1.2rem;">💳</span> Payment Bills</a></li>
+                                                    <span style="font-size: 1.2rem;">💳</span> Bills Payment</a></li>
                                         </ul>
                                     </li>
                                 @endif
@@ -304,6 +304,38 @@
                                     <a href="{{ route('services.index') }}"><i
                                             class="fas fa-wrench"></i><span>Services</span></a>
                                 </li>
+                                {{-- Payroll Management (NEW) --}}
+                                <li>
+                                    <a href="javascript:void(0)"><i
+                                            class="fas fa-calculator"></i><span>Payroll</span></a>
+                                    <ul class="submenu">
+                                        <li>
+                                            <a href="{{ route('payroll.index') }}">
+                                                <i class="fas fa-list"></i> All Payrolls
+                                            </a>
+                                        </li>
+                                        {{-- <li>
+                                            <a href="{{ route('payroll.create') }}">
+                                                <i class="fas fa-plus"></i> Generate Payroll
+                                            </a>
+                                        </li> --}}
+                                        <li>
+                                            <a href="{{ route('employee.statements')}}">
+                                                <i class="fas fa-file-alt"></i> Employee Statements
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="{{ route('heslb.index') }}">
+                                                <i class="fas fa-graduation-cap"></i> HESLB Deductions
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="{{ route('deductions.unofficial') }}">
+                                                <i class="fas fa-hand-holding-usd"></i> Staff Loans
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
 
                                 {{-- Reports & Analytics --}}
                                 <li>
@@ -313,7 +345,7 @@
                                         <li><a href="{{ route('expenditure.all.transactions') }}"><span
                                                     style="font-size: 1.2rem;">💶</span> Transactions</a></li>
                                         <li><a href="{{ route('payment.report') }}">
-                                                <span style="font-size: 1.2rem;">💳</span> Payment Bills</a></li>
+                                                <span style="font-size: 1.2rem;">💳</span> Bills Payment</a></li>
                                     </ul>
                                 </li>
                             @endif

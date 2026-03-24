@@ -485,7 +485,7 @@
                         <img src="{{ asset('storage/logo/new_logo.png') }}" alt="ShuleApp Logo" class="company-logo">
                     </div>
                     <div class="company-info">
-                        <h1 class="company-name">SHULEAPP</h1>
+                        <h1 class="company-name">ShuleApp</h1>
                         <p class="company-tagline">Empowering Education</p>
                         <div class="contact-details">
                             <div>{{ ucwords(strtolower(Auth::user()->first_name)) }}

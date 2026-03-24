@@ -458,7 +458,7 @@
             if (result.isConfirmed) {
                 // Show loading state
                 Swal.fire({
-                    title: 'Processing...',
+                    title: 'Signing out...',
                     text: 'Please, just wait!',
                     allowOutsideClick: false,
                     allowEscapeKey: false,

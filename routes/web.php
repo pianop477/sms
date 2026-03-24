@@ -13,16 +13,19 @@ use App\Http\Controllers\ClassesController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\ContractGatewayController;
 use App\Http\Controllers\CoursesController;
+use App\Http\Controllers\EmployeeStatementController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\ExpenditureController;
 use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\GeneratedReportController;
+use App\Http\Controllers\HeslbController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\OtherStaffsController;
 use App\Http\Controllers\PackagesController;
 use App\Http\Controllers\ParentsController;
 use App\Http\Controllers\paymentBatchController;
+use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\PdfGeneratorController;
 use App\Http\Controllers\ResultsController;
 use App\Http\Controllers\RolesController;
@@ -36,6 +39,7 @@ use App\Http\Controllers\TeachersController;
 use App\Http\Controllers\TimetableController;
 use App\Http\Controllers\TodRosterController;
 use App\Http\Controllers\TransportController;
+use App\Http\Controllers\UnofficialDeductionController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\WebAuthn\WebAuthnLoginController;
 use App\Http\Controllers\WebAuthn\WebAuthnRegisterController;
@@ -615,7 +619,75 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::delete('/Batches/delete/{batch}', [paymentBatchController::class, 'deleteBatch'])->name('batch.delete');
         Route::get('/Batches/download/batch/{batch}', [paymentBatchController::class, 'downloadBatch'])->name('batch.download');
         Route::get('/Students/list', [BillsController::class, 'studentsList'])->name('students.list');
+
+        // ========================================================================
+        // PAYROLL ROUTES
+        // ========================================================================
+        Route::prefix('payroll')->name('payroll.')->group(function () {
+
+            // Main views - using hash
+            Route::get('/', [PayrollController::class, 'index'])->name('index');
+            Route::get('/create', [PayrollController::class, 'create'])->name('create');
+            Route::get('/{hash}', [PayrollController::class, 'show'])->name('show');
+            Route::get('/{hash}/edit', [PayrollController::class, 'edit'])->name('edit'); // Optional
+
+            // Actions (POST requests) - using hash
+            Route::post('/generate', [PayrollController::class, 'generate'])->name('generate');
+            Route::post('/{hash}/calculate', [PayrollController::class, 'calculate'])->name('calculate');
+            Route::post('/{hash}/finalize', [PayrollController::class, 'finalize'])->name('finalize');
+            Route::post('/{hash}/generate-slips', [PayrollController::class, 'generateSlips'])->name('generate-slips');
+
+            // Delete action (DELETE request) - using hash
+            Route::delete('/{hash}', [PayrollController::class, 'destroy'])->name('destroy');
+
+            // Downloads - using hash
+            Route::get('/{hash}/download-summary', [PayrollController::class, 'downloadSummary'])->name('download-summary');
+            Route::get('/{hash}/download-slips', [PayrollController::class, 'downloadSlips'])->name('download-slips');
+
+            // Employee in batch - using hash for batch and employee
+            Route::get('/{batchHash}/employee/{employeeHash}', [PayrollController::class, 'employeeDetail'])->name('employee.detail');
+        });
+
+        // ========================================================================
+        // EMPLOYEE STATEMENT ROUTES
+        // ========================================================================
+        Route::prefix('employee')->name('employee.')->group(function () {
+            Route::get('/statements', [EmployeeStatementController::class, 'index'])->name('statements');
+            Route::get('/statement/{staffId}', [EmployeeStatementController::class, 'show'])->name('statement.show');
+            Route::get('/statement/{staffId}/pdf', [EmployeeStatementController::class, 'downloadPdf'])->name('statement.pdf');
+        });
+
+        // ========================================================================
+        // HESLB MANAGEMENT ROUTES
+        // ========================================================================
+        Route::prefix('heslb')->name('heslb.')->group(function () {
+            Route::get('/', [HeslbController::class, 'index'])->name('index');
+            Route::post('/store', [HeslbController::class, 'store'])->name('store');
+            Route::post('/{id}/stop', [HeslbController::class, 'stop'])->name('stop');
+            Route::post('/{id}/update-amount', [HeslbController::class, 'updateAmount'])->name('update-amount');
+        });
+
+        // ========================================================================
+        // UNOFFICIAL DEDUCTIONS (Loans, Advances)
+        // ========================================================================
+        Route::prefix('deductions')->name('deductions.')->group(function () {
+            Route::get('/unofficial', [UnofficialDeductionController::class, 'index'])->name('unofficial');
+            Route::post('/unofficial/store', [UnofficialDeductionController::class, 'store'])->name('unofficial.store');
+            Route::post('/unofficial/{id}/cancel', [UnofficialDeductionController::class, 'cancel'])->name('unofficial.cancel');
+        });
+
+        // ========================================================================
+        // PAYROLL REPORTS
+        // ========================================================================
+        Route::prefix('reports')->name('reports.')->group(function () {
+            Route::get('/payroll', [PayrollController::class, 'reports'])->name('payroll');
+            Route::get('/payroll/yearly', [PayrollController::class, 'yearlyReport'])->name('payroll.yearly');
+        });
     });
+
+    // routes/web.php - ShuleApp
+    Route::get('/api/employees/with-contracts', [PayrollController::class, 'getEmployeesWithContracts'])->name('api.employees.with-contracts');
+    Route::get('/api/employees/search', [PayrollController::class, 'searchEmployees'])->name('api.employees.search');
 
     // end of auth
 });
