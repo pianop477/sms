@@ -947,7 +947,7 @@
                                     </div>
                                 </div>
 
-                                <div class="card-body p-1">
+                                <div class="card-body p-2">
                                     @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
                                         <div class="table-responsive" style="overflow-y: auto;">
                                             <table class="table table-hover mb-0 table-sm">
@@ -1596,7 +1596,7 @@
                                     </div>
                                 </div>
 
-                                <div class="card-body p-1">
+                                <div class="card-body p-2">
                                     @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
                                         <div class="table-responsive" style="overflow-y: auto;">
                                             <table class="table table-hover mb-0 table-sm">

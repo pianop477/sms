@@ -611,7 +611,7 @@
                     </div>
 
                     @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
-                        <div class="table-responsive" style="overflow-y: auto;">
+                        <div class="table-responsive p-2" style="overflow-y: auto;">
                             <table class="table table-premium">
                                 <thead>
                                     <tr>
