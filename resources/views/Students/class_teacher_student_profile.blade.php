@@ -276,7 +276,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th><i class="fas fa-phone me-2"></i> Phone</th>
+                                            <th><i class="fas fa-phone-alt me-2"></i> Phone</th>
                                             <td>
                                                 <a href="tel:{{ $students->phone }}" class="text-decoration-none">
                                                     {{ $students->phone }}

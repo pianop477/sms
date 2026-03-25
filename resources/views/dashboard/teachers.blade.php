@@ -949,7 +949,7 @@
 
                                 <div class="card-body p-1">
                                     @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
-                                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                                        <div class="table-responsive" style="overflow-y: auto;">
                                             <table class="table table-hover mb-0 table-sm">
                                                 <thead class="sticky-top" style="background: #f8f9fa; z-index: 1;">
                                                     <tr>
@@ -1598,7 +1598,7 @@
 
                                 <div class="card-body p-1">
                                     @if (isset($attendanceByClassData) && count($attendanceByClassData) > 0)
-                                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                                        <div class="table-responsive" style="overflow-y: auto;">
                                             <table class="table table-hover mb-0 table-sm">
                                                 <thead class="sticky-top" style="background: #f8f9fa; z-index: 1;">
                                                     <tr>
