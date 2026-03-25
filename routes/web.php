@@ -29,6 +29,7 @@ use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\PdfGeneratorController;
 use App\Http\Controllers\ResultsController;
 use App\Http\Controllers\RolesController;
+use App\Http\Controllers\SalarySlipVerificationController;
 use App\Http\Controllers\SchoolsController;
 use App\Http\Controllers\SendMessageController;
 use App\Http\Controllers\ServiceController;
@@ -683,6 +684,17 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
             Route::get('/payroll', [PayrollController::class, 'reports'])->name('payroll');
             Route::get('/payroll/yearly', [PayrollController::class, 'yearlyReport'])->name('payroll.yearly');
         });
+
+        // ========================================================================
+        // API ENDPOINTS (kwa ajili ya AJAX calls)
+        // ========================================================================
+        Route::prefix('api')->name('api.')->group(function () {
+            Route::get('/employees/with-contracts', [PayrollController::class, 'getEmployeesWithContracts'])->name('employees.with-contracts');
+            Route::get('/employees/search', [PayrollController::class, 'searchEmployees'])->name('employees.search');
+
+            // ✅ Add this route for schedule details
+            Route::get('/payroll/schedule-details', [PayrollController::class, 'getScheduleDetails'])->name('payroll.schedule.details');
+        });
     });
 
     // routes/web.php - ShuleApp
@@ -754,3 +766,12 @@ Route::post('/bank/modal-closed', function () {
     session(['bank_modal_last_shown' => time()]);
     return response()->json(['success' => true]);
 })->name('bank.modal.closed')->middleware('auth');
+
+// ========================================================================
+// SALARY SLIP VERIFICATION ROUTES (Public - Hakuna authentication)
+// ========================================================================
+Route::get('/verify-slip', [SalarySlipVerificationController::class, 'verifyWeb'])
+    ->name('salary-slip.verify.web');
+Route::get('/scan-qr', function () {
+    return view('payroll.scan-qr');
+})->name('scan.qr');

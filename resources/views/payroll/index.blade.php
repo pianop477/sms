@@ -234,12 +234,12 @@
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
                         <h4 class="mb-1 fw-bold">
-                            <i class="fas fa-calculator me-2 text-primary"></i> Payroll Management
+                            <i class="fas fa-calculator mr-2 text-primary"></i> Payroll Management
                         </h4>
                         <p class="text-muted mb-0">Manage and track all payroll batches</p>
                     </div>
                     <a href="{{ route('payroll.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus me-2"></i> Generate Payroll
+                        <i class="fas fa-plus mr-2"></i> Generate Payroll
                     </a>
                 </div>
 
@@ -275,10 +275,10 @@
                     <div class="col-xl-3 col-md-6 mb-3">
                         <div class="stat-card bg-info-custom text-white">
                             <div class="card-body">
-                                <div class="card-title">Total Employees</div>
-                                <div class="card-value">{{ number_format($statistics['total_employees'] ?? 0) }}</div>
+                                <div class="card-title">Calculated</div>
+                                <div class="card-value">{{ number_format($statistics['calculated'] ?? 0) }}</div>
                             </div>
-                            <i class="fas fa-users card-icon"></i>
+                            <i class="fas fa-dollar-sign card-icon"></i>
                         </div>
                     </div>
                 </div>
@@ -309,10 +309,10 @@
                         <div class="col-md-3">
                             <div class="d-flex gap-2">
                                 <button class="btn btn-primary btn-sm w-100" id="apply-filters">
-                                    <i class="fas fa-search me-1"></i> Apply
+                                    <i class="fas fa-search mr-1"></i> Apply
                                 </button>
                                 <a href="{{ route('payroll.index') }}" class="btn btn-secondary btn-sm w-100">
-                                    <i class="fas fa-times me-1"></i> Reset
+                                    <i class="fas fa-times mr-1"></i> Reset
                                 </a>
                             </div>
                         </div>
@@ -348,7 +348,7 @@
                                             </td>
                                             <td>{{ $batch['name'] }}</td>
                                             <td>
-                                                <i class="far fa-calendar-alt me-1 text-muted"></i>
+                                                <i class="far fa-calendar-alt mr-1 text-muted"></i>
                                                 {{ \Carbon\Carbon::parse($batch['payroll_month'] . '-01')->format('F Y') }}
                                             </td>
                                             <td class="text-center">
@@ -377,7 +377,7 @@
                                                     <i
                                                         class="fas
                                                 {{ $batch['status'] == 'finalized' ? 'fa-check-circle' : ($batch['status'] == 'calculated' ? 'fa-calculator' : ($batch['status'] == 'draft' ? 'fa-pen' : 'fa-times-circle')) }}
-                                                me-1"></i>
+                                                mr-1"></i>
                                                     {{ ucfirst($batch['status']) }}
                                                 </span>
                                             </td>
@@ -421,12 +421,12 @@
                                                     {{-- ✅ Download buttons for finalized batches --}}
                                                     @if ($batch['status'] == 'finalized')
                                                         <a href="{{ route('payroll.download-slips', $batch['hash']) }}"
-                                                            class="action-btn btn-download" title="Download Salary Slips">
+                                                            class="action-btn btn-download" title="Download Slips">
                                                             <i class="fas fa-download"></i>
                                                         </a>
                                                         <a href="{{ route('payroll.download-summary', $batch['hash']) }}"
-                                                            class="action-btn btn-export" title="Download Summary">
-                                                            <i class="fas fa-file-pdf"></i>
+                                                            class="action-btn btn-export" title="Download Payroll">
+                                                            <i class="fas fa-file-excel"></i>
                                                         </a>
                                                     @endif
                                                 </div>
@@ -512,97 +512,354 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        // Apply filters
-        document.getElementById('apply-filters').addEventListener('click', function() {
-            let status = document.getElementById('filter-status').value;
-            let year = document.getElementById('filter-year').value;
-            let search = document.getElementById('filter-search').value;
+        // ==================== HELPER FUNCTIONS ====================
 
-            let url = new URL(window.location.href);
-            if (status) url.searchParams.set('status', status);
-            else url.searchParams.delete('status');
-            if (year) url.searchParams.set('year', year);
-            else url.searchParams.delete('year');
-            if (search) url.searchParams.set('search', search);
-            else url.searchParams.delete('search');
-            url.searchParams.set('page', '1');
-
-            window.location.href = url.toString();
-        });
-
-        // Calculate payroll function
-        function calculatePayroll(batchId) {
-            if (confirm(
-                    'Are you sure you want to calculate this payroll? This will compute PAYE, NSSF, and net salaries.')) {
-                const button = event.currentTarget;
-                const originalHtml = button.innerHTML;
-                button.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
-                button.disabled = true;
-
-                fetch('{{ url('/payroll') }}/' + batchId + '/calculate', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            location.reload();
-                        } else {
-                            alert('Error: ' + data.message);
-                            button.innerHTML = originalHtml;
-                            button.disabled = false;
-                        }
-                    })
-                    .catch(error => {
-                        alert('Connection error: ' + error);
-                        button.innerHTML = originalHtml;
-                        button.disabled = false;
-                    });
-            }
+        /**
+         * Show loading alert
+         */
+        function showLoadingAlert(message) {
+            Swal.fire({
+                title: message,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
         }
 
-        // Finalize payroll function
-        function finalizePayroll(batchId) {
-            if (confirm('Are you sure you want to finalize this payroll? This action cannot be undone.')) {
-                const button = event.currentTarget;
-                const originalHtml = button.innerHTML;
-                button.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
-                button.disabled = true;
-
-                fetch('{{ url('/payroll') }}/' + batchId + '/finalize', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            location.reload();
-                        } else {
-                            alert('Error: ' + data.message);
-                            button.innerHTML = originalHtml;
-                            button.disabled = false;
-                        }
-                    })
-                    .catch(error => {
-                        alert('Connection error: ' + error);
-                        button.innerHTML = originalHtml;
-                        button.disabled = false;
-                    });
-            }
+        /**
+         * Show success alert
+         */
+        function showSuccessAlert(message, reload = true) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: message,
+                timer: 2000,
+                timerProgressBar: true,
+                showConfirmButton: false
+            }).then(() => {
+                if (reload) location.reload();
+            });
         }
+
+        /**
+         * Show error alert
+         */
+        function showErrorAlert(message) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: message,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+        }
+
+        /**
+         * Show confirmation dialog
+         */
+        function showConfirmAlert(title, text, confirmText, callback) {
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: confirmText,
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    callback();
+                }
+            });
+        }
+
+        /**
+         * Show info alert
+         */
+        function showInfoAlert(title, text) {
+            Swal.fire({
+                icon: 'info',
+                title: title,
+                text: text,
+                confirmButtonColor: '#3085d6'
+            });
+        }
+
+        // ==================== FILTERS ====================
+        const applyFiltersBtn = document.getElementById('apply-filters');
+        if (applyFiltersBtn) {
+            applyFiltersBtn.addEventListener('click', function() {
+                let status = document.getElementById('filter-status').value;
+                let year = document.getElementById('filter-year').value;
+                let search = document.getElementById('filter-search').value;
+
+                let url = new URL(window.location.href);
+                if (status) url.searchParams.set('status', status);
+                else url.searchParams.delete('status');
+                if (year) url.searchParams.set('year', year);
+                else url.searchParams.delete('year');
+                if (search) url.searchParams.set('search', search);
+                else url.searchParams.delete('search');
+                url.searchParams.set('page', '1');
+
+                window.location.href = url.toString();
+            });
+        }
+
         // Enter key on search
-        document.getElementById('filter-search').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('apply-filters').click();
-            }
-        });
+        const filterSearch = document.getElementById('filter-search');
+        if (filterSearch) {
+            filterSearch.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('apply-filters').click();
+                }
+            });
+        }
+
+        // ==================== CALCULATE PAYROLL ====================
+        window.calculatePayroll = function(batchId) {
+            showConfirmAlert(
+                'Calculate Payroll?',
+                'This will compute PAYE, NSSF, and net salaries for all employees. This action can be reviewed before finalization.',
+                'Yes, Calculate!',
+                () => {
+                    const button = event.currentTarget;
+                    const originalHtml = button.innerHTML;
+                    button.disabled = true;
+                    button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Calculating...';
+
+                    showLoadingAlert('Calculating payroll...');
+
+                    fetch('{{ url('/payroll') }}/' + batchId + '/calculate', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            Swal.close();
+                            if (data.success) {
+                                showSuccessAlert('Payroll calculated successfully!');
+                            } else {
+                                showErrorAlert(data.message || 'Calculation failed');
+                                button.innerHTML = originalHtml;
+                                button.disabled = false;
+                            }
+                        })
+                        .catch(error => {
+                            Swal.close();
+                            showErrorAlert('Connection error: ' + error.message);
+                            button.innerHTML = originalHtml;
+                            button.disabled = false;
+                        });
+                }
+            );
+        };
+
+        // ==================== FINALIZE PAYROLL ====================
+        window.finalizePayroll = function(batchId) {
+            showConfirmAlert(
+                'Finalize Payroll?',
+                '⚠️ WARNING: This action cannot be undone. Once finalized, no further changes can be made to this payroll.',
+                'Yes, Finalize!',
+                () => {
+                    const button = event.currentTarget;
+                    const originalHtml = button.innerHTML;
+                    button.disabled = true;
+                    button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Finalizing...';
+
+                    showLoadingAlert('Finalizing payroll...');
+
+                    fetch('{{ url('/payroll') }}/' + batchId + '/finalize', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            Swal.close();
+                            if (data.success) {
+                                showSuccessAlert('Payroll finalized successfully!');
+                            } else {
+                                showErrorAlert(data.message || 'Finalization failed');
+                                button.innerHTML = originalHtml;
+                                button.disabled = false;
+                            }
+                        })
+                        .catch(error => {
+                            Swal.close();
+                            showErrorAlert('Connection error: ' + error.message);
+                            button.innerHTML = originalHtml;
+                            button.disabled = false;
+                        });
+                }
+            );
+        };
+
+        // ==================== DELETE PAYROLL ====================
+        window.deletePayroll = function(hash) {
+            showConfirmAlert(
+                'Delete Payroll?',
+                '⚠️ WARNING: This action cannot be undone. All payroll data including employees and calculations will be permanently deleted.',
+                'Yes, Delete!',
+                () => {
+                    const button = event.currentTarget;
+                    const originalHtml = button.innerHTML;
+                    button.disabled = true;
+                    button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Deleting...';
+
+                    showLoadingAlert('Deleting payroll...');
+
+                    fetch('{{ url('/payroll') }}/' + hash, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            Swal.close();
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Deleted!',
+                                    text: 'Payroll has been deleted successfully.',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    window.location.href = '{{ route('payroll.index') }}';
+                                });
+                            } else {
+                                showErrorAlert(data.message || 'Delete failed');
+                                button.innerHTML = originalHtml;
+                                button.disabled = false;
+                            }
+                        })
+                        .catch(error => {
+                            Swal.close();
+                            showErrorAlert('Connection error: ' + error.message);
+                            button.innerHTML = originalHtml;
+                            button.disabled = false;
+                        });
+                }
+            );
+        };
+
+        // ==================== GENERATE SALARY SLIPS ====================
+        window.generateSlips = function(hash) {
+            showConfirmAlert(
+                'Generate Salary Slips?',
+                'This will generate PDF salary slips for all employees in this payroll. Existing slips will be regenerated.',
+                'Yes, Generate!',
+                () => {
+                    const button = event.currentTarget;
+                    const originalHtml = button.innerHTML;
+                    button.disabled = true;
+                    button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Generating...';
+
+                    showLoadingAlert('Generating salary slips...');
+
+                    fetch('{{ url('/payroll') }}/' + hash + '/generate-slips', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.text().then(text => {
+                                    throw new Error(
+                                        `HTTP ${response.status}: ${text.substring(0, 200)}`);
+                                });
+                            }
+                            const contentType = response.headers.get('content-type');
+                            if (!contentType || !contentType.includes('application/json')) {
+                                return response.text().then(text => {
+                                    throw new Error('Server returned HTML instead of JSON');
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            Swal.close();
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success!',
+                                    html: 'Salary slips generated successfully!<br><small>You can now download the combined PDF.</small>',
+                                    timer: 3000,
+                                    timerProgressBar: true,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                showErrorAlert(data.message || 'Generation failed');
+                                button.innerHTML = originalHtml;
+                                button.disabled = false;
+                            }
+                        })
+                        .catch(error => {
+                            Swal.close();
+                            showErrorAlert('Error: ' + error.message);
+                            button.innerHTML = originalHtml;
+                            button.disabled = false;
+                        });
+                }
+            );
+        };
+
+        // ==================== DOWNLOAD SLIPS ====================
+        window.downloadSlips = function(hash) {
+            Swal.fire({
+                title: 'Downloading...',
+                text: 'Preparing your salary slips PDF. This may take a moment.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                    window.location.href = '{{ url('/payroll') }}/' + hash + '/download-slips';
+                    setTimeout(() => {
+                        Swal.close();
+                    }, 2000);
+                }
+            });
+        };
+
+        // ==================== DOWNLOAD SUMMARY ====================
+        window.downloadSummary = function(hash) {
+            Swal.fire({
+                title: 'Downloading...',
+                text: 'Preparing payroll summary PDF.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                    window.location.href = '{{ url('/payroll') }}/' + hash + '/download-summary';
+                    setTimeout(() => {
+                        Swal.close();
+                    }, 1500);
+                }
+            });
+        };
+
+        // ==================== VIEW DETAILS ====================
+        window.viewDetails = function(hash) {
+            // Simple navigation, no confirmation needed
+            window.location.href = '{{ url('/payroll') }}/' + hash;
+        };
     </script>
 
 @endsection

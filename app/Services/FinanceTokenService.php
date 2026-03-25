@@ -55,7 +55,7 @@ class FinanceTokenService
     private function refreshToken($oldToken)
     {
         try {
-            Log::info("Attempting to refresh finance token");
+            // Log::info("Attempting to refresh finance token");
 
             $response = Http::timeout(15)
                 ->retry(2, 100)
@@ -67,7 +67,7 @@ class FinanceTokenService
 
                 if (isset($tokenData['status']) && $tokenData['status'] === true) {
                     $this->storeToken($tokenData);
-                    Log::info("Finance token refreshed successfully");
+                    // Log::info("Finance token refreshed successfully");
                     return $tokenData['token'];
                 }
             }
@@ -83,12 +83,12 @@ class FinanceTokenService
     private function getNewToken()
     {
         try {
-            Log::info("Requesting new finance token");
+            // Log::info("Requesting new finance token");
 
             $tokenUrl = rtrim(config('app.finance_api_base_url') . '/auth/token');
             // $tokenUrl = $baseUrl . '/api/v1.0/auth/token';
 
-            Log::info("Making request to:", ['url' => $tokenUrl]);
+            // Log::info("Making request to:", ['url' => $tokenUrl]);
 
             $response = Http::timeout(30)
                 ->retry(3, 100)
@@ -97,15 +97,15 @@ class FinanceTokenService
                     'client_secret' => config('app.finance_api_client_secret'),
                 ]);
 
-            Log::info("Response status:", ['status' => $response->status()]);
+            // Log::info("Response status:", ['status' => $response->status()]);
 
             if ($response->successful()) {
                 $tokenData = $response->json();
-                Log::info("Token response:", $tokenData);
+                // Log::info("Token response:", $tokenData);
 
                 if (isset($tokenData['status']) && $tokenData['status'] === true) {
                     $this->storeToken($tokenData);
-                    Log::info("New finance token acquired successfully");
+                    // Log::info("New finance token acquired successfully");
                     return $tokenData['token'];
                 }
             } else {
@@ -155,12 +155,12 @@ class FinanceTokenService
         $fullUrl = rtrim(config('app.finance_api_base_url') . '/auth/token');
         // $fullUrl = $baseUrl . '/api/v1.0/auth/token';
 
-        Log::info("Finance API Debug Info:", [
-            'base_url' => config('app.finance_api_base_url'),
-            'full_token_url' => $fullUrl,
-            'client_key_exists' => !empty(config('app.finance_api_client_key')),
-            'client_secret_exists' => !empty(config('app.finance_api_client_secret')),
-        ]);
+        // Log::info("Finance API Debug Info:", [
+        //     'base_url' => config('app.finance_api_base_url'),
+        //     'full_token_url' => $fullUrl,
+        //     'client_key_exists' => !empty(config('app.finance_api_client_key')),
+        //     'client_secret_exists' => !empty(config('app.finance_api_client_secret')),
+        // ]);
 
         return $fullUrl;
     }

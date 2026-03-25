@@ -304,6 +304,7 @@ class PayrollController extends Controller
                 'finalized_count' => $data['finalized_count'] ?? 0,
                 'draft_count' => $data['draft_count'] ?? 0,
                 'total_employees' => $data['total_employees'] ?? 0,
+                'calculated' => $data['total_calculated'] ?? 0,
             ];
 
             // ✅ Add hash to each batch for URL
@@ -749,7 +750,8 @@ class PayrollController extends Controller
                 return back()->with('error', 'Summary not found');
             }
 
-            $filename = "payroll_summary_{$id}.pdf";
+            $time_stamp = time();
+            $filename = "payroll_{$time_stamp}.xlsx";
 
             return response($response->body())
                 ->header('Content-Type', 'application/pdf')
@@ -785,7 +787,9 @@ class PayrollController extends Controller
                 return back()->with('error', 'Slips not found');
             }
 
-            $filename = "salary_slips_{$id}.pdf";
+            $time = time();
+
+            $filename = "salary_slips_{$time}.pdf";
 
             return response($response->body())
                 ->header('Content-Type', 'application/pdf')
@@ -892,5 +896,78 @@ class PayrollController extends Controller
         }
 
         return view('payroll.yearly-report', compact('report', 'year'));
+    }
+
+    public function getScheduleDetails(Request $request)
+    {
+        $batchId = $request->query('batch_id');
+
+        if (!$batchId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Batch ID required'
+            ], 400);
+        }
+
+        try {
+            // Call backend API to get batch details
+            $response = Http::withToken(session('finance_api_token'))
+                ->timeout(30)
+                ->get($this->apiBaseUrl . '/payroll/batches/' . $batchId);
+
+            if (!$response->successful()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Could not fetch schedule details'
+                ], 404);
+            }
+
+            $data = $response->json()['data'];
+            $batch = $data['batch'];
+            $summary = $data['summary'];
+
+            // Format employees data for preview
+            $employees = [];
+            foreach ($batch['payroll_employees'] ?? [] as $employee) {
+                // Find calculation for this employee
+                $calculation = null;
+                foreach ($batch['payroll_calculations'] ?? [] as $calc) {
+                    if ($calc['payroll_employee_id'] == $employee['id']) {
+                        $calculation = $calc;
+                        break;
+                    }
+                }
+
+                $employees[] = [
+                    'staff_id' => $employee['staff_id'],
+                    'employee_name' => $employee['employee_full_name'],
+                    'basic_salary' => $employee['basic_salary'],
+                    'allowances' => $employee['allowances'] ?? 0,
+                    'gross' => $calculation['gross_salary'] ?? 0,
+                    'nssf' => $calculation['nssf'] ?? 0,
+                    'paye' => $calculation['paye_tax'] ?? 0,
+                    'net' => $calculation['net_salary'] ?? 0
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'id' => $batch['id'],
+                    'name' => $batch['name'],
+                    'month_name' => date('F Y', strtotime($batch['payroll_month'] . '-01')),
+                    'total_employees' => $summary['total_employees'] ?? 0,
+                    'total_gross' => $summary['total_gross'] ?? 0,
+                    'total_net' => $summary['total_net'] ?? 0,
+                    'total_tax' => $summary['total_paye'] ?? 0,
+                    'employees' => $employees
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

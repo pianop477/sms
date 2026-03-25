@@ -114,12 +114,12 @@
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
                         <h4 class="mb-1 fw-bold">
-                            <i class="fas fa-calculator me-2 text-primary"></i> Payroll Details
+                            <i class="fas fa-calculator mr-2 text-primary"></i> Payroll Details
                         </h4>
                         <p class="text-muted mb-0">View and manage payroll batch</p>
                     </div>
                     <a href="{{ route('payroll.index') }}" class="btn btn-secondary btn-sm">
-                        <i class="fas fa-arrow-left me-1"></i> Back to List
+                        <i class="fas fa-arrow-left mr-1"></i> Back to List
                     </a>
                 </div>
 
@@ -152,7 +152,7 @@
                                 @endphp
                                 <span class="status-badge {{ $statusClass }}">
                                     <i
-                                        class="fas {{ $batch['status'] == 'finalized' ? 'fa-check-circle' : ($batch['status'] == 'calculated' ? 'fa-calculator' : 'fa-pen') }} me-1"></i>
+                                        class="fas {{ $batch['status'] == 'finalized' ? 'fa-check-circle' : ($batch['status'] == 'calculated' ? 'fa-calculator' : 'fa-pen') }} mr-1"></i>
                                     {{ ucfirst($batch['status']) }}
                                 </span>
                             </div>
@@ -207,33 +207,33 @@
                     @if ($batch['status'] == 'draft')
                         <button type="button" class="btn btn-action btn-calculate"
                             onclick="calculatePayroll('{{ $batch['hash'] }}')">
-                            <i class="fas fa-calculator me-1"></i> Calculate Payroll
+                            <i class="fas fa-calculator mr-1"></i> Calculate Payroll
                         </button>
                         <button type="button" class="btn btn-action btn-danger"
                             onclick="deletePayroll('{{ $batch['hash'] }}')">
-                            <i class="fas fa-trash me-1"></i> Delete Payroll
+                            <i class="fas fa-trash mr-1"></i> Delete Payroll
                         </button>
                     @endif
 
                     @if ($batch['status'] == 'calculated')
                         <button type="button" class="btn btn-action btn-finalize"
                             onclick="finalizePayroll('{{ $batch['hash'] }}')">
-                            <i class="fas fa-check-circle me-1"></i> Finalize Payroll
+                            <i class="fas fa-check-circle mr-1"></i> Finalize Payroll
                         </button>
                     @endif
 
                     @if ($batch['status'] == 'finalized')
                         <button type="button" class="btn btn-action btn-generate-slips"
                             onclick="generateSlips('{{ $batch['hash'] }}')">
-                            <i class="fas fa-file-pdf me-1"></i> Generate Salary Slips
+                            <i class="fas fa-file-pdf mr-1"></i> Generate Slips
                         </button>
                         <a href="{{ route('payroll.download-slips', $batch['hash']) }}"
                             class="btn btn-action btn-download">
-                            <i class="fas fa-download me-1"></i> Download All Slips
+                            <i class="fas fa-download mr-1"></i> Download Slips
                         </a>
                         <a href="{{ route('payroll.download-summary', $batch['hash']) }}"
                             class="btn btn-action btn-export">
-                            <i class="fas fa-file-pdf me-1"></i> Download Summary
+                            <i class="fas fa-file-excel mr-1"></i> Download Payroll
                         </a>
                     @endif
                 </div>
@@ -241,7 +241,7 @@
                 {{-- Employees Table --}}
                 <div class="card">
                     <div class="card-header bg-white">
-                        <h5 class="mb-0"><i class="fas fa-users me-2"></i> Employee Lists</h5>
+                        <h5 class="mb-0"><i class="fas fa-users mr-2"></i> Employee Lists</h5>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -285,7 +285,7 @@
                                     @empty
                                         <tr>
                                             <td colspan="10" class="text-center text-muted py-4">
-                                                <i class="fas fa-info-circle me-1"></i> No employees found in this payroll
+                                                <i class="fas fa-info-circle mr-1"></i> No employees found in this payroll
                                             </td>
                                         </tr>
                                     @endforelse
@@ -365,7 +365,7 @@
                     const btn = event.currentTarget;
                     const originalHtml = btn.innerHTML;
                     btn.disabled = true;
-                    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>';
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm mr-1"></span>';
 
                     showLoadingAlert('Calculating payroll...');
 
@@ -407,7 +407,7 @@
                     const btn = event.currentTarget;
                     const originalHtml = btn.innerHTML;
                     btn.disabled = true;
-                    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>';
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm mr-1"></span>';
 
                     showLoadingAlert('Finalizing payroll...');
 
@@ -449,7 +449,7 @@
                     const btn = event.currentTarget;
                     const originalHtml = btn.innerHTML;
                     btn.disabled = true;
-                    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>';
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm mr-1"></span>';
 
                     showLoadingAlert('Deleting payroll...');
 
@@ -499,7 +499,7 @@
                     const btn = event.currentTarget;
                     const originalHtml = btn.innerHTML;
                     btn.disabled = true;
-                    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>';
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm mr-1"></span>';
 
                     showLoadingAlert('Generating salary slips...');
 
@@ -575,7 +575,7 @@
         function downloadSummary(hash) {
             Swal.fire({
                 title: 'Downloading...',
-                text: 'Preparing payroll summary PDF.',
+                text: 'Preparing payroll Excel file.',
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
