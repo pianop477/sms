@@ -3,6 +3,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\PayrollImport;
 use App\Models\school_constracts;
 use App\Traits\HashIdTrait;
 use App\Traits\ResolveApplicantTrait;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PayrollController extends Controller
 {
@@ -464,10 +466,25 @@ class PayrollController extends Controller
 
     private function parseExcelFile($file)
     {
-        Log::info('Excel file parsing - placeholder', [
-            'file_name' => $file->getClientOriginalName()
+        $import = new PayrollImport();
+        Excel::import($import, $file);
+
+        $data = $import->getData();
+
+        // Filter out rows without staff_id
+        $data = array_filter($data, function ($row) {
+            return !empty($row['staff_id']);
+        });
+
+        // Reindex array
+        $data = array_values($data);
+
+        Log::info('Excel file parsed', [
+            'file_name' => $file->getClientOriginalName(),
+            'record_count' => count($data)
         ]);
-        return [];
+
+        return $data;
     }
 
     /**

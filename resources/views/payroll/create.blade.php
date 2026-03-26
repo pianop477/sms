@@ -4,6 +4,24 @@
 
 @section('content')
     <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #f94144;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
         /* ==================== METHOD CARDS ==================== */
         .method-card {
             border: 2px solid #e9ecef;
@@ -431,28 +449,28 @@
                                                     ({{ $schedule['total_employees'] ?? 0 }} employees)
                                                 </option>
                                             @empty
-                                                <option value="" disabled>No previous payrolls found</option>
+                                                <option value="" disabled> No previous payrolls found</option>
                                             @endforelse
                                         </select>
                                         <small class="text-muted">Select a previous payroll to view details</small>
                                     </div>
                                     <div class="col-md-4">
-                                        <button type="button" class="btn btn-sm btn-info w-100" id="loadScheduleBtn"
-                                            disabled>
-                                            <i class="fas fa-eye me-1"></i> Load Schedule Details
+                                        <button type="button" class="btn btn-sm btn-primary w-100 text-white"
+                                            id="loadScheduleBtn" disabled>
+                                            <i class="fas fa-sync-alt me-1"></i> Fetch schedule data
                                         </button>
                                     </div>
                                 </div>
                                 <div id="schedulePreviewContainer" class="mt-3" style="display: none;"></div>
                                 <div id="scheduleConfirmContainer" class="mt-3" style="display: none;">
                                     <button type="button" class="btn btn-success" id="confirmScheduleBtn">
-                                        <i class="fas fa-check me-1"></i> Use This Schedule
+                                        <i class="fas fa-check me-1"></i> Confirm
                                     </button>
                                 </div>
                             </div>
 
                             {{-- ==================== SECTION 4: MANUAL ENTRY MODE ==================== --}}
-                            <div id="manual_section" class="section-card" style="display: none;">
+                            {{-- <div id="manual_section" class="section-card" style="display: none;">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h6 class="mb-0">
                                         <i class="fas fa-user-plus text-secondary me-1"></i> Add Employees Manually
@@ -468,7 +486,6 @@
                                     </div>
                                 </div>
 
-                                {{-- Manual Add Form --}}
                                 <div id="manualAddForm" class="card border-primary mb-3" style="display: none;">
                                     <div class="card-header bg-primary text-white py-2">
                                         <strong><i class="fas fa-user-plus me-1"></i> Add Employee Manually</strong>
@@ -533,7 +550,6 @@
                                     </div>
                                 </div>
 
-                                {{-- Employee Search Modal --}}
                                 <div id="employeeSearchModal"
                                     style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 9999;">
                                     <div
@@ -554,7 +570,6 @@
                                     </div>
                                 </div>
 
-                                {{-- Manual Employees Table --}}
                                 <div id="manualEmployeesContainer" class="mt-3">
                                     <div class="alert alert-info">
                                         <i class="fas fa-info-circle me-1"></i>
@@ -590,7 +605,7 @@
                                     </div>
                                 </div>
                                 <input type="hidden" name="manual_employees" id="manual_employees" value="">
-                            </div>
+                            </div> --}}
 
                             {{-- ADVANCED FILTERS --}}
                             <div class="row mt-4">
@@ -742,12 +757,12 @@
                         displayContractsData(data.data);
                     } else {
                         contractsResultContainer.innerHTML =
-                            `<div class="alert alert-warning">No active contracts found.</div>`;
+                            `<div class="alert alert-warning"> No active contracts found.</div>`;
                     }
                 } catch (error) {
                     contractsLoading.style.display = 'none';
                     contractsResultContainer.innerHTML =
-                        `<div class="alert alert-danger">Failed to fetch contracts data.</div>`;
+                        `<div class="alert alert-danger"> Failed to fetch contracts data.</div>`;
                 }
             });
         }
@@ -763,12 +778,12 @@
                 <table class="table table-bordered">
                     <thead>
                         32\<th style="width: 40px;"><input type="checkbox" id="selectAllContracts" checked></th>
-                        <th>Staff ID</th>
-                        <th>Employee Name</th>
-                        <th>Staff Type</th>
-                        <th class="text-end">Basic Salary</th>
-                        <th class="text-end">Allowance</th>
-                        <th>Contract Type</th>
+                        <th>STAFF ID</th>
+                        <th>EMPLOYEE NAME</th>
+                        <th>STAFF TYPE</th>
+                        <th class="text-end">BASIC SALARY</th>
+                        <th class="text-end">ALLOWANCES</th>
+                        <th>CONTRACT TYPE</th>
                     </thead>
                     </thead>
                     <tbody>
@@ -777,12 +792,12 @@
                 html += `
                 <tr>
                     <td class="text-center"><input type="checkbox" class="contract-employee-checkbox" data-index="${index}" checked></td>
-                    <td><strong>${escapeHtml(emp.staff_id)}</strong></td>
-                    <td>${escapeHtml(emp.employee_name)}</td>
-                    <td>${escapeHtml(emp.staff_type)}</td>
+                    <td class="text-uppercase"><strong>${escapeHtml(emp.staff_id)}</strong></td>
+                    <td class="text-uppercase">${escapeHtml(emp.employee_name)}</td>
+                    <td class="text-uppercase">${escapeHtml(emp.staff_type)}</td>
                     <td class="text-end"> ${formatNumber(emp.basic_salary)}</td>
                     <td class="text-end"> ${formatNumber(emp.allowances)}</td>
-                    <td><span class="badge bg-${emp.contract_type === 'provision' ? 'warning' : 'success'}">${escapeHtml(emp.contract_type)}</span></td>
+                    <td class="text-uppercase"><span class="badge bg-${emp.contract_type === 'provision' ? 'warning' : 'success'}">${escapeHtml(emp.contract_type)}</span></td>
                 </tr>
             `;
             });
@@ -796,7 +811,7 @@
                     <button type="button" class="btn btn-sm btn-outline-primary" id="selectAllContractsBtn">Select All</button>
                 </div>
                 <button type="button" class="btn btn-success" id="confirmContractsData">
-                    <i class="fas fa-check me-1"></i> Confirm & Use Selected (${employees.length} employees)
+                    <i class="fas fa-check me-1"></i> Confirm
                 </button>
             </div>
         `;
@@ -828,7 +843,7 @@
                 const selected = document.querySelectorAll('.contract-employee-checkbox:checked').length;
                 const btn = document.getElementById('confirmContractsData');
                 if (btn && !btn.disabled) btn.innerHTML =
-                    `<i class="fas fa-check me-1"></i> Confirm & Use Selected (${selected} employees)`;
+                    `<i class="fas fa-check me-1"></i> Confirm`;
             }
             document.querySelectorAll('.contract-employee-checkbox').forEach(cb => cb.addEventListener('change',
                 updateContractCount));
@@ -841,9 +856,9 @@
                 e.preventDefault();
                 const templateData = [
                     ['staff_id', 'basic_salary', 'allowances', 'department', 'contract_type'],
-                    ['TCH001', '800000', '100000', 'Science', 'new'],
-                    ['DRV001', '500000', '50000', 'Transport', 'new'],
-                    ['STF001', '400000', '0', 'Administration', 'provision']
+                    ['TCH-001', '800000', '100000', 'Science', 'new'],
+                    ['DRV-001', '500000', '50000', 'Transport', 'new'],
+                    ['STF-001', '400000', '0', 'Staff', 'provision']
                 ];
                 const csvContent = templateData.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
                 const blob = new Blob([csvContent], {
@@ -894,25 +909,25 @@
                         data.push({
                             staff_id: row.staff_id,
                             employee_name: employeeFound?.employee_name || row.staff_id,
-                            staff_type: employeeFound?.staff_type || 'teacher',
+                            staff_type: employeeFound?.staff_type || 'Teacher',
                             basic_salary: parseFloat(row.basic_salary) || 0,
                             allowances: parseFloat(row.allowances) || 0,
                             department: row.department || '',
-                            contract_type: row.contract_type || 'new',
+                            contract_type: row.contract_type || 'New',
                             exists_in_system: !!employeeFound
                         });
                     }
 
                     if (data.length === 0) {
                         excelPreviewContainer.innerHTML =
-                            '<div class="alert alert-warning">No valid data found. Please check the format.</div>';
+                            '<div class="alert alert-warning"> No valid data found. Please check the format.</div>';
                         return;
                     }
                     displayExcelPreview(data);
                 } catch (error) {
                     console.error('Error parsing file:', error);
                     excelPreviewContainer.innerHTML =
-                        '<div class="alert alert-danger">Failed to parse file. Please use the template format.</div>';
+                        '<div class="alert alert-danger"> Failed to parse file. Please use the template format.</div>';
                 }
             });
         }
@@ -952,15 +967,15 @@
                 <table class="preview-table">
                     <thead>
                         32\<th style="width: 40px;"><input type="checkbox" id="selectAllExcel" checked></th>
-                        <th>Staff ID</th>
-                        <th>Employee Name</th>
-                        <th>Staff Type</th>
-                        <th class="text-end">Basic Salary</th>
-                        <th class="text-end">Allowances</th>
-                        <th class="text-end">Gross</th>
-                        <th>Department</th>
-                        <th>Contract Type</th>
-                        <th>Status</th>
+                        <th>STAFF ID</th>
+                        <th>EMPLOYEE NAME</th>
+                        <th>STAFF TYPE</th>
+                        <th class="text-end">BASIC SALARY</th>
+                        <th class="text-end">ALLOWANCES</th>
+                        <th class="text-end">GROSS PAY</th>
+                        <th>DEPARTMENT</th>
+                        <th>CONTRACT TYPE</th>
+                        <th>STATUS</th>
                     </thead>
                     </thead>
                     <tbody>
@@ -968,18 +983,18 @@
             data.forEach((emp, idx) => {
                 const gross = (emp.basic_salary || 0) + (emp.allowances || 0);
                 const statusBadge = emp.exists_in_system ? '<span class="badge bg-success">Found</span>' :
-                    '<span class="badge bg-warning text-dark">New</span>';
+                    '<span class="badge bg-warning text-dark"> New</span>';
                 html += `
                 <tr>
                     <td class="text-center"><input type="checkbox" class="excel-checkbox" data-index="${idx}" checked></td>
-                    <td><strong>${escapeHtml(emp.staff_id)}</strong></td>
-                    <td>${escapeHtml(emp.employee_name)}</td>
-                    <td>${escapeHtml(emp.staff_type)}</td>
+                    <td class="text-uppercase"><strong>${escapeHtml(emp.staff_id)}</strong></td>
+                    <td class="text-uppercase">${escapeHtml(emp.employee_name)}</td>
+                    <td class="text-uppercase">${escapeHtml(emp.staff_type)}</td>
                     <td class="text-end"> ${formatNumber(emp.basic_salary)}</td>
                     <td class="text-end"> ${formatNumber(emp.allowances)}</td>
                     <td class="text-end"><strong> ${formatNumber(gross)}</strong></td>
-                    <td>${escapeHtml(emp.department)}</td>
-                    <td><span class="badge bg-${emp.contract_type === 'provision' ? 'warning' : 'info'}">${escapeHtml(emp.contract_type)}</span></td>
+                    <td class="text-uppercase">${escapeHtml(emp.department)}</td>
+                    <td class="text-uppercase"><span class="badge bg-${emp.contract_type === 'provision' ? 'warning' : 'info'}">${escapeHtml(emp.contract_type)}</span></td>
                     <td class="text-center">${statusBadge}</td>
                 </tr>
             `;
@@ -994,7 +1009,7 @@
                     <button class="btn btn-sm btn-outline-primary" id="selectAllExcel">Select All</button>
                 </div>
                 <button class="btn btn-success" id="confirmExcelData">
-                    <i class="fas fa-check me-1"></i> Confirm & Use Selected (${data.length} employees)
+                    <i class="fas fa-check me-1"></i> Confirm
                 </button>
             </div>
             <input type="hidden" id="excel_data" name="excel_data" value="">
@@ -1049,7 +1064,7 @@
                 const batchId = previousSelect.value;
                 if (!batchId) return;
                 schedulePreviewContainer.innerHTML =
-                    '<div class="text-center py-3"><div class="loading-spinner"></div> Loading schedule details...</div>';
+                    '<div class="text-center py-3"><div class="loading-spinner"></div> Loading payroll schedule data...</div>';
                 schedulePreviewContainer.style.display = 'block';
                 try {
                     const response = await fetch('{{ route('api.payroll.schedule.details') }}?batch_id=' +
@@ -1066,11 +1081,11 @@
                         scheduleConfirmContainer.style.display = 'block';
                     } else {
                         schedulePreviewContainer.innerHTML =
-                            '<div class="alert alert-warning">Could not load schedule details.</div>';
+                            '<div class="alert alert-warning"> Could not load payroll schedule data.</div>';
                     }
                 } catch (error) {
                     schedulePreviewContainer.innerHTML =
-                        '<div class="alert alert-danger">Failed to load schedule details.</div>';
+                        '<div class="alert alert-danger"> Failed to load payroll schedule data.</div>';
                 }
             });
         }
@@ -1089,14 +1104,14 @@
                     <table class="preview-table">
                         <thead>
                             32\<th style="width: 50px;">#</th>
-                            <th>Staff ID</th>
-                            <th>Employee Name</th>
-                            <th class="text-end">Basic Salary</th>
-                            <th class="text-end">Allowances</th>
-                            <th class="text-end">Gross</th>
+                            <th>STAFF ID</th>
+                            <th>EMPLOYEE NAME</th>
+                            <th class="text-end">BASIC SALARY</th>
+                            <th class="text-end">ALLOWANCES</th>
+                            <th class="text-end">GROSS PAY</th>
                             <th class="text-end">NSSF</th>
                             <th class="text-end">PAYE</th>
-                            <th class="text-end">Net Pay</th>
+                            <th class="text-end">NET PAY</th>
                         </thead>
                         </thead>
                         <tbody>
@@ -1105,8 +1120,8 @@
                 html += `
                 <tr>
                     <td class="text-center">${idx + 1}</td>
-                    <td><strong>${escapeHtml(emp.staff_id)}</strong></td>
-                    <td>${escapeHtml(emp.employee_name)}</td>
+                    <td class="text-uppercase"><strong>${escapeHtml(emp.staff_id)}</strong></td>
+                    <td class="text-uppercase">${escapeHtml(emp.employee_name)}</td>
                     <td class="text-end"> ${formatNumber(emp.basic_salary)}</td>
                     <td class="text-end"> ${formatNumber(emp.allowances)}</td>
                     <td class="text-end"><strong> ${formatNumber(emp.gross)}</strong></td>
@@ -1384,57 +1399,73 @@
             });
         }
 
-        // ==================== FORM SUBMIT ====================
+        // ==================== FORM SUBMIT (Normal Submit with Error Handling) ====================
         const form = document.getElementById('payrollForm');
         const submitBtn = document.getElementById('submitBtn');
 
         if (form) {
             form.addEventListener('submit', function(e) {
                 const method = document.querySelector('input[name="generation_method"]:checked').value;
-                if (method === 'contracts') {
-                    const contractsData = document.getElementById('contracts_data').value;
-                    if (!contractsData || contractsData === '[]') {
-                        e.preventDefault();
-                        showToast('Please fetch and confirm contracts data first', 'warning');
-                        return;
-                    }
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'selected_employees';
-                    input.value = contractsData;
-                    form.appendChild(input);
+                let hasError = false;
+
+                // ✅ Validation
+                switch (method) {
+                    case 'contracts':
+                        const contractsData = document.getElementById('contracts_data').value;
+                        if (!contractsData || contractsData === '[]') {
+                            showToast('Please fetch and confirm contracts data first', 'warning');
+                            e.preventDefault();
+                            hasError = true;
+                        }
+                        break;
+                    case 'excel_upload':
+                        const excelData = document.getElementById('excel_data').value;
+                        if (!excelData || excelData === '[]') {
+                            showToast('Please load and confirm Excel data first', 'warning');
+                            e.preventDefault();
+                            hasError = true;
+                        }
+                        break;
+                    case 'previous_batch':
+                        const previousBatchId = document.getElementById('previous_batch_id').value;
+                        if (!previousBatchId) {
+                            showToast('Please select a previous schedule', 'warning');
+                            e.preventDefault();
+                            hasError = true;
+                        }
+                        if (!document.querySelector('input[name="previous_batch_data"]')) {
+                            showToast('Please load and confirm the schedule first', 'warning');
+                            e.preventDefault();
+                            hasError = true;
+                        }
+                        break;
+                    case 'manual_entry':
+                        if (manualEmployeesList.length === 0) {
+                            showToast('Please add at least one employee manually', 'warning');
+                            e.preventDefault();
+                            hasError = true;
+                        }
+                        break;
                 }
-                if (method === 'excel_upload') {
-                    const excelData = document.getElementById('excel_data').value;
-                    if (!excelData || excelData === '[]') {
-                        e.preventDefault();
-                        showToast('Please load and confirm Excel data first', 'warning');
-                        return;
-                    }
+
+                // ✅ Only show preloader if NO error
+                if (!hasError) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML =
+                        '<span class="spinner-border spinner-border-sm me-2"></span> Generating Payroll...';
                 }
-                if (method === 'previous_batch') {
-                    const previousBatchId = document.getElementById('previous_batch_id').value;
-                    if (!previousBatchId) {
-                        e.preventDefault();
-                        showToast('Please select a previous schedule', 'warning');
-                        return;
-                    }
-                    if (!document.querySelector('input[name="previous_batch_data"]')) {
-                        e.preventDefault();
-                        showToast('Please load and confirm the schedule first', 'warning');
-                        return;
-                    }
-                }
-                if (method === 'manual_entry') {
-                    if (manualEmployeesList.length === 0) {
-                        e.preventDefault();
-                        showToast('Please add at least one employee manually', 'warning');
-                        return;
-                    }
-                }
-                submitBtn.disabled = true;
-                submitBtn.innerHTML =
-                    '<span class="spinner-border spinner-border-sm me-2"></span> Generating Payroll...';
+            });
+
+            // ✅ Reset button on page load (in case of error page)
+            window.addEventListener('load', function() {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-cogs me-2"></i> Generate Payroll';
+            });
+
+            // ✅ Reset button on beforeunload (in case of navigation)
+            window.addEventListener('pageshow', function() {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-cogs me-2"></i> Generate Payroll';
             });
         }
     </script>

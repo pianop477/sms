@@ -4,29 +4,29 @@
             {{-- Logo & School Info Section --}}
             <div class="d-flex align-items-center" style="min-width: 0; flex: 1;">
                 @php
-                    $schoolName = Auth::user()->school && Auth::user()->school->school_name
-                                ? Auth::user()->school->school_name
-                                : 'ShuleApp - Admin Panel';
+                    $schoolName =
+                        Auth::user()->school && Auth::user()->school->school_name
+                            ? Auth::user()->school->school_name
+                            : 'ShuleApp - Admin Panel';
 
-                    $logoPath = Auth::user()->school && Auth::user()->school->logo
-                                ? url('storage/logo/' . Auth::user()->school->logo)
-                                : url('storage/logo/new_logo.png');
+                    $logoPath =
+                        Auth::user()->school && Auth::user()->school->logo
+                            ? url('storage/logo/' . Auth::user()->school->logo)
+                            : url('storage/logo/new_logo.png');
                 @endphp
 
                 <div class="brand-container d-flex align-items-center">
-                    <img src="{{ $logoPath }}"
-                         alt="School Logo"
-                         class="school-logo-img mr-2">
+                    <img src="{{ $logoPath }}" alt="School Logo" class="school-logo-img me-2">
 
                     <div class="school-text-info">
-                        <a href="{{ route('home') }}"
-                           class="school-name-link text-decoration-none fw-bold d-block">
+                        <a href="{{ route('home') }}" class="school-name-link text-decoration-none fw-bold d-block">
                             {{ $schoolName }}
                         </a>
-                        @if(Auth::user()->school && Auth::user()->school->postal_address)
-                        <span class="school-address-text d-none d-sm-block">
-                            {{ strtoupper(Auth::user()->school->postal_address )}} - {{strtoupper(Auth::user()->school->postal_name)}}
-                        </span>
+                        @if (Auth::user()->school && Auth::user()->school->postal_address)
+                            <span class="school-address-text d-none d-sm-block">
+                                {{ strtoupper(Auth::user()->school->postal_address) }} -
+                                {{ strtoupper(Auth::user()->school->postal_name) }}
+                            </span>
                         @endif
                     </div>
                 </div>
@@ -41,22 +41,20 @@
                     if ($imageName && file_exists($filePath)) {
                         $avatarImage = asset('storage/profile/' . $imageName);
                     } else {
-                        $default = auth()->user()->gender == 'male'
-                                    ? 'avatar.jpg'
-                                    : 'avatar-female.jpg';
+                        $default = auth()->user()->gender == 'male' ? 'avatar.jpg' : 'avatar-female.jpg';
 
                         $avatarImage = asset('storage/profile/' . $default);
                     }
 
                     // Fix for usertype display
                     $usertype = Auth::user()->usertype;
-                    if($usertype == 1) {
+                    if ($usertype == 1) {
                         $roleDisplay = 'Administrator';
-                    } elseif($usertype == 2) {
+                    } elseif ($usertype == 2) {
                         $roleDisplay = 'Manager';
-                    } elseif($usertype == 3) {
+                    } elseif ($usertype == 3) {
                         $roleDisplay = 'Teacher';
-                    } elseif($usertype == 4) {
+                    } elseif ($usertype == 4) {
                         $roleDisplay = 'Parent';
                     } elseif ($usertype == 5) {
                         # code...
@@ -79,10 +77,10 @@
 
                     {{-- Profile Image with Dropdown Toggle --}}
                     <div class="dropdown">
-                        <button class="btn p-0 border-0 bg-transparent d-flex align-items-center" type="button" id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
-                            <img src="{{ $avatarImage }}"
-                                 alt="Profile"
-                                 class="profile-avatar rounded-circle">
+                        <button class="btn p-0 border-0 bg-transparent d-flex align-items-center" type="button"
+                            id="userMenuDropdown" data-bs-toggle="dropdown" aria-expanded="false"
+                            style="cursor: pointer;">
+                            <img src="{{ $avatarImage }}" alt="Profile" class="profile-avatar rounded-circle">
                         </button>
 
                         <ul class="dropdown-menu dropdown-menu-end mt-2 shadow-sm border-0">
@@ -96,16 +94,17 @@
                                     <i class="ti-key mr-2" style="color: #667eea;"></i> Change Password
                                 </a>
                             </li>
-                            <li><hr class="dropdown-divider my-1"></li>
                             <li>
-                                <button type="button"
-                                        class="dropdown-item py-2 signout-btn"
-                                        onclick="confirmSignout()"
-                                        style="background: none; border: none; width: 100%; text-align: left;">
+                                <hr class="dropdown-divider my-1">
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item py-2 signout-btn" onclick="confirmSignout()"
+                                    style="background: none; border: none; width: 100%; text-align: left;">
                                     <i class="ti-power-off me-2" style="color: #e74a3b;"></i>
                                     <span style="color: #e74a3b; font-weight: 600;">Sign out</span>
                                 </button>
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                    style="display: none;">
                                     @csrf
                                 </form>
                             </li>
@@ -139,30 +138,46 @@
     /* Reduced Image Sizes */
     .school-logo-img {
         transition: all 0.3s ease;
-        width: 70px;
-        height: 70px;
+        width: 65px;
+        height: 65px;
         object-fit: cover;
-        border-radius: 8px;
+        border-radius: 50% !important;
         border: 1.5px solid #e9ecef;
         padding: 1px;
     }
 
+    /* Enhanced Profile Avatar Styling */
     .profile-avatar {
+        /* Critical for maintaining circle shape */
+        width: 40px !important;
+        height: 40px !important;
+        object-fit: cover;
+        /* Crops the image to fit without stretching */
+        flex-shrink: 0;
+        /* Prevents the circle from becoming an oval in flex containers */
+
+        /* Aesthetics */
+        border-radius: 50% !important;
+        border: 2px solid #667eea;
+        padding: 2px;
+        background-color: #fff;
         transition: all 0.3s ease;
         cursor: pointer;
-        width: 35px;
-        height: 35px;
-        object-fit: cover;
-        border: 1.5px solid #667eea;
-        padding: 1px;
+    }
+
+    #userMenuDropdown {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
         border-radius: 50%;
     }
 
     /* Small Mobile Devices */
     @media (min-width: 481px) {
         .school-logo-img {
-            width: 45% !important;
-            height: 45px !important;
+            width: 38% !important;
+            height: 38px !important;
         }
 
         .profile-avatar {
@@ -174,44 +189,43 @@
     /* Tablets */
     @media (min-width: 768px) {
         .school-logo-img {
-            width: 50px !important;
-            height: 50px !important;
-            border-radius: 10px;
+            width: 45px !important;
+            height: 45px !important;
+            border-radius: 50% !important;
             border-width: 2px;
         }
 
         .profile-avatar {
-            width: 40px !important;
-            height: 40px !important;
-            border-width: 2px;
+            width: 35px !important;
+            height: 35px !important;
         }
     }
 
     /* Laptops/Desktops */
     @media (min-width: 992px) {
         .school-logo-img {
-            width: 60px !important;
-            height: 60px !important;
-            border-radius: 12px;
+            width: 50px !important;
+            height: 50px !important;
+            border-radius: 50% !important;
         }
 
         .profile-avatar {
-            width: 45% !important;
-            height: 45px !important;
+            width: 40% !important;
+            height: 40px !important;
         }
     }
 
     /* Large Screens */
     @media (min-width: 1200px) {
         .school-logo-img {
-            width: 70px !important;
-            height: 70px !important;
-            border-radius: 12px;
+            width: 65px !important;
+            height: 65px !important;
+            border-radius: 50% !important;
         }
 
         .profile-avatar {
-            width: 50px !important;
-            height: 50px !important;
+            width: 45px !important;
+            height: 45px !important;
         }
     }
 
@@ -261,13 +275,13 @@
     /* Large Screens */
     @media (min-width: 1200px) {
         .school-name-link {
-            font-size: 1.2rem;
+            font-size: 1rem;
         }
     }
 
     /* School Address Text */
     .school-address-text {
-        font-size: 0.6rem;
+        font-size: 0.8rem;
         color: #718096;
         max-width: 130px;
         white-space: nowrap;
@@ -278,7 +292,7 @@
     @media (min-width: 768px) {
         .school-address-text {
             max-width: 250px;
-            font-size: 0.7rem;
+            font-size: 0.6rem;
             white-space: normal;
             overflow: visible;
             text-overflow: clip;
@@ -291,7 +305,7 @@
     }
 
     .profile-top-name {
-        font-size: 1rem;
+        font-size: 1.1rem;
         color: #2d3748;
         white-space: nowrap;
         overflow: hidden;
@@ -300,7 +314,7 @@
     }
 
     .profile-role {
-        font-size: 0.6rem;
+        font-size: 0.65rem;
         color: #718096;
         white-space: nowrap;
         overflow: hidden;
@@ -317,7 +331,7 @@
         }
 
         .profile-role {
-            font-size: 0.7rem;
+            font-size: 0.6rem;
         }
     }
 
@@ -387,6 +401,7 @@
             opacity: 0;
             transform: translateY(-8px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);

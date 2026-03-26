@@ -378,7 +378,7 @@
                         </div>
                     </div>
                     <div class="text-end">
-                        <small class="text-muted d-block">Subscription Package.</small>
+                        <small class="text-muted d-block">Current Plan.</small>
                         @if ($school->package == 'premium')
                             <span class="fw-semibold badge bg-success text-white"><i class="fas fa-crown"></i> {{ ucfirst($school->package) }}</span>
                         @else

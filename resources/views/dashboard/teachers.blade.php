@@ -121,7 +121,7 @@
             width: 60px;
             height: 60px;
             border-radius: 18px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             display: flex;
             align-items: center;
             justify-content: center;
@@ -550,19 +550,19 @@
             // Status colors and messages
             if ($daysRemaining > 30) {
                 $statusColor = 'white';
-                $statusBg = 'var(--success)';
+                $statusBg = 'var(--success-color)';
                 $statusText = 'Active';
                 $icon = 'fa-check-circle';
                 $progressColor = 'bg-success';
             } elseif ($daysRemaining > 15) {
                 $statusColor = 'black';
-                $statusBg = 'var(--warning)';
+                $statusBg = 'var(--warning-color)';
                 $statusText = 'Expiring Soon';
                 $icon = 'fa-clock';
                 $progressColor = 'bg-warning';
             } else {
                 $statusColor = 'black';
-                $statusBg = 'var(--danger)';
+                $statusBg = 'var(--danger-color)';
                 $statusText = 'Critical';
                 $icon = 'fa-exclamation-triangle';
                 $progressColor = 'bg-danger';
@@ -675,7 +675,7 @@
                             </div>
                         </div>
                         <div class="text-end">
-                            <small class="text-muted d-block">Subscription Package.</small>
+                            <small class="text-muted d-block">Current Plan.</small>
                             @if ($school->package == 'premium')
                                 <span class="fw-semibold badge bg-success text-white"><i class="fas fa-crown"></i>
                                     {{ ucfirst($school->package) }}</span>
