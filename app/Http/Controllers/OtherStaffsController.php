@@ -208,7 +208,7 @@ class OtherStaffsController extends Controller
             'joined'     => 'required|date_format:Y',
             'job_title'  => 'required|string|max:255',
             'image'      => ['nullable', 'file', 'mimetypes:image/jpeg,image/png,image/jpg', 'max:1024'],
-            'nida'       => 'nullable|string|regex:/^\d{8}-?\d{5}-?\d{5}-?\d{2}$/'
+            'nida'       => ['nullable','string','regex:/^\d{8}-?\d{5}-?\d{5}-?\d{2}$/',"unique:{$tableName},nida,{$staff->id},id"]
         ];
 
         $extra = $type === 'driver'
@@ -243,7 +243,7 @@ class OtherStaffsController extends Controller
             }
         }
 
-        $nin = preg_replace('/[^0-9]/', '', $request->nida);
+        $nin = $request->nida ? preg_replace('/[^0-9]/', '', $request->nida) : null;
 
         // Map fields based on staff type
         $updateData = [
