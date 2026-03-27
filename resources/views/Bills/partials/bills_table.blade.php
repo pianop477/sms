@@ -58,7 +58,7 @@
                     <td>
                         <div class="dropdown">
                             <ul class="d-flex justify-content-center">
-                                <li class="mr-3">
+                                <li class="me-3">
                                     <button class="btn btn-action btn-xs dropdown-toggle mr-2" type="button"
                                         id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="fas fa-cog me-1"></i> Manage

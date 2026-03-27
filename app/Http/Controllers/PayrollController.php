@@ -495,66 +495,77 @@ class PayrollController extends Controller
      */
     public function show($hash)
     {
-        // ✅ Step 1: Decrypt hash
+        // Decrypt hash
         $id = $this->decryptId($hash);
 
-        // Log::info('Payroll Show - Decryption', [
-        //     'hash' => $hash,
-        //     'decrypted_id' => $id,
-        //     'success' => !is_null($id)
-        // ]);
-
         if (!$id) {
-            Log::warning('Payroll Show - Invalid hash', ['hash' => $hash]);
-            return redirect()->route('payroll.index')->with('error', 'Invalid payroll link');
+            // Log::warning('Payroll Show - Invalid hash', ['hash' => $hash]);
+            Alert()->toast('Invalid payroll found', 'error');
+            return redirect()->route('payroll.index');
         }
 
         try {
-            // ✅ Step 2: Call API
+            // Call API
             $response = Http::withToken(session('finance_api_token'))
                 ->timeout(30)
                 ->get($this->apiBaseUrl . '/payroll/batches/' . $id);
 
-            // Log::info('Payroll Show - API Response', [
-            //     'batch_id' => $id,
-            //     'status' => $response->status(),
-            //     'successful' => $response->successful(),
-            //     'body' => substr($response->body(), 0, 500)
-            // ]);
-
             if (!$response->successful()) {
                 $errorMsg = $response->json()['message'] ?? 'Payroll not found';
-                Log::warning('Payroll Show - API Error', [
-                    'batch_id' => $id,
-                    'error' => $errorMsg
-                ]);
-                return redirect()->route('payroll.index')
-                    ->with('error', $errorMsg);
+                Alert()->toast($errorMsg, 'error');
+                return redirect()->route('payroll.index');
             }
 
             $data = $response->json()['data'];
             $batch = $data['batch'];
             $summary = $data['summary'];
 
+            // ✅ ENRICH EMPLOYEES WITH FULL NAMES FROM LOCAL DATABASE
+            $batch['payroll_employees'] = $this->enrichEmployeesWithDetails(
+                $batch['payroll_employees'] ?? [],
+                Auth::user()->school_id
+            );
+
             // ✅ Add hash to batch for view
             $batch['hash'] = $hash;
 
-            // Log::info('Payroll Show - Success', [
-            //     'batch_id' => $batch['id'],
-            //     'batch_number' => $batch['batch_number'],
-            //     'employee_count' => $summary['total_employees'] ?? 0
-            // ]);
         } catch (\Exception $e) {
-            // Log::error('Payroll Show - Exception', [
-            //     'batch_id' => $id,
-            //     'error' => $e->getMessage(),
-            //     'trace' => $e->getTraceAsString()
-            // ]);
-            return redirect()->route('payroll.index')
-                ->with('error', 'Connection error: ' . $e->getMessage());
+            Log::error('Payroll Show - Exception', [
+                'batch_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+
+            Alert()->toast($e->getMessage(), 'error');
+            return redirect()->route('payroll.index');
         }
 
         return view('payroll.show', compact('batch', 'summary'));
+    }
+
+    private function enrichEmployeesWithDetails($employees, $schoolId)
+    {
+        if (empty($employees)) {
+            return [];
+        }
+
+        $enrichedEmployees = [];
+
+        foreach ($employees as $employee) {
+            // Get employee details using staff_id from local database
+            $staffDetails = $this->resolveApplicantDetails($employee['staff_id'], $schoolId);
+
+            // Merge original employee data with enriched details
+            $enrichedEmployees[] = array_merge($employee, [
+                'employee_full_name' => $staffDetails['first_name'] . ' ' . $staffDetails['last_name'],
+                'staff_type' => $staffDetails['staff_type'] ?? $employee['staff_type'],
+                'first_name' => $staffDetails['first_name'],
+                'last_name' => $staffDetails['last_name'],
+                'staff_table_id' => $staffDetails['staff_table_id'] ?? null,
+                'user_id' => $staffDetails['user_id'] ?? null
+            ]);
+        }
+
+        return $enrichedEmployees;
     }
 
     /**

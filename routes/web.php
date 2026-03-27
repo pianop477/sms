@@ -672,9 +672,9 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         // UNOFFICIAL DEDUCTIONS (Loans, Advances)
         // ========================================================================
         Route::prefix('deductions')->name('deductions.')->group(function () {
-            Route::get('/unofficial', [UnofficialDeductionController::class, 'index'])->name('unofficial');
-            Route::post('/unofficial/store', [UnofficialDeductionController::class, 'store'])->name('unofficial.store');
-            Route::post('/unofficial/{id}/cancel', [UnofficialDeductionController::class, 'cancel'])->name('unofficial.cancel');
+            Route::get('/staff-loan', [UnofficialDeductionController::class, 'index'])->name('unofficial');
+            Route::post('/staff-loan/store', [UnofficialDeductionController::class, 'store'])->name('unofficial.store');
+            Route::post('/staff-loan/{id}/cancel', [UnofficialDeductionController::class, 'cancel'])->name('unofficial.cancel');
         });
 
         // ========================================================================

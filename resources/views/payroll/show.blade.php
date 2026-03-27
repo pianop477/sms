@@ -245,7 +245,7 @@
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table employee-table mb-0">
+                            <table class="table employee-table mb-0" id="myTable">
                                 <thead>
                                     <tr>
                                         <th>#</th>

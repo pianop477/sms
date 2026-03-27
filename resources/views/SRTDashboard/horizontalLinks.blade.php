@@ -311,27 +311,22 @@
                                     <ul class="submenu">
                                         <li>
                                             <a href="{{ route('payroll.index') }}">
-                                                <i class="fas fa-list"></i> All Payrolls
-                                            </a>
-                                        </li>
-                                        {{-- <li>
-                                            <a href="{{ route('payroll.create') }}">
-                                                <i class="fas fa-plus"></i> Generate Payroll
-                                            </a>
-                                        </li> --}}
-                                        <li>
-                                            <a href="{{ route('employee.statements')}}">
-                                                <i class="fas fa-file-alt"></i> Employee Statements
+                                                <i class="fas fa-list"></i> Payrolls
                                             </a>
                                         </li>
                                         <li>
                                             <a href="{{ route('heslb.index') }}">
-                                                <i class="fas fa-graduation-cap"></i> HESLB Deductions
+                                                <i class="fas fa-graduation-cap"></i> HESLB
                                             </a>
                                         </li>
                                         <li>
                                             <a href="{{ route('deductions.unofficial') }}">
                                                 <i class="fas fa-hand-holding-usd"></i> Staff Loans
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="{{ route('employee.statements')}}">
+                                                <i class="fas fa-file-alt"></i> Statements
                                             </a>
                                         </li>
                                     </ul>
