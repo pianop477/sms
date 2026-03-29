@@ -480,6 +480,48 @@
             transition: width 0.6s, height 0.6s;
         }
 
+        @media (max-width: 768px) {
+
+            .advanced-table thead {
+                display: none;
+            }
+
+            .advanced-table,
+            .advanced-table tbody,
+            .advanced-table tr,
+            .advanced-table td {
+                display: block;
+                width: 100%;
+            }
+
+            .advanced-table tr {
+                margin-bottom: 1rem;
+                background: #fff;
+                border-radius: 15px;
+                box-shadow: var(--shadow-sm);
+                padding: 1rem;
+            }
+
+            .advanced-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.6rem 0;
+                border: none;
+            }
+
+            .advanced-table td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: var(--dark);
+                font-size: 0.85rem;
+            }
+
+            .advanced-table td:last-child {
+                justify-content: flex-end;
+            }
+        }
+
         .btn-enterprise:hover::before {
             width: 300px;
             height: 300px;
