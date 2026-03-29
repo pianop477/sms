@@ -20,6 +20,7 @@
             overflow: hidden;
             transition: all 0.4s ease;
             min-height: 130px;
+            cursor: pointer;
         }
 
         .stat-card::before {
@@ -35,6 +36,12 @@
         .stat-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card.active {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
+            filter: brightness(1.05);
         }
 
         .stat-card .card-body {
@@ -88,21 +95,6 @@
             padding: 15px 20px;
             margin-bottom: 25px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        .btn-filter {
-            background: #f8f9fc;
-            border: 1px solid #e3e6f0;
-            border-radius: 8px;
-            padding: 8px 15px;
-            transition: all 0.3s;
-        }
-
-        .btn-filter:hover,
-        .btn-filter.active {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
         }
 
         .status-badge {
@@ -200,6 +192,36 @@
             color: white;
         }
 
+        .btn-calculate {
+            background: #ffc107;
+            color: #856404;
+        }
+
+        .btn-calculate:hover {
+            background: #e0a800;
+            color: white;
+        }
+
+        .btn-finalize {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-finalize:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            color: white;
+            transform: translateY(-2px);
+        }
+
         .pagination-custom {
             margin-top: 20px;
         }
@@ -225,6 +247,28 @@
             color: #d1d3e2;
             margin-bottom: 20px;
         }
+
+        .loading-overlay {
+            position: relative;
+            min-height: 200px;
+        }
+
+        .loading-spinner-table {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        .table-container {
+            transition: opacity 0.3s ease;
+        }
+
+        .table-container.loading {
+            opacity: 0.5;
+            pointer-events: none;
+        }
     </style>
 
     <div class="py-4">
@@ -244,39 +288,39 @@
                 </div>
 
                 {{-- Statistics Cards --}}
-                <div class="row mb-4">
+                <div class="row mb-4" id="statistics-container">
                     <div class="col-xl-3 col-md-6 mb-3">
-                        <div class="stat-card bg-primary-custom text-white">
+                        <div class="stat-card bg-primary-custom text-white" data-filter-status="all">
                             <div class="card-body">
                                 <div class="card-title">Total Payrolls</div>
-                                <div class="card-value">{{ number_format($statistics['total_batches'] ?? 0) }}</div>
+                                <div class="card-value" id="stat-total">0</div>
                             </div>
                             <i class="fas fa-calculator card-icon"></i>
                         </div>
                     </div>
                     <div class="col-xl-3 col-md-6 mb-3">
-                        <div class="stat-card bg-success-custom text-white">
+                        <div class="stat-card bg-success-custom text-white" data-filter-status="finalized">
                             <div class="card-body">
                                 <div class="card-title">Finalized</div>
-                                <div class="card-value">{{ number_format($statistics['finalized_count'] ?? 0) }}</div>
+                                <div class="card-value" id="stat-finalized">0</div>
                             </div>
                             <i class="fas fa-check-circle card-icon"></i>
                         </div>
                     </div>
                     <div class="col-xl-3 col-md-6 mb-3">
-                        <div class="stat-card bg-warning-custom text-white">
+                        <div class="stat-card bg-warning-custom text-white" data-filter-status="draft">
                             <div class="card-body">
                                 <div class="card-title">Draft</div>
-                                <div class="card-value">{{ number_format($statistics['draft_count'] ?? 0) }}</div>
+                                <div class="card-value" id="stat-draft">0</div>
                             </div>
                             <i class="fas fa-pen-fancy card-icon"></i>
                         </div>
                     </div>
                     <div class="col-xl-3 col-md-6 mb-3">
-                        <div class="stat-card bg-info-custom text-white">
+                        <div class="stat-card bg-info-custom text-white" data-filter-status="calculated">
                             <div class="card-body">
                                 <div class="card-title">Calculated</div>
-                                <div class="card-value">{{ number_format($statistics['calculated'] ?? 0) }}</div>
+                                <div class="card-value" id="stat-calculated">0</div>
                             </div>
                             <i class="fas fa-dollar-sign card-icon"></i>
                         </div>
@@ -289,29 +333,24 @@
                         <div class="col-md-3 mb-2 mb-md-0">
                             <select id="filter-status" class="form-select form-select-sm">
                                 <option value="">All Status</option>
-                                <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Draft</option>
-                                <option value="calculated" {{ request('status') == 'calculated' ? 'selected' : '' }}>
-                                    Calculated</option>
-                                <option value="finalized" {{ request('status') == 'finalized' ? 'selected' : '' }}>Finalized
-                                </option>
-                                <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled
-                                </option>
+                                <option value="draft">Draft</option>
+                                <option value="calculated">Calculated</option>
+                                <option value="finalized">Finalized</option>
+                                <option value="cancelled">Cancelled</option>
                             </select>
                         </div>
                         <div class="col-md-3 mb-2 mb-md-0">
                             <input type="text" id="filter-year" class="form-control form-control-sm"
-                                placeholder="Year (e.g., 2024)" value="{{ request('year') }}">
+                                placeholder="Year (e.g., 2024)">
                         </div>
                         <div class="col-md-3 mb-2 mb-md-0">
                             <input type="text" id="filter-search" class="form-control form-control-sm"
-                                placeholder="Search by batch number or name" value="{{ request('search') }}">
+                                placeholder="Search by batch number or name">
                         </div>
                         <div class="col-md-3">
                             <div class="d-flex gap-2">
-                                <button class="btn btn-primary btn-sm w-100" id="apply-filters">
-                                    <i class="fas fa-search mr-1"></i> Apply
-                                </button>
-                                <a href="{{ route('payroll.index') }}" class="btn btn-secondary btn-sm w-100">
+                                <a href="{{ route('payroll.index') }}" class="btn btn-secondary btn-sm w-100"
+                                    id="reset-filters">
                                     <i class="fas fa-times mr-1"></i> Reset
                                 </a>
                             </div>
@@ -319,207 +358,53 @@
                     </div>
                 </div>
 
-                {{-- Payroll Table --}}
-                <div class="card">
+                {{-- Payroll Table Container --}}
+                <div class="card" id="table-container">
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-payroll mb-0">
                                 <thead>
-                                    <tr>
-                                        <th class="ps-3">#</th>
-                                        <th>Batch Number</th>
-                                        <th>Name</th>
-                                        <th>Month</th>
-                                        <th class="text-center">Employees</th>
-                                        <th class="text-end">Gross Salary</th>
-                                        <th class="text-end">Net Salary</th>
-                                        <th class="text-center">Status</th>
-                                        <th class="">Issued By</th>
-                                        <th class="text-center">Actions</th>
-                                    </tr>
+                                    <th class="ps-3">#</th>
+                                    <th>Batch Number</th>
+                                    <th>Name</th>
+                                    <th>Month</th>
+                                    <th class="text-center">Employees</th>
+                                    <th class="text-end">Gross Salary</th>
+                                    <th class="text-end">Net Salary</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="">Issued By</th>
+                                    <th class="text-center">Actions</th>
                                 </thead>
-                                <tbody>
-                                    @forelse($batches['data'] ?? [] as $index => $batch)
-                                        <tr>
-                                            <td class="ps-3 fw-semibold">{{ $batches['from'] + $index }}</td>
-                                            <td>
-                                                <span class="fw-semibold">{{ $batch['batch_number'] }}</span>
-                                                {{-- <small class="text-muted">ID: {{ $batch['id'] }}</small> --}}
-                                            </td>
-                                            <td>{{ $batch['name'] }}</td>
-                                            <td>
-                                                <i class="far fa-calendar-alt mr-1 text-muted"></i>
-                                                {{ \Carbon\Carbon::parse($batch['payroll_month'] . '-01')->format('F Y') }}
-                                            </td>
-                                            <td class="text-center">
-                                                <span
-                                                    class="badge bg-light text-dark">{{ $batch['payroll_employees_count'] ?? 0 }}</span>
-                                            </td>
-                                            <td class="text-end">
-                                                <span class="fw-medium">
-                                                    {{ number_format($batch['summary']['total_gross_salary'] ?? 0, 0) }}</span>
-                                            </td>
-                                            <td class="text-end">
-                                                <span class="fw-bold text-success">
-                                                    {{ number_format($batch['summary']['total_net_salary'] ?? 0, 0) }}</span>
-                                            </td>
-                                            <td class="text-center">
-                                                @php
-                                                    $statusClass =
-                                                        [
-                                                            'draft' => 'status-draft',
-                                                            'calculated' => 'status-calculated',
-                                                            'finalized' => 'status-finalized',
-                                                            'cancelled' => 'status-cancelled',
-                                                        ][$batch['status']] ?? 'status-draft';
-                                                @endphp
-                                                <span class="status-badge {{ $statusClass }}">
-                                                    <i
-                                                        class="fas
-                                                {{ $batch['status'] == 'finalized' ? 'fa-check-circle' : ($batch['status'] == 'calculated' ? 'fa-calculator' : ($batch['status'] == 'draft' ? 'fa-pen' : 'fa-times-circle')) }}
-                                                mr-1"></i>
-                                                    {{ ucfirst($batch['status']) }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                {{ ucwords(strtolower($batch['generated_by'])) }}
-                                            </td>
-                                            {{-- resources/views/payroll/index.blade.php --}}
-                                            <td class="text-center">
-                                                <div class="action-btns">
-                                                    {{-- ✅ View button - using hash --}}
-                                                    <a href="{{ route('payroll.show', $batch['hash']) }}"
-                                                        class="action-btn btn-view" title="View Details">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-
-                                                    {{-- ✅ Calculate button for draft batches --}}
-                                                    @if ($batch['status'] == 'draft')
-                                                        <button type="button" class="action-btn btn-calculate"
-                                                            onclick="calculatePayroll('{{ $batch['hash'] }}')"
-                                                            title="Calculate Payroll">
-                                                            <i class="fas fa-calculator"></i>
-                                                        </button>
-
-                                                        {{-- ✅ Delete button for draft batches --}}
-                                                        <button type="button" class="action-btn btn-danger"
-                                                            onclick="deletePayroll('{{ $batch['hash'] }}')"
-                                                            title="Delete Payroll">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    @endif
-
-                                                    {{-- ✅ Finalize button for calculated batches --}}
-                                                    @if ($batch['status'] == 'calculated')
-                                                        <button type="button" class="action-btn btn-finalize"
-                                                            onclick="finalizePayroll('{{ $batch['hash'] }}')"
-                                                            title="Finalize Payroll">
-                                                            <i class="fas fa-check-circle"></i>
-                                                        </button>
-                                                    @endif
-
-                                                    {{-- ✅ Download buttons for finalized batches --}}
-                                                    @if ($batch['status'] == 'finalized')
-                                                        <a href="{{ route('payroll.download-slips', $batch['hash']) }}"
-                                                            class="action-btn btn-download" title="Download Slips">
-                                                            <i class="fas fa-download"></i>
-                                                        </a>
-                                                        <a href="{{ route('payroll.download-summary', $batch['hash']) }}"
-                                                            class="action-btn btn-export" title="Download Payroll">
-                                                            <i class="fas fa-file-excel"></i>
-                                                        </a>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <style>
-                                            /* Add these styles */
-                                            .btn-calculate {
-                                                background: #ffc107;
-                                                color: #856404;
-                                            }
-
-                                            .btn-calculate:hover {
-                                                background: #e0a800;
-                                                color: white;
-                                            }
-
-                                            .btn-finalize {
-                                                background: #28a745;
-                                                color: white;
-                                            }
-
-                                            .btn-finalize:hover {
-                                                background: #218838;
-                                            }
-
-                                            /* Delete button styling */
-                                            .btn-danger {
-                                                background: #dc3545;
-                                                color: white;
-                                            }
-
-                                            .btn-danger:hover {
-                                                background: #c82333;
-                                                color: white;
-                                                transform: translateY(-2px);
-                                            }
-                                        </style>
-                                    @empty
-                                        <tr>
-                                            <td colspan="9" class="empty-state">
-                                                <i class="fas fa-inbox"></i>
-                                                <h5 class="mt-2">No Payroll Batches Found</h5>
-                                                <p class="text-muted mb-3">Get started by generating your first payroll</p>
-                                            </td>
-                                        </tr>
-                                    @endforelse
+                                <tbody id="payroll-table-body">
+                                    <tr>
+                                        <td colspan="10" class="text-center py-5">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <p class="mt-2 text-muted">Loading payroll data...</p>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-
-                {{-- Pagination --}}
-                @if (isset($batches['last_page']) && $batches['last_page'] > 1)
-                    <div class="pagination-custom d-flex justify-content-end mt-3">
-                        <nav>
-                            <ul class="pagination">
-                                <li class="page-item {{ $batches['current_page'] == 1 ? 'disabled' : '' }}">
-                                    <a class="page-link" href="{{ $batches['prev_page_url'] ?? '#' }}">
-                                        <i class="fas fa-chevron-left"></i>
-                                    </a>
-                                </li>
-                                @for ($i = 1; $i <= $batches['last_page']; $i++)
-                                    <li class="page-item {{ $batches['current_page'] == $i ? 'active' : '' }}">
-                                        <a class="page-link"
-                                            href="{{ route('payroll.index', array_merge(request()->query(), ['page' => $i])) }}">
-                                            {{ $i }}
-                                        </a>
-                                    </li>
-                                @endfor
-                                <li
-                                    class="page-item {{ $batches['current_page'] == $batches['last_page'] ? 'disabled' : '' }}">
-                                    <a class="page-link" href="{{ $batches['next_page_url'] ?? '#' }}">
-                                        <i class="fas fa-chevron-right"></i>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                @endif
             </div>
+
+            {{-- Pagination Container --}}
+            <div id="pagination-container" class="pagination-custom d-flex justify-content-end mt-3"></div>
         </div>
+    </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // ==================== HELPER FUNCTIONS ====================
+        // ==================== GLOBAL VARIABLES ====================
+        let currentPage = 1;
+        let isLoading = false;
 
-        /**
-         * Show loading alert
-         */
+        // ==================== HELPER FUNCTIONS ====================
         function showLoadingAlert(message) {
             Swal.fire({
                 title: message,
@@ -530,9 +415,6 @@
             });
         }
 
-        /**
-         * Show success alert
-         */
         function showSuccessAlert(message, reload = true) {
             Swal.fire({
                 icon: 'success',
@@ -542,13 +424,10 @@
                 timerProgressBar: true,
                 showConfirmButton: false
             }).then(() => {
-                if (reload) location.reload();
+                if (reload) loadPayrollData();
             });
         }
 
-        /**
-         * Show error alert
-         */
         function showErrorAlert(message) {
             Swal.fire({
                 icon: 'error',
@@ -559,9 +438,6 @@
             });
         }
 
-        /**
-         * Show confirmation dialog
-         */
         function showConfirmAlert(title, text, confirmText, callback) {
             Swal.fire({
                 title: title,
@@ -579,64 +455,370 @@
             });
         }
 
-        /**
-         * Show info alert
-         */
-        function showInfoAlert(title, text) {
-            Swal.fire({
-                icon: 'info',
-                title: title,
-                text: text,
-                confirmButtonColor: '#3085d6'
-            });
-        }
+        // ==================== FETCH PAYROLL DATA ====================
+        async function loadPayrollData() {
+            if (isLoading) return;
+            isLoading = true;
 
-        // ==================== FILTERS ====================
-        const applyFiltersBtn = document.getElementById('apply-filters');
-        if (applyFiltersBtn) {
-            applyFiltersBtn.addEventListener('click', function() {
-                let status = document.getElementById('filter-status').value;
-                let year = document.getElementById('filter-year').value;
-                let search = document.getElementById('filter-search').value;
+            const status = document.getElementById('filter-status').value;
+            const year = document.getElementById('filter-year').value;
+            const search = document.getElementById('filter-search').value;
 
-                let url = new URL(window.location.href);
-                if (status) url.searchParams.set('status', status);
-                else url.searchParams.delete('status');
-                if (year) url.searchParams.set('year', year);
-                else url.searchParams.delete('year');
-                if (search) url.searchParams.set('search', search);
-                else url.searchParams.delete('search');
-                url.searchParams.set('page', '1');
+            // Show loading on table
+            const tableBody = document.getElementById('payroll-table-body');
+            if (tableBody) {
+                tableBody.innerHTML = `
+                <tr>
+                    <td colspan="10" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Loading payroll data...</p>
+                    </td>
+                </tr>
+            `;
+            }
 
-                window.location.href = url.toString();
-            });
-        }
+            try {
+                // Build URL with query parameters
+                let url = `{{ route('payroll.data') }}?page=${currentPage}`;
+                if (status) url += `&status=${encodeURIComponent(status)}`;
+                if (year) url += `&year=${encodeURIComponent(year)}`;
+                if (search) url += `&search=${encodeURIComponent(search)}`;
 
-        // Enter key on search
-        const filterSearch = document.getElementById('filter-search');
-        if (filterSearch) {
-            filterSearch.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    document.getElementById('apply-filters').click();
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update statistics
+                    updateStatistics(data.statistics);
+
+                    // Update table
+                    updatePayrollTable(data.batches.data || []);
+
+                    // Update pagination
+                    updatePagination(data.batches);
+
+                    // Update URL without reload
+                    updateUrlParams(status, year, search);
+                } else {
+                    showErrorAlert(data.message || 'Failed to load payroll data');
                 }
+            } catch (error) {
+                console.error('Error loading payroll data:', error);
+                showErrorAlert('Connection error: ' + error.message);
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        // ==================== UPDATE STATISTICS ====================
+        function updateStatistics(statistics) {
+            const statTotal = document.getElementById('stat-total');
+            const statFinalized = document.getElementById('stat-finalized');
+            const statDraft = document.getElementById('stat-draft');
+            const statCalculated = document.getElementById('stat-calculated');
+
+            if (statTotal) statTotal.textContent = formatNumber(statistics.total_batches || 0);
+            if (statFinalized) statFinalized.textContent = formatNumber(statistics.finalized_count || 0);
+            if (statDraft) statDraft.textContent = formatNumber(statistics.draft_count || 0);
+            if (statCalculated) statCalculated.textContent = formatNumber(statistics.calculated || 0);
+        }
+
+        // ==================== UPDATE PAYROLL TABLE ====================
+        function updatePayrollTable(batches) {
+            const tableBody = document.getElementById('payroll-table-body');
+
+            if (!tableBody) return;
+
+            if (!batches || batches.length === 0) {
+                tableBody.innerHTML = `
+                <tr>
+                    <td colspan="10" class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h5 class="mt-2">No Payroll Batches Found</h5>
+                    </td>
+                </tr>
+            `;
+                return;
+            }
+
+            let html = '';
+            batches.forEach((batch, index) => {
+                const statusClass = {
+                    'draft': 'status-draft',
+                    'calculated': 'status-calculated',
+                    'finalized': 'status-finalized',
+                    'cancelled': 'status-cancelled'
+                } [batch.status] || 'status-draft';
+
+                const statusIcon = batch.status == 'finalized' ? 'fa-check-circle' :
+                    (batch.status == 'calculated' ? 'fa-calculator' :
+                        (batch.status == 'draft' ? 'fa-pen' : 'fa-times-circle'));
+
+                // Build URLs using Laravel's url helper
+                const viewUrl = `{{ url('/payroll') }}/${batch.hash}`;
+                const downloadSlipsUrl = `{{ url('/payroll') }}/${batch.hash}/download-slips`;
+                const downloadSummaryUrl = `{{ url('/payroll') }}/${batch.hash}/download-summary`;
+
+                html += `
+                <tr>
+                    <td class="ps-3 fw-semibold">${(currentPage - 1) * 15 + index + 1}</td>
+                    <td><span class="fw-semibold">${escapeHtml(batch.batch_number)}</span></td>
+                    <td>${escapeHtml(batch.name)}</td>
+                    <td><i class="far fa-calendar-alt mr-1 text-muted"></i> ${formatMonth(batch.payroll_month)}</td>
+                    <td class="text-center"><span class="badge bg-light text-dark">${batch.payroll_employees_count || 0}</span></td>
+                    <td class="text-end"><span class="fw-medium">${formatNumber(batch.summary?.total_gross_salary || 0)}</span></td>
+                    <td class="text-end"><span class="fw-bold text-success">${formatNumber(batch.summary?.total_net_salary || 0)}</span></td>
+                    <td class="text-center">
+                        <span class="status-badge ${statusClass}">
+                            <i class="fas ${statusIcon} mr-1"></i> ${ucfirst(batch.status)}
+                        </span>
+                    </td>
+                    <td>${ucwords(batch.generated_by || 'System')}</td>
+                    <td class="text-center">
+                        <div class="action-btns">
+                            <a href="${viewUrl}" class="action-btn btn-view" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </a>
+            `;
+
+                // Draft status buttons
+                if (batch.status == 'draft') {
+                    html += `
+                            <button type="button" class="action-btn btn-calculate" onclick="calculatePayroll('${batch.hash}')" title="Calculate Payroll">
+                                <i class="fas fa-calculator"></i>
+                            </button>
+                            <button type="button" class="action-btn btn-danger" onclick="deletePayroll('${batch.hash}')" title="Delete Payroll">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                `;
+                }
+
+                // Calculated status buttons
+                if (batch.status == 'calculated') {
+                    html += `
+                            <button type="button" class="action-btn btn-finalize" onclick="finalizePayroll('${batch.hash}')" title="Finalize Payroll">
+                                <i class="fas fa-check-circle"></i>
+                            </button>
+                            <button type="button" class="action-btn btn-danger" onclick="deletePayroll('${batch.hash}')" title="Delete Payroll">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                `;
+                }
+
+                // Finalized status buttons
+                if (batch.status == 'finalized') {
+                    html += `
+                            <a href="${downloadSlipsUrl}" class="action-btn btn-download" title="Download Slips">
+                                <i class="fas fa-download"></i>
+                            </a>
+                            <a href="${downloadSummaryUrl}" class="action-btn btn-export" title="Download Payroll">
+                                <i class="fas fa-file-excel"></i>
+                            </a>
+                `;
+                }
+
+                html += `
+                        </div>
+                    </td>
+                </tr>
+            `;
+            });
+
+            tableBody.innerHTML = html;
+        }
+
+        // ==================== UPDATE PAGINATION ====================
+        function updatePagination(pagination) {
+            const container = document.getElementById('pagination-container');
+
+            if (!container) return;
+
+            if (!pagination || pagination.last_page <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = '<nav><ul class="pagination">';
+
+            // Previous button
+            html += `<li class="page-item ${pagination.current_page == 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="${pagination.current_page - 1}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                 </li>`;
+
+            // Page numbers
+            for (let i = 1; i <= pagination.last_page; i++) {
+                html += `<li class="page-item ${pagination.current_page == i ? 'active' : ''}">
+                        <a class="page-link" href="#" data-page="${i}">${i}</a>
+                     </li>`;
+            }
+
+            // Next button
+            html += `<li class="page-item ${pagination.current_page == pagination.last_page ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="${pagination.current_page + 1}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                 </li>`;
+
+            html += '</ul></nav>';
+            container.innerHTML = html;
+
+            // Attach pagination click handlers
+            container.querySelectorAll('.page-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const page = parseInt(link.dataset.page);
+                    if (page && !isNaN(page) && page !== currentPage) {
+                        currentPage = page;
+                        loadPayrollData();
+                    }
+                });
             });
         }
 
-        // ==================== CALCULATE PAYROLL ====================
-        window.calculatePayroll = function(batchId) {
+        // ==================== UPDATE URL PARAMS ====================
+        function updateUrlParams(status, year, search) {
+            const url = new URL(window.location.href);
+            if (status) url.searchParams.set('status', status);
+            else url.searchParams.delete('status');
+            if (year) url.searchParams.set('year', year);
+            else url.searchParams.delete('year');
+            if (search) url.searchParams.set('search', search);
+            else url.searchParams.delete('search');
+            url.searchParams.set('page', currentPage);
+
+            window.history.pushState({}, '', url.toString());
+        }
+
+        // ==================== HELPER FORMAT FUNCTIONS ====================
+        function formatNumber(num) {
+            return new Intl.NumberFormat().format(num);
+        }
+
+        function formatMonth(monthStr) {
+            if (!monthStr) return 'N/A';
+            try {
+                const [year, month] = monthStr.split('-');
+                const date = new Date(year, month - 1, 1);
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long'
+                });
+            } catch (e) {
+                return monthStr;
+            }
+        }
+
+        function ucfirst(str) {
+            if (!str) return '';
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function ucwords(str) {
+            if (!str) return '';
+            return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // ==================== EVENT LISTENERS ====================
+        function setupEventListeners() {
+            // Real-time filter changes
+            const filterStatus = document.getElementById('filter-status');
+            const filterYear = document.getElementById('filter-year');
+            const filterSearch = document.getElementById('filter-search');
+
+            const debouncedLoad = debounce(() => {
+                currentPage = 1;
+                loadPayrollData();
+            }, 1000);
+
+            if (filterStatus) {
+                filterStatus.addEventListener('change', () => {
+                    currentPage = 1;
+                    loadPayrollData();
+                });
+            }
+
+            if (filterYear) {
+                filterYear.addEventListener('input', debouncedLoad);
+            }
+
+            if (filterSearch) {
+                filterSearch.addEventListener('input', debouncedLoad);
+            }
+
+            // Reset filters button
+            const resetBtn = document.getElementById('reset-filters');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (filterStatus) filterStatus.value = '';
+                    if (filterYear) filterYear.value = '';
+                    if (filterSearch) filterSearch.value = '';
+                    currentPage = 1;
+                    loadPayrollData();
+                });
+            }
+
+            // Stat cards click - filter by status
+            document.querySelectorAll('.stat-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const filterStatusValue = card.dataset.filterStatus;
+                    if (filterStatusValue && filterStatusValue !== 'all' && filterStatus) {
+                        filterStatus.value = filterStatusValue;
+                        currentPage = 1;
+                        loadPayrollData();
+                    } else if (filterStatusValue === 'all' && filterStatus) {
+                        filterStatus.value = '';
+                        currentPage = 1;
+                        loadPayrollData();
+                    }
+                });
+            });
+        }
+
+        // Debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // ==================== API ACTIONS ====================
+        window.calculatePayroll = function(hash) {
             showConfirmAlert(
                 'Calculate Payroll?',
-                'This will compute PAYE, NSSF, and net salaries for all employees. This action can be reviewed before finalization.',
+                'This will compute PAYE, NSSF, and net salaries for all employees.',
                 'Yes, Calculate!',
                 () => {
-                    const button = event.currentTarget;
-                    const originalHtml = button.innerHTML;
-                    button.disabled = true;
-                    button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Calculating...';
-
                     showLoadingAlert('Calculating payroll...');
 
-                    fetch('{{ url('/payroll') }}/' + batchId + '/calculate', {
+                    fetch(`{{ url('/payroll') }}/${hash}/calculate`, {
                             method: 'POST',
                             headers: {
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -650,35 +832,25 @@
                                 showSuccessAlert('Payroll calculated successfully!');
                             } else {
                                 showErrorAlert(data.message || 'Calculation failed');
-                                button.innerHTML = originalHtml;
-                                button.disabled = false;
                             }
                         })
                         .catch(error => {
                             Swal.close();
                             showErrorAlert('Connection error: ' + error.message);
-                            button.innerHTML = originalHtml;
-                            button.disabled = false;
                         });
                 }
             );
         };
 
-        // ==================== FINALIZE PAYROLL ====================
-        window.finalizePayroll = function(batchId) {
+        window.finalizePayroll = function(hash) {
             showConfirmAlert(
                 'Finalize Payroll?',
-                '⚠️ WARNING: This action cannot be undone. Once finalized, no further changes can be made to this payroll.',
+                '⚠️ WARNING: This action cannot be undone.',
                 'Yes, Finalize!',
                 () => {
-                    const button = event.currentTarget;
-                    const originalHtml = button.innerHTML;
-                    button.disabled = true;
-                    button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Finalizing...';
-
                     showLoadingAlert('Finalizing payroll...');
 
-                    fetch('{{ url('/payroll') }}/' + batchId + '/finalize', {
+                    fetch(`{{ url('/payroll') }}/${hash}/finalize`, {
                             method: 'POST',
                             headers: {
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -692,35 +864,25 @@
                                 showSuccessAlert('Payroll finalized successfully!');
                             } else {
                                 showErrorAlert(data.message || 'Finalization failed');
-                                button.innerHTML = originalHtml;
-                                button.disabled = false;
                             }
                         })
                         .catch(error => {
                             Swal.close();
                             showErrorAlert('Connection error: ' + error.message);
-                            button.innerHTML = originalHtml;
-                            button.disabled = false;
                         });
                 }
             );
         };
 
-        // ==================== DELETE PAYROLL ====================
         window.deletePayroll = function(hash) {
             showConfirmAlert(
                 'Delete Payroll?',
-                '⚠️ WARNING: This action cannot be undone. All payroll data including employees and calculations will be permanently deleted.',
+                '⚠️ WARNING: This action cannot be undone.',
                 'Yes, Delete!',
                 () => {
-                    const button = event.currentTarget;
-                    const originalHtml = button.innerHTML;
-                    button.disabled = true;
-                    button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Deleting...';
-
                     showLoadingAlert('Deleting payroll...');
 
-                    fetch('{{ url('/payroll') }}/' + hash, {
+                    fetch(`{{ url('/payroll') }}/${hash}`, {
                             method: 'DELETE',
                             headers: {
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -738,128 +900,37 @@
                                     timer: 1500,
                                     showConfirmButton: false
                                 }).then(() => {
-                                    window.location.href = '{{ route('payroll.index') }}';
+                                    loadPayrollData();
                                 });
                             } else {
                                 showErrorAlert(data.message || 'Delete failed');
-                                button.innerHTML = originalHtml;
-                                button.disabled = false;
                             }
                         })
                         .catch(error => {
                             Swal.close();
                             showErrorAlert('Connection error: ' + error.message);
-                            button.innerHTML = originalHtml;
-                            button.disabled = false;
                         });
                 }
             );
         };
 
-        // ==================== GENERATE SALARY SLIPS ====================
-        window.generateSlips = function(hash) {
-            showConfirmAlert(
-                'Generate Salary Slips?',
-                'This will generate PDF salary slips for all employees in this payroll. Existing slips will be regenerated.',
-                'Yes, Generate!',
-                () => {
-                    const button = event.currentTarget;
-                    const originalHtml = button.innerHTML;
-                    button.disabled = true;
-                    button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Generating...';
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get initial filter values from URL
+            const urlParams = new URLSearchParams(window.location.search);
 
-                    showLoadingAlert('Generating salary slips...');
+            const filterStatus = document.getElementById('filter-status');
+            const filterYear = document.getElementById('filter-year');
+            const filterSearch = document.getElementById('filter-search');
 
-                    fetch('{{ url('/payroll') }}/' + hash + '/generate-slips', {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                return response.text().then(text => {
-                                    throw new Error(
-                                        `HTTP ${response.status}: ${text.substring(0, 200)}`);
-                                });
-                            }
-                            const contentType = response.headers.get('content-type');
-                            if (!contentType || !contentType.includes('application/json')) {
-                                return response.text().then(text => {
-                                    throw new Error('Server returned HTML instead of JSON');
-                                });
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            Swal.close();
-                            if (data.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Success!',
-                                    html: 'Salary slips generated successfully!<br><small>You can now download the combined PDF.</small>',
-                                    timer: 3000,
-                                    timerProgressBar: true,
-                                    showConfirmButton: false
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                showErrorAlert(data.message || 'Generation failed');
-                                button.innerHTML = originalHtml;
-                                button.disabled = false;
-                            }
-                        })
-                        .catch(error => {
-                            Swal.close();
-                            showErrorAlert('Error: ' + error.message);
-                            button.innerHTML = originalHtml;
-                            button.disabled = false;
-                        });
-                }
-            );
-        };
+            if (filterStatus) filterStatus.value = urlParams.get('status') || '';
+            if (filterYear) filterYear.value = urlParams.get('year') || '';
+            if (filterSearch) filterSearch.value = urlParams.get('search') || '';
 
-        // ==================== DOWNLOAD SLIPS ====================
-        window.downloadSlips = function(hash) {
-            Swal.fire({
-                title: 'Downloading...',
-                text: 'Preparing your salary slips PDF. This may take a moment.',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                    window.location.href = '{{ url('/payroll') }}/' + hash + '/download-slips';
-                    setTimeout(() => {
-                        Swal.close();
-                    }, 2000);
-                }
-            });
-        };
+            currentPage = parseInt(urlParams.get('page')) || 1;
 
-        // ==================== DOWNLOAD SUMMARY ====================
-        window.downloadSummary = function(hash) {
-            Swal.fire({
-                title: 'Downloading...',
-                text: 'Preparing payroll summary PDF.',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                    window.location.href = '{{ url('/payroll') }}/' + hash + '/download-summary';
-                    setTimeout(() => {
-                        Swal.close();
-                    }, 1500);
-                }
-            });
-        };
-
-        // ==================== VIEW DETAILS ====================
-        window.viewDetails = function(hash) {
-            // Simple navigation, no confirmation needed
-            window.location.href = '{{ url('/payroll') }}/' + hash;
-        };
+            setupEventListeners();
+            loadPayrollData();
+        });
     </script>
-
 @endsection

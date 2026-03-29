@@ -172,32 +172,58 @@
                 </div>
 
                 {{-- Summary Statistics --}}
+                {{-- Summary Statistics with HESLB and Unofficial --}}
                 <div class="row mb-4">
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="summary-box">
                             <div class="summary-title">Total Employees</div>
                             <div class="summary-value">{{ number_format($summary['total_employees'] ?? 0) }}</div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="summary-box">
-                            <div class="summary-title">Total Gross Salary</div>
-                            <div class="summary-value">TZS {{ number_format($summary['total_gross'] ?? 0, 2) }}</div>
+                            <div class="summary-title">Total Gross</div>
+                            <div class="summary-value">TZS {{ number_format($summary['total_gross'] ?? 0, 0) }}</div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="summary-box">
-                            <div class="summary-title">Total Deductions</div>
-                            <div class="summary-value">TZS
-                                {{ number_format(($summary['total_nssf'] ?? 0) + ($summary['total_paye'] ?? 0) + ($summary['total_heslb'] ?? 0), 2) }}
+                            <div class="summary-title">Total NSSF</div>
+                            <div class="summary-value">TZS {{ number_format($summary['total_nssf'] ?? 0, 0) }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="summary-box">
+                            <div class="summary-title">Total PAYE</div>
+                            <div class="summary-value">TZS {{ number_format($summary['total_paye'] ?? 0, 0) }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="summary-box">
+                            <div class="summary-title">Total HESLB</div>
+                            <div class="summary-value text-danger">TZS {{ number_format($summary['total_heslb'] ?? 0, 0) }}
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="summary-box">
-                            <div class="summary-title">Total Net Salary</div>
-                            <div class="summary-value text-success">TZS {{ number_format($summary['total_net'] ?? 0, 2) }}
-                            </div>
+                            <div class="summary-title">Total Loans</div>
+                            <div class="summary-value text-danger">TZS
+                                {{ number_format($summary['total_unofficial'] ?? 0, 0) }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="summary-box bg-success text-white">
+                            <div class="summary-title text-white">Total Net Salary (After Official Deductions)</div>
+                            <div class="summary-value">TZS {{ number_format($summary['total_net'] ?? 0, 0) }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="summary-box bg-info text-white">
+                            <div class="summary-title text-white">Total Amount to Pay (After Loans)</div>
+                            <div class="summary-value">TZS {{ number_format($summary['total_amount_paid'] ?? 0, 0) }}</div>
                         </div>
                     </div>
                 </div>
@@ -216,9 +242,17 @@
                     @endif
 
                     @if ($batch['status'] == 'calculated')
+                        <button type="button" class="btn btn-action btn-warning"
+                            onclick="recalculatePayroll('{{ $batch['hash'] }}')">
+                            <i class="fas fa-sync-alt mr-1"></i> Recalculate Payroll
+                        </button>
                         <button type="button" class="btn btn-action btn-finalize"
                             onclick="finalizePayroll('{{ $batch['hash'] }}')">
                             <i class="fas fa-check-circle mr-1"></i> Finalize Payroll
+                        </button>
+                        <button type="button" class="btn btn-action btn-danger"
+                            onclick="deletePayroll('{{ $batch['hash'] }}')">
+                            <i class="fas fa-trash mr-1"></i> Delete Payroll
                         </button>
                     @endif
 
@@ -247,18 +281,18 @@
                         <div class="table-responsive">
                             <table class="table employee-table mb-0" id="myTable">
                                 <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Staff ID</th>
-                                        <th>Employee Name</th>
-                                        <th>Staff Type</th>
-                                        <th>Basic Salary</th>
-                                        <th>Allowances</th>
-                                        <th>Gross Pay</th>
-                                        <th>NSSF</th>
-                                        <th>PAYE</th>
-                                        <th>Net Pay</th>
-                                    </tr>
+                                    <th>#</th>
+                                    <th>Staff ID</th>
+                                    <th>Employee Name</th>
+                                    <th>Staff Type</th>
+                                    <th class="text-end">Basic Salary</th>
+                                    <th class="text-end">Allowances</th>
+                                    <th class="text-end">Gross Pay</th>
+                                    <th class="text-end">NSSF</th>
+                                    <th class="text-end">PAYE</th>
+                                    <th class="text-end">HESLB</th>
+                                    <th class="text-end">Loan</th>
+                                    <th class="text-end">Net Pay</th>
                                 </thead>
                                 <tbody>
                                     @forelse($batch['payroll_employees'] ?? [] as $index => $employee)
@@ -267,27 +301,85 @@
                                                 'payroll_employee_id',
                                                 $employee['id'],
                                             );
+
+                                            // HESLB amount - make sure it's a float
+                                                $heslbAmount = isset($calculation['heslb'])
+                                                    ? (float) $calculation['heslb']
+                                                    : 0;
+
+                                                // Unofficial deductions
+                                                $totalUnofficial = 0;
+                                                $hasUnofficial = false;
+
+                                                if (
+                                                    isset($calculation['unofficial_deductions']) &&
+                                                    $calculation['unofficial_deductions']
+                                                ) {
+                                                    $unofficialDeductions = json_decode(
+                                                        $calculation['unofficial_deductions'],
+                                                        true,
+                                                    );
+                                                    if (
+                                                        is_array($unofficialDeductions) &&
+                                                        count($unofficialDeductions) > 0
+                                                    ) {
+                                                        $totalUnofficial = array_sum($unofficialDeductions);
+                                                        $hasUnofficial = $totalUnofficial > 0;
+                                                    }
+                                                }
+
+                                                // Amount to pay (net after all deductions including loans)
+                                                $amountToPay = isset($calculation['amount_to_pay'])
+                                                    ? (float) $calculation['amount_to_pay']
+                                                    : (isset($calculation['net_salary'])
+                                                        ? (float) $calculation['net_salary']
+                                                        : 0);
+
+                                                // Gross salary
+                                                $grossSalary = isset($calculation['gross_salary'])
+                                                    ? (float) $calculation['gross_salary']
+                                                    : 0;
+                                                $nssf = isset($calculation['nssf']) ? (float) $calculation['nssf'] : 0;
+                                                $paye = isset($calculation['paye_tax'])
+                                                    ? (float) $calculation['paye_tax']
+                                                : 0;
                                         @endphp
-                                        <tr>
-                                            <td>{{ $index + 1 }}</td>
-                                            <td><strong>{{ strtoupper($employee['staff_id']) }}</strong></td>
-                                            <td>{{ ucwords(strtolower($employee['employee_full_name'])) }}</td>
-                                            <td>{{ ucfirst($employee['staff_type']) }}</td>
-                                            <td class="">{{ number_format($employee['basic_salary'], 0) }}</td>
-                                            <td class="">{{ number_format($employee['allowances'], 0) }}</td>
-                                            <td class="fw-bold">{{ number_format($calculation['gross_salary'] ?? 0, 0) }}
-                                            </td>
-                                            <td class="">{{ number_format($calculation['nssf'] ?? 0, 0) }}</td>
-                                            <td class="">{{ number_format($calculation['paye_tax'] ?? 0, 0) }}</td>
-                                            <td class="text-success fw-bold">
-                                                {{ number_format($calculation['net_salary'] ?? 0, 0) }}</td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="10" class="text-center text-muted py-4">
-                                                <i class="fas fa-info-circle mr-1"></i> No employees found in this payroll
-                                            </td>
-                                        </tr>
+                                        <td class="text-center">{{ $index + 1 }}
+                                        <td><strong>{{ strtoupper($employee['staff_id']) }}</strong>
+                                        <td>{{ ucwords(strtolower($employee['employee_full_name'])) }}
+                                        <td>{{ ucfirst($employee['staff_type']) }}
+                                        <td class="text-end">{{ number_format($employee['basic_salary'], 0) }}
+                                        <td class="text-end">{{ number_format($employee['allowances'], 0) }}
+                                        <td class="fw-bold text-end">{{ number_format($grossSalary, 0) }}
+                                        <td class="text-end">{{ number_format($nssf, 0) }}
+                                        <td class="text-end">{{ number_format($paye, 0) }}
+
+                                            {{-- HESLB Column - Show only amount, no extra text --}}
+                                        <td class="text-end">
+                                            @if ($heslbAmount > 0)
+                                                <span
+                                                    class="text-danger fw-bold">{{ number_format($heslbAmount, 0) }}</span>
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+
+                                            {{-- Loan Column - Show only total amount, no breakdown --}}
+                                        <td class="text-end">
+                                            @if ($hasUnofficial)
+                                                <span
+                                                    class="text-danger fw-bold">{{ number_format($totalUnofficial, 0) }}</span>
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+
+                                            {{-- Net Pay Column - After all deductions including loans --}}
+                                        <td class="text-success fw-bold text-end">
+                                            {{ number_format($amountToPay, 0) }}
+                                            </tr>
+                                        @empty
+                                        <td colspan="12" class="text-center text-muted py-4">
+                                            <i class="fas fa-info-circle mr-1"></i> No employees found in this payroll
+                                            </tr>
                                     @endforelse
                                 </tbody>
                             </table>
@@ -383,6 +475,67 @@
                                 showSuccessAlert('Payroll calculated successfully!');
                             } else {
                                 showErrorAlert(data.message || 'Calculation failed');
+                                btn.innerHTML = originalHtml;
+                                btn.disabled = false;
+                            }
+                        })
+                        .catch(error => {
+                            Swal.close();
+                            showErrorAlert('Connection error: ' + error.message);
+                            btn.innerHTML = originalHtml;
+                            btn.disabled = false;
+                        });
+                }
+            );
+        }
+
+        // ==================== RECALCULATE PAYROLL ====================
+        function recalculatePayroll(hash) {
+            showConfirmAlert(
+                'Recalculate Payroll?',
+                '⚠️ This will recalculate all employees. This action can be done multiple times before finalization.',
+                'Yes, Recalculate!',
+                () => {
+                    const btn = event.currentTarget;
+                    const originalHtml = btn.innerHTML;
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm mr-1"></span>';
+
+                    showLoadingAlert('Recalculating...............');
+
+                    fetch('{{ url('/payroll') }}/' + hash + '/recalculate', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            Swal.close();
+                            if (data.success) {
+                                const result = data.data;
+                                let message = `Payroll recalculated successfully!\n\n`;
+                                message += `✅ Total Employees: ${result.total_employees}\n`;
+                                message += `✅ Calculated: ${result.calculated}\n`;
+
+                                if (result.failed > 0) {
+                                    message += `\n⚠️ Failed: ${result.failed}\n`;
+                                    message +=
+                                        `Errors: ${result.errors.map(e => `${e.staff_id}: ${e.error}`).join(', ')}`;
+                                }
+
+                                Swal.fire({
+                                    icon: result.failed > 0 ? 'warning' : 'success',
+                                    title: result.failed > 0 ? 'Partial Success!' : 'Success!',
+                                    html: message.replace(/\n/g, '<br>'),
+                                    confirmButtonColor: '#3085d6',
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                showErrorAlert(data.message || 'Recalculation failed');
                                 btn.innerHTML = originalHtml;
                                 btn.disabled = false;
                             }

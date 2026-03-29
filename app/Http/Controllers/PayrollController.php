@@ -479,10 +479,10 @@ class PayrollController extends Controller
         // Reindex array
         $data = array_values($data);
 
-        Log::info('Excel file parsed', [
-            'file_name' => $file->getClientOriginalName(),
-            'record_count' => count($data)
-        ]);
+        // Log::info('Excel file parsed', [
+        //     'file_name' => $file->getClientOriginalName(),
+        //     'record_count' => count($data)
+        // ]);
 
         return $data;
     }
@@ -499,16 +499,19 @@ class PayrollController extends Controller
         $id = $this->decryptId($hash);
 
         if (!$id) {
-            // Log::warning('Payroll Show - Invalid hash', ['hash' => $hash]);
-            Alert()->toast('Invalid payroll found', 'error');
+            Log::warning('Payroll Show - Invalid hash', ['hash' => $hash]);
+            Alert()->toast('Invalid payroll link. Please check the URL.', 'error');
             return redirect()->route('payroll.index');
         }
 
         try {
             // Call API
+            $apiUrl = $this->apiBaseUrl . '/payroll/batches/' . $id;
+            // Log::info('Payroll Show - Calling API', ['url' => $apiUrl]);
+
             $response = Http::withToken(session('finance_api_token'))
                 ->timeout(30)
-                ->get($this->apiBaseUrl . '/payroll/batches/' . $id);
+                ->get($apiUrl);
 
             if (!$response->successful()) {
                 $errorMsg = $response->json()['message'] ?? 'Payroll not found';
@@ -520,22 +523,22 @@ class PayrollController extends Controller
             $batch = $data['batch'];
             $summary = $data['summary'];
 
-            // ✅ ENRICH EMPLOYEES WITH FULL NAMES FROM LOCAL DATABASE
+            // ENRICH EMPLOYEES WITH FULL NAMES FROM LOCAL DATABASE
             $batch['payroll_employees'] = $this->enrichEmployeesWithDetails(
                 $batch['payroll_employees'] ?? [],
                 Auth::user()->school_id
             );
 
-            // ✅ Add hash to batch for view
+            // Add hash to batch for view
             $batch['hash'] = $hash;
-
         } catch (\Exception $e) {
             Log::error('Payroll Show - Exception', [
                 'batch_id' => $id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
 
-            Alert()->toast($e->getMessage(), 'error');
+            Alert()->toast('Connection error: ' . $e->getMessage(), 'error');
             return redirect()->route('payroll.index');
         }
 
@@ -992,6 +995,116 @@ class PayrollController extends Controller
                 ]
             ]);
         } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Kwenye PayrollController.php (frontend)
+    public function getPayrollData(Request $request)
+    {
+        $schoolId = Auth::user()->school_id;
+
+        try {
+            $response = Http::withToken(session('finance_api_token'))
+                ->timeout(60)
+                ->get($this->apiBaseUrl . '/payroll/batches', [
+                    'school_id' => $schoolId,
+                    'status' => $request->status,
+                    'year' => $request->year,
+                    'search' => $request->search,
+                    'page' => $request->page ?? 1,
+                    'per_page' => 15
+                ]);
+
+            if (!$response->successful()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $response->json()['message'] ?? 'Failed to fetch payroll data'
+                ], $response->status());
+            }
+
+            $data = $response->json();
+            $batches = $data['data'] ?? [];
+
+            // ✅ FRONTEND GENERATES ITS OWN HASH (not using backend's hash)
+            if (isset($batches['data']) && is_array($batches['data'])) {
+                foreach ($batches['data'] as &$batch) {
+                    // Generate hash using frontend's encryption
+                    $batch['hash'] = $this->hashId($batch['id']);
+                }
+            } elseif (is_array($batches)) {
+                foreach ($batches as &$batch) {
+                    $batch['hash'] = $this->hashId($batch['id']);
+                }
+            }
+
+            $statistics = [
+                'total_batches' => $data['total_batches'] ?? 0,
+                'finalized_count' => $data['finalized_count'] ?? 0,
+                'draft_count' => $data['draft_count'] ?? 0,
+                'calculated' => $data['total_calculated'] ?? 0,
+            ];
+
+            return response()->json([
+                'success' => true,
+                'batches' => $batches,
+                'statistics' => $statistics
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to fetch payroll data', [
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Connection error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // app/Http/Controllers/PayrollController.php
+
+    /**
+     * Recalculate payroll batch
+     * POST /payroll/{hash}/recalculate
+     */
+    public function recalculate($hash)
+    {
+        $id = $this->decryptId($hash);
+
+        if (!$id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid payroll link'
+            ]);
+        }
+
+        try {
+            $response = Http::withToken(session('finance_api_token'))
+                ->timeout(60)
+                ->post($this->apiBaseUrl . '/payroll/batches/' . $id . '/recalculate');
+
+            if (!$response->successful()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $response->json()['message'] ?? 'Recalculation failed'
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $response->json()['data'] ?? null,
+                'message' => 'Payroll recalculated successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Payroll recalculation failed', [
+                'hash' => $hash,
+                'error' => $e->getMessage()
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage()

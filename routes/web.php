@@ -647,6 +647,8 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
 
             // Employee in batch - using hash for batch and employee
             Route::get('/{batchHash}/employee/{employeeHash}', [PayrollController::class, 'employeeDetail'])->name('employee.detail');
+
+            Route::post('/{hash}/recalculate', [PayrollController::class, 'recalculate'])->name('recalculate');
         });
 
         // ========================================================================
@@ -695,6 +697,8 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
             // ✅ Add this route for schedule details
             Route::get('/payroll/schedule-details', [PayrollController::class, 'getScheduleDetails'])->name('payroll.schedule.details');
         });
+
+        Route::get('/payroll-data', [PayrollController::class, 'getPayrollData'])->name('payroll.data');
     });
 
     // routes/web.php - ShuleApp
