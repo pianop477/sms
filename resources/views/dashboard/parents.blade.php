@@ -765,7 +765,7 @@
                     </div>
                     <div class="card-body-enterprise">
                         <div class="advanced-table-container">
-                            <table class="advanced-table">
+                            <table class="advanced-table table-responsive-md">
                                 <thead>
                                     <tr>
                                         <th>Student Information</th>
