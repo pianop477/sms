@@ -249,7 +249,7 @@
                         @endphp
                         <td>{{ strtoupper($indexNo ?? 'N/A') }}</td>
                         <td>{{ $teacher->joined }}</td>
-                        <td class="ellipsis" title="{{ $teacher->address }}">{{ $teacher->address }}</td>
+                        <td class="ellipsis" title="{{ $teacher->address }}">{{ ucwords(strtolower($teacher->address ?? 'N/A')) }}</td>
                         <td>{{ $teacher->status == 1 ? 'Active' : 'Inactive' }}</td>
                     </tr>
                     @endforeach

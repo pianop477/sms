@@ -90,7 +90,7 @@
         .dashboard-headers {
             background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-accent) 100%);
             border-radius: 20px;
-            padding: 0.7rem;
+            padding: 8px 12px;
             margin-bottom: 2rem;
             color: white;
             position: relative;
@@ -480,48 +480,6 @@
             transition: width 0.6s, height 0.6s;
         }
 
-        @media (max-width: 768px) {
-
-            .advanced-table thead {
-                display: none;
-            }
-
-            .advanced-table,
-            .advanced-table tbody,
-            .advanced-table tr,
-            .advanced-table td {
-                display: block;
-                width: 100%;
-            }
-
-            .advanced-table tr {
-                margin-bottom: 1rem;
-                background: #fff;
-                border-radius: 15px;
-                box-shadow: var(--shadow-sm);
-                padding: 1rem;
-            }
-
-            .advanced-table td {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 0.6rem 0;
-                border: none;
-            }
-
-            .advanced-table td::before {
-                content: attr(data-label);
-                font-weight: 600;
-                color: var(--dark);
-                font-size: 0.85rem;
-            }
-
-            .advanced-table td:last-child {
-                justify-content: flex-end;
-            }
-        }
-
         .btn-enterprise:hover::before {
             width: 300px;
             height: 300px;
@@ -693,33 +651,44 @@
         }
 
         @media (max-width: 768px) {
-            .dashboard-headers {
-                padding: 0.65rem;
+
+            .advanced-table thead {
+                display: none;
             }
 
-            .dashboard-headers h1 {
-                font-size: 1.5rem;
-            }
-
-            .advanced-table th,
+            .advanced-table,
+            .advanced-table tbody,
+            .advanced-table tr,
             .advanced-table td {
-                padding: 0.8rem 1rem;
+                display: block;
+                width: 100%;
             }
 
-            .student-avatar {
-                width: 35px;
-                height: 35px;
-                font-size: 0.9rem;
+            .advanced-table tr {
+                margin-bottom: 1rem;
+                background: #fff;
+                border-radius: 15px;
+                box-shadow: var(--shadow-sm);
+                padding: 1rem;
             }
 
-            .action-btn {
-                width: 32px;
-                height: 32px;
+            .advanced-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.6rem 0;
+                border: none;
+            }
+
+            .advanced-table td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: var(--dark);
                 font-size: 0.85rem;
             }
 
-            .toast-enterprise {
-                min-width: 250px;
+            .advanced-table td:last-child {
+                justify-content: flex-end;
             }
         }
 
@@ -772,10 +741,10 @@
     <div class="container-fluid px-3 px-md-4 py-3 py-md-4">
         <!-- Dashboard Header -->
         <div class="dashboard-headers">
-            <h2>
+            <h5>
                 Welcome back, {{ ucwords(strtolower(Auth::user()->first_name)) }}!
-            </h2>
-            <p class="text-white"> Manage your children's Academic progress and other related information</p>
+            </h5>
+            <p class="" style="color: gold; font-size:15px;"> Manage your child academic progress and other information by clicking on eye icon </p>
         </div>
 
         <!-- Statistics Row -->
@@ -820,7 +789,7 @@
                                         <tr>
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    <div class="student-avatar">
+                                                    <div class="student-avatar mr-3">
                                                         {{ strtoupper(substr($student->first_name, 0, 1)) }}{{ strtoupper(substr($student->last_name, 0, 1)) }}
                                                     </div>
                                                     <div class="student-info">
@@ -869,192 +838,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Student Registration Modal -->
-    <div class="modal fade enterprise-modal" id="studentRegistrationModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fas fa-user-graduate"></i>
-                        Student Registration
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form class="needs-validation" novalidate action="{{ route('register.student') }}" method="POST"
-                        enctype="multipart/form-data" id="studentRegistrationForm">
-                        @csrf
-
-                        <!-- Name Section -->
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <div class="form-group-enterprise">
-                                    <label class="form-label-enterprise">
-                                        <i class="fas fa-user"></i>First Name
-                                    </label>
-                                    <input type="text" name="fname" class="form-control-enterprise" id="firstName"
-                                        placeholder="Enter first name" value="{{ old('fname') }}" required>
-                                    @error('fname')
-                                        <div class="error-message">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group-enterprise">
-                                    <label class="form-label-enterprise">
-                                        <i class="fas fa-user"></i>Middle Name
-                                    </label>
-                                    <input type="text" name="middle" class="form-control-enterprise" id="middleName"
-                                        placeholder="Enter middle name" value="{{ old('middle') }}" required>
-                                    @error('middle')
-                                        <div class="error-message">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group-enterprise">
-                                    <label class="form-label-enterprise">
-                                        <i class="fas fa-user"></i>Last Name
-                                    </label>
-                                    <input type="text" name="lname" class="form-control-enterprise" id="lastName"
-                                        placeholder="Enter last name" value="{{ old('lname') }}" required>
-                                    @error('lname')
-                                        <div class="error-message">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Personal Details -->
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <div class="form-group-enterprise">
-                                    <label class="form-label-enterprise">
-                                        <i class="fas fa-venus-mars"></i>Gender
-                                    </label>
-                                    <select name="gender" id="gender" class="form-control-enterprise" required>
-                                        <option value="">-- Select Gender --</option>
-                                        <option value="male" {{ old('gender') == 'male' ? 'selected' : '' }}>Male
-                                        </option>
-                                        <option value="female" {{ old('gender') == 'female' ? 'selected' : '' }}>Female
-                                        </option>
-                                    </select>
-                                    @error('gender')
-                                        <div class="error-message">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group-enterprise">
-                                    <label class="form-label-enterprise">
-                                        <i class="fas fa-calendar"></i>Date of Birth
-                                    </label>
-                                    <input type="date" name="dob" class="form-control-enterprise" id="dob"
-                                        value="{{ old('dob') }}"
-                                        min="{{ \Carbon\Carbon::now()->subYears(17)->format('Y-m-d') }}"
-                                        max="{{ \Carbon\Carbon::now()->subYears(2)->format('Y-m-d') }}" required>
-                                    @error('dob')
-                                        <div class="error-message">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group-enterprise">
-                                    <label class="form-label-enterprise">
-                                        <i class="fas fa-school"></i>Class
-                                    </label>
-                                    <select name="grade" id="grade" class="form-control-enterprise" required>
-                                        <option value="">-- Select Class --</option>
-                                        @forelse ($classes as $class)
-                                            <option value="{{ $class->id }}"
-                                                {{ old('grade') == $class->id ? 'selected' : '' }}>
-                                                {{ $class->class_name }}
-                                            </option>
-                                        @empty
-                                            <option value="" disabled>No classes available</option>
-                                        @endforelse
-                                    </select>
-                                    @error('grade')
-                                        <div class="error-message">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Additional Details -->
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <div class="form-group-enterprise">
-                                    <label class="form-label-enterprise">
-                                        <i class="fas fa-users"></i>Stream
-                                    </label>
-                                    <select name="group" id="stream" class="form-control-enterprise" required>
-                                        <option value="">-- Select Stream --</option>
-                                        <option value="a" {{ old('group') == 'a' ? 'selected' : '' }}>Stream A
-                                        </option>
-                                        <option value="b" {{ old('group') == 'b' ? 'selected' : '' }}>Stream B
-                                        </option>
-                                        <option value="c" {{ old('group') == 'c' ? 'selected' : '' }}>Stream C
-                                        </option>
-                                    </select>
-                                    @error('group')
-                                        <div class="error-message">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group-enterprise">
-                                    <label class="form-label-enterprise">
-                                        <i class="fas fa-bus"></i>School Bus
-                                    </label>
-                                    <select name="driver" id="busNumber" class="form-control-enterprise">
-                                        <option value="">-- Select Bus (Optional) --</option>
-                                        @forelse ($buses as $bus)
-                                            <option value="{{ $bus->id }}"
-                                                {{ old('driver') == $bus->id ? 'selected' : '' }}>
-                                                Bus No. {{ $bus->bus_no }}
-                                            </option>
-                                        @empty
-                                            <option value="" disabled>No buses available</option>
-                                        @endforelse
-                                    </select>
-                                    @error('driver')
-                                        <div class="error-message">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group-enterprise">
-                                    <label class="form-label-enterprise">
-                                        <i class="fas fa-camera"></i>Photo
-                                    </label>
-                                    <input type="file" name="image" class="form-control-enterprise"
-                                        id="studentPhoto" accept="image/*">
-                                    @error('image')
-                                        <div class="error-message">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="modal-footer border-0 pt-4 px-0 pb-0">
-                            <button type="button" class="btn-enterprise btn-enterprise-secondary"
-                                data-bs-dismiss="modal">
-                                <i class="fas fa-times me-2"></i>Cancel
-                            </button>
-                            <button type="submit" class="btn-enterprise btn-enterprise-primary" id="saveButton">
-                                <span id="submitText">Register Child</span>
-                                <span id="submitSpinner" class="spinner-border spinner-border-sm d-none ms-2"></span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // Initialize tooltips

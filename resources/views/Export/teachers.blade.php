@@ -50,11 +50,11 @@
             @foreach($teachers as $teacher)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td class="text-uppercase" style="text-transform: uppercase">{{ $teacher->member_id }}</td>
-                    <td class="text-capitalize" style="text-transform: uppercase">{{ $teacher->gender[0] }}</td>
+                    <td class="text-uppercase" style="text-transform: uppercase">{{ strtoupper($teacher->member_id ?? 'N/A') }}</td>
+                    <td class="text-capitalize" style="text-transform: uppercase">{{ strtoupper($teacher->gender ?? 'N/A') }}</td>
                     <td>{{$teacher->nida ?? 'N/A'}}</td>
-                    <td class="text-capitalize" style="text-transform: capitalize">{{ ucwords(strtolower($teacher->first_name. ' '. $teacher->last_name)) }}</td>
-                    <td class="text-capitalize" style="text-transform: capitalize">{{ $teacher->role_name }}</td>
+                    <td class="text-capitalize" style="text-transform: capitalize">{{ ucwords(strtolower($teacher->first_name ?? 'N/A').' '.ucwords(strtolower($teacher->last_name ?? 'N/A'))) }}</td>
+                    <td class="text-capitalize" style="text-transform: capitalize">{{ ucwords(strtolower($teacher->role_name ?? 'N/A')) }}</td>
                     <td>{{ \Carbon\Carbon::parse($teacher->dob)->format('d/M/Y') }}</td>
                     <td>{{ $teacher->phone }}</td>
                     <td>{{ $teacher->email }}</td>
@@ -74,7 +74,7 @@
                     @endphp
                     <td>{{strtoupper($indexNo ?? 'N/A')}}</td>
                     <td>{{ $teacher->joined }}</td>
-                    <td class="text-capitalize" style="text-transform: capitalize">{{ $teacher->address }}</td>
+                    <td class="text-capitalize" style="text-transform: capitalize">{{ ucwords(strtolower($teacher->address ?? 'N/A')) }}</td>
                     <td>{{ $teacher->status == 1 ? 'Active' : 'Inactive' }}</td>
                 </tr>
             @endforeach

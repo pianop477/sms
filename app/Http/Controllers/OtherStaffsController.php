@@ -543,7 +543,7 @@ class OtherStaffsController extends Controller
         $pdf->render();
 
         // Hii itastream PDF kwenye browser badala ya kudownload
-        return $pdf->stream('Report.pdf', ['Attachment' => true]);
+        return $pdf->stream('Other staffs.pdf', ['Attachment' => true]);
     }
 
     protected function generateExcel($user, $school, $combinedStaffs)
@@ -574,7 +574,7 @@ class OtherStaffsController extends Controller
         // =========================
         //  SCHOOL NAME & ADDRESS
         // =========================
-        $sheet->mergeCells("A{$logoRow}:J{$logoRow}");
+        $sheet->mergeCells("A{$logoRow}:K{$logoRow}");
         $sheet->setCellValue("A{$logoRow}", strtoupper($school->school_name));
         $sheet->getStyle("A{$logoRow}")->applyFromArray([
             'font' => ['bold' => true, 'size' => 16, 'color' => ['rgb' => '2C3E50']],
@@ -582,7 +582,7 @@ class OtherStaffsController extends Controller
         ]);
 
         $addressRow = $logoRow + 1;
-        $sheet->mergeCells("A{$addressRow}:J{$addressRow}");
+        $sheet->mergeCells("A{$addressRow}:K{$addressRow}");
         $sheet->setCellValue("A{$addressRow}", ucwords(strtolower($school->postal_address)) . ', ' .
             ucwords(strtolower($school->postal_name)) . ' - ' .
             ucwords(strtolower($school->country)));
@@ -595,7 +595,7 @@ class OtherStaffsController extends Controller
         //  REPORT TITLE
         // =========================
         $titleRow = $addressRow + 1;
-        $sheet->mergeCells("A{$titleRow}:J{$titleRow}");
+        $sheet->mergeCells("A{$titleRow}:K{$titleRow}");
         $sheet->setCellValue("A{$titleRow}", "NON-TEACHING STAFF MEMBERS REPORT");
         $sheet->getStyle("A{$titleRow}")->applyFromArray([
             'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '2C3E50']],
@@ -607,14 +607,14 @@ class OtherStaffsController extends Controller
         // =========================
         //  TABLE HEADER - 10 COLUMNS
         // =========================
-        $headers = ['#', 'NIN', 'Full Name', 'Gender', 'Phone', 'Email', 'Job Title', 'DoB', 'Address', 'Status'];
+        $headers = ['#', 'STAFF ID', 'NIN', 'Full Name', 'Gender', 'Phone', 'Email', 'Job Title', 'DoB', 'Address', 'Status'];
         $sheet->fromArray($headers, null, 'A' . $startRow, true);
 
         $headerRow = $startRow;
         $dataStartRow = $headerRow + 1;
 
         // FIX 1: Badilisha I kuwa J (10 columns badala ya 9)
-        $sheet->getStyle("A{$headerRow}:J{$headerRow}")->applyFromArray([
+        $sheet->getStyle("A{$headerRow}:K{$headerRow}")->applyFromArray([
             'font' => ['bold' => true, 'size' => 11, 'color' => ['rgb' => 'FFFFFF']],
             'fill' => [
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
@@ -639,18 +639,19 @@ class OtherStaffsController extends Controller
         foreach ($combinedStaffs as $index => $data) {
             $dataArray[] = [
                 $index + 1,
+                strtoupper($data->staff_id ?? 'N/A'),
                 $data->nida ?? 'N/A',
                 isset($data->driver_name)
-                    ? $data->driver_name
-                    : (($data->first_name ?? '') . ' ' . ($data->last_name ?? '')),
+                    ? ucwords(strtolower($data->driver_name))
+                    : (ucwords(strtolower($data->first_name ?? '')) . ' ' . ucwords(strtolower($data->last_name ?? ''))),
                 strtoupper($data->gender ?? ''),
                 $data->phone ?? 'N/A',
                 $data->email ?? 'N/A',
-                $data->job_title ?? 'N/A',
+                ucwords(strtolower($data->job_title ?? 'N/A')),
                 !empty($data->date_of_birth)
                     ? \Carbon\Carbon::parse($data->date_of_birth)->format('d-m-Y')
                     : 'N/A',
-                $data->street_address ?? 'N/A',
+                ucwords(strtolower($data->street_address ?? 'N/A')),
                 $data->status == 1 ? 'Active' : 'Inactive',
             ];
         }
@@ -668,7 +669,7 @@ class OtherStaffsController extends Controller
             for ($row = $dataStartRow; $row <= $lastDataRow; $row++) {
                 $fillColor = $row % 2 == 0 ? 'FFFFFF' : 'F8F9FA';
                 // FIX 2: Badilisha I kuwa J
-                $sheet->getStyle("A{$row}:J{$row}")->applyFromArray([
+                $sheet->getStyle("A{$row}:K{$row}")->applyFromArray([
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                         'startColor' => ['rgb' => $fillColor]
@@ -690,12 +691,12 @@ class OtherStaffsController extends Controller
                 ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
             $sheet->getStyle("C{$dataStartRow}:C{$lastDataRow}")
-                ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
             // FIX 3: Address column is now J (Status moved from I to J)
             // Add alignment for other columns as needed
             $sheet->getStyle("D{$dataStartRow}:D{$lastDataRow}")
-                ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
             $sheet->getStyle("E{$dataStartRow}:E{$lastDataRow}")
                 ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
@@ -704,15 +705,18 @@ class OtherStaffsController extends Controller
                 ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
             $sheet->getStyle("G{$dataStartRow}:G{$lastDataRow}")
-                ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
             $sheet->getStyle("H{$dataStartRow}:H{$lastDataRow}")
-                ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
             $sheet->getStyle("I{$dataStartRow}:I{$lastDataRow}")
                 ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT); // Address
 
             $sheet->getStyle("J{$dataStartRow}:J{$lastDataRow}")
+                ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT); // Status
+
+            $sheet->getStyle("K{$dataStartRow}:K{$lastDataRow}")
                 ->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER); // Status
 
             // Status column coloring - FIX 4: Now column J
@@ -725,13 +729,13 @@ class OtherStaffsController extends Controller
                     default => '000000'
                 };
 
-                $sheet->getStyle("J{$row}")->applyFromArray([ // Changed from I to J
+                $sheet->getStyle("K{$row}")->applyFromArray([ // Changed from I to J
                     'font' => ['bold' => true, 'color' => ['rgb' => $statusColor]]
                 ]);
             }
 
             // Outline border - FIX 5: Badilisha I kuwa J
-            $sheet->getStyle("A{$headerRow}:J{$lastDataRow}")->applyFromArray([
+            $sheet->getStyle("A{$headerRow}:K{$lastDataRow}")->applyFromArray([
                 'borders' => [
                     'outline' => [
                         'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM,
@@ -754,6 +758,7 @@ class OtherStaffsController extends Controller
         $sheet->getColumnDimension('H')->setWidth(14);   // DoB
         $sheet->getColumnDimension('I')->setWidth(20);   // Address
         $sheet->getColumnDimension('J')->setWidth(12);   // Status - ADD THIS LINE
+        $sheet->getColumnDimension('K')->setWidth(12);   // Status - ADD THIS LINE
 
         // Freeze header row
         $sheet->freezePane('A' . $dataStartRow);
@@ -761,7 +766,7 @@ class OtherStaffsController extends Controller
         // =========================
         //  OUTPUT FILE
         // =========================
-        $filename = 'Non_Teaching_Staff_Report_' . now()->format('Ymd_His') . '.xlsx';
+        $filename = 'Other staffs.xlsx';
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $temp_file = tempnam(sys_get_temp_dir(), $filename);
         $writer->save($temp_file);

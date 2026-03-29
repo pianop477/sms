@@ -601,7 +601,7 @@
                         </h5>
                         <p class="mb-0 text-white">
                             <i class="fas fa-id-card me-1"></i>
-                            Admission: <strong>{{ $students->admission_number }}</strong>
+                            Admission: <strong>{{ strtoupper($students->admission_number) }}</strong>
                         </p>
                     </div>
 
