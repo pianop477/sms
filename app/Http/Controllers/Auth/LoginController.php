@@ -72,7 +72,7 @@ class LoginController extends Controller
             $seconds = RateLimiter::availableIn($key);
 
             Alert()->toast(
-                'Account locked. Try again in ' . ceil($seconds / 60) . ' minutes.',
+                'This Account is temporary locked. Try again in ' . ceil($seconds / 60) . ' minutes.',
                 'error'
             );
 
