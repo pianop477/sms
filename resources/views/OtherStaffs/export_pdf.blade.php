@@ -294,6 +294,7 @@
         <thead>
             <tr>
                 <th class="col-number">#</th>
+                <th class="col-category">STAFF ID</th>
                 <th class="col-nida">NIN</th>
                 <th class="col-date">Full Name</th>
                 <th class="col-reference">Gender</th>
@@ -309,6 +310,7 @@
             @foreach($combinedStaffs as $t)
                 <tr class="avoid-break">
                     <td class="text-center col-number">{{ $loop->iteration }}</td>
+                    <td class="col-category">{{strtoupper($t->staff_id ?? 'N/A')}}</td>
                     <td class="col-nida">{{$t->nida ?? 'N/A'}}</td>
                     <td class="col-date">{{$t->job_title == 'driver' ? ucwords(strtolower($t->driver_name)) : ucwords(strtolower($t->first_name. ' '. $t->last_name)) }}</td>
                     <td class="col-reference">{{ strtoupper($t->gender) }}</td>

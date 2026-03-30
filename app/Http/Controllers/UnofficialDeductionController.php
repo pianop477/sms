@@ -139,13 +139,6 @@ class UnofficialDeductionController extends Controller
         // Auto-generate reference number
         $referenceNumber = $this->generateReferenceNumber($schoolId, $request->deduction_type);
 
-        // Log::info('Preparing to send deduction to API', [
-        //     'school_id' => $schoolId,
-        //     'staff_id' => $request->staff_id,
-        //     'reference_number' => $referenceNumber,
-        //     'api_url' => $this->apiBaseUrl . '/deductions/staff-loan/store'
-        // ]);
-
         try {
             $payload = [
                 'school_id' => $schoolId,
@@ -167,16 +160,8 @@ class UnofficialDeductionController extends Controller
                 ->timeout(30)
                 ->post($this->apiBaseUrl . '/deductions/unofficial', $payload);
 
-            // Log full response for debugging
-            // Log::info('API Response', [
-            //     'status' => $response->status(),
-            //     'body' => $response->body(),
-            //     'successful' => $response->successful()
-            // ]);
-
             if ($response->successful()) {
                 $responseData = $response->json();
-                Log::info('Deduction added successfully', $responseData);
                 Alert()->toast($responseData['message'] ?? 'Loan deduction added successfully', 'success');
                 return redirect()->route('deductions.unofficial');
             }
@@ -240,11 +225,11 @@ class UnofficialDeductionController extends Controller
         try {
             $response = Http::withToken($token)
                 ->timeout(30)
-                ->post($this->apiBaseUrl . '/deductions/staff-loan/' . $id . '/cancel');
+                ->post($this->apiBaseUrl . '/deductions/unofficial/' . $id . '/cancel');
 
             if ($response->successful()) {
                 Alert()->toast($response->json()['message'] ?? 'Loan deduction cancelled successfully', 'success');
-                return redirect()->route('staff.loans.index');
+                return redirect()->route('deductions.unofficial');
             }
 
             $errorMessage = $response->json()['message'] ?? 'Failed to cancel deduction';
@@ -256,8 +241,8 @@ class UnofficialDeductionController extends Controller
                 'error' => $e->getMessage()
             ]);
 
-            Alert()->toast();
-            return redirect()->back($e->getMessage(), 'error');
+            Alert()->toast($e->getMessage(), 'error');
+            return redirect()->back();
         }
     }
 }

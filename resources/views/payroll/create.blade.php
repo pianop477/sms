@@ -446,7 +446,7 @@
                                                     data-date="{{ $schedule['generated_at'] ?? '' }}">
                                                     {{ $schedule['name'] }} -
                                                     {{ $schedule['month_name'] ?? $schedule['payroll_month'] }}
-                                                    ({{ $schedule['total_employees'] ?? 0 }} employees)
+                                                    {{-- ({{ $schedule['total_employees'] ?? 0 }} employees) --}}
                                                 </option>
                                             @empty
                                                 <option value="" disabled> No previous payrolls found</option>
@@ -757,12 +757,12 @@
                         displayContractsData(data.data);
                     } else {
                         contractsResultContainer.innerHTML =
-                            `<div class="alert alert-warning"> No active contracts found.</div>`;
+                            `<div class="alert alert-warning">No active contracts found.</div>`;
                     }
                 } catch (error) {
                     contractsLoading.style.display = 'none';
                     contractsResultContainer.innerHTML =
-                        `<div class="alert alert-danger"> Failed to fetch contracts data.</div>`;
+                        `<div class="alert alert-danger">Failed to fetch contracts data.</div>`;
                 }
             });
         }
@@ -770,61 +770,68 @@
         function displayContractsData(employees) {
             document.getElementById('contracts_data').value = JSON.stringify(employees);
             let html = `
-            <div class="alert alert-success mb-3">
-                <i class="fas fa-check-circle me-1"></i>
-                <strong>${employees.length} employees found</strong> with active contracts.
-            </div>
-            <div class="employee-preview-table">
-                <table class="table table-bordered">
-                    <thead>
-                        <th style="width: 40px;"><input type="checkbox" id="selectAllContracts" checked></th>
-                        <th>STAFF ID</th>
-                        <th>EMPLOYEE NAME</th>
-                        <th>STAFF TYPE</th>
-                        <th class="text-end">BASIC SALARY</th>
-                        <th class="text-end">ALLOWANCES</th>
-                        <th>CONTRACT TYPE</th>
-                    </thead>
-                    </thead>
-                    <tbody>
-        `;
+                <div class="alert alert-success mb-3">
+                    <i class="fas fa-check-circle me-1"></i>
+                    <strong>${employees.length} employees found</strong> with active contracts.
+                </div>
+                <div class="employee-preview-table">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;"><input type="checkbox" id="selectAllContracts" checked></th>
+                                <th>STAFF ID</th>
+                                <th>EMPLOYEE NAME</th>
+                                <th>STAFF TYPE</th>
+                                <th class="text-end">BASIC SALARY</th>
+                                <th class="text-end">ALLOWANCES</th>
+                                <th>CONTRACT TYPE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
             employees.forEach((emp, index) => {
                 html += `
-                <tr>
-                    <td class="text-center"><input type="checkbox" class="contract-employee-checkbox" data-index="${index}" checked></td>
-                    <td class="text-uppercase"><strong>${escapeHtml(emp.staff_id)}</strong></td>
-                    <td class="text-uppercase">${escapeHtml(emp.employee_name)}</td>
-                    <td class="text-uppercase">${escapeHtml(emp.staff_type)}</td>
-                    <td class="text-end"> ${formatNumber(emp.basic_salary)}</td>
-                    <td class="text-end"> ${formatNumber(emp.allowances)}</td>
-                    <td class="text-uppercase"><span class="badge bg-${emp.contract_type === 'provision' ? 'warning' : 'success'}">${escapeHtml(emp.contract_type)}</span></td>
-                </tr>
-            `;
+                        <tr>
+                            <td class="text-center"><input type="checkbox" class="contract-employee-checkbox" data-index="${index}" checked></td>
+                            <td class="text-uppercase"><strong>${escapeHtml(emp.staff_id)}</strong></td>
+                            <td class="text-uppercase">${escapeHtml(emp.employee_name)}</td>
+                            <td class="text-uppercase">${escapeHtml(emp.staff_type)}</td>
+                            <td class="text-end">${formatNumber(emp.basic_salary)}</td>
+                            <td class="text-end">${formatNumber(emp.allowances)}</td>
+                            <td class="text-uppercase"><span class="badge bg-${emp.contract_type === 'provision' ? 'warning' : 'success'}">${escapeHtml(emp.contract_type)}</span></td>
+                        </tr>
+                    `;
             });
-            html += `
-                    </tbody>
 
-            </div>
-            <div class="mt-3 d-flex justify-content-between align-items-center">
-                <div>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" id="deselectAllContracts">Deselect All</button>
-                    <button type="button" class="btn btn-sm btn-outline-primary" id="selectAllContractsBtn">Select All</button>
-                </div>
-                <button type="button" class="btn btn-success btn-xs" id="confirmContractsData">
-                    <i class="fas fa-check me-1"></i> Confirm
-                </button>
-            </div>
-        `;
+            html += `
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="deselectAllContracts">Deselect All</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="selectAllContractsBtn">Select All</button>
+                        </div>
+                        <button type="button" class="btn btn-success" id="confirmContractsData">
+                            <i class="fas fa-check me-1"></i> Confirm
+                        </button>
+                    </div>
+                `;
+
             contractsResultContainer.innerHTML = html;
 
+            // Event listeners
             document.getElementById('selectAllContractsBtn')?.addEventListener('click', () => {
                 document.querySelectorAll('.contract-employee-checkbox').forEach(cb => cb.checked = true);
                 updateContractCount();
             });
+
             document.getElementById('deselectAllContracts')?.addEventListener('click', () => {
                 document.querySelectorAll('.contract-employee-checkbox').forEach(cb => cb.checked = false);
                 updateContractCount();
             });
+
             document.getElementById('confirmContractsData')?.addEventListener('click', () => {
                 const selected = [];
                 document.querySelectorAll('.contract-employee-checkbox:checked').forEach(cb => {
@@ -837,19 +844,22 @@
                 document.getElementById('contracts_data').value = JSON.stringify(selected);
                 showToast(`${selected.length} employees confirmed for payroll`, 'success');
                 document.getElementById('confirmContractsData').disabled = true;
-
-                // ✅ Update submit button state
                 updateSubmitButtonState();
             });
 
             function updateContractCount() {
                 const selected = document.querySelectorAll('.contract-employee-checkbox:checked').length;
                 const btn = document.getElementById('confirmContractsData');
-                if (btn && !btn.disabled) btn.innerHTML =
-                    `<i class="fas fa-check me-1"></i> Confirm`;
+                if (btn && !btn.disabled) {
+                    btn.innerHTML = `<i class="fas fa-check me-1"></i> Confirm (${selected} selected)`;
+                }
             }
-            document.querySelectorAll('.contract-employee-checkbox').forEach(cb => cb.addEventListener('change',
-                updateContractCount));
+
+            document.querySelectorAll('.contract-employee-checkbox').forEach(cb => {
+                cb.addEventListener('change', updateContractCount);
+            });
+
+            updateContractCount();
         }
 
         // ==================== EXCEL UPLOAD MODE WITH DUPLICATE VALIDATION ====================
@@ -883,6 +893,44 @@
         const excelFileInput = document.getElementById('excel_file');
         const excelPreviewContainer = document.getElementById('excelPreviewContainer');
 
+        // Function to fetch employee details from backend
+        async function fetchEmployeeDetails(staffId) {
+            try {
+                const schoolId = {{ Auth::user()->school_id }};
+                const response = await fetch('{{ route('api.employees.search') }}?school_id=' + schoolId + '&q=' +
+                    encodeURIComponent(staffId), {
+                        headers: {
+                            'Authorization': 'Bearer ' + '{{ session('finance_api_token') }}',
+                            'Accept': 'application/json'
+                        }
+                    });
+                const data = await response.json();
+
+                if (data.success && data.data && data.data.length > 0) {
+                    // Find exact match by staff_id (case insensitive)
+                    const emp = data.data.find(e => e.staff_id.toUpperCase() === staffId.toUpperCase());
+                    if (emp) {
+                        return {
+                            employee_name: emp.employee_name,
+                            staff_type: emp.staff_type,
+                            basic_salary: emp.basic_salary,
+                            allowances: emp.allowances,
+                            bank_name: emp.bank_name,
+                            bank_account_name: emp.bank_account_name,
+                            bank_account_number: emp.bank_account_number,
+                            phone: emp.phone,
+                            email: emp.email,
+                            exists_in_system: true
+                        };
+                    }
+                }
+                return null;
+            } catch (e) {
+                console.error('Error fetching employee details:', e);
+                return null;
+            }
+        }
+
         // Function to check for duplicate staff_id in Excel data
         function checkDuplicateStaffIds(data) {
             const staffIds = [];
@@ -913,99 +961,101 @@
             const duplicateCheck = checkDuplicateStaffIds(data);
 
             let html = `
-    <div class="alert alert-${duplicateCheck.hasDuplicates ? 'danger' : 'success'}">
-        <i class="fas ${duplicateCheck.hasDuplicates ? 'fa-exclamation-triangle' : 'fa-check-circle'} me-1"></i>
-        <strong>${data.length} record(s) found.</strong>
-        ${duplicateCheck.hasDuplicates ?
-            `<br><span class="text-danger"><i class="fas fa-times-circle me-1"></i> Found ${duplicateCheck.duplicateRows.length} duplicate staff ID(s)!</span>` :
-            '<span class="text-success"><i class="fas fa-check me-1"></i> No duplicates found.</span>'}
-    </div>
-    `;
+            <div class="alert alert-${duplicateCheck.hasDuplicates ? 'danger' : 'success'}">
+                <i class="fas ${duplicateCheck.hasDuplicates ? 'fa-exclamation-triangle' : 'fa-check-circle'} me-1"></i>
+                <strong>${data.length} record(s) found.</strong>
+                ${duplicateCheck.hasDuplicates ?
+                    `<br><span class="text-danger"><i class="fas fa-times-circle me-1"></i> Found ${duplicateCheck.duplicateRows.length} duplicate staff ID(s)!</span>` :
+                    '<span class="text-success"><i class="fas fa-check me-1"></i> No duplicates found.</span>'}
+            </div>
+        `;
 
             // Show duplicate details if any
             if (duplicateCheck.hasDuplicates) {
                 html += `
-        <div class="alert alert-warning mb-3">
-            <i class="fas fa-info-circle me-1"></i>
-            <strong>Duplicate Staff IDs Found:</strong>
-            <ul class="mb-0 mt-2">
-                ${duplicateCheck.duplicateRows.map(dup => `<li><strong>${dup.staff_id}</strong> appears at row ${dup.row_number}</li>`).join('')}
-            </ul>
-            <hr>
-            <small class="text-muted">Please remove duplicates from your Excel file and re-upload.</small>
-        </div>
-        `;
+                <div class="alert alert-warning mb-3">
+                    <i class="fas fa-info-circle me-1"></i>
+                    <strong>Duplicate Staff IDs Found:</strong>
+                    <ul class="mb-0 mt-2">
+                        ${duplicateCheck.duplicateRows.map(dup => `<li><strong>${dup.staff_id}</strong> appears at row ${dup.row_number}</li>`).join('')}
+                    </ul>
+                    <hr>
+                    <small class="text-muted">Please remove duplicates from your Excel file and re-upload.</small>
+                </div>
+            `;
             }
 
             html += `
-    <div class="preview-table-container">
-        <table class="preview-table">
-            <thead>
-                <tr>
-                    <th style="width: 40px;"><input type="checkbox" id="selectAllExcel" ${!duplicateCheck.hasDuplicates ? 'checked' : ''} ${duplicateCheck.hasDuplicates ? 'disabled' : ''}></th>
-                    <th>STAFF ID</th>
-                    <th>EMPLOYEE NAME</th>
-                    <th>STAFF TYPE</th>
-                    <th class="text-end">BASIC SALARY</th>
-                    <th class="text-end">ALLOWANCES</th>
-                    <th class="text-end">GROSS PAY</th>
-                    <th>DEPARTMENT</th>
-                    <th>CONTRACT TYPE</th>
-                    <th>STATUS</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
+            <div class="preview-table-container">
+                <table class="preview-table">
+                    <thead>
+
+                            <th style="width: 40px;"><input type="checkbox" id="selectAllExcel" ${!duplicateCheck.hasDuplicates ? 'checked' : ''} ${duplicateCheck.hasDuplicates ? 'disabled' : ''}></th>
+                            <th>STAFF ID</th>
+                            <th>EMPLOYEE NAME</th>
+                            <th>STAFF TYPE</th>
+                            <th class="text-end">BASIC SALARY</th>
+                            <th class="text-end">ALLOWANCES</th>
+                            <th class="text-end">GROSS PAY</th>
+                            <th>DEPARTMENT</th>
+                            <th>CONTRACT TYPE</th>
+                            <th>STATUS</th>
+                        </thead>
+                        <tbody>
+        `;
 
             data.forEach((emp, idx) => {
                 const gross = (emp.basic_salary || 0) + (emp.allowances || 0);
-                const statusBadge = emp.exists_in_system ? '<span class="badge bg-success">Found</span>' :
-                    '<span class="badge bg-warning text-dark">New</span>';
-
-                // Check if this is a duplicate
+                const statusBadge = emp.exists_in_system ?
+                    '<span class="badge bg-success">✓ Found</span>' :
+                    '<span class="badge bg-danger">✗ Not Found</span>';
                 const isDuplicate = duplicateCheck.duplicateRows.some(dup => dup.index === idx);
                 const rowClass = isDuplicate ?
                     'style="background-color: #fff3f3; border-left: 3px solid #dc3545;"' : '';
 
+                // Show employee name with warning if not found
+                const displayName = emp.exists_in_system ? emp.employee_name :
+                    `${emp.staff_id} (EMPLOYEE NOT FOUND IN SYSTEM)`;
+
                 html += `
-        <tr ${rowClass}>
-            <td class="text-center">
-                <input type="checkbox" class="excel-checkbox" data-index="${idx}" ${!isDuplicate && !duplicateCheck.hasDuplicates ? 'checked' : ''} ${isDuplicate ? 'disabled' : ''}>
-            </td>
-            <td class="text-uppercase">
-                <strong>${escapeHtml(emp.staff_id)}</strong>
-                ${isDuplicate ? '<span class="badge bg-danger ms-1">Duplicate</span>' : ''}
-            </td>
-            <td class="text-uppercase">${escapeHtml(emp.employee_name)}</td>
-            <td class="text-uppercase">${escapeHtml(emp.staff_type)}</td>
-            <td class="text-end">${formatNumber(emp.basic_salary)}</td>
-            <td class="text-end">${formatNumber(emp.allowances)}</td>
-            <td class="text-end"><strong>${formatNumber(gross)}</strong></td>
-            <td class="text-uppercase">${escapeHtml(emp.department)}</td>
-            <td class="text-uppercase"><span class="badge bg-${emp.contract_type === 'provision' ? 'warning' : 'info'}">${escapeHtml(emp.contract_type)}</span></td>
-            <td class="text-center">${statusBadge}</td>
-        </tr>
-        `;
+                <tr ${rowClass}>
+                    <td class="text-center">
+                        <input type="checkbox" class="excel-checkbox" data-index="${idx}" ${!isDuplicate && !duplicateCheck.hasDuplicates && emp.exists_in_system ? 'checked' : ''} ${isDuplicate || !emp.exists_in_system ? 'disabled' : ''}>
+
+                    <td class="text-uppercase">
+                        <strong>${escapeHtml(emp.staff_id)}</strong>
+                        ${isDuplicate ? '<span class="badge bg-danger ms-1">Duplicate</span>' : ''}
+
+                    <td class="text-uppercase ${!emp.exists_in_system ? 'text-danger fw-bold' : ''}">
+                        ${escapeHtml(displayName)}
+                        ${!emp.exists_in_system ? '<i class="fas fa-exclamation-triangle ms-1" title="Employee not found in system"></i>' : ''}
+
+                    <td class="text-uppercase">${escapeHtml(emp.staff_type)}
+                    <td class="text-end">${formatNumber(emp.basic_salary)}
+                    <td class="text-end">${formatNumber(emp.allowances)}
+                    <td class="text-end"><strong>${formatNumber(gross)}</strong>
+                    <td class="text-uppercase">${escapeHtml(emp.department)}
+                    <td class="text-uppercase"><span class="badge bg-${emp.contract_type === 'provision' ? 'warning' : 'info'}">${escapeHtml(emp.contract_type)}</span>
+                    <td class="text-center">${statusBadge}
+
+            `;
             });
 
             html += `
-            </tbody>
-        </table>
-    </div>
-    `;
+                        </tbody>
 
-            html += `
-    <div class="mt-3 d-flex justify-content-between align-items-center">
-        <div>
-            <button class="btn btn-sm btn-outline-secondary" id="deselectAllExcel" ${duplicateCheck.hasDuplicates ? 'disabled' : ''}>Deselect All</button>
-            <button class="btn btn-sm btn-outline-primary" id="selectAllExcelBtn" ${duplicateCheck.hasDuplicates ? 'disabled' : ''}>Select All</button>
-        </div>
-        <button class="btn btn-xs btn-${duplicateCheck.hasDuplicates ? 'secondary' : 'success'} btn-xs" id="confirmExcelData" ${duplicateCheck.hasDuplicates ? 'disabled' : ''}>
-            <i class="fas fa-check me-1"></i> Confirm
-        </button>
-    </div>
-    <input type="hidden" id="excel_data" name="excel_data" value="">
-    `;
+                </div>
+                <div class="mt-3 d-flex justify-content-between align-items-center">
+                    <div>
+                        <button class="btn btn-sm btn-outline-secondary" id="deselectAllExcel" ${duplicateCheck.hasDuplicates ? 'disabled' : ''}>Deselect All</button>
+                        <button class="btn btn-sm btn-outline-primary" id="selectAllExcelBtn" ${duplicateCheck.hasDuplicates ? 'disabled' : ''}>Select All</button>
+                    </div>
+                    <button class="btn btn-${duplicateCheck.hasDuplicates ? 'secondary' : 'success'}" id="confirmExcelData" ${duplicateCheck.hasDuplicates ? 'disabled' : ''}>
+                        <i class="fas fa-check me-1"></i> Confirm
+                    </button>
+                </div>
+                <input type="hidden" id="excel_data" name="excel_data" value="">
+        `;
 
             excelPreviewContainer.innerHTML = html;
 
@@ -1017,8 +1067,6 @@
 
                 function updateExcelCount() {
                     const selectedCount = document.querySelectorAll('.excel-checkbox:checked').length;
-                    const countSpan = document.getElementById('excelSelectedCount');
-                    if (countSpan) countSpan.textContent = selectedCount;
                     if (confirmBtn && !confirmBtn.disabled) {
                         confirmBtn.innerHTML =
                             `<i class="fas fa-check me-1"></i> Confirm`;
@@ -1027,14 +1075,16 @@
 
                 if (selectAllBtn) {
                     selectAllBtn.addEventListener('click', () => {
-                        document.querySelectorAll('.excel-checkbox').forEach(cb => cb.checked = true);
+                        document.querySelectorAll('.excel-checkbox:not([disabled])').forEach(cb => cb.checked =
+                            true);
                         updateExcelCount();
                     });
                 }
 
                 if (deselectAllBtn) {
                     deselectAllBtn.addEventListener('click', () => {
-                        document.querySelectorAll('.excel-checkbox').forEach(cb => cb.checked = false);
+                        document.querySelectorAll('.excel-checkbox:not([disabled])').forEach(cb => cb.checked =
+                            false);
                         updateExcelCount();
                     });
                 }
@@ -1067,27 +1117,18 @@
                         showToast(`${selected.length} employee(s) confirmed for payroll`, 'success');
                         confirmBtn.disabled = true;
                         confirmBtn.innerHTML = '<i class="fas fa-check-circle me-1"></i> Confirmed!';
-
-                        // ✅ IMPORTANT: Update submit button state after confirmation
-                        if (typeof updateSubmitButtonState === 'function') {
-                            updateSubmitButtonState();
-                        }
+                        updateSubmitButtonState();
                     });
                 }
 
-                document.querySelectorAll('.excel-checkbox').forEach(cb => {
+                document.querySelectorAll('.excel-checkbox:not([disabled])').forEach(cb => {
                     cb.addEventListener('change', updateExcelCount);
                 });
-
-                // Initial count
                 updateExcelCount();
             } else {
                 showToast('Please fix duplicate staff IDs in your Excel file and re-upload', 'warning');
-                // Reset excel_data if there are duplicates
                 document.getElementById('excel_data').value = '';
-                if (typeof updateSubmitButtonState === 'function') {
-                    updateSubmitButtonState();
-                }
+                updateSubmitButtonState();
             }
         }
 
@@ -1100,8 +1141,13 @@
                 }
 
                 excelPreviewContainer.style.display = 'block';
-                excelPreviewContainer.innerHTML =
-                    `<div class="alert alert-info"><i class="fas fa-spinner fa-spin me-1"></i> Processing "${file.name}"...</div>`;
+                excelPreviewContainer.innerHTML = `
+                <div class="alert alert-info">
+                    <i class="fas fa-spinner fa-spin me-1"></i>
+                    Processing "${file.name}"...<br>
+                    <small class="text-muted">Fetching employee details from system...</small>
+                </div>
+            `;
 
                 try {
                     const text = await file.text();
@@ -1129,18 +1175,18 @@
                             staffIdMap.set(row.staff_id, [i + 1]);
                         }
 
-                        // Validate employee exists in system
-                        const employeeFound = await validateEmployeeExists(row.staff_id);
+                        // Fetch employee details from system
+                        const employeeDetails = await fetchEmployeeDetails(row.staff_id);
 
                         data.push({
                             staff_id: row.staff_id,
-                            employee_name: employeeFound?.employee_name || row.staff_id,
-                            staff_type: employeeFound?.staff_type || 'Teacher',
+                            employee_name: employeeDetails?.employee_name || '',
+                            staff_type: employeeDetails?.staff_type || 'Teacher',
                             basic_salary: parseFloat(row.basic_salary) || 0,
                             allowances: parseFloat(row.allowances) || 0,
                             department: row.department || '',
-                            contract_type: row.contract_type || 'New',
-                            exists_in_system: !!employeeFound,
+                            contract_type: row.contract_type || 'new',
+                            exists_in_system: !!employeeDetails,
                             row_number: i + 1
                         });
                     }
@@ -1159,30 +1205,6 @@
                         '<div class="alert alert-danger">Failed to parse file. Please use the template format.</div>';
                 }
             });
-        }
-
-        async function validateEmployeeExists(staffId) {
-            try {
-                const schoolId = {{ Auth::user()->school_id }};
-                const response = await fetch('{{ route('api.employees.search') }}?school_id=' + schoolId + '&q=' +
-                    encodeURIComponent(staffId), {
-                        headers: {
-                            'Authorization': 'Bearer ' + '{{ session('finance_api_token') }}',
-                            'Accept': 'application/json'
-                        }
-                    });
-                const data = await response.json();
-                if (data.success && data.data && data.data.length > 0) {
-                    const emp = data.data.find(e => e.staff_id === staffId);
-                    if (emp) return {
-                        employee_name: emp.employee_name,
-                        staff_type: emp.staff_type
-                    };
-                }
-                return null;
-            } catch (e) {
-                return null;
-            }
         }
 
         // ==================== PREVIOUS SCHEDULE MODE ====================
@@ -1219,28 +1241,28 @@
                         scheduleConfirmContainer.style.display = 'block';
                     } else {
                         schedulePreviewContainer.innerHTML =
-                            '<div class="alert alert-warning"> Could not load payroll schedule data.</div>';
+                            '<div class="alert alert-warning">Could not load payroll schedule data.</div>';
                     }
                 } catch (error) {
                     schedulePreviewContainer.innerHTML =
-                        '<div class="alert alert-danger"> Failed to load payroll schedule data.</div>';
+                        '<div class="alert alert-danger">Failed to load payroll schedule data.</div>';
                 }
             });
         }
 
         function displaySchedulePreview(schedule) {
             let html = `
-            <div class="selected-schedule-card">
-                <h6 class="mb-2">📋 ${escapeHtml(schedule.name)} (${escapeHtml(schedule.month_name)})</h6>
-                <div class="summary-stats mb-3">
-                    <div class="summary-item"><strong>Employees:</strong> ${schedule.total_employees}</div>
-                    <div class="summary-item"><strong>Total Gross:</strong>  ${formatNumber(schedule.total_gross)}</div>
-                    <div class="summary-item"><strong>Total Net:</strong>  ${formatNumber(schedule.total_net)}</div>
-                    <div class="summary-item"><strong>Total Tax:</strong> ${formatNumber(schedule.total_tax)}</div>
-                </div>
-                <div class="preview-table-container">
-                    <table class="preview-table">
-                        <thead>
+        <div class="selected-schedule-card">
+            <h6 class="mb-2">📋 ${escapeHtml(schedule.name)} (${escapeHtml(schedule.month_name)})</h6>
+            <div class="summary-stats mb-3">
+                <div class="summary-item"><strong>Employees:</strong> ${schedule.total_employees}</div>
+                <div class="summary-item"><strong>Total Gross:</strong> ${formatNumber(schedule.total_gross)}</div>
+                <div class="summary-item"><strong>Total Net:</strong> ${formatNumber(schedule.total_net)}</div>
+                <div class="summary-item"><strong>Total Tax:</strong> ${formatNumber(schedule.total_tax)}</div>
+            </div>
+            <div class="preview-table-container">
+                <table class="preview-table">
+                    <thead>
                             <th style="width: 50px;">#</th>
                             <th>STAFF ID</th>
                             <th>EMPLOYEE NAME</th>
@@ -1251,30 +1273,32 @@
                             <th class="text-end">PAYE</th>
                             <th class="text-end">NET PAY</th>
                         </thead>
-                        </thead>
                         <tbody>
-        `;
+    `;
+
             (schedule.employees || []).forEach((emp, idx) => {
                 html += `
-                <tr>
-                    <td class="text-center">${idx + 1}</td>
-                    <td class="text-uppercase"><strong>${escapeHtml(emp.staff_id)}</strong></td>
-                    <td class="text-uppercase">${escapeHtml(emp.employee_name)}</td>
-                    <td class="text-end"> ${formatNumber(emp.basic_salary)}</td>
-                    <td class="text-end"> ${formatNumber(emp.allowances)}</td>
-                    <td class="text-end"><strong> ${formatNumber(emp.gross)}</strong></td>
-                    <td class="text-end"> ${formatNumber(emp.nssf)}</td>
-                    <td class="text-end"> ${formatNumber(emp.paye)}</td>
-                    <td class="text-end text-success"><strong> ${formatNumber(emp.net)}</strong></td>
-                </tr>
-            `;
-            });
-            html += `
-                        </tbody>
-
-                </div>
-            </div>
+            <tr>
+                <td class="text-center">${idx + 1}</td>
+                <td class="text-uppercase"><strong>${escapeHtml(emp.staff_id)}</strong></td>
+                <td class="text-uppercase">${escapeHtml(emp.employee_name)}</td>
+                <td class="text-end">${formatNumber(emp.basic_salary)}</td>
+                <td class="text-end">${formatNumber(emp.allowances)}</td>
+                <td class="text-end"><strong>${formatNumber(emp.gross)}</strong></td>
+                <td class="text-end">${formatNumber(emp.nssf)}</td>
+                <td class="text-end">${formatNumber(emp.paye)}</td>
+                <td class="text-end text-success"><strong>${formatNumber(emp.net)}</strong></td>
+            </tr>
         `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+
             schedulePreviewContainer.innerHTML = html;
         }
 
@@ -1289,243 +1313,10 @@
                     document.getElementById('payrollForm').appendChild(hiddenInput);
                     showToast('Schedule confirmed! Ready to generate payroll.', 'success');
                     this.disabled = true;
-
-                    // ✅ Update submit button state
                     updateSubmitButtonState();
                 }
             });
         }
-
-        // ==================== MANUAL ENTRY MODE ====================
-        const manualAddFormDiv = document.getElementById('manualAddForm');
-        const showManualFormBtn = document.getElementById('showManualFormBtn');
-        const cancelManualFormBtn = document.getElementById('cancelManualFormBtn');
-        const addManualEmployeeBtn = document.getElementById('addManualEmployeeBtn');
-        const manualTableBody = document.getElementById('manualTableBody');
-        const manualTableContainer = document.getElementById('manualTableContainer');
-        const manualSummaryStats = document.getElementById('manualSummaryStats');
-        const manualEmployeesContainerDiv = document.getElementById('manualEmployeesContainer');
-        const manualEmployeesInputHidden = document.getElementById('manual_employees');
-
-        if (showManualFormBtn) {
-            showManualFormBtn.addEventListener('click', () => {
-                manualAddFormDiv.style.display = 'block';
-                showManualFormBtn.style.display = 'none';
-            });
-        }
-
-        if (cancelManualFormBtn) {
-            cancelManualFormBtn.addEventListener('click', () => {
-                manualAddFormDiv.style.display = 'none';
-                showManualFormBtn.style.display = 'block';
-                document.getElementById('manual_staff_id').value = '';
-                document.getElementById('manual_name').value = '';
-                document.getElementById('manual_basic_salary').value = '0';
-                document.getElementById('manual_allowances').value = '0';
-                document.getElementById('manual_department').value = '';
-            });
-        }
-
-        if (addManualEmployeeBtn) {
-            addManualEmployeeBtn.addEventListener('click', async () => {
-                const staffId = document.getElementById('manual_staff_id').value.trim();
-                const name = document.getElementById('manual_name').value.trim();
-                const staffType = document.getElementById('manual_staff_type').value;
-                const basicSalary = parseFloat(document.getElementById('manual_basic_salary').value) || 0;
-                const allowances = parseFloat(document.getElementById('manual_allowances').value) || 0;
-                const department = document.getElementById('manual_department').value;
-                const contractType = document.getElementById('manual_contract_type').value;
-
-                if (!staffId || !name) {
-                    showToast('Staff ID and Name are required', 'warning');
-                    return;
-                }
-                if (manualEmployeesList.some(emp => emp.staff_id === staffId)) {
-                    showToast('Employee already added', 'warning');
-                    return;
-                }
-
-                let employeeExists = false;
-                try {
-                    const schoolId = {{ Auth::user()->school_id }};
-                    const response = await fetch('{{ route('api.employees.search') }}?school_id=' + schoolId +
-                        '&q=' + encodeURIComponent(staffId), {
-                            headers: {
-                                'Authorization': 'Bearer ' + '{{ session('finance_api_token') }}',
-                                'Accept': 'application/json'
-                            }
-                        });
-                    const data = await response.json();
-                    if (data.success && data.data && data.data.length > 0) {
-                        const found = data.data.find(e => e.staff_id === staffId);
-                        if (found) employeeExists = true;
-                    }
-                } catch (e) {}
-
-                manualEmployeesList.push({
-                    staff_id: staffId,
-                    employee_name: name,
-                    staff_type: staffType,
-                    basic_salary: basicSalary,
-                    allowances: allowances,
-                    department: department,
-                    contract_type: contractType,
-                    exists_in_system: employeeExists
-                });
-                updateManualTable();
-                cancelManualFormBtn.click();
-                showToast('Employee added successfully', 'success');
-            });
-        }
-
-        function updateManualTable() {
-            if (manualEmployeesList.length === 0) {
-                if (manualTableContainer) manualTableContainer.style.display = 'none';
-                if (manualEmployeesContainerDiv) manualEmployeesContainerDiv.innerHTML =
-                    `<div class="alert alert-info"><i class="fas fa-info-circle me-1"></i> No employees added yet.</div>`;
-                if (manualEmployeesInputHidden) manualEmployeesInputHidden.value = '';
-                return;
-            }
-            if (manualEmployeesContainerDiv) manualEmployeesContainerDiv.innerHTML = '';
-            if (manualTableContainer) manualTableContainer.style.display = 'block';
-
-            let totals = {
-                basic: 0,
-                allowances: 0,
-                gross: 0
-            };
-            let html = '';
-            manualEmployeesList.forEach((emp, idx) => {
-                const gross = emp.basic_salary + emp.allowances;
-                totals.basic += emp.basic_salary;
-                totals.allowances += emp.allowances;
-                totals.gross += gross;
-                const statusBadge = emp.exists_in_system ? '<span class="badge bg-success">Found</span>' :
-                    '<span class="badge bg-warning text-dark">New</span>';
-                html += `
-                <tr>
-                    <td class="text-center">${idx + 1}</td>
-                    <td><strong>${escapeHtml(emp.staff_id)}</strong></td>
-                    <td>${escapeHtml(emp.employee_name)}</td>
-                    <td>${escapeHtml(emp.staff_type)}</td>
-                    <td class="text-end"> ${formatNumber(emp.basic_salary)}</td>
-                    <td class="text-end"> ${formatNumber(emp.allowances)}</td>
-                    <td class="text-end"><strong> ${formatNumber(gross)}</strong></td>
-                    <td>${escapeHtml(emp.department)}</td>
-                    <td><span class="badge bg-${emp.contract_type === 'provision' ? 'warning' : 'info'}">${escapeHtml(emp.contract_type)}</span></td>
-                    <td class="text-center">${statusBadge}</td>
-                    <td class="text-center"><button class="btn btn-xs btn-danger" onclick="removeManualEmployee(${idx})"><i class="fas fa-trash"></i></button></td>
-                </tr>
-            `;
-            });
-            if (manualTableBody) manualTableBody.innerHTML = html;
-            if (manualSummaryStats) {
-                manualSummaryStats.innerHTML = `
-                <div class="summary-item"><strong>Total Employees:</strong> ${manualEmployeesList.length}</div>
-                <div class="summary-item"><strong>Total Basic Salary:</strong>  ${formatNumber(totals.basic)}</div>
-                <div class="summary-item"><strong>Total Allowances:</strong>  ${formatNumber(totals.allowances)}</div>
-                <div class="summary-item"><strong>Total Gross:</strong>  ${formatNumber(totals.gross)}</div>
-            `;
-            }
-            if (manualEmployeesInputHidden) manualEmployeesInputHidden.value = JSON.stringify(manualEmployeesList);
-        }
-
-        window.removeManualEmployee = function(idx) {
-            manualEmployeesList.splice(idx, 1);
-            updateManualTable();
-        };
-
-        const confirmManualDataBtn = document.getElementById('confirmManualDataBtn');
-        if (confirmManualDataBtn) {
-            confirmManualDataBtn.addEventListener('click', function() {
-                if (manualEmployeesList.length === 0) {
-                    showToast('Please add at least one employee', 'warning');
-                    return;
-                }
-                showToast(`${manualEmployeesList.length} employees confirmed for manual payroll`, 'success');
-                this.disabled = true;
-                this.innerHTML = '<i class="fas fa-check-circle me-1"></i> Confirmed!';
-            });
-        }
-
-        // ==================== SEARCH MODAL ====================
-        const searchEmployeeBtn2 = document.getElementById('searchEmployeeBtn');
-        const employeeSearchModal = document.getElementById('employeeSearchModal');
-
-        function openEmployeeSearch() {
-            if (employeeSearchModal) employeeSearchModal.style.display = 'block';
-            document.getElementById('employeeSearchInput')?.focus();
-        }
-
-        function closeEmployeeSearch() {
-            if (employeeSearchModal) employeeSearchModal.style.display = 'none';
-            document.getElementById('employeeSearchInput').value = '';
-            document.getElementById('employeeSearchResults').innerHTML = '';
-        }
-
-        if (searchEmployeeBtn2) searchEmployeeBtn2.addEventListener('click', openEmployeeSearch);
-        if (document.getElementById('employeeSearchInput')) {
-            document.getElementById('employeeSearchInput').addEventListener('input', async function(e) {
-                const query = e.target.value;
-                const resultsDiv = document.getElementById('employeeSearchResults');
-                if (query.length < 2) {
-                    resultsDiv.innerHTML = '<div class="text-muted">Type at least 2 characters</div>';
-                    return;
-                }
-                resultsDiv.innerHTML = '<div class="loading-spinner"></div> Searching...';
-                try {
-                    const schoolId = {{ Auth::user()->school_id ?? 1 }};
-                    const response = await fetch('{{ route('api.employees.search') }}?school_id=' + schoolId +
-                        '&q=' + encodeURIComponent(query), {
-                            headers: {
-                                'Authorization': 'Bearer ' + '{{ session('finance_api_token') }}',
-                                'Accept': 'application/json'
-                            }
-                        });
-                    const data = await response.json();
-                    if (data.success && data.data.length > 0) {
-                        let html = '<div class="list-group">';
-                        data.data.forEach(emp => {
-                            html += `<div class="list-group-item list-group-item-action" style="cursor:pointer;" onclick="selectEmployeeFromSearch('${emp.staff_id}', '${emp.employee_name}', '${emp.staff_type}', ${emp.basic_salary || 0})">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div><strong>${escapeHtml(emp.employee_name)}</strong><br><small>ID: ${emp.staff_id} | ${emp.staff_type}</small></div>
-                                <div><small>Basic: ${formatNumber(emp.basic_salary || 0)}</small></div>
-                            </div>
-                        </div>`;
-                        });
-                        html += '</div>';
-                        resultsDiv.innerHTML = html;
-                    } else {
-                        resultsDiv.innerHTML =
-                            '<div class="alert alert-warning">No employees found. You can add manually using the form.</div>';
-                    }
-                } catch (e) {
-                    resultsDiv.innerHTML =
-                        '<div class="alert alert-danger">Search failed. Please try again.</div>';
-                }
-            });
-        }
-
-        window.selectEmployeeFromSearch = function(staffId, name, staffType, basicSalary) {
-            if (manualEmployeesList.some(emp => emp.staff_id === staffId)) {
-                showToast('Employee already added', 'warning');
-                closeEmployeeSearch();
-                return;
-            }
-            manualEmployeesList.push({
-                staff_id: staffId,
-                employee_name: name,
-                staff_type: staffType,
-                basic_salary: basicSalary,
-                allowances: 0,
-                department: '',
-                contract_type: 'new',
-                exists_in_system: true
-            });
-            updateManualTable();
-            closeEmployeeSearch();
-            showToast('Employee added successfully', 'success');
-        };
 
         // ==================== FILTERS TOGGLE ====================
         const toggleFilters = document.getElementById('toggleFilters');
@@ -1540,11 +1331,10 @@
             });
         }
 
-        // ==================== FORM SUBMIT VALIDATION WITH CONFIRM BUTTON STATE ====================
+        // ==================== FORM SUBMIT VALIDATION ====================
         const form = document.getElementById('payrollForm');
         const submitBtn = document.getElementById('submitBtn');
 
-        // Function to update submit button state based on method and confirmation
         function updateSubmitButtonState() {
             const method = document.querySelector('input[name="generation_method"]:checked')?.value;
             let isConfirmed = false;
@@ -1559,72 +1349,46 @@
                     const contractsData = document.getElementById('contracts_data').value;
                     isConfirmed = contractsData && contractsData !== '[]';
                     break;
-
                 case 'excel_upload':
-                    // ✅ Fix: Use correct ID 'excel_data' (not confirmExcelDataBtn)
                     const excelData = document.getElementById('excel_data').value;
                     isConfirmed = excelData && excelData !== '[]';
                     break;
-
                 case 'previous_batch':
                     const hasPreviousBatchData = document.querySelector('input[name="previous_batch_data"]');
                     isConfirmed = hasPreviousBatchData && hasPreviousBatchData.value !== '';
                     break;
-
                 default:
                     isConfirmed = false;
                     break;
             }
 
             submitBtn.disabled = !isConfirmed;
-
-            if (submitBtn.disabled) {
-                submitBtn.title = 'Please confirm your selection first';
-            } else {
-                submitBtn.title = '';
-            }
+            submitBtn.title = submitBtn.disabled ? 'Please confirm your selection first' : '';
         }
 
-        // Listen for confirm actions in each mode
         function setupConfirmListeners() {
-            // Contracts mode confirm button
             const confirmContractsBtn = document.getElementById('confirmContractsData');
             if (confirmContractsBtn) {
-                // Store original click handler
-                const originalClick = confirmContractsBtn.onclick;
-                confirmContractsBtn.addEventListener('click', function() {
-                    setTimeout(() => updateSubmitButtonState(), 100);
-                });
+                confirmContractsBtn.addEventListener('click', () => setTimeout(updateSubmitButtonState, 100));
             }
 
-            // Excel mode confirm button
-            const confirmExcelBtn = document.getElementById('confirmExcelDataBtn');
+            const confirmExcelBtn = document.getElementById('confirmExcelData');
             if (confirmExcelBtn) {
-                confirmExcelBtn.addEventListener('click', function() {
-                    setTimeout(() => updateSubmitButtonState(), 100);
-                });
+                confirmExcelBtn.addEventListener('click', () => setTimeout(updateSubmitButtonState, 100));
             }
 
-            // Previous schedule confirm button
             const confirmScheduleBtn = document.getElementById('confirmScheduleBtn');
             if (confirmScheduleBtn) {
-                confirmScheduleBtn.addEventListener('click', function() {
-                    setTimeout(() => updateSubmitButtonState(), 100);
-                });
+                confirmScheduleBtn.addEventListener('click', () => setTimeout(updateSubmitButtonState, 100));
             }
 
-            // Also listen for method changes
             document.querySelectorAll('input[name="generation_method"]').forEach(radio => {
-                radio.addEventListener('change', () => {
-                    updateSubmitButtonState();
-                });
+                radio.addEventListener('change', updateSubmitButtonState);
             });
 
-            // Initial check
             updateSubmitButtonState();
         }
 
-        // ==================== FORM SUBMIT VALIDATION ====================
         if (form) {
             form.addEventListener('submit', function(e) {
                 const method = document.querySelector('input[name="generation_method"]:checked')?.value;
@@ -1645,48 +1409,37 @@
                             hasError = true;
                         }
                         break;
-
                     case 'excel_upload':
                         const excelData = document.getElementById('excel_data').value;
-
                         if (!excelData || excelData === '[]') {
                             showToast('Please load and confirm Excel data first', 'warning');
                             e.preventDefault();
                             hasError = true;
                             break;
                         }
-
-                        // Parse and validate for duplicates
                         try {
                             const selectedEmployees = JSON.parse(excelData);
-
                             if (selectedEmployees.length === 0) {
                                 showToast('Please select at least one employee from Excel', 'warning');
                                 e.preventDefault();
                                 hasError = true;
                                 break;
                             }
-
-                            // Check for duplicates in confirmed data
                             const staffIds = selectedEmployees.map(emp => emp.staff_id);
                             const duplicates = staffIds.filter((id, index) => staffIds.indexOf(id) !== index);
-
                             if (duplicates.length > 0) {
-                                showToast(
-                                    `Duplicate staff IDs found: ${duplicates.join(', ')}. Please fix and re-upload.`,
+                                showToast(`Duplicate staff IDs found: ${duplicates.join(', ')}. Please fix.`,
                                     'warning');
                                 e.preventDefault();
                                 hasError = true;
                                 break;
                             }
-
                         } catch (err) {
                             showToast('Invalid Excel data. Please re-upload.', 'warning');
                             e.preventDefault();
                             hasError = true;
                         }
                         break;
-
                     case 'previous_batch':
                         const previousBatchId = document.getElementById('previous_batch_id').value;
                         if (!previousBatchId) {
@@ -1710,14 +1463,12 @@
             });
 
             window.addEventListener('load', function() {
-                submitBtn.disabled = true; // Initially disabled until confirmation
+                submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-cogs me-2"></i> Generate Payroll';
                 setupConfirmListeners();
             });
 
-            window.addEventListener('pageshow', function() {
-                updateSubmitButtonState();
-            });
+            window.addEventListener('pageshow', updateSubmitButtonState);
         }
     </script>
 @endsection

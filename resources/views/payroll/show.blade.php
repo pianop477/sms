@@ -105,6 +105,48 @@
             background: #17a2b8;
             color: white;
         }
+
+        /* Scrollable Table Styles */
+        .table-scrollable {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e3e6f0;
+            border-radius: 8px;
+        }
+
+        .employee-table thead th {
+            position: sticky;
+            top: 0;
+            background: #f8f9fc;
+            z-index: 10;
+            border-bottom: 2px solid #e3e6f0;
+        }
+
+        .employee-table tbody tr:nth-child(even) {
+            background-color: #f8f9fc;
+        }
+
+        .employee-table tbody tr:hover {
+            background-color: #eef2ff;
+        }
+
+        @media (min-width: 1200px) {
+            .table-scrollable {
+                max-height: 400px;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1199px) {
+            .table-scrollable {
+                max-height: 400px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .table-scrollable {
+                max-height: 300px;
+            }
+        }
     </style>
 
     <div class="py-4">
@@ -172,7 +214,6 @@
                 </div>
 
                 {{-- Summary Statistics --}}
-                {{-- Summary Statistics with HESLB and Unofficial --}}
                 <div class="row mb-4">
                     <div class="col-md-2">
                         <div class="summary-box">
@@ -213,6 +254,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <div class="summary-box bg-success text-white">
@@ -278,21 +320,24 @@
                         <h5 class="mb-0"><i class="fas fa-users mr-2"></i> Employee Lists</h5>
                     </div>
                     <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table employee-table mb-0" id="myTable">
+                        <div class="table-scrollable">
+                            <table class="table employee-table mb-0">
                                 <thead>
-                                    <th>#</th>
-                                    <th>Staff ID</th>
-                                    <th>Employee Name</th>
-                                    <th>Staff Type</th>
-                                    <th class="text-end">Basic Salary</th>
-                                    <th class="text-end">Allowances</th>
-                                    <th class="text-end">Gross Pay</th>
-                                    <th class="text-end">NSSF</th>
-                                    <th class="text-end">PAYE</th>
-                                    <th class="text-end">HESLB</th>
-                                    <th class="text-end">Loan</th>
-                                    <th class="text-end">Net Pay</th>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Staff ID</th>
+                                        <th>Employee Name</th>
+                                        <th>Staff Type</th>
+                                        <th>Contract</th>
+                                        <th class="text-end">Basic Salary</th>
+                                        <th class="text-end">Allowances</th>
+                                        <th class="text-end">Gross Pay</th>
+                                        <th class="text-end">NSSF</th>
+                                        <th class="text-end">PAYE</th>
+                                        <th class="text-end">HESLB</th>
+                                        <th class="text-end">Loan</th>
+                                        <th class="text-end">Net Pay</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                     @forelse($batch['payroll_employees'] ?? [] as $index => $employee)
@@ -302,84 +347,99 @@
                                                 $employee['id'],
                                             );
 
-                                            // HESLB amount - make sure it's a float
-                                                $heslbAmount = isset($calculation['heslb'])
-                                                    ? (float) $calculation['heslb']
-                                                    : 0;
-
-                                                // Unofficial deductions
-                                                $totalUnofficial = 0;
-                                                $hasUnofficial = false;
-
-                                                if (
-                                                    isset($calculation['unofficial_deductions']) &&
-                                                    $calculation['unofficial_deductions']
-                                                ) {
-                                                    $unofficialDeductions = json_decode(
-                                                        $calculation['unofficial_deductions'],
-                                                        true,
-                                                    );
-                                                    if (
-                                                        is_array($unofficialDeductions) &&
-                                                        count($unofficialDeductions) > 0
-                                                    ) {
-                                                        $totalUnofficial = array_sum($unofficialDeductions);
-                                                        $hasUnofficial = $totalUnofficial > 0;
-                                                    }
-                                                }
-
-                                                // Amount to pay (net after all deductions including loans)
-                                                $amountToPay = isset($calculation['amount_to_pay'])
-                                                    ? (float) $calculation['amount_to_pay']
-                                                    : (isset($calculation['net_salary'])
-                                                        ? (float) $calculation['net_salary']
-                                                        : 0);
-
-                                                // Gross salary
-                                                $grossSalary = isset($calculation['gross_salary'])
-                                                    ? (float) $calculation['gross_salary']
-                                                    : 0;
-                                                $nssf = isset($calculation['nssf']) ? (float) $calculation['nssf'] : 0;
-                                                $paye = isset($calculation['paye_tax'])
-                                                    ? (float) $calculation['paye_tax']
+                                            $heslbAmount = isset($calculation['heslb'])
+                                                ? (float) $calculation['heslb']
                                                 : 0;
+
+                                            $totalUnofficial = 0;
+                                            $hasUnofficial = false;
+
+                                            if (
+                                                isset($calculation['unofficial_deductions']) &&
+                                                $calculation['unofficial_deductions']
+                                            ) {
+                                                $unofficialDeductions = json_decode(
+                                                    $calculation['unofficial_deductions'],
+                                                    true,
+                                                );
+                                                if (
+                                                    is_array($unofficialDeductions) &&
+                                                    count($unofficialDeductions) > 0
+                                                ) {
+                                                    $totalUnofficial = array_sum($unofficialDeductions);
+                                                    $hasUnofficial = $totalUnofficial > 0;
+                                                }
+                                            }
+
+                                            $amountToPay = isset($calculation['amount_to_pay'])
+                                                ? (float) $calculation['amount_to_pay']
+                                                : (isset($calculation['net_salary'])
+                                                    ? (float) $calculation['net_salary']
+                                                    : 0);
+
+                                            $grossSalary = isset($calculation['gross_salary'])
+                                                ? (float) $calculation['gross_salary']
+                                                : 0;
+                                            $nssf = isset($calculation['nssf']) ? (float) $calculation['nssf'] : 0;
+                                            $paye = isset($calculation['paye_tax'])
+                                                ? (float) $calculation['paye_tax']
+                                                : 0;
+
+                                            // Get contract type
+                                            $contractType =
+                                                $employee['contract_type'] ??
+                                                ($employee['is_provision_period'] ? 'provision' : 'new');
+                                            $isProvision =
+                                                $contractType === 'provision' ||
+                                                ($employee['is_provision_period'] ?? false);
                                         @endphp
-                                        <td class="text-center">{{ $index + 1 }}
-                                        <td><strong>{{ strtoupper($employee['staff_id']) }}</strong>
-                                        <td>{{ ucwords(strtolower($employee['employee_full_name'])) }}
-                                        <td>{{ ucfirst($employee['staff_type']) }}
-                                        <td class="text-end">{{ number_format($employee['basic_salary'], 0) }}
-                                        <td class="text-end">{{ number_format($employee['allowances'], 0) }}
-                                        <td class="fw-bold text-end">{{ number_format($grossSalary, 0) }}
-                                        <td class="text-end">{{ number_format($nssf, 0) }}
-                                        <td class="text-end">{{ number_format($paye, 0) }}
-
-                                            {{-- HESLB Column - Show only amount, no extra text --}}
-                                        <td class="text-end">
-                                            @if ($heslbAmount > 0)
-                                                <span
-                                                    class="text-danger fw-bold">{{ number_format($heslbAmount, 0) }}</span>
-                                            @else
-                                                <span class="text-muted">-</span>
-                                            @endif
-
-                                            {{-- Loan Column - Show only total amount, no breakdown --}}
-                                        <td class="text-end">
-                                            @if ($hasUnofficial)
-                                                <span
-                                                    class="text-danger fw-bold">{{ number_format($totalUnofficial, 0) }}</span>
-                                            @else
-                                                <span class="text-muted">-</span>
-                                            @endif
-
-                                            {{-- Net Pay Column - After all deductions including loans --}}
-                                        <td class="text-success fw-bold text-end">
-                                            {{ number_format($amountToPay, 0) }}
-                                            </tr>
-                                        @empty
-                                        <td colspan="12" class="text-center text-muted py-4">
-                                            <i class="fas fa-info-circle mr-1"></i> No employees found in this payroll
-                                            </tr>
+                                        <tr>
+                                            <td class="text-center">{{ $index + 1 }}</td>
+                                            <td><strong>{{ strtoupper($employee['staff_id']) }}</strong></td>
+                                            <td>{{ ucwords(strtolower($employee['employee_full_name'])) }}</td>
+                                            <td>{{ ucfirst($employee['staff_type']) }}</td>
+                                            <td class="text-center">
+                                                @if ($isProvision)
+                                                    <span class="badge bg-warning text-dark">
+                                                        <i class="fas fa-clock me-1"></i> Provision
+                                                    </span>
+                                                @else
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check-circle me-1"></i> New
+                                                    </span>
+                                                @endif
+                                            </td>
+                                            <td class="text-end">{{ number_format($employee['basic_salary'], 0) }}</td>
+                                            <td class="text-end">{{ number_format($employee['allowances'], 0) }}</td>
+                                            <td class="fw-bold text-end">{{ number_format($grossSalary, 0) }}</td>
+                                            <td class="text-end">{{ number_format($nssf, 0) }}</td>
+                                            <td class="text-end">{{ number_format($paye, 0) }}</td>
+                                            <td class="text-end">
+                                                @if ($heslbAmount > 0)
+                                                    <span
+                                                        class="text-danger fw-bold">{{ number_format($heslbAmount, 0) }}</span>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-end">
+                                                @if ($hasUnofficial)
+                                                    <span
+                                                        class="text-danger fw-bold">{{ number_format($totalUnofficial, 0) }}</span>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-success fw-bold text-end">
+                                                {{ number_format($amountToPay, 0) }}
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="13" class="text-center text-muted py-4">
+                                                <i class="fas fa-info-circle mr-1"></i> No employees found in this payroll
+                                            </td>
+                                        </tr>
                                     @endforelse
                                 </tbody>
                             </table>
@@ -393,7 +453,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // Helper function to show loading alert
         function showLoadingAlert(message) {
             Swal.fire({
                 title: message,
@@ -404,7 +463,6 @@
             });
         }
 
-        // Helper function to show success alert
         function showSuccessAlert(message, reload = true) {
             Swal.fire({
                 icon: 'success',
@@ -418,7 +476,6 @@
             });
         }
 
-        // Helper function to show error alert
         function showErrorAlert(message) {
             Swal.fire({
                 icon: 'error',
@@ -429,7 +486,6 @@
             });
         }
 
-        // Helper function to show confirmation dialog
         function showConfirmAlert(title, text, confirmText, callback) {
             Swal.fire({
                 title: title,
@@ -447,7 +503,6 @@
             });
         }
 
-        // ==================== CALCULATE PAYROLL ====================
         function calculatePayroll(hash) {
             showConfirmAlert(
                 'Calculate Payroll?',
@@ -489,7 +544,6 @@
             );
         }
 
-        // ==================== RECALCULATE PAYROLL ====================
         function recalculatePayroll(hash) {
             showConfirmAlert(
                 'Recalculate Payroll?',
@@ -501,7 +555,7 @@
                     btn.disabled = true;
                     btn.innerHTML = '<span class="spinner-border spinner-border-sm mr-1"></span>';
 
-                    showLoadingAlert('Recalculating...............');
+                    showLoadingAlert('Recalculating...');
 
                     fetch('{{ url('/payroll') }}/' + hash + '/recalculate', {
                             method: 'POST',
@@ -550,7 +604,6 @@
             );
         }
 
-        // ==================== FINALIZE PAYROLL ====================
         function finalizePayroll(hash) {
             showConfirmAlert(
                 'Finalize Payroll?',
@@ -592,7 +645,6 @@
             );
         }
 
-        // ==================== DELETE PAYROLL ====================
         function deletePayroll(hash) {
             showConfirmAlert(
                 'Delete Payroll?',
@@ -642,7 +694,6 @@
             );
         }
 
-        // ==================== GENERATE SALARY SLIPS ====================
         function generateSlips(hash) {
             showConfirmAlert(
                 'Generate Salary Slips?',
@@ -708,7 +759,6 @@
             );
         }
 
-        // ==================== DOWNLOAD SLIPS (Optional - with notification) ====================
         function downloadSlips(hash) {
             Swal.fire({
                 title: 'Downloading...',
@@ -724,7 +774,6 @@
             });
         }
 
-        // ==================== DOWNLOAD SUMMARY (Optional - with notification) ====================
         function downloadSummary(hash) {
             Swal.fire({
                 title: 'Downloading...',

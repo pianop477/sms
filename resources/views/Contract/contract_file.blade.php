@@ -115,8 +115,7 @@
             <p style="font-size:12px; text-transform:capitalize; margin:0; padding:0;"><b>Email:</b> <span
                     style="text-transform: lowercase; text-align:center">{{ strtolower($contract['school_email'] ?? 'N/A') }}</span>
                 |
-                <b>Phone:</b> {{ $contract['school_phone'] ?? 'N/A' }} |
-                {{ $contract['school_alternative_phone'] ?? 'N/A' }}
+                <b>Phone:</b> {{ $contract['school_phone'] ?? 'N/A' }}
             </p>
             {{-- <h5>Barua ya Kukubaliwa</h5> --}}
         </div>

@@ -253,8 +253,7 @@
                         <h4>the president's office - ralg</h4>
                         <h4>{{ Auth::user()->school->school_name }}</h4>
                         <p style="font-size:14px; text-transform:capitalize;"><b>Email:</b> <span style="text-transform: lowercase; text-align:center">{{strtolower(Auth::user()->school->school_email ?? 'N/A')}}</span> |
-                            <b>Phone:</b> {{Auth::user()->school->school_phone ?? 'N/A'}} |
-                            {{Auth::user()->school->school_alternative_phone ?? 'N/A'}}
+                            <b>Phone:</b> {{Auth::user()->school->school_phone ?? 'N/A'}}
                         </p>
                     </div>
                 </div>

@@ -190,8 +190,7 @@
                 <p style="font-size:14px; text-transform:capitalize; margin:0; padding:0;"><b>Email:</b> <span
                         style="text-transform: lowercase; text-align:center">{{ strtolower($schoolInfo->school_email ?? 'N/A') }}</span>
                     |
-                    <b>Phone:</b> {{ $schoolInfo->school_phone ?? 'N/A' }} |
-                    {{ $schoolInfo->school_alternative_phone ?? 'N/A' }}
+                    <b>Phone:</b> {{ $schoolInfo->school_phone ?? 'N/A' }}
                 </p>
             </td>
             <td width="15%" align="right">

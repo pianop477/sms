@@ -96,7 +96,6 @@
                             <table class="table table-deductions table-bordered" id="pendingTable">
                                 <thead>
                                     <th>#</th>
-                                    <th>Reference#</th>
                                     <th>Staff ID</th>
                                     <th>Employee Name</th>
                                     <th>Staff Type</th>
@@ -111,7 +110,6 @@
                                     @forelse($deductions['pending'] as $index => $deduction)
                                         <tr>
                                             <td class="text-center">{{ $index + 1 }}</td>
-                                            <td>{{ $deduction['reference_number'] ?? 'N/A' }}</td>
                                             <td><strong>{{ strtoupper($deduction['staff_id']) }}</strong></td>
                                             <td>{{ ucwords(strtolower($deduction['employee_name'])) }}</td>
                                             <td>{{ $deduction['staff_type'] }}</td>
@@ -530,7 +528,7 @@
                 if (result.isConfirmed) {
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    form.action = '{{ url('/deductions/staff-loans') }}/' + id + '/cancel';
+                    form.action = '{{ url('/deductions/staff-loan') }}/' + id + '/cancel';
                     form.innerHTML = '<input type="hidden" name="_token" value="{{ csrf_token() }}">';
                     document.body.appendChild(form);
                     form.submit();

@@ -87,8 +87,6 @@ class PayrollController extends Controller
      * ========================================================================
      * SEARCH EMPLOYEES (For Manual Entry)
      * ========================================================================
-     *
-     * Endpoint: GET /api/employees/search
      */
     public function searchEmployees(Request $request)
     {
@@ -202,9 +200,6 @@ class PayrollController extends Controller
      * ========================================================================
      * GET STAFF DETAILS BY TABLE ID
      * ========================================================================
-     *
-     * Hii method inatafuta mfanyakazi kwa ID yake kwenye source table
-     * (teachers, transports, other_staffs) na kurudisha details zake
      */
     private function getStaffDetailsById($sourceTableId, $schoolId)
     {
@@ -246,8 +241,6 @@ class PayrollController extends Controller
      * ========================================================================
      * GET ACTIVE CONTRACT FOR STAFF
      * ========================================================================
-     *
-     * Hii method inatafuta contract active ya mfanyakazi kwa ID yake
      */
     private function getActiveContractForStaff($staffId, $schoolId)
     {
@@ -281,57 +274,7 @@ class PayrollController extends Controller
      */
     public function index(Request $request)
     {
-        $schoolId = Auth::user()->school_id;
-        $previousSchedules = [];
-
-        try {
-            $response = Http::withToken(session('finance_api_token'))
-                ->timeout(60)
-                ->get($this->apiBaseUrl . '/payroll/batches', [
-                    'school_id' => $schoolId,
-                    'status' => $request->status,
-                    'year' => $request->year,
-                    'per_page' => 15
-                ]);
-
-            if (!$response->successful()) {
-                return back()->with('error', $response->json()['message'] ?? 'Failed to fetch payroll data');
-            }
-
-            $data = $response->json();
-
-            $batches = $data['data'] ?? [];
-            $statistics = [
-                'total_batches' => $data['total_batches'] ?? 0,
-                'finalized_count' => $data['finalized_count'] ?? 0,
-                'draft_count' => $data['draft_count'] ?? 0,
-                'total_employees' => $data['total_employees'] ?? 0,
-                'calculated' => $data['total_calculated'] ?? 0,
-            ];
-
-            // ✅ Add hash to each batch for URL
-            if (isset($batches['data']) && is_array($batches['data'])) {
-                foreach ($batches['data'] as &$batch) {
-                    $batch['hash'] = $this->hashId($batch['id']);
-                }
-            }
-
-            // Get previous schedules
-            $schedulesResponse = Http::withToken(session('finance_api_token'))
-                ->timeout(30)
-                ->get($this->apiBaseUrl . '/payroll/schedules', [
-                    'school_id' => $schoolId,
-                    'limit' => 10
-                ]);
-
-            if ($schedulesResponse->successful()) {
-                $previousSchedules = $schedulesResponse->json()['data'] ?? [];
-            }
-        } catch (\Exception $e) {
-            return back()->with('error', 'Connection error: ' . $e->getMessage());
-        }
-
-        return view('payroll.index', compact('batches', 'previousSchedules', 'statistics'));
+        return view('payroll.index');
     }
 
     // app/Http/Controllers/PayrollController.php (ShuleApp)
@@ -478,11 +421,6 @@ class PayrollController extends Controller
 
         // Reindex array
         $data = array_values($data);
-
-        // Log::info('Excel file parsed', [
-        //     'file_name' => $file->getClientOriginalName(),
-        //     'record_count' => count($data)
-        // ]);
 
         return $data;
     }
@@ -766,7 +704,8 @@ class PayrollController extends Controller
         $id = $this->decryptId($hash);
 
         if (!$id) {
-            return back()->with('error', 'Invalid payroll link');
+            Alert()->toast('Invalid payroll link. Please check the URL.', 'error');
+            return back();
         }
 
         // ✅ SAHIHISHA URL - Ongeza /batches/
@@ -778,17 +717,19 @@ class PayrollController extends Controller
                 ->get($url);
 
             if (!$response->successful()) {
-                return back()->with('error', 'Summary not found');
+                Alert()->toast('Summary not found', 'error');
+                return back();
             }
 
-            $time_stamp = time();
-            $filename = "payroll_{$time_stamp}.xlsx";
+            $date = now();
+            $filename = "payroll_{$date}.xlsx";
 
             return response($response->body())
                 ->header('Content-Type', 'application/pdf')
                 ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
         } catch (\Exception $e) {
-            return back()->with('error', 'Connection error: ' . $e->getMessage());
+            Alert()->toast('Connection error: ' . $e->getMessage(), 'error');
+            return back();
         }
     }
 
@@ -803,7 +744,8 @@ class PayrollController extends Controller
         $id = $this->decryptId($hash);
 
         if (!$id) {
-            return back()->with('error', 'Invalid payroll link');
+            Alert()->toast('Invalid payroll link. Please check the URL.', 'error');
+            return back();
         }
 
         // ✅ SAHIHISHA URL - Ongeza /batches/
@@ -815,18 +757,19 @@ class PayrollController extends Controller
                 ->get($url);
 
             if (!$response->successful()) {
-                return back()->with('error', 'Slips not found');
+                Alert()->toast($response->json()['message'] ?? 'Unknown error', 'error');
+                return back();
             }
 
-            $time = time();
-
-            $filename = "salary_slips_{$time}.pdf";
+            $date = now();
+            $filename = "salary_slips_{$date}.pdf";
 
             return response($response->body())
                 ->header('Content-Type', 'application/pdf')
                 ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
         } catch (\Exception $e) {
-            return back()->with('error', 'Connection error: ' . $e->getMessage());
+            Alert()->toast('Connection error: ' . $e->getMessage(), 'error');
+            return back();
         }
     }
 
