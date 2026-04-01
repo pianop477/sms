@@ -1083,7 +1083,7 @@
                     <div class="success-card">
                         <div class="success-header">
                             <i class="fas fa-check-circle"></i>
-                            <h2>HALALI</h2>
+                            <h2>ACTIVE</h2>
                             <p>Gate Pass Valid</p>
                         </div>
 
