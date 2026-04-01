@@ -34,6 +34,12 @@ class ContractController extends Controller
     //
     use ResolveApplicantTrait;
 
+    protected $appBaseUrl;
+
+    public function __construct() {
+        $this->appBaseUrl = config('app.url', 'http://localhost');
+    }
+
     private function getCurrentApplicant(?Request $request = null)
     {
         $request = $request ?? request();
@@ -1165,7 +1171,7 @@ class ContractController extends Controller
                 $schoolName = $school->name ?? 'Shule yako';
 
                 // Create portal login link - adjust according to your portal URL
-                $portalLink = route('welcome'); // Or specific staff portal URL
+                $portalLink = $this->appBaseUrl; // Or specific staff portal URL
 
                 if ($contract->contract_type == 'provision') {
                     $message = "Habari {$applicant['first_name']}, Ombi lako la mkataba wa muda wa matazamio limeshughulikiwa. Ingia kwenye portal kupitia $portalLink pakua barua, saini na kisha irudishwe ofisini. Asante.";
@@ -1259,7 +1265,7 @@ class ContractController extends Controller
                 $schoolName = $school->name ?? 'Shule yako';
 
                 // Create portal login link - adjust according to your portal URL
-                $portalLink = route('welcome'); // Or specific staff portal URL
+                $portalLink = $this->appBaseUrl; // Or specific staff portal URL
 
                 if ($contract->contract_type == 'provision') {
                     $message = "Habari {$applicant['first_name']}, Ombi lako la mkataba wa muda wa matazamio limekataliwa. Sababu: {$request->remarks}. Ingia kwenye portal kupitia $portalLink kwa maelekezo zaidi.";
@@ -1383,7 +1389,7 @@ class ContractController extends Controller
                 $endDate = Carbon::parse($contract->end_date)->format('d M Y');
 
                 // Create portal login link - adjust according to your portal URL
-                $portalLink = route('welcome'); // Or specific staff portal URL
+                $portalLink = $this->appBaseUrl; // Or specific staff portal URL
 
                 if ($contract->contract_type == 'provision') {
                     $message = "Habari {$applicant['first_name']}, Barua ya mkataba wa muda wa matazamio umekamilika na utaanza kutumika: {$startDate} hadi {$endDate}. Ingia kwenye portal kupitia $portalLink ili kupakua. Asante.";

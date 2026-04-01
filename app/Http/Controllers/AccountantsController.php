@@ -19,6 +19,12 @@ class AccountantsController extends Controller
 {
     //
 
+    protected $appBaseUrl;
+
+    public function __construct() {
+        $this->appBaseUrl = config('app.url', 'http://localhost');
+    }
+
     public function index()
     {
         $accountant = User::where('usertype', 5)
@@ -60,7 +66,7 @@ class AccountantsController extends Controller
 
             // send SMS using nextSMS API ***********************************************
                 $nextSmsService = new NextSmsService();
-                $url = "https://shuleapp.tech";
+                $url = $this->appBaseUrl;
                 $school = school::findOrFail($accountant->school_id);
                 $destination = $this->formatPhoneNumber($accountant->phone);
 

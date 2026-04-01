@@ -10,9 +10,20 @@ class school_fees_payment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'school_id', 'student_id', 'student_fee_id', 'amount',
-        'payment_mode', 'installment', 'approved_by', 'approved_at'
+        'school_id',
+        'student_id',
+        'student_fee_id',
+        'amount',
+        'payment_mode',
+        'installment',
+        'approved_by',
+        'approved_at'
     ];
 
     protected $guarded = ['id'];
+
+    public function student()
+    {
+        return $this->belongsTo(Student::class);
+    }
 }

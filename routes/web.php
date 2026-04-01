@@ -17,6 +17,7 @@ use App\Http\Controllers\EmployeeStatementController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\ExpenditureController;
 use App\Http\Controllers\ExpenseCategoryController;
+use App\Http\Controllers\FeeStructureController;
 use App\Http\Controllers\GeneratedReportController;
 use App\Http\Controllers\HeslbController;
 use App\Http\Controllers\HomeController;
@@ -39,6 +40,7 @@ use App\Http\Controllers\SubjectsController;
 use App\Http\Controllers\TeachersController;
 use App\Http\Controllers\TimetableController;
 use App\Http\Controllers\TodRosterController;
+use App\Http\Controllers\TokenController;
 use App\Http\Controllers\TransportController;
 use App\Http\Controllers\UnofficialDeductionController;
 use App\Http\Controllers\UsersController;
@@ -699,6 +701,24 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         });
 
         Route::get('/payroll-data', [PayrollController::class, 'getPayrollData'])->name('payroll.data');
+
+        Route::prefix('fee-structures')->group(function () {
+            // Main structure routes
+            Route::get('/', [FeeStructureController::class, 'index'])->name('fee-structures.index');
+            Route::get('/create', [FeeStructureController::class, 'create'])->name('fee-structures.create');
+            Route::post('/', [FeeStructureController::class, 'store'])->name('fee-structures.store');
+            Route::put('/{feeStructure}', [FeeStructureController::class, 'update'])->name('fee-structures.update');
+
+            // Installment management
+            Route::get('/{feeStructure}/installments', [FeeStructureController::class, 'manageInstallments'])->name('fee-structures.installments');
+            Route::post('/{feeStructure}/installments', [FeeStructureController::class, 'storeInstallment'])->name('fee-structures.installments.store');
+
+            // IMPORTANT: These routes must be AFTER the routes with {feeStructure} parameter
+            // and BEFORE the routes with {installment} parameter to avoid conflicts
+            Route::get('/installments/{installment}/edit', [FeeStructureController::class, 'editInstallment'])->name('fee-structures.installments.edit');
+            Route::put('/installments/{installment}', [FeeStructureController::class, 'updateInstallment'])->name('fee-structures.installments.update');
+            Route::delete('/installments/{installment}', [FeeStructureController::class, 'deleteInstallment'])->name('fee-structures.installments.delete');
+        });
     });
 
     // routes/web.php - ShuleApp
@@ -707,6 +727,14 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
 
     // end of auth
 });
+
+// Token Verification Routes
+Route::get('/tokens/verify', [TokenController::class, 'showVerificationForm'])->name('tokens.verify');
+Route::post('/tokens/verify', [TokenController::class, 'verifyToken'])->name('tokens.verify.submit');
+
+// Token resend routes
+Route::post('/tokens/resend', [TokenController::class, 'resendToken'])->name('tokens.resend');
+Route::get('/tokens/resend/form', [TokenController::class, 'showResendForm'])->name('tokens.resend.form');
 
 // ===== PUBLIC GATEWAY ROUTES (No Auth) =====
 Route::prefix('contract-gateway')->name('contract.gateway.')->group(function () {

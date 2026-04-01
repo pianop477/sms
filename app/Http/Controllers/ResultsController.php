@@ -38,11 +38,13 @@ class ResultsController extends Controller
 {
     protected $beemSmsService;
     protected $nextSmsService;
+    protected $appBaseUrl;
 
     public function __construct(BeemSmsService $beemSmsService, NextSmsService $nextSmsService)
     {
         $this->beemSmsService = $beemSmsService;
         $this->nextSmsService = $nextSmsService;
+        $this->appBaseUrl = config('app.url', 'http://localhost');
     }
 
     public function index($student)
@@ -1465,7 +1467,7 @@ class ResultsController extends Controller
                 }
 
                 $totalStudents = $rankedStudents->count();
-                $url = "https://shuleapp.tech";
+                $url = $this->appBaseUrl;
                 $dateFormat = Carbon::parse($date)->format('d/m/Y');
                 $nextSmsService = new NextSmsService();
                 $sender = $schools->sender_id ?? "SHULE APP";
@@ -2318,7 +2320,7 @@ class ResultsController extends Controller
             $fullName = $studentInfo->first_name . ' ' . $studentInfo->last_name;
             $examination = $results->first()->exam_type;
             $schoolName = strtoupper($results->first()->school_name);
-            $url = 'https://shuleapp.tech';
+            $url = $this->appBaseUrl;
             $dateFormat = Carbon::parse($date)->format('d/m/Y');
 
             // Find parent phone
@@ -3119,7 +3121,7 @@ class ResultsController extends Controller
                 $reportDate = Carbon::parse($reports->created_at)->format('d-m-Y');
                 $schoolInfo = school::find($schoolId);
                 $sender = $schoolInfo->sender_id ?? "SHULE APP";
-                $link = "https://shuleapp.tech";
+                $link = $this->appBaseUrl;
 
                 // ==== REKEDISHA: Build subject results part of the message ====
                 $subjectResultsText = "";
@@ -3739,7 +3741,7 @@ class ResultsController extends Controller
             $successCount = 0;
             $failCount = 0;
             $schoolInfo = school::find($schoolId);
-            $link = "https://shuleapp.tech";
+            $link = $this->appBaseUrl;
             $sender = $schoolInfo->sender_id ?? "SHULE APP";
             $reportDate = Carbon::parse($report->created_at)->format('d-m-Y');
             $nextSmsService = new NextSmsService();

@@ -7,7 +7,7 @@
         "productivity",
         "school"
     ],
-    "start_url": "/?v=2026.1",
+    "start_url": "/?v=2026.04.01.12",
     "display": "standalone",
     "display_override": [
         "window-controls-overlay",
@@ -18,24 +18,24 @@
     "color": "#2C3E50",
     "orientation": "portrait",
     "scope": "/",
-    "id": "shuleapp-2026-1",
-    "lang": "en",
+    "id": "shuleapp-2026.04.01.12",
+    "lang": "sw",
     "dir": "auto",
     "icons": [
         {
-            "src": "/icons/new_icon1.png?v=2026.2",
+            "src": "/icons/new_icon1.png?v=2026.04.01.12",
             "sizes": "96x96",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/icons/new_icon2.png?v=2026.2",
+            "src": "/icons/new_icon2.png?v=2026.04.01.12",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/icons/new_icon3.png?v=2026.2",
+            "src": "/icons/new_icon3.png?v=2026.04.01.12",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
@@ -47,7 +47,8 @@
         "Cross Platform",
         "Offline Capabilities",
         "Real-time Updates",
-        "Secure Data Handling"
+        "Secure Data Handling",
+        "Offline Token Verification"
     ],
     "protocol_handlers": [
         {

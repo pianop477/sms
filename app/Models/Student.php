@@ -21,7 +21,9 @@ class Student extends Model
         'transport_id',
         'school_id',
         'admission_number',
-        'status', 'graduated', 'graduated_at'
+        'status',
+        'graduated',
+        'graduated_at'
     ];
 
     protected $guarded = ['id', 'created_at', 'updated_at'];
@@ -64,5 +66,19 @@ class Student extends Model
     public function transport()
     {
         return $this->belongsTo(Transport::class);
+    }
+
+    public function feeAssignment()
+    {
+        return $this->hasOne(StudentFeeAssignment::class, 'student_id')->where('is_active', true);
+    }
+    public function payments()
+    {
+        return $this->hasMany(school_fees_payment::class, 'student_id');
+    }
+
+    public function tokens()
+    {
+        return $this->hasMany(FeeClearanceToken::class);
     }
 }

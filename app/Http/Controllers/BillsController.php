@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Grade;
+use App\Models\Parents;
 use App\Models\payment_service;
 use App\Models\school;
 use App\Models\school_fees;
 use App\Models\school_fees_payment;
 use App\Models\Student;
+use App\Services\FeeClearanceService;
 use App\Services\NextSmsService;
+use App\Traits\formatPhoneTrait;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Exception;
@@ -22,6 +25,13 @@ use Vinkla\Hashids\Facades\Hashids;
 class BillsController extends Controller
 {
     //
+
+    protected $appBaseUrl;
+
+    public function __construct() {
+        $this->appBaseUrl = config('app.url', 'http://localhost');
+    }
+    use formatPhoneTrait;
 
     public function index(Request $request)
     {
@@ -548,7 +558,7 @@ class BillsController extends Controller
                     'showingText' => $showingText
                 ]);
             } catch (\Exception $e) {
-                \Log::error('Error in feesPayment AJAX: ' . $e->getMessage());
+                Log::error('Error in feesPayment AJAX: ' . $e->getMessage());
                 return response()->json([
                     'success' => false,
                     'message' => 'Error loading transactions. Please try again.'
@@ -596,18 +606,16 @@ class BillsController extends Controller
         ]);
 
         try {
-            // Decode the bill ID
-            $billId = Hashids::decode($request->bill_id);
-            if (empty($billId)) {
+            // Decode bill ID
+            $billIdDecoded = Hashids::decode($request->bill_id);
+            if (empty($billIdDecoded)) {
                 Alert()->toast('Invalid bill reference', 'error');
                 return back();
             }
+            $billId = $billIdDecoded[0];
 
-            $billId = $billId[0];
-
-            // Get the bill/school_fee record
-            $bill = school_fees::where('id', $billId)->first();
-
+            // Get bill record with student
+            $bill = school_fees::with('student')->find($billId);
             if (!$bill) {
                 Alert()->toast('Bill not found', 'error');
                 return back();
@@ -619,37 +627,174 @@ class BillsController extends Controller
                 return back();
             }
 
-            // Check if amount doesn't exceed balance
-            $balance = $bill->amount - $bill->total_paid;
-            // if ($request->amount > $balance) {
-            //     Alert()->toast('Payment amount exceeds outstanding balance', 'error');
-            //     return back();
-            // }
-
-            // Get the latest installment
+            // Get next installment number
             $latestInstallment = school_fees_payment::where('student_fee_id', $billId)
                 ->max('installment');
+            $installmentNumber = $latestInstallment ? $latestInstallment + 1 : 1;
 
-            $installment = $latestInstallment ? $latestInstallment + 1 : 1;
-
-            // Create payment record
+            // Record the payment
             $newPayment = school_fees_payment::create([
                 'school_id' => $user->school_id,
                 'student_id' => $bill->student_id,
                 'student_fee_id' => $billId,
                 'amount' => $request->amount,
                 'payment_mode' => $request->payment,
-                'installment' => $installment,
+                'installment' => $installmentNumber,
                 'payment_note' => $request->payment_note,
                 'approved_by' => $user->id,
-                'approved_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                'approved_at' => Carbon::now(),
             ]);
 
-            Alert()->toast('Payment has been recorded successfully', 'success');
+            // Update bill total paid
+            $bill->total_paid += $request->amount;
+            $bill->status = $bill->total_paid >= $bill->amount ? 'paid' : 'partially_paid';
+            $bill->save();
+
+            // 🔥 Process fee clearance and send token if eligible
+            $student = $bill->student;
+            $tokenSent = false;
+            $tokenData = null;
+
+            if ($student) {
+                $service = new FeeClearanceService();
+
+                // Log before processing
+                // Log::info('Processing fee clearance after payment', [
+                //     'student_id' => $student->id,
+                //     'student_name' => $student->first_name . ' ' . $student->last_name,
+                //     'payment_amount' => $request->amount,
+                //     'payment_mode' => $request->payment,
+                //     'timestamp' => Carbon::now()->toDateTimeString()
+                // ]);
+
+                // Process token (only if eligible and not already sent)
+                $token = $service->process($student);
+
+                if ($token) {
+                    // Check if this is a newly created token
+                    $isNewToken = $token->wasRecentlyCreated ?? false;
+
+                    if ($isNewToken) {
+                        // New token was created - send SMS
+                        $tokenSent = true;
+                        $tokenData = $token;
+
+                        // Get parent details - correct relationship: parents.user
+                        $parent = Parents::with('user')
+                            ->where('id', $student->parent_id)
+                            ->first();
+
+                        $school = School::find($student->school_id);
+
+                        // Get installment name safely
+                        $installmentName = 'Current Term';
+                        if ($token->relationLoaded('installment') && $token->installment) {
+                            $installmentName = $token->installment->name;
+                        } else {
+                            $token->load('installment');
+                            if ($token->installment) {
+                                $installmentName = $token->installment->name;
+                            }
+                        }
+
+                        // Format token for SMS (add dash for readability)
+                        $formattedToken = substr($token->token, 0, 3) . '-' . substr($token->token, 3, 3);
+                        $expiryDate = Carbon::parse($token->expires_at)->format('d/m/Y');
+
+                        // Check parent phone - correct path: parent->user->phone
+                        if ($parent && $parent->user && $parent->user->phone) {
+                            $parentPhone = $parent->user->phone;
+
+                            // Prepare message
+                            $link =  $this->appBaseUrl . '/tokens/verify';
+                            // Prepare message
+                            $message = "Habari, Gate Pass No yako ni:.\n\n" .
+                                "{$formattedToken}\n\n" .
+                                "Kwa ajili ya: {$student->first_name} {$student->last_name}\n" .
+                                "Muda wa kuisha: {$expiryDate}\n\n" .
+                                "Hakiki kupitia: {$link}\n\n" .
+                                "Onesha Getini au Kwenye School Bus.\n\n" .
+                                "Asante.";
+
+
+                            // Send SMS
+                            $this->sendGatepassToken($school, $parentPhone, $message);
+
+                            // Log::info('Gate pass token SMS sent', [
+                            //     'student_id' => $student->id,
+                            //     'token' => $token->token,
+                            //     'formatted_token' => $formattedToken,
+                            //     'phone' => $parentPhone,
+                            //     'installment' => $installmentName
+                            // ]);
+                        } else {
+                            Log::warning('Cannot send SMS - parent phone not found', [
+                                'student_id' => $student->id,
+                                'parent_id' => $student->parent_id,
+                                'has_parent' => !is_null($parent),
+                                'has_user' => $parent ? !is_null($parent->user) : false,
+                                'has_phone' => $parent && $parent->user ? !empty($parent->user->phone) : false
+                            ]);
+                        }
+                    } else {
+                        // Token already existed - don't send SMS again
+                        // Log::info('Token already existed, not sending SMS', [
+                        //     'student_id' => $student->id,
+                        //     'token' => $token->token,
+                        //     'created_at' => $token->created_at,
+                        //     'expires_at' => $token->expires_at
+                        // ]);
+                    }
+                } else {
+                    // Student not eligible
+                    // Log::info('Student not eligible for token', [
+                    //     'student_id' => $student->id,
+                    //     'student_name' => $student->first_name . ' ' . $student->last_name,
+                    //     'reason' => 'Insufficient payment or no active installment'
+                    // ]);
+                }
+            }
+
+            // Prepare success message
+            $successMessage = 'Payment recorded successfully';
+            if ($tokenSent) {
+                $successMessage .= ' and gate pass token sent to parent\'s phone!';
+            } elseif ($tokenData) {
+                $successMessage .= ' Gate pass token was already sent previously.';
+            } else {
+                $successMessage .= ' Student not yet eligible for gate pass token.';
+            }
+
+            Alert()->toast($successMessage, 'success');
             return back();
         } catch (Exception $e) {
+            Log::error('Payment recording failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'bill_id' => $request->bill_id ?? null,
+                'amount' => $request->amount ?? null
+            ]);
             Alert()->toast('Error: ' . $e->getMessage(), 'error');
             return back();
+        }
+    }
+
+    private function sendGatepassToken(school $school, $phone, $message)
+    {
+        try {
+            $smsService = new NextSmsService();
+
+            $payload = [
+                'from' => $school->sender_id ?? 'SHULE APP',
+                'to' => $this->formatPhoneNumberForSms($phone),
+                'text' => $message,
+                'reference' => 'fee_clearance_' . time(),
+            ];
+
+            // $smsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+            // Log::info('Gate pass token SMS sent to ' . $payload['text'] . ' for phone: ' . $payload['to']);
+        } catch (Exception $e) {
+            Log::error('Failed to send gate pass token SMS: ' . $e->getMessage());
         }
     }
 
@@ -1109,18 +1254,18 @@ class BillsController extends Controller
             // find important information so as to prepare sms payload
             $account = '';
             if ($bill->collection_account != null) {
-                $account = 'Tumia Account#: ' . strtoupper($bill->collection_account);
+                $account = 'Tumia Account No: ' . strtoupper($bill->collection_account);
             } else {
-                $account = 'Tumia Control#: ' . strtoupper($bill->control_number);
+                $account = 'Tumia Control No: ' . strtoupper($bill->control_number);
             }
 
             // dd($account);
             $studentName = strtoupper($bill->first_name . ' ' . $bill->last_name);
             $paidAmount = (float) $bill->total_paid;
             $billedAmount = (float) $bill->amount;
-            $dueDate = Carbon::parse($bill->due_date)->format('d-m-Y');
+            $dueDate = Carbon::parse($bill->due_date)->format('d/m/Y');
             $balance = $billedAmount - $paidAmount;
-            $destinationPhone = $this->formatPhoneNumber($bill->parent_phone);
+            $destinationPhone = $this->formatPhoneNumberForSms($bill->parent_phone);
             $service = strtoupper($bill->service_name);
 
             $formattedPaidAmount = number_format($paidAmount);
@@ -1131,7 +1276,7 @@ class BillsController extends Controller
             $sendBillBySms = new NextSmsService();
             $user = Auth::user();
             $school = school::findOrFail($user->school_id);
-            $message = "Habari! Unakumbushwa kulipa {$service} ya {$studentName}, Tsh. {$formattedBalance}. {$account} kulipa kabla ya {$dueDate}. Tafadhali lipa kwa wakati kuepuka usumbufu";
+            $message = "Unakumbushwa kulipa {$service} ya {$studentName}, Tsh. {$formattedBalance}. {$account} kulipa kabla ya {$dueDate}. Lipa kwa wakati kuepuka usumbufu";
 
             $senderId = $school->sender_id ?? 'SHULE APP';
             $payload = [
@@ -1193,7 +1338,7 @@ class BillsController extends Controller
                     }
 
                     // Format the phone number
-                    $destinationPhone = $this->formatPhoneNumber($bill->parent_phone);
+                    $destinationPhone = $this->formatPhoneNumberForSms($bill->parent_phone);
 
                     if (empty($destinationPhone)) {
                         $failedCount++;
@@ -1206,26 +1351,26 @@ class BillsController extends Controller
                     $billedAmount = (float) $bill->amount;
                     $paidAmount = (float) $bill->total_paid;
                     $balance = $billedAmount - $paidAmount;
-                    $dueDate = Carbon::parse($bill->due_date)->format('d-m-Y');
+                    $dueDate = Carbon::parse($bill->due_date)->format('d/m/Y');
                     $service = strtoupper($bill->service_name);
 
                     // Determine account/control number to use
                     $account = '';
                     if (!empty($bill->collection_account)) {
-                        $account = 'Tumia Account#: ' . strtoupper($bill->collection_account);
+                        $account = 'Tumia Account No: ' . strtoupper($bill->collection_account);
                     } else {
-                        $account = 'Tumia Control#: ' . strtoupper($bill->control_number);
+                        $account = 'Tumia Control No: ' . strtoupper($bill->control_number);
                     }
 
                     $formattedBalance = number_format($balance);
                     $formattedBilledAmount = number_format($billedAmount);
 
                     // Create message
-                    $message = "Habari! Unakumbushwa kulipa {$service} ya {$studentName}, ";
+                    $message = "Unakumbushwa kulipa {$service} ya {$studentName}, ";
                     $message .= "JUMLA YA BILI: Tsh. {$formattedBilledAmount}, ";
                     $message .= "UMELIPA: Tsh." . number_format($paidAmount) . ", ";
-                    $message .= "DENI LAKO: Tsh. {$formattedBalance}. ";
-                    $message .= "{$account} kulipa kabla ya {$dueDate}. Tafadhali lipa kwa wakati kuepuka usumbufu";
+                    $message .= "DENI: Tsh. {$formattedBalance}. ";
+                    $message .= "{$account} kulipa kabla ya {$dueDate}. Lipa kwa wakati kuepuka usumbufu";
 
                     // Prepare SMS payload
                     $payload = [

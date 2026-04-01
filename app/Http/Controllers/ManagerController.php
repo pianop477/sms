@@ -22,7 +22,15 @@ use Vinkla\Hashids\Facades\Hashids;
 class ManagerController extends Controller
 {
 
-    public function index() {
+    protected $appBaseUrl;
+
+    public function __construct()
+    {
+        $this->appBaseUrl = config('app.url', 'http://localhost');
+    }
+
+    public function index()
+    {
         $managers = User::where('usertype', '=', 2, 'AND', 'status', '=', 1)->get();
         $schools = school::where('status', '=', 1)->get()->orderBy('school_name', 'ASC');
         return view('Schools.create', ['managers' => $managers, 'schools' => $schools]);
@@ -73,10 +81,10 @@ class ManagerController extends Controller
             ]);
 
             // Generate login link
-            $link = config('app.url') ?? 'https://shuleapp.tech';
+            $link = $this->appBaseUrl;
 
             // Create SMS message
-            $message = "Hello ". strtoupper($user->first_name) .", Welcome to ShuleApp. Your Username is: {$user->phone} Password: shule2025. Use link {$link} to Login and change password Thank you.";
+            $message = "Hello " . strtoupper($user->first_name) . ", Welcome to ShuleApp. Your Username is: {$user->phone} Password: shule2025. Use link {$link} to Login and change password Thank you.";
 
             // Get school for SMS sender ID
             $school = School::find($user->school_id);
@@ -99,12 +107,11 @@ class ManagerController extends Controller
                     // Log::info('SMS Response:', $response);
 
                     // If SMS fails, log but don't stop
-                    if(!$response['success'] ?? false) {
+                    if (!$response['success'] ?? false) {
                         Log::warning('SMS failed: ' . ($response['error'] ?? 'Unknown error'));
                         // Alert()->toast($response['message'], 'error');
                         return back();
                     }
-
                 } catch (\Exception $e) {
                     // Log::error('SMS Exception: ' . $e->getMessage());
                     Alert()->toast($e->getMessage(), 'error');
@@ -114,11 +121,9 @@ class ManagerController extends Controller
 
             Alert()->toast('Manager registered successfully. Password sent via SMS.', 'success');
             return redirect()->back();
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Laravel handles validation errors automatically
             return redirect()->back()->withErrors($e->validator)->withInput();
-
         } catch (\Exception $e) {
             Log::error('User registration failed: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
@@ -150,10 +155,10 @@ class ManagerController extends Controller
     {
         //
         $users = User::query()->join('schools', 'schools.id', '=', 'users.school_id')
-                        ->select('users.*', 'schools.school_name', 'schools.school_reg_no')
-                        ->where('users.usertype', 2)
-                        ->orderBy('users.first_name')
-                        ->get();
+            ->select('users.*', 'schools.school_name', 'schools.school_reg_no')
+            ->where('users.usertype', 2)
+            ->orderBy('users.first_name')
+            ->get();
         return view('Managers.managers_password_reset', compact('users'));
     }
 
@@ -194,42 +199,41 @@ class ManagerController extends Controller
         // return $user_status;
 
         $status = $request->input('status', 0);
-        foreach($user_status as $row) {
+        foreach ($user_status as $row) {
             // Update the status of the user
             $row->status = $status;
             $row->update();
         }
-            // Update the status of the school associated with the user
-            $school_info = School::findOrFail($school_id);
-            $school_info->status = $status;
-            $school_info->update();
+        // Update the status of the school associated with the user
+        $school_info = School::findOrFail($school_id);
+        $school_info->status = $status;
+        $school_info->update();
 
-                // Update the status of all users associated with the school
-                User::where('school_id', $school_info->id)->whereIn('usertype', [3,4,5])->update(['status' => $status]);
+        // Update the status of all users associated with the school
+        User::where('school_id', $school_info->id)->whereIn('usertype', [3, 4, 5])->update(['status' => $status]);
 
-                // Update the status of all teachers associated with the school
-                Teacher::where('school_id', $school_info->id)->update(['status' => $status]);
+        // Update the status of all teachers associated with the school
+        Teacher::where('school_id', $school_info->id)->update(['status' => $status]);
 
-                // Update the status of all parents associated with the school
-                Parents::where('school_id', $school_info->id)->update(['status' => $status]);
+        // Update the status of all parents associated with the school
+        Parents::where('school_id', $school_info->id)->update(['status' => $status]);
 
-                //update the status of all classes associated with the school
-                Grade::where('school_id', $school_info->id)->update(['status' => $status]);
+        //update the status of all classes associated with the school
+        Grade::where('school_id', $school_info->id)->update(['status' => $status]);
 
-                //update the status of all subjects associated with the school
-                Subject::where('school_id', $school_info->id)->update(['status' => $status]);
+        //update the status of all subjects associated with the school
+        Subject::where('school_id', $school_info->id)->update(['status' => $status]);
 
-                //update the status of all transport associated with the school
-                Transport::where('school_id', $school_info->id)->update(['status' => $status]);
+        //update the status of all transport associated with the school
+        Transport::where('school_id', $school_info->id)->update(['status' => $status]);
 
-            if($school_info) {
-                Alert()->toast('School has been deactivated Successfully', 'success');
-                return back();
-            } else {
-                Alert()->toast('Something went wrong, try again', 'error');
-                return back();
-            }
-
+        if ($school_info) {
+            Alert()->toast('School has been deactivated Successfully', 'success');
+            return back();
+        } else {
+            Alert()->toast('Something went wrong, try again', 'error');
+            return back();
+        }
     }
 
     public function activateStatus($school, Request $request)
@@ -239,7 +243,7 @@ class ManagerController extends Controller
         // $school_id = $user_status->school_id;
         $status = $request->input('status', 1);
 
-        foreach($user_status as $row) {
+        foreach ($user_status as $row) {
             // Update the status of the user
             $row->status = $status;
             $row->update();
@@ -250,47 +254,54 @@ class ManagerController extends Controller
         $school_info->status = $status;
         $school_info->update();
 
-            // Update the status of all users associated with the school
-            User::where('school_id', $school_info->id)->whereIn('usertype', [3,4,5])->update(['status' => $status]);
+        // Update the status of all users associated with the school
+        User::where('school_id', $school_info->id)->whereIn('usertype', [3, 4, 5])->update(['status' => $status]);
 
-            // Update the status of all teachers associated with the school
-            Teacher::where('school_id', $school_info->id)->update(['status' => $status]);
+        // Update the status of all teachers associated with the school
+        Teacher::where('school_id', $school_info->id)->update(['status' => $status]);
 
-            // Update the status of all parents associated with the school
-            Parents::where('school_id', $school_info->id)->update(['status' => $status]);
+        // Update the status of all parents associated with the school
+        Parents::where('school_id', $school_info->id)->update(['status' => $status]);
 
-            //update the status of all classes associated with the school
-            Grade::where('school_id', $school_info->id)->update(['status' => $status]);
+        //update the status of all classes associated with the school
+        Grade::where('school_id', $school_info->id)->update(['status' => $status]);
 
-            //update the status of all subjects associated with the school
-            Subject::where('school_id', $school_info->id)->update(['status' => $status]);
+        //update the status of all subjects associated with the school
+        Subject::where('school_id', $school_info->id)->update(['status' => $status]);
 
-            //update the status of all transport associated with the school
-            Transport::where('school_id', $school_info->id)->update(['status' => $status]);
+        //update the status of all transport associated with the school
+        Transport::where('school_id', $school_info->id)->update(['status' => $status]);
 
-        if($school_info) {
+        if ($school_info) {
             Alert()->toast('School has been activated successfully', 'success');
             return back();
         }
     }
 
-    public function show ($id)
+    public function show($id)
     {
         $decoded = Hashids::decode($id);
         $user = User::query()
-                ->join('schools', 'schools.id', '=', 'users.school_id')
-                ->select('users.*', 'schools.school_name', 'schools.school_reg_no', 'schools.postal_address', 'schools.postal_name', 'schools.country',
-                    'schools.id as school_id')
-                ->findOrFail($decoded[0]);
+            ->join('schools', 'schools.id', '=', 'users.school_id')
+            ->select(
+                'users.*',
+                'schools.school_name',
+                'schools.school_reg_no',
+                'schools.postal_address',
+                'schools.postal_name',
+                'schools.country',
+                'schools.id as school_id'
+            )
+            ->findOrFail($decoded[0]);
         return view('Managers.manager_profile', compact('user'));
     }
 
-    public function updateProfile (Request $request, $id)
+    public function updateProfile(Request $request, $id)
     {
         $decoded = Hashids::decode($id);
         $user = User::findOrFail($decoded[0]);
 
-        if(!$user) {
+        if (!$user) {
             Alert()->toast('User not found', 'error');
             return back();
         }
@@ -298,8 +309,8 @@ class ManagerController extends Controller
         $this->validate($request, [
             'fname' => 'required|string|max:255',
             'lname' => 'required|string|max:255',
-            'email' => 'nullable|string|unique:users,email,'.$decoded[0],
-            'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,'.$decoded[0],
+            'email' => 'nullable|string|unique:users,email,' . $decoded[0],
+            'phone' => 'required|regex:/^[0-9]{10}$/|unique:users,phone,' . $decoded[0],
             'gender' => 'required|string|max:255',
             'school' => 'required|exists:schools,id',
         ]);
@@ -323,15 +334,15 @@ class ManagerController extends Controller
         $user = User::findOrFail($decoded[0]);
 
 
-        if(!$user) {
+        if (!$user) {
             Alert()->toast('User not found', 'error');
             return back();
         }
 
         //check if user has image in directory storage/app/public/profile and delete it
-        if($user->image) {
-            $image_path = storage_path('app/public/profile/'.$user->image);
-            if(file_exists($image_path)) {
+        if ($user->image) {
+            $image_path = storage_path('app/public/profile/' . $user->image);
+            if (file_exists($image_path)) {
                 unlink($image_path);
             }
         }
@@ -341,5 +352,4 @@ class ManagerController extends Controller
         Alert()->toast('User deleted successfully', 'success');
         return back();
     }
-
 }

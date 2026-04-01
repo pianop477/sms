@@ -301,8 +301,17 @@
                                 </li>
                                 {{-- Services --}}
                                 <li>
-                                    <a href="{{ route('services.index') }}"><i
-                                            class="fas fa-wrench"></i><span>Services</span></a>
+                                    <a href="javascript:void(0)"><i class="fas fa-gears"></i><span> Advanced Settings </span></a>
+                                    <ul class="submenu">
+                                        <li>
+                                            <a href="{{ route('services.index') }}"><i
+                                                    class="fas fa-wrench"></i><span> Services</span></a>
+                                        </li>
+                                        <li>
+                                            <a href="{{route('fee-structures.index')}}"><i
+                                                    class="fas fa-file-archive-o"></i><span> Fee structure</span></a>
+                                        </li>
+                                    </ul>
                                 </li>
                                 {{-- Payroll Management (NEW) --}}
                                 <li>

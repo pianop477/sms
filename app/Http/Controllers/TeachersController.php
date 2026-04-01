@@ -28,11 +28,13 @@ class TeachersController extends Controller
 {
     protected $beemSmsService;
     protected $nextSmsService;
+    protected $appBaseUrl;
 
     public function __construct(BeemSmsService $beemSmsService, NextSmsService $nextSmsService)
     {
         $this->beemSmsService = $beemSmsService;
         $this->nextSmsService = $nextSmsService;
+        $this->appBaseUrl = config('app.url', 'http://localhost');
     }
 
 
@@ -165,7 +167,7 @@ class TeachersController extends Controller
             DB::commit();
 
             // notify teacher through sms using Beem API *************************************************
-            $url = "https://shuleapp.tech";
+            $url = $this->appBaseUrl;
 
             $beemSmsService = new BeemSmsService();
             $sourceAddr = $school->sender_id ?? 'shuleApp'; // Get sender ID

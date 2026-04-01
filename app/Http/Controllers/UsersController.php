@@ -26,11 +26,13 @@ class UsersController extends Controller
 {
     protected $beemSmsService;
     protected $nextSmsService;
+    protected $appBaseUrl;
 
     public function __construct(BeemSmsService $beemSmsService, NextSmsService $nextSmsService)
     {
         $this->beemSmsService = $beemSmsService;
         $this->nextSmsService = $nextSmsService;
+        $this->appBaseUrl = config('app.url', 'http://localhost');
     }
 
     // get schools list for user registration and show form ********************************************
@@ -121,7 +123,7 @@ class UsersController extends Controller
         $parents->save();
         // return redirect()->back()->with('success', 'User registered successfully, Login now');
 
-        $url = "https://shuleapp.tech"; //url for application
+        $url = $this->appBaseUrl; //url for application
         //send sms after registration using Beem API *******************************************************
         $beemSmsService = new BeemSmsService();
         $sourceAddr = $school->sender_id ?? 'shuleApp'; // Get sender ID

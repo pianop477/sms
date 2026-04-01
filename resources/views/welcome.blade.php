@@ -879,6 +879,9 @@
                         <li><a href="{{ route('contract.gateway.init') }}"
                                 class="text-gray-400 hover:text-white transition text-sm sm:text-base block py-1"
                                 id="footer-link-contract">Contracts Gateway</a></li>
+                        <li><a href="{{ route('tokens.verify') }}"
+                                class="text-gray-400 hover:text-white transition text-sm sm:text-base block py-1"
+                                id="footer-link-token">Gate Pass Verifier</a></li>
                     </ul>
                 </div>
 
@@ -1306,6 +1309,7 @@
                 'footer-link-contact': 'Contact Us',
                 'footer-link-login': 'Login',
                 'footer-link-contract': 'Contracts Gateway',
+                'footer-link-token': 'Gate Pass Verifier',
                 'footer-services-title': 'Our Services',
                 'footer-service-1': 'Academic Management',
                 'footer-service-2': 'Financial Management',
@@ -1453,6 +1457,7 @@
                 'footer-link-contact': 'Wasiliana Nasi',
                 'footer-link-login': 'Ingia',
                 'footer-link-contract': 'Dirisha la Mikataba',
+                'footer-link-token': 'Hakiki Geti Pass',
                 'footer-services-title': 'Huduma Zetu',
                 'footer-service-1': 'Usimamizi wa Masomo',
                 'footer-service-2': 'Usimamizi wa Fedha',

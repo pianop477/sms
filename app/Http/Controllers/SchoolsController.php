@@ -28,11 +28,13 @@ class SchoolsController extends Controller
 {
     protected $beemSmsService;
     protected $nextSmsService;
+    protected $appBaseUrl;
 
     public function __construct(BeemSmsService $beemSmsService, NextSmsService $nextSmsService)
     {
         $this->beemSmsService = $beemSmsService;
         $this->nextSmsService = $nextSmsService;
+        $this->appBaseUrl = config('app.url', 'http://localhost');
     }
 
     public function index()
@@ -155,7 +157,7 @@ class SchoolsController extends Controller
 
             //notify manager using nextSms API
             $nextSmsService = new NextSmsService();
-            $url = "https://shuleapp.tech";
+            $url = $this->appBaseUrl;
             $sender = 'SHULE APP';
             $message = "Welcome to Shule App. Your login details are: Username: $users->phone, Password: shule2025, Thanks for choosing us. Visit; $url";
             $destinations = $this->formatPhoneNumber($users->phone);

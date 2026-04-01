@@ -52,8 +52,31 @@ class Kernel extends ConsoleKernel
         $schedule->command('bills:update-statuses')->everySecond();
         $schedule->command('reminders:service-expiry')
             ->dailyAt('08:00')
-            ->withoutOverlapping()
-            ->appendOutputTo(storage_path('logs/service-reminders.log'));
+            ->withoutOverlapping();
+
+        $schedule->command('students:assign-fee-structure --force --chunk=100')
+            ->hourly()
+            ->withoutOverlapping();
+
+        $schedule->command('tokens:clean-expired')
+            ->dailyAt('01:00')
+            ->withoutOverlapping();
+
+        $schedule->command('tokens:send-existing --chunk=50')
+            ->hourly()
+            ->withoutOverlapping();
+
+        $schedule->command('tokens:sync-offline')
+            ->everyThirtyMinutes()
+            ->withoutOverlapping();
+
+        // ========== PWA VERSION UPDATE ==========
+        // Update PWA version weekly on Sunday at 2 AM
+        $schedule->command('pwa:version')
+            ->weekly()
+            ->sundays()
+            ->at('02:00')
+            ->withoutOverlapping();
     }
 
     /**
