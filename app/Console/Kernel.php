@@ -58,10 +58,6 @@ class Kernel extends ConsoleKernel
             ->hourly()
             ->withoutOverlapping();
 
-        $schedule->command('tokens:clean-expired')
-            ->dailyAt('01:00')
-            ->withoutOverlapping();
-
         $schedule->command('tokens:send-existing --chunk=50')
             ->hourly()
             ->withoutOverlapping();
@@ -76,6 +72,23 @@ class Kernel extends ConsoleKernel
             ->weekly()
             ->sundays()
             ->at('02:00')
+            ->withoutOverlapping();
+
+        // Add to schedule() method
+        $schedule->command('tokens:auto-expire')
+            ->dailyAt('00:30')  // Run daily at 12:30 AM
+            ->withoutOverlapping();
+
+        // Cleanup old tokens (older than 365 days / 1 year)
+        $schedule->command('tokens:clean-expired --days=365')
+            ->weekly()
+            ->mondays()
+            ->at('01:00')
+            ->withoutOverlapping();
+
+        // Sync tokens after payment corrections - run every hour
+        $schedule->command('tokens:sync-after-correction')
+            ->hourly()
             ->withoutOverlapping();
     }
 

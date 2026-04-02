@@ -14,6 +14,7 @@ class FeeInstallment extends Model
         'cumulative_required',
         'start_date',
         'end_date',
+        'academic_year',
         'order'
     ];
 

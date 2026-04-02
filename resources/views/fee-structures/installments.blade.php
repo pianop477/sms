@@ -48,6 +48,16 @@
             height: 100%;
             transition: width 0.3s ease;
         }
+
+        .academic-year-badge {
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            display: inline-block;
+            margin-left: 8px;
+        }
     </style>
 
     <div class="py-4">
@@ -86,6 +96,10 @@
                                                     <h6 class="mb-0">
                                                         <span class="badge bg-primary me-2">Order {{ $inst->order }}</span>
                                                         {{ $inst->name }}
+                                                        <span class="academic-year-badge">
+                                                            <i class="fas fa-calendar-alt me-1"></i>
+                                                            {{ $inst->academic_year ?? 'N/A' }}
+                                                        </span>
                                                     </h6>
                                                     <div class="dropdown">
                                                         <button class="btn btn-sm btn-link" type="button"
@@ -143,6 +157,11 @@
                                                     <i class="fas fa-info-circle me-1"></i>
                                                     Students qualify when total paid ≥
                                                     {{ number_format($inst->cumulative_required, 0) }} TZS
+                                                    <br>
+                                                    <small class="text-muted mt-1 d-block">
+                                                        <i class="fas fa-calendar-alt me-1"></i>
+                                                        Academic Year: {{ $inst->academic_year ?? 'N/A' }}
+                                                    </small>
                                                 </div>
                                             </div>
                                         </div>
@@ -153,14 +172,14 @@
                             {{-- Summary Card --}}
                             <div class="alert alert-secondary mt-3">
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <strong>Total Installments:</strong> {{ $installments->count() }}
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <strong>Sum of Installments:</strong>
                                         {{ number_format($installments->sum('amount'), 0) }} TZS
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <strong>Structure Total:</strong>
                                         {{ number_format($feeStructure->total_amount, 0) }} TZS
                                         @if ($installments->sum('amount') != $feeStructure->total_amount)
@@ -168,6 +187,15 @@
                                                 <i class="fas fa-exclamation-triangle"></i> Mismatch!
                                             </span>
                                         @endif
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Academic Years:</strong>
+                                        @php
+                                            $years = $installments->pluck('academic_year')->unique()->sort();
+                                        @endphp
+                                        @foreach($years as $year)
+                                            <span class="badge bg-info ms-1">{{ $year }}</span>
+                                        @endforeach
                                     </div>
                                 </div>
                             </div>
@@ -200,6 +228,11 @@
                 <form action="{{ route('fee-structures.installments.store', $feeStructure->id) }}" method="POST">
                     @csrf
                     <div class="modal-body">
+                        <div class="alert alert-info small">
+                            <i class="fas fa-info-circle me-1"></i>
+                            <strong>Kumbuka:</strong> Academic year itatumika kutofautisha installments za miaka tofauti.
+                            Mfano: Unaweza kuwa na installments za 2025 na 2026 tofauti.
+                        </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Installment Name <span class="text-danger">*</span></label>
@@ -211,6 +244,11 @@
                                 <input type="number" name="order" class="form-control" required min="1"
                                     placeholder="1, 2, 3...">
                                 <small class="text-muted">Order in which installments are processed</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Academic Year <span class="text-danger">*</span></label>
+                                <input type="text" name="academic_year" class="form-control" required placeholder="e.g., 2025">
+                                <small class="text-muted">The academic year for which this installment applies</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Installment Amount (TZS) <span
@@ -265,6 +303,10 @@
                                 <label class="form-label">Order Number *</label>
                                 <input type="number" name="order" id="edit_inst_order" class="form-control" required
                                     min="1">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Academic Year *</label>
+                                <input type="text" name="academic_year" id="edit_inst_academic_year" class="form-control" required placeholder="e.g. 2025">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Installment Amount (TZS) *</label>
@@ -351,6 +393,12 @@
                     document.getElementById('edit_inst_cumulative').value = data.cumulative_required;
                     document.getElementById('edit_inst_start_date').value = data.start_date;
                     document.getElementById('edit_inst_end_date').value = data.end_date;
+
+                    // Set academic year in select dropdown
+                    const academicYearSelect = document.getElementById('edit_inst_academic_year');
+                    if (academicYearSelect && data.academic_year) {
+                        academicYearSelect.value = data.academic_year;
+                    }
 
                     // Set form action
                     document.getElementById('editInstallmentForm').action = `/fee-structures/installments/${id}`;

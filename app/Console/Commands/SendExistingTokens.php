@@ -9,33 +9,123 @@ use App\Models\FeeInstallment;
 use App\Models\FeeClearanceToken;
 use App\Models\school;
 use App\Models\Parents;
+use App\Models\school_fees;
+use App\Models\school_fees_payment;
 use App\Services\FeeClearanceService;
 use App\Services\NextSmsService;
+use App\Traits\formatPhoneTrait;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class SendExistingTokens extends Command
 {
+    use formatPhoneTrait;
+
     protected $signature = 'tokens:send-existing
                             {--school-id= : Process specific school}
+                            {--academic-year= : Academic year to process (default: current year)}
                             {--dry-run : Run without sending actual SMS}
-                            {--chunk=50 : Number of records per chunk}';
+                            {--chunk=50 : Number of records per chunk}
+                            {--force : Force send even if token exists}';
 
-    protected $description = 'Send tokens to students who already qualify but never received token';
+    protected $description = 'Send tokens to students who already qualify for current academic year but never received token';
 
     protected $appBaseUrl;
+
     public function __construct()
     {
         $this->appBaseUrl = config('app.url', 'http://localhost');
         parent::__construct();
     }
 
+    /**
+     * Get current academic year
+     */
+    private function getCurrentAcademicYear()
+    {
+        if ($this->option('academic-year')) {
+            return $this->option('academic-year');
+        }
+        return date('Y');
+    }
+
+    /**
+     * Get total paid for specific academic year
+     */
+    private function getTotalPaidForAcademicYear($student, $academicYear)
+    {
+        $bills = school_fees::where('student_id', $student->id)
+            ->where('academic_year', $academicYear)
+            ->pluck('id');
+
+        if ($bills->isEmpty()) {
+            return 0;
+        }
+
+        return school_fees_payment::whereIn('student_fee_id', $bills)->sum('amount');
+    }
+
+    /**
+     * Get current active installment for the student
+     * 🔥 IMPORTANT: Using DATE only, not TIME
+     */
+    private function getCurrentActiveInstallment($student, $feeStructureId, $academicYear)
+    {
+        $today = Carbon::today(); // Returns date only: 2026-04-02 00:00:00
+
+        // Get all installments for this academic year that are active based on DATE
+        $allInstallments = FeeInstallment::where('fee_structure_id', $feeStructureId)
+            ->where('academic_year', $academicYear)
+            ->whereDate('start_date', '<=', $today)  // 🔥 Using whereDate()
+            ->whereDate('end_date', '>=', $today)    // 🔥 Using whereDate()
+            ->orderBy('order')
+            ->get();
+
+        if ($allInstallments->isEmpty()) {
+            return null;
+        }
+
+        $totalPaid = $this->getTotalPaidForAcademicYear($student, $academicYear);
+
+        // Find the highest order installment that is fully paid
+        $lastPaidInstallment = null;
+        foreach ($allInstallments as $installment) {
+            if ($totalPaid >= $installment->cumulative_required) {
+                $lastPaidInstallment = $installment;
+            } else {
+                break;
+            }
+        }
+
+        // If no installment is paid, check the first installment
+        if (!$lastPaidInstallment) {
+            $firstInstallment = $allInstallments->first();
+            // First installment is already active (we filtered by date above)
+            return $firstInstallment;
+        }
+
+        // Check if the next installment exists and is active
+        $nextInstallment = $allInstallments->where('order', $lastPaidInstallment->order + 1)->first();
+
+        if ($nextInstallment) {
+            // Next installment is already active (we filtered by date above)
+            return $nextInstallment;
+        }
+
+        // All installments are paid, return the last one
+        return $lastPaidInstallment;
+    }
+
     public function handle()
     {
-        $this->info('🚀 Checking for students who qualify but have no token...');
+        $academicYear = $this->getCurrentAcademicYear();
+        $today = Carbon::today()->toDateString();
 
-        // Get students with active fee assignments
+        $this->info('🚀 Checking for students who qualify for academic year ' . $academicYear . '...');
+        $this->info("📅 Current date (for comparison): {$today}");
+        $this->newLine();
+
         $query = Student::whereHas('feeAssignment', function ($q) {
             $q->where('is_active', true);
         });
@@ -46,6 +136,7 @@ class SendExistingTokens extends Command
 
         $students = $query->get();
         $dryRun = $this->option('dry-run');
+        $force = $this->option('force');
         $chunkSize = (int) $this->option('chunk');
 
         $stats = [
@@ -54,7 +145,9 @@ class SendExistingTokens extends Command
             'already_have_token' => 0,
             'new_tokens' => 0,
             'sms_sent' => 0,
-            'errors' => 0
+            'errors' => 0,
+            'no_installment' => 0,
+            'wrong_academic_year' => 0
         ];
 
         $progressBar = $this->output->createProgressBar($students->count());
@@ -63,13 +156,15 @@ class SendExistingTokens extends Command
         foreach ($students->chunk($chunkSize) as $chunk) {
             foreach ($chunk as $student) {
                 $stats['processed']++;
-                $result = $this->processStudent($student, $dryRun);
+                $result = $this->processStudent($student, $dryRun, $force, $academicYear);
 
                 if ($result === 'eligible') $stats['eligible']++;
                 elseif ($result === 'already_have') $stats['already_have_token']++;
                 elseif ($result === 'new_token') $stats['new_tokens']++;
                 elseif ($result === 'sms_sent') $stats['sms_sent']++;
                 elseif ($result === 'error') $stats['errors']++;
+                elseif ($result === 'no_installment') $stats['no_installment']++;
+                elseif ($result === 'wrong_academic_year') $stats['wrong_academic_year']++;
 
                 $progressBar->advance();
             }
@@ -79,11 +174,15 @@ class SendExistingTokens extends Command
         $this->newLine(2);
 
         $this->info('📈 ========== SUMMARY ==========');
+        $this->info("📅 Academic Year: {$academicYear}");
+        $this->info("📅 Current Date: {$today}");
         $this->info("✅ Processed: {$stats['processed']}");
         $this->info("✅ Eligible students: {$stats['eligible']}");
         $this->info("   ├─ Already had token: {$stats['already_have_token']}");
         $this->info("   └─ New tokens created: {$stats['new_tokens']}");
         $this->info("📱 SMS Sent: {$stats['sms_sent']}");
+        $this->info("⚠️  No active installment: {$stats['no_installment']}");
+        $this->info("⚠️  Wrong academic year: {$stats['wrong_academic_year']}");
         $this->info("❌ Errors: {$stats['errors']}");
 
         if ($dryRun) {
@@ -93,13 +192,11 @@ class SendExistingTokens extends Command
         return 0;
     }
 
-    private function processStudent($student, $dryRun)
+    private function processStudent($student, $dryRun, $force, $academicYear)
     {
         try {
-            // Load class
             $student->load('class');
 
-            // Get active fee assignment with its fee structure
             $assignment = StudentFeeAssignment::with('feeStructure')
                 ->where('student_id', $student->id)
                 ->where('is_active', true)
@@ -112,73 +209,74 @@ class SendExistingTokens extends Command
             $feeStructureId = $assignment->fee_structure_id;
             $feeStructure = $assignment->feeStructure;
 
-            // Get total paid from payments
-            $totalPaid = $student->payments()->sum('amount');
-
-            // Get current installment (time-based)
-            $currentInstallment = FeeInstallment::where('fee_structure_id', $feeStructureId)
-                ->where('start_date', '<=', now())
-                ->where('end_date', '>=', now())
-                ->orderBy('order')
-                ->first();
+            $totalPaid = $this->getTotalPaidForAcademicYear($student, $academicYear);
+            $currentInstallment = $this->getCurrentActiveInstallment($student, $feeStructureId, $academicYear);
 
             if (!$currentInstallment) {
-                return 'not_eligible';
+                if (!$dryRun) {
+                    $this->line("\n   ⏭️  {$student->admission_number} - No active installment for academic year {$academicYear}");
+                }
+                return 'no_installment';
             }
 
-            // Check if student has reached cumulative required
+            if ($currentInstallment->academic_year != $academicYear) {
+                if (!$dryRun) {
+                    $this->line("\n   ⚠️  {$student->admission_number} - Installment {$currentInstallment->name} is for {$currentInstallment->academic_year}, not {$academicYear}");
+                }
+                return 'wrong_academic_year';
+            }
+
             if ($totalPaid < $currentInstallment->cumulative_required) {
+                if (!$dryRun) {
+                    $this->line("\n   ⏭️  {$student->admission_number} - Payment insufficient");
+                    $this->line("      Total Paid: " . number_format($totalPaid, 0) . " / Required: " . number_format($currentInstallment->cumulative_required, 0));
+                }
                 return 'not_eligible';
             }
 
-            // Check if token already exists for this installment
             $existingToken = FeeClearanceToken::where([
                 'student_id' => $student->id,
                 'installment_id' => $currentInstallment->id,
             ])->first();
 
-            if ($existingToken) {
+            if ($existingToken && !$force) {
                 if (!$dryRun) {
                     $this->line("\n   ⏭️  {$student->admission_number} - Already has token for {$currentInstallment->name}");
                 }
                 return 'already_have';
             }
 
-            // Show details
             if ($dryRun) {
                 $this->line("\n   [DRY RUN] {$student->admission_number} - {$student->first_name} {$student->last_name}");
                 $this->line("      Class: " . ($student->class->class_name ?? 'N/A'));
-                $this->line("      Installment: {$currentInstallment->name}");
+                $this->line("      Academic Year: {$academicYear}");
+                $this->line("      Installment: {$currentInstallment->name} (Order: {$currentInstallment->order})");
+                $this->line("      Installment Period: " . Carbon::parse($currentInstallment->start_date)->format('d/m/Y') . " - " . Carbon::parse($currentInstallment->end_date)->format('d/m/Y'));
                 $this->line("      Total Paid: " . number_format($totalPaid, 0) . " / Required: " . number_format($currentInstallment->cumulative_required, 0));
                 return 'eligible';
             }
 
-            // Show details for actual run
             $this->line("\n   📝 {$student->admission_number} - {$student->first_name} {$student->last_name}");
             $this->line("      Class: " . ($student->class->class_name ?? 'N/A'));
+            $this->line("      Academic Year: {$academicYear}");
             $this->line("      Fee Structure: {$feeStructure->name}");
-            $this->line("      Installment: {$currentInstallment->name}");
+            $this->line("      Installment: {$currentInstallment->name} (Order: {$currentInstallment->order})");
+            $this->line("      Installment Period: " . Carbon::parse($currentInstallment->start_date)->format('d/m/Y') . " - " . Carbon::parse($currentInstallment->end_date)->format('d/m/Y'));
             $this->line("      Total Paid: " . number_format($totalPaid, 0) . " / Required: " . number_format($currentInstallment->cumulative_required, 0));
 
-            // Generate token using FeeClearanceService
             $service = new FeeClearanceService();
             $tokenResult = $service->process($student);
 
-            // Check if token was generated
             if (!$tokenResult) {
                 $this->error("      ❌ Failed to generate token");
                 return 'error';
             }
 
-            // Get the token (it might be existing or new)
             $token = $tokenResult;
-
-            // Check if this is a new token or existing
             $isNewToken = $token->wasRecentlyCreated ?? false;
 
             if ($isNewToken) {
                 $this->line("      ✅ New Token: {$token->token}");
-                $statsType = 'new_token';
             } else {
                 $this->line("      ⏭️  Token already existed: {$token->token}");
                 return 'already_have';
@@ -186,43 +284,50 @@ class SendExistingTokens extends Command
 
             $this->line("      Expires: " . Carbon::parse($token->expires_at)->format('d/m/Y'));
 
-            // Send SMS
             $parent = Parents::with('user')->find($student->parent_id);
             $school = school::find($student->school_id);
 
             if ($parent && $parent->user && $parent->user->phone) {
-                // Format token for SMS (add dash for readability)
                 $formattedToken = substr($token->token, 0, 3) . '-' . substr($token->token, 3, 3);
-
                 $link = $this->appBaseUrl . '/tokens/verify';
-                $message = "Habari, Gate Pass No yako ni:.\n\n" .
-                    "{$formattedToken}\n\n" .
+
+                $formatedPhone = $this->formatPhoneNumberForSms($parent->user->phone);
+                $message = "Gate Pass No yako ni:\n" .
+                    "{$formattedToken}\n" .
                     "Kwa ajili ya: {$student->first_name} {$student->last_name}\n" .
-                    "Muda wa kuisha: ". Carbon::parse($currentInstallment->end_date)->format('d/m/Y') ."\n\n" .
-                    "Hakiki kupitia: {$link}\n\n" .
-                    "Onesha Getini au Kwenye School Bus.\n\n" .
-                    "Asante.";
+                    "Malipo ya: {$currentInstallment->name}\n" .
+                    "Expiry: " . Carbon::parse($currentInstallment->end_date)->format('d/m/Y') . "\n" .
+                    "Hakiki hapa: {$link}\n";
 
-                // TODO: Uncomment this when SMS service is ready
-                $smsService = new NextSmsService();
-                // $smsService->sendSmsByNext(
-                //     $school->sender_id ?? 'SHULE APP',
-                //     $parent->user->phone,
-                //     $message,
-                //     'fee_clearance_' . time()
-                // );
+                try {
+                    $smsService = new NextSmsService();
+                    $smsService->sendSmsByNext(
+                        $school->sender_id ?? 'SHULE APP',
+                        $formatedPhone,
+                        $message,
+                        'fee_clearance_' . time()
+                    );
+                    // Log::info("      [SIMULATION] SMS sent to: {$formatedPhone} with message: {$message}");
 
-                $this->line("      📱 SMS would be sent to: {$parent->user->phone}");
-                $this->line("      📨 Message: {$formattedToken}");
-                // Log::info('Token generated and SMS sent', [
-                //     'student_id' => $student->id,
-                //     'token' => $token->token,
-                //     'expires_at' => $token->expires_at,
-                //     'parent_phone' => $parent->user->phone
-                // ]);
-                return 'sms_sent';
+                    $this->line("      📱 SMS sent to: {$formatedPhone}");
+                    $this->line("      📨 Token: {$formattedToken}");
+
+                    return 'sms_sent';
+                } catch (\Exception $e) {
+                    $this->line("      ⚠️  SMS failed to send: " . $e->getMessage());
+                    Log::error('SMS sending failed', [
+                        'student_id' => $student->id,
+                        'token' => $token->token,
+                        'error' => $e->getMessage()
+                    ]);
+                    return 'new_token';
+                }
             } else {
                 $this->line("      ⚠️  No phone number found for parent");
+                Log::warning('No parent phone found', [
+                    'student_id' => $student->id,
+                    'parent_id' => $student->parent_id
+                ]);
                 return 'new_token';
             }
         } catch (\Exception $e) {

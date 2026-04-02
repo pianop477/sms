@@ -24,7 +24,7 @@ class CleanExpiredTokens extends Command
         $softDelete = $this->option('soft-delete');
         $keepDays = (int) $this->option('days');
 
-        // Mark expired tokens that are still active
+        // 1. Kwanza: Mark tokens that are expired (active but past expiry)
         $expiredCount = FeeClearanceToken::where('status', 'active')
             ->where('expires_at', '<', Carbon::now())
             ->update(['status' => 'expired']);
@@ -32,7 +32,7 @@ class CleanExpiredTokens extends Command
         $this->info("✅ Marked {$expiredCount} expired tokens as expired");
 
         if (!$softDelete) {
-            // Hard delete tokens that expired more than $keepDays days ago
+            // 2. Kisha: Hard delete tokens that expired more than $keepDays days ago
             $cutoffDate = Carbon::now()->subDays($keepDays);
 
             $deletedCount = FeeClearanceToken::where('status', 'expired')
@@ -45,11 +45,11 @@ class CleanExpiredTokens extends Command
         $executionTime = round(microtime(true) - $startTime, 2);
         $this->info("⏱️  Cleanup completed in {$executionTime} seconds");
 
-        // Log::channel('fee_assignment')->info('Token cleanup completed', [
-        //     'expired_marked' => $expiredCount,
-        //     'deleted' => $deletedCount ?? 0,
-        //     'execution_time' => $executionTime
-        // ]);
+        Log::channel('fee_assignment')->info('Token cleanup completed', [
+            'expired_marked' => $expiredCount,
+            'deleted' => $deletedCount ?? 0,
+            'execution_time' => $executionTime
+        ]);
 
         return 0;
     }

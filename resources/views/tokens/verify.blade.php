@@ -1108,12 +1108,12 @@
                             </div>
                             <div class="info-card">
                                 <i class="fas fa-calendar-week"></i>
-                                <div class="label">MUHULA</div>
+                                <div class="label">AWAMU YA KULIPA</div>
                                 <div class="value">${escapeHtml(installment.name)}</div>
                             </div>
                             <div class="info-card">
                                 <i class="fas fa-clock"></i>
-                                <div class="label">INA MUDA HADI</div>
+                                <div class="label">MUDA WA KUISHA</div>
                                 <div class="value">${formatDate(token.expires_at)}</div>
                             </div>
                             <div class="info-card transport-card" style="background: ${transportBg}; border: 1px solid ${transportColor};">

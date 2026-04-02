@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\FeeStructure;
 use App\Models\FeeInstallment;
 use App\Models\Grade;
+use App\Traits\HashIdTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,8 @@ use ProtoneMedia\LaravelCrossEloquentSearch\Searcher;
 
 class FeeStructureController extends Controller
 {
+    use HashIdTrait;
+
     public function index()
     {
         $structures = FeeStructure::where('school_id', Auth::user()->school_id)
@@ -100,12 +103,16 @@ class FeeStructureController extends Controller
         return view('fee-structures.installments', compact('feeStructure', 'installments'));
     }
 
+    /**
+     * Store a new installment
+     */
     public function storeInstallment(Request $request, FeeStructure $feeStructure)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
             'cumulative_required' => 'required|numeric|min:0',
+            'academic_year' => 'required|integer|min:2020|max:2100',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'order' => 'required|integer|min:1',
@@ -114,19 +121,32 @@ class FeeStructureController extends Controller
         try {
             DB::beginTransaction();
 
-            // Check if order already exists
+            // Check if order already exists for the SAME academic year
             $existing = FeeInstallment::where('fee_structure_id', $feeStructure->id)
+                ->where('academic_year', $request->academic_year)
                 ->where('order', $request->order)
                 ->first();
 
             if ($existing) {
-                throw new \Exception("Installment with order {$request->order} already exists. Please use a different order number.");
+                throw new \Exception("Installment with order {$request->order} already exists for academic year {$request->academic_year}. Please use a different order number.");
+            }
+
+            // Optional: Check if cumulative required is consistent with previous installments
+            $previousInstallments = FeeInstallment::where('fee_structure_id', $feeStructure->id)
+                ->where('academic_year', $request->academic_year)
+                ->where('order', '<', $request->order)
+                ->orderBy('order', 'desc')
+                ->first();
+
+            if ($previousInstallments && $request->cumulative_required < $previousInstallments->cumulative_required) {
+                throw new \Exception("Cumulative required amount cannot be less than previous installment ({$previousInstallments->cumulative_required} TZS).");
             }
 
             FeeInstallment::create([
                 'fee_structure_id' => $feeStructure->id,
                 'name' => $request->name,
                 'amount' => $request->amount,
+                'academic_year' => $request->academic_year,
                 'cumulative_required' => $request->cumulative_required,
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
@@ -164,6 +184,7 @@ class FeeStructureController extends Controller
                 'name' => $installment->name,
                 'order' => $installment->order,
                 'amount' => $installment->amount,
+                'academic_year' => $installment->academic_year,
                 'cumulative_required' => $installment->cumulative_required,
                 'start_date' => $installment->start_date instanceof \DateTime
                     ? $installment->start_date->format('Y-m-d')
@@ -180,12 +201,16 @@ class FeeStructureController extends Controller
         }
     }
 
+    /**
+     * Update an existing installment
+     */
     public function updateInstallment(Request $request, FeeInstallment $installment)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
             'cumulative_required' => 'required|numeric|min:0',
+            'academic_year' => 'required|integer|min:2020|max:2100',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'order' => 'required|integer|min:1',
@@ -199,20 +224,45 @@ class FeeStructureController extends Controller
                 throw new \Exception('Unauthorized action');
             }
 
-            // Check if order conflicts with other installments
+            // Check if order conflicts with other installments for the SAME academic year
             $conflict = FeeInstallment::where('fee_structure_id', $installment->fee_structure_id)
+                ->where('academic_year', $request->academic_year)
                 ->where('order', $request->order)
                 ->where('id', '!=', $installment->id)
                 ->first();
 
             if ($conflict) {
-                throw new \Exception("Installment with order {$request->order} already exists.");
+                throw new \Exception("Installment with order {$request->order} already exists for academic year {$request->academic_year}.");
+            }
+
+            // Optional: Check if cumulative required is consistent with other installments
+            $previousInstallments = FeeInstallment::where('fee_structure_id', $installment->fee_structure_id)
+                ->where('academic_year', $request->academic_year)
+                ->where('order', '<', $request->order)
+                ->where('id', '!=', $installment->id)
+                ->orderBy('order', 'desc')
+                ->first();
+
+            if ($previousInstallments && $request->cumulative_required < $previousInstallments->cumulative_required) {
+                throw new \Exception("Cumulative required amount cannot be less than previous installment ({$previousInstallments->cumulative_required} TZS).");
+            }
+
+            $nextInstallments = FeeInstallment::where('fee_structure_id', $installment->fee_structure_id)
+                ->where('academic_year', $request->academic_year)
+                ->where('order', '>', $request->order)
+                ->where('id', '!=', $installment->id)
+                ->orderBy('order', 'asc')
+                ->first();
+
+            if ($nextInstallments && $request->cumulative_required > $nextInstallments->cumulative_required) {
+                throw new \Exception("Cumulative required amount cannot be greater than next installment ({$nextInstallments->cumulative_required} TZS).");
             }
 
             $installment->update([
                 'name' => $request->name,
                 'amount' => $request->amount,
                 'cumulative_required' => $request->cumulative_required,
+                'academic_year' => $request->academic_year,
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
                 'order' => $request->order,
@@ -228,6 +278,7 @@ class FeeStructureController extends Controller
             return back()->withInput();
         }
     }
+
 
     public function deleteInstallment(FeeInstallment $installment)
     {

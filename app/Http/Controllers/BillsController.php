@@ -28,7 +28,8 @@ class BillsController extends Controller
 
     protected $appBaseUrl;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->appBaseUrl = config('app.url', 'http://localhost');
     }
     use formatPhoneTrait;
@@ -594,15 +595,25 @@ class BillsController extends Controller
         }
     }
 
+    /**
+     * Get current academic year
+     */
+    private function getCurrentAcademicYear()
+    {
+        // TODO: Get from school settings
+        // For now, use current year
+        return date('Y');
+    }
+
     public function recordPayment(Request $request)
     {
         $user = Auth::user();
+        $currentAcademicYear = $this->getCurrentAcademicYear();
 
         $this->validate($request, [
             'bill_id' => 'required|string',
             'amount' => 'required|numeric|min:1',
             'payment' => 'required|string|in:bank,mobile,cash',
-            'payment_note' => 'nullable|string|max:500',
         ]);
 
         try {
@@ -621,12 +632,6 @@ class BillsController extends Controller
                 return back();
             }
 
-            // Verify bill status
-            if (!in_array($bill->status, ['active', 'partially_paid'])) {
-                Alert()->toast('This bill is not eligible for payment', 'error');
-                return back();
-            }
-
             // Get next installment number
             $latestInstallment = school_fees_payment::where('student_fee_id', $billId)
                 ->max('installment');
@@ -640,14 +645,10 @@ class BillsController extends Controller
                 'amount' => $request->amount,
                 'payment_mode' => $request->payment,
                 'installment' => $installmentNumber,
-                'payment_note' => $request->payment_note,
                 'approved_by' => $user->id,
                 'approved_at' => Carbon::now(),
             ]);
 
-            // Update bill total paid
-            $bill->total_paid += $request->amount;
-            $bill->status = $bill->total_paid >= $bill->amount ? 'paid' : 'partially_paid';
             $bill->save();
 
             // 🔥 Process fee clearance and send token if eligible
@@ -658,21 +659,12 @@ class BillsController extends Controller
             if ($student) {
                 $service = new FeeClearanceService();
 
-                // Log before processing
-                // Log::info('Processing fee clearance after payment', [
-                //     'student_id' => $student->id,
-                //     'student_name' => $student->first_name . ' ' . $student->last_name,
-                //     'payment_amount' => $request->amount,
-                //     'payment_mode' => $request->payment,
-                //     'timestamp' => Carbon::now()->toDateTimeString()
-                // ]);
-
                 // Process token (only if eligible and not already sent)
                 $token = $service->process($student);
 
                 if ($token) {
                     // Check if this is a newly created token
-                    $isNewToken = $token->wasRecentlyCreated ?? false;
+                    $isNewToken = $service->isNewlyCreatedToken($token);
 
                     if ($isNewToken) {
                         // New token was created - send SMS
@@ -686,14 +678,21 @@ class BillsController extends Controller
 
                         $school = School::find($student->school_id);
 
-                        // Get installment name safely
+                        // Get installment name and details safely
                         $installmentName = 'Current Term';
+                        $installmentOrder = null;
+                        $academicYear = null;
+
                         if ($token->relationLoaded('installment') && $token->installment) {
                             $installmentName = $token->installment->name;
+                            $installmentOrder = $token->installment->order;
+                            $academicYear = $token->installment->academic_year;
                         } else {
                             $token->load('installment');
                             if ($token->installment) {
                                 $installmentName = $token->installment->name;
+                                $installmentOrder = $token->installment->order;
+                                $academicYear = $token->installment->academic_year;
                             }
                         }
 
@@ -706,27 +705,16 @@ class BillsController extends Controller
                             $parentPhone = $parent->user->phone;
 
                             // Prepare message
-                            $link =  $this->appBaseUrl . '/tokens/verify';
-                            // Prepare message
-                            $message = "Habari, Gate Pass No yako ni:.\n\n" .
-                                "{$formattedToken}\n\n" .
+                            $link = $this->appBaseUrl . '/tokens/verify';
+                            $message = "Gate Pass No yako ni:\n" .
+                                "{$formattedToken}\n" .
                                 "Kwa ajili ya: {$student->first_name} {$student->last_name}\n" .
-                                "Muda wa kuisha: {$expiryDate}\n\n" .
-                                "Hakiki kupitia: {$link}\n\n" .
-                                "Onesha Getini au Kwenye School Bus.\n\n" .
-                                "Asante.";
-
+                                "Malipo ya: {$installmentName}\n" .
+                                "Expiry: {$expiryDate}\n" .
+                                "Hakiki hapa: {$link}\n\n";
 
                             // Send SMS
                             $this->sendGatepassToken($school, $parentPhone, $message);
-
-                            // Log::info('Gate pass token SMS sent', [
-                            //     'student_id' => $student->id,
-                            //     'token' => $token->token,
-                            //     'formatted_token' => $formattedToken,
-                            //     'phone' => $parentPhone,
-                            //     'installment' => $installmentName
-                            // ]);
                         } else {
                             Log::warning('Cannot send SMS - parent phone not found', [
                                 'student_id' => $student->id,
@@ -737,32 +725,20 @@ class BillsController extends Controller
                             ]);
                         }
                     } else {
-                        // Token already existed - don't send SMS again
-                        // Log::info('Token already existed, not sending SMS', [
-                        //     'student_id' => $student->id,
-                        //     'token' => $token->token,
-                        //     'created_at' => $token->created_at,
-                        //     'expires_at' => $token->expires_at
-                        // ]);
                     }
                 } else {
-                    // Student not eligible
-                    // Log::info('Student not eligible for token', [
-                    //     'student_id' => $student->id,
-                    //     'student_name' => $student->first_name . ' ' . $student->last_name,
-                    //     'reason' => 'Insufficient payment or no active installment'
-                    // ]);
+
                 }
             }
 
             // Prepare success message
             $successMessage = 'Payment recorded successfully';
             if ($tokenSent) {
-                $successMessage .= ' and gate pass token sent to parent\'s phone!';
+                $successMessage .= '';
             } elseif ($tokenData) {
-                $successMessage .= ' Gate pass token was already sent previously.';
+                $successMessage .= '';
             } else {
-                $successMessage .= ' Student not yet eligible for gate pass token.';
+                $successMessage .= '';
             }
 
             Alert()->toast($successMessage, 'success');
@@ -791,7 +767,7 @@ class BillsController extends Controller
                 'reference' => 'fee_clearance_' . time(),
             ];
 
-            // $smsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+            $smsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
             // Log::info('Gate pass token SMS sent to ' . $payload['text'] . ' for phone: ' . $payload['to']);
         } catch (Exception $e) {
             Log::error('Failed to send gate pass token SMS: ' . $e->getMessage());
