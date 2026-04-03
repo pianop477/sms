@@ -44,7 +44,7 @@ class HomeController extends Controller
         $user = Auth::user();
         //system adminstrator dashboard redirection --------------------------------------------
         if ($user->usertype == 1) {
-            $schools = School::orderBy('school_name')->get();
+            $schools = school::orderBy('school_name')->get();
             $teachers = Teacher::where('status', '=', 1)->where('status', 1)->get();
             $students = Student::where('status', '=', 1)->where('status', 1)->get();
             $parents = Parents::where('status', '=', 1)->where('status', 1)->get();

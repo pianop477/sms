@@ -568,7 +568,7 @@ class ContractGatewayController extends Controller
         // Get school
         $school = null;
         if (!empty($staffData['school_id'])) {
-            $school = School::find($staffData['school_id']);
+            $school = school::find($staffData['school_id']);
         }
 
         $session = [

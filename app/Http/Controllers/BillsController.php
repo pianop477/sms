@@ -676,7 +676,7 @@ class BillsController extends Controller
                             ->where('id', $student->parent_id)
                             ->first();
 
-                        $school = School::find($student->school_id);
+                        $school = school::find($student->school_id);
 
                         // Get installment name and details safely
                         $installmentName = 'Current Term';
@@ -1284,7 +1284,7 @@ class BillsController extends Controller
     {
         try {
             $user = Auth::user();
-            $school = School::findOrFail($user->school_id);
+            $school = school::findOrFail($user->school_id);
 
             // Get all bills with balance > 0 for the current school and academic year
             $bills = $this->getBillsWithBalance($request);

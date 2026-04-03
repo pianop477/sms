@@ -300,7 +300,7 @@ class TransportController extends Controller
     protected function getStaffId()
     {
         $user = Auth::user();
-        $schoolData = School::find($user->school_id);
+        $schoolData = school::find($user->school_id);
 
         do {
             $staffIdNumber = str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);

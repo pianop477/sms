@@ -708,7 +708,7 @@ class TeachersController extends Controller
     protected function getMemberId()
     {
         $user = Auth::user();
-        $schoolData = School::find($user->school_id);
+        $schoolData = school::find($user->school_id);
 
         // Hakikisha school code ipo
         $schoolCode = $schoolData->abbriv_code ?? $schoolData->school_code;

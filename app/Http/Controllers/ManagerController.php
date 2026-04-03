@@ -87,7 +87,7 @@ class ManagerController extends Controller
             $message = "Hello " . strtoupper($user->first_name) . ", Welcome to ShuleApp. Your Username is: {$user->phone} Password: shule2025. Use link {$link} to Login and change password Thank you.";
 
             // Get school for SMS sender ID
-            $school = School::find($user->school_id);
+            $school = school::find($user->school_id);
 
             // Format phone number for SMS
             $formattedPhone = $this->formatPhoneNumber($user->phone);
@@ -205,7 +205,7 @@ class ManagerController extends Controller
             $row->update();
         }
         // Update the status of the school associated with the user
-        $school_info = School::findOrFail($school_id);
+        $school_info = school::findOrFail($school_id);
         $school_info->status = $status;
         $school_info->update();
 
@@ -250,7 +250,7 @@ class ManagerController extends Controller
         }
 
         // Update the status of the school associated with the user
-        $school_info = School::findOrFail($school_id);
+        $school_info = school::findOrFail($school_id);
         $school_info->status = $status;
         $school_info->update();
 

@@ -784,7 +784,7 @@ class OtherStaffsController extends Controller
     protected function getStaffId()
     {
         $user = Auth::user();
-        $schoolData = School::find($user->school_id);
+        $schoolData = school::find($user->school_id);
 
         // Validation: Hakikisha school code ipo
         if (!$schoolData || empty($schoolData->abbriv_code)) {

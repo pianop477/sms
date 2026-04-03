@@ -4,8 +4,9 @@ namespace App\Console\Commands;
 
 use App\Models\TodRoster;
 use App\Models\User;
-use App\Models\School;
+use App\Models\school;
 use App\Models\AcademicNotification;
+use App\Models\school as ModelsSchool;
 use App\Services\NextSmsService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -335,7 +336,7 @@ class updateRostersStatus extends Command
 
             // PATA SCHOOL
             $schoolId = $academicUsers->first()->school_id;
-            $school = School::find($schoolId);
+            $school = school::find($schoolId);
 
             if (!$school) {
                 $this->error('  ❌ School haikupatikana.');
@@ -437,7 +438,7 @@ class updateRostersStatus extends Command
             }
 
             // PATA SHULE
-            $school = School::find($teacher->school_id);
+            $school = school::find($teacher->school_id);
             if (!$school) {
                 $this->error("  ❌ Shule haipatikani kwa roster {$roster->roster_id}");
                 return false;

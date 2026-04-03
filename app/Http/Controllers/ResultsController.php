@@ -659,7 +659,7 @@ class ResultsController extends Controller
         $exam_id = Hashids::decode($examType);
 
         $user = Auth::user();
-        $schools = School::find($school_id[0]);
+        $schools = school::find($school_id[0]);
 
         if ($user->school_id != $schools->id) {
             Alert()->toast('You are not authorized to view this page', 'error');
@@ -776,7 +776,7 @@ class ResultsController extends Controller
         $user = Auth::user();
 
         // Get school
-        $schools = School::find($school_id[0]);
+        $schools = school::find($school_id[0]);
 
         // Authorization check
         if ($user->school_id != $schools->id) {
@@ -1304,7 +1304,7 @@ class ResultsController extends Controller
             $exam_id = Hashids::decode($examType);
 
             $user = Auth::user();
-            $schools = School::find($school_id[0]);
+            $schools = school::find($school_id[0]);
 
             if ($user->school_id != $schools->id) {
                 return response()->json(['success' => false, 'message' => 'You are not authorized to perform this action.', 'type' => 'error']);
@@ -1344,7 +1344,9 @@ class ResultsController extends Controller
                         'students.id as student_id',
                         'students.first_name',
                         'students.middle_name',
-                        'students.last_name',
+                        'students.last_name', 'students.gender',
+                        'students.group', 'students.status',
+                        'students.admission_number',
                         'students.parent_id',
                         'students.status',
                         'examinations.exam_type',
@@ -1352,6 +1354,7 @@ class ResultsController extends Controller
                         'subjects.course_code',
                         'schools.school_name'
                     )
+                    ->where('students.status', 1) // Only active students
                     ->get();
 
                 // Group results by student
@@ -1758,7 +1761,7 @@ class ResultsController extends Controller
                 'students.id as student_id',
                 'students.first_name',
                 'students.middle_name',
-                'students.last_name',
+                'students.last_name', 'students.status',
                 'students.admission_number',
                 'students.gender',
                 'grades.class_name',
@@ -1769,6 +1772,7 @@ class ResultsController extends Controller
             // ->whereYear('examination_results.exam_date', $year)
             // ->whereMonth('examination_results.exam_date', $monthNumber)
             ->where('examination_results.class_id', $classId->id)
+            ->where('students.status', 1) // Hakikisha tunachagua wanafunzi tu waliopo active
             ->whereDate('examination_results.exam_date', $date)
             ->where('examination_results.exam_type_id', $exam_id[0])
             ->distinct() // Hakikisha data ni ya kipekee kulingana na select fields
@@ -2616,7 +2620,7 @@ class ResultsController extends Controller
                 'students.middle_name',
                 'students.last_name',
                 'students.admission_number',
-                'students.gender',
+                'students.gender', 'students.status',
                 'students.id as studentId',
                 'students.class_id as student_class_id',
                 'grades.class_name',
@@ -2627,6 +2631,7 @@ class ResultsController extends Controller
                 'users.phone',
             )
             ->where('examination_results.class_id', $reports->class_id)
+            ->where('students.status', 1)
             ->where('examination_results.school_id', $reports->school_id)
             ->whereIn(DB::raw('DATE(exam_date)'), $reports->exam_dates)
             ->orderBy('students.first_name')
@@ -2682,7 +2687,7 @@ class ResultsController extends Controller
                 'students.last_name',
                 'students.group',
                 'students.gender',
-                'students.image',
+                'students.image', 'students.status',
                 'subjects.id as subjectId',
                 'subjects.course_name',
                 'subjects.course_code',
@@ -2703,6 +2708,7 @@ class ResultsController extends Controller
                 'teachers.id as teacher_id' // ==== REKEDISHA: Pata teacher_id ya aliyepakia ====
             )
             ->where('examination_results.student_id', $studentId)
+            ->where('students.status', 1)
             ->where('examination_results.class_id', $storedClassId) // TUMIA CLASS_ID ILIYOHIFADHIWA
             ->where('examination_results.school_id', $schoolId)
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
@@ -3054,6 +3060,7 @@ class ResultsController extends Controller
 
                 // STEP 2: Calculate totals
                 $studentTotal = $results->sum('score');
+
                 $studentAverageTotal = number_format($subjectAverages->sum('average'));
                 $studentAverage = $results->avg('score');
 
@@ -3223,7 +3230,7 @@ class ResultsController extends Controller
                 'students.id as studentId',
                 'students.first_name',
                 'students.middle_name',
-                'students.last_name',
+                'students.last_name', 'students.status',
                 'students.group',
                 'students.gender',
                 'students.image',
@@ -3248,6 +3255,7 @@ class ResultsController extends Controller
                 'teachers.id as teacher_id' // ==== REKEDISHA: Ongeza teacher_id ====
             )
             ->where('examination_results.student_id', $studentId)
+            ->where('students.status', 1)
             ->where('examination_results.class_id', $storedClassId) // TUMIA STORED CLASS ID
             ->where('examination_results.school_id', $schoolId)
             ->whereIn(DB::raw('DATE(exam_date)'), $examDates)
@@ -3748,6 +3756,13 @@ class ResultsController extends Controller
 
             foreach ($parentsPayload as $payload) {
                 try {
+                    // check if student has total score and average, if not skip SMS
+                    if ($payload['total_score'] === 0 || $payload['total_average'] === 0) {
+                        // Log::warning("Missing total score or average for student ID: {$payload['student_id']}");
+                        $failCount++;
+                        continue;
+                    }
+
                     // ==== REKEDISHA: Check if parent exists ====
                     $parent = Parents::find($payload['parent_id']);
 
@@ -3776,17 +3791,13 @@ class ResultsController extends Controller
 
                     // ==== REKEDISHA: Create better formatted message ====
                     $message = "MATOKEO YA {$payload['student_name']}\n";
-                    $message .= "==========================\n";
                     $message .= "Ripoti: " . strtoupper($report->title) . "\n";
                     $message .= "Tarehe: {$reportDate}\n";
-                    $message .= "==========================\n";
                     $message .= "MATOKEO YA MASOMO:\n";
                     $message .= $payload['subject_results'];
-                    $message .= "==========================\n";
                     $message .= "Jumla: {$payload['total_score']}\n";
                     $message .= "Wastani: {$payload['total_average']}\n";
                     $message .= "Nafasi: {$payload['position']}\n";
-                    $message .= "==========================\n";
                     $message .= "Pakua ripoti: {$link}";
 
                     // Check message length
@@ -4093,7 +4104,7 @@ class ResultsController extends Controller
         }
 
         // 10. GET SCHOOL INFO
-        $schoolInfo = School::find($schoolId);
+        $schoolInfo = school::find($schoolId);
         $classInfo = Grade::find($classId);
 
         // 11. GENERATE PDF
@@ -4464,7 +4475,7 @@ class ResultsController extends Controller
             $school_id = $report->school_id;
             $class_id = $report->class_id;
 
-            if ($report->status == 1) {
+            if ($report->status == 2) {
                 return redirect()
                     ->route('results.examTypesByClass', ['school' => $school, 'year' => $year, 'class' => $class])
                     ->with('error', 'Cannot delete a published report');

@@ -189,7 +189,7 @@ class StudentsController extends Controller
     protected function getAdmissionNumber()
     {
         $user = Auth::user();
-        $schoolData = School::findOrFail($user->school_id);
+        $schoolData = school::findOrFail($user->school_id);
 
         // Pata ID ya mwisho ya mwanafunzi na uongeze 1
         $lastStudent = Student::where('school_id', $user->school_id)

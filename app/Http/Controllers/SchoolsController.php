@@ -212,7 +212,7 @@ class SchoolsController extends Controller
         $prefix = 'SHULEAPP-' . $year . '-';
 
         // pata number ya mwisho kwa mwaka huu
-        $lastSchool = School::where('school_reg_no', 'like', $prefix . '%')
+        $lastSchool = school::where('school_reg_no', 'like', $prefix . '%')
             ->orderBy('school_reg_no', 'desc')
             ->first();
 
@@ -335,7 +335,7 @@ class SchoolsController extends Controller
             'alternative_phone' => 'nullable|string',
         ]);
 
-        $school = School::findOrFail($decoded[0]);
+        $school = school::findOrFail($decoded[0]);
 
         $school->school_name = $request->name;
         $school->abbriv_code = $request->abbriv;

@@ -32,7 +32,7 @@ class updateSchoolStatus extends Command
             $today = Carbon::now();
 
             // Tafuta shule zote zilizomaliza muda wa huduma
-            $expiredSchools = School::where('service_end_date', '<', $today)
+            $expiredSchools = school::where('service_end_date', '<', $today)
                                     ->where('status', 1)
                                     ->get();
 

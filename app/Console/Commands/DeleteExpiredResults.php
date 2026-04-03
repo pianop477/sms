@@ -50,7 +50,7 @@ class DeleteExpiredResults extends Command
             foreach ($soonExpiringResults as $result) {
 
                 $teacher = Teacher::find($result->teacher_id);
-                $school  = School::find($result->school_id);
+                $school  = school::find($result->school_id);
                 $user    = $teacher ? User::find($teacher->user_id) : null;
 
                 // Skip if important data missing
