@@ -656,11 +656,11 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         // ========================================================================
         // EMPLOYEE STATEMENT ROUTES
         // ========================================================================
-        Route::prefix('employee')->name('employee.')->group(function () {
-            Route::get('/statements', [EmployeeStatementController::class, 'index'])->name('statements');
-            Route::get('/statement/{staffId}', [EmployeeStatementController::class, 'show'])->name('statement.show');
-            Route::get('/statement/{staffId}/pdf', [EmployeeStatementController::class, 'downloadPdf'])->name('statement.pdf');
-        });
+        // Route::prefix('employee')->name('employee.')->group(function () {
+        //     Route::get('/statements', [EmployeeStatementController::class, 'index'])->name('statements');
+        //     Route::get('/statement/{staffId}', [EmployeeStatementController::class, 'show'])->name('statement.show');
+        //     Route::get('/statement/{staffId}/pdf', [EmployeeStatementController::class, 'downloadPdf'])->name('statement.pdf');
+        // });
 
         // ========================================================================
         // HESLB MANAGEMENT ROUTES
@@ -718,6 +718,12 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
             Route::get('/installments/{installment}/edit', [FeeStructureController::class, 'editInstallment'])->name('fee-structures.installments.edit');
             Route::put('/installments/{installment}', [FeeStructureController::class, 'updateInstallment'])->name('fee-structures.installments.update');
             Route::delete('/installments/{installment}', [FeeStructureController::class, 'deleteInstallment'])->name('fee-structures.installments.delete');
+        });
+
+        Route::prefix('employee')->name('employee.')->group(function () {
+            Route::get('/statement', [EmployeeStatementController::class, 'index'])->name('statement.index');
+            Route::post('/statement/search', [EmployeeStatementController::class, 'search'])->name('statement.search');
+            Route::get('/statement/pdf', [EmployeeStatementController::class, 'downloadPdf'])->name('statement.pdf');
         });
     });
 

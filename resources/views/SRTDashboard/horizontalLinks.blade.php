@@ -334,7 +334,7 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="{{ route('employee.statements')}}">
+                                            <a href="{{ route('employee.statement.index')}}">
                                                 <i class="fas fa-file-alt"></i> Statements
                                             </a>
                                         </li>

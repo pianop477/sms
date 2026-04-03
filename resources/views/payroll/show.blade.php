@@ -255,21 +255,6 @@
                     </div>
                 </div>
 
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <div class="summary-box bg-success text-white">
-                            <div class="summary-title text-white">Total Net Salary (After Official Deductions)</div>
-                            <div class="summary-value">TZS {{ number_format($summary['total_net'] ?? 0, 0) }}</div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="summary-box bg-info text-white">
-                            <div class="summary-title text-white">Total Amount to Pay (After Loans)</div>
-                            <div class="summary-value">TZS {{ number_format($summary['total_amount_paid'] ?? 0, 0) }}</div>
-                        </div>
-                    </div>
-                </div>
-
                 {{-- Action Buttons --}}
                 <div class="mb-4">
                     @if ($batch['status'] == 'draft')
