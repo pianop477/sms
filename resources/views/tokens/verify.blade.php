@@ -1164,7 +1164,7 @@
                 modalAdmissionInput.required = true;
                 modalPhoneInput.required = false;
                 modalSubmitBtn.disabled = false;
-                modalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Tuma Token Tena';
+                modalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Tuma Ombi';
             }
 
             function showModalAlert(message, type) {
