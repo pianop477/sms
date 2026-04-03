@@ -13,134 +13,186 @@
             --light: #f8f9fa;
         }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 15px;
+            padding: 8px;
             margin: 0;
         }
 
-        /* Main Container - SIMPLIFIED */
+        /* Main Container */
         .sms-dashboard {
             max-width: 1400px;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.95);
             border-radius: 12px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
             overflow: hidden;
         }
 
-        /* Header - CLEAN */
+        /* Header */
         .dashboard-header-sms {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            padding: 20px 30px;
+            padding: 15px;
             text-align: center;
         }
 
         .header-title {
             font-weight: 700;
-            font-size: 1.8rem;
+            font-size: 1.3rem;
             margin: 0;
             color: white;
         }
 
         .header-subtitle {
-            font-size: 1rem;
+            font-size: 0.8rem;
             opacity: 0.9;
-            margin-top: 8px;
+            margin-top: 5px;
             color: rgba(255, 255, 255, 0.9);
         }
 
-        /* Main Grid - FIXED HEIGHT ISSUE */
+        /* Main Grid - Mobile First */
         .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            padding: 25px;
-            min-height: 600px;
-            /* Minimum height */
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 15px;
         }
 
-        @media (max-width: 992px) {
+        @media (min-width: 992px) {
             .dashboard-grid {
-                grid-template-columns: 1fr;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
                 gap: 20px;
+                padding: 25px;
+            }
+
+            .dashboard-header-sms {
                 padding: 20px;
+            }
+
+            .header-title {
+                font-size: 1.8rem;
+            }
+
+            .header-subtitle {
+                font-size: 1rem;
             }
         }
 
-        /* Card - REMOVED COMPLEX FLEX */
+        /* Card */
         .dashboard-card {
             background: white;
             border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(78, 84, 200, 0.1);
-            transition: all 0.3s ease;
-            position: relative;
         }
 
-        .dashboard-card:hover {
-            box-shadow: 0 10px 25px rgba(78, 84, 200, 0.15);
+        @media (min-width: 768px) {
+            .dashboard-card {
+                padding: 20px;
+            }
         }
 
         .card-header {
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
             border-bottom: 1px solid rgba(78, 84, 200, 0.1);
         }
 
         .card-icon {
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 15px;
+            margin-right: 12px;
+            flex-shrink: 0;
         }
 
         .card-icon i {
-            font-size: 20px;
+            font-size: 18px;
             color: white;
         }
 
         .card-title {
             font-weight: 600;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             margin: 0;
             color: var(--dark);
         }
 
         .card-subtitle {
             color: #666;
-            font-size: 0.9rem;
-            margin-top: 3px;
+            font-size: 0.75rem;
+            margin-top: 2px;
         }
 
-        /* Classes Section - VISIBLE */
+        @media (min-width: 768px) {
+            .card-icon {
+                width: 45px;
+                height: 45px;
+                margin-right: 15px;
+            }
+
+            .card-icon i {
+                font-size: 20px;
+            }
+
+            .card-title {
+                font-size: 1.2rem;
+            }
+
+            .card-subtitle {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Classes Section - Improved for mobile */
         .classes-section {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .section-title {
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: var(--dark);
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
         }
 
+        /* Classes Grid - Responsive */
         .classes-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        @media (min-width: 480px) {
+            .classes-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .classes-grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 10px;
+            }
         }
 
         .class-option {
@@ -154,7 +206,7 @@
 
         .class-label {
             display: block;
-            padding: 12px 10px;
+            padding: 10px 8px;
             background: #f8f9fa;
             border: 1px solid #e9ecef;
             border-radius: 8px;
@@ -162,14 +214,15 @@
             transition: all 0.2s ease;
             text-align: center;
             font-weight: 500;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            word-break: break-word;
         }
 
         .class-checkbox:checked+.class-label {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             border-color: var(--primary);
-            box-shadow: 0 4px 10px rgba(78, 84, 200, 0.2);
+            position: relative;
         }
 
         .class-checkbox:checked+.class-label::after {
@@ -177,28 +230,28 @@
             position: absolute;
             top: -6px;
             right: -6px;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             background: var(--success);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 11px;
             color: white;
         }
 
-        /* Groups Section - VISIBLE */
+        /* Groups Section */
         .group-grid {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .group-option {
             display: flex;
             align-items: center;
-            padding: 12px 15px;
+            padding: 10px 12px;
             background: white;
             border: 1px solid #e9ecef;
             border-radius: 8px;
@@ -206,70 +259,70 @@
             transition: all 0.2s ease;
         }
 
-        .group-option:hover {
-            border-color: var(--primary);
-            background: #f8f9fa;
+        .group-option:active {
+            background: #f0f0f0;
         }
 
         .group-option input[type="checkbox"] {
-            margin-right: 12px;
+            margin-right: 10px;
             width: 18px;
             height: 18px;
             accent-color: var(--primary);
+            flex-shrink: 0;
         }
 
         .group-icon {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             background: rgba(78, 84, 200, 0.1);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 12px;
+            margin-right: 10px;
+            flex-shrink: 0;
         }
 
         .group-icon i {
-            font-size: 16px;
+            font-size: 14px;
             color: var(--primary);
         }
 
         .group-info {
             flex: 1;
+            min-width: 0;
         }
 
         .group-info h6 {
             margin: 0;
             font-weight: 600;
             color: var(--dark);
-            font-size: 0.95rem;
+            font-size: 0.85rem;
         }
 
         .group-info small {
             color: #666;
-            font-size: 0.85rem;
+            font-size: 0.7rem;
             display: block;
             margin-top: 2px;
         }
 
-        /* Message Area - SIMPLE */
+        /* Message Area */
         .message-container {
             margin-bottom: 20px;
         }
 
         .message-textarea {
             width: 100%;
-            min-height: 180px;
-            padding: 15px;
+            min-height: 120px;
+            padding: 12px;
             border: 1px solid #e9ecef;
             border-radius: 8px;
-            font-size: 15px;
+            font-size: 14px;
             line-height: 1.5;
             resize: vertical;
-            transition: all 0.2s ease;
             background: #f8f9fa;
             font-family: inherit;
-            box-sizing: border-box;
         }
 
         .message-textarea:focus {
@@ -281,49 +334,59 @@
 
         .char-counter {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-            padding: 8px 12px;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+            padding: 8px 10px;
             background: #f8f9fa;
             border-radius: 6px;
+        }
+
+        @media (min-width: 480px) {
+            .char-counter {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
         }
 
         .char-info {
             display: flex;
             align-items: center;
             gap: 8px;
+            font-size: 0.85rem;
         }
 
         .char-count {
             font-weight: 600;
-            font-size: 1.1rem;
             color: var(--primary);
         }
 
-        /* SMS History - SIMPLE & VISIBLE */
+        /* SMS History - Card View for Mobile */
         .sms-history {
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
         .history-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .history-title {
             font-weight: 600;
             color: var(--dark);
-            font-size: 1rem;
+            font-size: 0.9rem;
             margin: 0;
             display: flex;
             align-items: center;
         }
 
         .history-stats {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: var(--primary);
             font-weight: 600;
             padding: 4px 10px;
@@ -331,26 +394,122 @@
             border-radius: 15px;
         }
 
-        /* SMS Table - SIMPLE & VISIBLE */
+        /* Mobile Cards View for SMS History */
+        .sms-cards-view {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sms-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .sms-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .sms-recipient-info {
+            flex: 1;
+        }
+
+        .sms-phone {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--dark);
+        }
+
+        .sms-time {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .sms-status {
+            flex-shrink: 0;
+        }
+
+        .sms-card-body {
+            margin-bottom: 8px;
+        }
+
+        .sms-message-preview {
+            font-size: 0.85rem;
+            color: #555;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .sms-message-full {
+            display: none;
+        }
+
+        .sms-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 8px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .sms-count {
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .view-details-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 0.75rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .view-details-btn:active {
+            background: rgba(78, 84, 200, 0.1);
+        }
+
+        /* Desktop Table View */
         .sms-table-container {
+            display: none;
             border-radius: 8px;
             border: 1px solid #e9ecef;
-            overflow: auto;
-            max-height: 300px;
-            /* Fixed height with scroll */
+            overflow-x: auto;
+        }
+
+        @media (min-width: 768px) {
+            .sms-cards-view {
+                display: none;
+            }
+
+            .sms-table-container {
+                display: block;
+            }
         }
 
         .sms-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 500px;
+            min-width: 600px;
         }
 
         .sms-table thead {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            position: sticky;
-            top: 0;
-            z-index: 10;
         }
 
         .sms-table th {
@@ -359,36 +518,26 @@
             font-weight: 600;
             text-align: left;
             font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
             white-space: nowrap;
-        }
-
-        .sms-table tbody tr {
-            border-bottom: 1px solid #f0f0f0;
-            transition: background 0.2s ease;
-        }
-
-        .sms-table tbody tr:hover {
-            background: rgba(78, 84, 200, 0.03);
         }
 
         .sms-table td {
             padding: 12px 15px;
             color: #495057;
             vertical-align: middle;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid #f0f0f0;
         }
 
         /* Status Badges */
         .status-badge {
-            padding: 5px 10px;
+            padding: 4px 8px;
             border-radius: 12px;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             white-space: nowrap;
         }
 
@@ -400,7 +549,7 @@
 
         .status-pending {
             background: rgba(253, 203, 110, 0.1);
-            color: #e17055;
+            color: #f39c12;
             border: 1px solid rgba(253, 203, 110, 0.2);
         }
 
@@ -410,52 +559,9 @@
             border: 1px solid rgba(225, 112, 85, 0.2);
         }
 
-        /* SMS Preview */
-        .sms-preview {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            max-width: 300px;
-        }
-
-        .sms-icon {
-            width: 28px;
-            height: 28px;
-            background: rgba(78, 84, 200, 0.1);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .sms-icon i {
-            font-size: 14px;
-            color: var(--primary);
-        }
-
-        .sms-text {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .sms-text a {
-            color: var(--dark);
-            text-decoration: none;
-            font-size: 0.9rem;
-            display: block;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .sms-text a:hover {
-            color: var(--primary);
-        }
-
         /* Submit Button */
         .submit-section {
-            padding: 20px;
+            padding: 15px;
             background: rgba(248, 249, 250, 0.95);
             border-top: 1px solid rgba(78, 84, 200, 0.1);
             text-align: center;
@@ -465,95 +571,110 @@
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             border: none;
             border-radius: 8px;
-            padding: 12px 35px;
-            font-size: 1rem;
+            padding: 12px 20px;
+            font-size: 0.95rem;
             font-weight: 600;
             color: white;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(78, 84, 200, 0.25);
+            width: 100%;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .send-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(78, 84, 200, 0.35);
+        .send-btn:active {
+            transform: scale(0.98);
         }
 
-        /* Modal - COMPACT */
+        @media (min-width: 768px) {
+            .submit-section {
+                padding: 20px;
+            }
+
+            .send-btn {
+                width: auto;
+                padding: 12px 35px;
+                font-size: 1rem;
+            }
+
+            .send-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(78, 84, 200, 0.35);
+            }
+        }
+
+        /* Modal */
         .modal-content {
             border-radius: 12px;
             border: none;
+            margin: 10px;
+        }
+
+        @media (min-width: 768px) {
+            .modal-content {
+                margin: 0;
+            }
         }
 
         .modal-header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            padding: 15px 20px;
+            padding: 12px 15px;
             border-radius: 12px 12px 0 0;
         }
 
         .modal-title {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
         }
 
         .modal-body {
-            padding: 20px;
+            padding: 15px;
+            max-height: 70vh;
+            overflow-y: auto;
         }
 
         .modal-footer {
-            padding: 15px 20px;
+            padding: 12px 15px;
         }
 
-        /* Scrollbar */
-        .sms-table-container::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+        /* Alerts */
+        .alert {
+            margin: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            padding: 12px;
         }
 
-        .sms-table-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
         }
 
-        .sms-table-container::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            border-radius: 10px;
+        .empty-state i {
+            font-size: 2rem;
+            color: #ccc;
+            margin-bottom: 10px;
         }
 
-        /* Mobile */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
+        .empty-state h6 {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
 
-            .dashboard-header-sms {
-                padding: 15px 20px;
-            }
+        .empty-state p {
+            font-size: 0.8rem;
+        }
 
-            .dashboard-grid {
-                padding: 15px;
-                gap: 15px;
-            }
-
-            .dashboard-card {
-                padding: 15px;
-            }
-
-            .classes-grid {
-                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            }
-
-            .send-btn {
-                width: 100%;
-                padding: 12px;
-            }
+        /* Loading Spinner */
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+            border-width: 0.2em;
         }
     </style>
 
-
     <!-- Session Alerts -->
     @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin: 15px; border-radius: 8px;">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="fas fa-exclamation-circle me-2"></i>
             {{ Session::get('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -561,8 +682,7 @@
     @endif
 
     @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert"
-            style="margin: 15px; border-radius: 8px;">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
             <i class="fas fa-check-circle me-2"></i>
             {{ Session::get('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -592,7 +712,7 @@
                         <i class="fas fa-users"></i>
                     </div>
                     <div>
-                        <h3 class="card-title"> Recipients</h3>
+                        <h3 class="card-title">Recipients</h3>
                         <p class="card-subtitle">Select message recipients</p>
                     </div>
                 </div>
@@ -615,7 +735,7 @@
                         @empty
                             <div class="text-center py-4" style="grid-column: 1 / -1;">
                                 <i class="fas fa-inbox fa-lg text-muted mb-2"></i>
-                                <p class="text-muted mb-0"> No classes available</p>
+                                <p class="text-muted mb-0">No classes available</p>
                             </div>
                         @endforelse
                     </div>
@@ -627,77 +747,68 @@
                         <i class="fas fa-layer-group me-2"></i> Groups
                     </div>
                     <div class="group-grid">
-                        <!-- All Parents -->
                         <label class="group-option">
-                            <input type="checkbox" name="send_to_all" value="1"
-                                {{ old('send_to_all') ? 'checked' : '' }}>
+                            <input type="checkbox" name="send_to_all" value="1" {{ old('send_to_all') ? 'checked' : '' }}>
                             <div class="group-icon">
                                 <i class="fas fa-users"></i>
                             </div>
                             <div class="group-info">
-                                <h6> All Parents</h6>
+                                <h6>All Parents</h6>
                                 <small>All students from all classes</small>
                             </div>
                         </label>
 
-                        <!-- Transport Groups -->
                         <label class="group-option">
-                            <input type="checkbox" name="send_with_transport" value="1"
-                                {{ old('send_with_transport') ? 'checked' : '' }}>
+                            <input type="checkbox" name="send_with_transport" value="1" {{ old('send_with_transport') ? 'checked' : '' }}>
                             <div class="group-icon">
                                 <i class="fas fa-bus"></i>
                             </div>
                             <div class="group-info">
-                                <h6> With Transport</h6>
+                                <h6>With Transport</h6>
                                 <small>Parents whose children use school transport</small>
                             </div>
                         </label>
 
                         <label class="group-option">
-                            <input type="checkbox" name="send_without_transport" value="1"
-                                {{ old('send_without_transport') ? 'checked' : '' }}>
+                            <input type="checkbox" name="send_without_transport" value="1" {{ old('send_without_transport') ? 'checked' : '' }}>
                             <div class="group-icon">
                                 <i class="fas fa-walking"></i>
                             </div>
                             <div class="group-info">
-                                <h6> Without Transport</h6>
+                                <h6>Without Transport</h6>
                                 <small>Parents whose children don't use transport</small>
                             </div>
                         </label>
 
-                        <!-- Staff Groups -->
                         <label class="group-option">
-                            <input type="checkbox" name="send_to_teachers" value="1"
-                                {{ old('send_to_teachers') ? 'checked' : '' }}>
+                            <input type="checkbox" name="send_to_teachers" value="1" {{ old('send_to_teachers') ? 'checked' : '' }}>
                             <div class="group-icon">
                                 <i class="fas fa-chalkboard-teacher"></i>
                             </div>
                             <div class="group-info">
-                                <h6> Teaching Staff</h6>
+                                <h6>Teaching Staff</h6>
                                 <small>All teachers and academic staff</small>
                             </div>
                         </label>
 
                         <label class="group-option">
-                            <input type="checkbox" name="send_to_other_staff" value="1"
-                                {{ old('send_to_other_staff') ? 'checked' : '' }}>
+                            <input type="checkbox" name="send_to_other_staff" value="1" {{ old('send_to_other_staff') ? 'checked' : '' }}>
                             <div class="group-icon">
                                 <i class="fas fa-user-tie"></i>
                             </div>
                             <div class="group-info">
-                                <h6> Non-Teaching Staff</h6>
+                                <h6>Non-Teaching Staff</h6>
                                 <small>All support staff</small>
                             </div>
                         </label>
 
                         <label class="group-option">
-                            <input type="checkbox" name="send_to_drivers" value="1"
-                                {{ old('send_to_drivers') ? 'checked' : '' }}>
+                            <input type="checkbox" name="send_to_drivers" value="1" {{ old('send_to_drivers') ? 'checked' : '' }}>
                             <div class="group-icon">
                                 <i class="fas fa-truck"></i>
                             </div>
                             <div class="group-info">
-                                <h6> Drivers</h6>
+                                <h6>Drivers</h6>
                                 <small>School transport drivers only</small>
                             </div>
                         </label>
@@ -713,22 +824,23 @@
                         <i class="fas fa-comment-alt"></i>
                     </div>
                     <div>
-                        <h3 class="card-title"> Compose Message</h3>
+                        <h3 class="card-title">Compose Message</h3>
                         <p class="card-subtitle">Write your announcement message</p>
                     </div>
                 </div>
 
-                <!-- Badili sehemu ya message container -->
+                <!-- Message Container -->
                 <div class="message-container">
                     @php
                         $school = Auth::user()->school;
                         $isBasicPackage = $school && $school->package === 'basic';
-                        $maxChars = $isBasicPackage ? 306 : 459; // 306 = SMS 2, 459 = SMS 3
+                        $maxChars = $isBasicPackage ? 306 : 459;
                         $smsCount = $isBasicPackage ? 2 : 3;
                     @endphp
 
                     <textarea name="message_content" id="message_content"
-                        class="message-textarea @error('message_content') is-invalid @enderror" placeholder="Type your message here..."
+                        class="message-textarea @error('message_content') is-invalid @enderror"
+                        placeholder="Type your message here..."
                         required maxlength="{{ $maxChars }}">{{ old('message_content') }}</textarea>
 
                     @error('message_content')
@@ -741,10 +853,9 @@
                             <span class="text-muted">/ {{ $maxChars }} characters</span>
                         </div>
                         <div>
-                            <span class="badge"
-                                style="background: {{ $isBasicPackage ? '#e17055' : '#4e54c8' }}; color: white; padding: 5px 10px; border-radius: 20px;">
+                            <span class="badge" style="background: {{ $isBasicPackage ? '#e17055' : '#4e54c8' }}; color: white; padding: 4px 8px; border-radius: 20px; font-size: 0.7rem;">
                                 <i class="fas fa-{{ $isBasicPackage ? 'star' : 'crown' }} me-1"></i>
-                                {{ $isBasicPackage ? 'Basic Package' : 'Premium Package' }} - Max {{ $smsCount }} SMS
+                                {{ $isBasicPackage ? 'Basic' : 'Premium' }} - Max {{ $smsCount }} SMS
                             </span>
                         </div>
                     </div>
@@ -754,14 +865,70 @@
                 <div class="sms-history">
                     <div class="history-header">
                         <h6 class="history-title">
-                            <i class="fas fa-history mr-2"></i> Recent Messages
+                            <i class="fas fa-history me-2"></i> Recent Messages
                         </h6>
-                        <span class="history-stats">{{ $smsCount }} total</span>
+                        <span class="history-stats">{{ count($smsContents) }} total</span>
                     </div>
 
-                    @if ($smsCount > 0)
+                    @if (count($smsContents) > 0)
+                        <!-- Mobile Cards View -->
+                        <div class="sms-cards-view">
+                            @foreach ($smsContents as $sms)
+                                <div class="sms-card">
+                                    <div class="sms-card-header">
+                                        <div class="sms-recipient-info">
+                                            <div class="sms-phone">
+                                                <i class="fas fa-phone-alt me-1" style="font-size: 0.7rem;"></i>
+                                                {{ substr($sms['to'], -4) }}...
+                                            </div>
+                                            <div class="sms-time">
+                                                <i class="far fa-clock me-1"></i>
+                                                {{ \Carbon\Carbon::parse($sms['sentAt'])->format('d/m/Y H:i') }}
+                                            </div>
+                                        </div>
+                                        <div class="sms-status">
+                                            @if ($sms['delivery'] == 'DELIVERED')
+                                                <span class="status-badge status-delivered">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </span>
+                                            @elseif ($sms['delivery'] == 'PENDING')
+                                                <span class="status-badge status-pending">
+                                                    <i class="fas fa-clock"></i>
+                                                </span>
+                                            @else
+                                                <span class="status-badge status-failed">
+                                                    <i class="fas fa-times-circle"></i>
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="sms-card-body">
+                                        <div class="sms-message-preview">
+                                            {{ \Illuminate\Support\Str::limit($sms['text'], 60) }}
+                                        </div>
+                                    </div>
+                                    <div class="sms-card-footer">
+                                        <div class="sms-count">
+                                            <i class="fas fa-envelope"></i> {{ $sms['smsCount'] }} SMS
+                                        </div>
+                                        <button type="button" class="view-details-btn" data-bs-toggle="modal"
+                                            data-bs-target="#smsModal"
+                                            data-full-text="{{ htmlspecialchars($sms['text']) }}"
+                                            data-to="{{ $sms['to'] }}"
+                                            data-from="{{ $sms['from'] }}"
+                                            data-status="{{ $sms['delivery'] }}"
+                                            data-sent-at="{{ \Carbon\Carbon::parse($sms['sentAt'])->format('d/m/Y H:i') }}"
+                                            data-delivered-at="{{ \Carbon\Carbon::parse($sms['doneAt'])->format('d/m/Y H:i') }}">
+                                            <i class="fas fa-eye me-1"></i> View Details
+                                        </button>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <!-- Desktop Table View -->
                         <div class="sms-table-container">
-                            <table class="sms-table table-responsive-md">
+                            <table class="sms-table">
                                 <thead>
                                     <tr>
                                         <th>Sent At</th>
@@ -776,17 +943,10 @@
                                     @foreach ($smsContents as $sms)
                                         <tr>
                                             <td style="white-space: nowrap;">
-                                                <div class="text-muted">
-                                                    {{ \Carbon\Carbon::parse($sms['sentAt'])->format('H:i:s') }}
-                                                </div>
-                                                <div class="text-muted" style="font-size: 0.85rem;">
-                                                    {{ \Carbon\Carbon::parse($sms['sentAt'])->format('d/m/Y') }}
-                                                </div>
+                                                {{ \Carbon\Carbon::parse($sms['sentAt'])->format('d/m/Y H:i') }}
                                             </td>
                                             <td>{{ $sms['from'] }}</td>
-                                            <td style="white-space: nowrap;">
-                                                {{ substr($sms['to'], -4) }}...
-                                            </td>
+                                            <td>{{ substr($sms['to'], -4) }}...</td>
                                             <td>
                                                 <div class="sms-preview">
                                                     <div class="sms-icon">
@@ -801,40 +961,37 @@
                                                             data-status="{{ $sms['delivery'] }}"
                                                             data-sent-at="{{ \Carbon\Carbon::parse($sms['sentAt'])->format('d/m/Y H:i') }}"
                                                             data-delivered-at="{{ \Carbon\Carbon::parse($sms['doneAt'])->format('d/m/Y H:i') }}">
-                                                            {{ \Illuminate\Support\Str::limit($sms['text'], 20) }}
+                                                            {{ \Illuminate\Support\Str::limit($sms['text'], 30) }}
                                                         </a>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>{{ $sms['smsCount'] }}</td>
+                                            <td style="text-align: center;">{{ $sms['smsCount'] }}</td>
                                             <td>
                                                 @if ($sms['delivery'] == 'DELIVERED')
                                                     <span class="status-badge status-delivered">
-                                                        <i class="fas fa-check-circle"></i>
-                                                        <span> Delivered</span>
+                                                        <i class="fas fa-check-circle"></i> Delivered
                                                     </span>
                                                 @elseif ($sms['delivery'] == 'PENDING')
                                                     <span class="status-badge status-pending">
-                                                        <i class="fas fa-clock"></i>
-                                                        <span> Pending</span>
+                                                        <i class="fas fa-clock"></i> Pending
                                                     </span>
                                                 @else
                                                     <span class="status-badge status-failed">
-                                                        <i class="fas fa-times-circle"></i>
-                                                        <span> Failed</span>
+                                                        <i class="fas fa-times-circle"></i> Failed
                                                     </span>
                                                 @endif
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
-                            </table>
+                             </table>
                         </div>
                     @else
-                        <div class="text-center py-5">
-                            <i class="fas fa-inbox fa-2x text-muted mb-3"></i>
-                            <h6 class="mb-1"> No messages yet</h6>
-                            <p class="text-muted mb-0" style="font-size: 0.9rem;">Your sent messages will appear here</p>
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h6>No messages yet</h6>
+                            <p class="text-muted">Your sent messages will appear here</p>
                         </div>
                     @endif
                 </div>
@@ -843,8 +1000,7 @@
 
         <!-- Submit Button -->
         <div class="submit-section">
-            <button type="submit" form="smsForm" class="send-btn" id="sendButton"
-                onclick="return confirm('Are you sure you want to send this message?')">
+            <button type="submit" form="smsForm" class="send-btn" id="sendButton">
                 <i class="fas fa-paper-plane me-2"></i> Broadcast SMS
             </button>
         </div>
@@ -852,48 +1008,38 @@
 
     <!-- SMS Modal -->
     <div class="modal fade" id="smsModal" tabindex="-1" aria-labelledby="smsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title text-white mb-0">
                         <i class="fas fa-sms me-2"></i> SMS Details
                     </h5>
-                    <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close"><i
-                            class="fas fa-close"></i></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="row g-2 mb-3">
-                        <div class="col-6">
-                            <small class="text-muted d-block mb-1">Recipient</small>
-                            <div class="fw-semibold" id="modalTo"></div>
-                        </div>
-                        <div class="col-6">
-                            <small class="text-muted d-block mb-1">Sender</small>
-                            <div class="fw-semibold" id="modalFrom"></div>
-                        </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1">Recipient</small>
+                        <div class="fw-semibold" id="modalTo" style="word-break: break-all;"></div>
                     </div>
-
-                    <div class="row g-2 mb-3">
-                        <div class="col-6">
-                            <small class="text-muted d-block mb-1">Sent</small>
-                            <div class="fw-semibold" id="modalSentAt"></div>
-                        </div>
-                        <div class="col-6">
-                            <small class="text-muted d-block mb-1">Delivered</small>
-                            <div class="fw-semibold" id="modalDeliveredAt"></div>
-                        </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1">Sender</small>
+                        <div class="fw-semibold" id="modalFrom"></div>
                     </div>
-
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1">Sent At</small>
+                        <div class="fw-semibold" id="modalSentAt"></div>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1">Delivered At</small>
+                        <div class="fw-semibold" id="modalDeliveredAt"></div>
+                    </div>
                     <div class="mb-3">
                         <small class="text-muted d-block mb-1">Status</small>
-                        <div id="modalStatus" class="text-white"></div>
+                        <div id="modalStatus"></div>
                     </div>
-
                     <div>
                         <small class="text-muted d-block mb-2">Message</small>
-                        <div class="p-3 bg-light rounded border"
-                            style="white-space: pre-wrap; word-wrap: break-word; max-height: 200px; overflow-y: auto;"
-                            id="modalFullText"></div>
+                        <div class="p-3 bg-light rounded border" style="white-space: pre-wrap; word-wrap: break-word; max-height: 200px; overflow-y: auto; font-size: 0.9rem;" id="modalFullText"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -913,126 +1059,94 @@
             const sendButton = document.getElementById('sendButton');
             const form = document.querySelector('form');
 
-            // Pata max length kutoka kwenye textarea attribute
             const maxLength = parseInt(textarea.getAttribute('maxlength'));
-            const warningThreshold = maxLength - 50; // Onyo when 50 characters left
+            const warningThreshold = maxLength - 50;
 
             // Character counter
-            textarea.addEventListener('input', function() {
-                const currentLength = this.value.length;
+            function updateCharCount() {
+                const currentLength = textarea.value.length;
                 charCount.textContent = currentLength;
 
-                // Badili rangi kulingana na package na remaining characters
                 if (currentLength > maxLength - 10) {
-                    charCount.style.color = '#e17055'; // Danger - almost full
+                    charCount.style.color = '#e17055';
                 } else if (currentLength > warningThreshold) {
-                    charCount.style.color = '#f39c12'; // Warning - yellow
+                    charCount.style.color = '#f39c12';
                 } else {
-                    charCount.style.color = '#4e54c8'; // Normal
+                    charCount.style.color = '#4e54c8';
                 }
 
-                // Onyesha remaining characters
                 const remaining = maxLength - currentLength;
                 if (remaining <= 20) {
-                    // Add tooltip or visual indicator
                     textarea.style.borderColor = remaining <= 10 ? '#e17055' : '#f39c12';
                 } else {
                     textarea.style.borderColor = '';
                 }
-            });
+            }
 
-            // Initialize
-            charCount.textContent = textarea.value.length;
+            textarea.addEventListener('input', updateCharCount);
+            updateCharCount();
 
-            // Form submission - ENHANCED VALIDATION
+            // Form submission validation
             form.addEventListener('submit', function(e) {
-                e.preventDefault(); // Stop form submission first
+                e.preventDefault();
 
-                // Reset previous error states
+                // Remove existing error messages
                 document.querySelectorAll('.validation-error').forEach(el => el.remove());
+                document.querySelectorAll('.invalid').forEach(el => el.classList.remove('invalid'));
 
                 let isValid = true;
                 let errorMessages = [];
 
-                // 1. Check recipients (same as before)
+                // Check recipients
                 const classChecked = document.querySelectorAll('.class-checkbox:checked').length;
-                const groupChecked = document.querySelectorAll(
-                    '.group-option input[type="checkbox"]:checked').length;
+                const groupChecked = document.querySelectorAll('.group-option input[type="checkbox"]:checked').length;
 
                 if (classChecked === 0 && groupChecked === 0) {
                     isValid = false;
                     errorMessages.push('Please select at least one recipient group or class.');
 
-                    // Highlight recipients section (same as before)
                     const recipientsSection = document.querySelector('.dashboard-card:first-child');
                     recipientsSection.style.border = '2px solid #e17055';
-                    recipientsSection.style.animation = 'shake 0.5s ease-in-out';
 
                     const errorDiv = document.createElement('div');
                     errorDiv.className = 'validation-error alert alert-danger mt-2';
-                    errorDiv.innerHTML = `
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    Please select at least one recipient
-                `;
+                    errorDiv.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i> Please select at least one recipient';
                     recipientsSection.querySelector('.card-header').after(errorDiv);
-                } else {
-                    const recipientsSection = document.querySelector('.dashboard-card:first-child');
-                    recipientsSection.style.border = '';
-                    recipientsSection.style.animation = '';
+
+                    setTimeout(() => {
+                        recipientsSection.style.border = '';
+                    }, 3000);
                 }
 
-                // 2. Check message content with dynamic max length
+                // Check message
                 const messageText = textarea.value.trim();
                 const maxChars = parseInt(textarea.getAttribute('maxlength'));
 
                 if (messageText.length === 0) {
                     isValid = false;
                     errorMessages.push('Please enter a message to send.');
-                    highlightMessageArea(textarea, 'Message cannot be empty');
+                    highlightMessageArea('Message cannot be empty');
                 } else if (messageText.length > maxChars) {
                     isValid = false;
-                    errorMessages.push(
-                        `Message is too long. Maximum ${maxChars} characters allowed (${getSMSCount(maxChars)} SMS).`
-                        );
-
-                    const smsCount = getSMSCount(maxChars);
-                    highlightMessageArea(textarea,
-                        `Message is too long (${messageText.length}/${maxChars} characters). ` +
-                        `Maximum ${smsCount} SMS allowed.`
-                    );
-                } else {
-                    textarea.style.border = '';
-                    textarea.style.boxShadow = '';
+                    errorMessages.push(`Message is too long. Maximum ${maxChars} characters allowed.`);
+                    highlightMessageArea(`Message is too long (${messageText.length}/${maxChars} characters)`);
                 }
 
-                // Helper function for SMS count
-                function getSMSCount(maxChars) {
-                    return maxChars === 306 ? 2 : 3;
-                }
-
-                // Helper function to highlight message area
-                function highlightMessageArea(textarea, errorMessage) {
+                function highlightMessageArea(errorMessage) {
                     textarea.style.border = '2px solid #e17055';
-                    textarea.style.boxShadow = '0 0 0 3px rgba(225, 112, 85, 0.1)';
-
                     const errorDiv = document.createElement('div');
                     errorDiv.className = 'validation-error alert alert-danger mt-2';
-                    errorDiv.innerHTML = `
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    ${errorMessage}
-                `;
+                    errorDiv.innerHTML = `<i class="fas fa-exclamation-circle me-2"></i> ${errorMessage}`;
                     textarea.parentNode.insertBefore(errorDiv, textarea.nextSibling);
-
-                    textarea.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
+                    textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     textarea.focus();
+
+                    setTimeout(() => {
+                        textarea.style.border = '';
+                    }, 3000);
                 }
 
-                // If valid, proceed with confirmation
                 if (isValid) {
-                    // Get package info for confirmation message
                     const isBasic = {{ Auth::user()->school->package === 'basic' ? 'true' : 'false' }};
                     const smsLimit = isBasic ? 2 : 3;
                     const charLimit = isBasic ? 306 : 459;
@@ -1049,38 +1163,38 @@
                     if (confirmed) {
                         sendButton.disabled = true;
                         sendButton.innerHTML = `
-                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                        Sending...
-                    `;
+                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                            Sending...
+                        `;
                         form.submit();
                     }
                 } else {
-                    // Show error alert (same as before)
                     showErrorAlert(errorMessages);
                 }
             });
 
-            // Helper function to show error alert
             function showErrorAlert(messages) {
                 const errorAlert = document.createElement('div');
                 errorAlert.className = 'alert alert-danger alert-dismissible fade show';
                 errorAlert.style.position = 'fixed';
-                errorAlert.style.top = '20px';
-                errorAlert.style.right = '20px';
+                errorAlert.style.top = '10px';
+                errorAlert.style.left = '10px';
+                errorAlert.style.right = '10px';
                 errorAlert.style.zIndex = '9999';
                 errorAlert.style.maxWidth = '400px';
+                errorAlert.style.margin = '10px auto';
                 errorAlert.innerHTML = `
-                <div class="d-flex align-items-start">
-                    <i class="fas fa-exclamation-triangle me-3 mt-1 fs-4"></i>
-                    <div>
-                        <h5 class="alert-heading mb-2">Please fix the following:</h5>
-                        <ul class="mb-1">
-                            ${messages.map(msg => `<li>${msg}</li>`).join('')}
-                        </ul>
+                    <div class="d-flex align-items-start">
+                        <i class="fas fa-exclamation-triangle me-3 mt-1"></i>
+                        <div>
+                            <strong>Please fix the following:</strong>
+                            <ul class="mb-0 mt-1">
+                                ${messages.map(msg => `<li>${msg}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `;
+                `;
                 document.body.appendChild(errorAlert);
 
                 setTimeout(() => {
@@ -1092,89 +1206,9 @@
                 }, 5000);
             }
 
-            // Add shake animation
-            const style = document.createElement('style');
-            style.textContent = `
-            @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-                20%, 40%, 60%, 80% { transform: translateX(5px); }
-            }
-
-            .validation-error {
-                border-radius: 8px;
-                border-left: 4px solid #e17055;
-            }
-
-            .message-textarea.invalid {
-                border: 2px solid #e17055 !important;
-                background: rgba(225, 112, 85, 0.05) !important;
-            }
-
-            .class-label.invalid, .group-option.invalid {
-                border: 2px solid #e17055 !important;
-                background: rgba(225, 112, 85, 0.05) !important;
-            }
-
-            /* Package indicator styles */
-            .package-badge {
-                display: inline-block;
-                padding: 3px 8px;
-                border-radius: 12px;
-                font-size: 0.75rem;
-                font-weight: 500;
-            }
-
-            .package-basic {
-                background: #ffeaa7;
-                color: #d35400;
-            }
-
-            .package-premium {
-                background: #74b9ff;
-                color: #2c3e50;
-            }
-        `;
-            document.head.appendChild(style);
-
-            // Real-time validation
-            textarea.addEventListener('input', function() {
-                const text = this.value.trim();
-                const maxChars = parseInt(this.getAttribute('maxlength'));
-
-                if (text.length === 0 || text.length > maxChars) {
-                    this.classList.add('invalid');
-                } else {
-                    this.classList.remove('invalid');
-                }
-            });
-
-            // Real-time validation for checkboxes (same as before)
-            const checkboxes = document.querySelectorAll('.class-checkbox, .group-option input[type="checkbox"]');
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const classChecked = document.querySelectorAll('.class-checkbox:checked')
-                    .length;
-                    const groupChecked = document.querySelectorAll(
-                        '.group-option input[type="checkbox"]:checked').length;
-
-                    if (classChecked === 0 && groupChecked === 0) {
-                        document.querySelectorAll('.class-label, .group-option').forEach(el => {
-                            el.classList.add('invalid');
-                        });
-                    } else {
-                        document.querySelectorAll('.class-label, .group-option').forEach(el => {
-                            el.classList.remove('invalid');
-                        });
-                    }
-                });
-            });
-
-            // Modal functionality (same as before)
-            document.querySelectorAll('.sms-preview-link').forEach(link => {
+            // Modal functionality
+            document.querySelectorAll('.sms-preview-link, .view-details-btn').forEach(link => {
                 link.addEventListener('click', function(e) {
-                    e.preventDefault();
-
                     const data = {
                         fullText: this.getAttribute('data-full-text'),
                         to: this.getAttribute('data-to'),
@@ -1191,21 +1225,22 @@
                     document.getElementById('modalDeliveredAt').textContent = data.deliveredAt;
 
                     let statusHtml = '';
+                    let statusClass = '';
                     if (data.status === 'DELIVERED') {
-                        statusHtml =
-                            `<span class="badge bg-success py-1 px-2">${data.status}</span>`;
+                        statusClass = 'bg-success';
+                        statusHtml = `<span class="badge ${statusClass} py-1 px-2">${data.status}</span>`;
                     } else if (data.status === 'PENDING') {
-                        statusHtml =
-                            `<span class="badge bg-warning text-dark py-1 px-2">${data.status}</span>`;
+                        statusClass = 'bg-warning text-dark';
+                        statusHtml = `<span class="badge ${statusClass} py-1 px-2">${data.status}</span>`;
                     } else {
-                        statusHtml =
-                        `<span class="badge bg-danger py-1 px-2">${data.status}</span>`;
+                        statusClass = 'bg-danger';
+                        statusHtml = `<span class="badge ${statusClass} py-1 px-2">${data.status}</span>`;
                     }
                     document.getElementById('modalStatus').innerHTML = statusHtml;
                 });
             });
 
-            // Copy SMS (same as before)
+            // Copy SMS
             document.getElementById('copySmsBtn')?.addEventListener('click', function() {
                 const text = document.getElementById('modalFullText').textContent;
                 navigator.clipboard.writeText(text).then(() => {
@@ -1220,12 +1255,9 @@
                 });
             });
 
-            // Prevent form submission on Enter
+            // Prevent form submission on Enter key in textarea
             textarea.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && e.ctrlKey) {
-                    return;
-                }
-                if (e.key === 'Enter') {
+                if (e.key === 'Enter' && !e.ctrlKey) {
                     e.preventDefault();
                 }
             });

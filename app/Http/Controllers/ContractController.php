@@ -767,8 +767,8 @@ class ContractController extends Controller
         $destination = $this->formatPhoneNumber($phone);
 
         $smsMessage = $isReapply
-            ? "Habari {$firstName}, Ombi lako la mkataba limepokelewa kikamilifu baada ya marekebisho. Utapokea taarifa baada ya kufanyiwa kazi."
-            : "Habari {$firstName}, Ombi lako la mkataba limepokelewa kikamilifu. Utapokea taarifa baada ya kufanyiwa kazi.";
+            ? "Habari {$firstName}, Ombi lako la mkataba limepokelewa baada ya marekebisho. Utapokea taarifa baada ya kufanyiwa kazi."
+            : "Habari {$firstName}, Ombi lako la mkataba limepokelewa. Utapokea taarifa baada ya kufanyiwa kazi.";
 
         $nextSmsService = new NextSmsService();
 
@@ -1174,9 +1174,9 @@ class ContractController extends Controller
                 $portalLink = $this->appBaseUrl; // Or specific staff portal URL
 
                 if ($contract->contract_type == 'provision') {
-                    $message = "Habari {$applicant['first_name']}, Ombi lako la mkataba wa muda wa matazamio limeshughulikiwa. Ingia kwenye portal kupitia $portalLink pakua barua, saini na kisha irudishwe ofisini. Asante.";
+                    $message = "Ombi lako la mkataba wa muda wa matazamio limeshughulikiwa. Ingia kwenye portal kupitia $portalLink pakua barua, saini na kisha irudishwe ofisini. Asante.";
                 } else {
-                    $message = "Habari {$applicant['first_name']}, Ombi lako la mkataba mpya wa ajira limeshughulikiwa. Ingia kwenye portal kupitia $portalLink kupakua mkataba, saini na kisha irudishwe ofisini. Asante.";
+                    $message = "Ombi lako la mkataba mpya limeshughulikiwa. Ingia kwenye portal kupitia $portalLink kupakua mkataba, saini na kisha irudishwe ofisini. Asante.";
                 }
                 $payload = [
                     'from' => $school->sender_id ?? "SHULE APP",
@@ -1268,9 +1268,9 @@ class ContractController extends Controller
                 $portalLink = $this->appBaseUrl; // Or specific staff portal URL
 
                 if ($contract->contract_type == 'provision') {
-                    $message = "Habari {$applicant['first_name']}, Ombi lako la mkataba wa muda wa matazamio limekataliwa. Sababu: {$request->remarks}. Ingia kwenye portal kupitia $portalLink kwa maelekezo zaidi.";
+                    $message = "Ombi lako la mkataba wa muda wa matazamio limekataliwa. Sababu: {$request->remarks}. Ingia kwenye portal kupitia $portalLink kwa maelekezo zaidi.";
                 } else {
-                    $message = "Habari {$applicant['first_name']}, Ombi lako la mkataba mpya wa ajira limekataliwa. Sababu: {$request->remarks}. Ingia kwenye portal kupitia $portalLink kwa maelekezo zaidi.";
+                    $message = "Ombi lako la mkataba mpya wa ajira limekataliwa. Sababu: {$request->remarks}. Ingia kwenye portal kupitia $portalLink kwa maelekezo zaidi.";
                 }
 
                 $payload = [
@@ -1392,9 +1392,9 @@ class ContractController extends Controller
                 $portalLink = $this->appBaseUrl; // Or specific staff portal URL
 
                 if ($contract->contract_type == 'provision') {
-                    $message = "Habari {$applicant['first_name']}, Barua ya mkataba wa muda wa matazamio umekamilika na utaanza kutumika: {$startDate} hadi {$endDate}. Ingia kwenye portal kupitia $portalLink ili kupakua. Asante.";
+                    $message = "Barua ya mkataba wa muda wa matazamio umekamilika na utaanza kutumika: {$startDate} hadi {$endDate}. Ingia kwenye portal kupitia $portalLink ili kupakua. Asante.";
                 } else {
-                    $message = "Habari {$applicant['first_name']}, Mkataba wako wa ajira umekamilika na utaanza kutumika: {$startDate} hadi {$endDate}. Ingia kwenye portal kupitia $portalLink ili kupakua. Asante.";
+                    $message = "Mkataba wako wa ajira umekamilika na utaanza kutumika: {$startDate} hadi {$endDate}. Ingia kwenye portal kupitia $portalLink ili kupakua. Asante.";
                 }
                 $payload = [
                     'from' => $school->sender_id ?? "SHULE APP",
@@ -2294,7 +2294,7 @@ class ContractController extends Controller
                     $nextSmsService = new NextSmsService();
                     $destination = $this->formatPhoneNumber($applicant['phone']);
 
-                    $message = "Habari {$applicant['first_name']}, mkataba wako wa ajira umesitishwa. Sababu: {$request->termination_reason}. Tafadhali wasiliana na ofisi kwa maelezo zaidi.";
+                    $message = "Habari, Mkataba wako wa ajira umesitishwa. Sababu: {$request->termination_reason}. Tafadhali wasiliana na ofisi kwa maelezo zaidi.";
 
                     $nextSmsService->sendSmsByNext(
                         $request->from ?? "SHULE APP",
