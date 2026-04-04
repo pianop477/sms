@@ -331,7 +331,7 @@
                 <div class="filter-bar">
                     <div class="row align-items-center">
                         <div class="col-md-3 mb-2 mb-md-0">
-                            <select id="filter-status" class="form-select form-select-sm">
+                            <select id="filter-status" class="form-control form-control-sm">
                                 <option value="">All Status</option>
                                 <option value="draft">Draft</option>
                                 <option value="calculated">Calculated</option>

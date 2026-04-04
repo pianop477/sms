@@ -436,7 +436,7 @@
                                 </h6>
                                 <div class="row">
                                     <div class="col-md-8">
-                                        <select name="previous_batch_id" id="previous_batch_id" class="form-select">
+                                        <select name="previous_batch_id" id="previous_batch_id" class="form-control">
                                             <option value="">-- Select Payroll --</option>
                                             @forelse($previousSchedules as $schedule)
                                                 <option value="{{ $schedule['id'] }}" data-name="{{ $schedule['name'] }}"
@@ -620,7 +620,7 @@
                             <div id="filters_section" class="row mt-2" style="display: none;">
                                 <div class="col-md-4">
                                     <label class="form-label">Staff Type</label>
-                                    <select name="staff_type" id="staff_type" class="form-select">
+                                    <select name="staff_type" id="staff_type" class="form-control">
                                         <option value="">All Staff Types</option>
                                         <option value="teacher">Teachers Only</option>
                                         <option value="transport">Transport Staff Only</option>
