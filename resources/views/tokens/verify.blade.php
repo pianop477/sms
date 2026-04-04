@@ -50,6 +50,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -134,9 +135,19 @@
         }
 
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
         }
 
         .token-separator {
@@ -213,6 +224,7 @@
                 opacity: 0;
                 transform: translateY(-10px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -259,7 +271,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* Success Card - Clean & Simple */
@@ -278,6 +292,7 @@
                 opacity: 0;
                 transform: translateY(15px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -386,7 +401,7 @@
             position: absolute;
             bottom: 8px;
             right: 8px;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.6);
             color: white;
             padding: 6px;
             border-radius: 50%;
@@ -406,7 +421,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0, 0, 0, 0.9);
             z-index: 2000;
             display: flex;
             align-items: center;
@@ -739,15 +754,21 @@
                 <div class="token-input-container">
                     <div class="token-input-group">
                         <div class="token-box">
-                            <input type="text" class="token-input" maxlength="1" data-idx="0" autocomplete="off" inputmode="text">
-                            <input type="text" class="token-input" maxlength="1" data-idx="1" autocomplete="off" inputmode="text">
-                            <input type="text" class="token-input" maxlength="1" data-idx="2" autocomplete="off" inputmode="text">
+                            <input type="text" class="token-input" maxlength="1" data-idx="0" autocomplete="off"
+                                inputmode="text">
+                            <input type="text" class="token-input" maxlength="1" data-idx="1" autocomplete="off"
+                                inputmode="text">
+                            <input type="text" class="token-input" maxlength="1" data-idx="2" autocomplete="off"
+                                inputmode="text">
                         </div>
                         <div class="token-separator">—</div>
                         <div class="token-box">
-                            <input type="text" class="token-input" maxlength="1" data-idx="3" autocomplete="off" inputmode="text">
-                            <input type="text" class="token-input" maxlength="1" data-idx="4" autocomplete="off" inputmode="text">
-                            <input type="text" class="token-input" maxlength="1" data-idx="5" autocomplete="off" inputmode="text">
+                            <input type="text" class="token-input" maxlength="1" data-idx="3" autocomplete="off"
+                                inputmode="text">
+                            <input type="text" class="token-input" maxlength="1" data-idx="4" autocomplete="off"
+                                inputmode="text">
+                            <input type="text" class="token-input" maxlength="1" data-idx="5" autocomplete="off"
+                                inputmode="text">
                         </div>
                     </div>
                 </div>
@@ -806,13 +827,15 @@
                 @csrf
                 <div class="radio-group">
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="search_type" id="modalTypeAdmission" value="admission" checked>
+                        <input class="form-check-input" type="radio" name="search_type" id="modalTypeAdmission"
+                            value="admission" checked>
                         <label class="form-check-label" for="modalTypeAdmission">
                             <i class="fas fa-id-card"></i> Admission
                         </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="search_type" id="modalTypePhone" value="phone">
+                        <input class="form-check-input" type="radio" name="search_type" id="modalTypePhone"
+                            value="phone">
                         <label class="form-check-label" for="modalTypePhone">
                             <i class="fas fa-phone"></i> Simu
                         </label>
@@ -821,20 +844,23 @@
 
                 <div id="modalAdmissionField" class="mb-3">
                     <label class="form-label fw-bold">Namba ya Usajili</label>
-                    <input type="text" id="modalAdmissionInput" class="form-control" placeholder="Mfano: SSC-001" autocomplete="off">
+                    <input type="text" id="modalAdmissionInput" class="form-control" placeholder="Mfano: SSC-001"
+                        autocomplete="off">
                     <small class="text-muted">Ingiza namba ya usajili ya mwanafunzi</small>
                 </div>
 
                 <div id="modalPhoneField" class="mb-3" style="display: none;">
                     <label class="form-label fw-bold">Simu ya Mzazi</label>
-                    <input type="tel" id="modalPhoneInput" class="form-control" placeholder="Mfano: 0712345678" autocomplete="off">
+                    <input type="tel" id="modalPhoneInput" class="form-control" placeholder="Mfano: 0712345678"
+                        autocomplete="off">
                     <small class="text-muted">Ingiza namba ya simu iliyosajiliwa kwa mzazi</small>
                 </div>
 
-                <button type="submit" id="modalSubmitBtn" class="btn-submit" style="margin-top: 0;">
-                    <i class="fas fa-paper-plane me-2"></i> Tuma Ombi
-                </button>
-
+                <div class="btn-container">
+                    <button type="submit" id="modalSubmitBtn" class="btn-submit" style="margin-top: 0;">
+                        <i class="fas fa-paper-plane me-2"></i> Tuma Ombi
+                    </button>
+                </div>
                 <div class="text-center mt-3">
                     <button type="button" id="closeModalBtn" class="resend-close btn btn-link">
                         <i class="fas fa-times"></i> Funga
@@ -973,7 +999,10 @@
                 alertBox.textContent = message;
                 alertBox.className = `alert alert-${type}`;
                 alertBox.style.display = 'block';
-                alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                alertBox.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
                 setTimeout(() => {
                     if (alertBox.style.display === 'block') alertBox.style.display = 'none';
                 }, 5000);
@@ -1001,7 +1030,8 @@
                 const installment = data.installment;
                 const token = data.token;
                 const formattedToken = token.token.substring(0, 3) + '-' + token.token.substring(3, 6);
-                const studentImage = student.image ? '/storage/students/' + student.image : '/storage/students/student.jpg';
+                const studentImage = student.image ? '/storage/students/' + student.image :
+                    '/storage/students/student.jpg';
 
                 const hasTransport = student.has_transport;
                 const transportIcon = hasTransport ? 'fa-bus' : 'fa-walking';
@@ -1098,7 +1128,8 @@
 
             function confirmAccess() {
                 showAlert('✅ Ruhusa imetolewa! Mwanafunzi anaweza kuingia.', 'success');
-                console.log('Access granted for student ID:', currentStudentId, 'Token:', currentTokenData?.token, 'Time:', new Date().toISOString());
+                console.log('Access granted for student ID:', currentStudentId, 'Token:', currentTokenData?.token,
+                    'Time:', new Date().toISOString());
                 setTimeout(() => {
                     resetAll();
                     showAlert('Tayari kwa verification nyingine', 'info');
@@ -1111,7 +1142,7 @@
                     '&': '&amp;',
                     '<': '&lt;',
                     '>': '&gt;'
-                }[m]));
+                } [m]));
             }
 
             function formatDate(dateStr) {
@@ -1179,7 +1210,8 @@
             async function handleResendToken(e) {
                 e.preventDefault();
                 const searchType = document.querySelector('input[name="search_type"]:checked').value;
-                const identifier = searchType === 'admission' ? modalAdmissionInput.value.trim() : modalPhoneInput.value.trim();
+                const identifier = searchType === 'admission' ? modalAdmissionInput.value.trim() : modalPhoneInput
+                    .value.trim();
 
                 if (!identifier) {
                     showModalAlert('Tafadhali ingiza taarifa sahihi', 'error');
@@ -1194,7 +1226,8 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                'content')
                         },
                         body: JSON.stringify({
                             identifier_type: searchType,
@@ -1225,7 +1258,8 @@
                     if (alert && alert.classList.contains('alert-warning')) alert.style.display = 'none';
                 });
                 window.addEventListener('offline', () => {
-                    showAlert('⚠️ Hali ya Offline. Verification itafanya kazi kwa token zilizohifadhiwa.', 'warning');
+                    showAlert('⚠️ Hali ya Offline. Verification itafanya kazi kwa token zilizohifadhiwa.',
+                        'warning');
                 });
             }
 
@@ -1248,10 +1282,13 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                'content'),
                             'Accept': 'application/json'
                         },
-                        body: JSON.stringify({ token: tokenCode })
+                        body: JSON.stringify({
+                            token: tokenCode
+                        })
                     });
                     const data = await response.json();
 
