@@ -1007,8 +1007,8 @@
             data.forEach((emp, idx) => {
                 const gross = (emp.basic_salary || 0) + (emp.allowances || 0);
                 const statusBadge = emp.exists_in_system ?
-                    '<span class="badge bg-success">✓ Found</span>' :
-                    '<span class="badge bg-danger">✗ Not Found</span>';
+                    '<span class="badge bg-success text-white">✓ Found</span>' :
+                    '<span class="badge bg-danger text-white">✗ Not Found</span>';
                 const isDuplicate = duplicateCheck.duplicateRows.some(dup => dup.index === idx);
                 const rowClass = isDuplicate ?
                     'style="background-color: #fff3f3; border-left: 3px solid #dc3545;"' : '';

@@ -321,14 +321,18 @@ class PayrollController extends Controller
             'month' => 'required|date_format:Y-m',
             'generation_method' => 'required|in:contracts,excel_upload,previous_batch,manual_entry',
             'previous_batch_id' => 'required_if:generation_method,previous_batch',
-            'excel_file' => 'required_if:generation_method,excel_upload|file|mimes:xlsx,xls,csv',
+            'excel_file' => 'required_if:generation_method,excel_upload|file'
         ];
 
         if ($request->generation_method === 'contracts') {
             $rules['contracts_data'] = 'required|json';
         }
 
-        if ($request->generation_method === 'manual_entry' && $request->has('manual_employees') && !is_null($request->manual_employees)) {
+        if (
+            $request->generation_method === 'manual_entry' &&
+            $request->has('manual_employees') &&
+            !is_null($request->manual_employees)
+        ) {
             $rules['manual_employees'] = 'json';
         }
 
@@ -336,6 +340,19 @@ class PayrollController extends Controller
 
         if ($validator->fails()) {
             return back()->with('error', 'Validation failed: ' . implode(', ', $validator->errors()->all()))->withInput();
+        }
+
+        // ✅ STRICT FILE VALIDATION (IMPORTANT FIX)
+        if ($request->generation_method === 'excel_upload' && $request->hasFile('excel_file')) {
+
+            $file = $request->file('excel_file');
+            $extension = strtolower($file->getClientOriginalExtension());
+
+            $allowedExtensions = ['xlsx', 'xls', 'csv'];
+
+            if (!in_array($extension, $allowedExtensions)) {
+                return back()->with('error', 'Invalid file type. Only Excel files (xlsx, xls, csv) are allowed.')->withInput();
+            }
         }
 
         $schoolId = Auth::user()->school_id;
@@ -361,7 +378,11 @@ class PayrollController extends Controller
         }
 
         // Handle manual employees
-        if ($request->generation_method === 'manual_entry' && $request->has('manual_employees') && !is_null($request->manual_employees)) {
+        if (
+            $request->generation_method === 'manual_entry' &&
+            $request->has('manual_employees') &&
+            !is_null($request->manual_employees)
+        ) {
             try {
                 $manualEmployees = json_decode($request->manual_employees, true);
                 $data['manual_employees'] = $manualEmployees;
@@ -371,13 +392,21 @@ class PayrollController extends Controller
         }
 
         // Handle previous batch
-        if ($request->generation_method === 'previous_batch' && $request->has('previous_batch_id') && $request->previous_batch_id) {
+        if (
+            $request->generation_method === 'previous_batch' &&
+            $request->has('previous_batch_id') &&
+            $request->previous_batch_id
+        ) {
             $data['previous_batch_id'] = $request->previous_batch_id;
         }
 
-        // Handle Excel file
+        // ✅ Handle Excel file safely
         if ($request->generation_method === 'excel_upload' && $request->hasFile('excel_file')) {
-            $data['excel_data'] = $this->parseExcelFile($request->file('excel_file'));
+            try {
+                $data['excel_data'] = $this->parseExcelFile($request->file('excel_file'));
+            } catch (\Exception $e) {
+                return back()->with('error', 'Failed to read Excel file. Ensure file format is correct.')->withInput();
+            }
         }
 
         $token = session('finance_api_token');
