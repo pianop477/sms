@@ -74,8 +74,8 @@
         }
 
         .gateway-icon {
-            width: 70px;
-            height: 70px;
+            width: 80px;
+            height: 80px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 50%;
             display: flex;
@@ -85,7 +85,7 @@
         }
 
         .gateway-icon i {
-            font-size: 32px;
+            font-size: 36px;
             color: white;
         }
 
@@ -658,12 +658,12 @@
             }
 
             .gateway-icon {
-                width: 55px;
-                height: 55px;
+                width: 65px;
+                height: 65px;
             }
 
             .gateway-icon i {
-                font-size: 26px;
+                font-size: 32px;
             }
 
             .token-input {
@@ -1102,7 +1102,7 @@
                 setTimeout(() => {
                     resetAll();
                     showAlert('Tayari kwa verification nyingine', 'info');
-                }, 3000);
+                }, 5000);
             }
 
             function escapeHtml(str) {
@@ -1215,7 +1215,7 @@
                     showModalAlert('Hitilafu ya mtandao. Tafadhali jaribu tena.', 'error');
                 } finally {
                     modalSubmitBtn.disabled = false;
-                    modalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Tuma Token Tena';
+                    modalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Tuma Ombi';
                 }
             }
 
@@ -1261,12 +1261,12 @@
                     } else {
                         showAlert(data.message || 'Token si sahihi au imekwisha muda wake.', 'error');
                         addErrorStyling();
-                        setTimeout(() => resetAll(), 3000);
+                        setTimeout(() => resetAll(), 5000);
                     }
                 } catch (error) {
                     showAlert('Hitilafu ya mtandao. Tafadhali jaribu tena.', 'error');
                     addErrorStyling();
-                    setTimeout(() => resetAll(), 3000);
+                    setTimeout(() => resetAll(), 5000);
                 } finally {
                     isLoading = false;
                     loadingSection.style.display = 'none';
