@@ -799,7 +799,7 @@
                             <td class="text-uppercase">${escapeHtml(emp.staff_type)}</td>
                             <td class="text-end">${formatNumber(emp.basic_salary)}</td>
                             <td class="text-end">${formatNumber(emp.allowances)}</td>
-                            <td class="text-uppercase"><span class="badge bg-${emp.contract_type === 'provision' ? 'warning' : 'success'}">${escapeHtml(emp.contract_type)}</span></td>
+                            <td class="text-capitalize text-white"><span class="badge bg-${emp.contract_type === 'provision' ? 'warning' : 'success'}">${escapeHtml(emp.contract_type)}</span></td>
                         </tr>
                     `;
             });
@@ -1034,9 +1034,9 @@
                     <td class="text-end">${formatNumber(emp.basic_salary)}
                     <td class="text-end">${formatNumber(emp.allowances)}
                     <td class="text-end"><strong>${formatNumber(gross)}</strong>
-                    <td class="text-uppercase">${escapeHtml(emp.department)}
-                    <td class="text-uppercase"><span class="badge bg-${emp.contract_type === 'provision' ? 'warning' : 'info'}">${escapeHtml(emp.contract_type)}</span>
-                    <td class="text-center">${statusBadge}
+                    <td class="text-capitalize">${escapeHtml(emp.department)}
+                    <td class="text-capitalize text-white"><span class="badge bg-${emp.contract_type === 'provision' ? 'warning' : 'info'}">${escapeHtml(emp.contract_type)}</span>
+                    <td class="text-center text-white">${statusBadge}
 
             `;
             });
