@@ -32,21 +32,18 @@ class school_fees_payment extends Model
      /**
      * Boot the model
      */
-    protected static function boot()
+    protected static function booted()
     {
-        parent::boot();
+        // static::created(function ($payment) {
+        //     event(new PaymentCreated($payment, null));
+        // });
 
-        // Dispatch event when payment is updated
-        static::updating(function ($payment) {
-            $oldAmount = $payment->getOriginal('amount');
-            if ($oldAmount != $payment->amount) {
-                event(new PaymentUpdated($payment, $oldAmount));
-            }
+        static::updated(function ($payment) {
+            event(new PaymentUpdated($payment, $payment->getOriginal()));
         });
 
-        // Dispatch event when payment is deleted
         static::deleted(function ($payment) {
-            event(new PaymentDeleted($payment));
+            event(new PaymentDeleted($payment, null));
         });
     }
 

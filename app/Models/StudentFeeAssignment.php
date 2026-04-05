@@ -11,6 +11,7 @@ class StudentFeeAssignment extends Model
         'fee_structure_id',
         'assigned_class_id',
         'assignment_reason',
+        'academic_year',
         'is_active'
     ];
 

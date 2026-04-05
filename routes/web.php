@@ -654,15 +654,6 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         });
 
         // ========================================================================
-        // EMPLOYEE STATEMENT ROUTES
-        // ========================================================================
-        // Route::prefix('employee')->name('employee.')->group(function () {
-        //     Route::get('/statements', [EmployeeStatementController::class, 'index'])->name('statements');
-        //     Route::get('/statement/{staffId}', [EmployeeStatementController::class, 'show'])->name('statement.show');
-        //     Route::get('/statement/{staffId}/pdf', [EmployeeStatementController::class, 'downloadPdf'])->name('statement.pdf');
-        // });
-
-        // ========================================================================
         // HESLB MANAGEMENT ROUTES
         // ========================================================================
         Route::prefix('heslb')->name('heslb.')->group(function () {

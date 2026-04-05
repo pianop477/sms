@@ -1,4 +1,5 @@
 <?php
+// app/Events/PaymentUpdated.php
 
 namespace App\Events;
 
@@ -11,11 +12,9 @@ class PaymentUpdated
     use Dispatchable, SerializesModels;
 
     public $payment;
-    public $old_amount;
 
-    public function __construct(school_fees_payment $payment, $old_amount)
+    public function __construct(school_fees_payment $payment)
     {
         $this->payment = $payment;
-        $this->old_amount = $old_amount;
     }
 }

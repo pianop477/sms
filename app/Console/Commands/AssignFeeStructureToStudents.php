@@ -2,10 +2,15 @@
 
 namespace App\Console\Commands;
 
+use App\Models\FeeInstallment;
 use Illuminate\Console\Command;
 use App\Models\Student;
 use App\Models\FeeStructure;
+use App\Models\Grade;
 use App\Models\StudentFeeAssignment;
+use App\Models\SchoolFee;
+use App\Models\Installment;
+use App\Models\school_fees;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -18,16 +23,25 @@ class AssignFeeStructureToStudents extends Command
                             {--chunk=100 : Number of records to process per chunk}
                             {--dry-run : Run without actually updating database}
                             {--force : Force reassign even if already assigned}
-                            {--show-details : Show detailed assignment info per student}';
+                            {--show-details : Show detailed assignment info per student}
+                            {--skip-transport-check : Skip checking transport status changes}
+                            {--skip-class-check : Skip checking class changes}
+                            {--full-sync : Full synchronization - check all students regardless of previous assignment}
+                            {--academic-year= : Manually specify academic year (optional, auto-detected if not provided)}';
 
-    protected $description = 'Assign fee structures to students - uses class-specific first, then general';
+    protected $description = 'Assign fee structures to students - automatically detects academic year from existing bills';
 
     public function handle()
     {
         $startTime = microtime(true);
-        $this->info('🚀 Starting fee structure assignment...');
+
+        // ✅ AUTOMATIC: Determine academic year from existing bills
+        $academicYear = $this->determineAcademicYear();
+
+        $this->info("🚀 Starting fee structure assignment for academic year {$academicYear}...");
         $this->newLine();
 
+        // Build query
         $query = Student::with(['class']);
 
         if ($this->option('school-id')) {
@@ -55,12 +69,27 @@ class AssignFeeStructureToStudents extends Command
         $this->info("📊 Total students to process: {$totalStudents}");
         $this->newLine();
 
-        $this->displayAvailableStructures();
+        // Display available structures for the determined academic year
+        $this->displayAvailableStructures($academicYear);
 
         $dryRun = $this->option('dry-run');
         $force = $this->option('force');
         $showDetails = $this->option('show-details');
-        $chunkSize = (int) $this->option('chunk');
+        $fullSync = $this->option('full-sync');
+
+        // By default, check everything UNLESS explicitly skipped
+        $skipTransportCheck = $this->option('skip-transport-check');
+        $skipClassCheck = $this->option('skip-class-check');
+
+        $shouldCheckTransport = !$skipTransportCheck;
+        $shouldCheckClass = !$skipClassCheck;
+
+        $this->info('🔍 DETECTION SETTINGS:');
+        $this->line("   ✓ Academic Year: {$academicYear} (AUTO-DETECTED FROM EXISTING BILLS)");
+        $this->line("   ✓ Transport status changes: " . ($shouldCheckTransport ? 'ENABLED' : 'DISABLED'));
+        $this->line("   ✓ Class changes: " . ($shouldCheckClass ? 'ENABLED' : 'DISABLED'));
+        $this->line("   ✓ Full sync mode: " . ($fullSync ? 'YES (recheck all)' : 'NO (only changed)'));
+        $this->newLine();
 
         if ($dryRun) {
             $this->warn('⚠️  DRY RUN MODE: No changes will be made');
@@ -75,24 +104,85 @@ class AssignFeeStructureToStudents extends Command
             'errors' => 0,
             'class_specific' => 0,
             'general' => 0,
-            'no_class' => 0
+            'no_class' => 0,
+            'transport_changes' => 0,
+            'class_changes' => 0,
+            'reassigned' => 0,
+            'has_bills' => 0,
+            'no_bills' => 0
         ];
 
         $progressBar = $this->output->createProgressBar($totalStudents);
         $progressBar->start();
 
         Student::with(['class'])
-            ->chunk($chunkSize, function ($students) use (&$stats, $dryRun, $force, $showDetails, $progressBar) {
+            ->chunk((int) $this->option('chunk'), function ($students) use (&$stats, $dryRun, $force, $showDetails, $shouldCheckTransport, $shouldCheckClass, $fullSync, $progressBar, $academicYear) {
                 foreach ($students as $student) {
                     $stats['processed']++;
-                    $result = $this->assignForStudent($student, $dryRun, $force, $showDetails);
 
+                    // ✅ Check if student has existing bills for this academic year
+                    $hasBills = school_fees::where('student_id', $student->id)
+                        ->where('academic_year', $academicYear)
+                        ->exists();
+
+                    if ($hasBills) {
+                        $stats['has_bills']++;
+                    } else {
+                        $stats['no_bills']++;
+                        if ($showDetails) {
+                            $this->line("\n   ⏭️  {$student->admission_number} - No existing bills for year {$academicYear}, skipping assignment");
+                        }
+                        $progressBar->advance();
+                        continue;
+                    }
+
+                    // Get current eligibility criteria
+                    $hasTransport = !is_null($student->transport_id);
+                    $currentClassId = $student->class_id;
+
+                    // Get previously assigned fee structure for THIS academic year
+                    $previousAssignment = StudentFeeAssignment::where('student_id', $student->id)
+                        ->where('academic_year', $academicYear)
+                        ->first();
+
+                    $previousStructureId = $previousAssignment->fee_structure_id ?? null;
+                    $previousTransportStatus = $previousAssignment->had_transport ?? false;
+                    $previousClassId = $previousAssignment->assigned_class_id ?? null;
+
+                    // Check if changes occurred
+                    $transportChanged = $shouldCheckTransport && ($previousTransportStatus != $hasTransport);
+                    $classChanged = $shouldCheckClass && ($previousClassId != $currentClassId);
+
+                    // Determine if we need to reassign
+                    $needsReassignment = $force || $fullSync || $transportChanged || $classChanged || !$previousAssignment;
+
+                    $result = $this->assignForStudent(
+                        $student,
+                        $academicYear,
+                        $dryRun,
+                        $force || $needsReassignment,
+                        $showDetails,
+                        $transportChanged,
+                        $classChanged,
+                        $hasTransport,
+                        $currentClassId,
+                        $previousTransportStatus,
+                        $previousClassId,
+                        $fullSync,
+                        $hasBills
+                    );
+
+                    // Update statistics
                     if ($result['status'] === 'assigned') {
                         $stats['assigned']++;
                         if ($result['type'] === 'class_specific') $stats['class_specific']++;
                         if ($result['type'] === 'general') $stats['general']++;
                     } elseif ($result['status'] === 'updated') {
                         $stats['updated']++;
+                    } elseif ($result['status'] === 'reassigned') {
+                        $stats['reassigned']++;
+                        if ($result['trigger'] === 'transport') $stats['transport_changes']++;
+                        if ($result['trigger'] === 'class') $stats['class_changes']++;
                     } elseif ($result['status'] === 'skipped') {
                         $stats['skipped']++;
                     } elseif ($result['status'] === 'error') {
@@ -106,17 +196,51 @@ class AssignFeeStructureToStudents extends Command
         $progressBar->finish();
         $this->newLine(2);
 
-        $this->displaySummary($stats, $startTime, $dryRun);
+        $this->displaySummary($stats, $startTime, $dryRun, $academicYear);
 
         return 0;
     }
 
-    private function assignForStudent($student, $dryRun, $force, $showDetails)
+    /**
+     * ✅ AUTOMATICALLY determine academic year from existing bills
+     */
+    private function determineAcademicYear(): int
+    {
+        // 1. If manually specified via flag
+        if ($this->option('academic-year')) {
+            $this->info("📅 Using manually specified academic year: " . $this->option('academic-year'));
+            return (int) $this->option('academic-year');
+        }
+
+        // 2. Check school_fees table for latest academic year with bills
+        $latestBillYear = school_fees::max('academic_year');
+        if ($latestBillYear) {
+            $this->info("📅 Detected academic year from existing bills: {$latestBillYear}");
+            return (int) $latestBillYear;
+        }
+
+        // 3. Check student_fee_assignments for latest year
+        $latestAssignmentYear = StudentFeeAssignment::max('academic_year');
+        if ($latestAssignmentYear) {
+            $this->info("📅 Detected academic year from existing assignments: {$latestAssignmentYear}");
+            return (int) $latestAssignmentYear;
+        }
+
+        // 4. Default to current year
+        $currentYear = (int) date('Y');
+        $this->info("📅 No existing bills found. Using current year: {$currentYear}");
+        return $currentYear;
+    }
+
+    private function assignForStudent($student, $academicYear, $dryRun, $force, $showDetails, $transportChanged = false, $classChanged = false, $hasTransport = null, $currentClassId = null, $previousTransportStatus = null, $previousClassId = null, $fullSync = false, $hasBills = false)
     {
         try {
             $classId = $student->class_id;
             $className = $student->class ? $student->class->class_name : 'NO CLASS';
-            $hasTransport = !is_null($student->transport_id);
+
+            // Use passed value or get from student
+            $hasTransport = $hasTransport ?? !is_null($student->transport_id);
+            $currentClassId = $currentClassId ?? $student->class_id;
 
             // Check if student has a class
             if (!$classId) {
@@ -126,52 +250,8 @@ class AssignFeeStructureToStudents extends Command
                 return ['status' => 'skipped', 'type' => 'no_class'];
             }
 
-            // STEP 1: Try to find class-specific structure
-            $selectedStructure = FeeStructure::where('school_id', $student->school_id)
-                ->where('class_id', $classId)
-                ->where('transport_applies', $hasTransport)
-                ->where('is_hostel_class', false)
-                ->first();
-
-            $assignmentType = 'class_specific';
-            $structureType = "Class-specific ({$className})";
-
-            // STEP 2: If no class-specific structure, use general structure (class_id = null)
-            if (!$selectedStructure) {
-                $selectedStructure = FeeStructure::where('school_id', $student->school_id)
-                    ->whereNull('class_id')
-                    ->where('transport_applies', $hasTransport)
-                    ->where('is_hostel_class', false)
-                    ->first();
-
-                $assignmentType = 'general';
-                $structureType = "General (All Classes)";
-            }
-
-            // STEP 3: If still no structure, check for hostel class
-            if (!$selectedStructure) {
-                $selectedStructure = FeeStructure::where('school_id', $student->school_id)
-                    ->where('class_id', $classId)
-                    ->where('is_hostel_class', true)
-                    ->first();
-
-                if ($selectedStructure) {
-                    $assignmentType = 'hostel';
-                    $structureType = "Hostel Class ({$className})";
-                }
-            }
-
-            // STEP 4: Last resort - try any structure
-            if (!$selectedStructure) {
-                $selectedStructure = FeeStructure::where('school_id', $student->school_id)
-                    ->where('transport_applies', $hasTransport)
-                    ->first();
-
-                if ($selectedStructure) {
-                    $assignmentType = 'fallback';
-                    $structureType = "Fallback";
-                }
-            }
+            // Find appropriate fee structure
+            $selectedStructure = $this->findBestFeeStructure($student->school_id, $classId, $hasTransport);
 
             if (!$selectedStructure) {
                 if ($showDetails) {
@@ -180,12 +260,46 @@ class AssignFeeStructureToStudents extends Command
                 return ['status' => 'skipped', 'type' => null];
             }
 
-            $existingStructureId = $student->fee_structure_id;
+            $assignmentType = $selectedStructure->class_id ? 'class_specific' : 'general';
+            $structureType = $selectedStructure->class_id ? "Class-specific ({$className})" : "General (All Classes)";
+
+            // Get existing assignment for THIS academic year
+            $existingAssignment = StudentFeeAssignment::where('student_id', $student->id)
+                ->where('academic_year', $academicYear)
+                ->first();
+
+            $existingStructureId = $existingAssignment->fee_structure_id ?? null;
+
+            // Check if reassignment is needed due to changes
+            $isReassignment = false;
+            $triggerReason = null;
+
+            if ($transportChanged) {
+                $isReassignment = true;
+                $triggerReason = 'transport';
+                if ($showDetails) {
+                    $this->line("\n   🔄 TRANSPORT CHANGE: {$student->admission_number}");
+                    $this->line("      From: " . ($previousTransportStatus ? 'Has Transport' : 'No Transport'));
+                    $this->line("      To: " . ($hasTransport ? 'Has Transport' : 'No Transport'));
+                }
+            }
+
+            if ($classChanged) {
+                $isReassignment = true;
+                $triggerReason = 'class';
+                if ($showDetails) {
+                    $this->line("\n   🔄 CLASS CHANGE: {$student->admission_number}");
+                    $oldClass = Grade::find($previousClassId);
+                    $newClass = Grade::find($currentClassId);
+                    $this->line("      From: " . ($oldClass->class_name ?? 'Unknown'));
+                    $this->line("      To: " . ($newClass->class_name ?? 'Unknown'));
+                }
+            }
 
             // Check if update needed
-            if (!$force && $existingStructureId == $selectedStructure->id) {
+            if (!$force && !$fullSync && !$transportChanged && !$classChanged && $existingStructureId == $selectedStructure->id) {
                 if ($showDetails) {
-                    $this->line("\n   ⏭️  SKIP: {$student->admission_number} - Already assigned");
+                    $this->line("\n   ⏭️  SKIP: {$student->admission_number} - Already assigned for {$academicYear}");
                 }
                 return ['status' => 'skipped', 'type' => null];
             }
@@ -193,53 +307,62 @@ class AssignFeeStructureToStudents extends Command
             // Show details if requested
             if ($showDetails) {
                 $this->line("\n   📝 {$student->admission_number} - {$student->first_name} {$student->last_name}");
+                $this->line("      Academic Year: {$academicYear}");
                 $this->line("      Class: {$className}");
                 $this->line("      Transport: " . ($hasTransport ? 'Yes' : 'No'));
                 $this->line("      Structure Type: {$structureType}");
                 $this->line("      Structure: {$selectedStructure->name}");
                 $this->line("      Amount: " . number_format($selectedStructure->total_amount, 0) . " TZS");
-                if ($existingStructureId) {
+                $this->line("      Has Existing Bills: " . ($hasBills ? 'Yes' : 'No'));
+                if ($existingStructureId && $existingStructureId != $selectedStructure->id) {
                     $oldStructure = FeeStructure::find($existingStructureId);
-                    $this->line("      Previous: " . ($oldStructure->name ?? 'N/A'));
+                    $this->line("      PREVIOUS: " . ($oldStructure->name ?? 'N/A'));
+                    if ($transportChanged) $this->line("      REASON: Transport status changed");
+                    elseif ($classChanged) $this->line("      REASON: Class changed");
+                    elseif ($fullSync) $this->line("      REASON: Full sync mode");
                 }
             }
 
-            if (!$dryRun) {
-                DB::transaction(function () use ($student, $selectedStructure) {
-                    $student->update([
-                        'fee_structure_id' => $selectedStructure->id
-                    ]);
+            $status = 'assigned';
+            if ($existingStructureId && $existingStructureId != $selectedStructure->id) {
+                $status = $isReassignment ? 'reassigned' : 'updated';
+            }
 
+            if (!$dryRun) {
+                DB::transaction(function () use ($student, $selectedStructure, $hasTransport, $currentClassId, $triggerReason, $academicYear) {
+                    // Create or update assignment for THIS academic year
                     StudentFeeAssignment::updateOrCreate(
-                        ['student_id' => $student->id],
+                        [
+                            'student_id' => $student->id,
+                            'academic_year' => $academicYear
+                        ],
                         [
                             'fee_structure_id' => $selectedStructure->id,
-                            'assigned_class_id' => $student->class_id,
+                            'assigned_class_id' => $currentClassId,
+                            'had_transport' => $hasTransport,
                             'assignment_reason' => $selectedStructure->class_id ? 'class_specific' : 'general',
                             'is_active' => true,
+                            'last_reassigned_at' => now(),
+                            'last_reassign_reason' => $triggerReason
                         ]
                     );
-                });
 
-                // Log::channel('fee_assignment')->info('Assigned fee structure', [
-                //     'student_id' => $student->id,
-                //     'student_name' => $student->first_name . ' ' . $student->last_name,
-                //     'class_name' => $className,
-                //     'has_transport' => $hasTransport,
-                //     'fee_structure_id' => $selectedStructure->id,
-                //     'fee_structure_name' => $selectedStructure->name,
-                //     'assignment_type' => $assignmentType
-                // ]);
+                    // Update student's current fee_structure_id only if this is current year
+                    if ($academicYear == date('Y')) {
+                        $student->update(['fee_structure_id' => $selectedStructure->id]);
+                    }
+                });
             }
 
             return [
-                'status' => $existingStructureId ? 'updated' : 'assigned',
-                'type' => $assignmentType
+                'status' => $status,
+                'type' => $assignmentType,
+                'trigger' => $triggerReason
             ];
-
         } catch (\Exception $e) {
             Log::error('Failed to assign fee structure', [
                 'student_id' => $student->id,
+                'academic_year' => $academicYear,
                 'error' => $e->getMessage()
             ]);
 
@@ -251,7 +374,46 @@ class AssignFeeStructureToStudents extends Command
         }
     }
 
-    private function displayAvailableStructures()
+    /**
+     * Find the best fee structure for a student
+     */
+    private function findBestFeeStructure($schoolId, $classId, $hasTransport)
+    {
+        // Priority 1: Class-specific with matching transport
+        $structure = FeeStructure::where('school_id', $schoolId)
+            ->where('class_id', $classId)
+            ->where('transport_applies', $hasTransport)
+            ->where('is_hostel_class', false)
+            ->first();
+
+        if ($structure) return $structure;
+
+        // Priority 2: General structure with matching transport
+        $structure = FeeStructure::where('school_id', $schoolId)
+            ->whereNull('class_id')
+            ->where('transport_applies', $hasTransport)
+            ->where('is_hostel_class', false)
+            ->first();
+
+        if ($structure) return $structure;
+
+        // Priority 3: Hostel class structure
+        $structure = FeeStructure::where('school_id', $schoolId)
+            ->where('class_id', $classId)
+            ->where('is_hostel_class', true)
+            ->first();
+
+        if ($structure) return $structure;
+
+        // Priority 4: Any structure with matching transport (fallback)
+        $structure = FeeStructure::where('school_id', $schoolId)
+            ->where('transport_applies', $hasTransport)
+            ->first();
+
+        return $structure;
+    }
+
+    private function displayAvailableStructures($academicYear)
     {
         $schoolId = $this->option('school-id');
 
@@ -271,10 +433,9 @@ class AssignFeeStructureToStudents extends Command
         $this->info('📋 Available Fee Structures:');
         $this->newLine();
 
-        // Show general structures first
         $general = $structures->whereNull('class_id');
         if ($general->count() > 0) {
-            $this->line("   🌍 GENERAL STRUCTURES (Apply to all classes without specific structure):");
+            $this->line("   🌍 GENERAL STRUCTURES (Apply to all classes):");
             foreach ($general as $s) {
                 $type = $s->transport_applies ? '🚌 With Transport' : '🚶 Without Transport';
                 $this->line("      • {$type}: {$s->name} - " . number_format($s->total_amount, 0) . " TZS");
@@ -282,10 +443,9 @@ class AssignFeeStructureToStudents extends Command
             $this->newLine();
         }
 
-        // Show class-specific structures
         $specific = $structures->whereNotNull('class_id');
         if ($specific->count() > 0) {
-            $this->line("   📚 CLASS-SPECIFIC STRUCTURES (Override general):");
+            $this->line("   📚 CLASS-SPECIFIC STRUCTURES:");
             foreach ($specific as $s) {
                 $className = $s->class ? $s->class->class_name : 'Unknown';
                 $type = $s->transport_applies ? '🚌 With Transport' : '🚶 Without Transport';
@@ -295,20 +455,31 @@ class AssignFeeStructureToStudents extends Command
         }
 
         $this->newLine();
-        $this->info("💡 NOTE: Students get class-specific structure if available, otherwise general structure applies.");
-        $this->newLine();
     }
 
-    private function displaySummary($stats, $startTime, $dryRun)
+    private function displaySummary($stats, $startTime, $dryRun, $academicYear)
     {
         $executionTime = round(microtime(true) - $startTime, 2);
 
-        $this->info('📈 ========== SUMMARY ==========');
+        $this->info('📈 ========== SUMMARY for ' . $academicYear . ' ==========');
         $this->info("✅ Processed: {$stats['processed']}");
+        $this->info("   ├─ Has existing bills: {$stats['has_bills']}");
+        $this->info("   └─ No bills (skipped): {$stats['no_bills']}");
         $this->info("✅ New Assignments: {$stats['assigned']}");
         $this->info("   ├─ Class-Specific: {$stats['class_specific']}");
         $this->info("   └─ General: {$stats['general']}");
         $this->info("🔄 Updated: {$stats['updated']}");
+
+        if ($stats['reassigned'] > 0) {
+            $this->info("🔄 REASSIGNED (Auto-detected changes): {$stats['reassigned']}");
+            if ($stats['transport_changes'] > 0) {
+                $this->info("   ├─ Transport Changes: {$stats['transport_changes']}");
+            }
+            if ($stats['class_changes'] > 0) {
+                $this->info("   └─ Class Changes: {$stats['class_changes']}");
+            }
+        }
+
         $this->info("⚠️  Skipped: {$stats['skipped']}");
         $this->info("❌ Errors: {$stats['errors']}");
         $this->info("⏱️  Execution time: {$executionTime} seconds");

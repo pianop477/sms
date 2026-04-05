@@ -55,10 +55,10 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping();
 
         $schedule->command('students:assign-fee-structure --force --chunk=100')
-            ->hourly()
+            ->everyFifteenMinutes()
             ->withoutOverlapping();
 
-        $schedule->command('tokens:send-existing --chunk=50')
+        $schedule->command('tokens:send-existing --chunk=100')
             ->hourly()
             ->withoutOverlapping();
 
@@ -69,14 +69,12 @@ class Kernel extends ConsoleKernel
         // ========== PWA VERSION UPDATE ==========
         // Update PWA version weekly on Sunday at 2 AM
         $schedule->command('pwa:version')
-            ->weekly()
-            ->sundays()
-            ->at('02:00')
+            ->dailyAt('02:00')
             ->withoutOverlapping();
 
         // Add to schedule() method
         $schedule->command('tokens:auto-expire')
-            ->dailyAt('00:30')  // Run daily at 12:30 AM
+            ->dailyAt('02:30')  // Run daily at 12:30 AM
             ->withoutOverlapping();
 
         // Cleanup old tokens (older than 365 days / 1 year)
@@ -88,7 +86,7 @@ class Kernel extends ConsoleKernel
 
         // Sync tokens after payment corrections - run every hour
         $schedule->command('tokens:sync-after-correction')
-            ->hourly()
+            ->everyFiveSeconds()
             ->withoutOverlapping();
     }
 

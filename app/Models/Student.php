@@ -45,7 +45,7 @@ class Student extends Model
      */
     public function parents()
     {
-        return $this->belongsTo(Parents::class);
+        return $this->belongsTo(Parents::class, 'parent_id', 'id');
     }
 
     /**

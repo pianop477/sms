@@ -11,7 +11,7 @@ class FeeClearanceToken extends Model
         'fee_structure_id',
         'installment_id',
         'token',
-        'expires_at',
+        'expires_at', 'academic_year',
         'status',
     ];
 

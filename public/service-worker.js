@@ -1,4 +1,4 @@
-const APP_VERSION = '2026.04.01.12';
+const APP_VERSION = '2026.04.05.15';
 const CACHE_NAME = `shuleapp-cache-${APP_VERSION}`;
 
 // STATIC ASSETS (these are cached for offline)

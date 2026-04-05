@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="{{ asset('assets/fontawesome-free-6.5.2-web/css/all.css') }}">
 
     <style>
-        /* All original styles remain the same */
         * {
             margin: 0;
             padding: 0;
@@ -50,7 +49,6 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -135,19 +133,9 @@
         }
 
         @keyframes shake {
-
-            0%,
-            100% {
-                transform: translateX(0);
-            }
-
-            25% {
-                transform: translateX(-5px);
-            }
-
-            75% {
-                transform: translateX(5px);
-            }
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
 
         .token-separator {
@@ -224,7 +212,6 @@
                 opacity: 0;
                 transform: translateY(-10px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -271,12 +258,9 @@
         }
 
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
         }
 
-        /* Success Card - Clean & Simple */
         .success-card {
             background: white;
             border-radius: 24px;
@@ -292,74 +276,46 @@
                 opacity: 0;
                 transform: translateY(15px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
 
-        /* Simple header - not overpowering */
         .success-header {
-            background: #f0fdf4;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
             border-radius: 24px 24px 0 0;
-            padding: 12px;
+            padding: 16px;
             text-align: center;
-            border-bottom: 1px solid #dcfce7;
         }
 
         .success-header i {
-            font-size: 24px;
-            color: #22c55e;
+            font-size: 28px;
+            color: white;
             margin-right: 8px;
         }
 
         .success-header h2 {
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 20px;
+            font-weight: 700;
             margin: 0;
-            color: #166534;
+            color: white;
             display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .success-header p {
             font-size: 12px;
             margin: 4px 0 0;
-            color: #64748b;
+            color: rgba(255, 255, 255, 0.9);
         }
 
-        /* Token display - minimal */
-        .token-display {
-            background: #f8fafc;
-            margin: 16px;
-            padding: 8px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .token-display-label {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #64748b;
-            font-weight: 600;
-        }
-
-        .token-display-code {
-            font-size: 16px;
-            font-weight: 700;
-            font-family: monospace;
-            letter-spacing: 2px;
-            color: #1e293b;
-            margin-top: 2px;
-        }
-
-        /* Photo Section - Clean with zoom capability */
         .identity-verification-section {
             background: white;
             border-radius: 20px;
             padding: 16px;
-            margin: 0 16px 16px 16px;
+            margin: 16px;
             border: 1px solid #e2e8f0;
         }
 
@@ -374,7 +330,7 @@
             cursor: pointer;
             border-radius: 16px;
             overflow: hidden;
-            border: 2px solid #e2e8f0;
+            border: 3px solid #e2e8f0;
             transition: all 0.2s;
         }
 
@@ -414,7 +370,6 @@
             opacity: 1;
         }
 
-        /* Modal for zoomed photo */
         .photo-modal {
             position: fixed;
             top: 0;
@@ -446,7 +401,7 @@
 
         .face-match-instruction {
             background: #fef3c7;
-            border-left: 3px solid #f59e0b;
+            border-left: 4px solid #f59e0b;
             padding: 10px;
             border-radius: 10px;
             margin-top: 12px;
@@ -462,7 +417,6 @@
             color: #f59e0b;
         }
 
-        /* Student Details - Clean grid */
         .student-details-panel {
             background: #f8fafc;
             border-radius: 16px;
@@ -488,6 +442,8 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .detail-label i {
@@ -501,9 +457,9 @@
             color: #0f172a;
             font-size: 12px;
             text-align: right;
+            text-transform: uppercase;
         }
 
-        /* Transport status - simple */
         .transport-status-card {
             background: #f8fafc;
             margin: 0 16px 16px 16px;
@@ -519,6 +475,7 @@
             font-weight: 600;
             color: #64748b;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .transport-status-card .value {
@@ -527,9 +484,9 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            text-transform: uppercase;
         }
 
-        /* Buttons in success card */
         .confirm-access-section {
             padding: 0 16px 16px 16px;
         }
@@ -537,9 +494,11 @@
         .btn-confirm {
             background: #22c55e;
             max-width: 100%;
-            padding: 10px;
-            font-size: 13px;
-            font-weight: 600;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .btn-confirm:hover {
@@ -550,8 +509,11 @@
             background: #64748b;
             max-width: 100%;
             margin-top: 8px;
-            padding: 10px;
+            padding: 12px;
             font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .btn-new-verify:hover {
@@ -583,14 +545,13 @@
             background: #f7fafc;
         }
 
-        /* Modal Styles */
         .resend-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -610,34 +571,57 @@
             border-radius: 28px;
             max-width: 400px;
             width: 90%;
-            padding: 24px;
+            padding: 28px 24px;
             animation: slideUp 0.3s ease;
         }
 
         .resend-modal-header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .resend-modal-header i {
-            font-size: 48px;
-            color: #667eea;
+            font-size: 52px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
             margin-bottom: 12px;
         }
 
         .resend-modal-header h4 {
             font-weight: 700;
             color: #2d3748;
+            font-size: 1.4rem;
+            margin-bottom: 4px;
         }
 
-        .radio-group {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 20px;
+        .resend-modal-header p {
+            color: #718096;
+            font-size: 0.8rem;
         }
 
-        .radio-group .form-check {
-            flex: 1;
+        .resend-modal .form-control {
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            padding: 12px 16px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .resend-modal .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .resend-close {
+            color: #a0aec0;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .resend-close:hover {
+            color: #718096;
         }
 
         .footer {
@@ -657,82 +641,25 @@
             text-decoration: underline;
         }
 
-        /* Responsive - maintaining original breakpoints */
         @media (max-width: 480px) {
-            body {
-                padding: 12px;
-            }
-
-            .gateway-card {
-                padding: 20px 16px;
-                border-radius: 24px;
-            }
-
-            .gateway-header h2 {
-                font-size: 1.3rem;
-            }
-
-            .gateway-icon {
-                width: 65px;
-                height: 65px;
-            }
-
-            .gateway-icon i {
-                font-size: 32px;
-            }
-
-            .token-input {
-                width: 45px;
-                height: 52px;
-                font-size: 22px;
-                border-radius: 12px;
-            }
-
-            .token-separator {
-                font-size: 20px;
-                padding: 0 2px;
-            }
-
-            .student-large-photo {
-                width: 150px !important;
-                height: 150px !important;
-            }
-
-            .detail-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 4px;
-            }
-
-            .detail-value {
-                text-align: left;
-            }
+            body { padding: 12px; }
+            .gateway-card { padding: 20px 16px; border-radius: 24px; }
+            .gateway-header h2 { font-size: 1.3rem; }
+            .gateway-icon { width: 65px; height: 65px; }
+            .gateway-icon i { font-size: 32px; }
+            .token-input { width: 45px; height: 52px; font-size: 22px; border-radius: 12px; }
+            .token-separator { font-size: 20px; padding: 0 2px; }
+            .student-large-photo { width: 150px !important; height: 150px !important; }
+            .detail-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+            .detail-value { text-align: left; }
         }
 
         @media (max-width: 380px) {
-            .token-input {
-                width: 38px;
-                height: 45px;
-                font-size: 18px;
-                border-radius: 10px;
-            }
-
-            .token-box {
-                gap: 6px;
-            }
-
-            .token-input-group {
-                gap: 4px;
-            }
-
-            .token-separator {
-                font-size: 16px;
-            }
-
-            .student-large-photo {
-                width: 130px !important;
-                height: 130px !important;
-            }
+            .token-input { width: 38px; height: 45px; font-size: 18px; border-radius: 10px; }
+            .token-box { gap: 6px; }
+            .token-input-group { gap: 4px; }
+            .token-separator { font-size: 16px; }
+            .student-large-photo { width: 130px !important; height: 130px !important; }
         }
     </style>
 </head>
@@ -744,7 +671,7 @@
                 <div class="gateway-icon">
                     <i class="fas fa-shield-alt"></i>
                 </div>
-                <h2>Gate Pass Verification</h2>
+                <h2>GATE PASS VERIFICATION</h2>
                 <p>Ingiza msimbo uliopokea kwenye simu yako</p>
             </div>
 
@@ -754,21 +681,15 @@
                 <div class="token-input-container">
                     <div class="token-input-group">
                         <div class="token-box">
-                            <input type="text" class="token-input" maxlength="1" data-idx="0" autocomplete="off"
-                                inputmode="text">
-                            <input type="text" class="token-input" maxlength="1" data-idx="1" autocomplete="off"
-                                inputmode="text">
-                            <input type="text" class="token-input" maxlength="1" data-idx="2" autocomplete="off"
-                                inputmode="text">
+                            <input type="text" class="token-input" maxlength="1" data-idx="0" autocomplete="off" inputmode="text">
+                            <input type="text" class="token-input" maxlength="1" data-idx="1" autocomplete="off" inputmode="text">
+                            <input type="text" class="token-input" maxlength="1" data-idx="2" autocomplete="off" inputmode="text">
                         </div>
                         <div class="token-separator">—</div>
                         <div class="token-box">
-                            <input type="text" class="token-input" maxlength="1" data-idx="3" autocomplete="off"
-                                inputmode="text">
-                            <input type="text" class="token-input" maxlength="1" data-idx="4" autocomplete="off"
-                                inputmode="text">
-                            <input type="text" class="token-input" maxlength="1" data-idx="5" autocomplete="off"
-                                inputmode="text">
+                            <input type="text" class="token-input" maxlength="1" data-idx="3" autocomplete="off" inputmode="text">
+                            <input type="text" class="token-input" maxlength="1" data-idx="4" autocomplete="off" inputmode="text">
+                            <input type="text" class="token-input" maxlength="1" data-idx="5" autocomplete="off" inputmode="text">
                         </div>
                     </div>
                 </div>
@@ -787,7 +708,7 @@
 
                 <div class="resend-section">
                     <button id="showResendModalBtn" class="resend-btn">
-                        <i class="fas fa-redo-alt me-2"></i> Umepoteza Token? Omba Token
+                        <i class="fas fa-redo-alt me-2"></i> Umepoteza Token? Omba Tena
                     </button>
                 </div>
             </div>
@@ -817,43 +738,19 @@
         <div class="resend-modal-content">
             <div class="resend-modal-header">
                 <i class="fas fa-paper-plane"></i>
-                <h4>Omba Token Tena</h4>
-                <p class="text-muted small">Token itatumwa kwa simu ya mzazi</p>
+                <h4>OMBA TOKEN TENA</h4>
+                <p>Token itatumwa kwa simu ya mzazi</p>
             </div>
 
             <div id="modalAlert" class="alert" style="display: none;"></div>
 
             <form id="resendForm">
                 @csrf
-                <div class="radio-group">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="search_type" id="modalTypeAdmission"
-                            value="admission" checked>
-                        <label class="form-check-label" for="modalTypeAdmission">
-                            <i class="fas fa-id-card"></i> Admission
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="search_type" id="modalTypePhone"
-                            value="phone">
-                        <label class="form-check-label" for="modalTypePhone">
-                            <i class="fas fa-phone"></i> Simu
-                        </label>
-                    </div>
-                </div>
-
-                <div id="modalAdmissionField" class="mb-3">
-                    <label class="form-label fw-bold">Namba ya Usajili</label>
-                    <input type="text" id="modalAdmissionInput" class="form-control" placeholder="Mfano: SSC-001"
-                        autocomplete="off">
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Namba ya Usajili (Admission Number)</label>
+                    <input type="text" id="modalAdmissionInput" class="form-control text-uppercase"
+                        placeholder="Mfano: SSC-001, TCH-001" autocomplete="off" required>
                     <small class="text-muted">Ingiza namba ya usajili ya mwanafunzi</small>
-                </div>
-
-                <div id="modalPhoneField" class="mb-3" style="display: none;">
-                    <label class="form-label fw-bold">Simu ya Mzazi</label>
-                    <input type="tel" id="modalPhoneInput" class="form-control" placeholder="Mfano: 0712345678"
-                        autocomplete="off">
-                    <small class="text-muted">Ingiza namba ya simu iliyosajiliwa kwa mzazi</small>
                 </div>
 
                 <div class="btn-container">
@@ -888,12 +785,7 @@
             const modalAlert = document.getElementById('modalAlert');
             const resendForm = document.getElementById('resendForm');
             const modalSubmitBtn = document.getElementById('modalSubmitBtn');
-            const modalAdmissionField = document.getElementById('modalAdmissionField');
-            const modalPhoneField = document.getElementById('modalPhoneField');
             const modalAdmissionInput = document.getElementById('modalAdmissionInput');
-            const modalPhoneInput = document.getElementById('modalPhoneInput');
-            const modalTypeAdmission = document.getElementById('modalTypeAdmission');
-            const modalTypePhone = document.getElementById('modalTypePhone');
 
             // Photo Zoom Elements
             const photoZoomModal = document.getElementById('photoZoomModal');
@@ -999,10 +891,7 @@
                 alertBox.textContent = message;
                 alertBox.className = `alert alert-${type}`;
                 alertBox.style.display = 'block';
-                alertBox.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
+                alertBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 setTimeout(() => {
                     if (alertBox.style.display === 'block') alertBox.style.display = 'none';
                 }, 5000);
@@ -1012,7 +901,6 @@
                 alertBox.style.display = 'none';
             }
 
-            // Photo Zoom Setup
             function setupPhotoZoom() {
                 photoZoomModal.addEventListener('click', () => {
                     photoZoomModal.classList.remove('active');
@@ -1024,14 +912,12 @@
                 photoZoomModal.classList.add('active');
             }
 
-            // Student Info Display - Clean Version
             function showStudentInfo(data) {
                 const student = data.student;
                 const installment = data.installment;
                 const token = data.token;
                 const formattedToken = token.token.substring(0, 3) + '-' + token.token.substring(3, 6);
-                const studentImage = student.image ? '/storage/students/' + student.image :
-                    '/storage/students/student.jpg';
+                const studentImage = student.image ? '/storage/students/' + student.image : '/storage/students/student.jpg';
 
                 const hasTransport = student.has_transport;
                 const transportIcon = hasTransport ? 'fa-bus' : 'fa-walking';
@@ -1047,7 +933,7 @@
                             <div>
                                 <i class="fas fa-check-circle"></i>
                                 <h2>HALALI</h2>
-                                <p>Gate Pass ni Sahihi</p>
+                                <p>GATE PASS NI SAHIHI</p>
                             </div>
                         </div>
 
@@ -1064,29 +950,29 @@
 
                                 <div class="face-match-instruction">
                                     <i class="fas fa-user-check"></i>
-                                    <span><strong>Kumbuka:</strong> Linganisha sura ya mwanafunzi aliye mbele yako na picha hii</span>
+                                    <span><strong>KUMBUKA:</strong> Linganisha sura ya mwanafunzi aliye mbele yako na picha hii</span>
                                 </div>
                             </div>
 
                             <div class="student-details-panel">
                                 <div class="detail-row">
-                                    <div class="detail-label"><i class="fas fa-user-graduate"></i> Jina Kamili</div>
+                                    <div class="detail-label"><i class="fas fa-user-graduate"></i> JINA KAMILI</div>
                                     <div class="detail-value">${escapeHtml(student.first_name)} ${escapeHtml(student.last_name)}</div>
                                 </div>
                                 <div class="detail-row">
-                                    <div class="detail-label"><i class="fas fa-id-card"></i> Namba ya Usajili</div>
+                                    <div class="detail-label"><i class="fas fa-id-card"></i> NAMBA YA USAJILI</div>
                                     <div class="detail-value">${escapeHtml(student.admission_number || 'N/A')}</div>
                                 </div>
                                 <div class="detail-row">
-                                    <div class="detail-label"><i class="fas fa-chalkboard-user"></i> Darasa</div>
+                                    <div class="detail-label"><i class="fas fa-chalkboard-user"></i> DARASA</div>
                                     <div class="detail-value text-uppercase">${student.class ? escapeHtml(student.class.class_name) : 'N/A'}</div>
                                 </div>
                                 <div class="detail-row">
-                                    <div class="detail-label"><i class="fas fa-calendar-week"></i> Awamu ya Malipo</div>
+                                    <div class="detail-label"><i class="fas fa-calendar-week"></i> AWAMU YA MALIPO</div>
                                     <div class="detail-value text-capitalize">${escapeHtml(installment.name)}</div>
                                 </div>
                                 <div class="detail-row">
-                                    <div class="detail-label"><i class="fas fa-clock"></i> Muda wa Kuisha</div>
+                                    <div class="detail-label"><i class="fas fa-clock"></i> MUDA WA KUIKUSHA</div>
                                     <div class="detail-value">${formatDate(token.expires_at)}</div>
                                 </div>
                             </div>
@@ -1127,22 +1013,16 @@
             }
 
             function confirmAccess() {
-                showAlert('✅ Ruhusa imetolewa! Mwanafunzi anaweza kuingia.', 'success');
-                console.log('Access granted for student ID:', currentStudentId, 'Token:', currentTokenData?.token,
-                    'Time:', new Date().toISOString());
+                showAlert('✅ RUHUSA IMETOLEWA! Mwanafunzi anaweza kuingia.', 'success');
                 setTimeout(() => {
                     resetAll();
-                    showAlert('Tayari kwa verification nyingine', 'info');
+                    showAlert('TAYARI KWA VERIFICATION NYINGINE', 'info');
                 }, 5000);
             }
 
             function escapeHtml(str) {
                 if (!str) return '';
-                return str.replace(/[&<>]/g, m => ({
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;'
-                } [m]));
+                return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
             }
 
             function formatDate(dateStr) {
@@ -1159,41 +1039,23 @@
                 }
             }
 
-            // Modal Setup
             function setupModal() {
                 showResendModalBtn.addEventListener('click', () => {
                     resendModal.classList.add('active');
                     resetModalForm();
                 });
-                closeModalBtn.addEventListener('click', () => resendModal.classList.remove('active'));
+                closeModalBtn.addEventListener('click', () => {
+                    resendModal.classList.remove('active');
+                });
                 resendModal.addEventListener('click', (e) => {
                     if (e.target === resendModal) resendModal.classList.remove('active');
-                });
-
-                modalTypeAdmission.addEventListener('change', () => {
-                    modalAdmissionField.style.display = 'block';
-                    modalPhoneField.style.display = 'none';
-                    modalAdmissionInput.required = true;
-                    modalPhoneInput.required = false;
-                });
-                modalTypePhone.addEventListener('change', () => {
-                    modalAdmissionField.style.display = 'none';
-                    modalPhoneField.style.display = 'block';
-                    modalAdmissionInput.required = false;
-                    modalPhoneInput.required = true;
                 });
                 resendForm.addEventListener('submit', handleResendToken);
             }
 
             function resetModalForm() {
                 modalAdmissionInput.value = '';
-                modalPhoneInput.value = '';
                 modalAlert.style.display = 'none';
-                modalTypeAdmission.checked = true;
-                modalAdmissionField.style.display = 'block';
-                modalPhoneField.style.display = 'none';
-                modalAdmissionInput.required = true;
-                modalPhoneInput.required = false;
                 modalSubmitBtn.disabled = false;
                 modalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Tuma Ombi';
             }
@@ -1209,12 +1071,11 @@
 
             async function handleResendToken(e) {
                 e.preventDefault();
-                const searchType = document.querySelector('input[name="search_type"]:checked').value;
-                const identifier = searchType === 'admission' ? modalAdmissionInput.value.trim() : modalPhoneInput
-                    .value.trim();
 
-                if (!identifier) {
-                    showModalAlert('Tafadhali ingiza taarifa sahihi', 'error');
+                const admissionNumber = modalAdmissionInput.value.trim();
+
+                if (!admissionNumber) {
+                    showModalAlert('Tafadhali ingiza namba ya usajili', 'error');
                     return;
                 }
 
@@ -1226,29 +1087,30 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                                'content')
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                         },
                         body: JSON.stringify({
-                            identifier_type: searchType,
-                            identifier: identifier
+                            admission_number: admissionNumber
                         })
                     });
+
                     const data = await response.json();
+
                     if (data.success) {
                         showModalAlert(data.message, 'success');
                         setTimeout(() => {
                             resendModal.classList.remove('active');
                             resetModalForm();
-                        }, 2000);
+                        }, 5000);
                     } else {
                         showModalAlert(data.message, 'error');
                     }
                 } catch (error) {
+                    console.error('Error:', error);
                     showModalAlert('Hitilafu ya mtandao. Tafadhali jaribu tena.', 'error');
                 } finally {
                     modalSubmitBtn.disabled = false;
-                    modalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> Tuma Ombi';
+                    modalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i> TUMA OMBI';
                 }
             }
 
@@ -1258,8 +1120,7 @@
                     if (alert && alert.classList.contains('alert-warning')) alert.style.display = 'none';
                 });
                 window.addEventListener('offline', () => {
-                    showAlert('⚠️ Hali ya Offline. Verification itafanya kazi kwa token zilizohifadhiwa.',
-                        'warning');
+                    showAlert('⚠️ Hali ya Offline. Verification itafanya kazi kwa token zilizohifadhiwa.', 'warning');
                 });
             }
 
@@ -1282,13 +1143,10 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                                'content'),
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                             'Accept': 'application/json'
                         },
-                        body: JSON.stringify({
-                            token: tokenCode
-                        })
+                        body: JSON.stringify({ token: tokenCode })
                     });
                     const data = await response.json();
 
@@ -1311,9 +1169,7 @@
                 }
             }
 
-            // Expose showPhotoZoom to global scope for onclick
             window.showPhotoZoom = showPhotoZoom;
-
             init();
         })();
     </script>

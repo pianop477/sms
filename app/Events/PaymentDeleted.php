@@ -1,4 +1,5 @@
 <?php
+// app/Events/PaymentDeleted.php
 
 namespace App\Events;
 
