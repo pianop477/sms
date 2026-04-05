@@ -46,7 +46,8 @@ class FeeClearanceService
         $cacheKey = "total_paid_{$student->id}_{$academicYear}";
 
         return cache()->remember($cacheKey, 60, function () use ($student, $academicYear) {
-            return school_fees_payment::whereHas('schoolFee', function ($q) use ($student, $academicYear) {
+            // ✅ Use 'bill' instead of 'schoolFee'
+            return school_fees_payment::whereHas('bill', function ($q) use ($student, $academicYear) {
                 $q->where('student_id', $student->id)
                     ->where('academic_year', $academicYear);
             })->sum('amount');
