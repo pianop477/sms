@@ -972,7 +972,7 @@
                                     <div class="detail-value text-capitalize">${escapeHtml(installment.name)}</div>
                                 </div>
                                 <div class="detail-row">
-                                    <div class="detail-label"><i class="fas fa-clock"></i> MUDA WA KUIKUSHA</div>
+                                    <div class="detail-label"><i class="fas fa-clock"></i> MUDA WA KUISHA</div>
                                     <div class="detail-value">${formatDate(token.expires_at)}</div>
                                 </div>
                             </div>
