@@ -3,7 +3,8 @@
 /public/build
 /public/hot
 /public/storage
-/public/assets
+/public/assets/img
+/public/assets/images
 /public/attendances
 /public/exam_results
 /public/reports
