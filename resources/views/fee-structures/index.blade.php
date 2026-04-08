@@ -87,54 +87,43 @@
             display: inline-block;
         }
 
-        /* Switch Toggle Styles */
-        .switch {
-            position: relative;
+        .filter-section {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .class-type-badge {
             display: inline-block;
-            width: 50px;
-            height: 24px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-left: 5px;
         }
 
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
+        .class-type-hostel {
+            background: #fed7aa;
+            color: #9b2c1d;
         }
 
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
+        .class-type-regular {
+            background: #d1fae5;
+            color: #065f46;
         }
 
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
+        .filter-active {
+            background: #e0e7ff;
+            border-left: 4px solid #4e73df;
         }
 
-        input:checked + .slider {
-            background-color: #2196F3;
-        }
-
-        input:focus + .slider {
-            box-shadow: 0 0 1px #2196F3;
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(26px);
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
         }
 
         /* DataTables Custom Styling */
@@ -177,33 +166,6 @@
             padding: 10px 8px;
             vertical-align: middle;
         }
-
-        .filter-section {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .class-type-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: bold;
-            margin-left: 5px;
-        }
-
-        .class-type-hostel {
-            background: #fed7aa;
-            color: #9b2c1d;
-        }
-
-        .class-type-regular {
-            background: #d1fae5;
-            color: #065f46;
-        }
     </style>
 
     <div class="py-4">
@@ -226,34 +188,55 @@
                         <div class="filter-section">
                             <div class="row align-items-end">
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Filter by Class</label>
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-chalkboard me-1"></i> Filter by Class
+                                    </label>
                                     <select id="classFilter" class="form-select">
                                         <option value="all">All Structures</option>
                                         <option value="general">General Structures (All Classes)</option>
                                         <option value="specific">Class Specific Structures</option>
                                         <option disabled>──────────</option>
                                         @foreach($classes as $class)
-                                            <option value="class_{{ $class->id }}">{{ $class->class_name ?? $class->name }}</option>
+                                            <option value="class_{{ $class->id }}">
+                                                {{ $class->class_name ?? $class->name }}
+                                                ({{ $class->class_code ?? '' }})
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Filter by Type</label>
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-tag me-1"></i> Filter by Type
+                                    </label>
                                     <select id="typeFilter" class="form-select">
                                         <option value="all">All Types</option>
                                         <option value="transport">With Transport</option>
                                         <option value="non-transport">Without Transport</option>
-                                        <option value="hostel">Hostel Class</option>
+                                        <option value="hostel">Hostel/Boarding Class</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">&nbsp;</label>
-                                    <button id="resetFilters" class="btn btn-secondary form-control">
-                                        <i class="fas fa-undo-alt me-1"></i> Reset Filters
-                                    </button>
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-search me-1"></i> Quick Search
+                                    </label>
+                                    <input type="text" id="quickSearch" class="form-control"
+                                           placeholder="Search by name or class...">
                                 </div>
-                                <div class="col-md-3 text-end">
-                                    <span id="filterCount" class="badge bg-info">Showing all structures</span>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">&nbsp;</label>
+                                    <div class="d-grid gap-2">
+                                        <button id="resetFilters" class="btn btn-secondary">
+                                            <i class="fas fa-undo-alt me-1"></i> Reset All Filters
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div id="filterSummary" class="small text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        <span id="filterCount">Showing all structures</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -261,20 +244,28 @@
                         <div class="table-responsive">
                             <table class="table table-fee table-bordered" id="feeStructureTable">
                                 <thead>
-                                    32
-                                        <th>#</th>
-                                        <th>Name</th>
-                                        <th>Class</th>
-                                        <th>Type</th>
-                                        <th>Total Amount (TZS)</th>
-                                        <th>Installments</th>
-                                        <th>Created Date</th>
-                                        <th>Actions</th>
-                                    </thead>
+                                    <tr>
+                                        <th width="5%">#</th>
+                                        <th width="20%">Name</th>
+                                        <th width="15%">Class</th>
+                                        <th width="15%">Type</th>
+                                        <th width="15%">Total Amount (TZS)</th>
+                                        <th width="20%">Installments</th>
+                                        <th width="10%">Created Date</th>
+                                        <th width="10%">Actions</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     @forelse($structures as $index => $structure)
-                                        <tr data-class="{{ $structure->class_id ? 'class_'.$structure->class_id : 'general' }}"
-                                            data-type="{{ $structure->is_hostel_class ? 'hostel' : ($structure->transport_applies ? 'transport' : 'non-transport') }}">
+                                        @php
+                                            $class = $structure->class_id ? $classes->firstWhere('id', $structure->class_id) : null;
+                                            $rowClass = $structure->class_id ? 'class_'.$structure->class_id : 'general';
+                                            $rowType = $structure->is_hostel_class ? 'hostel' : ($structure->transport_applies ? 'transport' : 'non-transport');
+                                        @endphp
+                                        <tr data-class="{{ $rowClass }}"
+                                            data-type="{{ $rowType }}"
+                                            data-name="{{ strtolower($structure->name) }}"
+                                            data-class-name="{{ strtolower($class->class_name ?? $class->name ?? 'all classes') }}">
                                             <td class="text-center">{{ $index + 1 }}</td>
                                             <td>
                                                 <strong>{{ ucfirst($structure->name) }}</strong>
@@ -290,12 +281,10 @@
                                             </td>
                                             <td>
                                                 @if($structure->class_id)
-                                                    @php
-                                                        $class = $classes->firstWhere('id', $structure->class_id);
-                                                    @endphp
                                                     <span class="class-badge">
                                                         <i class="fas fa-graduation-cap me-1"></i>
-                                                        {{ strtoupper($class->class_code ?? 'N/A') }}
+                                                        {{ strtoupper($class->class_name ?? $class->name ?? 'N/A') }}
+                                                        <small>({{ $class->class_code ?? '' }})</small>
                                                     </span>
                                                 @else
                                                     <span class="general-badge">
@@ -327,8 +316,11 @@
                                             </td>
                                             <td>
                                                 @foreach($structure->installments->sortBy('order') as $inst)
-                                                    <span class="installment-badge">
-                                                        {{ $inst->name }}: {{ number_format($inst->amount, 0) }}
+                                                    <span class="installment-badge" title="{{ $inst->name }}: {{ number_format($inst->amount, 0) }} TZS">
+                                                        {{ $inst->name }}
+                                                        @if($inst->academic_year)
+                                                            <small>({{ $inst->academic_year }})</small>
+                                                        @endif
                                                     </span>
                                                 @endforeach
                                                 @if($structure->installments->isEmpty())
@@ -339,10 +331,10 @@
                                             <td>
                                                 <div class="action-buttons">
                                                     <a href="{{ route('fee-structures.installments', $structure->id) }}"
-                                                       class="btn btn-xs btn-info">
+                                                       class="btn btn-xs btn-info" title="Manage Installments">
                                                         <i class="fas fa-list"></i> Installments
                                                     </a>
-                                                    <button class="btn btn-xs btn-warning"
+                                                    <button class="btn btn-xs btn-warning" title="Edit Structure"
                                                         onclick="editStructure({{ $structure->id }}, '{{ $structure->name }}', {{ $structure->total_amount }})">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
@@ -350,7 +342,7 @@
                                             </td>
                                         </tr>
                                     @empty
-                                        <tr>
+                                        <tr class="no-data-row">
                                             <td colspan="8" class="text-center text-muted py-4">
                                                 <i class="fas fa-info-circle me-1"></i> No fee structures found
                                                 <br>
@@ -398,7 +390,7 @@
                             <select name="class_id" id="classIdSelect" class="form-select">
                                 <option value="">All Classes (General Structure)</option>
                                 @foreach($classes as $class)
-                                    <option value="{{ $class->id }}">{{ strtoupper($class->class_code ?? 'N/A') }}</option>
+                                    <option value="{{ $class->id }}">{{ strtoupper($class->class_name ?? $class->name) }} ({{ $class->class_code ?? '' }})</option>
                                 @endforeach
                             </select>
                             <small class="text-muted">
@@ -424,7 +416,7 @@
                                         <input class="form-check-input" type="radio" name="class_type" id="hostelClass" value="hostel">
                                         <label class="form-check-label" for="hostelClass">
                                             <i class="fas fa-hotel"></i> Hostel/Boarding Class
-                                            <small class="text-muted d-block">All students pay same fees (e.g. Std 7)</small>
+                                            <small class="text-muted d-block">All students pay same fees (e.g., Std 7)</small>
                                         </label>
                                     </div>
                                 </div>
@@ -513,152 +505,371 @@
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        $(document).ready(function() {
-            let table = null;
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if jQuery is loaded
+            if (typeof jQuery === 'undefined') {
+                console.error('jQuery is not loaded!');
+                return;
+            }
 
-            // Class type toggle logic
-            $('input[name="class_type"]').change(function() {
-                if ($(this).val() === 'hostel') {
-                    $('#transportSection').hide();
-                    $('#hostelInfo').show();
-                    // Disable transport selection for hostel classes
-                    $('input[name="transport_applies"]').prop('disabled', true);
+            // Use jQuery in no-conflict mode
+            jQuery(document).ready(function($) {
+                let table = null;
+
+                // Check if DataTables is loaded
+                if ($.fn.DataTable) {
+                    // Initialize DataTable only if there are rows with data
+                    const hasDataRows = $('#feeStructureTable tbody tr').length > 0 &&
+                                       $('#feeStructureTable tbody tr:first').find('td').length > 1 &&
+                                       !$('#feeStructureTable tbody tr:first').hasClass('no-data-row');
+
+                    if (hasDataRows) {
+                        try {
+                            table = $('#feeStructureTable').DataTable({
+                                pageLength: 10,
+                                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                                order: [[0, 'asc']],
+                                language: {
+                                    search: "🔍 Search:",
+                                    lengthMenu: "Show _MENU_ entries",
+                                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                                    infoEmpty: "No entries found",
+                                    infoFiltered: "(filtered from _MAX_ total entries)",
+                                    paginate: {
+                                        previous: "← Previous",
+                                        next: "Next →"
+                                    }
+                                },
+                                columnDefs: [{
+                                    orderable: false,
+                                    targets: [7]
+                                }],
+                                responsive: true,
+                                autoWidth: false
+                            });
+                        } catch(e) {
+                            console.log('DataTable initialization error:', e);
+                            table = null;
+                        }
+                    }
                 } else {
-                    $('#transportSection').show();
-                    $('#hostelInfo').hide();
-                    $('input[name="transport_applies"]').prop('disabled', false);
+                    console.log('DataTables not loaded');
                 }
-            });
 
-            // Initialize DataTable
-            if ($('#feeStructureTable').length && $('#feeStructureTable tbody tr').length > 0) {
-                table = $('#feeStructureTable').DataTable({
-                    pageLength: 10,
-                    lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
-                    order: [[0, 'asc']],
-                    language: {
-                        search: "🔍 Search:",
-                        lengthMenu: "Show _MENU_ entries",
-                        info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                        infoEmpty: "No entries found",
-                        infoFiltered: "(filtered from _MAX_ total entries)",
-                        paginate: {
-                            previous: "← Previous",
-                            next: "Next →"
-                        }
-                    },
-                    columnDefs: [{
-                        orderable: false,
-                        targets: [7]
-                    }],
-                    responsive: true,
-                    autoWidth: false
-                });
-            }
-
-            // Function to apply filters
-            function applyFilters() {
-                const classFilter = $('#classFilter').val();
-                const typeFilter = $('#typeFilter').val();
-
-                let visibleCount = 0;
-                let totalCount = 0;
-
-                $('#feeStructureTable tbody tr').each(function() {
-                    totalCount++;
-                    let show = true;
-
-                    // Class filter
-                    if (classFilter !== 'all') {
-                        const rowClass = $(this).data('class');
-                        if (classFilter === 'general' && rowClass !== 'general') {
-                            show = false;
-                        } else if (classFilter === 'specific' && rowClass === 'general') {
-                            show = false;
-                        } else if (classFilter.startsWith('class_') && rowClass !== classFilter) {
-                            show = false;
-                        }
-                    }
-
-                    // Type filter
-                    if (show && typeFilter !== 'all') {
-                        const rowType = $(this).data('type');
-                        if (rowType !== typeFilter) {
-                            show = false;
-                        }
-                    }
-
-                    if (show) {
-                        $(this).show();
-                        visibleCount++;
-                    } else {
-                        $(this).hide();
-                    }
-                });
-
-                // Update filter count display
-                const filterText = classFilter !== 'all' || typeFilter !== 'all'
-                    ? `Showing ${visibleCount} of ${totalCount} structures`
-                    : `Showing all ${totalCount} structures`;
-                $('#filterCount').text(filterText).removeClass().addClass('badge bg-info');
-
+                // Custom filtering function for DataTables
                 if (table) {
-                    table.draw();
+                    $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                        const row = table.row(dataIndex).node();
+                        const $row = $(row);
+
+                        const classFilter = $('#classFilter').val();
+                        const typeFilter = $('#typeFilter').val();
+                        const quickSearch = $('#quickSearch').val().toLowerCase().trim();
+
+                        let show = true;
+
+                        // Class filter
+                        if (classFilter !== 'all') {
+                            const rowClass = $row.data('class');
+                            if (classFilter === 'general' && rowClass !== 'general') {
+                                show = false;
+                            } else if (classFilter === 'specific' && rowClass === 'general') {
+                                show = false;
+                            } else if (classFilter.startsWith('class_') && rowClass !== classFilter) {
+                                show = false;
+                            }
+                        }
+
+                        // Type filter
+                        if (show && typeFilter !== 'all') {
+                            const rowType = $row.data('type');
+                            if (rowType !== typeFilter) {
+                                show = false;
+                            }
+                        }
+
+                        // Quick search filter
+                        if (show && quickSearch !== '') {
+                            const name = ($row.data('name') || '').toLowerCase();
+                            const className = ($row.data('class-name') || '').toLowerCase();
+                            if (name.indexOf(quickSearch) === -1 && className.indexOf(quickSearch) === -1) {
+                                show = false;
+                            }
+                        }
+
+                        return show;
+                    });
                 }
-            }
 
-            // Filter change events
-            $('#classFilter, #typeFilter').change(function() {
-                applyFilters();
+                // Function to update filter count display
+                function updateFilterCount() {
+                    if (table) {
+                        // Draw the table to apply filters
+                        table.draw();
+
+                        // Get filtered records count
+                        const filteredCount = table.rows({filter: 'applied'}).count();
+                        const totalCount = table.rows().count();
+
+                        const classFilter = $('#classFilter').val();
+                        const typeFilter = $('#typeFilter').val();
+                        const quickSearch = $('#quickSearch').val();
+
+                        let filterText = '';
+                        if (classFilter !== 'all' || typeFilter !== 'all' || quickSearch !== '') {
+                            filterText = `Showing ${filteredCount} of ${totalCount} structure${totalCount !== 1 ? 's' : ''}`;
+
+                            // Add filter details
+                            const filters = [];
+                            if (classFilter !== 'all') {
+                                const classText = $('#classFilter option:selected').text();
+                                filters.push(`Class: ${classText}`);
+                            }
+                            if (typeFilter !== 'all') {
+                                const typeText = $('#typeFilter option:selected').text();
+                                filters.push(`Type: ${typeText}`);
+                            }
+                            if (quickSearch !== '') {
+                                filters.push(`Search: "${quickSearch}"`);
+                            }
+                            filterText += ` (${filters.join(', ')})`;
+                        } else {
+                            filterText = `Showing all ${totalCount} structure${totalCount !== 1 ? 's' : ''}`;
+                        }
+
+                        $('#filterCount').text(filterText);
+
+                        // Update UI highlight
+                        if (classFilter !== 'all' || typeFilter !== 'all' || quickSearch !== '') {
+                            $('.filter-section').addClass('filter-active');
+                        } else {
+                            $('.filter-section').removeClass('filter-active');
+                        }
+                    } else {
+                        // Manual filtering without DataTable
+                        applyManualFilters();
+                    }
+                }
+
+                // Manual filtering function (fallback)
+                function applyManualFilters() {
+                    const classFilter = $('#classFilter').val();
+                    const typeFilter = $('#typeFilter').val();
+                    const quickSearch = $('#quickSearch').val().toLowerCase().trim();
+
+                    let visibleCount = 0;
+                    let totalCount = 0;
+
+                    $('#feeStructureTable tbody tr').each(function() {
+                        const $row = $(this);
+
+                        // Skip no-data row
+                        if ($row.hasClass('no-data-row') || ($row.find('td').length === 1 && $row.find('td').attr('colspan'))) {
+                            return;
+                        }
+
+                        totalCount++;
+                        let show = true;
+
+                        // Class filter
+                        if (classFilter !== 'all') {
+                            const rowClass = $row.data('class');
+                            if (classFilter === 'general' && rowClass !== 'general') {
+                                show = false;
+                            } else if (classFilter === 'specific' && rowClass === 'general') {
+                                show = false;
+                            } else if (classFilter.startsWith('class_') && rowClass !== classFilter) {
+                                show = false;
+                            }
+                        }
+
+                        // Type filter
+                        if (show && typeFilter !== 'all') {
+                            const rowType = $row.data('type');
+                            if (rowType !== typeFilter) {
+                                show = false;
+                            }
+                        }
+
+                        // Quick search filter
+                        if (show && quickSearch !== '') {
+                            const name = ($row.data('name') || '').toLowerCase();
+                            const className = ($row.data('class-name') || '').toLowerCase();
+                            if (name.indexOf(quickSearch) === -1 && className.indexOf(quickSearch) === -1) {
+                                show = false;
+                            }
+                        }
+
+                        if (show) {
+                            $row.show();
+                            visibleCount++;
+                        } else {
+                            $row.hide();
+                        }
+                    });
+
+                    // Show no results message if needed
+                    if (visibleCount === 0 && totalCount > 0) {
+                        if ($('#feeStructureTable tbody tr.no-results-row').length === 0) {
+                            $('#feeStructureTable tbody').append(`
+                                <tr class="no-results-row">
+                                    <td colspan="8" class="text-center text-muted py-4">
+                                        <i class="fas fa-search me-1"></i> No fee structures match your filters
+                                    </td>
+                                </tr>
+                            `);
+                        }
+                    } else {
+                        $('#feeStructureTable tbody tr.no-results-row').remove();
+                    }
+
+                    // Update filter count
+                    let filterText = '';
+                    if (classFilter !== 'all' || typeFilter !== 'all' || quickSearch !== '') {
+                        filterText = `Showing ${visibleCount} of ${totalCount} structure${totalCount !== 1 ? 's' : ''}`;
+
+                        const filters = [];
+                        if (classFilter !== 'all') {
+                            const classText = $('#classFilter option:selected').text();
+                            filters.push(`Class: ${classText}`);
+                        }
+                        if (typeFilter !== 'all') {
+                            const typeText = $('#typeFilter option:selected').text();
+                            filters.push(`Type: ${typeText}`);
+                        }
+                        if (quickSearch !== '') {
+                            filters.push(`Search: "${quickSearch}"`);
+                        }
+                        filterText += ` (${filters.join(', ')})`;
+                    } else {
+                        filterText = `Showing all ${totalCount} structure${totalCount !== 1 ? 's' : ''}`;
+                    }
+                    $('#filterCount').text(filterText);
+
+                    // Update UI highlight
+                    if (classFilter !== 'all' || typeFilter !== 'all' || quickSearch !== '') {
+                        $('.filter-section').addClass('filter-active');
+                    } else {
+                        $('.filter-section').removeClass('filter-active');
+                    }
+                }
+
+                // Debounce function for search input
+                function debounce(func, wait) {
+                    let timeout;
+                    return function() {
+                        const context = this;
+                        const args = arguments;
+                        clearTimeout(timeout);
+                        timeout = setTimeout(() => func.apply(context, args), wait);
+                    };
+                }
+
+                // Filter change events
+                $('#classFilter, #typeFilter').change(function() {
+                    updateFilterCount();
+                });
+
+                $('#quickSearch').on('keyup', debounce(function() {
+                    updateFilterCount();
+                }, 300));
+
+                // Reset all filters
+                $('#resetFilters').click(function() {
+                    $('#classFilter').val('all');
+                    $('#typeFilter').val('all');
+                    $('#quickSearch').val('');
+                    updateFilterCount();
+
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Filters Reset',
+                        text: 'All filters have been cleared',
+                        timer: 1500,
+                        showConfirmButton: false,
+                        toast: true,
+                        position: 'top-end'
+                    });
+                });
+
+                // Class type toggle logic for modal
+                $('input[name="class_type"]').change(function() {
+                    if ($(this).val() === 'hostel') {
+                        $('#transportSection').hide();
+                        $('#hostelInfo').show();
+                        $('input[name="transport_applies"]').prop('disabled', true);
+                    } else {
+                        $('#transportSection').show();
+                        $('#hostelInfo').hide();
+                        $('input[name="transport_applies"]').prop('disabled', false);
+                    }
+                });
+
+                // Initial filter application
+                updateFilterCount();
             });
-
-            // Reset filters button
-            $('#resetFilters').click(function() {
-                $('#classFilter').val('all');
-                $('#typeFilter').val('all');
-                applyFilters();
-            });
-
-            applyFilters();
         });
 
         function editStructure(id, name, totalAmount) {
-            document.getElementById('edit_name').value = name;
-            document.getElementById('edit_total_amount').value = totalAmount;
-            document.getElementById('editStructureForm').action = '/fee-structures/' + id;
-            $('#editFeeStructureModal').modal('show');
+            if (typeof jQuery !== 'undefined') {
+                jQuery(document).ready(function($) {
+                    document.getElementById('edit_name').value = name;
+                    document.getElementById('edit_total_amount').value = totalAmount;
+                    document.getElementById('editStructureForm').action = '/fee-structures/' + id;
+                    $('#editFeeStructureModal').modal('show');
+                });
+            } else {
+                // Fallback without jQuery
+                document.getElementById('edit_name').value = name;
+                document.getElementById('edit_total_amount').value = totalAmount;
+                document.getElementById('editStructureForm').action = '/fee-structures/' + id;
+                var modal = new bootstrap.Modal(document.getElementById('editFeeStructureModal'));
+                modal.show();
+            }
         }
 
+        // Display success/error messages
         @if (session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: '{{ session('success') }}',
-                timer: 3000,
-                showConfirmButton: false,
-                toast: true,
-                position: 'top-end'
-            });
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '{{ session('success') }}',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            }
         @endif
 
         @if (session('error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: '{{ session('error') }}',
-                confirmButtonText: 'OK'
-            });
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: '{{ session('error') }}',
+                    confirmButtonText: 'OK'
+                });
+            }
         @endif
 
         @if ($errors->any())
-            Swal.fire({
-                icon: 'error',
-                title: 'Validation Error',
-                html: `{!! implode('<br>', $errors->all()) !!}`,
-                confirmButtonText: 'OK'
-            });
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    html: `{!! implode('<br>', $errors->all()) !!}`,
+                    confirmButtonText: 'OK'
+                });
+            }
         @endif
     </script>
 @endsection

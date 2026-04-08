@@ -91,7 +91,7 @@ class FeeStructureController extends Controller
         }
     }
 
-    public function manageInstallments(FeeStructure $feeStructure)
+    public function manageInstallments(FeeStructure $feeStructure, Request $request)
     {
         // Ensure the fee structure belongs to the authenticated user's school
         if ($feeStructure->school_id !== Auth::user()->school_id) {
@@ -100,7 +100,18 @@ class FeeStructureController extends Controller
 
         $installments = $feeStructure->installments()->orderBy('order')->get();
 
-        return view('fee-structures.installments', compact('feeStructure', 'installments'));
+        // Get unique years from installments
+        $years = $installments->pluck('academic_year')->unique()->sort()->values();
+
+        // Determine selected year (from request, or current year, or first available year)
+        $selectedYear = $request->get('year', date('Y'));
+
+        // If selected year doesn't exist in installments but there are years available, use the first year
+        if (!$years->contains($selectedYear) && $years->isNotEmpty()) {
+            $selectedYear = $years->first();
+        }
+
+        return view('fee-structures.installments', compact('feeStructure', 'installments', 'selectedYear'));
     }
 
     /**

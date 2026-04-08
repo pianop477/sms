@@ -203,7 +203,7 @@
                 <form class="needs-validation" novalidate="" action="{{route('bills.update', ['bill' => Hashids::encode($bill->id)])}}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
-                    <div class="form-row">
+                    <div class="row">
                         <div class="col-md-4 mb-4">
                             <label for="validationCustom01" class="form-label">Student Name</label>
                             <input type="text" name="name" disabled class="form-control form-control-custom text-capitalize" id="validationCustom01" placeholder="" value="{{old('name', $bill->first_name. ' '. $bill->middle_name. ' '. $bill->last_name)}}" required="">
@@ -232,7 +232,7 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div class="row">
                         <div class="col-md-4 mb-4">
                             <label for="validationCustom02" class="form-label">Academic Year</label>
                             <input type="text" name="year" disabled class="form-control form-control-custom" id="validationCustom02" placeholder="" value="{{old('year', $bill->academic_year)}}" required="">
@@ -262,7 +262,7 @@
                             @enderror
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div class="row">
                         <div class="col-md-4 mb-4">
                             <label for="validationCustom02" class="form-label">Payment Mode</label>
                             <select name="payment" id="selectPayment" class="form-control-custom">

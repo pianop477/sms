@@ -305,7 +305,7 @@
             </div>
         </div>
     </div>
-    <!-- Add this modal for confirmation -->
+    <!-- Add this modal for confirmation sending reminder -->
     <div class="modal fade" id="reminderModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -372,7 +372,7 @@
             </div>
         </div>
     </div>
-    <!-- Add Teacher Modal -->
+    <!-- Add new bill modal -->
     <div class="modal fade" id="addTeacherModal" tabindex="-1" aria-labelledby="addTeacherModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg">

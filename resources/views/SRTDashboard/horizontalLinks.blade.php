@@ -258,12 +258,16 @@
                         @if (Auth::user()->usertype == 5)
                             {{-- Community --}}
                             <li>
-                            <li>
-                                <a href="{{ route('classes.list') }}"><i
-                                        class="fas fa-user-graduate"></i><span>Students</span></a>
+                                <a href="javascript:void(0)"><i class="fas fa-users"></i><span>Community</span></a>
+                                <ul class="submenu">
+                                    <li><a href="{{ route('Teachers.index') }}"><i class="fa fa-user-tie"></i>
+                                            Teachers</a></li>
+                                    <li><a href="{{ route('classes.list') }}"><i class="fa fa-user-graduate"></i>
+                                            Students</a></li>
+                                    <li><a href="{{ route('OtherStaffs.index') }}"><i class="fa fa-user-friends"></i>
+                                            Other Staffs</a></li>
+                                </ul>
                             </li>
-                            </li>
-
                             {{-- Academic Management --}}
                             @if (Auth::user()->school->package === 'premium')
                                 <li>

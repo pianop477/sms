@@ -58,6 +58,36 @@
             display: inline-block;
             margin-left: 8px;
         }
+
+        .year-filter {
+            transition: all 0.3s ease;
+        }
+
+        .year-filter:hover {
+            transform: translateY(-2px);
+        }
+
+        .year-btn {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .year-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white !important;
+            border-color: transparent;
+        }
+
+        .year-btn.active:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46a0 100%);
+            color: white !important;
+        }
+
+        .installment-count-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            margin-left: 5px;
+        }
     </style>
 
     <div class="py-4">
@@ -86,9 +116,58 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        @if ($installments->count() > 0)
+                        {{-- Year Filter Section --}}
+                        @php
+                            $years = $installments->pluck('academic_year')->unique()->sort()->values();
+                            $currentYear = date('Y');
+                            $selectedYear = request('year', $currentYear);
+
+                            // If selected year doesn't exist in installments, use the first available year or current year
+                            if (!$years->contains($selectedYear) && $years->isNotEmpty()) {
+                                $selectedYear = $years->first();
+                            } elseif (!$years->contains($selectedYear) && $years->isEmpty()) {
+                                $selectedYear = $currentYear;
+                            }
+
+                            $filteredInstallments = $installments->where('academic_year', $selectedYear)->sortBy('order');
+                        @endphp
+
+                        @if($years->isNotEmpty())
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <label class="fw-bold">
+                                        <i class="fas fa-filter me-2"></i>Filter by Academic Year:
+                                    </label>
+                                    <div class="btn-group flex-wrap" role="group" aria-label="Year filter">
+                                        @foreach($years as $year)
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-primary year-btn @if($selectedYear == $year) active @endif"
+                                                    data-year="{{ $year }}">
+                                                {{ $year }}
+                                                <span class="badge bg-light text-dark rounded-pill installment-count-badge">
+                                                    {{ $installments->where('academic_year', $year)->count() }}
+                                                </span>
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                @if($selectedYear != $currentYear && !$years->contains($currentYear))
+                                    <div class="alert alert-info small mb-3">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Showing installments for year {{ $selectedYear }}.
+                                        <a href="{{ route('fee-structures.installments.manage', $feeStructure->id) }}" class="alert-link">
+                                            Click here to view current year ({{ $currentYear }})
+                                        </a>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+
+                        {{-- Installments Display --}}
+                        @if ($filteredInstallments->count() > 0)
                             <div class="row">
-                                @foreach ($installments->sortBy('order') as $inst)
+                                @foreach ($filteredInstallments as $inst)
                                     <div class="col-md-6 col-lg-4 mb-4">
                                         <div class="card installment-card h-100">
                                             <div class="card-header bg-white">
@@ -104,7 +183,7 @@
                                                     <div class="dropdown">
                                                         <button class="btn btn-sm btn-link" type="button"
                                                             data-bs-toggle="dropdown">
-                                                            <i class="fas fa-ellipsis-v text-white"></i>
+                                                            <i class="fas fa-ellipsis-v text-dark"></i>
                                                         </button>
                                                         <ul class="dropdown-menu">
                                                             <li>
@@ -157,11 +236,6 @@
                                                     <i class="fas fa-info-circle me-1"></i>
                                                     Students qualify when total paid ≥
                                                     {{ number_format($inst->cumulative_required, 0) }} TZS
-                                                    <br>
-                                                    <small class="text-muted mt-1 d-block">
-                                                        <i class="fas fa-calendar-alt me-1"></i>
-                                                        Academic Year: {{ $inst->academic_year ?? 'N/A' }}
-                                                    </small>
                                                 </div>
                                             </div>
                                         </div>
@@ -173,40 +247,43 @@
                             <div class="alert alert-secondary mt-3">
                                 <div class="row">
                                     <div class="col-md-3">
-                                        <strong>Total Installments:</strong> {{ $installments->count() }}
+                                        <strong>Total Installments:</strong> {{ $filteredInstallments->count() }}
+                                        @if($years->count() > 1)
+                                            <small class="text-muted">(of {{ $installments->count() }} total)</small>
+                                        @endif
                                     </div>
                                     <div class="col-md-3">
                                         <strong>Sum of Installments:</strong>
-                                        {{ number_format($installments->sum('amount'), 0) }} TZS
+                                        {{ number_format($filteredInstallments->sum('amount'), 0) }} TZS
                                     </div>
                                     <div class="col-md-3">
                                         <strong>Structure Total:</strong>
                                         {{ number_format($feeStructure->total_amount, 0) }} TZS
-                                        @if ($installments->sum('amount') != $feeStructure->total_amount)
-                                            <span class="text-danger ms-2">
-                                                <i class="fas fa-exclamation-triangle"></i> Mismatch!
+                                        @if ($filteredInstallments->sum('amount') != $feeStructure->total_amount)
+                                            <span class="text-warning ms-2">
+                                                <i class="fas fa-exclamation-triangle"></i> Partial
                                             </span>
                                         @endif
                                     </div>
                                     <div class="col-md-3">
-                                        <strong>Academic Years:</strong>
-                                        @php
-                                            $years = $installments->pluck('academic_year')->unique()->sort();
-                                        @endphp
-                                        @foreach($years as $year)
-                                            <span class="badge bg-info ms-1">{{ $year }}</span>
-                                        @endforeach
+                                        <strong>Academic Year:</strong>
+                                        <span class="badge bg-info">{{ $selectedYear }}</span>
                                     </div>
                                 </div>
                             </div>
                         @else
                             <div class="text-center py-5">
                                 <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
-                                <h5>No Installments Added Yet</h5>
-                                <p class="text-muted">Add installments (terms) for this fee structure</p>
-                                <button class="btn btn-primary" data-bs-toggle="modal"
+                                <h5>No Installments for {{ $selectedYear }}</h5>
+                                <p class="text-muted">No installments found for academic year {{ $selectedYear }}</p>
+                                @if($years->isNotEmpty())
+                                    <button class="btn btn-outline-primary year-btn" data-year="{{ $years->first() }}">
+                                        <i class="fas fa-arrow-left me-1"></i> View {{ $years->first() }} Installments
+                                    </button>
+                                @endif
+                                <button class="btn btn-primary mt-2" data-bs-toggle="modal"
                                     data-bs-target="#addInstallmentModal">
-                                    <i class="fas fa-plus me-1"></i> Add First Installment
+                                    <i class="fas fa-plus me-1"></i> Add Installment for {{ $selectedYear }}
                                 </button>
                             </div>
                         @endif
@@ -230,8 +307,8 @@
                     <div class="modal-body">
                         <div class="alert alert-info small">
                             <i class="fas fa-info-circle me-1"></i>
-                            <strong>Kumbuka:</strong> Academic year itatumika kutofautisha installments za miaka tofauti.
-                            Mfano: Unaweza kuwa na installments za 2025 na 2026 tofauti.
+                            <strong>Note:</strong> Academic year is used to differentiate installments for different years.
+                            Current filter is set to <strong>{{ $selectedYear }}</strong>.
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -247,7 +324,8 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Academic Year <span class="text-danger">*</span></label>
-                                <input type="text" name="academic_year" class="form-control" required placeholder="e.g., 2025">
+                                <input type="text" name="academic_year" class="form-control" required
+                                    value="{{ $selectedYear }}" placeholder="e.g., 2025">
                                 <small class="text-muted">The academic year for which this installment applies</small>
                             </div>
                             <div class="col-md-6 mb-3">
@@ -342,7 +420,14 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
-            // Any initialization code if needed
+            // Year filter functionality without page reload
+            $('.year-btn').click(function(e) {
+                e.preventDefault();
+                const year = $(this).data('year');
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('year', year);
+                window.location.href = currentUrl.toString();
+            });
         });
 
         function editInstallment(id) {
@@ -394,10 +479,10 @@
                     document.getElementById('edit_inst_start_date').value = data.start_date;
                     document.getElementById('edit_inst_end_date').value = data.end_date;
 
-                    // Set academic year in select dropdown
-                    const academicYearSelect = document.getElementById('edit_inst_academic_year');
-                    if (academicYearSelect && data.academic_year) {
-                        academicYearSelect.value = data.academic_year;
+                    // Set academic year
+                    const academicYearInput = document.getElementById('edit_inst_academic_year');
+                    if (academicYearInput && data.academic_year) {
+                        academicYearInput.value = data.academic_year;
                     }
 
                     // Set form action
@@ -415,13 +500,6 @@
                     });
                     console.error('Error:', error);
                 });
-        }
-
-        function editStructure(id, name, totalAmount) {
-            document.getElementById('edit_name').value = name;
-            document.getElementById('edit_total_amount').value = totalAmount;
-            document.getElementById('editStructureForm').action = '/fee-structures/' + id;
-            $('#editFeeStructureModal').modal('show');
         }
 
         // Display success/error messages

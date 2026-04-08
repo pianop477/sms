@@ -374,7 +374,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th>Account Number</th>
+                                        <th>Bank Name</th>
                                         <td>
                                             {{ $staff->bank_name ?? 'N/A' }}
                                         </td>
