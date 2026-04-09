@@ -845,7 +845,7 @@
                         <small class="text-muted d-block">Unapoishi</small>
                         <strong id="modal-profile-address" class="text-uppercase">-</strong>
                     </div>
-                    {{-- <div class="bg-light p-2 rounded mb-2">
+                    <div class="bg-light p-2 rounded mb-2">
                         <small class="text-muted d-block">Akaunti ya Benki</small>
                         <strong id="modal-profile-account-number" class="text-uppercase">-</strong>
                     </div>
@@ -857,7 +857,7 @@
                     <div class="bg-light p-2 rounded mb-2">
                         <small class="text-muted d-block">Jina la Benki</small>
                         <strong id="modal-profile-bank-name" class="text-uppercase">-</strong>
-                    </div> --}}
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
