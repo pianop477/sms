@@ -757,8 +757,8 @@ class AttendanceController extends Controller
                         <tr>
                             <th class="col-number">#</th>
                             <th class="col-name">Student\'s Name</th>
-                            <th class="col-gender">Sex</th>
-                            <th class="col-stream">Stm</th>';
+                            <th class="col-gender">Gender</th>
+                            <th class="col-stream">Stream</th>';
 
         foreach ($datesInMonth as $date) {
             $html .= '<th class="col-date">' . Carbon::parse($date)->format('d') . '</th>';
@@ -773,9 +773,9 @@ class AttendanceController extends Controller
             $index++;
             $html .= '<tr>
                         <td class="col-number">' . $index . '</td>
-                        <td class="col-name">' . $student['name'] . '</td>
-                        <td class="col-gender">' . $student['gender'] . '</td>
-                        <td class="col-stream">' . $student['group'] . '</td>';
+                        <td class="col-name">' . ucwords(strtolower($student['name'])) . '</td>
+                        <td class="col-gender">' . strtoupper($student['gender']) . '</td>
+                        <td class="col-stream">' . strtoupper($student['group']) . '</td>';
 
             foreach ($datesInMonth as $date) {
                 $status = $student['attendances'][$date] ?? 'A';
@@ -944,8 +944,8 @@ class AttendanceController extends Controller
                         <tr>
                             <th class="col-number">#</th>
                             <th class="col-name">Student\'s Name</th>
-                            <th class="col-gender">Sex</th>
-                            <th class="col-stream">Stm</th>';
+                            <th class="col-gender">Gender</th>
+                            <th class="col-stream">Stream</th>';
 
             foreach ($datesInMonth as $date) {
                 $html .= '<th class="col-date">' . Carbon::parse($date)->format('d') . '</th>';
