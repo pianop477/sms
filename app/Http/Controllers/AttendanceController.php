@@ -327,7 +327,9 @@ class AttendanceController extends Controller
                 'students.middle_name',
                 'students.last_name',
                 'students.gender',
-                'students.group', 'students.status', 'students.graduated',
+                'students.group',
+                'students.status',
+                'students.graduated',
                 'students.admission_number',
                 'users.first_name as teacher_firstname',
                 'users.last_name as teacher_lastname',
@@ -500,7 +502,8 @@ class AttendanceController extends Controller
                     'students.group',
                     'students.class_id as student_class',
                     'students.admission_number',
-                    'students.status', 'students.graduated',
+                    'students.status',
+                    'students.graduated',
                     'grades.id as class_id',
                     'grades.class_name',
                     'grades.class_code',
@@ -637,10 +640,14 @@ class AttendanceController extends Controller
             $startOfMonth = Carbon::parse($datesInMonth[0])->startOfDay();
             $endOfMonth = Carbon::parse(end($datesInMonth))->endOfDay();
 
-            // Get students for this class
+            // Get students for this class - EXCLUDE GRADUATED STUDENTS
             $studentsQuery = \App\Models\Student::query()
                 ->where('class_id', $classId)
-                ->where('school_id', Auth::user()->school_id);
+                ->where('school_id', Auth::user()->school_id)
+                ->where(function ($query) {
+                    $query->where('status', '!=', 2)  // Exclude status 2 (graduated)
+                        ->where('graduated', '!=', 1); // Exclude graduated = 1
+                });
 
             // Apply stream filter
             if ($streamFilter !== 'all') {
@@ -673,13 +680,18 @@ class AttendanceController extends Controller
                 ];
             }
 
-            // Get attendance records for this month with proper select
+            // Get attendance records for this month - ONLY FOR NON-GRADUATED STUDENTS
             $attendanceRecords = Attendance::query()
                 ->select('attendances.student_id', 'attendances.attendance_date', 'attendances.attendance_status')
+                ->join('students', 'students.id', '=', 'attendances.student_id')
                 ->where('attendances.class_id', $classId)
                 ->where('attendances.school_id', Auth::user()->school_id)
                 ->whereBetween('attendances.attendance_date', [$startOfMonth, $endOfMonth])
                 ->whereIn('attendances.student_id', array_keys($students))
+                ->where(function ($query) {
+                    $query->where('students.status', '!=', 2)
+                        ->where('students.graduated', '!=', 1);
+                })
                 ->orderBy('attendances.attendance_date', 'ASC')
                 ->get();
 
