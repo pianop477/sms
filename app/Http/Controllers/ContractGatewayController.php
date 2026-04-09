@@ -7,7 +7,7 @@ use App\Models\school;
 use App\Models\school_constracts;
 use App\Models\Teacher;
 use App\Services\NextSmsService;
-use App\Traits\ResolveApplicantTrait;
+use App\Traits\ResolveApplicantTrait as TraitsResolveApplicantTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -16,16 +16,17 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
+use ResolveApplicantTrait;
 use Vinkla\Hashids\Facades\Hashids;
 
 class ContractGatewayController extends Controller
 {
     //
+
+    use TraitsResolveApplicantTrait;
     private $otpExpiryMinutes = 10;
     private $tokenExpiryHours = 1;
     private $maxAttempts = 3;
-
-    use ResolveApplicantTrait;
 
     public function init()
     {

@@ -9,6 +9,10 @@ trait ResolveApplicantTrait
 {
     private function resolveApplicantDetails($identifier, $schoolId = null)
     {
+        // Validate identifier
+        if (empty($identifier)) {
+            return $this->getNotFoundResponse($identifier, $schoolId);
+        }
 
         /*
         |--------------------------------------------------------------------------
@@ -163,10 +167,18 @@ trait ResolveApplicantTrait
 
         /*
         |--------------------------------------------------------------------------
-        | NOT FOUND
+        | NOT FOUND - Return proper not found response
         |--------------------------------------------------------------------------
         */
 
+        return $this->getNotFoundResponse($identifier, $schoolId);
+    }
+
+    /**
+     * Get standardized not found response
+     */
+    private function getNotFoundResponse($identifier, $schoolId = null)
+    {
         return [
             'first_name' => 'Unknown',
             'last_name' => 'Staff',
@@ -178,7 +190,14 @@ trait ResolveApplicantTrait
             'staff_type' => 'Unknown',
             'staff_table_id' => null,
             'school_id' => $schoolId,
-            'user_id' => null
+            'user_id' => null,
+            'profile_image' => null,
+            'nida' => null,
+            'bank_account_number' => null,
+            'bank_account_name' => null,
+            'bank_name' => null,
+            'dob' => null,
+            'qualification' => null
         ];
     }
 }
