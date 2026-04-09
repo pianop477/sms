@@ -51,131 +51,225 @@
 </script>
 <script>
     $(document).ready(function() {
-    var table = $('#myTable').DataTable({
-        stateSave: true,
-        columnDefs: [{
-            orderable: false,
-            targets: 0
-        }],
-        // Safisha data zilizohifadhiwa kwenye state kabla ya kuinitialize
-        stateLoadParams: function(settings, data) {
-            if (data.checkedRows) {
-                delete data.checkedRows;
-            }
-        }
-    });
-
-    // Object ya kuhifadhi rows zilizochaguliwa
-    var selectedRows = new Set();
-
-    // Handle select all checkbox
-    $('#selectAll').on('click', function() {
-        var isChecked = this.checked;
-
-        if (isChecked) {
-            // Get ALL rows (including those not on current page)
-            table.rows({ search: 'applied' }).every(function() {
-                var rowId = $(this.node()).find('input[name="student[]"]').val();
-                selectedRows.add(rowId);
-            });
-        } else {
-            // Clear all selections
-            selectedRows.clear();
-        }
-
-        // Update checkboxes on current page
-        table.rows({ page: 'current' }).every(function() {
-            var checkbox = $(this.node()).find('input[name="student[]"]');
-            var rowId = checkbox.val();
-            checkbox.prop('checked', isChecked);
-
-            // Update selectedRows set
-            if (isChecked) {
-                selectedRows.add(rowId);
-            } else if (selectedRows.has(rowId)) {
-                selectedRows.delete(rowId);
+        var table = $('#myTable').DataTable({
+            stateSave: true,
+            columnDefs: [{
+                orderable: false,
+                targets: 0
+            }],
+            // Safisha data zilizohifadhiwa kwenye state kabla ya kuinitialize
+            stateLoadParams: function(settings, data) {
+                if (data.checkedRows) {
+                    delete data.checkedRows;
+                }
             }
         });
 
-        updateSelectedCount();
-        updateFormInputs();
-    });
+        // Object ya kuhifadhi rows zilizochaguliwa
+        var selectedRows = new Set();
 
-    // Handle individual checkboxes
-    $('#myTable tbody').on('change', 'input[name="student[]"]', function() {
-        var rowId = $(this).val();
+        // Handle select all checkbox
+        $('#selectAll').on('click', function() {
+            var isChecked = this.checked;
 
-        if (this.checked) {
-            selectedRows.add(rowId);
-        } else {
-            selectedRows.delete(rowId);
-            $('#selectAll').prop('checked', false);
+            if (isChecked) {
+                // Get ALL rows (including those not on current page)
+                table.rows({
+                    search: 'applied'
+                }).every(function() {
+                    var rowId = $(this.node()).find('input[name="student[]"]').val();
+                    selectedRows.add(rowId);
+                });
+            } else {
+                // Clear all selections
+                selectedRows.clear();
+            }
+
+            // Update checkboxes on current page
+            table.rows({
+                page: 'current'
+            }).every(function() {
+                var checkbox = $(this.node()).find('input[name="student[]"]');
+                var rowId = checkbox.val();
+                checkbox.prop('checked', isChecked);
+
+                // Update selectedRows set
+                if (isChecked) {
+                    selectedRows.add(rowId);
+                } else if (selectedRows.has(rowId)) {
+                    selectedRows.delete(rowId);
+                }
+            });
+
+            updateSelectedCount();
+            updateFormInputs();
+        });
+
+        // Handle individual checkboxes
+        $('#myTable tbody').on('change', 'input[name="student[]"]', function() {
+            var rowId = $(this).val();
+
+            if (this.checked) {
+                selectedRows.add(rowId);
+            } else {
+                selectedRows.delete(rowId);
+                $('#selectAll').prop('checked', false);
+            }
+
+            updateSelectedCount();
+            updateFormInputs();
+        });
+
+        // Function to update selected count
+        function updateSelectedCount() {
+            $('#selectedCount').text(selectedRows.size + ' students selected');
         }
 
-        updateSelectedCount();
-        updateFormInputs();
-    });
+        // Function to update hidden inputs in the form
+        function updateFormInputs() {
+            // Clear existing hidden inputs
+            $('#batchForm input[name="student[]"][type="hidden"]').remove();
 
-    // Function to update selected count
-    function updateSelectedCount() {
-        $('#selectedCount').text(selectedRows.size + ' students selected');
-    }
-
-    // Function to update hidden inputs in the form
-    function updateFormInputs() {
-        // Clear existing hidden inputs
-        $('#batchForm input[name="student[]"][type="hidden"]').remove();
-
-        // Add new hidden inputs for all selected rows
-        selectedRows.forEach(function(studentId) {
-            $('#batchForm').append(
-                $('<input>')
+            // Add new hidden inputs for all selected rows
+            selectedRows.forEach(function(studentId) {
+                $('#batchForm').append(
+                    $('<input>')
                     .attr('type', 'hidden')
                     .attr('name', 'student[]')
                     .val(studentId)
+                );
+            });
+        }
+
+        // Update checkboxes when page changes
+        table.on('draw', function() {
+            // Update checkboxes on current page based on selectedRows
+            table.rows({
+                page: 'current'
+            }).every(function() {
+                var checkbox = $(this.node()).find('input[name="student[]"]');
+                var rowId = checkbox.val();
+                checkbox.prop('checked', selectedRows.has(rowId));
+            });
+
+            // Update selectAll checkbox state
+            var currentPageRows = table.rows({
+                page: 'current',
+                search: 'applied'
+            }).count();
+            var currentPageSelected = table.rows({
+                    page: 'current',
+                    search: 'applied'
+                })
+                .nodes().to$().find('input[name="student[]"]:checked').length;
+
+            $('#selectAll').prop('checked',
+                currentPageSelected === currentPageRows && currentPageRows > 0
             );
-        });
-    }
 
-    // Update checkboxes when page changes
-    table.on('draw', function() {
-        // Update checkboxes on current page based on selectedRows
-        table.rows({ page: 'current' }).every(function() {
-            var checkbox = $(this.node()).find('input[name="student[]"]');
-            var rowId = checkbox.val();
-            checkbox.prop('checked', selectedRows.has(rowId));
+            updateSelectedCount();
         });
 
-        // Update selectAll checkbox state
-        var currentPageRows = table.rows({ page: 'current', search: 'applied' }).count();
-        var currentPageSelected = table.rows({ page: 'current', search: 'applied' })
-            .nodes().to$().find('input[name="student[]"]:checked').length;
+        // Handle form submission
+        $('#batchForm').on('submit', function(e) {
+            if (selectedRows.size === 0) {
+                e.preventDefault();
+                alert('Please select at least one student');
+                return false;
+            }
 
-        $('#selectAll').prop('checked',
-            currentPageSelected === currentPageRows && currentPageRows > 0
-        );
+            // Confirm before submitting
+            if (!confirm(`Are you sure you want to update ${selectedRows.size} student(s)?`)) {
+                e.preventDefault();
+                return false;
+            }
 
-        updateSelectedCount();
-    });
+            // Update hidden inputs before submit
+            updateFormInputs();
+            return true;
+        });
+        // Function to refresh CSRF token periodically
+        function refreshCsrfToken() {
+            fetch('/csrf-token', {
+                    cache: 'no-store',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.token) {
+                        // Update meta tag
+                        let metaToken = document.querySelector('meta[name="csrf-token"]');
+                        if (metaToken) {
+                            metaToken.setAttribute('content', data.token);
+                        }
 
-    // Handle form submission
-    $('#batchForm').on('submit', function(e) {
-        if (selectedRows.size === 0) {
-            e.preventDefault();
-            alert('Please select at least one student');
-            return false;
+                        // Update all forms with _token input
+                        document.querySelectorAll('input[name="_token"]').forEach(input => {
+                            input.value = data.token;
+                        });
+
+                        // Update all forms with _token in hidden fields
+                        document.querySelectorAll('form').forEach(form => {
+                            let tokenInput = form.querySelector('input[name="_token"]');
+                            if (!tokenInput) {
+                                tokenInput = document.createElement('input');
+                                tokenInput.type = 'hidden';
+                                tokenInput.name = '_token';
+                                form.appendChild(tokenInput);
+                            }
+                            tokenInput.value = data.token;
+                        });
+                    }
+                })
+                .catch(error => console.log('CSRF refresh failed:', error));
         }
 
-        // Confirm before submitting
-        if (!confirm(`Are you sure you want to update ${selectedRows.size} student(s)?`)) {
-            e.preventDefault();
-            return false;
-        }
+        // Refresh CSRF token every 4 minutes (before it expires)
+        setInterval(refreshCsrfToken, 4 * 60 * 1000);
 
-        // Update hidden inputs before submit
-        updateFormInputs();
-        return true;
+        // Refresh on page load
+        document.addEventListener('DOMContentLoaded', refreshCsrfToken);
+
+        // Clear caches on logout button click
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('form[action*="logout"]') ||
+                e.target.closest('a[href*="logout"]') ||
+                (e.target.type === 'submit' && e.target.form && e.target.form.action.includes('logout'))
+            ) {
+
+                e.preventDefault();
+
+                // Clear all caches
+                if ('caches' in window) {
+                    caches.keys().then(function(names) {
+                        for (let name of names) {
+                            if (name.includes('shuleapp-cache') || name.includes(
+                                    'gatepass-tokens')) {
+                                caches.delete(name);
+                            }
+                        }
+                    });
+                }
+
+                // Clear localStorage
+                localStorage.clear();
+
+                // Clear sessionStorage
+                sessionStorage.clear();
+
+                // Submit the form after a small delay
+                setTimeout(() => {
+                    if (e.target.closest('form')) {
+                        e.target.closest('form').submit();
+                    } else if (e.target.form) {
+                        e.target.form.submit();
+                    }
+                }, 100);
+            }
+        });
+
     });
-});
 </script>
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>

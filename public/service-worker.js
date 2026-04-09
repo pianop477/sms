@@ -1,4 +1,4 @@
-const APP_VERSION = '2026.04.08';
+const APP_VERSION = '2026.04.09';
 const CACHE_NAME = `shuleapp-cache-${APP_VERSION}`;
 
 // STATIC ASSETS (these are cached for offline)
@@ -16,7 +16,15 @@ const STATIC_ASSETS = [
 // Token cache storage name (separate from main cache)
 const TOKEN_CACHE_NAME = `gatepass-tokens-${APP_VERSION}`;
 
-// Pages that MUST work offline (No offline.html redirection)
+// Pages that should ALWAYS get fresh copy (no cache for navigation)
+const NO_CACHE_NAVIGATION = [
+    '/login',
+    '/logout',
+    '/register',
+    '/password/reset'
+];
+
+// Critical pages that work offline but need fresh CSRF
 const CRITICAL_PAGES = [
     '/',
     '/offline.html',
@@ -26,7 +34,7 @@ const CRITICAL_PAGES = [
     '/contracts/verify'
 ];
 
-// API routes that should NEVER be cached (Go directly to network)
+// API routes that should NEVER be cached
 const API_ROUTES_TO_SKIP = [
     '/api/',
     '/login',
@@ -34,14 +42,15 @@ const API_ROUTES_TO_SKIP = [
     '/verify',
     '/otp',
     '/session',
-    '/tokens/verify/submit',  // POST request for verification
+    '/tokens/verify/submit',
     '/biometric/send-otp',
     '/biometric/verify-otp',
     '/webauthn/login/options',
     '/webauthn/login/verify',
     '/webauthn/register/options',
     '/webauthn/register/verify',
-    '/contract-gateway/api/'
+    '/contract-gateway/api/',
+    '/csrf-token'
 ];
 
 // INSTALL
@@ -75,7 +84,43 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
 
-    // 🔥 CRITICAL: Check if this is an API route that should NEVER be cached
+    // SPECIAL HANDLING FOR LOGOUT REQUESTS
+    if (url.pathname === '/logout' && event.request.method === 'POST') {
+        event.respondWith(
+            fetch(event.request).then(response => {
+                // Clear all caches on successful logout
+                caches.keys().then(keys => {
+                    keys.forEach(key => {
+                        if (key.includes('shuleapp-cache') || key.includes('gatepass-tokens')) {
+                            caches.delete(key);
+                            console.log('[SW] Cleared cache on logout:', key);
+                        }
+                    });
+                });
+                return response;
+            }).catch(error => {
+                console.error('[SW] Logout network error:', error);
+                // Still try to clear caches and redirect
+                caches.keys().then(keys => {
+                    keys.forEach(key => {
+                        if (key.includes('shuleapp-cache') || key.includes('gatepass-tokens')) {
+                            caches.delete(key);
+                        }
+                    });
+                });
+                return new Response(null, {
+                    status: 302,
+                    headers: {
+                        'Location': '/',
+                        'Cache-Control': 'no-cache, no-store, must-revalidate'
+                    }
+                });
+            })
+        );
+        return;
+    }
+
+    // Check if this is an API route that should NEVER be cached
     const isApiRoute = API_ROUTES_TO_SKIP.some(route => {
         if (route.includes('/api/')) {
             return url.pathname.startsWith(route);
@@ -93,9 +138,13 @@ self.addEventListener('fetch', event => {
 
         // For all other API routes - network only, no caching
         event.respondWith(
-            fetch(event.request).catch(error => {
+            fetch(event.request, {
+                cache: 'no-store',
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate'
+                }
+            }).catch(error => {
                 console.log('[SW] API offline:', url.pathname);
-                // Return appropriate error response for offline APIs
                 return new Response(JSON.stringify({
                     success: false,
                     message: 'Hakuna mtandao. Tafadhali wasiliana na ofisi ya shule.'
@@ -111,12 +160,26 @@ self.addEventListener('fetch', event => {
     // ONLY HANDLE GET requests for non-API routes
     if (event.request.method !== 'GET') return;
 
+    // Check if this page should never be cached for navigation
+    const isNoCachePage = NO_CACHE_NAVIGATION.some(page => url.pathname === page);
+    if (isNoCachePage && event.request.mode === 'navigate') {
+        event.respondWith(
+            fetch(event.request, {
+                cache: 'no-store',
+                headers: {
+                    'Cache-Control': 'no-cache, no-store, must-revalidate'
+                }
+            })
+        );
+        return;
+    }
+
     // Check if this is a critical page that must work offline
     const isCriticalPage = CRITICAL_PAGES.some(page => {
         if (page === '/') {
             return url.pathname === '/' || url.pathname === '';
         }
-        return url.pathname === page || url.pathname.startsWith(page);
+        return url.pathname === page;
     });
 
     // STATIC FILES STRATEGY (CACHE FIRST then NETWORK)
@@ -133,31 +196,25 @@ self.addEventListener('fetch', event => {
         event.respondWith(
             caches.match(event.request).then(cached => {
                 if (cached) {
-                    // Return cached version and update in background
-                    const fetchPromise = fetch(event.request).then(networkResponse => {
+                    // Update cache in background
+                    fetch(event.request).then(networkResponse => {
                         if (networkResponse && networkResponse.status === 200) {
-                            const responseClone = networkResponse.clone();
                             caches.open(CACHE_NAME).then(cache => {
-                                cache.put(event.request, responseClone);
+                                cache.put(event.request, networkResponse.clone());
                             });
                         }
-                        return networkResponse;
-                    }).catch(() => cached);
-
+                    }).catch(() => {});
                     return cached;
                 }
 
-                // Not in cache, fetch from network
                 return fetch(event.request).then(networkResponse => {
                     if (networkResponse && networkResponse.status === 200) {
-                        const responseClone = networkResponse.clone();
                         caches.open(CACHE_NAME).then(cache => {
-                            cache.put(event.request, responseClone);
+                            cache.put(event.request, networkResponse.clone());
                         });
                     }
                     return networkResponse;
                 }).catch(() => {
-                    // If offline and not in cache, try to show offline page
                     if (event.request.mode === 'navigate') {
                         return caches.match('/offline.html?v=' + APP_VERSION);
                     }
@@ -168,33 +225,32 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // CRITICAL PAGES (Welcome & Token Verification) - CACHE FIRST then NETWORK
-    if (isCriticalPage) {
+    // CRITICAL PAGES - NETWORK FIRST for fresh CSRF, fallback to cache
+    if (isCriticalPage && event.request.mode === 'navigate') {
         event.respondWith(
-            caches.match(event.request).then(cached => {
+            fetch(event.request, {
+                cache: 'no-cache',
+                headers: {
+                    'Cache-Control': 'no-cache, must-revalidate'
+                }
+            })
+            .then(response => {
+                // Cache successful responses for offline use
+                if (response && response.status === 200) {
+                    const responseClone = response.clone();
+                    caches.open(CACHE_NAME).then(cache => {
+                        cache.put(event.request, responseClone);
+                    });
+                }
+                return response;
+            })
+            .catch(async () => {
+                // Only use cache if network fails
+                const cached = await caches.match(event.request);
                 if (cached) {
-                    // Return cached version
                     return cached;
                 }
-
-                // Not in cache, fetch from network and cache
-                return fetch(event.request).then(networkResponse => {
-                    if (networkResponse && networkResponse.status === 200) {
-                        const responseClone = networkResponse.clone();
-                        caches.open(CACHE_NAME).then(cache => {
-                            cache.put(event.request, responseClone);
-                        });
-                    }
-                    return networkResponse;
-                }).catch(error => {
-                    console.log('[SW] Critical page offline and not cached:', url.pathname);
-                    // For critical pages, try to show the page if it was cached before
-                    // If not, show offline page as last resort
-                    if (event.request.mode === 'navigate') {
-                        return caches.match('/offline.html?v=' + APP_VERSION);
-                    }
-                    return new Response('Page not available offline', { status: 404 });
-                });
+                return caches.match('/offline.html?v=' + APP_VERSION);
             })
         );
         return;
@@ -205,7 +261,6 @@ self.addEventListener('fetch', event => {
         event.respondWith(
             fetch(event.request)
                 .then(response => {
-                    // Cache successful responses
                     if (response && response.status === 200) {
                         const responseClone = response.clone();
                         caches.open(CACHE_NAME).then(cache => {
@@ -215,11 +270,8 @@ self.addEventListener('fetch', event => {
                     return response;
                 })
                 .catch(() => {
-                    // Offline - try cache first, then offline page
                     return caches.match(event.request).then(cached => {
-                        if (cached) {
-                            return cached;
-                        }
+                        if (cached) return cached;
                         return caches.match('/offline.html?v=' + APP_VERSION);
                     });
                 })
@@ -227,30 +279,27 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // Default: Try network, fallback to cache
+    // Default: Try cache first for other resources
     event.respondWith(
-        fetch(event.request)
-            .then(response => response)
-            .catch(() => {
-                return caches.match(event.request);
-            })
+        caches.match(event.request).then(cached => {
+            if (cached) return cached;
+            return fetch(event.request);
+        })
     );
 });
 
 // ========== OFFLINE TOKEN VERIFICATION ==========
 
-// Handle token verification (online/offline)
 async function handleTokenVerification(request) {
     try {
         // Try network first with timeout
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
 
         try {
             const response = await fetch(request.clone(), { signal: controller.signal });
             clearTimeout(timeoutId);
 
-            // If online and successful, update cache
             if (response.ok) {
                 const data = await response.clone().json();
                 if (data.success && data.data) {
@@ -264,7 +313,6 @@ async function handleTokenVerification(request) {
             throw fetchError;
         }
     } catch (error) {
-        // Offline mode or network error - check cache
         console.log('[SW] Offline mode - checking cached tokens');
 
         try {
@@ -281,7 +329,6 @@ async function handleTokenVerification(request) {
                 });
             }
 
-            // Check token cache
             const cachedToken = await getTokenFromCache(tokenCode);
 
             if (cachedToken) {
@@ -315,7 +362,6 @@ async function handleTokenVerification(request) {
     }
 }
 
-// Store token in cache
 async function storeTokenInCache(tokenData) {
     try {
         const cache = await caches.open(TOKEN_CACHE_NAME);
@@ -327,18 +373,14 @@ async function storeTokenInCache(tokenData) {
             cached_at: new Date().toISOString()
         };
 
-        // Store with expiration check
         await cache.put(tokenKey, new Response(JSON.stringify(cacheData)));
         console.log('[SW] Token stored in cache:', tokenData.token.token);
-
-        // Clean old tokens
         await cleanOldTokens();
     } catch (error) {
         console.error('[SW] Failed to store token:', error);
     }
 }
 
-// Get token from cache
 async function getTokenFromCache(tokenCode) {
     try {
         const cache = await caches.open(TOKEN_CACHE_NAME);
@@ -347,7 +389,6 @@ async function getTokenFromCache(tokenCode) {
 
         if (response) {
             const data = await response.json();
-            // Check if token is still valid
             const expiresAt = new Date(data.token.expires_at);
             const now = new Date();
 
@@ -358,7 +399,6 @@ async function getTokenFromCache(tokenCode) {
                     installment: data.installment
                 };
             } else {
-                // Remove expired token
                 await cache.delete(tokenKey);
                 console.log('[SW] Removed expired token from cache:', tokenCode);
                 return null;
@@ -371,7 +411,6 @@ async function getTokenFromCache(tokenCode) {
     }
 }
 
-// Clean old/expired tokens from cache
 async function cleanOldTokens() {
     try {
         const cache = await caches.open(TOKEN_CACHE_NAME);
@@ -408,5 +447,4 @@ self.addEventListener('sync', (event) => {
 
 async function syncTokens() {
     console.log('[SW] Syncing tokens with server...');
-    // Implement if needed for pending verifications
 }

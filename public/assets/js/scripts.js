@@ -262,7 +262,7 @@
 
         window.addEventListener('load', () => {
 
-            const SW_URL = '/service-worker.js?v=2026.04.08';
+            const SW_URL = '/service-worker.js?v=2026.04.09';
 
             navigator.serviceWorker.register(SW_URL)
                 .then((registration) => {

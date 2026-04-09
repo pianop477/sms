@@ -7,7 +7,7 @@
         "productivity",
         "school"
     ],
-    "start_url": "/?v=2026.04.08",
+    "start_url": "/?v=2026.04.09",
     "display": "standalone",
     "display_override": [
         "window-controls-overlay",
@@ -18,24 +18,24 @@
     "color": "#2C3E50",
     "orientation": "portrait",
     "scope": "/",
-    "id": "shuleapp-2026.04.08",
+    "id": "shuleapp-2026.04.09",
     "lang": "sw",
     "dir": "auto",
     "icons": [
         {
-            "src": "/icons/new_icon1.png?v=2026.04.08",
+            "src": "/icons/new_icon1.png?v=2026.04.09",
             "sizes": "96x96",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/icons/new_icon2.png?v=2026.04.08",
+            "src": "/icons/new_icon2.png?v=2026.04.09",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/icons/new_icon3.png?v=2026.04.08",
+            "src": "/icons/new_icon3.png?v=2026.04.09",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"

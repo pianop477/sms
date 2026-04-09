@@ -13,6 +13,16 @@
     <link rel="icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon-512 x 512.png') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ filemtime(public_path('manifest.json')) }}">
+    <!-- Prevent caching of sensitive pages -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, private">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <!-- Always refresh CSRF token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <!-- Prevent back-forward cache -->
+    <meta http-equiv="Cache-Control" content="no-store">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/scrollreveal"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -189,7 +199,8 @@
                     </div>
                     <div>
                         <div class="text-xl sm:text-2xl font-bold text-blue-700">ShuleApp
-                            <p class="text-sm text-muted text-dark" style="font-size: 9px;"><i>Empowering Education</i></p>
+                            <p class="text-sm text-muted text-dark" style="font-size: 9px;"><i>Empowering Education</i>
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -1669,6 +1680,29 @@
                     form.submit();
                 }, 1500);
             });
+        });
+
+        // Refresh CSRF token periodically
+        setInterval(function() {
+            fetch('/csrf-token')
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelector('meta[name="csrf-token"]').content = data.token;
+                    document.querySelector('input[name="_token"]')?.setAttribute('value', data.token);
+                });
+        }, 5 * 60 * 1000); // Refresh every 5 minutes
+
+        // Clear browser cache on logout button click
+        document.querySelector('form[action*="logout"]')?.addEventListener('submit', function() {
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    for (let name of names) {
+                        if (name.includes('shuleapp-cache')) {
+                            caches.delete(name);
+                        }
+                    }
+                });
+            }
         });
     </script>
 </body>
