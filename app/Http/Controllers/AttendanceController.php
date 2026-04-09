@@ -498,7 +498,7 @@ class AttendanceController extends Controller
                     'students.group',
                     'students.class_id as student_class',
                     'students.admission_number',
-                    'students.status',
+                    'students.status', 'students.graduated',
                     'grades.id as class_id',
                     'grades.class_name',
                     'grades.class_code',
@@ -507,6 +507,8 @@ class AttendanceController extends Controller
                     'schools.school_reg_no',
                 )
                 ->whereIn('students.status', [0, 1])
+                ->where('students.status', '!=', 2) // Exclude graduated students
+                ->where('students.graduated', 0) // Ensure graduated students are excluded
                 ->where('attendances.class_id', $request->class)
                 ->whereBetween('attendances.attendance_date', [$startDate, $endDate])
                 ->where(function ($query) use ($stream, $arrayStream) {
