@@ -1028,8 +1028,8 @@
                         nida: data.data.nida || "N/A",
                         dob: data.data.dob || "N/A",
                         address: data.data.address || "N/A",
-                        accountNumber: data.data.account_number || "N/A",
-                        accountName: data.data.account_name || "N/A",
+                        accountNumber: data.data.bank_account_number || "N/A",
+                        accountName: data.data.bank_account_name || "N/A",
                         bankName: data.data.bank_name || "N/A"
                     };
 
