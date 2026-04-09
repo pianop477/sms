@@ -619,36 +619,43 @@ class AttendanceController extends Controller
             $months[$monthYear][] = $date;
         }
 
-        // Get class name from first record (for display)
+        // Get class id and name from first record
         $firstRecordQuery = clone $query;
         $firstRecord = $firstRecordQuery->first();
+        $classId = $firstRecord->class_id ?? $firstRecord->student_class ?? null;
         $className = $firstRecord->class_name ?? 'N/A';
+        $streamFilter = request()->input('stream', 'all');
 
         // Process each month separately to save memory
         foreach ($months as $monthYear => $datesInMonth) {
             $monthName = Carbon::parse($monthYear . '-01')->format('F Y');
+            $startOfMonth = Carbon::parse($datesInMonth[0])->startOfDay();
+            $endOfMonth = Carbon::parse(end($datesInMonth))->endOfDay();
 
-            // Get students for this month
-            $studentsQuery = clone $query;
-            $students = [];
+            // Get students for this class
+            $studentsQuery = \App\Models\Student::query()
+                ->where('class_id', $classId)
+                ->where('school_id', Auth::user()->school_id);
 
-            // Get unique students for this month with their details
-            $studentIds = $studentsQuery->select(
-                'students.id',
-                'students.first_name',
-                'students.middle_name',
-                'students.last_name',
-                'students.gender',
-                'students.group',
-                'students.admission_number'
-            )
-                ->distinct()
+            // Apply stream filter
+            if ($streamFilter !== 'all') {
+                $studentsQuery->where('group', $streamFilter);
+            } else {
+                $studentsQuery->whereIn('group', ['a', 'b', 'c']);
+            }
+
+            $studentsList = $studentsQuery->orderBy('group', 'ASC')
+                ->orderBy('gender', 'DESC')
+                ->orderBy('first_name', 'ASC')
                 ->get();
 
-            // Get unique groups for filtering
-            $uniqueGroups = $studentIds->pluck('group')->unique()->toArray();
+            if ($studentsList->isEmpty()) {
+                continue;
+            }
 
-            foreach ($studentIds as $student) {
+            // Initialize students array
+            $students = [];
+            foreach ($studentsList as $student) {
                 $students[$student->id] = [
                     'id' => $student->id,
                     'admission_number' => $student->admission_number,
@@ -661,64 +668,58 @@ class AttendanceController extends Controller
                 ];
             }
 
-            // Get attendance records for this month
-            $attendanceQuery = Attendance::query()
-                ->join('students', 'students.id', '=', 'attendances.student_id')
-                ->join('grades', 'grades.id', '=', 'attendances.class_id')
-                ->where('attendances.class_id', $firstRecord->class_id ?? null)
-                ->whereBetween('attendances.attendance_date', [
-                    Carbon::parse($datesInMonth[0])->startOfDay(),
-                    Carbon::parse(end($datesInMonth))->endOfDay()
-                ])
+            // Get attendance records for this month with proper select
+            $attendanceRecords = Attendance::query()
+                ->select('attendances.student_id', 'attendances.attendance_date', 'attendances.attendance_status')
+                ->where('attendances.class_id', $classId)
                 ->where('attendances.school_id', Auth::user()->school_id)
-                ->whereIn('students.group', $uniqueGroups);
+                ->whereBetween('attendances.attendance_date', [$startOfMonth, $endOfMonth])
+                ->whereIn('attendances.student_id', array_keys($students))
+                ->orderBy('attendances.attendance_date', 'ASC')
+                ->get();
 
-            // Add stream filter if not 'all'
-            $streamFilter = request()->input('stream', 'all');
-            if ($streamFilter !== 'all') {
-                $attendanceQuery->where('students.group', $streamFilter);
+            // Populate attendance data
+            foreach ($attendanceRecords as $record) {
+                $dateKey = Carbon::parse($record->attendance_date)->format('Y-m-d');
+                if (isset($students[$record->student_id])) {
+                    $students[$record->student_id]['attendances'][$dateKey] = $record->attendance_status;
+                }
             }
 
-            $attendanceQuery->chunk($chunkSize, function ($records) use (&$students) {
-                foreach ($records as $record) {
-                    $dateKey = Carbon::parse($record->attendance_date)->format('Y-m-d');
-                    if (isset($students[$record->studentId])) {
-                        $students[$record->studentId]['attendances'][$dateKey] = $record->attendance_status;
-                    }
-                }
-            });
+            // Calculate statistics
+            $totalRecords = $attendanceRecords->count();
+            $presentRecords = $attendanceRecords->where('attendance_status', 'present')->count();
+            $attendanceRate = $totalRecords > 0 ? round(($presentRecords / $totalRecords) * 100) : 0;
 
-            // Calculate statistics for this month
-            $stats = $this->calculateMonthStatsStreaming($attendanceQuery, $datesInMonth);
-
-            // Create a fake first record for display
+            // Create display record
             $displayRecord = new \stdClass();
             $displayRecord->class_name = $className;
+
+            $stats = [
+                'total_records' => $totalRecords,
+                'present_records' => $presentRecords,
+                'attendance_rate' => $attendanceRate
+            ];
 
             // Generate HTML for this month
             $html .= $this->generateMonthHtml($students, $datesInMonth, $monthName, $stats, $displayRecord);
 
             // Free memory
-            unset($students, $studentIds, $attendanceQuery);
+            unset($students, $studentsList, $attendanceRecords);
         }
 
         $html .= '</div>';
         return $html;
     }
 
+
     /**
      * Calculate monthly statistics efficiently
      */
-    private function calculateMonthStatsStreaming($query, $datesInMonth)
+    private function calculateMonthStatsStreaming($attendanceRecords, $datesInMonth)
     {
-        // Get total records count
-        $totalRecords = $query->count();
-
-        // Get present records count - create a fresh query
-        $presentQuery = clone $query;
-        $presentRecords = $presentQuery->where('attendances.attendance_status', 'present')->count();
-
-        // Calculate rate
+        $totalRecords = $attendanceRecords->count();
+        $presentRecords = $attendanceRecords->where('attendance_status', 'present')->count();
         $attendanceRate = $totalRecords > 0 ? round(($presentRecords / $totalRecords) * 100) : 0;
 
         return [
@@ -788,16 +789,16 @@ class AttendanceController extends Controller
             $html .= '<th class="col-date">' . Carbon::parse($date)->format('d') . '</th>';
         }
 
-        $html .= '                </tr>
-                        </thead>
-                        <tbody>';
+        $html .= '                </td>
+                    </thead>
+                    <tbody>';
 
         $index = 0;
         foreach ($students as $student) {
             $index++;
             $html .= '<tr>
                         <td class="col-number">' . $index . '</td>
-                        <td class="col-name">' . ucwords(strtolower($student['name'])) . '</td>
+                        <td class="col-name">' . $student['name'] . '</td>
                         <td class="col-gender">' . strtoupper($student['gender']) . '</td>
                         <td class="col-stream">' . strtoupper($student['group']) . '</td>';
 
@@ -821,11 +822,11 @@ class AttendanceController extends Controller
                 $html .= '<td class="' . $class . '">' . $symbol . '</td>';
             }
 
-            $html .= '';
+            $html .= '</tr>';
         }
 
         $html .= '            </tbody>
-                </table>
+            </table>
             </div>
 
             <div class="legend">
