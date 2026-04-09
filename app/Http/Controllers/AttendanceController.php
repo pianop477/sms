@@ -797,7 +797,7 @@ class AttendanceController extends Controller
                 $html .= '<td class="' . $class . '">' . $symbol . '</td>';
             }
 
-            $html .= ' hilab';
+            $html .= '';
         }
 
         $html .= '            </tbody>
