@@ -341,7 +341,7 @@ class AttendanceController extends Controller
             ->whereBetween('attendances.attendance_date', [$startDate, $endDate])
             ->where('attendances.school_id', Auth::user()->school_id)
             ->orderBy('attendances.attendance_date', 'ASC')
-            ->where('students.status', 1)
+            // ->where('students.status', 1)
             ->orderBy('students.gender', 'DESC')
             ->orderBy('students.first_name', 'ASC')
             ->get();
@@ -421,10 +421,9 @@ class AttendanceController extends Controller
     public function generateClassReport(Request $request)
     {
         try {
-            // Log the request for debugging
-            Log::info('Attendance Report Request:', $request->all());
+            ini_set('memory_limit', '1024M'); // optional safety
 
-            // Validate request
+            // ✅ Validate request
             $validator = Validator::make($request->all(), [
                 'class' => 'required|exists:grades,id',
                 'start' => 'required|date_format:Y-m-d',
@@ -440,12 +439,20 @@ class AttendanceController extends Controller
                 ], 422);
             }
 
-            $startDate = Carbon::parse($request->input('start'))->startOfDay();
-            $endDate = Carbon::parse($request->input('end'))->endOfDay();
-            $stream = strtolower($request->input('stream', 'all'));
+            $startDate = Carbon::parse($request->start)->startOfDay();
+            $endDate   = Carbon::parse($request->end)->endOfDay();
+            $stream    = strtolower($request->input('stream', 'all'));
             $arrayStream = ['a', 'b', 'c'];
 
-            // Get school info
+            // ✅ Limit date range (IMPORTANT)
+            if ($startDate->diffInDays($endDate) > 31) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please select a date range of 31 days or less'
+                ]);
+            }
+
+            // ✅ School
             $school = school::find(Auth::user()->school_id);
             if (!$school) {
                 return response()->json([
@@ -454,86 +461,83 @@ class AttendanceController extends Controller
                 ], 404);
             }
 
-            // Query to retrieve attendance records
-            $attendances = Attendance::query()
+            // ✅ Collect data using chunk (memory safe)
+            $attendances = collect();
+
+            Attendance::query()
                 ->join('students', 'students.id', '=', 'attendances.student_id')
                 ->join('grades', 'grades.id', '=', 'attendances.class_id')
                 ->join('teachers', 'teachers.id', '=', 'attendances.teacher_id')
                 ->leftJoin('users', 'users.id', '=', 'teachers.user_id')
                 ->leftJoin('schools', 'schools.id', '=', 'students.school_id')
                 ->select(
-                    'attendances.*',
+                    'attendances.attendance_date',
+                    'attendances.attendance_status',
                     'students.id as studentId',
                     'students.first_name',
                     'students.middle_name',
                     'students.last_name',
                     'students.gender',
                     'students.group',
-                    'students.class_id as student_class',
                     'students.admission_number',
-                    'students.status',
-                    'grades.id as class_id',
-                    'grades.class_name',
-                    'grades.class_code',
-                    'users.first_name as teacher_firstname',
-                    'users.last_name as teacher_lastname',
-                    'schools.school_reg_no',
+                    'grades.class_name'
                 )
                 ->where('attendances.class_id', $request->class)
                 ->whereBetween('attendances.attendance_date', [$startDate, $endDate])
+                ->where('attendances.school_id', Auth::user()->school_id)
                 ->where(function ($query) use ($stream, $arrayStream) {
-                    if ($stream == 'all') {
+                    if ($stream === 'all') {
                         $query->whereIn('students.group', $arrayStream);
                     } else {
                         $query->where('students.group', $stream);
                     }
                 })
-                ->where('attendances.school_id', Auth::user()->school_id)
-                ->where('students.status', 1)
                 ->orderBy('attendances.attendance_date', 'ASC')
-                ->orderBy('students.group', 'ASC')
-                ->orderBy('students.gender', 'DESC')
-                ->orderBy('students.first_name', 'ASC')
-                ->get();
+                ->chunk(500, function ($rows) use (&$attendances) {
+                    foreach ($rows as $row) {
+                        $attendances->push($row);
+                    }
+                });
 
             if ($attendances->isEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No attendance records found for selected time duration'
+                    'message' => 'No attendance records found'
                 ]);
             }
 
-            // Group by attendance date
+            // ✅ Group by date (lightweight)
             $datas = $attendances->groupBy(function ($item) {
                 return Carbon::parse($item->attendance_date)->format('Y-m-d');
             });
 
-            // Generate HTML for display
-            $html = $this->generateAttendanceHtml($datas, $attendances, $school);
+            // ✅ Generate HTML (preview)
+            $html = $this->generateAttendanceHtmlOptimized($datas);
 
-            // Generate PDF for download
-            try {
-                $pdf = \PDF::loadView('Attendance.all_report', [
-                    'datas' => $datas,
-                    'attendances' => $attendances,
-                    'startDate' => $startDate,
-                    'endDate' => $endDate,
-                    'school' => $school
-                ]);
+            // ✅ PDF (ONLY if data is small)
+            $fileUrl = null;
 
-                $timestamp = Carbon::now()->timestamp;
-                $fileName = "class_attendance_report_{$timestamp}.pdf";
-                $folderPath = public_path('attendances');
+            if ($attendances->count() <= 2000) {
+                try {
+                    $pdf = \PDF::loadView('Attendance.all_report', [
+                        'datas' => $datas,
+                        'startDate' => $startDate,
+                        'endDate' => $endDate,
+                        'school' => $school
+                    ])->setPaper('a4', 'landscape');
 
-                if (!File::exists($folderPath)) {
-                    File::makeDirectory($folderPath, 0755, true);
+                    $fileName = 'attendance_' . time() . '.pdf';
+                    $folderPath = public_path('attendances');
+
+                    if (!File::exists($folderPath)) {
+                        File::makeDirectory($folderPath, 0755, true);
+                    }
+
+                    $pdf->save($folderPath . '/' . $fileName);
+                    $fileUrl = asset('attendances/' . $fileName);
+                } catch (\Exception $e) {
+                    Log::error('PDF Error: ' . $e->getMessage());
                 }
-
-                $pdf->save($folderPath . '/' . $fileName);
-                $fileUrl = asset('attendances/' . $fileName);
-            } catch (\Exception $e) {
-                Log::error('PDF Generation Error: ' . $e->getMessage());
-                $fileUrl = null;
             }
 
             return response()->json([
@@ -542,170 +546,52 @@ class AttendanceController extends Controller
                 'pdf_url' => $fileUrl,
                 'total_records' => $attendances->count()
             ]);
-
         } catch (\Exception $e) {
-            Log::error('Attendance Report Error: ' . $e->getMessage());
-            Log::error($e->getTraceAsString());
+            Log::error('Attendance Error: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Server error: ' . $e->getMessage()
+                'message' => 'Server error'
             ], 500);
         }
     }
 
-    private function generateAttendanceHtml($datas, $attendances, $school)
+    private function generateAttendanceHtmlOptimized($datas)
     {
-        $html = '<div class="attendance-report">';
+        $html = '<table border="1" cellpadding="5" cellspacing="0">';
+            $html .= '<tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Sex</th>
+                <th>Stream</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>';
 
-        // Group by month
-        $monthlyData = [];
-        foreach ($datas as $date => $dateAttendances) {
-            $monthYear = Carbon::parse($date)->format('Y-m');
-            if (!isset($monthlyData[$monthYear])) {
-                $monthlyData[$monthYear] = [];
+        $index = 1;
+
+        foreach ($datas as $date => $records) {
+            foreach ($records as $row) {
+
+                $name = $row->first_name . ' ' . $row->last_name;
+                $gender = $row->gender ?? '-';
+                $group = $row->group ?? '-';
+                $status = strtoupper(substr($row->attendance_status, 0, 1));
+
+                $html .= "<tr>
+                <td>{$index}</td>
+                <td>{$name}</td>
+                <td>{$gender}</td>
+                <td>{$group}</td>
+                <td>{$date}</td>
+                <td>{$status}</td>
+            </tr>";
+
+                $index++;
             }
-            $monthlyData[$monthYear][$date] = $dateAttendances;
         }
 
-        ksort($monthlyData);
-
-        foreach ($monthlyData as $monthYear => $monthAttendances) {
-            $monthName = Carbon::parse($monthYear . '-01')->format('F Y');
-            $datesInMonth = array_keys($monthAttendances);
-            sort($datesInMonth);
-
-            // Get all students for this month
-            $students = [];
-            foreach ($monthAttendances as $dateAttendances) {
-                foreach ($dateAttendances as $attendance) {
-                    $studentId = $attendance->studentId;
-                    if (!isset($students[$studentId])) {
-                        $students[$studentId] = [
-                            'id' => $studentId,
-                            'admission_number' => $attendance->admission_number,
-                            'name' => ucwords(strtolower($attendance->first_name . ' ' .
-                                        ($attendance->middle_name ? $attendance->middle_name . ' ' : '') .
-                                        $attendance->last_name)),
-                            'gender' => $attendance->gender[0] ?? 'U',
-                            'group' => $attendance->group ?? 'N/A',
-                            'attendances' => []
-                        ];
-                    }
-                }
-            }
-
-            // Populate attendance data
-            foreach ($monthAttendances as $date => $dateAttendances) {
-                foreach ($dateAttendances as $attendance) {
-                    $studentId = $attendance->studentId;
-                    if (isset($students[$studentId])) {
-                        $students[$studentId]['attendances'][$date] = $attendance->attendance_status;
-                    }
-                }
-            }
-
-            // Calculate statistics
-            $totalRecords = 0;
-            $presentRecords = 0;
-            foreach ($monthAttendances as $dateAttendances) {
-                $totalRecords += $dateAttendances->count();
-                $presentRecords += $dateAttendances->where('attendance_status', 'present')->count();
-            }
-            $attendanceRate = $totalRecords > 0 ? round(($presentRecords / $totalRecords) * 100) : 0;
-            $firstRecord = reset($monthAttendances)[0];
-
-            $html .= '
-            <div class="month-section">
-                <div class="time-duration-header">
-                    Attendance Report for: <strong>' . $monthName . '</strong>
-                    | Attendance Rate: <strong>' . $attendanceRate . '%</strong>
-                </div>
-
-                <div class="summary-section">
-                    <div class="summary-content">
-                        <div class="course-details">
-                            <p style="text-transform: uppercase"><span class="bold">Class:</span> ' . ($firstRecord->class_name ?? 'N/A') . '</p>
-                            <p><span class="bold">Report Date:</span>
-                                ' . Carbon::parse($datesInMonth[0])->format('d/m/Y') . ' -
-                                ' . Carbon::parse($datesInMonth[count($datesInMonth)-1])->format('d/m/Y') . '
-                            </p>
-                            <p><span class="bold">Total Students:</span> ' . count($students) . '</p>
-                        </div>
-
-                        <div class="grade-summary">
-                            <p class="title">Attendance Rate</p>
-                            <div style="text-align: center; font-size: 18px; font-weight: bold; color: #28a745;">
-                                ' . $attendanceRate . '%
-                            </div>
-                            <div class="progress mt-3">
-                                <div class="progress-bar" style="width: ' . $attendanceRate . '%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <h5 class="summary-header">Student Attendance Records - ' . $monthName . '</h5>
-                <div class="table-container">
-                    <table class="attendance-table">
-                        <thead>
-                            <tr>
-                                <th class="col-number">#</th>
-                                <th class="col-name">Student\'s Name</th>
-                                <th class="col-gender">Sex</th>
-                                <th class="col-stream">Stm</th>';
-
-            foreach ($datesInMonth as $date) {
-                $html .= '<th class="col-date">' . Carbon::parse($date)->format('d') . '</th>';
-            }
-
-            $html .= '            </tr>
-                        </thead>
-                        <tbody>';
-
-            foreach ($students as $index => $student) {
-                $html .= '<tr>
-                    <td class="col-number">' . ($index + 1) . '</td>
-                    <td class="col-name">' . $student['name'] . '</td>
-                    <td class="col-gender">' . $student['gender'] . '</td>
-                    <td class="col-stream">' . $student['group'] . '</td>';
-
-                foreach ($datesInMonth as $date) {
-                    $status = $student['attendances'][$date] ?? 'A';
-
-                    if ($status === 'present') {
-                        $symbol = 'P';
-                        $class = 'attendance-present';
-                    } elseif ($status === 'absent') {
-                        $symbol = 'A';
-                        $class = 'attendance-absent';
-                    } elseif ($status === 'permission') {
-                        $symbol = '*';
-                        $class = 'attendance-permission';
-                    } else {
-                        $symbol = '?';
-                        $class = 'attendance-absent';
-                    }
-
-                    $html .= '<td class="' . $class . '">' . $symbol . '</td>';
-                }
-
-                $html .= '</tr>';
-            }
-
-            $html .= '        </tbody>
-                    </table>
-                </div>
-
-                <div class="legend">
-                    <span class="legend-item"><span class="attendance-present">P</span> = Present</span>
-                    <span class="legend-item"><span class="attendance-absent">A</span> = Absent</span>
-                    <span class="legend-item"><span class="attendance-permission">*</span> = Permission</span>
-                </div>
-            </div>';
-        }
-
-        $html .= '</div>';
+        $html .= '</table>';
 
         return $html;
     }

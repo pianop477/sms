@@ -561,7 +561,7 @@
                             </label>
                             <input type="date" id="endDate" class="form-control-modern" required
                                 max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}"
-                                value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                                value="">
                         </div>
                     </div>
 
