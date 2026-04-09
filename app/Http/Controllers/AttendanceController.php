@@ -619,15 +619,20 @@ class AttendanceController extends Controller
             $months[$monthYear][] = $date;
         }
 
+        // Get class name from first record (for display)
+        $firstRecordQuery = clone $query;
+        $firstRecord = $firstRecordQuery->first();
+        $className = $firstRecord->class_name ?? 'N/A';
+
         // Process each month separately to save memory
         foreach ($months as $monthYear => $datesInMonth) {
             $monthName = Carbon::parse($monthYear . '-01')->format('F Y');
 
-            // Get students for this month using pagination
+            // Get students for this month
             $studentsQuery = clone $query;
             $students = [];
 
-            // Get unique students for this month
+            // Get unique students for this month with their details
             $studentIds = $studentsQuery->select(
                 'students.id',
                 'students.first_name',
@@ -653,12 +658,22 @@ class AttendanceController extends Controller
                 ];
             }
 
-            // Get attendance records for this month chunked
-            $attendanceQuery = clone $query;
-            $attendanceQuery->whereBetween('attendances.attendance_date', [
-                Carbon::parse($datesInMonth[0])->startOfDay(),
-                Carbon::parse(end($datesInMonth))->endOfDay()
-            ]);
+            // Get attendance records for this month
+            $attendanceQuery = Attendance::query()
+                ->join('students', 'students.id', '=', 'attendances.student_id')
+                ->join('grades', 'grades.id', '=', 'attendances.class_id')
+                ->where('attendances.class_id', $firstRecord->class_id ?? null)
+                ->whereBetween('attendances.attendance_date', [
+                    Carbon::parse($datesInMonth[0])->startOfDay(),
+                    Carbon::parse(end($datesInMonth))->endOfDay()
+                ])
+                ->where('attendances.school_id', Auth::user()->school_id)
+                ->whereIn('students.group', $students->pluck('group')->unique()->toArray());
+
+            // Add stream filter if not 'all'
+            if (isset($firstRecord->group) && $firstRecord->group !== 'all') {
+                $attendanceQuery->where('students.group', $firstRecord->group);
+            }
 
             $attendanceQuery->chunk($chunkSize, function ($records) use (&$students) {
                 foreach ($records as $record) {
@@ -669,12 +684,15 @@ class AttendanceController extends Controller
                 }
             });
 
-            // Calculate statistics
-            $stats = $this->calculateMonthStats($attendanceQuery);
-            $firstRecord = $this->getFirstRecordForMonth($attendanceQuery);
+            // Calculate statistics for this month
+            $stats = $this->calculateMonthStatsCorrected($attendanceQuery, $datesInMonth);
 
-            // Generate HTML for this month (same style)
-            $html .= $this->generateMonthHtml($students, $datesInMonth, $monthName, $stats, $firstRecord);
+            // Create a fake first record for display
+            $displayRecord = new \stdClass();
+            $displayRecord->class_name = $className;
+
+            // Generate HTML for this month
+            $html .= $this->generateMonthHtml($students, $datesInMonth, $monthName, $stats, $displayRecord);
 
             // Free memory
             unset($students, $studentIds, $attendanceQuery);
@@ -687,20 +705,29 @@ class AttendanceController extends Controller
     /**
      * Calculate monthly statistics efficiently
      */
-    private function calculateMonthStats($query)
+    private function calculateMonthStatsCorrected($query, $datesInMonth)
     {
-        $clone = clone $query;
-        $totalRecords = $clone->count();
+        // Get all attendance records for the month
+        $allRecords = clone $query;
+        $totalRecords = $allRecords->count();
 
-        $clone2 = clone $query;
-        $presentRecords = $clone2->where('attendances.attendance_status', 'present')->count();
+        // Get present records
+        $presentRecordsQuery = clone $query;
+        $presentRecords = $presentRecordsQuery->where('attendances.attendance_status', 'present')->count();
 
+        // Calculate rate
         $attendanceRate = $totalRecords > 0 ? round(($presentRecords / $totalRecords) * 100) : 0;
+
+        // Alternative calculation: per day average
+        $numberOfDays = count($datesInMonth);
+        $expectedRecords = $numberOfDays * $query->distinct('students.id')->count('students.id');
 
         return [
             'total_records' => $totalRecords,
             'present_records' => $presentRecords,
-            'attendance_rate' => $attendanceRate
+            'attendance_rate' => $attendanceRate,
+            'expected_records' => $expectedRecords,
+            'number_of_days' => $numberOfDays
         ];
     }
 
