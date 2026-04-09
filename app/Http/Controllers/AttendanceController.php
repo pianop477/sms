@@ -506,6 +506,7 @@ class AttendanceController extends Controller
                     'users.last_name as teacher_lastname',
                     'schools.school_reg_no',
                 )
+                ->whereIn('students.status', [0, 1])
                 ->where('attendances.class_id', $request->class)
                 ->whereBetween('attendances.attendance_date', [$startDate, $endDate])
                 ->where(function ($query) use ($stream, $arrayStream) {
