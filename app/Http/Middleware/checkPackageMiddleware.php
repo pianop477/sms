@@ -20,6 +20,7 @@ class checkPackageMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         // Check if staff_id exists in request
+        // Log::info("check request: " . ($request->staff_id));
         if (!$request->has('staff_id') || empty($request->staff_id)) {
             return response()->json([
                 'success' => false,

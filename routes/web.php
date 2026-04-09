@@ -532,12 +532,6 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
 
     // 9. ROUTES ACCESS FOR LOGOUT AND REDIRECTION =======================================================================================
     Route::post('Logout', function () {
-        // Clear all caches first before anything else
-        if (function_exists('header_remove')) {
-            header_remove('Cache-Control');
-            header_remove('Pragma');
-        }
-
         // 1. Invalidate finance API token if exists
         if (Session::has('finance_api_token')) {
             try {
@@ -557,31 +551,17 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
             Session::forget(['finance_api_token', 'finance_token_expires_at', 'finance_refresh_attempted']);
         }
 
-        // 2. Clear all session data
-        Session::flush();
-
-        // 3. Logout from main system
+        // 2. Logout from main system
         Auth::logout();
 
-        // 4. Invalidate session and regenerate token
+        // 3. Session cleanup
         request()->session()->invalidate();
         request()->session()->regenerateToken();
 
-        // 5. Clear remember me cookie if exists
-        $cookie = cookie('remember_web_' . md5(config('app.key')), null, -1, '/', null, true, true, false, 'Strict');
-
-        // 6. Feedback
+        // 4. Feedback
         Alert()->toast('Goodbye! See you back later 👋', 'success');
 
-        // 7. Return response with no-cache headers and clear site data
-        return redirect()->route('welcome')
-            ->withCookie($cookie)
-            ->withHeaders([
-                'Cache-Control' => 'no-cache, no-store, must-revalidate, private, max-age=0',
-                'Pragma' => 'no-cache',
-                'Expires' => 'Sat, 26 Jul 1997 05:00:00 GMT',
-                'Clear-Site-Data' => '"cache", "cookies", "storage"'
-            ]);
+        return redirect()->route('welcome');
     })->name('logout');
 
     //10. ROUTE ACCESS FOR ACCOUNTANT USER GROUP =======================================================================================
@@ -757,8 +737,8 @@ Route::get('/tokens/resend/form', [TokenController::class, 'showResendForm'])->n
 Route::prefix('contract-gateway')->name('contract.gateway.')->group(function () {
     Route::get('/', [ContractGatewayController::class, 'init'])->name('init');
 
-    Route::prefix('api')->name('api.')->middleware('subscribed.package')->group(function () {
-        Route::post('verify-staff', [ContractGatewayController::class, 'verifyStaffId'])->name('verify-staff');
+    Route::prefix('api')->name('api.')->group(function () {
+        Route::post('verify-staff', [ContractGatewayController::class, 'verifyStaffId'])->name('verify-staff')->middleware(['throttle:5,1', 'subscribed.package']); // Limit to 5 attempts per minute
         Route::post('request-otp', [ContractGatewayController::class, 'requestOtp'])->name('request-otp');
         Route::post('verify-otp', [ContractGatewayController::class, 'verifyOtp'])->name('verify-otp');
         Route::post('resend-otp', [ContractGatewayController::class, 'resendOtp'])->name('resend-otp');
