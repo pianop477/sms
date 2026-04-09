@@ -14,44 +14,7 @@ const STATIC_ASSETS = [
 ].map(url => `${url}?v=${APP_VERSION}`);
 
 // Token cache storage name (separate from main cache)
-const TOKEN_CACHE_NAME = `gatepass-tokens-${APP_VERSION}`;
-
-// Pages that should ALWAYS get fresh copy (no cache for navigation)
-const NO_CACHE_NAVIGATION = [
-    '/login',
-    '/logout',
-    '/register',
-    '/password/reset'
-];
-
-// Critical pages that work offline but need fresh CSRF
-const CRITICAL_PAGES = [
-    '/',
-    '/offline.html',
-    '/tokens/verify',
-    '/login/biometric',
-    '/verify-report',
-    '/contracts/verify'
-];
-
-// API routes that should NEVER be cached
-const API_ROUTES_TO_SKIP = [
-    '/api/',
-    '/login',
-    '/logout',
-    '/verify',
-    '/otp',
-    '/session',
-    '/tokens/verify/submit',
-    '/biometric/send-otp',
-    '/biometric/verify-otp',
-    '/webauthn/login/options',
-    '/webauthn/login/verify',
-    '/webauthn/register/options',
-    '/webauthn/register/verify',
-    '/contract-gateway/api/',
-    '/csrf-token'
-];
+const TOKEN_CACHE_NAME = 'gatepass-tokens-v1';
 
 // INSTALL
 self.addEventListener('install', event => {
@@ -60,7 +23,6 @@ self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => cache.addAll(STATIC_ASSETS))
-            .catch(err => console.error('[SW] Install failed:', err))
     );
 });
 
@@ -71,7 +33,6 @@ self.addEventListener('activate', event => {
             return Promise.all(
                 keys.map(key => {
                     if (key !== CACHE_NAME && key !== TOKEN_CACHE_NAME) {
-                        console.log('[SW] Deleting old cache:', key);
                         return caches.delete(key);
                     }
                 })
@@ -84,105 +45,30 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
 
-    // SPECIAL HANDLING FOR LOGOUT REQUESTS
-    if (url.pathname === '/logout' && event.request.method === 'POST') {
-        event.respondWith(
-            fetch(event.request).then(response => {
-                // Clear all caches on successful logout
-                caches.keys().then(keys => {
-                    keys.forEach(key => {
-                        if (key.includes('shuleapp-cache') || key.includes('gatepass-tokens')) {
-                            caches.delete(key);
-                            console.log('[SW] Cleared cache on logout:', key);
-                        }
-                    });
-                });
-                return response;
-            }).catch(error => {
-                console.error('[SW] Logout network error:', error);
-                // Still try to clear caches and redirect
-                caches.keys().then(keys => {
-                    keys.forEach(key => {
-                        if (key.includes('shuleapp-cache') || key.includes('gatepass-tokens')) {
-                            caches.delete(key);
-                        }
-                    });
-                });
-                return new Response(null, {
-                    status: 302,
-                    headers: {
-                        'Location': '/',
-                        'Cache-Control': 'no-cache, no-store, must-revalidate'
-                    }
-                });
-            })
-        );
-        return;
-    }
-
-    // Check if this is an API route that should NEVER be cached
-    const isApiRoute = API_ROUTES_TO_SKIP.some(route => {
-        if (route.includes('/api/')) {
-            return url.pathname.startsWith(route);
-        }
-        return url.pathname.includes(route) || url.pathname === route;
-    });
-
-    // Handle API routes specially
-    if (isApiRoute || url.pathname.startsWith('/api/')) {
-        // Special handling for token verification POST requests
+    // 🔥 CRITICAL: NEVER CACHE TOKEN VERIFICATION API
+    if (
+        url.pathname.startsWith('/api/') ||
+        url.pathname.includes('login') ||
+        url.pathname.includes('logout') ||
+        url.pathname.includes('verify') ||
+        url.pathname.includes('otp') ||
+        url.pathname.includes('session') ||
+        url.pathname === '/tokens/verify'
+    ) {
+        // Handle token verification specially for offline
         if (url.pathname === '/tokens/verify' && event.request.method === 'POST') {
             event.respondWith(handleTokenVerification(event.request));
             return;
         }
 
-        // For all other API routes - network only, no caching
-        event.respondWith(
-            fetch(event.request, {
-                cache: 'no-store',
-                headers: {
-                    'Cache-Control': 'no-cache, no-store, must-revalidate'
-                }
-            }).catch(error => {
-                console.log('[SW] API offline:', url.pathname);
-                return new Response(JSON.stringify({
-                    success: false,
-                    message: 'Hakuna mtandao. Tafadhali wasiliana na ofisi ya shule.'
-                }), {
-                    status: 503,
-                    headers: { 'Content-Type': 'application/json' }
-                });
-            })
-        );
+        event.respondWith(fetch(event.request));
         return;
     }
 
-    // ONLY HANDLE GET requests for non-API routes
+    // ONLY HANDLE GET
     if (event.request.method !== 'GET') return;
 
-    // Check if this page should never be cached for navigation
-    const isNoCachePage = NO_CACHE_NAVIGATION.some(page => url.pathname === page);
-    if (isNoCachePage && event.request.mode === 'navigate') {
-        event.respondWith(
-            fetch(event.request, {
-                cache: 'no-store',
-                headers: {
-                    'Cache-Control': 'no-cache, no-store, must-revalidate'
-                }
-            })
-        );
-        return;
-    }
-
-    // Check if this is a critical page that must work offline
-    const isCriticalPage = CRITICAL_PAGES.some(page => {
-        if (page === '/') {
-            return url.pathname === '/' || url.pathname === '';
-        }
-        return url.pathname === page;
-    });
-
-    // STATIC FILES STRATEGY (CACHE FIRST then NETWORK)
+    // STATIC FILES STRATEGY (STALE WHILE REVALIDATE)
     if (
         url.pathname.startsWith('/assets/') ||
         url.pathname.startsWith('/icons/') ||
@@ -190,170 +76,70 @@ self.addEventListener('fetch', event => {
         url.pathname.endsWith('.js') ||
         url.pathname.endsWith('.png') ||
         url.pathname.endsWith('.jpg') ||
-        url.pathname.endsWith('.svg') ||
-        url.pathname.endsWith('.webp')
+        url.pathname.endsWith('.svg')
     ) {
         event.respondWith(
             caches.match(event.request).then(cached => {
-                if (cached) {
-                    // Update cache in background
-                    fetch(event.request).then(networkResponse => {
-                        if (networkResponse && networkResponse.status === 200) {
-                            caches.open(CACHE_NAME).then(cache => {
-                                cache.put(event.request, networkResponse.clone());
-                            });
-                        }
-                    }).catch(() => {});
-                    return cached;
-                }
-
-                return fetch(event.request).then(networkResponse => {
-                    if (networkResponse && networkResponse.status === 200) {
-                        caches.open(CACHE_NAME).then(cache => {
-                            cache.put(event.request, networkResponse.clone());
-                        });
-                    }
-                    return networkResponse;
-                }).catch(() => {
-                    if (event.request.mode === 'navigate') {
-                        return caches.match('/offline.html?v=' + APP_VERSION);
-                    }
-                    return new Response('Resource not available offline', { status: 404 });
-                });
-            })
-        );
-        return;
-    }
-
-    // CRITICAL PAGES - NETWORK FIRST for fresh CSRF, fallback to cache
-    if (isCriticalPage && event.request.mode === 'navigate') {
-        event.respondWith(
-            fetch(event.request, {
-                cache: 'no-cache',
-                headers: {
-                    'Cache-Control': 'no-cache, must-revalidate'
-                }
-            })
-            .then(response => {
-                // Cache successful responses for offline use
-                if (response && response.status === 200) {
-                    const responseClone = response.clone();
+                const fetchPromise = fetch(event.request).then(networkResponse => {
+                    const responseClone = networkResponse.clone();
                     caches.open(CACHE_NAME).then(cache => {
                         cache.put(event.request, responseClone);
                     });
-                }
-                return response;
-            })
-            .catch(async () => {
-                // Only use cache if network fails
-                const cached = await caches.match(event.request);
-                if (cached) {
-                    return cached;
-                }
-                return caches.match('/offline.html?v=' + APP_VERSION);
+                    return networkResponse;
+                }).catch(() => cached);
+                return cached || fetchPromise;
             })
         );
         return;
     }
 
-    // HTML PAGES (Non-critical) - NETWORK FIRST, fallback to cache
-    if (event.request.mode === 'navigate') {
-        event.respondWith(
-            fetch(event.request)
-                .then(response => {
-                    if (response && response.status === 200) {
-                        const responseClone = response.clone();
-                        caches.open(CACHE_NAME).then(cache => {
-                            cache.put(event.request, responseClone);
-                        });
-                    }
-                    return response;
-                })
-                .catch(() => {
-                    return caches.match(event.request).then(cached => {
-                        if (cached) return cached;
-                        return caches.match('/offline.html?v=' + APP_VERSION);
-                    });
-                })
-        );
-        return;
-    }
-
-    // Default: Try cache first for other resources
+    // HTML PAGES → NETWORK FIRST
     event.respondWith(
-        caches.match(event.request).then(cached => {
-            if (cached) return cached;
-            return fetch(event.request);
-        })
+        fetch(event.request)
+            .then(response => response)
+            .catch(() => caches.match('/offline.html?v=' + APP_VERSION))
     );
 });
 
 // ========== OFFLINE TOKEN VERIFICATION ==========
 
+// Handle token verification (online/offline)
 async function handleTokenVerification(request) {
     try {
-        // Try network first with timeout
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        // Try network first
+        const response = await fetch(request.clone());
 
-        try {
-            const response = await fetch(request.clone(), { signal: controller.signal });
-            clearTimeout(timeoutId);
-
-            if (response.ok) {
-                const data = await response.clone().json();
-                if (data.success && data.data) {
-                    await storeTokenInCache(data.data);
-                }
-                return response;
+        // If online and successful, update cache
+        if (response.ok) {
+            const data = await response.clone().json();
+            if (data.success) {
+                await storeTokenInCache(data.data);
             }
-            throw new Error('Network response not ok');
-        } catch (fetchError) {
-            clearTimeout(timeoutId);
-            throw fetchError;
+            return response;
         }
+        throw new Error('Network failed');
     } catch (error) {
+        // Offline mode - check cache
         console.log('[SW] Offline mode - checking cached tokens');
+        const requestData = await request.clone().json();
+        const tokenCode = requestData.token;
 
-        try {
-            const requestData = await request.clone().json();
-            const tokenCode = requestData.token;
+        // Check token cache
+        const cachedToken = await getTokenFromCache(tokenCode);
 
-            if (!tokenCode) {
-                return new Response(JSON.stringify({
-                    success: false,
-                    message: 'Token code is required'
-                }), {
-                    status: 400,
-                    headers: { 'Content-Type': 'application/json' }
-                });
-            }
-
-            const cachedToken = await getTokenFromCache(tokenCode);
-
-            if (cachedToken) {
-                return new Response(JSON.stringify({
-                    success: true,
-                    message: 'Token sahihi (Mode Offline)',
-                    data: cachedToken,
-                    offline: true
-                }), {
-                    headers: { 'Content-Type': 'application/json' }
-                });
-            } else {
-                return new Response(JSON.stringify({
-                    success: false,
-                    message: 'Token si sahihi au imeisha muda wake. Tafadhali wasiliana na ofisi ya shule au hakikisha mtandao umewashwa.'
-                }), {
-                    status: 400,
-                    headers: { 'Content-Type': 'application/json' }
-                });
-            }
-        } catch (parseError) {
-            console.error('[SW] Failed to parse request:', parseError);
+        if (cachedToken) {
+            return new Response(JSON.stringify({
+                success: true,
+                message: 'Token sahihi (Mode Offline)',
+                data: cachedToken,
+                offline: true
+            }), {
+                headers: { 'Content-Type': 'application/json' }
+            });
+        } else {
             return new Response(JSON.stringify({
                 success: false,
-                message: 'Invalid request format'
+                message: 'Token si sahihi. Tafadhali wasiliana na ofisi ya shule au hakikisha mtandao umewashwa.'
             }), {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' }
@@ -362,6 +148,7 @@ async function handleTokenVerification(request) {
     }
 }
 
+// Store token in cache
 async function storeTokenInCache(tokenData) {
     try {
         const cache = await caches.open(TOKEN_CACHE_NAME);
@@ -375,12 +162,15 @@ async function storeTokenInCache(tokenData) {
 
         await cache.put(tokenKey, new Response(JSON.stringify(cacheData)));
         console.log('[SW] Token stored in cache:', tokenData.token.token);
+
+        // Clean old tokens
         await cleanOldTokens();
     } catch (error) {
         console.error('[SW] Failed to store token:', error);
     }
 }
 
+// Get token from cache
 async function getTokenFromCache(tokenCode) {
     try {
         const cache = await caches.open(TOKEN_CACHE_NAME);
@@ -389,18 +179,17 @@ async function getTokenFromCache(tokenCode) {
 
         if (response) {
             const data = await response.json();
+            // Check if token is still valid
             const expiresAt = new Date(data.token.expires_at);
-            const now = new Date();
-
-            if (expiresAt > now) {
+            if (expiresAt > new Date()) {
                 return {
                     token: data.token,
                     student: data.student,
                     installment: data.installment
                 };
             } else {
+                // Remove expired token
                 await cache.delete(tokenKey);
-                console.log('[SW] Removed expired token from cache:', tokenCode);
                 return null;
             }
         }
@@ -411,12 +200,12 @@ async function getTokenFromCache(tokenCode) {
     }
 }
 
+// Clean old/expired tokens from cache
 async function cleanOldTokens() {
     try {
         const cache = await caches.open(TOKEN_CACHE_NAME);
         const requests = await cache.keys();
         const now = new Date();
-        let cleanedCount = 0;
 
         for (const request of requests) {
             const response = await cache.match(request);
@@ -425,20 +214,16 @@ async function cleanOldTokens() {
                 const expiresAt = new Date(data.token.expires_at);
                 if (expiresAt < now) {
                     await cache.delete(request);
-                    cleanedCount++;
+                    console.log('[SW] Removed expired token:', request.url);
                 }
             }
-        }
-
-        if (cleanedCount > 0) {
-            console.log(`[SW] Cleaned ${cleanedCount} expired tokens`);
         }
     } catch (error) {
         console.error('[SW] Failed to clean tokens:', error);
     }
 }
 
-// Background sync for tokens when back online
+// Sync tokens when back online
 self.addEventListener('sync', (event) => {
     if (event.tag === 'sync-tokens') {
         event.waitUntil(syncTokens());
@@ -447,4 +232,5 @@ self.addEventListener('sync', (event) => {
 
 async function syncTokens() {
     console.log('[SW] Syncing tokens with server...');
+    // Implement if needed
 }

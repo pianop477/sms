@@ -433,9 +433,9 @@ class AttendanceController extends Controller
                 'start' => 'required|date_format:Y-m-d',
                 'end' => 'required|date_format:Y-m-d',
                 'stream' => 'nullable|in:a,b,c,all',
-                'format' => 'nullable|in:html,pdf,both', // new flexibility
-                'page' => 'nullable|integer|min:1', // for pagination
-                'per_page' => 'nullable|integer|min:10|max:500' // chunk size
+                'format' => 'nullable|in:html,pdf,both',
+                'page' => 'nullable|integer|min:1',
+                'per_page' => 'nullable|integer|min:10|max:500'
             ]);
 
             if ($validator->fails()) {
@@ -471,11 +471,13 @@ class AttendanceController extends Controller
                 ], 404);
             }
 
-            // ✅ Get total count first for optimization decisions
+            // ✅ Get total count first for optimization decisions (excluding graduated only)
             $totalCount = Attendance::query()
-                ->where('class_id', $request->class)
-                ->whereBetween('attendance_date', [$startDate, $endDate])
-                ->where('school_id', Auth::user()->school_id)
+                ->join('students', 'students.id', '=', 'attendances.student_id')
+                ->where('attendances.class_id', $request->class)
+                ->whereBetween('attendances.attendance_date', [$startDate, $endDate])
+                ->where('attendances.school_id', Auth::user()->school_id)
+                ->where('students.graduated', '!=', 1) // Exclude graduated students only
                 ->count();
 
             if ($totalCount === 0) {
@@ -485,7 +487,7 @@ class AttendanceController extends Controller
                 ]);
             }
 
-            // ✅ Optimized query with pagination support
+            // ✅ Optimized query - Exclude graduated only (include deleted)
             $query = Attendance::query()
                 ->join('students', 'students.id', '=', 'attendances.student_id')
                 ->join('grades', 'grades.id', '=', 'attendances.class_id')
@@ -511,9 +513,8 @@ class AttendanceController extends Controller
                     'users.last_name as teacher_lastname',
                     'schools.school_reg_no',
                 )
-                ->whereIn('students.status', [0, 1])
-                ->where('students.status', '!=', 2) // Exclude graduated students
-                ->where('students.graduated', 0) // Ensure graduated students are excluded
+                // ONLY exclude graduated students (graduated = 1)
+                ->where('students.graduated', '!=', 1)
                 ->where('attendances.class_id', $request->class)
                 ->whereBetween('attendances.attendance_date', [$startDate, $endDate])
                 ->where(function ($query) use ($stream, $arrayStream) {
@@ -640,14 +641,12 @@ class AttendanceController extends Controller
             $startOfMonth = Carbon::parse($datesInMonth[0])->startOfDay();
             $endOfMonth = Carbon::parse(end($datesInMonth))->endOfDay();
 
-            // Get students for this class - EXCLUDE GRADUATED STUDENTS
+            // Get students for this class - INCLUDE ALL EXCEPT GRADUATED
+            // This includes: active (status=1), deleted (status=2), but NOT graduated (graduated=1)
             $studentsQuery = \App\Models\Student::query()
                 ->where('class_id', $classId)
                 ->where('school_id', Auth::user()->school_id)
-                ->where(function ($query) {
-                    $query->where('status', '!=', 2)  // Exclude status 2 (graduated)
-                        ->where('graduated', '!=', 1); // Exclude graduated = 1
-                });
+                ->where('graduated', '!=', 1); // Only exclude graduated students
 
             // Apply stream filter
             if ($streamFilter !== 'all') {
@@ -676,11 +675,13 @@ class AttendanceController extends Controller
                         $student->last_name)),
                     'gender' => $student->gender[0] ?? 'U',
                     'group' => $student->group ?? 'N/A',
+                    'status' => $student->status,
+                    'graduated' => $student->graduated,
                     'attendances' => []
                 ];
             }
 
-            // Get attendance records for this month - ONLY FOR NON-GRADUATED STUDENTS
+            // Get attendance records for this month - INCLUDE ALL EXCEPT GRADUATED
             $attendanceRecords = Attendance::query()
                 ->select('attendances.student_id', 'attendances.attendance_date', 'attendances.attendance_status')
                 ->join('students', 'students.id', '=', 'attendances.student_id')
@@ -688,10 +689,7 @@ class AttendanceController extends Controller
                 ->where('attendances.school_id', Auth::user()->school_id)
                 ->whereBetween('attendances.attendance_date', [$startOfMonth, $endOfMonth])
                 ->whereIn('attendances.student_id', array_keys($students))
-                ->where(function ($query) {
-                    $query->where('students.status', '!=', 2)
-                        ->where('students.graduated', '!=', 1);
-                })
+                ->where('students.graduated', '!=', 1) // Only exclude graduated students
                 ->orderBy('attendances.attendance_date', 'ASC')
                 ->get();
 
