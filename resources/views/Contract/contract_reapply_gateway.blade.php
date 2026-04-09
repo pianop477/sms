@@ -8,7 +8,7 @@
     <title>ShuleApp | Contracts Gateway</title>
 
     <!-- Manifest and Icons -->
-    <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ filemtime(public_path('manifest.json')) }}">
+    <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ time() }}">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon.ico') }}">
     <link rel="icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon-16x16.png') }}">
     <link rel="icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon-32x32.png') }}">
@@ -396,6 +396,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('assets/js/scripts.js') }}?v={{ time() }}"></script>
 
     <script>
     $(document).ready(function() {

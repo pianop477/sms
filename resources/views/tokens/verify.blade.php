@@ -11,6 +11,7 @@
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{{ asset('assets/fontawesome-free-6.5.2-web/css/all.css') }}">
+    <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ time() }}">
 
     <style>
         * {
@@ -767,6 +768,7 @@
         </div>
     </div>
 
+    <script src="{{asset('assets/js/scripts.js')}}"></script>
     <script>
         (function() {
             // DOM Elements

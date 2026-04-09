@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contract Verification | {{ $school->school_name ?? 'School' }}</title>
+    <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ time() }}">
     <style>
         * {
             margin: 0;

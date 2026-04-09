@@ -1,59 +1,25 @@
 {
     "name": "ShuleApp",
     "short_name": "ShuleApp",
-    "description": "Empowering Education",
-    "categories": [
-        "education",
-        "productivity",
-        "school"
-    ],
-    "start_url": "/?v=2026.04.09",
+    "start_url": "/?source=pwa",
     "display": "standalone",
-    "display_override": [
-        "window-controls-overlay",
-        "minimal-ui"
-    ],
     "background_color": "#ffffff",
     "theme_color": "#2C3E50",
-    "color": "#2C3E50",
     "orientation": "portrait",
     "scope": "/",
-    "id": "shuleapp-2026.04.09",
     "lang": "sw",
-    "dir": "auto",
     "icons": [
         {
-            "src": "/icons/new_icon1.png?v=2026.04.09",
-            "sizes": "96x96",
-            "type": "image/png",
-            "purpose": "any maskable"
-        },
-        {
-            "src": "/icons/new_icon2.png?v=2026.04.09",
+            "src": "/icons/new_icon2.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/icons/new_icon3.png?v=2026.04.09",
+            "src": "/icons/new_icon3.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
-        }
-    ],
-    "prefer_related_applications": false,
-    "related_applications": [],
-    "features": [
-        "Cross Platform",
-        "Offline Capabilities",
-        "Real-time Updates",
-        "Secure Data Handling",
-        "Offline Token Verification"
-    ],
-    "protocol_handlers": [
-        {
-            "protocol": "web+shuleapp",
-            "url": "/?url=%s"
         }
     ]
 }

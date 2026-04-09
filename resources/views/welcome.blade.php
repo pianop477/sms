@@ -12,7 +12,7 @@
     <link rel="icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon-192 x 192.png') }}">
     <link rel="icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon-512 x 512.png') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ filemtime(public_path('manifest.json')) }}">
+    <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ time() }}">
     <!-- Prevent caching of sensitive pages -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, private">
     <meta http-equiv="Pragma" content="no-cache">

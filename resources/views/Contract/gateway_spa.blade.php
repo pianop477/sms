@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>ShuleApp | Contract Gateway</title>
-    <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ filemtime(public_path('manifest.json')) }}">
+    <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ time() }}">
     <link rel="shortcut icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon.ico') }}">
     <link rel="icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon-16x16.png') }}">
     <link rel="icon" type="image/png" href="{{ asset('assets/images/favicon/new_favicon-32 x 32.png') }}">
@@ -443,6 +443,7 @@
     </div>
 
     {{-- <script src="{{asset('assets/js/js.js')}}"></script> --}}
+    <script src="{{asset('assets/js/scripts.js')}}?v={{ time() }}"></script>
     <script>
         (function() {
             'use strict';

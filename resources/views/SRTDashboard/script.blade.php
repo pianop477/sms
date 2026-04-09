@@ -39,7 +39,7 @@
 <script src="{{ asset('assets/js/maps.js') }}"></script>
 <!-- others plugins -->
 <script src="{{ asset('assets/js/plugins.js') }}"></script>
-<script src="{{ asset('assets/js/scripts.js') }}?v={{ filemtime(public_path('assets/js/scripts.js')) }}"></script>
+<script src="{{ asset('assets/js/scripts.js') }}?v={{ time() }}"></script>
 
 <script>
     function scrollToTopAndPrint() {

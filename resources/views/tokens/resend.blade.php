@@ -7,6 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>ShuleApp | Resend Token</title>
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="manifest" href="{{ asset('manifest.json') }}?v={{ time() }}">
     <link rel="stylesheet" href="{{ asset('assets/fontawesome-free-6.5.2-web/css/all.css') }}">
 
     <style>
@@ -140,6 +141,7 @@
         </div>
     </div>
 
+    <script src="{{asset('assets/js/scripts.js')}}"></script>
     <script>
         const searchTypeRadios = document.querySelectorAll('input[name="search_type"]');
         const admissionField = document.getElementById('admissionField');
