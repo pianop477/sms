@@ -645,7 +645,7 @@ class AttendanceController extends Controller
                 ->where('class_id', $classId)
                 ->where('school_id', Auth::user()->school_id)
                 ->where(function ($query) {
-                    $query->whereIn('status', [0, 1]);  // Exclude status 2 (graduated)
+                    $query->where('status', '!=', 2);  // Exclude status 2 (graduated)
                 });
 
             // Apply stream filter
