@@ -536,9 +536,9 @@
                             </label>
                             <select id="streamSelect" class="form-control-modern">
                                 <option value="all">All Streams</option>
-                                @foreach ($streams ?? [] as $stream)
-                                    <option value="{{ $stream->id }}">{{ $stream->stream_name }}</option>
-                                @endforeach
+                                <option value="a">Stream A</option>
+                                <option value="b">Stream B</option>
+                                <option value="c">Stream C</option>
                             </select>
                         </div>
 
