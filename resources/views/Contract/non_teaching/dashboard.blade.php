@@ -845,10 +845,11 @@
                         <small class="text-muted d-block">Unapoishi</small>
                         <strong id="modal-profile-address" class="text-uppercase">-</strong>
                     </div>
-                    <div class="bg-light p-2 rounded mb-2">
+                    {{-- <div class="bg-light p-2 rounded mb-2">
                         <small class="text-muted d-block">Akaunti ya Benki</small>
                         <strong id="modal-profile-account-number" class="text-uppercase">-</strong>
                     </div>
+
                     <div class="bg-light p-2 rounded mb-2">
                         <small class="text-muted d-block">Jina la Akaunti</small>
                         <strong id="modal-profile-account-name" class="text-uppercase">-</strong>
@@ -856,7 +857,7 @@
                     <div class="bg-light p-2 rounded mb-2">
                         <small class="text-muted d-block">Jina la Benki</small>
                         <strong id="modal-profile-bank-name" class="text-uppercase">-</strong>
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -1027,6 +1028,9 @@
                         nida: data.data.nida || "N/A",
                         dob: data.data.dob || "N/A",
                         address: data.data.address || "N/A",
+                        accountNumber: data.data.account_number || "N/A",
+                        accountName: data.data.account_name || "N/A",
+                        bankName: data.data.bank_name || "N/A"
                     };
 
                     updateHeaderFromProfileDetails();
