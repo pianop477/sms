@@ -327,7 +327,7 @@ class AttendanceController extends Controller
                 'students.middle_name',
                 'students.last_name',
                 'students.gender',
-                'students.group',
+                'students.group', 'students.status', 'students.graduated',
                 'students.admission_number',
                 'users.first_name as teacher_firstname',
                 'users.last_name as teacher_lastname',
@@ -337,6 +337,8 @@ class AttendanceController extends Controller
                 'schools.school_reg_no',
             )
             ->where('attendances.class_id', $classId)
+            ->where('students.status', '!=', 2) // Exclude graduated students
+            ->where('students.graduated', 0) // Ensure graduated students are excluded
             ->where('students.group', $group) // Compare 'group' directly
             ->whereBetween('attendances.attendance_date', [$startDate, $endDate])
             ->where('attendances.school_id', Auth::user()->school_id)
