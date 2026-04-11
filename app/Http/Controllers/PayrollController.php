@@ -63,7 +63,7 @@ class PayrollController extends Controller
                 'basic_salary' => (float) $contract->basic_salary,
                 'allowances' => $contract->allowances ? json_decode($contract->allowances, true) : [],
                 'contract_type' => $contract->contract_type ?? 'new',
-                'department' => $contract->job_title ?? null,
+                'department' => $this->mapStaffType($staffDetails['staff_type']),
                 'bank_name' => $staffDetails['bank_name'] ?? null,
                 'bank_account_name' => $staffDetails['bank_account_name'] ?? null,
                 'bank_account_number' => $staffDetails['bank_account_number'] ?? null,
