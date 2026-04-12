@@ -1,4 +1,4 @@
-(function ($) {
+(function() {
     "use strict";
 
     /*================================
@@ -49,19 +49,22 @@
     });
 
     /*================================
-    Sidebar menu (MetisMenu)
+    Sidebar menu (MetisMenu) - Pure JS version
     ==================================*/
     document.addEventListener('DOMContentLoaded', () => {
         const menu = document.getElementById('menu');
-        if (menu) {
-            $('#menu').metisMenu();
+        if (menu && typeof MetisMenu !== 'undefined') {
+            new MetisMenu(menu);
+        } else if (menu) {
+            console.warn('MetisMenu not loaded');
         }
     });
 
     /*================================
-    Slimscroll activation
+    Slimscroll activation - Pure JS
     ==================================*/
     document.addEventListener('DOMContentLoaded', () => {
+        // SlimScroll ni jQuery plugin, tumia CSS overflow au custom scroll
         const slimScrollElements = [
             { selector: '.menu-inner', height: 'auto' },
             { selector: '.nofity-list', height: '435px' },
@@ -73,9 +76,11 @@
         slimScrollElements.forEach((element) => {
             const el = document.querySelector(element.selector);
             if (el) {
-                $(element.selector).slimScroll({
-                    height: element.height
-                });
+                // Badala ya slimScroll, tumia CSS overflow
+                el.style.overflowY = 'auto';
+                if (element.height !== 'auto') {
+                    el.style.height = element.height;
+                }
             }
         });
     });
@@ -114,29 +119,36 @@
     });
 
     /*================================
-    DataTable Initialization
+    DataTable Initialization - Check if jQuery DataTable exists
     ==================================*/
     document.addEventListener('DOMContentLoaded', () => {
-        const dataTables = ['#dataTable', '#dataTable2', '#dataTable3'];
-        dataTables.forEach((table) => {
-            const el = document.querySelector(table);
-            if (el) {
-                $(table).DataTable({
-                    responsive: true
-                });
-            }
-        });
+        // Check if jQuery and DataTable are available
+        if (typeof jQuery !== 'undefined' && jQuery.fn.DataTable) {
+            const dataTables = ['#dataTable', '#dataTable2', '#dataTable3'];
+            dataTables.forEach((table) => {
+                const el = document.querySelector(table);
+                if (el) {
+                    jQuery(table).DataTable({
+                        responsive: true
+                    });
+                }
+            });
+        } else {
+            console.warn('jQuery or DataTable not loaded');
+        }
     });
 
     /*================================
-    Slicknav Mobile Menu
+    Slicknav Mobile Menu - Check jQuery
     ==================================*/
     document.addEventListener('DOMContentLoaded', () => {
         const navMenu = document.querySelector('ul#nav_menu');
-        if (navMenu) {
-            $('ul#nav_menu').slicknav({
+        if (navMenu && typeof jQuery !== 'undefined' && jQuery.fn.slicknav) {
+            jQuery('ul#nav_menu').slicknav({
                 prependTo: '#mobile_menu'
             });
+        } else if (navMenu) {
+            console.warn('jQuery or SlickNav not loaded');
         }
     });
 
@@ -175,18 +187,18 @@
         if (offsetClose && offsetArea) {
             offsetClose.addEventListener('click', () => {
                 offsetArea.classList.toggle('show_hide');
-                settingsBtn.classList.toggle('active');
+                if (settingsBtn) settingsBtn.classList.toggle('active');
             });
         }
     });
 
     /*================================
-    Owl Carousel Initialization
+    Owl Carousel Initialization - Check jQuery
     ==================================*/
     document.addEventListener('DOMContentLoaded', () => {
         const testimonialCarousel = document.querySelector('.testimonial-carousel');
-        if (testimonialCarousel) {
-            $('.testimonial-carousel').owlCarousel({
+        if (testimonialCarousel && typeof jQuery !== 'undefined' && jQuery.fn.owlCarousel) {
+            jQuery('.testimonial-carousel').owlCarousel({
                 margin: 50,
                 loop: true,
                 autoplay: false,
@@ -201,6 +213,8 @@
                     1600: { items: 2 }
                 }
             });
+        } else if (testimonialCarousel) {
+            console.warn('jQuery or OwlCarousel not loaded');
         }
     });
 
@@ -253,40 +267,42 @@
     /*================================
     PWA Service Worker + Update System
     =================================*/
-
-    (function () {
-
+    (function() {
         if (!('serviceWorker' in navigator)) return;
 
         let refreshing = false;
 
         window.addEventListener('load', async () => {
+            try {
+                const reg = await navigator.serviceWorker.register('/service-worker.js?v=2026.04.10');
 
-            const reg = await navigator.serviceWorker.register('/service-worker.js?v=2026.04.10');
+                if (reg.waiting) showUpdateUI(reg.waiting);
 
-            if (reg.waiting) showUpdateUI(reg.waiting);
-
-            reg.addEventListener('updatefound', () => {
-                const newWorker = reg.installing;
-
-                newWorker.addEventListener('statechange', () => {
-                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        showUpdateUI(newWorker);
+                reg.addEventListener('updatefound', () => {
+                    const newWorker = reg.installing;
+                    if (newWorker) {
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                showUpdateUI(newWorker);
+                            }
+                        });
                     }
                 });
-            });
 
-            /* 🔥 REGISTER BACKGROUND SYNC */
-            if ('sync' in reg) {
-                try {
-                    await reg.sync.register('sync-tokens');
-                } catch (e) {
-                    console.log('Sync registration failed');
+                /* 🔥 REGISTER BACKGROUND SYNC */
+                if ('sync' in reg) {
+                    try {
+                        await reg.sync.register('sync-tokens');
+                    } catch (e) {
+                        console.log('Sync registration failed:', e);
+                    }
                 }
-            }
 
-            /* 🔥 FORCE UPDATE CHECK */
-            setInterval(() => reg.update(), 60000);
+                /* 🔥 FORCE UPDATE CHECK */
+                setInterval(() => reg.update(), 60000);
+            } catch (error) {
+                console.error('Service worker registration failed:', error);
+            }
         });
 
         navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -296,16 +312,28 @@
         });
 
         function showUpdateUI(worker) {
-
             if (document.getElementById('update-toast')) return;
 
             const toast = document.createElement('div');
-
             toast.id = 'update-toast';
             toast.innerHTML = `
-            <span>New update available</span>
-            <button id="update-app-btn">Update</button>
-        `;
+                <span>New update available</span>
+                <button id="update-app-btn">Update</button>
+            `;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: #333;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                z-index: 9999;
+                display: flex;
+                gap: 15px;
+                align-items: center;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            `;
 
             document.body.appendChild(toast);
 
@@ -313,6 +341,6 @@
                 worker.postMessage({ type: 'SKIP_WAITING' });
             };
         }
-
     })();
-})(jQuery);
+
+})(); // Remove jQuery dependency

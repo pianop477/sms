@@ -1651,9 +1651,9 @@ class ContractController extends Controller
             $position = '';
             if ($authorizedUser) {
                 if ($authorizedUser->usertype == 2) {
-                    $position = 'School Manager';
+                    $position = 'Meneja wa Shule';
                 } elseif ($authorizedUser->usertype == 3) {
-                    $position = 'Head Teacher';
+                    $position = 'Mwalimu Mkuu';
                 }
             }
 
