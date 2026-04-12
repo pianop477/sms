@@ -423,6 +423,14 @@
             height: 1rem;
         }
 
+        .button-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 1rem;
+            margin-top: 1rem;
+        }
+
         @media (max-width: 768px) {
             .card-body {
                 padding: 10px;
@@ -457,23 +465,23 @@
                 margin-right: 0;
                 margin-bottom: 8px;
             }
+
+            .button-group {
+                flex-direction: column;
+            }
         }
     </style>
 
     <div class="">
         <!-- Assign Roster Button -->
-        <div class="text-right mb-1 mt-4">
-            <a href="{{ route('roster.by.year') }}" class="btn btn-info-custom mr-3">
+        <div class="button-group">
+            <a href="{{ route('roster.by.year') }}" class="btn btn-info-custom">
                 <i class="fas fa-arrow-left"></i> Back
             </a>
             <button type="button" class="btn btn-primary-custom" data-toggle="modal" data-target="#assignRosterModal">
                 <i class="fas fa-plus me-2"></i> Assign Duty Roster
             </button>
         </div>
-        <div class="row">
-
-        </div>
-
 
         <!-- Main Content Card -->
         <div class="glass-card">
@@ -498,7 +506,7 @@
                 @else
                     <div class="table-container">
                         <div class="table-responsive">
-                            <table class="table table-custom table-responsive-md" id="myTable">
+                            <table class="table table-responsive-md" id="myTable">
                                 <thead class="table-dark">
                                     <tr>
                                         <th>#</th>
@@ -559,7 +567,7 @@
                                                                 @csrf
                                                                 @method('PUT')
                                                                 <button class="btn btn-primary-custom" type="submit"
-                                                                    title="Activate"
+                                                                    title="Deactivate"
                                                                     onclick="return confirm('Deactivate this roster?');">
                                                                     <i class="fas fa-check me-1"></i> Deactivate
                                                                 </button>
