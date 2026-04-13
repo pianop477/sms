@@ -727,7 +727,6 @@ class BillsController extends Controller
                     } else {
                     }
                 } else {
-
                 }
             }
 
@@ -2345,13 +2344,21 @@ class BillsController extends Controller
             $user = Auth::user();
             $targetYear = $request->get('year', date('Y'));
 
+            // ✅ Validate year format
+            if (!preg_match('/^\d{4}$/', $targetYear)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid year format. Use YYYY'
+                ], 400);
+            }
+
             // Pata bills za mwaka husika ambazo hazijalipwa kabisa (active au partial)
             $bills = DB::table('school_fees')
                 ->join('students', 'students.id', '=', 'school_fees.student_id')
                 ->leftJoin('grades as old_grade', 'old_grade.id', '=', 'school_fees.class_id')
                 ->leftJoin('grades as new_grade', 'new_grade.id', '=', 'students.class_id')
                 ->where('school_fees.school_id', $user->school_id)
-                ->where('school_fees.academic_year', 'LIKE', "%{$targetYear}%")
+                ->where('school_fees.academic_year', $targetYear)
                 ->whereIn('school_fees.status', ['active', 'cancelled', 'full paid', 'overpaid', 'expired']) // Usiguse paid/cancelled
                 ->select(
                     'school_fees.id',
@@ -2404,63 +2411,67 @@ class BillsController extends Controller
     public function syncClasses(Request $request)
     {
         try {
-            DB::beginTransaction();
-
             $user = Auth::user();
             $targetYear = $request->get('year', date('Y'));
+            $chunkSize = 500;
 
-            // Pata bills zote za mwaka husika
-            $bills = DB::table('school_fees')
-                ->join('students', 'students.id', '=', 'school_fees.student_id')
-                ->where('school_fees.school_id', $user->school_id)
-                ->where('school_fees.academic_year', 'LIKE', "%{$targetYear}%")
-                ->whereIn('school_fees.status', ['active', 'cancelled', 'full paid', 'overpaid', 'expired']) // Pata bills zote isipokuwa partial
-                ->select('school_fees.id', 'school_fees.student_id', 'school_fees.class_id as old_class', 'students.class_id as new_class')
-                ->get();
-
-            $updatedCount = 0;
-            $skippedCount = 0;
-            $errors = [];
-
-            foreach ($bills as $bill) {
-                // Skip kama class haijabadilika
-                if ($bill->old_class == $bill->new_class) {
-                    $skippedCount++;
-                    continue;
-                }
-
-                // Update class_id
-                $updated = DB::table('school_fees')
-                    ->where('id', $bill->id)
-                    ->update([
-                        'class_id' => $bill->new_class,
-                        'updated_at' => now()
-                    ]);
-
-                if ($updated) {
-                    $updatedCount++;
-                } else {
-                    $errors[] = "Failed to update bill ID: {$bill->id}";
-                }
+            if (!preg_match('/^\d{4}$/', $targetYear)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid year format. Use YYYY'
+                ], 400);
             }
 
-            DB::commit();
+            $totalUpdated = 0;
+            $totalSkipped = 0;
+
+            // ✅ ADD orderBy() before chunk()
+            DB::table('school_fees as sf')
+                ->join('students as s', 's.id', '=', 'sf.student_id')
+                ->where('sf.school_id', $user->school_id)
+                ->where('sf.academic_year', $targetYear)
+                ->whereIn('sf.status', ['active', 'full paid', 'overpaid'])
+                ->whereRaw('sf.class_id != s.class_id')
+                ->select('sf.id', 'sf.class_id as old_class', 's.class_id as new_class')
+                ->orderBy('sf.id') // ✅ ORDER BY required for chunk()
+                ->chunk($chunkSize, function ($bills) use (&$totalUpdated, &$totalSkipped) {
+
+                    $billIds = $bills->pluck('id')->toArray();
+
+                    // Batch update
+                    $updated = DB::table('school_fees')
+                        ->whereIn('id', $billIds)
+                        ->update([
+                            'class_id' => DB::raw("(
+                            SELECT class_id FROM students
+                            WHERE students.id = school_fees.student_id
+                            LIMIT 1
+                        )"),
+                            'updated_at' => now()
+                        ]);
+
+                    $totalUpdated += $updated;
+                    $totalSkipped += count($billIds) - $updated;
+
+                    // Optional: Log progress for large datasets
+                });
 
             return response()->json([
                 'success' => true,
-                'message' => "Classes synced successfully! Updated: {$updatedCount} bills, Skipped: {$skippedCount} bills",
+                'message' => "Synced {$totalUpdated} bills, skipped {$totalSkipped}",
                 'stats' => [
-                    'updated' => $updatedCount,
-                    'skipped' => $skippedCount,
-                    'errors' => $errors
+                    'updated' => $totalUpdated,
+                    'skipped' => $totalSkipped
                 ]
             ]);
         } catch (\Exception $e) {
-            DB::rollBack();
+            Log::error('Class sync failed: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error syncing classes: ' . $e->getMessage()
+                'message' => 'Error: ' . $e->getMessage()
             ], 500);
         }
     }
