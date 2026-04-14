@@ -224,6 +224,10 @@
                             <input type="text" class="form-control-custom" id="academic_year"
                                 name="academic_year">
                         </div>
+                        <div class="col-md-6">
+                            <label for="description">Bill Description</label>
+                            <input type="text" name="description" class="form-control-custom" id="description">
+                        </div>
                     </div>
                 </div>
 

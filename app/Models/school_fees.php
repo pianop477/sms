@@ -24,7 +24,8 @@ class school_fees extends Model
         'cancel_reason',
         'control_number',
         'class_id',
-        'batch_id'
+        'batch_id',
+        'description'
     ];
 
     /**

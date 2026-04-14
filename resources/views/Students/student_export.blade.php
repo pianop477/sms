@@ -4,213 +4,222 @@
     <meta charset="UTF-8">
     <title>Students Report - {{ Auth::user()->school->school_name }}</title>
     <style>
-        body, html {
+        /* PDF specific resets */
+        @page {
+            size: A4 landscape;
+            margin: 1cm;
+        }
+
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 10px; /* Smaller for high-column density */
+            color: #333;
+            line-height: 1.4;
             margin: 0;
-            padding: 30px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 12px;
-            background: #fff;
-            color: #2c3e50;
+            padding: 0;
         }
 
-        .header-container {
-            display: flex;
-            align-items: center;
-            border-bottom: 2px solid #ccc;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-            position: relative;
-        }
-
-        .school-logo {
-            position: absolute;
-            left: 0;
-            height: 70px;
-            width: auto;
-            max-width: 80px;
-        }
-
-        .school-info {
+        /* Professional Header Layout (Old School Tables for domPDF) */
+        .header-table {
             width: 100%;
-            text-align: center;
+            border-bottom: 2px solid #1a5276;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
         }
 
-        .school-info h4 {
-            font-size: 18px;
-            margin: 5px 0;
-            text-transform: uppercase;
-            color: #1a5276;
-        }
-
-        .school-info h5 {
-            font-size: 13px;
-            margin: 3px 0;
-        }
-
-        .table-container {
-            margin-top: 15px;
-        }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11.5px;
-        }
-
-        .table th {
-            background-color: #293d4a;
-            color: #fff;
-            padding: 8px 5px;
-            border: 1px solid #dcdcdc;
-            text-transform: uppercase;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .table td {
-            padding: 6px 5px;
-            border: 1px solid #eee;
+        .header-table td {
             vertical-align: middle;
         }
 
-        .table tr:nth-child(even) {
-            background-color: #f5f8fa;
+        .school-logo {
+            max-height: 80px;
+            width: auto;
         }
 
-        .table tr:hover {
-            background-color: #f0f0f0;
+        .school-info {
+            text-align: right;
         }
 
-       @page {
-            size: A4 landscape;
-            margin-top: 4mm;
-            margin-bottom: 6mm; /* Ongeza nafasi ya chini kwa footer */
-            margin-left: 4mm;
-            margin-right: 4mm;
+        .school-info h1 {
+            font-size: 20px;
+            margin: 0;
+            color: #1a5276;
+            text-transform: uppercase;
         }
+
+        .school-info p {
+            margin: 2px 0;
+            color: #555;
+            font-size: 11px;
+        }
+
+        .report-title {
+            background-color: #f8f9fa;
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            margin-bottom: 15px;
+        }
+
+        .report-title h2 {
+            margin: 0;
+            font-size: 14px;
+            color: #2c3e50;
+            letter-spacing: 1px;
+        }
+
+        /* Professional Table Styling */
+        .main-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed; /* Critical for many columns */
+        }
+
+        .main-table th {
+            background-color: #2c3e50;
+            color: #ffffff;
+            padding: 8px 4px;
+            text-align: left;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 8px;
+            border: 1px solid #2c3e50;
+        }
+
+        .main-table td {
+            padding: 6px 4px;
+            border-bottom: 1px solid #e9ecef;
+            border-right: 1px solid #f1f1f1;
+            word-wrap: break-word; /* Prevents text overflow */
+            font-size: 9px;
+        }
+
+        .main-table tr:nth-child(even) {
+            background-color: #fcfcfc;
+        }
+
+        /* Specific Column Widths (Adjust as needed) */
+        .col-id { width: 25px; text-align: center; }
+        .col-adm { width: 50px; }
+        .col-sex { width: 30px; text-align: center; }
+        .col-name { width: 70px; }
+        .col-phone { width: 75px; }
+        .col-bus { width: 40px; text-align: center; }
+
+        /* Status Pills */
+        .badge {
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 8px;
+        }
+        .badge-yes { background-color: #d4edda; color: #155724; }
+        .badge-no { background-color: #f8d7da; color: #721c24; }
+
+        /* Footer */
         footer {
             position: fixed;
-            bottom: 0;
+            bottom: -30px;
             left: 0;
             right: 0;
-            height: 3mm; /*urefu wa footer*/
-            font-size: 10px;
+            height: 30px;
+            font-size: 9px;
+            color: #999;
+            border-top: 1px solid #eee;
             padding-top: 5px;
-            border-top: 1px solid #ddd;
-            text-align: center;
-            background-color: white;
-            z-index: 1000;
         }
-        footer .page-number:after {
-        content: "Page " counter(page);
+
+        .pagenum:before {
+            content: counter(page);
         }
-        footer .copyright {
-        float: left;
-        margin-left: 10px;
-        }
-        footer .printed {
-        float: right;
-        margin-right: 10px;
-        }
-        /* Clear floats */
-        footer:after {
-        content: "";
-        display: table;
-        clear: both;
-        }
+
         .no-records {
             text-align: center;
+            padding: 50px;
             color: #999;
-            font-style: italic;
-            margin-top: 50px;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <div class="header-container">
-        @if(Auth::user()->school->logo)
-            <img class="school-logo" src="{{ storage_path('app/public/logo/' . Auth::user()->school->logo) }}" alt="School Logo">
-        @endif
-        <div class="school-info">
-            <h4>{{ Auth::user()->school->school_name }}</h4>
-            <h5>{{ strtoupper(Auth::user()->school->postal_address) }} - {{ strtoupper(Auth::user()->school->postal_name) }}</h5>
-            <h5>{{ strtoupper($students->first()->class_name) ?? 'CLASS' }} Students List</h5>
-        </div>
+
+    <table class="header-table">
+        <tr>
+            <td width="15%">
+                @if(Auth::user()->school->logo)
+                    <img class="school-logo" src="{{ public_path('storage/logo/' . Auth::user()->school->logo) }}" alt="Logo">
+                @endif
+            </td>
+            <td class="school-info">
+                <h1>{{ Auth::user()->school->school_name }}</h1>
+                <p>{{ strtoupper(Auth::user()->school->postal_address) }} - {{ strtoupper(Auth::user()->school->postal_name) }}</p>
+                <p>Email: {{ Auth::user()->school->school_email ?? "N/A" }} | Tel: {{ Auth::user()->school->school_phone ?? "N/A" }}</p>
+            </td>
+        </tr>
+    </table>
+
+    <div class="report-title">
+        <h2>STUDENT ENROLLMENT LIST: {{ strtoupper($students->first()->class_name ?? 'N/A') }}</h2>
     </div>
 
     @if ($students->isEmpty())
-        <p class="no-records">No student records found</p>
+        <div class="no-records">No student records found for this criteria.</div>
     @else
-        <div class="table-container">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Adm No</th>
-                        <th>Gender</th>
-                        <th>Stream</th>
-                        <th>First name</th>
-                        <th>Middle name</th>
-                        <th>Last name</th>
-                        <th>DOB</th>
-                        <th>Parent Lirst name</th>
-                        <th>Parent Last name</th>
-                        <th>Parent Gender</th>
-                        <th>Parent Phone</th>
-                        <th>Parent email</th>
-                        <th>Address</th>
-                        <th>School Bus</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($students as $student)
-                    <tr>
-                        <td style="text-align: center;">{{ $loop->iteration }}</td>
-                        <td style="text-align: center;">{{ strtoupper($student->admission_number) }}</td>
-                        <td style="text-align: center;">{{ strtoupper($student->gender[0]) }}</td>
-                        <td style="text-align: center;">{{ strtoupper($student->group) }}</td>
-                        <td>{{ ucwords(strtolower($student->first_name)) }}</td>
-                        <td>{{ ucwords(strtolower($student->middle_name)) }}</td>
-                        <td>{{ ucwords(strtolower($student->last_name)) }}</td>
-                        <td style="text-align: center;">{{ $student->dob ? \Carbon\Carbon::parse($student->dob)->format('Y-m-d') : '' }}</td>
-                        <td>{{ ucwords(strtolower($student->parent_first_name)) }}</td>
-                        <td>{{ ucwords(strtolower($student->parent_last_name)) }}</td>
-                        <td style="text-align: center;">{{ strtoupper(substr($student->parent_gender, 0, 1)) }}</td>
-                        <td>{{ $student->parent_email }}</td>
-                        <td>{{ $student->phone }}</td>
-                        <td>{{ ucwords(strtolower(substr($student->address, 0, 15))) }}</td>
-                        <td style="text-align: center;">
-                            @if($student->transport_id == null)
-                                <span style="color: red; font-weight: bold;">No</span>
-                            @else
-                                <span style="color: green; font-weight: bold;">Yes</span>
-                            @endif
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+        <table class="main-table">
+            <thead>
+                <tr>
+                    <th class="col-id">#</th>
+                    <th class="col-adm">Adm. No</th>
+                    <th class="col-sex">Gen</th>
+                    <th class="col-name">First Name</th>
+                    <th class="col-name">Middle</th>
+                    <th class="col-name">Last Name</th>
+                    <th style="width: 55px;">DOB</th>
+                    <th class="col-name">Parent First</th>
+                    <th class="col-name">Parent Last</th>
+                    <th class="col-phone">Phone</th>
+                    <th style="width: 100px;">Email</th>
+                    <th style="width: 80px;">Address</th>
+                    <th class="col-bus">Bus</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($students as $student)
+                <tr>
+                    <td class="col-id">{{ $loop->iteration }}</td>
+                    <td style="font-weight: bold;">{{ strtoupper($student->admission_number) }}</td>
+                    <td class="col-sex">{{ strtoupper($student->gender[0]) }}</td>
+                    <td>{{ ucwords(strtolower($student->first_name)) }}</td>
+                    <td>{{ ucwords(strtolower($student->middle_name)) }}</td>
+                    <td>{{ ucwords(strtolower($student->last_name)) }}</td>
+                    <td>{{ $student->dob ? \Carbon\Carbon::parse($student->dob)->format('d/m/Y') : '-' }}</td>
+                    <td>{{ ucwords(strtolower($student->parent_first_name)) }}</td>
+                    <td>{{ ucwords(strtolower($student->parent_last_name)) }}</td>
+                    <td>{{ $student->phone }}</td>
+                    <td style="font-size: 8px;">{{ strtolower($student->parent_email) }}</td>
+                    <td>{{ Str::limit($student->address, 20) }}</td>
+                    <td class="col-bus">
+                        @if($student->transport_id == null)
+                            <span class="badge badge-no">NO</span>
+                        @else
+                            <span class="badge badge-yes">YES</span>
+                        @endif
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
     @endif
 
     <footer>
-        <span class="copyright">
-        &copy; {{ ucwords(strtolower(Auth::user()->school->school_name)) }} – {{ date('Y') }}
-        </span>
-        <span class="page-number"></span>
-        <span class="printed">
-        Printed at: {{ now()->format('d-M-Y H:i') }}
-        </span>
+        <table width="100%">
+            <tr>
+                <td align="left">&copy; {{ date('Y') }} {{ Auth::user()->school->school_name }}</td>
+                <td align="center">Page <span class="pagenum"></span></td>
+                <td align="right">Printed: {{ date('d M Y, H:i') }}</td>
+            </tr>
+        </table>
     </footer>
 
-    <script>
-        // Optional dynamic pagination script placeholder
-        document.addEventListener('DOMContentLoaded', function() {
-            const pages = document.querySelectorAll('.page-number');
-            pages.forEach((page, index) => {
-                page.textContent = index + 1;
-            });
-        });
-    </script>
 </body>
 </html>

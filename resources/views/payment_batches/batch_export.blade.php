@@ -1,29 +1,29 @@
 <table style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;">
     {{-- SCHOOL HEADER --}}
     <tr>
-        <td colspan="9" style="font-weight: bold; font-size: 18px; text-align: center; padding: 10px; color: #2c3e50;">
+        <td colspan="10" style="font-weight: bold; font-size: 18px; text-align: center; padding: 10px; color: #2c3e50;">
             {{ strtoupper($school->school_name) }}
         </td>
     </tr>
     <tr>
-        <td colspan="9" style="text-align: center; padding: 5px; font-size: 14px; color: #34495e;">
+        <td colspan="10" style="text-align: center; padding: 5px; font-size: 14px; color: #34495e;">
             {{ $school->postal_address }} - {{ strtoupper($school->postal_name) }}
         </td>
     </tr>
     <tr>
-        <td colspan="9" style="text-align: center; padding: 5px; font-size: 14px; color: #34495e;">
+        <td colspan="10" style="text-align: center; padding: 5px; font-size: 14px; color: #34495e;">
             {{ strtoupper($school->country) }}
         </td>
     </tr>
-    <tr><td colspan="9" style="height: 20px;"></td></tr>
+    <tr><td colspan="10" style="height: 20px;"></td></tr>
 
     {{-- BATCH TITLE --}}
     <tr>
-        <td colspan="9" style="font-weight: bold; font-size: 16px; text-align: center; padding: 8px; background-color: #3498db; color: white;">
+        <td colspan="10" style="font-weight: bold; font-size: 16px; text-align: center; padding: 8px; background-color: #3498db; color: white;">
             Bills Batch: {{ strtoupper($batch->batch_name) }}
         </td>
     </tr>
-    <tr><td colspan="9" style="height: 15px;"></td></tr>
+    <tr><td colspan="10" style="height: 15px;"></td></tr>
 
     {{-- TABLE HEADER --}}
     <tr style="background-color: #2c3e50; color: white; font-weight: bold; font-size: 12px; font-weight:bold">
@@ -35,6 +35,7 @@
         <td style="border: 1px solid #ddd; padding: 8px; text-align: left;">SERVICE</td>
         <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">BILLED AMOUNT</td>
         <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">STATUS</td>
+        <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">DESCRIPTION</td>
         <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">DUE DATE</td>
     </tr>
 
@@ -76,6 +77,9 @@
                     {{ ucfirst(strtolower($bill->status)) }}
                 </span>
             </td>
+            <td style="border: 1px solid #ddd; padding: 6px; text-align: right; background-color: {{ $i % 2 == 0 ? '#f8f9fa' : '#ffffff' }};">
+                {{ ucfirst($bill->description) }}
+            </td>
             <td style="border: 1px solid #ddd; padding: 6px; text-align: center; background-color: {{ $i % 2 == 0 ? '#f8f9fa' : '#ffffff' }};">
                 {{ date('d/m/Y', strtotime($bill->due_date)) }}
             </td>
@@ -88,13 +92,13 @@
         <td style="border: 1px solid #ddd; padding: 10px; text-align: right; color: #e74c3c; font-size: 14px;">
             {{ number_format($totalBilled) }}
         </td>
-        <td colspan="2" style="border: 1px solid #ddd; padding: 10px;"></td>
+        <td colspan="3" style="border: 1px solid #ddd; padding: 10px;"></td>
     </tr>
 
     {{-- FOOTER --}}
-    <tr><td colspan="9" style="height: 20px;"></td></tr>
+    <tr><td colspan="10" style="height: 20px;"></td></tr>
     <tr>
-        <td colspan="9" style="text-align: right; font-size: 10px; color: #7f8c8d; padding: 5px;">
+        <td colspan="10" style="text-align: right; font-size: 10px; color: #7f8c8d; padding: 5px;">
             Generated on: {{ date('d/m/Y H:i:s') }}
         </td>
     </tr>

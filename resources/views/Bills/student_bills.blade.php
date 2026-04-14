@@ -204,7 +204,7 @@
                         <div class="row align-items-center">
                             <div class="col">
                                 <div
-                                    class="text-xs font-weight-bold text-{{ $totalBalance > 0 ? 'warning' : 'info' }} text-uppercase mb-1">
+                                    class="text-xs font-weight-bold text-uppercase mb-1">
                                     Balance
                                 </div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
@@ -304,7 +304,7 @@
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-hover mb-0 table-responsive-md">
+                            <table class="table table-hover mb-0 table-responsive-md table-bordered" style="border-collapse: collapse;">
                                 <thead>
                                     <tr>
                                         @if ($hasCollectionAccount)
@@ -315,8 +315,9 @@
                                         <th>Year</th>
                                         <th>Receipt</th>
                                         <th>Service</th>
-                                        <th class="text-end">Bill</th>
-                                        <th class="text-end">Paid</th>
+                                        <th>Description</th>
+                                        <th class="text-end">Billed Amount</th>
+                                        <th class="text-end">Paid Amount</th>
                                         <th>Status</th>
                                         <th>Due Date</th>
                                     </tr>
@@ -346,7 +347,8 @@
                                                 <td>
                                                     <span class="invoice-badge">INVOICE</span>
                                                 </td>
-                                                <td class="text-capitalize">{{ $record['service_name'] }}</td>
+                                                <td class="text-capitalize">{{ ucwords(strtolower($record['service_name'] ))}}</td>
+                                                <td class="">{{ $record['description'] ?? 'N/A' }}</td>
                                                 <td class="amount-cell">{{ number_format($record['amount']) }}</td>
                                                 <td class="amount-cell">0</td>
                                                 <td>
@@ -398,7 +400,7 @@
                                         @endif
                                     @empty
                                         <tr>
-                                            <td colspan="{{ $displayAccountNumber ? 8 : 8 }}" class="text-center py-4">
+                                            <td colspan="{{ $displayAccountNumber ? 9 : 9 }}" class="text-center py-4">
                                                 <div class="text-muted">
                                                     <i class="fas fa-receipt fa-2x mb-3"></i>
                                                     <p class="mb-0">
@@ -416,7 +418,7 @@
                                     <!-- Closing Summary -->
                                     @if ($paymentRecords->count() > 0)
                                         <tr class="table-secondary">
-                                            <td colspan="{{ $displayAccountNumber ? 5 : 4 }}" class="text-end fw-bold">
+                                            <td colspan="5" class="fw-bold">
                                                 CLOSING BALANCE:
                                             </td>
                                             <td class="amount-cell fw-bold">{{ number_format($totalBilled) }}</td>
@@ -425,14 +427,14 @@
                                             <td colspan="2"></td>
                                         </tr>
                                         <tr class="table-light">
-                                            <td colspan="{{ $displayAccountNumber ? 5 : 4 }}" class="text-end fw-bold">
+                                            <td colspan="5" class="fw-bold">
                                                 OUTSTANDING BALANCE:
                                             </td>
                                             <td
                                                 class="amount-cell fw-bold {{ $totalBalance > 0 ? 'text-danger' : 'text-success' }}">
                                                 {{ number_format($totalBalance) }}
                                             </td>
-                                            <td colspan="3"></td>
+                                            <td colspan="4"></td>
                                         </tr>
                                     @endif
                                 </tbody>

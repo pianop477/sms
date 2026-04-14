@@ -2,240 +2,179 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Graduated Students {{$year}} - {{Auth::user()->school->school_name}}</title>
     <style>
-        /* Main Styles */
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            font-size: 12px;
-            color: #333;
+        @page {
+            size: A4 portrait; /* Graduation reports usually look better in portrait */
+            margin: 1.5cm;
         }
 
-        /* Header Styles */
-        .header-container {
-            display: flex;
-            padding: 5px;
-            flex-direction: row;
-            flex-wrap: wrap;
-            margin-bottom: 15px;
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 11px;
+            color: #333;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Professional Header Layout */
+        .header-table {
+            width: 100%;
+            border-bottom: 3px double #343a40;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
         }
 
         .logo {
-            position: absolute;
-            width: 70px;
-            left: 7px;
-            top: 20px;
-            color: inherit;
+            max-height: 80px;
+            width: auto;
         }
 
         .school-info {
-           text-align: center;
-            position: relative;
-            top: 0;
-            left: 40px;
-            margin-bottom: 10px;
+            text-align: center;
         }
 
         .school-name {
-            font-size: 18px;
+            font-size: 22px;
             font-weight: bold;
             margin: 0;
+            color: #1a2a3a;
             text-transform: uppercase;
-            color: #343a40;
         }
 
         .report-title {
-            font-size: 16px;
-            margin: 5px 0 0 0;
-            color: #555;
+            font-size: 14px;
+            margin: 5px 0;
+            color: #c0392b; /* Deep Red for "Official" status */
+            font-weight: bold;
+            letter-spacing: 1px;
         }
 
         .report-subtitle {
-            font-size: 14px;
-            margin: 10px 0 0 0;
-            color: #666;
+            font-size: 12px;
+            color: #555;
+            margin: 0;
         }
 
-        /* Table Styles */
+        /* Summary Box */
+        .summary-table {
+            width: 100%;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+        }
+
+        /* Data Table */
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
-            page-break-inside: auto;
         }
 
         .data-table th {
             background-color: #343a40;
-            color: white;
-            padding: 6px;
+            color: #ffffff;
+            padding: 10px 5px;
             text-align: left;
-            font-weight: bold;
-            border: 1px solid #ddd;
+            text-transform: uppercase;
+            font-size: 10px;
+            border: 1px solid #343a40;
         }
 
         .data-table td {
-            padding: 5px;
-            border: 1px solid #ddd;
+            padding: 8px 5px;
+            border-bottom: 1px solid #dee2e6;
             vertical-align: middle;
         }
 
-        .data-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
+        /* Avatar Styling */
         .student-photo {
-            width: 40px;
-            height: 40px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 1px solid #ddd;
-        }
-
-        /* Footer Styles */
-        @page {
-            margin-top: 8mm;
-            margin-bottom: 12mm; /* Ongeza nafasi ya chini kwa footer */
-            margin-left: 8mm;
-            margin-right: 8mm;
-        }
-        footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 4mm; /*urefu wa footer*/
-            font-size: 10px;
-            padding-top: 8px;
-            border-top: 1px solid #ddd;
-            text-align: center;
-            background-color: white;
-            z-index: 1000;
-        }
-        footer .page-number:after {
-            /* content: "Page " counter(page); */
-        }
-        footer .copyright {
-            float: left;
-            margin-left: 10px;
-        }
-        footer .printed {
-            float: right;
-            margin-right: 10px;
-        }
-        /* Clear floats */
-        footer:after {
-            content: "";
-            display: table;
-            clear: both;
-        }
-
-        /* Print Specific Styles */
-        @media print {
-            body {
-                padding: 0;
-                background: white;
-            }
-
-            .no-print {
-                display: none;
-            }
-
-            .data-table {
-                font-size: 10px;
-            }
-
-            .data-table th,
-            .data-table td {
-                padding: 4px;
-            }
-
-            .footer {
-                position: fixed;
-                bottom: 0;
-            }
-        }
-
-        /* Additional Utility Classes */
-        .text-center {
-            text-align: center;
-        }
-
-        .text-uppercase {
-            text-transform: uppercase;
-        }
-
-        .text-capitalize {
-            text-transform: capitalize;
+            width: 45px;
+            height: 45px;
+            border-radius: 4px; /* Squares often look more "official" for IDs */
+            border: 1px solid #ccc;
+            display: block;
         }
 
         .status-badge {
-            display: inline-block;
-            padding: 3px 6px;
-            border-radius: 3px;
-            font-size: 10px;
-            font-weight: bold;
-        }
-
-        .status-graduated {
-            background-color: #28a745;
+            background-color: #27ae60;
             color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 9px;
+            font-weight: bold;
+            text-align: center;
         }
 
-         .page-number {
-            flex: 1; /* Push printed-on to the far right */
-            text-align: left;
+        /* Footer */
+        footer {
+            position: fixed;
+            bottom: -30px;
+            left: 0;
+            right: 0;
+            height: 35px;
+            font-size: 9px;
+            color: #777;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
         }
 
-        .page-number:before {
-            content: "Page " counter(page);
+        .pagenum:before {
+            content: counter(page);
         }
+
+        .text-center { text-align: center; }
+        .bold { font-weight: bold; }
     </style>
 </head>
 <body>
-    <!-- Header Section -->
-    <div class="header-container">
-        <div class="logo-container">
-            <img class="logo" src="{{ storage_path('app/public/logo/'. Auth::user()->school->logo) }}" alt="School Logo">
-        </div>
-        <div class="school-info">
-            <h1 class="school-name">{{ Auth::user()->school->school_name }}</h1>
-            <h2 class="report-title">STANDARD SEVEN GRADUATION REPORT</h2>
-            <h3 class="report-subtitle">GRADUATION YEAR: {{ $year }}</h3>
-        </div>
-    </div>
 
-    <!-- Report Details -->
-    <div style="margin-bottom: 15px;">
-        <div style="float: left; width: 50%;">
-            <p><strong>Report Date:</strong> {{ date('d/m/Y') }}</p>
-            <p><strong>Total Graduates:</strong> {{ $studentExport->count() }}</p>
-        </div>
-        <div style="float: right; width: 50%; text-align: right;">
-            {{-- <p><strong>School Code:</strong> {{ Auth::user()->school->school_reg_no }}</p> --}}
-            <p><strong>Printed By:</strong> {{ ucwords(strtolower(Auth::user()->first_name))}} {{ ucwords(strtolower(Auth::user()->last_name))}}</p>
-        </div>
-        <div style="clear: both;"></div>
-    </div>
+    <table class="header-table">
+        <tr>
+            <td width="20%">
+                @if(Auth::user()->school->logo)
+                    <img class="logo" src="{{ public_path('storage/logo/'. Auth::user()->school->logo) }}" alt="Logo">
+                @endif
+            </td>
+            <td class="school-info">
+                <div class="school-name">{{ Auth::user()->school->school_name }}</div>
+                <div class="report-title">OFFICIAL GRADUATION REGISTRY</div>
+                <div class="report-subtitle">Academic Year: {{ $year }} — Standard Seven</div>
+            </td>
+            <td width="20%" style="text-align: right;">
+                {{-- Placeholder for QR code or School Stamp space --}}
+            </td>
+        </tr>
+    </table>
 
-    <!-- Students Table -->
+    <table class="summary-table">
+        <tr>
+            <td>
+                <strong>Report Date:</strong> {{ date('d M Y') }}<br>
+                <strong>Total Graduates:</strong> {{ $studentExport->count() }}
+            </td>
+            <td style="text-align: right;">
+                <strong>Generated By:</strong> {{ strtoupper(Auth::user()->first_name . ' ' . Auth::user()->last_name) }}<br>
+                <strong>Status:</strong> Final Registry
+            </td>
+        </tr>
+    </table>
+
     @if ($studentExport->isEmpty())
-        <div style="text-align: center; padding: 20px; border: 1px solid #ddd; margin-top: 20px;">
-            <p style="font-style: italic; color: #666;">No graduated students found for {{ $year }}</p>
+        <div class="text-center" style="padding: 50px; border: 1px dashed #ccc;">
+            <p>No student records found for the {{ $year }} graduation period.</p>
         </div>
     @else
         <table class="data-table">
             <thead>
                 <tr>
-                    <th width="5%">#</th>
-                    <th width="10%">Photo</th>
-                    <th width="15%">Admission No</th>
-                    <th width="10%">Gender</th>
-                    <th width="40%">Full Name</th>
-                    <th width="10%">Status</th>
+                    <th width="5%" class="text-center">#</th>
+                    <th width="12%" class="text-center">Photo</th>
+                    <th width="18%">Admission No</th>
+                    <th width="45%">Full Name</th>
+                    <th width="10%" class="text-center">Gender</th>
+                    <th width="10%" class="text-center">Result</th>
                 </tr>
             </thead>
             <tbody>
@@ -245,21 +184,18 @@
                         <td class="text-center">
                             @php
                                 $imageName = $student->image;
-                                $imagePath = storage_path('app/public/students/' . $imageName);
-
-                                if (!empty($imageName) && file_exists($imagePath)) {
-                                    $avatarImage = public_path('storage/students/' . $imageName);
-                                } else {
-                                    $avatarImage = public_path('storage/students/student.jpg');
-                                }
+                                $imagePath = public_path('storage/students/' . $imageName);
+                                $displayImage = (!empty($imageName) && file_exists($imagePath))
+                                    ? $imagePath
+                                    : public_path('storage/students/student.jpg');
                             @endphp
-                            <img class="student-photo" src="{{ $avatarImage }}" alt="Student Photo">
+                            <img class="student-photo" src="{{ $displayImage }}" alt="S">
                         </td>
-                        <td class="text-uppercase text-center">{{ strtoupper($student->admission_number) }}</td>
-                        <td class="text-uppercase text-center">{{ ucwords(strtolower($student->gender)) }}</td>
-                        <td class="text-capitalize">{{ ucwords(strtolower($student->first_name.' '.$student->middle_name.' '.$student->last_name)) }}</td>
+                        <td class="bold">{{ strtoupper($student->admission_number) }}</td>
+                        <td>{{ ucwords(strtolower($student->first_name.' '.$student->middle_name.' '.$student->last_name)) }}</td>
+                        <td class="text-center">{{ strtoupper(substr($student->gender, 0, 1)) }}</td>
                         <td class="text-center">
-                            <span class="status-badge status-graduated">GRADUATED</span>
+                            <span class="status-badge">GRADUATED</span>
                         </td>
                     </tr>
                 @endforeach
@@ -267,15 +203,15 @@
         </table>
     @endif
 
-    <!-- Footer Section -->
     <footer>
-        <span class="copyright">
-        &copy; {{ ucwords(strtolower(Auth::user()->school->school_name)) }} – {{ date('Y') }}
-        </span>
-        <span class="page-number"></span>
-        <span class="printed">
-        Printed at: {{ now()->format('d-m-Y H:i') }}
-        </span>
+        <table width="100%">
+            <tr>
+                <td align="left">Official Academic Record &copy; {{ date('Y') }}</td>
+                <td align="center">Page <span class="pagenum"></span></td>
+                <td align="right">Printed: {{ now()->format('d-m-Y H:i') }}</td>
+            </tr>
+        </table>
     </footer>
+
 </body>
 </html>

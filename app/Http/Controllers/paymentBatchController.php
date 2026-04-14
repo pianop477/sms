@@ -37,7 +37,7 @@ class paymentBatchController extends Controller
         $year = session('selected_year', date('Y'));
 
         $batch = school_fees_batches::when($year, fn($q) => $q->where('school_fees_batches.year', $year))
-                                    ->orderBy('created_at')->get();
+            ->orderBy('created_at')->get();
         return view('payment_batches.batch_index', compact('batch'));
     }
 
@@ -105,11 +105,10 @@ class paymentBatchController extends Controller
                 'errors' => $errors,
                 'total_records' => count($data)
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to process file: ' . $e->getMessage()
+                'message' => 'Failed to read file: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -144,8 +143,8 @@ class paymentBatchController extends Controller
 
             // check student
             $student = Student::whereRaw('LOWER(admission_number) = ?', strtolower($admission))
-                            ->where('school_id', auth()->user()->school_id)
-                            ->first();
+                ->where('school_id', auth()->user()->school_id)
+                ->first();
 
             if (!$student) {
                 $errors[] = [
@@ -169,8 +168,8 @@ class paymentBatchController extends Controller
         // Validate service existence
         if (!empty($rowData['SERVICE_NAME'])) {
             $service = payment_service::where('service_name', $rowData['SERVICE_NAME'])
-                                ->where('status', 'active')
-                                ->first();
+                ->where('status', 'active')
+                ->first();
 
             if (!$service) {
                 $errors[] = [
@@ -235,12 +234,12 @@ class paymentBatchController extends Controller
 
     public function exportFile()
     {
-        if (!Storage::exists('templates/sample bill file.xlsx')) {
+        if (!Storage::exists('templates/sample bill.xlsx')) {
             // abort(404, 'File not found.');
             Alert()->toast('No file found, please try again', 'error');
             return back();
         }
-        return Storage::download('templates/sample bill file.xlsx');
+        return Storage::download('templates/sample bill.xlsx');
     }
 
     public function store(Request $request)
@@ -278,8 +277,8 @@ class paymentBatchController extends Controller
                 try {
                     // Get student data using admission_number
                     $student = Student::where('admission_number', $row['ADMISSION_NUMBER'])
-                                    ->where('school_id', $schoolId)
-                                    ->first();
+                        ->where('school_id', $schoolId)
+                        ->first();
 
                     if (!$student) {
                         $failedInserts++;
@@ -289,8 +288,8 @@ class paymentBatchController extends Controller
 
                     // Get service data using service_name
                     $service = payment_service::where('service_name', $row['SERVICE_NAME'])
-                                        ->where('status', 'active')
-                                        ->first();
+                        ->where('status', 'active')
+                        ->first();
 
                     if (!$service) {
                         $failedInserts++;
@@ -316,6 +315,7 @@ class paymentBatchController extends Controller
                         'amount' => $this->cleanAmount($row['AMOUNT']),
                         'due_date' => $dueDate,
                         'status' => 'active',
+                        'description' => $row['DESCRIPTION'],
                         'is_cancelled' => 0,
                         'created_by' => $user->id,
                         'created_at' => now(),
@@ -325,7 +325,6 @@ class paymentBatchController extends Controller
                     // Insert into school_fees table
                     school_fees::create($schoolFeeData);
                     $successfulInserts++;
-
                 } catch (\Exception $e) {
                     $failedInserts++;
                     $errors[] = "Error processing row " . ($index + 2) . ": " . $e->getMessage();
@@ -335,7 +334,7 @@ class paymentBatchController extends Controller
             DB::commit();
 
             // Prepare response message
-            $message = "Batch uploaded successfully. {$successfulInserts} records inserted.";
+            $message = "Batch uploaded successfully. {$successfulInserts} records inserted successful.";
             if ($failedInserts > 0) {
                 $message .= " {$failedInserts} records failed.";
             }
@@ -348,7 +347,6 @@ class paymentBatchController extends Controller
                 'failed_inserts' => $failedInserts,
                 'errors' => $errors
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -359,9 +357,9 @@ class paymentBatchController extends Controller
         }
     }
 
-/**
- * Handle control number generation
- */
+    /**
+     * Handle control number generation
+     */
     private function handleControlNumber($controlNumberFromExcel)
     {
         // If control number is provided in Excel, use it
@@ -373,9 +371,9 @@ class paymentBatchController extends Controller
         return $this->generateControlNumber();
     }
 
-/**
- * Generate automatic control number
- */
+    /**
+     * Generate automatic control number
+     */
     private function generateControlNumber()
     {
         return DB::transaction(function () {
@@ -401,9 +399,9 @@ class paymentBatchController extends Controller
         });
     }
 
-/**
- * Handle due date calculation
- */
+    /**
+     * Handle due date calculation
+     */
     private function handleDueDate($dueDateFromExcel, $expiryDuration)
     {
         // If due date is provided in Excel, use it (convert from mm/dd/yyyy to timestamp)
@@ -431,9 +429,9 @@ class paymentBatchController extends Controller
         return now()->addDays(30)->format('Y-m-d H:i:s');
     }
 
-/**
- * Clean amount - remove commas and format for database
- */
+    /**
+     * Clean amount - remove commas and format for database
+     */
     private function cleanAmount($amount)
     {
         if (is_string($amount)) {
@@ -494,8 +492,11 @@ class paymentBatchController extends Controller
                 ->join('payment_services', 'payment_services.id', '=', 'school_fees.service_id')
                 ->select(
                     'school_fees.*',
-                    'students.first_name', 'students.middle_name', 'students.last_name',
-                    'payment_services.service_name', 'grades.class_code'
+                    'students.first_name',
+                    'students.middle_name',
+                    'students.last_name',
+                    'payment_services.service_name',
+                    'grades.class_code'
                 )
                 ->where('school_fees.batch_id', $batch->id)
                 ->where('school_fees.school_id', $user->school_id)
@@ -510,7 +511,6 @@ class paymentBatchController extends Controller
                 new BatchBillsExport($school, $bills, $totalBilled, $batch),
                 strtoupper($batch->batch_name) . '.xlsx'
             );
-
         } catch (\Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
             return back();

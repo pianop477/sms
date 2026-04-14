@@ -1,945 +1,314 @@
 @extends('SRTDashboard.frame')
 
 @section('content')
-    <style>
-        :root {
-            --primary: #4361ee;
-            --primary-dark: #3a56d4;
-            --primary-light: #6c8cff;
-            --secondary: #6c757d;
-            --success: #28a745;
-            --info: #17a2b8;
-            --warning: #ffc107;
-            --danger: #dc3545;
-            --light: #f8f9fa;
-            --dark: #343a40;
-            --white: #ffffff;
+<style>
+    :root {
+        /* Senior Palette: Deeper, desaturated professional tones */
+        --brand-primary: #2563eb;
+        --brand-dark: #1e3a8a;
+        --brand-accent: #3b82f6;
+        --surface-card: #ffffff;
+        --bg-main: #f1f5f9;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
 
-            /* Enterprise-grade colors */
-            --brand-primary: #2c3e50;
-            --brand-accent: #3498db;
-            --brand-success: #27ae60;
-            --brand-warning: #f39c12;
-            --brand-danger: #e74c3c;
-            --brand-info: #3498db;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
 
-            /* Shadows */
-            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.15);
+        --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-            /* Transitions */
-            --transition-base: all 0.3s ease;
-            --transition-smooth: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+    body {
+        background-color: var(--bg-main);
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        color: var(--text-main);
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    /* --- UX Fix: Top Progress Bar (Better than a blocking overlay) --- */
+    .loading-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        background: var(--brand-accent);
+        width: 0;
+        z-index: 9999;
+        transition: width 0.4s ease;
+    }
 
-        body {
-            background-color: #f0f2f5;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            color: var(--dark);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
+    /* --- Enhanced Header --- */
+    .dashboard-headers {
+        background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-primary) 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: white;
+        box-shadow: var(--shadow-md);
+        position: relative;
+    }
 
-        /* Loading States */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition-base);
-        }
+    .dashboard-headers h5 {
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        margin-bottom: 0.5rem;
+    }
 
-        .loading-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
+    /* --- Stat Card Refinement --- */
+    .stat-card {
+        background: var(--surface-card);
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        padding: 1.5rem;
+        transition: var(--transition);
+        height: 100%;
+    }
 
-        .spinner-enterprise {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(44, 62, 80, 0.1);
-            border-left-color: var(--brand-primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--brand-accent);
+    }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        background: #eff6ff;
+        color: var(--brand-primary);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
 
-        /* Dashboard Header */
-        .dashboard-headers {
-            background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-accent) 100%);
-            border-radius: 20px;
-            padding: 8px 12px;
-            margin-bottom: 2rem;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
+    /* --- The Professional Table --- */
+    .enterprise-card {
+        background: var(--surface-card);
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+    }
 
-        .dashboard-headers::before {
-            content: '📊';
-            font-size: 8rem;
-            position: absolute;
-            right: 20px;
-            bottom: -20px;
-            opacity: 0.1;
-            transform: rotate(10deg);
-        }
+    .card-header-enterprise {
+        background: #f8fafc;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
 
-        .dashboard-headers h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.5px;
-        }
+    .advanced-table th {
+        background: #f8fafc;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        border-bottom: 1px solid #e2e8f0;
+    }
 
-        .dashboard-headers p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            margin: 0;
-        }
+    .advanced-table td {
+        padding: 1rem 1.5rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9;
+        transition: var(--transition);
+    }
 
-        /* Statistics Cards */
-        .stat-card {
-            background: white;
-            border-radius: 20px;
-            border: none;
-            box-shadow: var(--shadow-md);
-            transition: var(--transition-smooth);
-            overflow: hidden;
-            position: relative;
-            height: 100%;
-            min-height: 160px;
-            cursor: pointer;
-        }
+    .advanced-table tbody tr:hover td {
+        background-color: #fdfdfd;
+    }
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-xl);
-        }
+    /* --- Student Avatar & Info --- */
+    .student-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: linear-gradient(45deg, var(--brand-primary), var(--brand-accent));
+        color: white;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+    }
 
-        .stat-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--brand-primary), var(--brand-accent));
-        }
+    .student-name {
+        font-weight: 600;
+        color: var(--text-main);
+        font-size: 0.95rem;
+    }
 
-        .stat-card .card-body {
-            padding: 1.8rem;
-        }
+    .class-badge {
+        background: #f1f5f9;
+        color: var(--brand-dark);
+        padding: 0.35rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        border: 1px solid #e2e8f0;
+    }
 
-        .stat-card .stat-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-accent) 100%);
-            color: white;
-            font-size: 1.8rem;
-        }
+    /* --- Action Buttons: High-end UX --- */
+    .action-btn.manage {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: #fff;
+        color: var(--brand-primary);
+        border: 1px solid #e2e8f0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+        text-decoration: none;
+    }
 
-        .stat-card .stat-label {
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--secondary);
-            margin-bottom: 0.5rem;
-        }
+    .action-btn.manage:hover {
+        background: var(--brand-primary);
+        color: white;
+        border-color: var(--brand-primary);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
 
-        .stat-card .stat-value {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--dark);
-            line-height: 1.2;
-            margin-bottom: 0.25rem;
-        }
-
-        .stat-card .stat-trend {
-            font-size: 0.85rem;
-            color: var(--success);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* Main Card */
-        .enterprise-card {
-            background: white;
-            border-radius: 20px;
-            border: none;
-            box-shadow: var(--shadow-lg);
-            transition: var(--transition-base);
-            overflow: hidden;
-            margin-bottom: 2rem;
-        }
-
-        .enterprise-card:hover {
-            box-shadow: var(--shadow-xl);
-        }
-
-        .card-header-enterprise {
-            padding: 1.5rem 2rem;
-            background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-accent) 100%);
-            color: white;
-            border-bottom: none;
-        }
-
-        .card-header-enterprise h4 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .card-body-enterprise {
-            padding: 2rem;
-        }
-
-        /* Advanced Table */
-        .advanced-table-container {
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .advanced-table {
-            width: 100%;
-            background: white;
-            border-collapse: collapse;
-        }
-
-        .advanced-table thead {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        }
-
-        .advanced-table th {
-            padding: 1rem 1.5rem;
-            font-weight: 700;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--dark);
-            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
-            white-space: nowrap;
-        }
-
-        .advanced-table td {
-            padding: 1rem 1.5rem;
-            vertical-align: middle;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            color: var(--secondary);
-            font-size: 0.95rem;
-        }
-
-        .advanced-table tbody tr {
-            transition: var(--transition-base);
-        }
-
-        .advanced-table tbody tr:hover {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            cursor: pointer;
-        }
-
-        .advanced-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        /* Student Avatar */
-        .student-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-accent) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 1.1rem;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .student-info {
-            margin-left: 12px;
-        }
-
-        .student-name {
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 4px;
-            font-size: 1rem;
-        }
-
-        .student-middle {
-            font-size: 0.8rem;
-            color: var(--secondary);
-        }
-
-        .class-badge {
-            background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-accent) 100%);
-            color: white;
-            padding: 0.4rem 1rem;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            display: inline-block;
-        }
-
-        /* Action Buttons */
-        .action-btn {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1rem;
-            transition: var(--transition-smooth);
-            border: none;
-            cursor: pointer;
-            margin: 0 4px;
-            text-decoration: none;
-        }
-
-        .action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .action-btn.manage {
-            background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-accent) 100%);
-        }
-
-        /* Enterprise Modal */
-        .enterprise-modal .modal-content {
-            border: none;
-            border-radius: 25px;
-            overflow: hidden;
-            box-shadow: var(--shadow-xl);
-        }
-
-        .enterprise-modal .modal-header {
-            background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-accent) 100%);
-            padding: 1.5rem 2rem;
-            border: none;
-        }
-
-        .enterprise-modal .modal-title {
-            color: white;
-            font-weight: 700;
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .enterprise-modal .modal-body {
-            padding: 2rem;
-        }
-
-        .enterprise-modal .modal-footer {
-            padding: 1.5rem 2rem;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        /* Enterprise Form Controls */
-        .form-group-enterprise {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label-enterprise {
+    /* --- Fix: Mobile Responsive Labels --- */
+    @media (max-width: 768px) {
+        .advanced-table thead { display: none; }
+        .advanced-table tr {
             display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--dark);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .form-label-enterprise i {
-            margin-right: 8px;
-            color: var(--brand-accent);
-        }
-
-        .form-control-enterprise {
-            width: 100%;
-            padding: 0.8rem 1.2rem;
-            font-size: 0.95rem;
-            border: 2px solid #eef2f6;
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0;
             border-radius: 12px;
-            background-color: white;
-            transition: var(--transition-base);
-            color: var(--dark);
+            padding: 0.5rem;
         }
-
-        .form-control-enterprise:focus {
-            outline: none;
-            border-color: var(--brand-accent);
-            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.15);
-        }
-
-        .form-control-enterprise.error {
-            border-color: var(--brand-danger);
-        }
-
-        .form-control-enterprise.success {
-            border-color: var(--brand-success);
-        }
-
-        select.form-control-enterprise {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23343a40' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 1rem;
-        }
-
-        .error-message {
-            color: var(--brand-danger);
-            font-size: 0.8rem;
-            margin-top: 0.4rem;
+        .advanced-table td {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 5px;
-        }
-
-        .success-message {
-            color: var(--brand-success);
-            font-size: 0.8rem;
-            margin-top: 0.4rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* Enterprise Buttons */
-        .btn-enterprise {
-            padding: 0.8rem 2rem;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: var(--transition-smooth);
             border: none;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            position: relative;
-            overflow: hidden;
-            text-decoration: none;
+            padding: 0.5rem 1rem;
         }
-
-        .btn-enterprise::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .btn-enterprise:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        .btn-enterprise-primary {
-            background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-accent) 100%);
-            color: white;
-        }
-
-        .btn-enterprise-secondary {
-            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
-            color: white;
-        }
-
-        .btn-enterprise-success {
-            background: linear-gradient(135deg, var(--brand-success) 0%, #2ecc71 100%);
-            color: white;
-        }
-
-        .btn-enterprise-danger {
-            background: linear-gradient(135deg, var(--brand-danger) 0%, #c0392b 100%);
-            color: white;
-        }
-
-        .btn-enterprise:disabled {
-            opacity: 0.65;
-            cursor: not-allowed;
-        }
-
-        /* Toast Notifications */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-        }
-
-        .toast-enterprise {
-            background: white;
-            border-radius: 15px;
-            box-shadow: var(--shadow-xl);
-            padding: 1rem 1.5rem;
-            margin-bottom: 1rem;
-            min-width: 300px;
-            border-left: 4px solid;
-            animation: slideIn 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .toast-enterprise.success {
-            border-left-color: var(--brand-success);
-        }
-
-        .toast-enterprise.error {
-            border-left-color: var(--brand-danger);
-        }
-
-        .toast-enterprise.warning {
-            border-left-color: var(--brand-warning);
-        }
-
-        .toast-enterprise.info {
-            border-left-color: var(--brand-info);
-        }
-
-        .toast-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .toast-icon.success {
-            background: var(--brand-success);
-        }
-
-        .toast-icon.error {
-            background: var(--brand-danger);
-        }
-
-        .toast-icon.warning {
-            background: var(--brand-warning);
-        }
-
-        .toast-icon.info {
-            background: var(--brand-info);
-        }
-
-        .toast-content {
-            flex: 1;
-        }
-
-        .toast-title {
+        .advanced-table td::before {
+            content: attr(data-label);
             font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 4px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
         }
+    }
+</style>
 
-        .toast-message {
-            font-size: 0.9rem;
-            color: var(--secondary);
-        }
+<div class="loading-bar" id="topLoadingBar"></div>
 
-        .toast-close {
-            cursor: pointer;
-            color: var(--secondary);
-            transition: var(--transition-base);
-        }
-
-        .toast-close:hover {
-            color: var(--dark);
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-        }
-
-        .empty-state-icon {
-            font-size: 5rem;
-            color: rgba(0, 0, 0, 0.1);
-            margin-bottom: 1rem;
-        }
-
-        .empty-state h5 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 0.5rem;
-        }
-
-        .empty-state p {
-            color: var(--secondary);
-            margin-bottom: 1.5rem;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            .dashboard-headers h1 {
-                font-size: 1.8rem;
-            }
-
-            .stat-card .stat-value {
-                font-size: 2rem;
-            }
-
-            .card-body-enterprise {
-                padding: 1.5rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-
-            .advanced-table thead {
-                display: none;
-            }
-
-            .advanced-table,
-            .advanced-table tbody,
-            .advanced-table tr,
-            .advanced-table td {
-                display: block;
-                width: 100%;
-            }
-
-            .advanced-table tr {
-                margin-bottom: 1rem;
-                background: #fff;
-                border-radius: 15px;
-                box-shadow: var(--shadow-sm);
-                padding: 1rem;
-            }
-
-            .advanced-table td {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 0.6rem 0;
-                border: none;
-            }
-
-            .advanced-table td::before {
-                content: attr(data-label);
-                font-weight: 600;
-                color: var(--dark);
-                font-size: 0.85rem;
-            }
-
-            .advanced-table td:last-child {
-                justify-content: flex-end;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .stat-card .card-body {
-                padding: 1.2rem;
-            }
-
-            .stat-card .stat-value {
-                font-size: 1.5rem;
-            }
-
-            .stat-card .stat-icon {
-                width: 45px;
-                height: 45px;
-                font-size: 1.4rem;
-            }
-
-            .btn-enterprise {
-                padding: 0.6rem 1.2rem;
-                font-size: 0.85rem;
-            }
-        }
-
-        /* Print Styles */
-        @media print {
-
-            .stat-card,
-            .enterprise-card {
-                box-shadow: none;
-                border: 1px solid #ddd;
-            }
-
-            .btn-enterprise,
-            .toast-container,
-            .action-btn {
-                display: none;
-            }
-        }
-    </style>
-
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner-enterprise"></div>
+<div class="container-fluid px-4 py-4">
+    <div class="dashboard-headers">
+        <div class="row align-items-center">
+            <div class="col">
+                <h5>Welcome back, {{ ucwords(strtolower(Auth::user()->first_name)) }}</h5>
+                <p class="mb-0 opacity-75 text-white">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Select a student profile below to view subjects, attendance, academic reports, payment info and other related details.
+                </p>
+            </div>
+        </div>
     </div>
 
-    <!-- Toast Container -->
-    <div class="toast-container" id="toastContainer"></div>
-
-    <div class="container-fluid px-3 px-md-4 py-3 py-md-4">
-        <!-- Dashboard Header -->
-        <div class="dashboard-headers">
-            <h5>
-                Welcome back, {{ ucwords(strtolower(Auth::user()->first_name)) }}!
-            </h5>
-            <p class="" style="color: gold; font-size:15px;"> Manage your child academic progress and other information by clicking on eye icon </p>
+    <div class="row g-4">
+        <div class="col-xl-3 col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-user-graduate"></i></div>
+                <div class="text-muted small fw-bold text-uppercase">Children Enrolled</div>
+                <div class="h2 fw-bold mb-1">{{ count($students) }}</div>
+                <div class="text-success small"><i class="fas fa-check-circle me-1"></i> Verified Account</div>
+            </div>
         </div>
 
-        <!-- Statistics Row -->
-        <div class="row g-4 mb-4">
-            <div class="col-xl-4">
-                <div class="stat-card" onclick="window.location.href='#children-list'">
-                    <div class="card-body">
-                        <div class="stat-icon">
-                            <i class="fas fa-user-graduate"></i>
-                        </div>
-                        <div class="stat-label">My Children</div>
-                        <div class="stat-value">{{ count($students) }}</div>
-                        <div class="stat-trend">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>Enrolled in school</span>
-                        </div>
-                    </div>
+        <div class="col-xl-9 col-md-8">
+            <div class="enterprise-card">
+                <div class="card-header-enterprise">
+                    <h6 class="mb-0 fw-bold">Student Directory</h6>
+                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="location.reload()">
+                        <i class="fas fa-sync-alt me-1"></i> Refresh
+                    </button>
                 </div>
-            </div>
-            <!-- Children List Section -->
-            <div class="col-xl-8 col-md-6">
-                <div class="enterprise-card" id="children-list">
-                    <div class="card-header-enterprise">
-                        <h4>
-                            <i class="fas fa-users me-2"></i>
-                            Children List
-                            <span class="badge bg-light text-dark ms-2">{{ count($students) }}</span>
-                        </h4>
-                    </div>
-                    <div class="card-body-enterprise">
-                        <div class="advanced-table-container">
-                            <table class="advanced-table table-responsive-md">
-                                <thead>
-                                    <tr>
-                                        <th>Student Information</th>
-                                        <th>Class</th>
-                                        <th class="text-end">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($students as $student)
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="student-avatar mr-3">
-                                                        {{ strtoupper(substr($student->first_name, 0, 1)) }}{{ strtoupper(substr($student->last_name, 0, 1)) }}
-                                                    </div>
-                                                    <div class="student-info">
-                                                        <div class="student-name">
-                                                            {{ ucwords(strtolower($student->first_name . ' ' . $student->last_name)) }}
-                                                        </div>
-                                                        <div class="student-middle">
-                                                            {{ ucwords(strtolower($student->middle_name)) }}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="class-badge">
-                                                    {{ strtoupper($student->class_code) }}
-                                                </span>
-                                            </td>
-                                            <td class="text-end">
-                                                <a href="{{ route('students.profile', ['student' => Hashids::encode($student->id)]) }}"
-                                                    class="action-btn manage" data-bs-toggle="tooltip"
-                                                    title="Manage Student Profile">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="3" class="text-center">
-                                                <div class="empty-state">
-                                                    <div class="empty-state-icon">
-                                                        <i class="fas fa-child"></i>
-                                                    </div>
-                                                    <h5>No Children Registered</h5>
-                                                    <p class="text-muted">Please contact the school administration to
-                                                        register
-                                                        your children.</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+
+                <div class="table-responsive">
+                    <table class="table advanced-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Student Detail</th>
+                                <th>Grade / Class</th>
+                                <th class="text-end">View Profile</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($students as $student)
+                                <tr>
+                                    <td data-label="Student">
+                                        <div class="d-flex align-items-center">
+                                            <div class="student-avatar me-3">
+                                                {{ strtoupper(substr($student->first_name, 0, 1)) }}{{ strtoupper(substr($student->last_name, 0, 1)) }}
+                                            </div>
+                                            <div>
+                                                <div class="student-name">{{ ucwords(strtolower($student->first_name . ' ' . $student->last_name)) }}</div>
+                                                <div class="text-muted small">{{ ucwords(strtolower($student->middle_name)) }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td data-label="Class">
+                                        <span class="class-badge">
+                                            {{ strtoupper($student->class_code) }}
+                                        </span>
+                                    </td>
+                                    <td data-label="Action" class="text-end">
+                                        <a href="{{ route('students.profile', ['student' => Hashids::encode($student->id)]) }}"
+                                           class="action-btn manage"
+                                           data-bs-toggle="tooltip"
+                                           title="Profile">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="text-center py-5">
+                                        <i class="fas fa-user-slash fa-3x text-light mb-3"></i>
+                                        <h6 class="text-muted">No students linked to this account.</h6>
+                                        <p class="small text-muted">Please contact administration to update your records.</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Initialize tooltips
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
+</div>
 
-            // Form submission handling
-            const form = document.getElementById("studentRegistrationForm");
-            const saveButton = document.getElementById("saveButton");
-            const submitText = document.getElementById("submitText");
-            const submitSpinner = document.getElementById("submitSpinner");
-            const loadingOverlay = document.getElementById("loadingOverlay");
-
-            if (form && saveButton) {
-                form.addEventListener("submit", function(event) {
-                    // Let the form submit normally - no preventDefault
-                    // Just show loading state
-                    saveButton.disabled = true;
-                    submitText.textContent = "Processing...";
-                    submitSpinner.classList.remove("d-none");
-                    if (loadingOverlay) loadingOverlay.classList.add("show");
-                });
-            }
-
-            // Reset form state when modal is closed
-            const modal = document.getElementById('studentRegistrationModal');
-            if (modal) {
-                modal.addEventListener('hidden.bs.modal', function() {
-                    if (form) {
-                        form.classList.remove("was-validated");
-                        if (saveButton) {
-                            saveButton.disabled = false;
-                            submitText.textContent = "Register Child";
-                            submitSpinner.classList.add("d-none");
-                        }
-                        if (loadingOverlay) loadingOverlay.classList.remove("show");
-                    }
-                });
-            }
-
-            // Toast notification system
-            window.showToast = function(type, title, message) {
-                const toastContainer = document.getElementById('toastContainer');
-                if (!toastContainer) return;
-
-                const toast = document.createElement('div');
-                toast.className = `toast-enterprise ${type}`;
-
-                const icons = {
-                    success: 'fa-check-circle',
-                    error: 'fa-exclamation-circle',
-                    warning: 'fa-exclamation-triangle',
-                    info: 'fa-info-circle'
-                };
-
-                toast.innerHTML = `
-                <div class="toast-icon ${type}">
-                    <i class="fas ${icons[type] || 'fa-info-circle'}"></i>
-                </div>
-                <div class="toast-content">
-                    <div class="toast-title">${title}</div>
-                    <div class="toast-message">${message}</div>
-                </div>
-                <div class="toast-close" onclick="this.parentElement.remove()">
-                    <i class="fas fa-times"></i>
-                </div>
-            `;
-
-                toastContainer.appendChild(toast);
-
-                // Auto remove after 5 seconds
-                setTimeout(() => {
-                    if (toast.parentElement) {
-                        toast.remove();
-                    }
-                }, 5000);
-            };
-
-            // Show any session messages as toasts
-            @if (session('success'))
-                showToast('success', 'Success', '{{ session('success') }}');
-            @endif
-
-            @if (session('error'))
-                showToast('error', 'Error', '{{ session('error') }}');
-            @endif
-
-            @if ($errors->any())
-                showToast('error', 'Validation Error', 'Please check the form and try again');
-            @endif
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Initialize Tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function(el) {
+            return new bootstrap.Tooltip(el);
         });
 
-        // Authorization check
+        // UX: Show top progress bar on any link click inside the dashboard
+        const loadingBar = document.getElementById('topLoadingBar');
+        document.querySelectorAll('.action-btn, .btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                loadingBar.style.width = '70%';
+            });
+        });
+
+        // Guard Clause for Authorization
         @if (Auth::user()->usertype != 4)
             window.location.href = '/error-page';
         @endif
-
-        // Prevent form resubmission on page refresh
-        if (window.history.replaceState) {
-            window.history.replaceState(null, null, window.location.href);
-        }
-    </script>
+    });
+</script>
 @endsection

@@ -1,378 +1,258 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Bills Report - {{ $school->school_name }}</title>
     <style>
         @page {
-            margin: 1cm;
             size: A4 landscape;
+            margin: 0.6cm;
         }
 
         body {
             font-family: 'DejaVu Sans', 'Helvetica', Arial, sans-serif;
-            font-size: 10px;
-            line-height: 1.3;
+            font-size: 8.5px;
             color: #2c3e50;
             margin: 0;
             padding: 0;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
+            line-height: 1.3;
         }
 
+        /* Original Color Identity Header */
         .header {
-            border-bottom: 3px solid #3498db;
+            border-bottom: 3px solid #3498db; /* Your Original Blue */
             padding-bottom: 12px;
             margin-bottom: 15px;
-            display: table;
             width: 100%;
         }
 
         .logo-container {
-            display: table-cell;
-            vertical-align: middle;
             width: 80px;
+            vertical-align: middle;
         }
 
         .logo {
-            max-width: 70px;
-            max-height: 60px;
-            display: block;
-        }
-
-        .logo-placeholder {
-            width: 70px;
-            height: 50px;
-            border: 1px solid #bdc3c7;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 8px;
-            color: #7f8c8d;
-            background: #ecf0f1;
-            border-radius: 4px;
+            max-width: 75px;
+            max-height: 65px;
         }
 
         .school-info {
-            display: table-cell;
-            vertical-align: middle;
             text-align: center;
-            padding-left: 15px;
+            vertical-align: middle;
         }
 
         .school-name {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 700;
-            margin-bottom: 3px;
             color: #2c3e50;
-            letter-spacing: 0.5px;
+            margin: 0;
+            text-transform: uppercase;
         }
 
-        .school-address {
-            font-size: 9px;
-            color: #7f8c8d;
-            margin-bottom: 2px;
-            line-height: 1.2;
-        }
-
-        .report-title {
-            text-align: center;
-            margin: 15px 0 12px 0;
-            padding: 8px 0;
-            background: linear-gradient(to right, #f8f9fa, #ecf0f1, #f8f9fa);
-            border-radius: 4px;
-        }
-
-        .report-title h1 {
-            font-size: 14px;
-            font-weight: 700;
-            margin: 0 0 3px 0;
-            color: #2c3e50;
-            letter-spacing: 0.5px;
-        }
-
-        .report-period {
-            font-size: 10px;
-            color: #7f8c8d;
-            font-weight: 600;
-        }
-
-        .report-summary {
+        /* High-Visibility Summary Box */
+        .summary-box {
             background: #f8f9fa;
-            padding: 8px 12px;
-            border-radius: 4px;
             border-left: 4px solid #3498db;
-            margin-bottom: 12px;
-            font-size: 9px;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
         }
 
-        table {
+        .summary-grid {
             width: 100%;
             border-collapse: collapse;
-            margin: 10px 0 5px 0;
-            font-size: 8px;
-            page-break-inside: auto;
         }
 
-        thead {
-            display: table-header-group;
+        .metric-title {
+            font-size: 7px;
+            text-transform: uppercase;
+            color: #7f8c8d;
+            font-weight: bold;
         }
 
-        tr {
-            page-break-inside: avoid;
-            page-break-after: auto;
+        .metric-value {
+            font-size: 11px;
+            font-weight: bold;
+            color: #2c3e50;
         }
 
-        th {
+        /* 14-Column Grid Control */
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .data-table th {
+            background: #34495e !important; /* Your Original Header Color */
+            color: white !important;
+            border: 1px solid #2c3e50;
+            padding: 6px 2px;
+            font-size: 7px;
+            text-transform: uppercase;
+            text-align: left;
+        }
+
+        .data-table td {
+            border: 1px solid #bdc3c7;
+            padding: 4px 2px;
+            vertical-align: middle;
+            word-wrap: break-word;
+        }
+
+        .data-table tr:nth-child(even) {
+            background-color: #f2f7fb;
+        }
+
+        /* Precise Column Ratios (Total 100%) */
+        .c-idx  { width: 2.5%; text-align: center; }
+        .c-ctrl { width: 8.5%; font-family: 'monospace'; }
+        .c-adm  { width: 7.5%; }
+        .c-name { width: 12%; }
+        .c-lvl  { width: 5%; text-align: center; }
+        .c-yr   { width: 4.5%; text-align: center; }
+        .c-svc  { width: 9%; }
+        .c-amt  { width: 8.5%; text-align: right; font-weight: 600; }
+        .c-stat { width: 7.5%; text-align: center; }
+        .c-note { width: 9%; font-size: 7px; color: #7f8c8d; }
+        .c-date { width: 6.5%; text-align: center; }
+
+        /* Original Status Badge Logic */
+        .status-badge {
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 700;
+            font-size: 7px;
+            display: inline-block;
+        }
+        .fullpaid { color: #27ae60; background: #d5f4e6; }
+        .expired  { color: #e74c3c; background: #fdeaea; }
+        .active   { color: #2980b9; background: #e8f4fd; }
+        .cancelled{ color: #f39c12; background: #fef5e7; }
+
+        .total-row {
             background: #34495e !important;
             color: white !important;
-            border: 1px solid #2c3e50 !important;
-            padding: 6px 4px !important;
-            text-align: left;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 7px;
-            letter-spacing: 0.3px;
+            font-weight: bold;
         }
 
-        td {
-            border: 1px solid #bdc3c7;
-            padding: 5px 4px;
-            vertical-align: top;
-        }
-
-        tbody tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-
-        .status-fullpaid {
-            color: #27ae60;
-            font-weight: 700;
-            background: #d5f4e6;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 7px;
-            display: inline-block;
-        }
-
-        .status-expired {
-            color: #e74c3c;
-            font-weight: 700;
-            background: #fdeaea;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 7px;
-            display: inline-block;
-        }
-
-        .status-cancelled {
-            color: #f39c12;
-            font-weight: 700;
-            background: #fef5e7;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 7px;
-            display: inline-block;
-        }
-        .status-active {
-            color: #2980b9;
-            font-weight: 700;
-            background: #e8f4fd;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 7px;
-            display: inline-block;
-        }
-        .status-overpaid {
-            color: #8e44ad;
-            font-weight: 700;
-            background: #f3e8fd;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 7px;
-            display: inline-block;
-        }
-
-        .amount {
-            text-align: right;
-            font-family: 'DejaVu Sans Mono', 'Courier New', monospace;
-            font-weight: 600;
-        }
-
-        .text-right {
-            text-align: right;
-        }
-
-        .text-center {
+        footer {
+            position: fixed;
+            bottom: -15px;
+            width: 100%;
             text-align: center;
-        }
-
-        .text-bold {
-            font-weight: 700;
-        }
-
-        .summary-row {
-            background: #2c3e50 !important;
-            color: white !important;
-            font-weight: 700;
-        }
-
-        .summary-row td {
-            border-color: #2c3e50;
-            background: #2c3e50 !important;
-            color: white !important;
-        }
-
-        .report-footer {
-            margin-top: 20px;
-            padding-top: 10px;
-            border-top: 2px solid #bdc3c7;
-            font-size: 8px;
+            font-size: 7.5px;
             color: #7f8c8d;
-            text-align: center;
+            border-top: 1px solid #bdc3c7;
+            padding-top: 5px;
         }
-
-        .avoid-break {
-            page-break-inside: avoid;
-        }
-
-        /* Column widths for bills report */
-        .col-number { width: 3%; }
-        .col-control { width: 8%; }
-        .col-admission { width: 8% }
-        .col-student { width: 13%; }
-        .col-level { width: 6%; }
-        .col-year { width: 6%; }
-        .col-billed { width: 8%; }
-        .col-paid { width: 8%; }
-        .col-balance { width: 8%; }
-        .col-status { width: 6%; }
-        .col-issued { width: 8%; }
-        .col-expires { width: 8%; }
-        .col-service { width: 10%; }
     </style>
 </head>
 <body>
-    <!-- Header Section -->
+
     <div class="header">
-        <div class="logo-container">
-            @php
-                $logoBase64 = null;
-                if (!empty($school->logo)) {
-                    $logoFile = storage_path('app/public/logo/' . $school->logo);
-                    if (file_exists($logoFile)) {
-                        $type = pathinfo($logoFile, PATHINFO_EXTENSION);
-                        $data = file_get_contents($logoFile);
-                        $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                    }
-                }
-            @endphp
-
-            @if($logoBase64)
-                <img src="{{ $logoBase64 }}" alt="School Logo" class="logo">
-            @else
-                <div class="logo-placeholder">
-                    SCHOOL<br>LOGO
-                </div>
-            @endif
-        </div>
-
-        <div class="school-info">
-            <div class="school-name">{{ strtoupper($school->school_name) }}</div>
-            <div class="school-address">{{ ucwords(strtolower($school->postal_address)) }}, {{ ucwords(strtolower($school->postal_name)) }}</div>
-            <div class="school-address">{{ ucwords(strtolower($school->country)) }}</div>
-        </div>
+        <table width="100%" style="border:none;">
+            <tr>
+                <td class="logo-container" style="border:none;">
+                    @php
+                        $logoBase64 = null;
+                        if (!empty($school->logo)) {
+                            $logoFile = storage_path('app/public/logo/' . $school->logo);
+                            if (file_exists($logoFile)) {
+                                $type = pathinfo($logoFile, PATHINFO_EXTENSION);
+                                $data = file_get_contents($logoFile);
+                                $logoBase64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                            }
+                        }
+                    @endphp
+                    @if($logoBase64)
+                        <img src="{{ $logoBase64 }}" class="logo">
+                    @else
+                        <div style="width:70px; height:50px; background:#ecf0f1; border:1px solid #bdc3c7; text-align:center; line-height:25px; font-size:8px;">LOGO</div>
+                    @endif
+                </td>
+                <td class="school-info" style="border:none;">
+                    <div class="school-name">{{ $school->school_name }}</div>
+                    <div style="font-size: 10px; font-weight: bold; margin-top: 2px;">BILLS REGISTRY REPORT</div>
+                    <div style="font-size: 8px; color: #7f8c8d;">{{ $school->postal_address }}, {{ $school->postal_name }}</div>
+                </td>
+                <td width="80px" style="border:none; text-align:right; font-size:7px;">
+                    PERIOD:<br>
+                    <strong>{{ date('d/m/Y', strtotime($start_date)) }}</strong><br>
+                    TO<br>
+                    <strong>{{ date('d/m/Y', strtotime($end_date)) }}</strong>
+                </td>
+            </tr>
+        </table>
     </div>
 
-    <!-- Report Title -->
-    <div class="report-title">
-        <h1>BILLS REPORT</h1>
-        <div class="report-period">
-            Reporting Period: {{ \Carbon\Carbon::parse($start_date)->format('d M Y') }} - {{ \Carbon\Carbon::parse($end_date)->format('d M Y') }}
-        </div>
+    <div class="summary-box">
+        <table class="summary-grid">
+            <tr>
+                <td><span class="metric-title">Total Bills</span><br><span class="metric-value">{{ count($bills) }}</span></td>
+                <td><span class="metric-title">Billed Amount</span><br><span class="metric-value">{{ number_format($total_billed, 2) }}</span></td>
+                <td><span class="metric-title">Paid Amount</span><br><span class="metric-value" style="color:#27ae60;">{{ number_format($total_paid, 2) }}</span></td>
+                <td style="text-align:right;"><span class="metric-title">Outstanding Balance</span><br><span class="metric-value" style="color:#e74c3c;">{{ number_format($total_balance, 2) }}</span></td>
+            </tr>
+        </table>
     </div>
 
-    <!-- Report Summary -->
-    <div class="report-summary">
-        <strong>Report Overview:</strong>
-        Total Bills: {{ count($bills) }} |
-        Total Billed: {{ number_format($total_billed) }} |
-        Total Paid: {{ number_format($total_paid) }} |
-        Total Balance: {{ number_format($total_balance) }}
-    </div>
-
-    <!-- Bills Table -->
-    <table>
+    <table class="data-table">
         <thead>
             <tr>
-                <th class="col-number">#</th>
-                <th class="col-control">Control #</th>
-                <th class="col-admission">Admission #</th>
-                <th class="col-student">Student Name</th>
-                <th class="col-level">Level</th>
-                <th class="col-year">Year</th>
-                <th class="col-service">Service</th>
-                <th class="col-billed text-right">Billed Amount</th>
-                <th class="col-paid text-right">Paid Amount</th>
-                <th class="col-balance text-right">Balance</th>
-                <th class="col-status">Status</th>
-                <th class="col-issued">Issued At</th>
-                <th class="col-expires">Expires At</th>
+                <th class="c-idx">#</th>
+                <th class="c-ctrl">Control #</th>
+                <th class="c-adm">Adm #</th>
+                <th class="c-name">Student Name</th>
+                <th class="c-lvl">Level</th>
+                <th class="c-yr">Year</th>
+                <th class="c-svc">Service</th>
+                <th class="c-amt">Billed</th>
+                <th class="c-amt">Paid</th>
+                <th class="c-amt">Balance</th>
+                <th class="c-stat">Status</th>
+                <th class="c-note">Description</th>
+                <th class="c-date">Issued</th>
+                <th class="c-date">Expires</th>
             </tr>
         </thead>
         <tbody>
             @foreach($bills as $bill)
-                <tr class="avoid-break">
-                    <td class="text-center col-number">{{ $loop->iteration }}</td>
-                    <td class="col-control">{{ strtoupper($bill['control_number']) }}</td>
-                    <td class="col-admission">{{strtoupper($bill['admission'])}}</td>
-                    <td class="col-student">{{ $bill['student_name'] }}</td>
-                    <td class="col-level">{{ $bill['level'] }}</td>
-                    <td class="col-year">{{ $bill['academic_year'] }}</td>
-                    <td class="col-service">{{ $bill['service_name'] }}</td>
-                    <td class="amount col-billed">{{ number_format($bill['billed_amount']) }}</td>
-                    <td class="amount col-paid">{{ number_format($bill['paid_amount']) }}</td>
-                    <td class="amount col-balance">{{ number_format($bill['balance']) }}</td>
-                    <td class="col-status">
-                        @if ($bill['status'] == 'active')
-                            <span class="status-active">{{ strtoupper($bill['status']) }}</span>
-                        @elseif ($bill['status'] == 'cancelled')
-                            <span class="status-cancelled">{{ strtoupper($bill['status']) }}</span>
-                        @elseif ($bill['status'] == 'expired')
-                            <span class="status-expired">{{ strtoupper($bill['status']) }}</span>
-                        @elseif ($bill['status'] == 'full paid')
-                            <span class="status-fullpaid">{{ strtoupper($bill['status']) }}</span>
-                        @else
-                            <span class="status-overpaid">{{ strtoupper($bill['status']) }}</span>
-                        @endif
+                <tr>
+                    <td class="c-idx">{{ $loop->iteration }}</td>
+                    <td class="c-ctrl">{{ strtoupper($bill['control_number']) }}</td>
+                    <td class="c-adm">{{ strtoupper($bill['admission']) }}</td>
+                    <td class="c-name">{{ ucwords(strtolower($bill['student_name'])) }}</td>
+                    <td class="c-lvl">{{ $bill['level'] }}</td>
+                    <td class="c-yr">{{ $bill['academic_year'] }}</td>
+                    <td class="c-svc">{{ $bill['service_name'] }}</td>
+                    <td class="c-amt">{{ number_format($bill['billed_amount'], 0) }}</td>
+                    <td class="c-amt">{{ number_format($bill['paid_amount'], 0) }}</td>
+                    <td class="c-amt">{{ number_format($bill['balance'], 0) }}</td>
+                    <td class="c-stat">
+                        @php $s = str_replace(' ', '', strtolower($bill['status'])); @endphp
+                        <span class="status-badge {{ $s }}">{{ strtoupper($bill['status']) }}</span>
                     </td>
-                    <td class="col-issued">{{ \Carbon\Carbon::parse($bill['issued_at'])->format('d-m-Y') }}</td>
-                    <td class="col-expires">
-                        @if ($bill['expires_at'])
-                            {{ \Carbon\Carbon::parse($bill['expires_at'])->format('d-m-Y') }}
-                        @else
-                            N/A
-                        @endif
-                    </td>
+                    <td class="c-note">{{ $bill['description'] }}</td>
+                    <td class="c-date">{{ date('d/m/y', strtotime($bill['issued_at'])) }}</td>
+                    <td class="c-date">{{ $bill['expires_at'] ? date('d/m/y', strtotime($bill['expires_at'])) : 'N/A' }}</td>
                 </tr>
             @endforeach
-
-            <!-- Summary Row -->
-            <tr class="summary-row">
-                <td colspan="7" class="text-right text-bold">GRAND TOTALS:</td>
-                <td class="amount text-bold">{{ number_format($total_billed) }}</td>
-                <td class="amount text-bold">{{ number_format($total_paid) }}</td>
-                <td class="amount text-bold">{{ number_format($total_balance) }}</td>
-                <td colspan="3" class="text-center">End of Report</td>
+            <tr class="total-row">
+                <td colspan="7" style="text-align:right; border-right:none;">AGGREGATE TOTALS</td>
+                <td class="c-amt" style="border-left:none;">{{ number_format($total_billed, 0) }}</td>
+                <td class="c-amt">{{ number_format($total_paid, 0) }}</td>
+                <td class="c-amt">{{ number_format($total_balance, 0) }}</td>
+                <td colspan="4" style="text-align:center;">REPORT FINALIZED</td>
             </tr>
         </tbody>
     </table>
 
-    <!-- Footer -->
-    <div class="report-footer">
-        <div class="footer-content">
-            <strong>&copy;{{ ucwords(strtolower($school->school_name)) }}</strong> |
-            Generated on {{ \Carbon\Carbon::now()->format('F d, Y \\a\\t H:i:s') }}
-        </div>
-    </div>
+    <footer>
+        <strong>&copy; {{ $school->school_name }}</strong> |
+        Generated: {{ date('d F, Y H:i') }}
+        {{-- Page <span style="font-weight:bold;">{PAGENO}</span> --}}
+    </footer>
+
 </body>
 </html>

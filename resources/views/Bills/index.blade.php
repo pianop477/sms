@@ -470,6 +470,16 @@
                                 @enderror
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="description" class="form-label">Bill Description </label>
+                                <input type="text" name="description" class="form-control-custom" id="description"
+                                    placeholder="Enter Description" value="{{ old('description') }}">
+                                @error('description')
+                                    <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" id="saveButton"
@@ -644,7 +654,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                        `;
+                                `;
 
                                     response.data.forEach((item, index) => {
                                         html += `
@@ -655,7 +665,7 @@
                                     <td><span class="badge bg-secondary text-white">${item.old_class.toUpperCase()}</span></td>
                                     <td><span class="badge bg-success text-white">${item.new_class.toUpperCase()}</span></td>
                                 </tr>
-                            `;
+                                `;
                                     });
 
                                     html += `
@@ -666,7 +676,7 @@
                                 <i class="fas fa-info-circle me-1"></i>
                                 All <strong>Bills </strong> statuses will be updated, It is safe 100%.
                             </p>
-                        `;
+                            `;
 
                                     $('#syncPreviewContent').html(html).show();
                                     $('#confirmSyncBtn').prop('disabled', false);
@@ -710,20 +720,20 @@
                 // Confirm Sync
                 $(document).on('click', '#confirmSyncBtn', function() {
                     const $btn = $(this);
-                    const selectedYear = $('#yearFilter').val() || localStorage.getItem(
-                        'selectedYear') || new Date().getFullYear();
+                                const selectedYear = $('#yearFilter').val() || localStorage.getItem(
+                                    'selectedYear') || new Date().getFullYear();
 
-                    // Disable button and show loading
-                    $btn.prop('disabled', true).html(
-                        '<span class="spinner-border spinner-border-sm me-2"></span>Syncing...');
+                                // Disable button and show loading
+                                $btn.prop('disabled', true).html(
+                                    '<span class="spinner-border spinner-border-sm me-2"></span>Syncing...');
 
-                    // Update preview content to show syncing
-                    $('#syncPreviewContent').html(`
-            <div class="text-center py-4">
-                <div class="spinner-border text-primary mb-3"></div>
-                <p class="text-muted">Updating classes... Please wait.</p>
-            </div>
-        `);
+                                // Update preview content to show syncing
+                                $('#syncPreviewContent').html(`
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary mb-3"></div>
+                            <p class="text-muted">Updating classes... Please wait.</p>
+                        </div>
+                    `);
 
                     $.ajax({
                         url: '{{ route('bills.sync-classes') }}',
@@ -830,57 +840,57 @@
 
             // When modal opens, use Select2 with client-side search
             $('#addTeacherModal').on('shown.bs.modal', function() {
-                $('#studentSelect').select2({
-                    placeholder: "Search student... (Type to filter)",
-                    allowClear: true,
-                    dropdownParent: $('#addTeacherModal'),
-                    width: '100%',
-                    data: [], // Start empty
-                    minimumInputLength: 0, // Show options immediately
+                    $('#studentSelect').select2({
+                        placeholder: "Search student... (Type to filter)",
+                        allowClear: true,
+                        dropdownParent: $('#addTeacherModal'),
+                        width: '100%',
+                        data: [], // Start empty
+                        minimumInputLength: 0, // Show options immediately
 
-                    // CLIENT-SIDE SEARCH FUNCTION
-                    ajax: {
-                        transport: function(params, success, failure) {
-                            const term = params.data.term || '';
-                            const page = params.data.page || 1;
-                            const pageSize = 50; // Show 50 at a time
+                        // CLIENT-SIDE SEARCH FUNCTION
+                        ajax: {
+                            transport: function(params, success, failure) {
+                                const term = params.data.term || '';
+                                const page = params.data.page || 1;
+                                const pageSize = 50; // Show 50 at a time
 
-                            // Filter students locally
-                            let filteredStudents = allStudents;
+                                // Filter students locally
+                                let filteredStudents = allStudents;
 
-                            if (term.trim() !== '') {
-                                const searchTerm = term.toLowerCase();
-                                filteredStudents = allStudents.filter(student =>
-                                    student.text.toLowerCase().includes(searchTerm) ||
-                                    (student.admissionNo && student.admissionNo
-                                        .toLowerCase().includes(searchTerm))
-                                );
+                                if (term.trim() !== '') {
+                                    const searchTerm = term.toLowerCase();
+                                    filteredStudents = allStudents.filter(student =>
+                                        student.text.toLowerCase().includes(searchTerm) ||
+                                        (student.admissionNo && student.admissionNo
+                                            .toLowerCase().includes(searchTerm))
+                                    );
+                                }
+
+                                // Implement pagination
+                                const startIndex = (page - 1) * pageSize;
+                                const endIndex = startIndex + pageSize;
+                                const paginatedStudents = filteredStudents.slice(startIndex,
+                                    endIndex);
+
+                                // Simulate AJAX response
+                                setTimeout(function() {
+                                    success({
+                                        results: paginatedStudents,
+                                        pagination: {
+                                            more: endIndex < filteredStudents.length
+                                        }
+                                    });
+                                }, 300); // Small delay for better UX
                             }
-
-                            // Implement pagination
-                            const startIndex = (page - 1) * pageSize;
-                            const endIndex = startIndex + pageSize;
-                            const paginatedStudents = filteredStudents.slice(startIndex,
-                                endIndex);
-
-                            // Simulate AJAX response
-                            setTimeout(function() {
-                                success({
-                                    results: paginatedStudents,
-                                    pagination: {
-                                        more: endIndex < filteredStudents.length
-                                    }
-                                });
-                            }, 300); // Small delay for better UX
                         }
+                    });
+                }).on('hidden.bs.modal', function() {
+                    // Cleanup
+                    if ($('#studentSelect').hasClass("select2-hidden-accessible")) {
+                        $('#studentSelect').select2('destroy');
+                        $('#studentSelect').val('').trigger('change');
                     }
-                });
-            }).on('hidden.bs.modal', function() {
-                // Cleanup
-                if ($('#studentSelect').hasClass("select2-hidden-accessible")) {
-                    $('#studentSelect').select2('destroy');
-                    $('#studentSelect').val('').trigger('change');
-                }
             });
 
             // Service amount & due date population - USE EVENT DELEGATION
@@ -1270,20 +1280,20 @@
                 // 1. Handle Cancel button click
                 $(document).off('click', '.cancel-btn').on('click', '.cancel-btn', function() {
                     const billId = $(this).data('id');
-                    const controlNumber = $(this).data('control');
-                    const serviceName = $(this).data('service');
-                    const amount = $(this).data('amount');
+                            const controlNumber = $(this).data('control');
+                            const serviceName = $(this).data('service');
+                            const amount = $(this).data('amount');
 
-                    console.log('Cancel button clicked:', billId);
+                            console.log('Cancel button clicked:', billId);
 
-                    $('#cancelBillForm').attr('action', `/Bills/cancel/${billId}`);
-                    $('#billPreview').html(`
-                <div class="alert alert-info small">
-                    <strong>Bill:</strong> ${controlNumber}<br>
-                    <strong>Service:</strong> ${serviceName}<br>
-                    <strong>Amount:</strong> ${amount}
-                </div>
-            `);
+                            $('#cancelBillForm').attr('action', `/Bills/cancel/${billId}`);
+                            $('#billPreview').html(`
+                        <div class="alert alert-info small">
+                            <strong>Bill:</strong> ${controlNumber}<br>
+                            <strong>Service:</strong> ${serviceName}<br>
+                            <strong>Amount:</strong> ${amount}
+                        </div>
+                    `);
                 });
 
                 // 2. Handle View Bill click
@@ -1321,13 +1331,13 @@
 
                 // Show loading spinner
                 $('#billDetailsContent').html(`
-            <div class="text-center py-3">
-                <div class="spinner-border spinner-border-sm text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <p class="mt-2 mb-0 small">Loading bill details...</p>
-            </div>
-        `);
+                    <div class="text-center py-3">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 mb-0 small">Loading bill details...</p>
+                    </div>
+                `);
 
                 // Show modal
                 $('#billDetailsModal').modal('show');
@@ -1368,6 +1378,7 @@
                                     <div><strong>Control #:</strong> ${response.bill.control_number.toUpperCase()}</div>
                                     <div><strong>Academic Year:</strong> ${response.bill.academic_year}</div>
                                     <div><strong>Due Date:</strong> ${response.bill.due_date || 'N/A'}</div>
+                                    <div><strong>Description:</strong> ${response.bill.description.toUpperCase() || 'N/A'}</div>
                                 </div>
                             </div>
                         </div>
@@ -1480,6 +1491,7 @@
                     $('#edit_amount').val(response.bill.amount);
                     $('#academic_year').val(response.bill.academic_year);
                     $('#edit_status').val(response.bill.status);
+                    $('#description').val(response.bill.description);
 
                     // Handle due_date conversion
                     if (response.bill.due_date) {
@@ -1501,13 +1513,13 @@
 
                     // Populate services
                     $('#edit_service_id').empty();
-                    response.services.forEach(service => {
-                        $('#edit_service_id').append(
-                            `<option value="${service.id}"
-                            data-amount="${service.amount}"
-                            data-duration="${service.expiry_duration}">
-                        ${service.service_name}
-                    </option>`
+                        response.services.forEach(service => {
+                            $('#edit_service_id').append(
+                                `<option value="${service.id}"
+                                data-amount="${service.amount}"
+                                data-duration="${service.expiry_duration}">
+                            ${service.service_name}
+                        </option>`
                         );
                     });
                     $('#edit_service_id').val(response.bill.service_id);

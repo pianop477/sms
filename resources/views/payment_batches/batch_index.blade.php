@@ -246,7 +246,7 @@
                                                 </td>
                                                 <td class="">
                                                     <ul class="d-flex justify-content-center">
-                                                        <li class="mr-3">
+                                                        <li class="me-3">
                                                             <a href="{{route('batch.download', ['batch' => Hashids::encode($row->id)])}}" class="btn btn-outline-primary btn-xs" onclick="return confirm('Are you sure you want to download this batch?')">
                                                                 <i class="fas fa-download"></i>
                                                             </a>
@@ -255,7 +255,7 @@
                                                             <form action="{{route('batch.delete', ['batch' => Hashids::encode($row->id)])}}" method="POST">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <button type="submit" class="btn p-1 btn-outline-danger" onclick="return confirm('Are you sure you want to delete this Batch?')">
+                                                                <button type="submit" class="btn btn-outline-danger btn-xs" onclick="return confirm('Are you sure you want to delete this Batch?')">
                                                                     <i class="fas fa-trash"></i>
                                                                 </button>
                                                             </form>
@@ -298,7 +298,7 @@
         }
     </style>
 
-    <!-- Add Teacher Modal -->
+    <!-- Upload batch Modal -->
     <div class="modal fade" id="addBillModal" tabindex="-1" aria-labelledby="addBillModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -314,14 +314,14 @@
                         @csrf
                         <!-- File Upload Section -->
                         <div class="row" id="fileUploadInput">
-                            <div class="col-md-6">
+                            <div class="col-md-8">
                                 <label for="uploadFile" class="form-label">Upload Excel File <span class="text-danger">*</span></label>
                                 <input type="file" name="upload_file" class="form-control-custom" id="uploadFile"
                                     accept=".xlsx,.xls" required>
                                 <div class="form-text text-muted">Only Excel files (.xlsx, .xls) are allowed</div>
                                 <div class="invalid-feedback" id="fileError">Please select a valid Excel file</div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="d-flex float-right btn py-4">
                                     <a href="{{ route('template.export') }}" class="btn btn-outline-primary">
                                         <i class="fas fa-download"></i> Download Bill Template
@@ -435,7 +435,7 @@
             dataPreviewArea.innerHTML = `
                 <div class="text-center py-4">
                     <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading data...</span>
+                        <span class="visually-hidden">Reading file...</span>
                     </div>
                     <p class="mt-2">Extracting and validating bill data...</p>
                 </div>
@@ -623,6 +623,7 @@
                 'ACADEMIC_YEAR': 'Academic Year',
                 'SERVICE_NAME': 'Service',
                 'AMOUNT': 'Amount',
+                'DESCRIPTION': 'Description',
                 'DUE_DATE': 'Due Date'
             };
             return headerMap[header] || header;
@@ -776,7 +777,7 @@
             formData.append('_token', '{{ csrf_token() }}');
 
             // Show loading state
-            uploadButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Uploading Bills...';
+            uploadButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Uploading Bills...';
             uploadButton.disabled = true;
 
             // AJAX call to store bills
