@@ -11,7 +11,7 @@ class school extends Model
     protected $fillable = [
         'school_name',
         'school_reg_no',
-        'postal_addres',
+        'postal_address',
         'postal_name',
         'country',
         'logo',

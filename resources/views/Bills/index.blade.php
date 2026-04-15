@@ -592,776 +592,44 @@
         }
     </style>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Initialize select2
-            let allStudents = []; // Store all students once
+        // ============ GLOBAL FUNCTIONS (Ziko nje ya DOMContentLoaded) ============
 
-            // Load ALL students once on page load
-            $(document).ready(function() {
-                // Sync button click - using event delegation
-                $(document).on('click', '#syncClassesBtn', function(e) {
-                    e.preventDefault(); //
+        // View Bill function - GLOBAL
+        window.viewBill = function(billId) {
+            // console.log('Loading bill:', billId);
 
-                    console.log('Sync button clicked'); // Debug log
-
-                    const selectedYear = $('#yearFilter').val() || localStorage.getItem(
-                        'selectedYear') || new Date().getFullYear();
-
-                    // Update modal title
-                    $('#syncYearDisplay').text(selectedYear);
-
-                    // Check if modal exists
-                    if ($('#syncClassesModal').length === 0) {
-                        // console.error('Modal #syncClassesModal haipo kwenye HTML!');
-                        // alert('Error: Sync modal haipo. Tafadhali wasiliana na developer.');
-                        return;
-                    }
-
-                    // Show modal with loading
-                    $('#syncClassesModal').modal('show');
-                    $('#syncLoading').show();
-                    $('#syncPreviewContent').hide().html('');
-                    $('#syncErrorContent').hide().html('');
-                    $('#confirmSyncBtn').prop('disabled', true);
-
-                    // Load preview
-                    $.ajax({
-                        url: '{{ route('bills.sync-classes.preview') }}',
-                        method: 'GET',
-                        data: {
-                            year: selectedYear
-                        },
-                        success: function(response) {
-                            $('#syncLoading').hide();
-
-                            if (response.success) {
-                                if (response.total > 0) {
-                                    // Build preview table
-                                    let html = `
-                            <div class="alert alert-warning">
-                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                <strong>${response.total}</strong> bill(s) will be updated for year <strong>${response.year}</strong>
-                            </div>
-                            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                                <table class="table table-sm table-bordered table-hover">
-                                    <thead class="table-light sticky-top">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Control Number</th>
-                                            <th>Student</th>
-                                            <th>Old Class</th>
-                                            <th>New Class</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                `;
-
-                                    response.data.forEach((item, index) => {
-                                        html += `
-                                <tr>
-                                    <td>${index + 1}</td>
-                                    <td><span class="text-primary">${item.control_number.toUpperCase()}</span></td>
-                                    <td>${item.student_name.toUpperCase()}</td>
-                                    <td><span class="badge bg-secondary text-white">${item.old_class.toUpperCase()}</span></td>
-                                    <td><span class="badge bg-success text-white">${item.new_class.toUpperCase()}</span></td>
-                                </tr>
-                                `;
-                                    });
-
-                                    html += `
-                                    </tbody>
-                                </table>
-                            </div>
-                            <p class="text-muted small mt-2 mb-0">
-                                <i class="fas fa-info-circle me-1"></i>
-                                All <strong>Bills </strong> statuses will be updated, It is safe 100%.
-                            </p>
-                            `;
-
-                                    $('#syncPreviewContent').html(html).show();
-                                    $('#confirmSyncBtn').prop('disabled', false);
-                                } else {
-                                    // No bills to update
-                                    $('#syncPreviewContent').html(`
-                            <div class="alert alert-success">
-                                <i class="fas fa-check-circle me-2"></i>
-                                <strong>No bills need class update for year ${response.year}!</strong>
-                                <p class="mb-0 mt-2">All Bills are already using the correct classes.</p>
-                            </div>
-                        `).show();
-                                }
-                            } else {
-                                $('#syncErrorContent').html(`
-                        <div class="alert alert-danger">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            ${response.message || 'Error loading preview'}
-                        </div>
-                    `).show();
-                            }
-                        },
-                        error: function(xhr) {
-                            $('#syncLoading').hide();
-
-                            let errorMsg = 'Error loading preview. Please try again.';
-                            if (xhr.responseJSON && xhr.responseJSON.message) {
-                                errorMsg = xhr.responseJSON.message;
-                            }
-
-                            $('#syncErrorContent').html(`
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        ${errorMsg}
+            // Show loading spinner
+            $('#billDetailsContent').html(`
+                <div class="text-center py-3">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
                     </div>
-                `).show();
-                        }
-                    });
-                });
-
-                // Confirm Sync
-                $(document).on('click', '#confirmSyncBtn', function() {
-                    const $btn = $(this);
-                                const selectedYear = $('#yearFilter').val() || localStorage.getItem(
-                                    'selectedYear') || new Date().getFullYear();
-
-                                // Disable button and show loading
-                                $btn.prop('disabled', true).html(
-                                    '<span class="spinner-border spinner-border-sm me-2"></span>Syncing...');
-
-                                // Update preview content to show syncing
-                                $('#syncPreviewContent').html(`
-                        <div class="text-center py-4">
-                            <div class="spinner-border text-primary mb-3"></div>
-                            <p class="text-muted">Updating classes... Please wait.</p>
-                        </div>
-                    `);
-
-                    $.ajax({
-                        url: '{{ route('bills.sync-classes') }}',
-                        method: 'PUT',
-                        data: {
-                            year: selectedYear,
-                            _token: '{{ csrf_token() }}'
-                        },
-                        success: function(response) {
-                            if (response.success) {
-                                $('#syncPreviewContent').html(`
-                        <div class="alert alert-success">
-                            <i class="fas fa-check-circle me-2"></i>
-                            <strong>Success!</strong>
-                            <p class="mb-0 mt-2">${response.message}</p>
-                        </div>
-                    `);
-
-                                // Show success message with SweetAlert
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Sync Completed!',
-                                    html: response.message,
-                                    confirmButtonText: 'OK',
-                                    timer: 3000
-                                });
-
-                                // Refresh the bills table after 2 seconds
-                                setTimeout(() => {
-                                    $('#syncClassesModal').modal('hide');
-                                    if (typeof loadBillsData === 'function') {
-                                        loadBillsData
-                                    (); // Call your existing function to refresh table
-                                    } else {
-                                        location.reload(); // Fallback
-                                    }
-                                }, 2000);
-                            } else {
-                                $('#syncPreviewContent').html(`
-                        <div class="alert alert-danger">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            ${response.message}
-                        </div>
-                    `);
-
-                                // Re-enable button
-                                $btn.prop('disabled', false).html(
-                                    '<i class="fas fa-check"></i> Try Again');
-                            }
-                        },
-                        error: function(xhr) {
-                            let errorMsg = 'Error syncing classes. Please try again.';
-                            if (xhr.responseJSON && xhr.responseJSON.message) {
-                                errorMsg = xhr.responseJSON.message;
-                            }
-
-                            $('#syncPreviewContent').html(`
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        ${errorMsg}
-                    </div>
-                `);
-
-                            // Re-enable button
-                            $btn.prop('disabled', false).html(
-                                '<i class="fas fa-check"></i> Try Again');
-                        }
-                    });
-                });
-
-                // Reset modal when closed
-                $('#syncClassesModal').on('hidden.bs.modal', function() {
-                    $('#confirmSyncBtn').prop('disabled', true).html(
-                        '<i class="fas fa-sync-alt"></i> Sync Now');
-                    $('#syncLoading').show();
-                    $('#syncPreviewContent').hide().html('');
-                    $('#syncErrorContent').hide().html('');
-                });
-
-                // other ajax functionalities==========================
-                $.ajax({
-                    url: '{{ route('students.list') }}',
-                    method: 'GET',
-                    success: function(response) {
-                        if (response.success && response.students) {
-                            allStudents = response.students.map(student => ({
-                                id: student.id,
-                                text: `${student.first_name} ${student.middle_name} ${student.last_name}`
-                                    .toUpperCase(),
-                                firstName: student.first_name,
-                                middleName: student.middle_name,
-                                lastName: student.last_name,
-                                admissionNo: student.admission_number
-                            }));
-
-                            console.log(`Loaded ${allStudents.length} students`);
-                        }
-                    },
-                    error: function(xhr) {
-                        console.error('Error loading students:', xhr);
-                    }
-                });
-            });
-
-            // When modal opens, use Select2 with client-side search
-            $('#addTeacherModal').on('shown.bs.modal', function() {
-                    $('#studentSelect').select2({
-                        placeholder: "Search student... (Type to filter)",
-                        allowClear: true,
-                        dropdownParent: $('#addTeacherModal'),
-                        width: '100%',
-                        data: [], // Start empty
-                        minimumInputLength: 0, // Show options immediately
-
-                        // CLIENT-SIDE SEARCH FUNCTION
-                        ajax: {
-                            transport: function(params, success, failure) {
-                                const term = params.data.term || '';
-                                const page = params.data.page || 1;
-                                const pageSize = 50; // Show 50 at a time
-
-                                // Filter students locally
-                                let filteredStudents = allStudents;
-
-                                if (term.trim() !== '') {
-                                    const searchTerm = term.toLowerCase();
-                                    filteredStudents = allStudents.filter(student =>
-                                        student.text.toLowerCase().includes(searchTerm) ||
-                                        (student.admissionNo && student.admissionNo
-                                            .toLowerCase().includes(searchTerm))
-                                    );
-                                }
-
-                                // Implement pagination
-                                const startIndex = (page - 1) * pageSize;
-                                const endIndex = startIndex + pageSize;
-                                const paginatedStudents = filteredStudents.slice(startIndex,
-                                    endIndex);
-
-                                // Simulate AJAX response
-                                setTimeout(function() {
-                                    success({
-                                        results: paginatedStudents,
-                                        pagination: {
-                                            more: endIndex < filteredStudents.length
-                                        }
-                                    });
-                                }, 300); // Small delay for better UX
-                            }
-                        }
-                    });
-                }).on('hidden.bs.modal', function() {
-                    // Cleanup
-                    if ($('#studentSelect').hasClass("select2-hidden-accessible")) {
-                        $('#studentSelect').select2('destroy');
-                        $('#studentSelect').val('').trigger('change');
-                    }
-            });
-
-            // Service amount & due date population - USE EVENT DELEGATION
-            $(document).on('change', '#service', function() {
-                const selectedOption = this.options[this.selectedIndex];
-                if (!selectedOption) return;
-
-                const amount = selectedOption.getAttribute("data-amount");
-                const duration = selectedOption.getAttribute("data-duration");
-                const amountInput = document.getElementById("amount");
-                const dueDateInput = document.getElementById("dueDate");
-
-                if (amountInput) {
-                    amountInput.value = amount ? amount : "";
-                }
-
-                if (dueDateInput && duration) {
-                    const today = new Date();
-                    today.setMonth(today.getMonth() + parseInt(duration));
-                    dueDateInput.value = today.toISOString().split('T')[0];
-                } else if (dueDateInput) {
-                    dueDateInput.value = "";
-                }
-            });
-
-            // Form validation - FIXED VERSION
-            $(document).on('submit', '.needs-validation', function(event) {
-                event.preventDefault();
-
-                const form = this;
-                const submitButton = document.getElementById("saveButton");
-
-                if (!form.checkValidity()) {
-                    event.stopPropagation();
-                    form.classList.add("was-validated");
-                    return;
-                }
-
-                if (submitButton) {
-                    submitButton.disabled = true;
-                    submitButton.innerHTML =
-                        `<span class="spinner-border spinner-border-sm me-2"></span> Saving...`;
-                }
-
-                // Use setTimeout to allow button state change before form submit
-                setTimeout(() => {
-                    form.submit();
-                }, 100);
-            });
-
-            // Re-initialize form validation when modal opens
-            $('#addTeacherModal').on('shown.bs.modal', function() {
-                // Reset form validation
-                const form = document.querySelector('#addTeacherModal .needs-validation');
-                if (form) {
-                    form.classList.remove("was-validated");
-                }
-
-                // Reset button state
-                const submitButton = document.getElementById("saveButton");
-                if (submitButton) {
-                    submitButton.disabled = false;
-                    submitButton.innerHTML = "Save Bill";
-                }
-            });
-
-            // Reset form when modal is closed
-            $('#addTeacherModal').on('hidden.bs.modal', function() {
-                const form = this.querySelector('form');
-                if (form) {
-                    form.reset();
-                    form.classList.remove("was-validated");
-
-                    // Reset select2
-                    if ($('#studentSelect').length) {
-                        $('#studentSelect').val(null).trigger('change');
-                    }
-
-                    // Clear amount and due date
-                    const amountInput = document.getElementById("amount");
-                    const dueDateInput = document.getElementById("dueDate");
-                    if (amountInput) amountInput.value = "";
-                    if (dueDateInput) dueDateInput.value = "";
-                }
-            });
-
-            // ============ TABLE & AJAX HANDLING ============
-            let searchTimeout;
-            const loadingSpinner = $('#loadingSpinner');
-            const billsTableSection = $('#billsTableSection');
-            const paginationSection = $('#paginationSection');
-            const yearFilter = $('#yearFilter');
-
-            // Initialize from localStorage
-            const savedYear = localStorage.getItem('selectedYear');
-            const currentYear = "{{ date('Y') }}";
-
-            if (savedYear && yearFilter.length > 0) {
-                yearFilter.val(savedYear);
-            }
-
-            // Load initial data
-            loadBillsData();
-
-            // Year filter change
-            yearFilter.on('change', function() {
-                const selectedYear = $(this).val();
-                console.log('Year changed to:', selectedYear);
-
-                // Store in localStorage
-                localStorage.setItem('selectedYear', selectedYear);
-
-                // Load data
-                loadBillsData();
-            });
-
-            // Real-time search
-            $('#searchInput').on('input', function() {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    loadBillsData();
-                }, 500);
-            });
-
-            // Search form submit
-            $('#searchForm').on('submit', function(e) {
-                e.preventDefault();
-                loadBillsData();
-            });
-
-            // Clear all filters
-            $('#clearFilters').on('click', function(e) {
-                e.preventDefault();
-                $('#searchInput').val('');
-                yearFilter.val('');
-                localStorage.removeItem('selectedYear');
-                loadBillsData();
-                window.history.pushState({}, '', '{{ route('bills.index') }}');
-            });
-
-            // Pagination links
-            $(document).on('click', '#paginationSection .pagination a', function(e) {
-                e.preventDefault();
-                const url = $(this).attr('href');
-                console.log('Pagination clicked:', url);
-                loadBillsData(url);
-            });
-
-            // Main function to load bills data
-            function loadBillsData(url = null) {
-                const searchValue = $('#searchInput').val();
-                const selectedYear = yearFilter.val() || localStorage.getItem('selectedYear') || currentYear;
-                const targetUrl = url || '{{ route('bills.index') }}';
-
-                console.log('Loading bills data:', {
-                    search: searchValue,
-                    year: selectedYear,
-                    url: targetUrl
-                });
-
-                // Show loading
-                loadingSpinner.removeClass('d-none');
-                billsTableSection.addClass('opacity-50');
-
-                // Prepare data for AJAX
-                const requestData = {
-                    search: searchValue,
-                    year: selectedYear,
-                    ajax: true
-                };
-
-                $.ajax({
-                    url: targetUrl,
-                    type: 'GET',
-                    data: requestData,
-                    success: function(response) {
-                        console.log('AJAX Success:', response);
-
-                        if (response.success) {
-                            billsTableSection.html(response.html);
-                            paginationSection.html(response.pagination);
-
-                            // CRITICAL: REBIND ALL TABLE EVENTS
-                            bindTableEvents();
-
-                            // Update year filter from response
-                            if (response.selectedYear) {
-                                yearFilter.val(response.selectedYear);
-                                localStorage.setItem('selectedYear', response.selectedYear);
-                            }
-
-                            // Update URL without reloading page
-                            updateUrl(searchValue, selectedYear, url);
-                        } else {
-                            console.error('AJAX Response Error:', response);
-                            billsTableSection.html('<div class="alert alert-danger">' + (response
-                                .message || 'Error loading data') + '</div>');
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('AJAX Request Error:', {
-                            status: status,
-                            error: error,
-                            response: xhr.responseText
-                        });
-                        billsTableSection.html(
-                            '<div class="alert alert-danger">Error loading bills. Please try again.</div>'
-                        );
-                    },
-                    complete: function() {
-                        loadingSpinner.addClass('d-none');
-                        billsTableSection.removeClass('opacity-50');
-                    }
-                });
-            }
-
-            // Function to update URL
-            function updateUrl(search, year, isPaginationUrl = false) {
-                const url = new URL(window.location);
-
-                // Update search parameter
-                if (search) {
-                    url.searchParams.set('search', search);
-                } else {
-                    url.searchParams.delete('search');
-                }
-
-                // Update year parameter
-                if (year) {
-                    url.searchParams.set('year', year);
-                } else {
-                    url.searchParams.delete('year');
-                }
-
-                // Remove page parameter if not pagination
-                if (!isPaginationUrl) {
-                    url.searchParams.delete('page');
-                }
-
-                // Update browser history
-                window.history.pushState({}, '', url);
-            }
-
-            // Handle browser back/forward buttons
-            window.addEventListener('popstate', function() {
-                const urlParams = new URLSearchParams(window.location.search);
-                const yearParam = urlParams.get('year');
-                const searchParam = urlParams.get('search');
-
-                console.log('Popstate triggered:', {
-                    year: yearParam,
-                    search: searchParam
-                });
-
-                // Update filters from URL
-                if (yearParam) {
-                    yearFilter.val(yearParam);
-                    localStorage.setItem('selectedYear', yearParam);
-                } else {
-                    yearFilter.val('');
-                    localStorage.removeItem('selectedYear');
-                }
-
-                if (searchParam) {
-                    $('#searchInput').val(searchParam);
-                } else {
-                    $('#searchInput').val('');
-                }
-
-                loadBillsData();
-            });
-
-            // ============ PAYMENT MODAL HANDLING ============
-            // Handle Pay button click
-            $(document).on('click', '.btn-pay', function() {
-                // Get data from button attributes
-                const billId = $(this).data('bill-id');
-                const studentId = $(this).data('student-id');
-                const studentName = $(this).data('student-name');
-                const controlNumber = $(this).data('control-number');
-                const academicYear = $(this).data('academic-year');
-                const billed = parseFloat($(this).data('billed'));
-                const paid = parseFloat($(this).data('paid'));
-                const balance = parseFloat($(this).data('balance'));
-
-                // Format currency
-                const formatter = new Intl.NumberFormat('en-US');
-
-                // Set values in modal
-                $('#payment_bill_id').val(billId);
-                $('#payment_student_id').val(studentId);
-                $('#payment_control_number').val(controlNumber);
-                $('#payment_academic_year_hidden').val(academicYear);
-
-                // Display values
-                $('#payment_student_display').val(studentName);
-                $('#payment_control_display').val(controlNumber);
-                $('#payment_academic_display').val(academicYear);
-                $('#payment_balance_display').val(formatter.format(balance));
-
-                // Reset form fields
-                $('#payment_amount').val('');
-                $('#payment_mode').val('bank');
-                $('#payment_note').val('');
-
-                // Set focus on amount field
-                setTimeout(() => {
-                    $('#payment_amount').focus();
-                }, 500);
-            });
-
-            // Format amount input
-            $('#payment_amount').on('input', function(e) {
-                let value = $(this).val();
-
-                // Remove all non-numeric characters except decimal
-                let numericValue = value.replace(/[^\d.]/g, '');
-
-                // Remove extra decimal points
-                let parts = numericValue.split('.');
-                if (parts.length > 2) {
-                    numericValue = parts[0] + '.' + parts.slice(1).join('');
-                }
-
-                // Format with commas for display only
-                if (numericValue) {
-                    let displayParts = numericValue.split('.');
-                    displayParts[0] = displayParts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-                    // Update display with commas
-                    $(this).val(displayParts.join('.'));
-                } else {
-                    $(this).val('');
-                }
-            });
-
-            // Before form submission, remove commas
-            $('#addPaymentModal form').on('submit', function(e) {
-                let amountInput = $('#payment_amount');
-                let amountValue = amountInput.val();
-
-                if (!amountValue || amountValue.trim() === '') {
-                    e.preventDefault();
-                    amountInput.addClass('is-invalid');
-                    amountInput.after('<div class="text-danger small">Please enter an amount</div>');
-                    return false;
-                }
-
-                // Clean the value: remove commas and validate
-                let cleanAmount = amountValue.replace(/,/g, '');
-
-                // Check if it's a valid number
-                if (isNaN(cleanAmount) || parseFloat(cleanAmount) <= 0) {
-                    e.preventDefault();
-                    amountInput.addClass('is-invalid');
-                    amountInput.after(
-                        '<div class="text-danger small">Please enter a valid amount (greater than 0)</div>'
-                    );
-                    return false;
-                }
-
-                // Update hidden/cleaned value for submission
-                amountInput.val(cleanAmount);
-
-                // Show processing state
-                $('#payment_save_button').prop('disabled', true)
-                    .html('<span class="spinner-border spinner-border-sm me-2"></span>Processing...');
-            });
-
-            // Reset button state when modal closes
-            $('#addPaymentModal').on('hidden.bs.modal', function() {
-                $('#payment_save_button').prop('disabled', false)
-                    .html('Save Payment');
-
-                // Clear validation
-                $('.is-invalid').removeClass('is-invalid');
-                $('.text-danger').remove();
-
-                // Reset amount field
-                $('#payment_amount').val('');
-            });
-
-            // ============ BIND ALL TABLE EVENTS ============
-            function bindTableEvents() {
-                console.log('Binding table events...');
-
-                // 1. Handle Cancel button click
-                $(document).off('click', '.cancel-btn').on('click', '.cancel-btn', function() {
-                    const billId = $(this).data('id');
-                            const controlNumber = $(this).data('control');
-                            const serviceName = $(this).data('service');
-                            const amount = $(this).data('amount');
-
-                            console.log('Cancel button clicked:', billId);
-
-                            $('#cancelBillForm').attr('action', `/Bills/cancel/${billId}`);
-                            $('#billPreview').html(`
-                        <div class="alert alert-info small">
-                            <strong>Bill:</strong> ${controlNumber}<br>
-                            <strong>Service:</strong> ${serviceName}<br>
-                            <strong>Amount:</strong> ${amount}
-                        </div>
-                    `);
-                });
-
-                // 2. Handle View Bill click
-                $(document).off('click', '[onclick^="viewBill"]').on('click', '[onclick^="viewBill"]', function(e) {
-                    e.preventDefault();
-                    const onclickAttr = $(this).attr('onclick');
-                    const match = onclickAttr.match(/viewBill\('([^']+)'\)/);
-                    if (match && match[1]) {
-                        viewBill(match[1]);
-                    }
-                });
-
-                // 3. Handle Edit Bill click
-                $(document).off('click', '[onclick^="openEditBillModal"]').on('click',
-                    '[onclick^="openEditBillModal"]',
-                    function(e) {
-                        e.preventDefault();
-                        const onclickAttr = $(this).attr('onclick');
-                        const match = onclickAttr.match(/openEditBillModal\('([^']+)'\)/);
-                        if (match && match[1]) {
-                            openEditBillModal(match[1]);
-                        }
-                    });
-
-                console.log('Table events bound successfully');
-            }
-
-            // Initial binding on page load
-            bindTableEvents();
-
-            // ============ HELPER FUNCTIONS ============
-            // View Bill function
-            function viewBill(billId) {
-                console.log('Loading bill:', billId);
-
-                // Show loading spinner
-                $('#billDetailsContent').html(`
-                    <div class="text-center py-3">
-                        <div class="spinner-border spinner-border-sm text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <p class="mt-2 mb-0 small">Loading bill details...</p>
-                    </div>
-                `);
-
-                // Show modal
-                $('#billDetailsModal').modal('show');
-
-                // Fetch bill details
-                $.ajax({
-                    url: `/Bills/view/${billId}`,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(response) {
-                        console.log('Bill details response:', response);
-
-                        if (response.success) {
-                            // Format dates
-                            const formatDate = (dateString) => {
-                                if (!dateString) return 'N/A';
-                                return new Date(dateString).toLocaleDateString('en-US', {
-                                    month: 'short',
-                                    day: 'numeric',
-                                    year: 'numeric'
-                                });
-                            };
-
-                            $('#billDetailsContent').html(`
+                    <p class="mt-2 mb-0 small">Loading bill details...</p>
+                </div>
+            `);
+
+            // Hide print button initially
+            $('#printBillBtn').hide();
+
+            // Show modal
+            $('#billDetailsModal').modal('show');
+
+            // Fetch bill details
+            $.ajax({
+                url: `/Bills/view/${billId}`,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    // console.log('Bill details response:', response);
+
+                    if (response.success) {
+                        // Store response globally for printing
+                        window.currentBillData = response;
+
+                        // Show and enable print button
+                        $('#printBillBtn').show().prop('disabled', false);
+
+                        $('#billDetailsContent').html(`
                         <!-- Student & Bill Info -->
                         <div class="row g-2 mb-3">
                             <div class="col-12">
@@ -1415,18 +683,18 @@
                             </div>
 
                             ${response.payment_history.length > 0 ? `
-                                                                            <div style="max-height: 200px; overflow-y: auto;">
-                                                                                <table class="table table-sm table-borderless mb-0">
-                                                                                    <thead>
-                                                                                        <tr class="small text-muted border-bottom">
-                                                                                            <th class="ps-2">#</th>
-                                                                                            <th>Date</th>
-                                                                                            <th>Mode</th>
-                                                                                            <th class="text-end pe-2">Amount</th>
-                                                                                        </tr>
-                                                                                    </thead>
-                                                                                    <tbody>
-                                                                                        ${response.payment_history.map((payment, index) => `
+                                                    <div style="max-height: 200px; overflow-y: auto;">
+                                                        <table class="table table-sm table-borderless mb-0">
+                                                            <thead>
+                                                                <tr class="small text-muted border-bottom">
+                                                                    <th class="ps-2">#</th>
+                                                                    <th>Date</th>
+                                                                    <th>Mode</th>
+                                                                    <th class="text-end pe-2">Amount</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                ${response.payment_history.map((payment, index) => `
                                                 <tr class="small border-bottom">
                                                     <td class="ps-2">#${payment.installment}</td>
                                                     <td>${new Date(payment.approved_at).toLocaleDateString('en-GB')}</td>
@@ -1438,71 +706,690 @@
                                                     </td>
                                                 </tr>
                                             `).join('')}
-                                                                                        <!-- Total Row -->
-                                                                                        <tr class="small border-top fw-bold bg-light">
-                                                                                            <td class="ps-2" colspan="3" style="font-weight:bold">Total Paid:</td>
-                                                                                            <td class="text-end pe-2 text-success" style="font-weight:bold">
-                                                                                                ${new Intl.NumberFormat().format(response.summary.total_paid)}
-                                                                                            </td>
-                                                                                        </tr>
-                                                                                    </tbody>
-                                                                                </table>
-                                                                            </div>
-                                                                        ` : `
-                                                                            <div class="text-center py-2">
-                                                                                <small class="text-muted">
-                                                                                    <i class="fas fa-info-circle me-1"></i>
-                                                                                    No payments recorded
-                                                                                </small>
-                                                                            </div>
-                                                                        `}
+                                                                <tr class="small border-top fw-bold bg-light">
+                                                                    <td class="ps-2" colspan="3" style="font-weight:bold">Total Paid:</td>
+                                                                    <td class="text-end pe-2 text-success" style="font-weight:bold">
+                                                                        ${new Intl.NumberFormat().format(response.summary.total_paid)}
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                ` : `
+                                                    <div class="text-center py-2">
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-info-circle me-1"></i>
+                                                            No payments recorded
+                                                        </small>
+                                                    </div>
+                                                `}
                         </div>
                     `);
-                        } else {
-                            $('#billDetailsContent').html(`
+                    } else {
+                        $('#billDetailsContent').html(`
                         <div class="alert alert-danger py-2 mb-0">
                             <i class="fas fa-exclamation-triangle me-1"></i>
                             <small>${response.message || 'Failed to load details'}</small>
                         </div>
                     `);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error loading bill details:', error);
-                        $('#billDetailsContent').html(`
+                        $('#printBillBtn').hide();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading bill details:', error);
+                    $('#billDetailsContent').html(`
                     <div class="alert alert-danger py-2 mb-0">
                         <i class="fas fa-times-circle me-1"></i>
                         <small>Error loading bill details. Please try again.</small>
                     </div>
                 `);
+                    $('#printBillBtn').hide();
+                }
+            });
+        };
+
+        window.printInvoice = function() {
+            if (!window.currentBillData) {
+                console.error('No bill data available');
+                alert('No bill data available. Please refresh and try again.');
+                return;
+            }
+
+            const response = window.currentBillData;
+            const school = response.school_info || {};
+
+            function escapeHtml(str) {
+                if (!str) return '';
+                return String(str).replace(/[&<>]/g, m => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;'
+                } [m]));
+            }
+
+            // Logo Logic
+            let logoHtml = '';
+            if (school.logo) {
+                let logoPath = school.logo.replace(/^(public\/|storage\/|app\/public\/)/, '');
+                if (!logoPath.includes('logo/')) logoPath = `logo/${logoPath}`;
+                logoHtml =
+                    `<img src="/storage/${logoPath}" alt="Logo" style="max-height: 60px;" onerror="this.style.display='none'">`;
+            }
+
+            const isPaid = response.summary.balance <= 0;
+            const currentDate = new Date().toLocaleDateString('en-GB');
+
+            const printContent = `
+                <div id="printableInvoice" style="position: relative; color: #1a202c; line-height: 1.4; font-family: 'Inter', sans-serif; max-width: 800px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column;">
+
+                    <!-- Watermark -->
+                    <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 80px; color: rgba(0,0,0,0.03); font-weight: 800; pointer-events: none; z-index: 0; text-transform: uppercase; white-space: nowrap;">
+                        ${isPaid ? 'OFFICIAL PAID' : 'PAYMENT DUE'}
+                    </div>
+
+                    <!-- Main Content -->
+                    <div style="flex: 1; position: relative; z-index: 1;">
+                        <!-- Header -->
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; border-bottom: 3px solid #1a202c; padding-bottom: 15px;">
+                            <div>
+                                ${logoHtml}
+                                <h2 style="margin: 8px 0 2px 0; font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">${escapeHtml(school.school_name ? school.school_name.toUpperCase() : 'SCHOOL NAME')}</h2>
+                                <p style="font-size: 10px; color: #4a5568; margin: 0; line-height: 1.2;">
+                                    ${school.postal_addres ? escapeHtml(school.postal_addres.toUpperCase()) : ''} ${school.postal_name ? escapeHtml(school.postal_name.toUpperCase()) : ''}<br>
+                                    ${school.school_phone ? 'Tel: ' + escapeHtml(school.school_phone) : ''} ${school.school_alternative_phone ? ' | Mobile: ' + escapeHtml(school.school_alternative_phone) : ''}<br>
+                                    ${school.school_email ? 'Email: ' + escapeHtml(school.school_email) : ''}
+                                </p>
+                            </div>
+                            <div style="text-align: right;">
+                                <h1 style="margin: 0; font-size: 28px; font-weight: 800; color: #1a202c; letter-spacing: -1px;">INVOICE</h1>
+                                <p style="font-size: 12px; font-weight: 700; margin: 2px 0;">REF: ${escapeHtml(response.bill.control_number ? response.bill.control_number.toUpperCase() : 'N/A')}</p>
+                                <p style="font-size: 10px; color: #718096; margin: 0;">Date: ${currentDate}</p>
+                            </div>
+                        </div>
+
+                        <!-- Bill To & Status -->
+                        <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 15px; margin-bottom: 20px;">
+                            <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border-left: 4px solid #1a202c;">
+                                <h4 style="font-size: 9px; text-transform: uppercase; color: #718096; margin: 0 0 5px 0; letter-spacing: 0.5px;">Bill To</h4>
+                                <p style="font-size: 14px; font-weight: 700; margin: 0;">${escapeHtml(response.bill.student_first_name ? response.bill.student_first_name.toUpperCase() : '')} ${escapeHtml(response.bill.student_middle_name ? response.bill.student_middle_name.toUpperCase() : '')} ${escapeHtml(response.bill.student_last_name ? response.bill.student_last_name.toUpperCase() : '')}</p>
+                                <p style="font-size: 11px; color: #4a5568; margin: 2px 0;">Class: ${escapeHtml(response.bill.class_code ? response.bill.class_code.toUpperCase() : 'N/A')} | Year: ${escapeHtml(response.bill.academic_year ? response.bill.academic_year : 'N/A')}</p>
+                            </div>
+                            <div style="text-align: right; align-self: center;">
+                                <div style="display: inline-block; padding: 4px 12px; background: ${isPaid ? '#dcfce7' : '#fee2e2'}; color: ${isPaid ? '#166534' : '#991b1b'}; border-radius: 4px; font-weight: 700; font-size: 10px; text-transform: uppercase; margin-bottom: 8px;">
+                                    ${escapeHtml(response.bill.status ? response.bill.status.toUpperCase() : 'ACTIVE')}
+                                </div>
+                                <p style="font-size: 10px; color: #718096; margin: 0;">Due Date: <b style="color: #1a202c">${response.bill.due_date || 'N/A'}</b></p>
+                                <p style="font-size: 10px; color: #718096; margin: 0;">Description: <b style="color: #1a202c">${escapeHtml(response.bill.description ? response.bill.description.toUpperCase() : 'SCHOOL FEES')}</b></p>
+                            </div>
+                        </div>
+
+                        <!-- Payment History Table -->
+                        <p style="text-transform:capitalize; font-weight: bold; color:black;">Bills Transactions</p>
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                            <thead>
+                                <tr style="background: #1a202c; color: white;">
+                                    <th style="padding: 10px; text-align: left; font-size: 10px; text-transform: uppercase;">Installment</th>
+                                    <th style="padding: 10px; text-align: left; font-size: 10px; text-transform: uppercase;">Payment Mode</th>
+                                    <th style="padding: 10px; text-align: left; font-size: 10px; text-transform: uppercase;">Approved Date</th>
+                                    <th style="padding: 10px; text-align: right; font-size: 10px; text-transform: uppercase;">Paid Amount (TZS)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${response.payment_history && response.payment_history.length > 0 ?
+                                    response.payment_history.map(payment => `
+                                            <tr style="border-bottom: 1px solid #edf2f7;">
+                                                <td style="padding: 8px 10px; font-size: 12px; font-weight: 600;">${escapeHtml("Term "+payment.installment)}</td>
+                                                <td style="padding: 8px 10px; font-size: 12px; font-weight: 600;">${escapeHtml(payment.payment_mode ? payment.payment_mode.toUpperCase() : 'N/A')}</td>
+                                                <td style="padding: 8px 10px; font-size: 12px; color: #4a5568;">${payment.approved_at ? new Date(payment.approved_at).toLocaleDateString('en-GB') : 'N/A'}</td>
+                                                <td style="padding: 8px 10px; font-size: 12px; text-align: right; font-weight: 700;">${new Intl.NumberFormat().format(payment.amount)}</td>
+                                            </tr>
+                                        `).join('') :
+                                    `<tr><td colspan="3" style="padding: 15px; text-align: center; color: #a0aec0; font-size: 12px;">No transactions found</td></tr>`
+                                }
+                            </tbody>
+                        </table>
+
+                        <!-- Financial Summary -->
+                        <div style="display: flex; justify-content: flex-end; margin-bottom: 30px;">
+                            <div style="width: 280px; background: #f8fafc; padding: 15px; border-radius: 6px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 12px;">
+                                    <span style="color: #718096;">Total Billed:</span>
+                                    <span><strong>${new Intl.NumberFormat().format(response.summary.total_billed)} TZS</strong></span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; color: #38a169; font-size: 12px;">
+                                    <span>Total Paid:</span>
+                                    <span><strong>- ${new Intl.NumberFormat().format(response.summary.total_paid)} TZS</strong></span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; border-top: 2px solid #e2e8f0; padding-top: 8px; margin-top: 5px;">
+                                    <span style="font-weight: 800; font-size: 13px;">BALANCE DUE:</span>
+                                    <span style="font-weight: 800; font-size: 16px; color: ${response.summary.balance > 0 ? '#e53e3e' : '#38a169'};">
+                                        ${new Intl.NumberFormat().format(response.summary.balance)} TZS
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Signature Section -->
+                        <div style="display: flex; justify-content: flex-end; align-items: center; gap: 40px; margin-top: 20px; padding: 0 10px;">
+                            <div style="width: 90px; height: 90px; border: 2px dashed #cbd5e0; border-radius: 50%; display: flex; align-items: center; text-align: center; justify-content: center; font-size: 8px; color: #cbd5e0; text-transform: uppercase; font-weight: bold; line-height: 1.2;">
+                                OFFICIAL<br> STAMP
+                            </div>
+                            <div style="text-align: center; width: 200px;">
+                                <div style="border-bottom: 2px solid #1a202c; height: 40px;"></div>
+                                <p style="font-size: 10px; font-weight: 700; margin-top: 5px; color: #4a5568;">Accountant / Cashier Signature</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Fixed Bottom -->
+                    <div style="margin-top: 40px; text-align: center; font-size: 9px; color: #718096; border-top: 1px solid #edf2f7; padding-top: 15px;">
+                        <p style="margin: 0;">Computer generated official document. Presented by <b>${escapeHtml(school.school_name.toUpperCase())}</b>.</strong>.</p>
+                        <p style="margin: 5px 0 0 0;">Generated by ShuleApp Billing Module</p>
+                        <p style="margin: 5px 0 0 0; font-size: 8px;">If you have any questions, please contact the accounts office. Thank you!</p>
+                    </div>
+                </div>
+            `;
+
+            // Create and open print window - FIXED
+            const printWindow = window.open('', '_blank');
+
+            if (!printWindow) {
+                alert('Please allow popups to print the invoice');
+                return;
+            }
+
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Invoice_${escapeHtml(response.bill.control_number)}</title>
+                    <meta charset="UTF-8">
+                    <style>
+                        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+                        * {
+                            margin: 0;
+                            padding: 0;
+                            box-sizing: border-box;
+                        }
+                        body {
+                            font-family: 'Inter', -apple-system, sans-serif;
+                            background: #fff;
+                            padding: 30px;
+                            margin: 0;
+                        }
+                        @media print {
+                            body {
+                                padding: 0;
+                                margin: 0;
+                            }
+                            #printableInvoice {
+                                width: 100%;
+                                margin: 0;
+                                padding: 20px;
+                            }
+                            .no-print {
+                                display: none;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${printContent}
+                    <script>
+                        window.onload = function() {
+                            setTimeout(function() {
+                                window.print();
+                                window.onafterprint = function() {
+                                    window.close();
+                                };
+                            }, 500);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        };
+
+        // ============ DOCUMENT READY (Kwa ajili ya initializers tu) ============
+        document.addEventListener("DOMContentLoaded", function() {
+            // Initialize select2
+            let allStudents = [];
+
+            // Sync button click
+            $(document).on('click', '#syncClassesBtn', function(e) {
+                e.preventDefault();
+                // console.log('Sync button clicked');
+                const selectedYear = $('#yearFilter').val() || localStorage.getItem('selectedYear') ||
+                    new Date().getFullYear();
+                $('#syncYearDisplay').text(selectedYear);
+
+                if ($('#syncClassesModal').length === 0) {
+                    return;
+                }
+
+                $('#syncClassesModal').modal('show');
+                $('#syncLoading').show();
+                $('#syncPreviewContent').hide().html('');
+                $('#syncErrorContent').hide().html('');
+                $('#confirmSyncBtn').prop('disabled', true);
+
+                $.ajax({
+                    url: '{{ route('bills.sync-classes.preview') }}',
+                    method: 'GET',
+                    data: {
+                        year: selectedYear
+                    },
+                    success: function(response) {
+                        $('#syncLoading').hide();
+                        if (response.success) {
+                            if (response.total > 0) {
+                                let html = `<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i><strong>${response.total}</strong> bill(s) will be updated for year <strong>${response.year}</strong></div>
+                            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                                <table class="table table-sm table-bordered table-hover">
+                                    <thead class="table-light sticky-top">
+                                        <tr><th>#</th><th>Control Number</th><th>Student</th><th>Old Class</th><th>New Class</th></tr>
+                                    </thead><tbody>`;
+                                response.data.forEach((item, index) => {
+                                    html +=
+                                        `<tr><td>${index + 1}</td><td><span class="text-primary">${item.control_number.toUpperCase()}</span></td>
+                                        <td>${item.student_name.toUpperCase()}</td>
+                                        <td><span class="badge bg-secondary text-white">${item.old_class.toUpperCase()}</span></td>
+                                        <td><span class="badge bg-success text-white">${item.new_class.toUpperCase()}</span></td></tr>`;
+                                });
+                                html +=
+                                    `</tbody></table></div><p class="text-muted small mt-2 mb-0"><i class="fas fa-info-circle me-1"></i>All <strong>Bills</strong> statuses will be updated, It is safe 100%.</p>`;
+                                $('#syncPreviewContent').html(html).show();
+                                $('#confirmSyncBtn').prop('disabled', false);
+                            } else {
+                                $('#syncPreviewContent').html(
+                                    `<div class="alert alert-success"><i class="fas fa-check-circle me-2"></i><strong>No bills need class update for year ${response.year}!</strong><p class="mb-0 mt-2">All Bills are already using the correct classes.</p></div>`
+                                ).show();
+                            }
+                        } else {
+                            $('#syncErrorContent').html(
+                                `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>${response.message || 'Error loading preview'}</div>`
+                            ).show();
+                        }
+                    },
+                    error: function(xhr) {
+                        $('#syncLoading').hide();
+                        let errorMsg = 'Error loading preview. Please try again.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) errorMsg = xhr
+                            .responseJSON.message;
+                        $('#syncErrorContent').html(
+                            `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>${errorMsg}</div>`
+                        ).show();
+                    }
+                });
+            });
+
+            // Confirm Sync
+            $(document).on('click', '#confirmSyncBtn', function() {
+                const $btn = $(this);
+                const selectedYear = $('#yearFilter').val() || localStorage.getItem('selectedYear') ||
+                    new Date().getFullYear();
+                $btn.prop('disabled', true).html(
+                    '<span class="spinner-border spinner-border-sm me-2"></span>Syncing...');
+                $('#syncPreviewContent').html(
+                    `<div class="text-center py-4"><div class="spinner-border text-primary mb-3"></div><p class="text-muted">Updating classes... Please wait.</p></div>`
+                );
+
+                $.ajax({
+                    url: '{{ route('bills.sync-classes') }}',
+                    method: 'PUT',
+                    data: {
+                        year: selectedYear,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#syncPreviewContent').html(
+                                `<div class="alert alert-success"><i class="fas fa-check-circle me-2"></i><strong>Success!</strong><p class="mb-0 mt-2">${response.message}</p></div>`
+                            );
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Sync Completed!',
+                                html: response.message,
+                                confirmButtonText: 'OK',
+                                timer: 3000
+                            });
+                            setTimeout(() => {
+                                $('#syncClassesModal').modal('hide');
+                                if (typeof loadBillsData === 'function')
+                                    loadBillsData();
+                                else location.reload();
+                            }, 2000);
+                        } else {
+                            $('#syncPreviewContent').html(
+                                `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>${response.message}</div>`
+                            );
+                            $btn.prop('disabled', false).html(
+                                '<i class="fas fa-check"></i> Try Again');
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorMsg = 'Error syncing classes. Please try again.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) errorMsg = xhr
+                            .responseJSON.message;
+                        $('#syncPreviewContent').html(
+                            `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>${errorMsg}</div>`
+                        );
+                        $btn.prop('disabled', false).html(
+                            '<i class="fas fa-check"></i> Try Again');
+                    }
+                });
+            });
+
+            // Reset modal when closed
+            $('#syncClassesModal').on('hidden.bs.modal', function() {
+                $('#confirmSyncBtn').prop('disabled', true).html(
+                    '<i class="fas fa-sync-alt"></i> Sync Now');
+                $('#syncLoading').show();
+                $('#syncPreviewContent').hide().html('');
+                $('#syncErrorContent').hide().html('');
+            });
+
+            // Load students
+            $.ajax({
+                url: '{{ route('students.list') }}',
+                method: 'GET',
+                success: function(response) {
+                    if (response.success && response.students) {
+                        allStudents = response.students.map(student => ({
+                            id: student.id,
+                            text: `${student.first_name} ${student.middle_name} ${student.last_name}`
+                                .toUpperCase(),
+                            firstName: student.first_name,
+                            middleName: student.middle_name,
+                            lastName: student.last_name,
+                            admissionNo: student.admission_number
+                        }));
+                        // console.log(`Loaded ${allStudents.length} students`);
+                    }
+                }
+            });
+
+            // Add bill Modal Select2
+            $('#addTeacherModal').on('shown.bs.modal', function() {
+                $('#studentSelect').select2({
+                    placeholder: "Search student... (Type to filter)",
+                    allowClear: true,
+                    dropdownParent: $('#addTeacherModal'),
+                    width: '100%',
+                    data: [],
+                    minimumInputLength: 0,
+                    ajax: {
+                        transport: function(params, success, failure) {
+                            const term = params.data.term || '';
+                            const page = params.data.page || 1;
+                            const pageSize = 50;
+                            let filteredStudents = allStudents;
+                            if (term.trim() !== '') {
+                                const searchTerm = term.toLowerCase();
+                                filteredStudents = allStudents.filter(student =>
+                                    student.text.toLowerCase().includes(searchTerm) ||
+                                    (student.admissionNo && student.admissionNo
+                                        .toLowerCase().includes(searchTerm))
+                                );
+                            }
+                            const startIndex = (page - 1) * pageSize;
+                            const endIndex = startIndex + pageSize;
+                            const paginatedStudents = filteredStudents.slice(startIndex,
+                                endIndex);
+                            setTimeout(function() {
+                                success({
+                                    results: paginatedStudents,
+                                    pagination: {
+                                        more: endIndex < filteredStudents.length
+                                    }
+                                });
+                            }, 300);
+                        }
+                    }
+                });
+            }).on('hidden.bs.modal', function() {
+                if ($('#studentSelect').hasClass("select2-hidden-accessible")) {
+                    $('#studentSelect').select2('destroy');
+                    $('#studentSelect').val('').trigger('change');
+                }
+            });
+
+            // Service amount & due date
+            $(document).on('change', '#service', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                if (!selectedOption) return;
+                const amount = selectedOption.getAttribute("data-amount");
+                const duration = selectedOption.getAttribute("data-duration");
+                if (document.getElementById("amount")) document.getElementById("amount").value = amount ?
+                    amount : "";
+                if (document.getElementById("dueDate") && duration) {
+                    const today = new Date();
+                    today.setMonth(today.getMonth() + parseInt(duration));
+                    document.getElementById("dueDate").value = today.toISOString().split('T')[0];
+                } else if (document.getElementById("dueDate")) {
+                    document.getElementById("dueDate").value = "";
+                }
+            });
+
+            // Form validation
+            $(document).on('submit', '.needs-validation', function(event) {
+                event.preventDefault();
+                const form = this;
+                const submitButton = document.getElementById("saveButton");
+                if (!form.checkValidity()) {
+                    event.stopPropagation();
+                    form.classList.add("was-validated");
+                    return;
+                }
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML =
+                        `<span class="spinner-border spinner-border-sm me-2"></span> Saving...`;
+                }
+                setTimeout(() => {
+                    form.submit();
+                }, 100);
+            });
+
+            $('#addTeacherModal').on('shown.bs.modal', function() {
+                const form = document.querySelector('#addTeacherModal .needs-validation');
+                if (form) form.classList.remove("was-validated");
+                const submitButton = document.getElementById("saveButton");
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = "Save Bill";
+                }
+            }).on('hidden.bs.modal', function() {
+                const form = this.querySelector('form');
+                if (form) {
+                    form.reset();
+                    form.classList.remove("was-validated");
+                    if ($('#studentSelect').length) $('#studentSelect').val(null).trigger('change');
+                    if (document.getElementById("amount")) document.getElementById("amount").value = "";
+                    if (document.getElementById("dueDate")) document.getElementById("dueDate").value = "";
+                }
+            });
+
+            // Table & AJAX handling
+            let searchTimeout;
+            const loadingSpinner = $('#loadingSpinner');
+            const billsTableSection = $('#billsTableSection');
+            const paginationSection = $('#paginationSection');
+            const yearFilter = $('#yearFilter');
+
+            const savedYear = localStorage.getItem('selectedYear');
+            const currentYear = "{{ date('Y') }}";
+            if (savedYear && yearFilter.length > 0) yearFilter.val(savedYear);
+
+            function loadBillsData(url = null) {
+                const searchValue = $('#searchInput').val();
+                const selectedYear = yearFilter.val() || localStorage.getItem('selectedYear') || currentYear;
+                const targetUrl = url || '{{ route('bills.index') }}';
+
+                loadingSpinner.removeClass('d-none');
+                billsTableSection.addClass('opacity-50');
+
+                $.ajax({
+                    url: targetUrl,
+                    type: 'GET',
+                    data: {
+                        search: searchValue,
+                        year: selectedYear,
+                        ajax: true
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            billsTableSection.html(response.html);
+                            paginationSection.html(response.pagination);
+                            bindTableEvents();
+                            if (response.selectedYear) {
+                                yearFilter.val(response.selectedYear);
+                                localStorage.setItem('selectedYear', response.selectedYear);
+                            }
+                        } else {
+                            billsTableSection.html('<div class="alert alert-danger">' + (response
+                                .message || 'Error loading data') + '</div>');
+                        }
+                    },
+                    error: function() {
+                        billsTableSection.html(
+                            '<div class="alert alert-danger">Error loading bills. Please try again.</div>'
+                        );
+                    },
+                    complete: function() {
+                        loadingSpinner.addClass('d-none');
+                        billsTableSection.removeClass('opacity-50');
                     }
                 });
             }
 
-            // Edit Bill function
-            function openEditBillModal(hashId) {
-                $('#editBillModal').modal('show');
+            yearFilter.on('change', function() {
+                localStorage.setItem('selectedYear', $(this).val());
+                loadBillsData();
+            });
 
+            $('#searchInput').on('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => loadBillsData(), 500);
+            });
+
+            $('#searchForm').on('submit', function(e) {
+                e.preventDefault();
+                loadBillsData();
+            });
+
+            $('#clearFilters').on('click', function(e) {
+                e.preventDefault();
+                $('#searchInput').val('');
+                yearFilter.val('');
+                localStorage.removeItem('selectedYear');
+                loadBillsData();
+            });
+
+            $(document).on('click', '#paginationSection .pagination a', function(e) {
+                e.preventDefault();
+                loadBillsData($(this).attr('href'));
+            });
+
+            function bindTableEvents() {
+                $(document).off('click', '.cancel-btn').on('click', '.cancel-btn', function() {
+                    const billId = $(this).data('id');
+                    const controlNumber = $(this).data('control');
+                    const serviceName = $(this).data('service');
+                    const amount = $(this).data('amount');
+                    $('#cancelBillForm').attr('action', `/Bills/cancel/${billId}`);
+                    $('#billPreview').html(
+                        `<div class="alert alert-info small"><strong>Bill:</strong> ${controlNumber}<br><strong>Service:</strong> ${serviceName}<br><strong>Amount:</strong> ${amount}</div>`
+                    );
+                });
+            }
+
+            bindTableEvents();
+            loadBillsData();
+
+            // Payment Modal Handling
+            $(document).on('click', '.btn-pay', function() {
+                const billId = $(this).data('bill-id');
+                const studentId = $(this).data('student-id');
+                const studentName = $(this).data('student-name');
+                const controlNumber = $(this).data('control-number');
+                const academicYear = $(this).data('academic-year');
+                const billed = parseFloat($(this).data('billed'));
+                const paid = parseFloat($(this).data('paid'));
+                const balance = parseFloat($(this).data('balance'));
+                const formatter = new Intl.NumberFormat('en-US');
+
+                $('#payment_bill_id').val(billId);
+                $('#payment_student_id').val(studentId);
+                $('#payment_control_number').val(controlNumber);
+                $('#payment_academic_year_hidden').val(academicYear);
+                $('#payment_student_display').val(studentName);
+                $('#payment_control_display').val(controlNumber);
+                $('#payment_academic_display').val(academicYear);
+                $('#payment_balance_display').val(formatter.format(balance));
+                $('#payment_amount').val('');
+                $('#payment_mode').val('bank');
+                $('#payment_note').val('');
+                setTimeout(() => $('#payment_amount').focus(), 500);
+            });
+
+            $('#payment_amount').on('input', function(e) {
+                let value = $(this).val();
+                let numericValue = value.replace(/[^\d.]/g, '');
+                let parts = numericValue.split('.');
+                if (parts.length > 2) numericValue = parts[0] + '.' + parts.slice(1).join('');
+                if (numericValue) {
+                    let displayParts = numericValue.split('.');
+                    displayParts[0] = displayParts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                    $(this).val(displayParts.join('.'));
+                } else $(this).val('');
+            });
+
+            $('#addPaymentModal form').on('submit', function(e) {
+                let amountInput = $('#payment_amount');
+                let amountValue = amountInput.val();
+                if (!amountValue || amountValue.trim() === '') {
+                    e.preventDefault();
+                    amountInput.addClass('is-invalid');
+                    amountInput.after('<div class="text-danger small">Please enter an amount</div>');
+                    return false;
+                }
+                let cleanAmount = amountValue.replace(/,/g, '');
+                if (isNaN(cleanAmount) || parseFloat(cleanAmount) <= 0) {
+                    e.preventDefault();
+                    amountInput.addClass('is-invalid');
+                    amountInput.after(
+                        '<div class="text-danger small">Please enter a valid amount (greater than 0)</div>'
+                    );
+                    return false;
+                }
+                amountInput.val(cleanAmount);
+                $('#payment_save_button').prop('disabled', true).html(
+                    '<span class="spinner-border spinner-border-sm me-2"></span>Processing...');
+            });
+
+            $('#addPaymentModal').on('hidden.bs.modal', function() {
+                $('#payment_save_button').prop('disabled', false).html('Save Payment');
+                $('.is-invalid').removeClass('is-invalid');
+                $('.text-danger').remove();
+                $('#payment_amount').val('');
+            });
+
+            // Edit Bill
+            window.openEditBillModal = function(hashId) {
+                $('#editBillModal').modal('show');
                 $.get(`/Bills/edit/${hashId}`, function(response) {
                     $('#editBillForm').attr('action', `/Bills/update/${hashId}`);
-
-                    // Fill basic fields
                     $('#edit_control_number').val(response.bill.control_number);
                     $('#edit_amount').val(response.bill.amount);
                     $('#academic_year').val(response.bill.academic_year);
                     $('#edit_status').val(response.bill.status);
                     $('#description').val(response.bill.description);
-
-                    // Handle due_date conversion
                     if (response.bill.due_date) {
-                        // Convert "2026-10-30 21:34:51" to "2026-10-30"
                         const dueDate = response.bill.due_date.split(' ')[0];
                         $('#edit_due_date').val(dueDate);
-                    } else {
-                        $('#edit_due_date').val('');
-                    }
-
-                    // Populate students
+                    } else $('#edit_due_date').val('');
                     $('#edit_student_id').empty();
                     response.students.forEach(student => {
                         $('#edit_student_id').append(
@@ -1510,16 +1397,10 @@
                         );
                     });
                     $('#edit_student_id').val(response.bill.student_id).trigger('change');
-
-                    // Populate services
                     $('#edit_service_id').empty();
-                        response.services.forEach(service => {
-                            $('#edit_service_id').append(
-                                `<option value="${service.id}"
-                                data-amount="${service.amount}"
-                                data-duration="${service.expiry_duration}">
-                            ${service.service_name}
-                        </option>`
+                    response.services.forEach(service => {
+                        $('#edit_service_id').append(
+                            `<option value="${service.id}" data-amount="${service.amount}" data-duration="${service.expiry_duration}">${service.service_name}</option>`
                         );
                     });
                     $('#edit_service_id').val(response.bill.service_id);
@@ -1527,72 +1408,41 @@
                     console.error('Error loading bill data:', error);
                     alert('Error loading bill details. Please try again.');
                 });
-            }
+            };
 
-            // Real-time service change - EDIT MODAL
             $(document).on('change', '#edit_service_id', function() {
                 let option = $(this).find(':selected');
                 const amount = option.data('amount');
                 const duration = option.data('duration');
-
-                // Set amount if exists
-                if (amount) {
-                    $('#edit_amount').val(amount);
-                }
-
-                // Set due date based on duration (months from now)
+                if (amount) $('#edit_amount').val(amount);
                 if (duration) {
                     const today = new Date();
                     today.setMonth(today.getMonth() + parseInt(duration));
-
-                    // Format as YYYY-MM-DD
-                    const formattedDate = today.toISOString().split('T')[0];
-                    $('#edit_due_date').val(formattedDate);
-                } else {
-                    $('#edit_due_date').val('');
-                }
+                    $('#edit_due_date').val(today.toISOString().split('T')[0]);
+                } else $('#edit_due_date').val('');
             });
 
-            // Select2 for edit modal
             $('.select2').select2({
                 dropdownParent: $('#editBillModal')
             });
 
-            // Cancel form submission
             $('#cancelBillForm').on('submit', function(e) {
-                // Add confirmation
                 if (!confirm('Are you sure you want to cancel this bill?')) {
                     e.preventDefault();
                     return false;
                 }
-
-                // Show processing
-                $(this).find('.btn-danger').prop('disabled', true)
-                    .html('<span class="spinner-border spinner-border-sm me-2"></span>Cancelling...');
+                $(this).find('.btn-danger').prop('disabled', true).html(
+                    '<span class="spinner-border spinner-border-sm me-2"></span>Cancelling...');
             });
 
-            // ============ REMIND ALL FUNCTIONALITY ============
-
-            // Simple version that works with real-time year filter
-            function showReminderModal() {
-                console.log('showReminderModal called');
-
+            // Reminder functions
+            window.showReminderModal = function() {
                 const selectedYear = $('#yearFilter').val() || localStorage.getItem('selectedYear') ||
                     "{{ date('Y') }}";
-                console.log('Using year:', selectedYear);
-
-                // Show modal immediately
                 $('#reminderModal').modal('show');
-                $('#reminderSummary').html(`
-            <div class="text-center py-3">
-                <div class="spinner-border spinner-border-sm text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <p class="mt-2 mb-0 small">Loading summary for ${selectedYear}...</p>
-            </div>
-        `);
-
-                // Load summary
+                $('#reminderSummary').html(
+                    `<div class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div><p class="mt-2 mb-0 small">Loading summary for ${selectedYear}...</p></div>`
+                );
                 $.ajax({
                     url: '{{ route('bills.get-overdue-summary') }}',
                     method: 'GET',
@@ -1600,68 +1450,37 @@
                         year: selectedYear
                     },
                     success: function(response) {
-                        console.log('Summary response:', response);
                         if (response.success) {
                             const summary = response.summary;
-                            $('#reminderSummary').html(`
-                        <div class="alert alert-info">
-                            <p><strong>Summary for ${selectedYear}</strong></p>
-                            <hr>
-                            <div class="row">
-                                <div class="col-4 text-center">
-                                    <div class="h5 mb-0">${summary.total_bills}</div>
-                                    <small class="text-muted">Total Bills</small>
-                                </div>
-                                <div class="col-4 text-center">
-                                    <div class="h5 mb-0">${summary.unique_parents}</div>
-                                    <small class="text-muted">Unique Parents</small>
-                                </div>
-                                <div class="col-4 text-center">
-                                    <div class="h5 mb-0 text-danger">${summary.formatted_total_balance}</div>
-                                    <small class="text-muted">Total Unpaid</small>
-                                </div>
-                            </div>
-                        </div>
-                    `);
+                            $('#reminderSummary').html(
+                                `<div class="alert alert-info"><p><strong>Summary for ${selectedYear}</strong></p><hr><div class="row"><div class="col-4 text-center"><div class="h5 mb-0">${summary.total_bills}</div><small class="text-muted">Total Bills</small></div><div class="col-4 text-center"><div class="h5 mb-0">${summary.unique_parents}</div><small class="text-muted">Unique Parents</small></div><div class="col-4 text-center"><div class="h5 mb-0 text-danger">${summary.formatted_total_balance}</div><small class="text-muted">Total Unpaid</small></div></div></div>`
+                            );
                         } else {
-                            $('#reminderSummary').html(`
-                        <div class="alert alert-danger">
-                            <i class="fas fa-exclamation-triangle me-1"></i>
-                            Error: ${response.message}
-                        </div>
-                    `);
+                            $('#reminderSummary').html(
+                                `<div class="alert alert-danger">Error: ${response.message}</div>`
+                            );
                         }
                     },
-                    error: function(xhr, status, error) {
-                        console.error('Error loading summary:', error);
-                        $('#reminderSummary').html(`
-                    <div class="alert alert-danger">
-                        <i class="fas fa-times-circle me-1"></i>
-                        Error loading summary. Please try again.
-                    </div>
-                `);
+                    error: function() {
+                        $('#reminderSummary').html(
+                            `<div class="alert alert-danger">Error loading summary. Please try again.</div>`
+                        );
                     }
                 });
-            }
+            };
 
-            function sendReminders() {
+            window.sendReminders = function() {
                 const $btn = $('#confirmRemind');
                 const $progress = $('#reminderProgress');
                 const $progressBar = $('#reminderProgress .progress-bar');
                 const $progressText = $('#progressText');
-
-                // Get current year
                 const selectedYear = $('#yearFilter').val() || localStorage.getItem('selectedYear') ||
                     "{{ date('Y') }}";
-
-                // Update form with current year
                 $('#remindAllForm input[name="year"]').val(selectedYear);
-
                 $btn.prop('disabled', true);
                 $progress.show();
                 $progressBar.css('width', '10%');
                 $progressText.text('Preparing to send...');
-
                 $.ajax({
                     url: $('#remindAllForm').attr('action'),
                     method: 'POST',
@@ -1678,75 +1497,42 @@
                         return xhr;
                     },
                     success: function(response) {
-                        console.log('Remind response:', response);
                         $progressBar.css('width', '100%');
                         $progressText.text('Completed!');
-
-                        setTimeout(function() {
+                        setTimeout(() => {
                             $('#reminderModal').modal('hide');
-
-                            // Show success message with stats
                             let statsHtml = '';
                             if (response.stats) {
-                                statsHtml = `
-                            <hr>
-                            <div class="text-start">
-                                <small>
-                                    <strong>Statistics:</strong><br>
-                                    - Total processed: ${response.stats.total}<br>
-                                    - Successful: ${response.stats.successful}<br>
-                                    - Failed: ${response.stats.failed}
-                                </small>
-                            </div>
-                        `;
-
-                                // Show failed details if any
+                                statsHtml =
+                                    `<hr><div class="text-start"><small><strong>Statistics:</strong><br>- Total processed: ${response.stats.total}<br>- Successful: ${response.stats.successful}<br>- Failed: ${response.stats.failed}</small></div>`;
                                 if (response.stats.failed > 0 && response.stats
                                     .failed_details) {
-                                    statsHtml += `
-                                <hr>
-                                <div class="text-start">
-                                    <small>
-                                        <strong>Failed details:</strong><br>
-                                        ${response.stats.failed_details.slice(0, 3).map(detail => `- ${detail}<br>`).join('')}
-                                        ${response.stats.failed_details.length > 3 ? `... and ${response.stats.failed_details.length - 3} more` : ''}
-                                    </small>
-                                </div>
-                            `;
+                                    statsHtml +=
+                                        `<hr><div class="text-start"><small><strong>Failed details:</strong><br>${response.stats.failed_details.slice(0, 3).map(detail => `- ${detail}<br>`).join('')}${response.stats.failed_details.length > 3 ? `... and ${response.stats.failed_details.length - 3} more` : ''}</small></div>`;
                                 }
                             }
-
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Reminders Sent!',
                                 html: response.message + statsHtml,
                                 confirmButtonText: 'OK'
                             });
-
-                            // Reset
                             $btn.prop('disabled', false);
                             $progress.hide();
                             $progressBar.css('width', '0%');
-
-                            // Refresh the bills table to show updated status
                             loadBillsData();
-
                         }, 1000);
                     },
                     error: function(xhr) {
-                        console.error('AJAX Error:', xhr);
                         $btn.prop('disabled', false);
                         $progress.hide();
-
                         let errorMsg = 'Error sending reminders. ';
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMsg += xhr.responseJSON.message;
-                        } else if (xhr.status === 422) {
-                            errorMsg += 'Validation error. Please check the data.';
-                        } else if (xhr.status === 500) {
-                            errorMsg += 'Server error. Please try again later.';
-                        }
-
+                        if (xhr.responseJSON && xhr.responseJSON.message) errorMsg += xhr
+                            .responseJSON.message;
+                        else if (xhr.status === 422) errorMsg +=
+                            'Validation error. Please check the data.';
+                        else if (xhr.status === 500) errorMsg +=
+                            'Server error. Please try again later.';
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
@@ -1755,18 +1541,16 @@
                         });
                     }
                 });
-            }
+            };
 
-            // Reset modal when closed
             $('#reminderModal').on('hidden.bs.modal', function() {
                 $('#confirmRemind').prop('disabled', false);
                 $('#reminderProgress').hide();
                 $('#reminderProgress .progress-bar').css('width', '0%');
             });
 
-            // Bind events using event delegation
-            $(document).on('click', '#remindAllBtn', showReminderModal);
-            $(document).on('click', '#confirmRemind', sendReminders);
+            $(document).on('click', '#remindAllBtn', window.showReminderModal);
+            $(document).on('click', '#confirmRemind', window.sendReminders);
         });
     </script>
 

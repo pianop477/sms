@@ -261,7 +261,8 @@
                     <input type="hidden" id="cancelBillId">
                     <div class="mb-3">
                         <label class="form-label">Cancel Reason <span class="text-danger">*</span></label>
-                        <input type="text" name="reason" class="form-control-custom" placeholder="Enter cancel reason" required>
+                        <input type="text" name="reason" class="form-control-custom"
+                            placeholder="Enter cancel reason" required>
                     </div>
                     <div class="small text-muted" id="billPreview"></div>
                     <div class="mb-3">
@@ -281,19 +282,25 @@
 <!-- Bill Details Modal -->
 <div class="modal fade" id="billDetailsModal" tabindex="-1" aria-labelledby="billDetailsModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-md"> <!-- Changed to modal-md for smaller size -->
+    <div class="modal-dialog modal-md">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white py-2">
                 <h6 class="modal-title mb-0" id="billDetailsModalLabel">
                     <i class="fas fa-file-invoice me-1"></i>
                     Bill Details
                 </h6>
-                <button type="button" class="btn btn-xs btn-danger btn-sm" data-bs-dismiss="modal"
-                    aria-label="Close"><i class="fas fa-close"></i></button>
+                <div>
+                    <button type="button" class="btn btn-xs btn-light me-2" id="printBillBtn"
+                        style="display: none;" onclick="printInvoice()">
+                        <i class="fas fa-print me-1"></i> Print
+                    </button>
+                    <button type="button" class="btn btn-xs btn-danger" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="fas fa-close"></i>
+                    </button>
+                </div>
             </div>
             <div class="modal-body p-3">
                 <div id="billDetailsContent">
-                    <!-- Content will be loaded here via AJAX -->
                     <div class="text-center py-3">
                         <div class="spinner-border spinner-border-sm text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>

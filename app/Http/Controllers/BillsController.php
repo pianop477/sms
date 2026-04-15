@@ -1074,12 +1074,9 @@ class BillsController extends Controller
     public function viewBill($billId)
     {
         try {
-            // Log::info('View Bill Request:', ['billId' => $billId]);
-
             $decodedBill = Hashids::decode($billId);
 
             if (empty($decodedBill)) {
-                Log::warning('Invalid bill ID format:', ['billId' => $billId]);
                 return response()->json([
                     'success' => false,
                     'message' => 'Invalid bill ID format'
@@ -1087,7 +1084,6 @@ class BillsController extends Controller
             }
 
             $billId = $decodedBill[0];
-            // Log::info('Decoded Bill ID:', ['decodedId' => $billId]);
 
             // Get bill basic info
             $bill = school_fees::query()
@@ -1108,14 +1104,11 @@ class BillsController extends Controller
                 ->find($billId);
 
             if (!$bill) {
-                // Log::warning('Bill not found:', ['billId' => $billId]);
                 return response()->json([
                     'success' => false,
                     'message' => 'Bill not found'
                 ], 404);
             }
-
-            // Log::info('Bill found:', ['control_number' => $bill->control_number]);
 
             // Get ALL payment history for this bill
             $paymentHistory = school_fees_payment::query()
@@ -1124,11 +1117,13 @@ class BillsController extends Controller
                 ->orderBy('approved_at', 'asc')
                 ->get();
 
-            // Log::info('Payment history count:', ['count' => $paymentHistory->count()]);
-
             // Calculate totals
             $totalPaid = $paymentHistory->sum('amount');
             $balance = $bill->amount - $totalPaid;
+
+            // Get school info for invoice
+            $user = Auth::user();
+            $school = DB::table('schools')->where('id', $user->school_id)->first();
 
             return response()->json([
                 'success' => true,
@@ -1139,14 +1134,10 @@ class BillsController extends Controller
                     'total_paid' => (float) $totalPaid,
                     'balance' => (float) $balance,
                     'payment_count' => $paymentHistory->count()
-                ]
+                ],
+                'school_info' => $school  // <--- HII NDIO TUNAONGEZA
             ]);
         } catch (\Exception $e) {
-            // Log::error('Error in viewBill: ' . $e->getMessage(), [
-            //     'exception' => $e,
-            //     'billId' => $billId ?? 'unknown'
-            // ]);
-
             return response()->json([
                 'success' => false,
                 'message' => 'Server error occurred while loading bill details'
