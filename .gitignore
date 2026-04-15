@@ -10,6 +10,8 @@
 /public/reports
 /public/Transactions
 /public/images
+/public/manifest.json
+/public/service-worker.js
 /storage/*.key
 /storage
 /vendor
