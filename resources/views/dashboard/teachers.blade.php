@@ -649,6 +649,94 @@
                         @endif
                     </div>
                 @endif
+
+                @auth
+                    @php
+                        $user = Auth::user();
+                        $teacher = App\Models\Teacher::where('user_id', $user->id)->first();
+
+                        // Check if teacher can access e-Permit
+                        // Only role_id 2 (Head), 3 (Academic), and 4 (Class Teacher) can access
+                        // Role_id 1 (Normal Teacher) cannot access
+                        $canAccessEPermit = false;
+                        $pendingCount = 0;
+
+                        if ($teacher && in_array($teacher->role_id, [2, 3, 4])) {
+                            $canAccessEPermit = true;
+
+                            // For Class Teacher (role_id=4), we need to check if they are assigned to any class
+                            if ($teacher->role_id == 4) {
+                                // Count permits where this teacher is the assigned class teacher
+                                $pendingCount = App\Models\EPermit::where('status', 'pending_class_teacher')
+                                    ->where('class_teacher_id', $teacher->id)
+                                    ->count();
+                            }
+                            // For Duty Teacher - handled via tod_roster, but they don't get count badge here
+                            // because duty assignment is date-specific
+                            elseif ($teacher->role_id == 3) {
+                                // Academic teacher can see duty teacher pending permits as well
+                                $pendingCount = App\Models\EPermit::where('status', 'pending_duty_teacher')
+                                    ->where('duty_teacher_id', $teacher->id)
+                                    ->count();
+                            }
+                            // For Academic Teacher (role_id=3)
+                            elseif ($teacher->role_id == 3) {
+                                $pendingCount = App\Models\EPermit::where('status', 'pending_academic')
+                                    ->where('academic_teacher_id', $teacher->id)
+                                    ->count();
+                            }
+                            // For Head Teacher (role_id=2)
+                            elseif ($teacher->role_id == 2) {
+                                $pendingCount = App\Models\EPermit::where('status', 'pending_head')
+                                    ->where('head_teacher_id', $teacher->id)
+                                                            ->count();
+                                                    }
+                        }
+                    @endphp
+
+                    @if ($canAccessEPermit)
+                        <li class="nav-item mb-3">
+                            <div class="card border-0 shadow-sm"
+                                style="border-radius: 12px; background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);">
+                                <a href="{{ route('teacher.e-permit.dashboard') }}" class="text-decoration-none">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-3"
+                                                    style="width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                                    <i class="fas fa-file-alt text-white fa-lg"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0 fw-bold" style="color: #1e293b;">Thibitisha Ruhusa</h6>
+                                                    <small class="text-muted">
+                                                        @if ($teacher->role_id == 2)
+                                                            Mwalimu Mkuu
+                                                        @elseif($teacher->role_id == 3)
+                                                            Mwalimu wa Taaluma
+                                                        @elseif($teacher->role_id == 4)
+                                                            Mwalimu wa Darasa
+                                                        @endif
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            <div class="text-end">
+                                                @if ($pendingCount > 0)
+                                                    <span class="badge bg-danger rounded-pill fs-6 px-3 py-2">
+                                                        {{ $pendingCount }}
+                                                    </span>
+                                                    <small class="d-block text-muted mt-1">Pending</small>
+                                                @else
+                                                    <i class="fas fa-check-circle text-success fa-lg"></i>
+                                                    <small class="d-block text-muted mt-1">Updated</small>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </li>
+                    @endif
+                @endauth
             </div>
         @endif
 

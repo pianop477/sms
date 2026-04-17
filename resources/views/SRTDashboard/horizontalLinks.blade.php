@@ -181,7 +181,8 @@
 
                             {{-- System Administration --}}
                             <li>
-                                <a href="javascript:void(0)"><i class="fa fa-screwdriver-wrench"></i><span>Advanced
+                                <a href="javascript:void(0)"><span style="font-size: 1.2rem;">🛠️</span><span>
+                                        Advanced
                                         Settings</span></a>
                                 <ul class="submenu">
                                     <li><a href="{{ route('roles.updateRole') }}"><i class="fas fa-shield"></i> Roles
@@ -215,20 +216,18 @@
                                 </ul>
                             </li>
                             {{-- payment reports --}}
-                            @if (Auth::user()->usertype == 2 && Auth::user()->school === null)
-                                @if (Auth::user()->school->package == 'premium')
-                                    <li>
-                                        <a href="javascript:void(0)"><i class="fas fa-exchange-alt"></i><span>
-                                                Financial
-                                                Transactions</span></a>
-                                        <ul class="submenu">
-                                            <li><a href="{{ route('expenditure.all.transactions') }}"><span
-                                                        style="font-size: 1.2rem;">💶</span> Transactions</a></li>
-                                            <li><a href="{{ route('payment.report') }}">
-                                                    <span style="font-size: 1.2rem;">💳</span> Bills Payment</a></li>
-                                        </ul>
-                                    </li>
-                                @endif
+                            @if (Auth::user()->school->package == 'premium')
+                                <li>
+                                    <a href="javascript:void(0)"><i class="fas fa-exchange-alt"></i><span>
+                                            Financial
+                                            Transactions</span></a>
+                                    <ul class="submenu">
+                                        <li><a href="{{ route('expenditure.all.transactions') }}"><span
+                                                    style="font-size: 1.2rem;">💶</span> Transactions</a></li>
+                                        <li><a href="{{ route('payment.report') }}">
+                                                <span style="font-size: 1.2rem;">💳</span> Bills Payment</a></li>
+                                    </ul>
+                                </li>
                             @endif
                             {{-- Services --}}
                             <li>
@@ -305,14 +304,15 @@
                                 </li>
                                 {{-- Services --}}
                                 <li>
-                                    <a href="javascript:void(0)"><i class="fas fa-gears"></i><span> Advanced Settings </span></a>
+                                    <a href="javascript:void(0)"><i class="fas fa-gears"></i><span> Advanced Settings
+                                        </span></a>
                                     <ul class="submenu">
                                         <li>
                                             <a href="{{ route('services.index') }}"><i
                                                     class="fas fa-wrench"></i><span> Services</span></a>
                                         </li>
                                         <li>
-                                            <a href="{{route('fee-structures.index')}}"><i
+                                            <a href="{{ route('fee-structures.index') }}"><i
                                                     class="fas fa-file-archive-o"></i><span> Fee structure</span></a>
                                         </li>
                                     </ul>
@@ -338,7 +338,7 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="{{ route('employee.statement.index')}}">
+                                            <a href="{{ route('employee.statement.index') }}">
                                                 <i class="fas fa-file-alt"></i> Statements
                                             </a>
                                         </li>

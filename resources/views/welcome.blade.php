@@ -875,24 +875,24 @@
                 <div>
                     <h4 class="text-lg sm:text-xl font-bold mb-3 sm:mb-4" id="footer-links-title">Important Links</h4>
                     <ul class="space-y-2">
-                        <li><a href="{{ route('welcome') }}"
-                                class="text-gray-400 hover:text-white transition text-sm sm:text-base block py-1"
-                                id="footer-link-home">Home</a></li>
-                        <li><a href="#features"
-                                class="text-gray-400 hover:text-white transition text-sm sm:text-base block py-1"
-                                id="footer-link-features">Features</a></li>
-                        <li><a href="#contact"
-                                class="text-gray-400 hover:text-white transition text-sm sm:text-base block py-1"
-                                id="footer-link-contact">Contact Us</a></li>
                         <li><a href="{{ route('login') }}"
                                 class="text-gray-400 hover:text-white transition text-sm sm:text-base block py-1"
                                 id="footer-link-login">Login</a></li>
                         <li><a href="{{ route('contract.gateway.init') }}"
                                 class="text-gray-400 hover:text-white transition text-sm sm:text-base block py-1"
                                 id="footer-link-contract">Contracts Gateway</a></li>
-                        <li><a href="{{ route('tokens.verify') }}"
+                        <li>
+                            <a href="{{ route('tokens.verify') }}"
                                 class="text-gray-400 hover:text-white transition text-sm sm:text-base block py-1"
-                                id="footer-link-token">Gate Pass Verifier</a></li>
+                                id="footer-link-token">Gate Pass Verifier
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('parent.e-permit.student-form') }}"
+                                class="text-gray-400 hover:text-white transition text-sm sm:text-base block py-1"
+                                id="footer-link-pass">e-Permit Request
+                            </a>
+                        </li>
                     </ul>
                 </div>
 
@@ -1315,12 +1315,10 @@
                 // Footer
                 'footer-description': 'We help schools have better management, accuracy and modern system at affordable cost.',
                 'footer-links-title': 'Important Links',
-                'footer-link-home': 'Home',
-                'footer-link-features': 'Features',
-                'footer-link-contact': 'Contact Us',
                 'footer-link-login': 'Login',
                 'footer-link-contract': 'Contracts Gateway',
                 'footer-link-token': 'Gate Pass Verifier',
+                'footer-link-pass': 'e-Permit Request',
                 'footer-services-title': 'Our Services',
                 'footer-service-1': 'Academic Management',
                 'footer-service-2': 'Financial Management',
@@ -1463,12 +1461,10 @@
                 // Footer
                 'footer-description': 'Tunasaidia shule kuwa na usimamizi bora, usahihi na wa kisasa kwa gharama nafuu.',
                 'footer-links-title': 'Viungo Muhimu',
-                'footer-link-home': 'Nyumbani',
-                'footer-link-features': 'Vipengele',
-                'footer-link-contact': 'Wasiliana Nasi',
                 'footer-link-login': 'Ingia',
                 'footer-link-contract': 'Dirisha la Mikataba',
                 'footer-link-token': 'Hakiki Geti Pass',
+                'footer-link-pass': 'Omba Ruhusa',
                 'footer-services-title': 'Huduma Zetu',
                 'footer-service-1': 'Usimamizi wa Masomo',
                 'footer-service-2': 'Usimamizi wa Fedha',

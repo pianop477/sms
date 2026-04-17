@@ -24,6 +24,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\OtherStaffsController;
 use App\Http\Controllers\PackagesController;
+use App\Http\Controllers\Parent\EPermitController;
 use App\Http\Controllers\ParentsController;
 use App\Http\Controllers\paymentBatchController;
 use App\Http\Controllers\PayrollController;
@@ -46,6 +47,7 @@ use App\Http\Controllers\UnofficialDeductionController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\WebAuthn\WebAuthnLoginController;
 use App\Http\Controllers\WebAuthn\WebAuthnRegisterController;
+use App\Http\Controllers\Teacher\EPermitController as TeacherEPermitController;
 use App\Models\Attendance;
 use App\Models\Examination_result;
 use App\Models\Parents;
@@ -722,6 +724,30 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
     Route::get('/api/employees/with-contracts', [PayrollController::class, 'getEmployeesWithContracts'])->name('api.employees.with-contracts');
     Route::get('/api/employees/search', [PayrollController::class, 'searchEmployees'])->name('api.employees.search');
 
+    // Teacher E-Permit Routes (require authentication)
+    Route::prefix('teacher/e-permit')->name('teacher.e-permit.')->group(function () {
+        // Dashboard & Listing
+        Route::get('/dashboard', [TeacherEPermitController::class, 'dashboard'])->name('dashboard');
+        Route::get('/{id}', [TeacherEPermitController::class, 'show'])->name('show');
+
+        // Approval Actions
+        Route::post('/{id}/approve', [TeacherEPermitController::class, 'approve'])->name('approve');
+        Route::post('/{id}/reject', [TeacherEPermitController::class, 'reject'])->name('reject');
+
+        // Return Check-in
+        Route::get('/return', [TeacherEPermitController::class, 'returnForm'])->name('return-form');
+        Route::get('/return/search', [TeacherEPermitController::class, 'searchReturn'])->name('return-search');
+        Route::post('/return/{id}/confirm', [TeacherEPermitController::class, 'confirmReturn'])->name('return-confirm');
+
+        // Reports
+        Route::get('/reports', [TeacherEPermitController::class, 'reports'])->name('reports');
+        Route::get('/reports/export-pdf', [TeacherEPermitController::class, 'exportPDF'])->name('export-pdf');
+        Route::get('/reports/export-excel', [TeacherEPermitController::class, 'exportExcel'])->name('export-excel');
+
+        // Print Gatepass
+        Route::get('/print/{id}', [TeacherEPermitController::class, 'printGatepass'])->name('print');
+    });
+
     // end of auth
 });
 
@@ -804,3 +830,11 @@ Route::get('/verify-slip', [SalarySlipVerificationController::class, 'verifyWeb'
 Route::get('/scan-qr', function () {
     return view('payroll.scan-qr');
 })->name('scan.qr');
+
+// Parent routes (no authentication required for submission)
+Route::prefix('e-permit')->name('parent.e-permit.')->group(function () {
+    Route::get('/request', [EPermitController::class, 'showStudentForm'])->name('student-form');
+    Route::post('/verify-student', [EPermitController::class, 'verifyStudent'])->name('verify-student');
+    Route::get('/request/{student}', [EPermitController::class, 'showRequestForm'])->name('request-form');
+    Route::post('/submit/{student}', [EPermitController::class, 'submitRequest'])->name('submit-request');
+});
