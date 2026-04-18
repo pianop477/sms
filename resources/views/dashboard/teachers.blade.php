@@ -696,7 +696,7 @@
                                                     <i class="fas fa-file-alt text-white fa-lg"></i>
                                                 </div>
                                                 <div>
-                                                    <h6 class="mb-0 fw-bold" style="color: #1e293b;">Maombi ya Ruhusa</h6>
+                                                    <h6 class="mb-0 fw-bold" style="color: #1e293b;">Maombi ya Ruhusa (e-Permit System Module)</h6>
                                                     <small class="text-muted">
                                                         @if ($teacher->role_id == 2)
                                                             Mwalimu Mkuu

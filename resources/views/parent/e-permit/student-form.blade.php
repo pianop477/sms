@@ -64,7 +64,7 @@
             margin-bottom: 24px;
         }
 
-        .gateway-header h2 {
+        .gateway-header h3 {
             color: #2d3748;
             font-weight: 700;
             margin-bottom: 6px;
@@ -251,7 +251,7 @@
             margin-right: 8px;
         }
 
-        .student-header h2 {
+        .student-header h3 {
             font-size: 20px;
             font-weight: 700;
             margin: 0;
@@ -453,7 +453,7 @@
         @media (max-width: 480px) {
             body { padding: 12px; }
             .gateway-card { padding: 20px 16px; border-radius: 24px; }
-            .gateway-header h2 { font-size: 1.3rem; }
+            .gateway-header h3 { font-size: 1.1rem; }
             .gateway-icon { width: 65px; height: 65px; }
             .gateway-icon i { font-size: 32px; }
             .student-id-input { padding: 14px 16px; font-size: 16px; }
@@ -476,7 +476,7 @@
                 <div class="gateway-icon">
                     <i class="fas fa-file-alt"></i>
                 </div>
-                <h2>e-PERMIT REQUEST</h2>
+                <h3>e-PERMIT System Module</h3>
                 <p>Omba ruhusa ya mwanafunzi hapa</p>
             </div>
 
@@ -658,7 +658,7 @@
                         <div class="student-header">
                             <div>
                                 <i class="fas fa-user-check"></i>
-                                <h2>TAARIFA ZA MWANAFUNZI</h2>
+                                <h3>TAARIFA ZA MWANAFUNZI</h3>
                                 <p>Tafadhali hakikisha taarifa kama ni sahihi</p>
                             </div>
                         </div>

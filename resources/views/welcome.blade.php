@@ -890,7 +890,7 @@
                         <li>
                             <a href="{{ route('parent.e-permit.student-form') }}"
                                 class="text-gray-400 hover:text-white transition text-sm sm:text-base block py-1"
-                                id="footer-link-pass">e-Permit Request
+                                id="footer-link-pass">e-Permit System Module
                             </a>
                         </li>
                     </ul>
@@ -1318,7 +1318,7 @@
                 'footer-link-login': 'Login',
                 'footer-link-contract': 'Contracts Gateway',
                 'footer-link-token': 'Gate Pass Verifier',
-                'footer-link-pass': 'e-Permit Request',
+                'footer-link-pass': 'e-Permit System Module',
                 'footer-services-title': 'Our Services',
                 'footer-service-1': 'Academic Management',
                 'footer-service-2': 'Financial Management',
@@ -1464,7 +1464,7 @@
                 'footer-link-login': 'Ingia',
                 'footer-link-contract': 'Dirisha la Mikataba',
                 'footer-link-token': 'Hakiki Geti Pass',
-                'footer-link-pass': 'Omba Ruhusa',
+                'footer-link-pass': 'Maombi ya Ruhusa kwa Wanafunzi',
                 'footer-services-title': 'Huduma Zetu',
                 'footer-service-1': 'Usimamizi wa Masomo',
                 'footer-service-2': 'Usimamizi wa Fedha',
