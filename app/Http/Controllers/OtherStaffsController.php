@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\other_staffs;
 use App\Models\school;
+use App\Models\school_constracts;
 use App\Models\Teacher;
 use App\Models\Transport;
 use Dompdf\Dompdf;
@@ -26,8 +27,8 @@ class OtherStaffsController extends Controller
 
     public function index()
     {
-        $drivers = Transport::all();
-        $otherStaffs = other_staffs::all();
+        $drivers = Transport::where('status', 1)->get();
+        $otherStaffs = other_staffs::where('status', 1)->get();
 
         // Normalize name key for every record
         $normalizedDrivers = $drivers->map(function ($driver) {
@@ -46,6 +47,29 @@ class OtherStaffsController extends Controller
             ->sortBy('full_name');
 
         return view('OtherStaffs.index', compact('combinedStaffs'));
+    }
+
+    public function deletedStaffs()
+    {
+        $drivers = Transport::where('status', 0)->get();
+        $otherStaffs = other_staffs::where('status', 0)->get();
+
+        $normalizedDrivers = $drivers->map(function ($driver) {
+            $driver->full_name = $driver->driver_name;   // from Transport model
+            return $driver;
+        });
+
+         $normalizedStaffs = $otherStaffs->map(function ($staff) {
+            $staff->full_name = $staff->first_name;      // from OtherStaffs model
+            return $staff;
+        });
+
+        // Combine
+        $combinedStaffs = $normalizedStaffs
+            ->concat($normalizedDrivers)
+            ->sortBy('full_name');
+
+        return view('OtherStaffs.trash', compact('combinedStaffs'));
     }
 
 
@@ -340,7 +364,7 @@ class OtherStaffsController extends Controller
                 'status' => $request->input('status', 1)
             ]);
 
-            Alert()->toast('Staff has been unblocked successfully', 'success');
+            Alert()->toast('Staff has been restored successfully', 'success');
             return back();
         } catch (Exception $e) {
             Alert()->toast($e->getMessage(), 'error');
@@ -359,15 +383,26 @@ class OtherStaffsController extends Controller
                 $staff = Other_staffs::findOrFail($decoded[0]);
             }
 
-            if ($staff->status == 1) {
-                Alert()->toast('Cannot delete active member, please block first', 'info');
+            $isActive = $this->isActive($staff);
+
+            if ($isActive == true) {
+                Alert()->toast('Cannot delete active staff, please block first', 'info');
                 return back();
             }
 
-            if ($staff->bus_no != null) {
+            $hasBus = $this->hasBusToDrive($staff);
+            if ($hasBus) {
                 Alert()->toast('This driver cannot be deleted because has a bus to drive', 'info');
                 return back();
             }
+
+            $hasContract = $this->hasContract($staff);
+
+            if($hasContract) {
+                Alert()->toast('This staff has contract cannot be deleted', 'info');
+                return back();
+            }
+
             // delete staff image
             if (!empty($staff->profile_image)) {
                 $staffImagePath = storage_path('app/public/profile/' . $staff->profile_image);
@@ -873,5 +908,30 @@ class OtherStaffsController extends Controller
         $image->storeAs($directory, $imageFile, 'public');
 
         return $imageFile;
+    }
+
+    private function hasContract($staff)
+    {
+        return $contractData = school_constracts::where('applicant_id', $staff->staff_id)->exists();
+
+    }
+
+    private function hasBusToDrive($staff)
+    {
+        return $buserDrive = Transport::where('id', $staff->id)->exists();
+    }
+
+    private function isActive ($staff)
+    {
+        $isActive = false;
+        $status = $staff->status;
+        if($status == 1) {
+            return $isActive = true;
+        }
+        else {
+            return $isActive = false;
+        }
+
+        return $isActive;
     }
 }

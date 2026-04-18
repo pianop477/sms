@@ -324,8 +324,8 @@
                                     <a class="dropdown-item dropdown-item-custom" href="{{route('students.trash')}}">
                                         <i class="fas fa-user-graduate me-2"></i> Students
                                     </a>
-                                    <a class="dropdown-item dropdown-item-custom" href="#">
-                                        <i class="fas fa-user-friends me-2"></i> Parents
+                                    <a class="dropdown-item dropdown-item-custom" href="{{route('staffs.trash')}}">
+                                        <i class="fas fa-user-tie me-2"></i> Other Staffs
                                     </a>
                                 </div>
                             </div>

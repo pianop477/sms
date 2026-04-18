@@ -27,18 +27,22 @@
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
             overflow-y: visible;
+            /* Changed from hidden to visible */
             margin-top: 30px;
             border: 1px solid rgba(255, 255, 255, 0.5);
             position: relative;
+            /* Added for proper dropdown positioning */
         }
 
         .card-header-custom {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
-            padding: 7px 15px;
+            padding: 12px 15px;
             position: relative;
             overflow: visible;
+            /* Changed from hidden to visible */
             z-index: 100;
+            /* Lower than dropdown */
         }
 
         .card-header-custom::before {
@@ -48,9 +52,10 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
             transform: rotate(30deg);
             z-index: -1;
+            /* Keep background behind content */
         }
 
         .header-title {
@@ -65,18 +70,20 @@
             padding: 10px;
             position: relative;
             z-index: 1;
+            /* Ensure content stays above background */
         }
 
         .dropdown-custom {
             background: linear-gradient(135deg, var(--success) 0%, #20c997 100%);
             border: none;
             border-radius: 50px;
-            padding: 10px 20px;
+            padding: 5px 10px;
             font-weight: 600;
             color: white;
             transition: all 0.3s;
             position: relative;
             z-index: 101;
+            /* Higher than card header */
         }
 
         .dropdown-custom:hover {
@@ -91,6 +98,7 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
             overflow: hidden;
             z-index: 1000;
+            /* Highest z-index to ensure visibility */
             position: absolute;
             margin-top: 5px;
         }
@@ -144,26 +152,8 @@
             background-color: rgba(78, 84, 200, 0.1);
         }
 
-        .badge-success-custom {
-            background: linear-gradient(135deg, var(--success) 0%, #20c997 100%);
-            color: white;
-            border-radius: 50px;
-            padding: 8px 16px;
-            font-weight: 600;
-            font-size: 12px;
-        }
-
         .badge-danger-custom {
             background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%);
-            color: white;
-            border-radius: 50px;
-            padding: 8px 16px;
-            font-weight: 600;
-            font-size: 12px;
-        }
-
-        .badge-secondary-custom {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
             color: white;
             border-radius: 50px;
             padding: 8px 16px;
@@ -177,7 +167,7 @@
             margin: 0;
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         .action-list li {
@@ -215,7 +205,7 @@
             color: var(--danger);
         }
 
-        .student-avatar {
+        .user-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -229,7 +219,7 @@
             margin-right: 10px;
         }
 
-        .student-info {
+        .user-info {
             display: flex;
             align-items: center;
         }
@@ -247,6 +237,51 @@
             width: 32px;
             height: 32px;
         }
+
+        .action-icons {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            flex-wrap: nowrap;
+        }
+
+        .action-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .action-icon.view {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .action-icon.warning {
+            background: linear-gradient(135deg, #f6c23e 0%, #f4b619 100%);
+        }
+
+        .action-icon.success {
+            background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%);
+        }
+
+        .action-icon.danger {
+            background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%);
+        }
+
+        .action-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
 
         .gender-badge.male {
             background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%);
@@ -266,6 +301,7 @@
             z-index: 0;
         }
 
+        /* Fix for dropdown positioning */
         .dropdown-container {
             position: relative;
             display: inline-block;
@@ -286,15 +322,15 @@
 
             .action-list {
                 flex-direction: column;
-                gap: 10px;
+                gap: 8px;
             }
 
-            .student-info {
+            .user-info {
                 flex-direction: column;
                 align-items: flex-start;
             }
 
-            .student-avatar {
+            .user-avatar {
                 margin-right: 0;
                 margin-bottom: 8px;
             }
@@ -319,112 +355,124 @@
 
     <div class="">
         <div class="glass-card">
+            <!-- Card Header with Dropdown -->
             <div class="card-header-custom">
                 <div class="row align-items-center">
                     <div class="col-md-8">
                         <h4 class="header-title text-white">
-                            <i class="fas fa-user-graduate me-2"></i> Deleted Student Accounts
+                            <i class="fas fa-trash-alt me-2"></i> Deleted Non-teaching Staffs
                         </h4>
-                        <p class="mb-0 text-white"> Manage deleted students</p>
+                        <p class="mb-0 text-white">Manage deleted non-teaching staffs and restore access</p>
                     </div>
                     <div class="col-md-4 text-end">
                         <div class="dropdown-container">
                             <div class="btn-group" role="group">
-                                <button id="btnGroupDrop1" type="button" class="dropdown-custom" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <button id="btnGroupDrop1" type="button" class="dropdown-custom" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false">
                                     <i class="fas fa-archive me-2"></i> Deleted Accounts
                                 </button>
                                 <div class="dropdown-menu dropdown-menu-custom" aria-labelledby="btnGroupDrop1">
-                                    <a href="{{route('Teachers.trashed')}}" class="dropdown-item dropdown-item-custom">
+                                    <a href="{{ route('Teachers.trashed') }}" class="dropdown-item dropdown-item-custom">
                                         <i class="fas fa-chalkboard-teacher me-2"></i> Teachers
                                     </a>
-                                    <a class="dropdown-item dropdown-item-custom" href="{{route('students.trash')}}">
+                                    <a class="dropdown-item dropdown-item-custom" href="{{ route('students.trash') }}">
                                         <i class="fas fa-user-graduate me-2"></i> Students
                                     </a>
-                                    <a class="dropdown-item dropdown-item-custom" href="{{route('staffs.trash')}}">
-                                        <i class="fas fa-user-friends me-2"></i> Other Staffs
+                                    <a class="dropdown-item dropdown-item-custom" href="{{ route('staffs.trash') }}">
+                                        <i class="fas fa-user-tie me-2"></i> Other Staffs
                                     </a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <i class="fas fa-user-graduate floating-icons"></i>
+                <i class="fas fa-user-slash floating-icons"></i>
             </div>
 
+            <!-- Card Body with Table -->
             <div class="card-body">
                 <div class="table-container">
                     <div class="table-responsive">
                         <table class="table table-custom table-responsive-md" id="myTable">
                             <thead class="table-dark">
                                 <tr>
-                                    <th scope="col">Admission No</th>
-                                    <th scope="col">Student Name</th>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Staff's Name</th>
                                     <th scope="col">Gender</th>
-                                    <th scope="col">Class</th>
+                                    <th scope="col">Phone</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Joined</th>
                                     <th scope="col">Status</th>
                                     <th scope="col" class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($students as $student)
+                                @foreach ($combinedStaffs as $teacher)
                                     <tr>
-                                        <td class="text-uppercase fw-bold">{{$student->admission_number}}</td>
+                                        <td>{{ $loop->iteration }}</td>
                                         <td>
-                                            <div class="student-info">
-                                                <div class="student-avatar text-capitalize">
-                                                    {{ ucwords(strtolower(substr($student->first_name, 0, 1))) }}{{ ucwords(strtolower(substr($student->last_name, 0, 1))) }}
+                                            <div class="user-info">
+                                                <div class="user-avatar text-capitalize">
+                                                    @if (isset($teacher->driver_name))
+                                                        {{ ucwords(strtolower(substr($teacher->driver_name, 0, 1))) }}
+                                                    @else
+                                                        {{ ucwords(strtolower(substr($teacher->first_name, 0, 1))) }}{{ ucwords(strtolower(substr($teacher->last_name, 0, 1))) }}
+                                                    @endif
                                                 </div>
                                                 <div>
-                                                    <div class="text-capitalize fw-bold">
-                                                        {{ucwords(strtolower($student->first_name. ' '. $student->middle_name. ' '. $student->last_name))}}
-                                                    </div>
+                                                    @if (isset($teacher->driver_name))
+                                                        <div class="text-capitalize fw-bold">
+                                                            {{ ucwords(strtolower($teacher->driver_name)) }} </div>
+                                                    @else
+                                                        <div class="text-capitalize fw-bold">
+                                                            {{ ucwords(strtolower($teacher->first_name)) }}{{ ucwords(strtolower($teacher->last_name)) }}
+                                                        </div>
+                                                    @endif
+                                                    <small class="text-muted">ID:
+                                                        {{ strtoupper($teacher->staff_id) }}</small>
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="text-center">
-                                            @if(strtolower($student->gender[0]) === 'm')
+                                            @if (strtolower($teacher->gender[0]) === 'm')
                                                 <span class="gender-badge male" title="Male">M</span>
-                                            @elseif(strtolower($student->gender[0]) === 'f')
+                                            @elseif(strtolower($teacher->gender[0]) === 'f')
                                                 <span class="gender-badge female" title="Female">F</span>
                                             @else
-                                                <span class="gender-badge" title="Other">{{$student->gender[0]}}</span>
+                                                <span class="gender-badge" title="Other">{{ $teacher->gender[0] }}</span>
                                             @endif
                                         </td>
-                                        <td class="text-uppercase fw-bold">{{$student->class_name}}</td>
+                                        <td>{{ $teacher->phone ?? 'N/A' }}</td>
+                                        <td>{{ $teacher->email ?? 'N/A' }}</td>
+                                        <td>{{ $teacher->joined ?? 'N/A' }}</td>
                                         <td>
-                                            @if ($student->status == 1)
-                                                <span class="badge-success-custom">
-                                                    <i class="fas fa-check-circle me-1"></i> Active
-                                                </span>
-                                            @elseif ($student->status == 2)
+                                            @if ($teacher->status == 0)
                                                 <span class="badge-danger-custom">
                                                     <i class="fas fa-trash me-1"></i> Deleted
-                                                </span>
-                                            @else
-                                                <span class="badge-secondary-custom">
-                                                    <i class="fas fa-ban me-1"></i> Blocked
                                                 </span>
                                             @endif
                                         </td>
                                         <td class="text-center">
                                             <ul class="action-list">
                                                 <li>
-                                                    <form action="{{route('student.restored.trash', ['student' => Hashids::encode($student->id)])}}"
+                                                    <form action="{{ route('unblock.other.staffs', ['type' => $teacher->job_title, 'id' => Hashids::encode($teacher->id)]) }}"
                                                           method="POST"
-                                                          class="d-inline"
-                                                          onsubmit="return confirmAction('restore', '{{$student->first_name}}', '{{$student->last_name}}')">
+                                                          class="d-inline">
                                                         @csrf
                                                         @method('PUT')
-                                                        <button type="submit" class="action-btn action-btn-success" title="Restore Student">
-                                                            <i class="fas fa-undo"></i>
+                                                        <button type="submit" onclick="return confirm('Are you sure?')" class="action-icon success" title="Restore">
+                                                            <i class="fas fa-check"></i>
                                                         </button>
                                                     </form>
                                                 </li>
                                                 <li>
-                                                    <form action="{{route('student.delete.permanent', ['student' => Hashids::encode($student->id)])}}" method="POST">
+                                                    <form
+                                                        action="{{ route('remove.other.staffs', ['type' => $teacher->job_title, 'id' => Hashids::encode($teacher->id)]) }}"
+                                                        method="POST" class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="action-btn action-btn-danger" title="Delete" onclick="return confirm('Are you sure you want delete permanently {{strtoupper($student->first_name)}} {{strtoupper($student->last_name)}}')">
+                                                        <button type="submit" onclick="return confirm(Are you sure? ')"
+                                                            class="action-icon danger" title="Delete">
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </form>
@@ -440,8 +488,9 @@
             </div>
         </div>
     </div>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             // Function to handle confirmation dialogs
             window.confirmAction = function(action, firstName, lastName) {
                 const userName = `${firstName.toUpperCase()} ${lastName.toUpperCase()}`;

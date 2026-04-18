@@ -359,17 +359,20 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::delete('Accountants/delete/{id}', [AccountantsController::class, 'deleteAccountants'])->name('Accountants.delete');
 
         // other staff management
-        Route::get('/Staffs', [OtherStaffsController::class, 'index'])->name('OtherStaffs.index');
-        Route::post('/Staffs', [OtherStaffsController::class, 'addStaffInformation'])->name('OtherStaffs.store');
-        Route::get('/Staffs/profile/type/{type}/{id}', [OtherStaffsController::class, 'staffProfile'])->name('OtherStaffs.profile');
-        Route::put('Staffs/profile/update/type/{type}/{id}', [OtherStaffsController::class, 'updateStaffProfile'])->name('OtherStaffs.update');
-        Route::put('/Staff/block/status/type/{type}/{id}', [OtherStaffsController::class, 'blockStatus'])->name('block.other.staffs');
-        Route::put('/Staff/unblock/status/type/{type}/{id}', [OtherStaffsController::class, 'unblockStatus'])->name('unblock.other.staffs');
-        Route::delete('Staff/remove/staff/type/{type}/{id}', [OtherStaffsController::class, 'removeStaff'])->name('remove.other.staffs');
-        Route::get('/Staff/export/format/{format}', [OtherStaffsController::class, 'exportStaffReport'])->name('export.other.staffs');
-        Route::get('/Staff/bank-details/stype/{type}/{id}', [OtherStaffsController::class, 'bankDetails'])->name('update.staff.bank.details');
-        Route::put('/Staff/update-bank-details/stype/{type}/{id}', [OtherStaffsController::class, 'updateStaffBankDetails'])->name('save.staff.bank');
-        Route::put('/Staff/update/alternative-phone/stype/{type}/{id}', [OtherStaffsController::class, 'addStaffAlternativePhone'])->name('staff.add.phone');
+        Route::prefix('Staffs')->group(function() {
+            Route::get('/', [OtherStaffsController::class, 'index'])->name('OtherStaffs.index');
+            Route::post('/store', [OtherStaffsController::class, 'addStaffInformation'])->name('OtherStaffs.store');
+            Route::get('/profile/type/{type}/{id}', [OtherStaffsController::class, 'staffProfile'])->name('OtherStaffs.profile');
+            Route::put('profile/update/type/{type}/{id}', [OtherStaffsController::class, 'updateStaffProfile'])->name('OtherStaffs.update');
+            Route::put('/block/status/type/{type}/{id}', [OtherStaffsController::class, 'blockStatus'])->name('block.other.staffs');
+            Route::put('/unblock/status/type/{type}/{id}', [OtherStaffsController::class, 'unblockStatus'])->name('unblock.other.staffs');
+            Route::delete('/remove/staff/type/{type}/{id}', [OtherStaffsController::class, 'removeStaff'])->name('remove.other.staffs');
+            Route::get('/export/format/{format}', [OtherStaffsController::class, 'exportStaffReport'])->name('export.other.staffs');
+            Route::get('/bank-details/stype/{type}/{id}', [OtherStaffsController::class, 'bankDetails'])->name('update.staff.bank.details');
+            Route::put('/update-bank-details/stype/{type}/{id}', [OtherStaffsController::class, 'updateStaffBankDetails'])->name('save.staff.bank');
+            Route::put('/update/alternative-phone/stype/{type}/{id}', [OtherStaffsController::class, 'addStaffAlternativePhone'])->name('staff.add.phone');
+            Route::get('/trash', [OtherStaffsController::class, 'deletedStaffs'])->name('staffs.trash');
+        });
     });
 
     //3. ROUTE ACCESS FOR EITHER HEAD TEACHER OR ACADEMIC ONLY ============================================================================

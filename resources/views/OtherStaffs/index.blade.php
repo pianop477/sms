@@ -855,16 +855,6 @@
                                                         </button>
                                                     </form>
                                                 @endif
-
-                                                <form action="{{ route('remove.other.staffs', ['type' => $row->job_title, 'id' => Hashids::encode($row->id)]) }}"
-                                                      method="POST"
-                                                      class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" onclick="return confirm('Delete {{ $row->first_name ?? $row->driver_name }}? This cannot be undone.')" class="action-icon danger" title="Delete">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
                                             </div>
                                         </td>
                                     </tr>
