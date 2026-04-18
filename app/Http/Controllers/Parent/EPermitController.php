@@ -8,7 +8,6 @@ use App\Models\Student;
 use App\Services\EPermitService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Hash;
 use Vinkla\Hashids\Facades\Hashids;
 
 class EPermitController extends Controller
@@ -139,8 +138,9 @@ class EPermitController extends Controller
             'expected_return_date' => 'required|date|after_or_equal:departure_date'
         ]);
 
-        // Find class teacher using class_id and group from class_teachers table
-        $classTeacher = $this->ePermitService->findClassTeacher($student);
+        // Get FIRST class teacher for assignment (we store one teacher ID as reference)
+        // ANY class teacher can approve later, but we need one for initial assignment
+        $classTeacher = $this->ePermitService->getFirstClassTeacher($student);
 
         if (!$classTeacher) {
             return response()->json([
@@ -149,18 +149,19 @@ class EPermitController extends Controller
             ], 422);
         }
 
-        // Find duty teacher(s) for the departure date from tod_roster
-        $dutyTeachers = $this->ePermitService->findDutyTeachersForDate($validated['departure_date']);
-        $firstDutyTeacher = !empty($dutyTeachers) ? $dutyTeachers[0] : null;
+        // Get first duty teacher for the departure date from tod_roster (for assignment)
+        $firstDutyTeacher = $this->ePermitService->getFirstDutyTeacherForDate($validated['departure_date']);
 
-        // Find academic teacher (role_id = 3)
-        $academicTeacher = $this->ePermitService->findAcademicTeacher($student->school_id);
+        // Get first academic teacher for reference (ANY academic teacher can approve later)
+        $academicTeachers = $this->ePermitService->getAcademicTeachers($student->school_id);
+        $firstAcademicTeacher = $academicTeachers->isNotEmpty() ? $academicTeachers->first() : null;
 
-        // Find head teacher (role_id = 2)
-        $headTeacher = $this->ePermitService->findHeadTeacher($student->school_id);
+        // Get first head teacher for reference (ANY head teacher can approve later)
+        $headTeachers = $this->ePermitService->getHeadTeachers($student->school_id);
+        $firstHeadTeacher = $headTeachers->isNotEmpty() ? $headTeachers->first() : null;
 
-        // Determine initial status - if no duty teacher, skip to academic
-        $initialStatus = $firstDutyTeacher ? 'pending_class_teacher' : 'pending_class_teacher';
+        // Determine initial status
+        $initialStatus = 'pending_class_teacher';
 
         // Create e-permit request
         $ePermit = EPermit::create([
@@ -179,8 +180,8 @@ class EPermitController extends Controller
             'status' => $initialStatus,
             'class_teacher_id' => $classTeacher->id,
             'duty_teacher_id' => $firstDutyTeacher?->id,
-            'academic_teacher_id' => $academicTeacher?->id,
-            'head_teacher_id' => $headTeacher?->id
+            'academic_teacher_id' => $firstAcademicTeacher?->id,
+            'head_teacher_id' => $firstHeadTeacher?->id
         ]);
 
         // Log tracking
@@ -192,10 +193,11 @@ class EPermitController extends Controller
             'Ombi la ruhusa limewasilishwa na mzazi/mlezi'
         );
 
-        $message = 'Ombi lako limewasilishwa kwa mafanikio.';
-        // if (!$firstDutyTeacher) {
-        //     $message .= ' Kumbuka: Hakuna mwalimu wa zamu kwa tarehe uliyochagua, hivyo ombi litaenda moja kwa moja kwa Mwalimu wa Taaluma baada ya Mwalimu wa Darasa.';
-        // }
+        $message = 'Ombi lako limewasilishwa kwa kikamilifu.';
+
+        if (!$firstDutyTeacher) {
+            $message .= ' Kumbuka: Hakuna mwalimu wa zamu kwa tarehe uliyochagua, hivyo ombi litaenda moja kwa moja kwa Mwalimu wa Taaluma baada ya Mwalimu wa Darasa.';
+        }
 
         return response()->json([
             'success' => true,

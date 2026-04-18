@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\Class_teacher;
+use App\Models\EPermit;
 use App\Models\Grade;
 use App\Models\Parents;
 use App\Models\school;
@@ -91,7 +92,6 @@ class AttendanceController extends Controller
     public function store(Request $request, $student_class)
     {
         $id = Hashids::decode($student_class);
-        // Check if the class exists
         $user = Auth::user();
 
         $class = Grade::findOrFail($id[0]);
@@ -100,18 +100,24 @@ class AttendanceController extends Controller
         $logged_user = Auth::user();
         $teacher = Teacher::where('user_id', '=', $logged_user->id)->firstOrFail();
 
-        //check if the teacher logged in is the class teacher
-        $class_teacher = Class_teacher::where('class_id', '=', $class_id)->where('teacher_id', '=', $teacher->id)->first();
+        // Check if the teacher logged in is the class teacher
+        $class_teacher = Class_teacher::where('class_id', '=', $class_id)
+            ->where('teacher_id', '=', $teacher->id)
+            ->first();
+
         if (!$class_teacher) {
-            // Alert::error('Error', 'You are not the class teacher for this class.');
             Alert()->toast('You are not the class teacher for this class', 'error');
             return back();
         }
 
         // Get the students in the class
-        $students = Student::where('class_id', '=', $class_id)->where('school_id', $user->school_id)->where('graduated', 0)->where('status', 1)->get();
+        $students = Student::where('class_id', '=', $class_id)
+            ->where('school_id', $user->school_id)
+            ->where('graduated', 0)
+            ->where('status', 1)
+            ->get();
+
         if ($students->isEmpty()) {
-            // Alert::error('Error', 'No students found in this class.');
             Alert()->toast('No students found in this class', 'error');
             return back();
         }
@@ -123,8 +129,6 @@ class AttendanceController extends Controller
             'attendance_date' => 'required|date_format:Y-m-d',
             'attendance_status' => 'required|array',
             'attendance_status.*' => 'required|in:present,absent,permission',
-        ], [
-            'attendance_status.*.required' => 'Each student must have an attendance status selected.',
         ]);
 
         $student_ids = $request->input('student_id');
@@ -139,34 +143,72 @@ class AttendanceController extends Controller
         }
 
         if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+            return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        // Check if attendance already exists for each student
+        // Check if attendance already exists
         $existingAttendance = Attendance::whereIn('student_id', $student_ids)
             ->where('attendance_date', '=', $attendanceDate)
             ->pluck('student_id')
             ->toArray();
 
         if (!empty($existingAttendance)) {
-            // Alert::error('Error', 'Attendance already taken and Submitted.');
             Alert()->toast('Attendance already taken and Submitted', 'error');
-            // return redirect()->route('get.student.list', $student_class);
             return back();
         }
+
+        // ============ E-PERMIT LOGIC ============
+        // Get all permits that are active on this attendance date
+        // A permit is active if:
+        // 1. Status is 'approved' (head teacher approved)
+        // 2. Attendance date falls between departure_date and expected_return_date
+        // 3. Student hasn't returned yet (verified_at is null)
+
+        $activePermits = EPermit::whereIn('student_id', $student_ids)
+            ->where('status', 'approved')
+            ->whereDate('departure_date', '<=', $attendanceDate)
+            ->whereDate('expected_return_date', '>=', $attendanceDate)
+            ->whereNull('verified_at')
+            ->get()
+            ->keyBy('student_id');
+
+        // Get students who have completed return (already back)
+        $completedReturns = EPermit::whereIn('student_id', $student_ids)
+            ->where('status', 'completed')
+            ->whereDate('verified_at', '<=', $attendanceDate)
+            ->pluck('student_id')
+            ->toArray();
+
+        // Track overrides for summary
+        $overrides = [];
+        $overriddenStudents = [];
 
         // Save the attendance data
         $attendanceData = [];
         foreach ($student_ids as $studentId) {
+            $selectedStatus = $attendance_status[$studentId];
+            $finalStatus = $selectedStatus;
+            $overrideReason = null;
+
+            // Check if student has an ACTIVE permit
+            if (isset($activePermits[$studentId])) {
+                $permit = $activePermits[$studentId];
+                $finalStatus = 'permission';
+                $overrideReason = "Active e-Permit: {$permit->permit_number} (Departure: {$permit->departure_date->format('d/m/Y')}, Return: {$permit->expected_return_date->format('d/m/Y')})";
+                $overrides[] = $overrideReason;
+                $overriddenStudents[] = $studentId;
+            }
+
+            // If student has completed return, use selected status (no override)
+            // This is automatically handled since $finalStatus remains $selectedStatus
+
             $attendanceData[] = [
                 'student_id' => $studentId,
                 'class_id' => $class_id,
                 'teacher_id' => $teacher->id,
                 'school_id' => $logged_user->school_id,
                 'class_group' => $class_group[$studentId] ?? null,
-                'attendance_status' => $attendance_status[$studentId],
+                'attendance_status' => $finalStatus,
                 'attendance_date' => $attendanceDate,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -175,9 +217,25 @@ class AttendanceController extends Controller
 
         Attendance::insert($attendanceData);
 
-        // Alert::success('Success', 'Attendance Submitted and Saved successfully');
+        // Prepare success message
+        // $overriddenCount = count($overrides);
+        // if ($overriddenCount > 0) {
+        //     $studentNames = Student::whereIn('id', $overriddenStudents)
+        //         ->get()
+        //         ->map(function ($student) {
+        //             return $student->first_name . ' ' . $student->last_name;
+        //         })
+        //         ->implode(', ');
+
+        //     Alert()->toast(
+        //         "Attendance saved. $overriddenCount student(s) with active e-Permit were automatically marked as 'permission': $studentNames",
+        //         'info'
+        //     );
+        // } else {
+
+        // }
+
         Alert()->toast('Attendance Submitted and Saved successfully', 'success');
-        // return redirect()->route('home');
         return redirect()->back();
     }
 

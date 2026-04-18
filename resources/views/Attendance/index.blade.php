@@ -1,343 +1,264 @@
 @extends('SRTDashboard.frame')
 @section('content')
 
-{{-- Custom Styling --}}
+{{-- Modern Typography --}}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
-    .page-header {
-        background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-        color: white;
-        padding: 1.2rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    :root {
+        --primary-hex: #4361ee;
+        --present-color: #2ec4b6;
+        --absent-color: #e71d36;
+        --permit-color: #ff9f1c;
+        --bg-main: #f8f9fe;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-main);
+        color: #2b2d42;
+    }
+
+    /* Minimalist Header */
+    .titan-header {
+        padding: 2rem 0;
+        border-bottom: 1px solid #e9ecef;
+        margin-bottom: 2rem;
+    }
+
+    /* Floating Action Bar */
+    .action-bar {
+        position: sticky;
+        top: 20px;
+        z-index: 1020;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 100px;
+        padding: 0.6rem 1.5rem;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
         display: flex;
         justify-content: space-between;
         align-items: center;
+        margin-bottom: 2.5rem;
     }
-    .page-header h4 {
-        margin: 0;
-        font-weight: 600;
+
+    /* Row System */
+    .student-entry {
+        background: white;
+        border-radius: 14px;
+        margin-bottom: 10px;
+        padding: 1rem 1.5rem;
+        display: grid;
+        grid-template-columns: 0.5fr 2.5fr 1fr 2fr;
+        align-items: center;
+        transition: all 0.25s ease;
+        border-left: 5px solid transparent;
     }
-    .date-form {
-        background: #ffffff;
-        padding: 1rem;
+
+    /* Dynamic Row States */
+    .student-entry:has(input[value="present"]:checked) { border-left-color: var(--present-color); background: #f0fdfa; }
+    .student-entry:has(input[value="absent"]:checked) { border-left-color: var(--absent-color); background: #fff1f2; }
+    .student-entry:has(input[value="permission"]:checked) { border-left-color: var(--permit-color); background: #fffbeb; }
+
+    .student-entry:hover {
+        transform: scale(1.01);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+    }
+
+    .student-num { font-weight: 800; color: #ced4da; font-size: 0.9rem; }
+    .student-name { font-weight: 700; font-size: 1.05rem; color: #1a1c23; letter-spacing: -0.3px; }
+    .student-meta { font-size: 0.8rem; color: #8d99ae; font-weight: 500; }
+
+    /* Modern Toggle Buttons */
+    .toggle-pill {
+        display: flex;
+        background: #f1f3f5;
+        padding: 4px;
+        border-radius: 12px;
+        width: fit-content;
+        margin-left: auto;
+    }
+
+    .toggle-item { display: none; }
+    .toggle-label {
+        padding: 8px 18px;
         border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s;
+        margin-bottom: 0;
+        color: #adb5bd;
     }
-    .table thead {
-        background: #2575fc;
+
+    .toggle-item[value="present"]:checked + .toggle-label { background: var(--present-color); color: white; }
+    .toggle-item[value="absent"]:checked + .toggle-label { background: var(--absent-color); color: white; }
+    .toggle-item[value="permission"]:checked + .toggle-label { background: var(--permit-color); color: white; }
+
+    /* Responsive Mobile Grid */
+    @media (max-width: 992px) {
+        .student-entry {
+            grid-template-columns: 1fr;
+            text-align: center;
+            padding: 1.5rem;
+            gap: 12px;
+        }
+        .toggle-pill { margin: 0 auto; }
+        .student-num { display: none; }
     }
-    .table thead th {
-        color: #fff;
-        font-weight: 600;
-    }
-    .table-hover tbody tr:hover {
-        background: #f1f7ff;
+
+    /* Buttons */
+    .btn-titan {
+        background: var(--primary-hex);
+        color: white;
+        border-radius: 50px;
+        padding: 10px 28px;
+        font-weight: 700;
+        border: none;
         transition: 0.3s;
     }
-    .status-radio label {
-        margin-right: 1rem;
-        cursor: pointer;
-    }
-    .status-radio input {
-        margin-right: 5px;
-    }
-    .btn-success {
-        border-radius: 25px;
-        padding: 0.6rem 1.5rem;
-        font-weight: 600;
-    }
-    .alert-success {
-        border-radius: 12px;
-        box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+
+    .btn-titan:hover {
+        background: #334bc9;
+        box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
     }
 </style>
 
-{{-- Page Header --}}
-<div class="page-header mb-3">
-    <h4><i class="fas fa-users"></i> Attendance Management</h4>
-</div>
-
-{{-- Date Form --}}
-<div class="row">
-    <div class="col-md-4">
-        <div class="date-form">
-            <form method="GET" action="{{ route('get.student.list', ['class' => Hashids::encode($myClass->first()->id)]) }}" class="needs-validation" novalidate>
-                <label for="attendance_date" class="font-weight-bold">Select Date:</label>
-                <div class="input-group mt-2">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text bg-primary text-white">
-                            <i class="fas fa-calendar-alt"></i>
-                        </span>
-                    </div>
-                    <input type="date" id="attendance_date" name="attendance_date"
-                        value="{{ request()->input('attendance_date', \Carbon\Carbon::now()->format('Y-m-d')) }}"
-                        max="{{ \Carbon\Carbon::now()->format('Y-m-d') }}"
-                        min="{{ \Carbon\Carbon::now()->subWeek()->format('Y-m-d') }}"
-                        class="form-control" required>
-                </div>
-            </form>
+<div class="container py-4">
+    {{-- Top Header --}}
+    <div class="titan-header d-flex justify-content-between align-items-end p-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius:12px;">
+        <div>
+            <span class="badge bg-primary mb-2 px-3 py-2 rounded-pill">ATTENDANCE MODULE</span>
+            <h1 class="fw-800 display-6 m-0 text-white">{{ strtoupper($student_class->class_name) }}</h1>
+            <p class="text-white mt-1">Manage and track daily student Attendance</p>
+        </div>
+        <div class="d-none d-md-block text-end">
+            <h5 class="fw-bold mb-0 text-white">{{ \Carbon\Carbon::parse($selectedDate)->format('l') }}</h5>
+            <p class="text-white small mb-0">{{ \Carbon\Carbon::parse($selectedDate)->format('F d, Y') }}</p>
         </div>
     </div>
-</div>
 
-{{-- Weekend Alert Container --}}
-<div id="weekendAlertContainer" style="display: none;" class="mt-4">
-    <!-- Will be populated by JavaScript -->
-</div>
-
-{{-- Attendance Feedback / Form --}}
-@if ($attendanceExists)
-    <div class="alert alert-success text-center mt-4">
-        <h5 class="mb-2"><i class="fas fa-calendar-check"></i> Attendance Submitted</h5>
-        <p>Attendance for <strong>{{ \Carbon\Carbon::parse($selectedDate)->format('d-m-Y') }}</strong> has already been submitted.</p>
-        <a href="{{ route('home') }}" class="btn btn-primary btn-sm mt-2"><i class="fas fa-home"></i> Go to Dashboard</a>
-    </div>
-@else
-    <div id="attendanceFormContainer">
-        <div class="card mt-4 shadow-sm">
-            <div class="card-header bg-info text-white">
-                <strong><i class="fas fa-edit"></i> Complete Attendance for {{ \Carbon\Carbon::parse($selectedDate)->format('d-m-Y') }}</strong>
+    @if(!$attendanceExists)
+    {{-- Floating Action Bar --}}
+    <div class="action-bar px-4">
+        <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center bg-light rounded-pill px-3 py-1">
+                <i class="fas fa-users text-muted me-2 small"></i>
+                <span class="fw-bold small">{{ count($studentList) }} Students</span>
             </div>
-            <form id="attendanceForm" action="{{ route('store.attendance', ['student_class' => Hashids::encode($student_class->id)]) }}" method="POST" class="needs-validation" novalidate>
-                @csrf
-                <input type="hidden" name="attendance_date" value="{{ $selectedDate }}">
-                <div class="table-responsive">
-                    <table class="table table-hover table-striped align-middle mb-0 table-responsive-md">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Student Name</th>
-                                <th class="text-center">Gender</th>
-                                <th class="text-center">Class</th>
-                                <th class="text-center">Attendance Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if ($studentList->isEmpty())
-                                <tr>
-                                    <td colspan="4" class="text-center text-danger">No students enrolled to this class!</td>
-                                </tr>
-                            @else
-                                @foreach ($studentList as $student)
-                                    <tr>
-                                        <input type="hidden" name="student_id[]" value="{{ $student->id }}">
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>
-                                            <a href="{{ route('class.teacher.student.profile', ['student' => Hashids::encode($student->id)]) }}" class="text-dark font-weight-bold">
-                                                {{ ucwords(strtolower($student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name)) }}
-                                            </a>
-                                        </td>
-                                        <td class="text-uppercase text-center">{{ $student->gender[0] }}</td>
-                                        <td class="text-center">{{strtoupper($student->class_code)}}-{{strtoupper($student->group)}}</td>
-                                        <input type="hidden" name="group[{{ $student->id }}]" value="{{ $student->group }}">
-                                        <td class="text-center status-radio">
-                                            <label><input type="radio" name="attendance_status[{{ $student->id }}]" required value="present"> ✅ Present</label>
-                                            <label><input type="radio" name="attendance_status[{{ $student->id }}]" value="absent"> ❌ Absent</label>
-                                            <label><input type="radio" name="attendance_status[{{ $student->id }}]" value="permission"> 📝 Permission</label>
-                                            @error('attendance_status.' . $student->id)
-                                                <div class="text-danger small">{{ $message }}</div>
-                                            @enderror
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            @endif
-                        </tbody>
-                    </table>
-                </div>
-                <div class="card-footer text-center">
-                    <button type="submit" id="saveButton" class="btn btn-success" onclick="return confirm('Are you sure you want to submit? You won’t be able to make changes afterward.')">
-                        <i class="fas fa-save"></i> Submit Attendance
-                    </button>
-                </div>
+            <div id="liveStats" class="small fw-bold text-success d-none d-md-block">
+                <span id="pCount">0</span> marked present
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 align-items-center">
+            <form action="{{ route('get.student.list', ['class' => Hashids::encode($myClass->first()->id)]) }}" method="GET" id="dateForm">
+                <input type="date" name="attendance_date" value="{{ $selectedDate }}" class="form-control form-control-sm border-0 bg-transparent fw-bold text-primary" onchange="this.form.submit()">
             </form>
+            <div class="vr mx-2 text-muted opacity-25 d-none d-md-block"></div>
+            <button class="btn btn-link text-dark text-decoration-none fw-bold small d-none d-md-block" id="markAllBtn">
+                Select All
+            </button>
+            <button form="mainForm" type="submit" class="btn btn-titan shadow-sm">
+                <i class="fas fa-send"></i> Submit
+            </button>
         </div>
     </div>
-@endif
 
-{{-- Scripts --}}
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const attendanceDateInput = document.getElementById("attendance_date");
-        const attendanceFormContainer = document.getElementById("attendanceFormContainer");
-        const weekendAlertContainer = document.getElementById("weekendAlertContainer");
+    {{-- Main Form List --}}
+    <form id="mainForm" action="{{ route('store.attendance', ['student_class' => Hashids::encode($student_class->id)]) }}" method="POST">
+        @csrf
+        <input type="hidden" name="attendance_date" value="{{ $selectedDate }}">
 
-        // Unda preloader kwa JavaScript ikiwa haipo
-        let preloader = document.createElement("div");
-        preloader.id = "preloader";
-        preloader.style.position = "fixed";
-        preloader.style.top = "0";
-        preloader.style.left = "0";
-        preloader.style.width = "100%";
-        preloader.style.height = "100%";
-        preloader.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
-        preloader.style.display = "none";
-        preloader.style.justifyContent = "center";
-        preloader.style.alignItems = "center";
-        preloader.innerHTML = `<div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">Loading, Please wait...</span>
-                            </div>`;
-        document.body.appendChild(preloader);
+        @foreach ($studentList as $student)
+        <div class="student-entry">
+            <div class="student-num">#{{ $loop->iteration }}</div>
 
-        // Function kuangalia kama tarehe ni weekend
-        function isWeekend(dateString) {
-            const date = new Date(dateString);
-            const day = date.getDay();
-            return day === 0; // 0 = Sunday, 6 = Saturday
-        }
+            <div class="text-start">
+                <div class="student-name">{{ ucwords(strtolower($student->first_name . ' ' . $student->last_name)) }}</div>
+                <div class="student-meta">{{ $student->admission_number }} • {{ strtoupper($student->gender) }}</div>
+            </div>
 
-        // Function kuonyesha alert ya weekend
-        function showWeekendAlert() {
-            if (!weekendAlertContainer) return;
+            <div class="d-none d-lg-block text-center">
+                <span class="badge rounded-pill bg-light text-dark border px-3">Stream {{ strtoupper($student->group) }}</span>
+            </div>
 
-            weekendAlertContainer.innerHTML = `
-                <div class="alert alert-danger text-center">
-                    <h5 class="mb-2"><i class="fas fa-calendar-times"></i> Weekend Not Allowed</h5>
-                    <p>Attendance cannot be submitted for weekends (Sunday).</p>
-                    <p>Selected date <strong>${attendanceDateInput.value}</strong> falls on a weekend.</p>
-                    <a href="{{ route('home') }}" class="btn btn-primary btn-sm mt-2">
-                        <i class="fas fa-home"></i> Go to Dashboard
-                    </a>
+            <div class="attendance-action">
+                <div class="toggle-pill">
+                    <input type="radio" name="attendance_status[{{ $student->id }}]" id="p-{{ $student->id }}" value="present" class="toggle-item status-input" required>
+                    <label class="toggle-label" for="p-{{ $student->id }}">PRESENT</label>
+
+                    <input type="radio" name="attendance_status[{{ $student->id }}]" id="a-{{ $student->id }}" value="absent" class="toggle-item status-input">
+                    <label class="toggle-label" for="a-{{ $student->id }}">ABSENT</label>
+
+                    <input type="radio" name="attendance_status[{{ $student->id }}]" id="l-{{ $student->id }}" value="permission" class="toggle-item status-input">
+                    <label class="toggle-label" for="l-{{ $student->id }}">PERMIT</label>
                 </div>
-            `;
-            weekendAlertContainer.style.display = 'block';
-        }
+            </div>
 
-        // Function kuficha form ya attendance
-        function hideAttendanceForm() {
-            if (attendanceFormContainer) {
-                attendanceFormContainer.style.display = 'none';
-            }
-        }
+            <input type="hidden" name="student_id[]" value="{{ $student->id }}">
+            <input type="hidden" name="group[{{ $student->id }}]" value="{{ $student->group }}">
+        </div>
+        @endforeach
+    </form>
+    @else
+    <div class="card border-0 shadow-lg text-center p-5 rounded-4">
+        <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-4 mx-auto" style="width: 80px; height: 80px;">
+            <i class="fas fa-check fa-2x"></i>
+        </div>
+        <h2 class="fw-800">Mission Accomplished!</h2>
+        <p class="text-muted">The attendance report for this session has already been synchronized with the database.</p>
+        <div class="mt-4">
+            <a href="{{ route('home') }}" class="btn btn-titan px-5">Back to Dashboard</a>
+        </div>
+    </div>
+    @endif
+</div>
 
-        // Function kuonyesha form ya attendance
-        function showAttendanceForm() {
-            if (attendanceFormContainer) {
-                attendanceFormContainer.style.display = 'block';
-            }
-            if (weekendAlertContainer) {
-                weekendAlertContainer.style.display = 'none';
-            }
-        }
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const inputs = document.querySelectorAll('.status-input');
+    const pCountLabel = document.getElementById('pCount');
+    const markAllBtn = document.getElementById('markAllBtn');
 
-        // Angalia tarehe ya sasa wakati page inapakia
-        function checkCurrentDate() {
-            const currentDate = attendanceDateInput.value;
+    function updateStats() {
+        const count = document.querySelectorAll('.status-input[value="present"]:checked').length;
+        pCountLabel.innerText = count;
+    }
 
-            if (isWeekend(currentDate)) {
-                showWeekendAlert();
-                hideAttendanceForm();
-
-                // Reset date input to today if it's weekend
-                const today = new Date().toISOString().split("T")[0];
-                if (attendanceDateInput.value !== today) {
-                    attendanceDateInput.value = today;
-                }
-            } else {
-                showAttendanceForm();
-            }
-        }
-
-        // Run initial check
-        checkCurrentDate();
-
-        // Event listener kwa date change
-        attendanceDateInput.addEventListener("change", function () {
-            const selectedDate = this.value;
-
-            if (isWeekend(selectedDate)) {
-                // Onyesha alert kwa weekend
-                showWeekendAlert();
-                hideAttendanceForm();
-
-                // Reset date input to today
-                this.value = new Date().toISOString().split("T")[0];
-
-                // Show toast notification
-                Swal.fire({
-                    position: 'top-end',
-                    icon: 'error',
-                    title: 'Weekends are not allowed',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    toast: true
-                });
-
-                // Reload page with today's date
-                preloader.style.display = "flex";
-                setTimeout(() => {
-                    window.location.href = "?attendance_date=" + this.value;
-                }, 500);
-                return;
-            }
-
-            // Ikiwa sio weekend, endelea na page reload
-            preloader.style.display = "flex";
-            setTimeout(() => {
-                window.location.href = "?attendance_date=" + selectedDate;
-            }, 500);
-        });
-
-        // Zima preloader baada ya page kupakia
-        window.addEventListener("load", function () {
-            preloader.style.display = "none";
-        });
-
-        // Validation ya form submission (block weekends)
-        const form = document.getElementById("attendanceForm");
-        if (form) {
-            form.addEventListener("submit", function (event) {
-                const attendanceDate = document.querySelector('input[name="attendance_date"]');
-                if (attendanceDate && isWeekend(attendanceDate.value)) {
-                    event.preventDefault();
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Weekend Not Allowed',
-                        text: 'Attendance cannot be submitted for weekends.',
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK'
-                    });
-                    return false;
-                }
-            });
-        }
+    inputs.forEach(input => {
+        input.addEventListener('change', updateStats);
     });
 
-    // Existing form submission logic (unchanged)
-    document.addEventListener("DOMContentLoaded", function () {
-        const form = document.getElementById("attendanceForm");
-        const submitButton = document.getElementById("saveButton");
-
-        if (!form || !submitButton) return;
-
-        form.addEventListener("submit", function (event) {
-            event.preventDefault();
-
-            let isValid = true;
-            document.querySelectorAll("tbody tr").forEach((row) => {
-                const studentId = row.querySelector("input[name^='student_id']").value;
-                const radios = row.querySelectorAll(`input[name="attendance_status[${studentId}]"]`);
-                const checked = [...radios].some(radio => radio.checked);
-
-                if (!checked) {
-                    isValid = false;
-                    row.style.backgroundColor = "#f8d7da";
-                } else {
-                    row.style.backgroundColor = "";
-                }
-            });
-
-            if (!isValid) {
-                alert("Please select attendance status for all students.");
-                return;
-            }
-
-            submitButton.disabled = true;
-            submitButton.innerHTML = `<span class="spinner-border spinner-border-sm text-white" role="status" aria-hidden="true"></span> Submitting...`;
-
-            setTimeout(() => {
-                form.submit();
-            }, 500);
+    markAllBtn.addEventListener('click', function() {
+        document.querySelectorAll('.status-input[value="present"]').forEach(radio => {
+            radio.checked = true;
+        });
+        updateStats();
+        Swal.fire({
+            toast: true, position: 'bottom-end', icon: 'success', title: 'Smart-selected all as present', showConfirmButton: false, timer: 2000
         });
     });
+
+    // Form confirmation
+    document.getElementById('mainForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Finalize Attendance?',
+            text: "This action will lock today's records.",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#4361ee',
+            confirmButtonText: 'Confirm & Sync'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.submit();
+            }
+        });
+    });
+});
 </script>
+
 @endsection

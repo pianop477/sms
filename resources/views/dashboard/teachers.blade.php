@@ -655,42 +655,31 @@
                         $user = Auth::user();
                         $teacher = App\Models\Teacher::where('user_id', $user->id)->first();
 
-                        // Check if teacher can access e-Permit
-                        // Only role_id 2 (Head), 3 (Academic), and 4 (Class Teacher) can access
-                        // Role_id 1 (Normal Teacher) cannot access
                         $canAccessEPermit = false;
                         $pendingCount = 0;
 
                         if ($teacher && in_array($teacher->role_id, [2, 3, 4])) {
                             $canAccessEPermit = true;
 
-                            // For Class Teacher (role_id=4), we need to check if they are assigned to any class
                             if ($teacher->role_id == 4) {
-                                // Count permits where this teacher is the assigned class teacher
+                                // Class Teacher
                                 $pendingCount = App\Models\EPermit::where('status', 'pending_class_teacher')
                                     ->where('class_teacher_id', $teacher->id)
                                     ->count();
-                            }
-                            // For Duty Teacher - handled via tod_roster, but they don't get count badge here
-                            // because duty assignment is date-specific
-                            elseif ($teacher->role_id == 3) {
-                                // Academic teacher can see duty teacher pending permits as well
-                                $pendingCount = App\Models\EPermit::where('status', 'pending_duty_teacher')
-                                    ->where('duty_teacher_id', $teacher->id)
-                                    ->count();
-                            }
-                            // For Academic Teacher (role_id=3)
-                            elseif ($teacher->role_id == 3) {
+                            } elseif ($teacher->role_id == 3) {
+                                // Academic Teacher
                                 $pendingCount = App\Models\EPermit::where('status', 'pending_academic')
                                     ->where('academic_teacher_id', $teacher->id)
                                     ->count();
+
+                                // Also count duty teacher permits (academic can act as backup)
+                                $dutyCount = App\Models\EPermit::where('status', 'pending_duty_teacher')->count();
+                                $pendingCount += $dutyCount;
+                            } elseif ($teacher->role_id == 2) {
+                                // Head Teacher - get all pending_head permits regardless of head_teacher_id
+                                // Since there's usually only one head teacher in a school
+        $pendingCount = App\Models\EPermit::where('status', 'pending_head')->count();
                             }
-                            // For Head Teacher (role_id=2)
-                            elseif ($teacher->role_id == 2) {
-                                $pendingCount = App\Models\EPermit::where('status', 'pending_head')
-                                    ->where('head_teacher_id', $teacher->id)
-                                                            ->count();
-                                                    }
                         }
                     @endphp
 
@@ -707,7 +696,7 @@
                                                     <i class="fas fa-file-alt text-white fa-lg"></i>
                                                 </div>
                                                 <div>
-                                                    <h6 class="mb-0 fw-bold" style="color: #1e293b;">Thibitisha Ruhusa</h6>
+                                                    <h6 class="mb-0 fw-bold" style="color: #1e293b;">Maombi ya Ruhusa</h6>
                                                     <small class="text-muted">
                                                         @if ($teacher->role_id == 2)
                                                             Mwalimu Mkuu

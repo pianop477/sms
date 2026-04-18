@@ -244,6 +244,11 @@
     .info-badge-academic { background: #dcfce7; color: #166534; }
     .info-badge-head { background: #e0e7ff; color: #3730a3; }
 
+    .return-section {
+        background: #f0fdf4;
+        border-left: 4px solid #22c55e;
+    }
+
     @media (max-width: 768px) {
         .main-container { padding: 12px; }
         .info-grid { grid-template-columns: 1fr; }
@@ -330,7 +335,6 @@
                                 </div>
                                 <div class="d-flex gap-3 flex-wrap">
                                     @php
-                                        // Correct student image path
                                         $studentImage = $permit->student->image && file_exists(storage_path('app/public/students/' . $permit->student->image))
                                             ? asset('storage/students/' . $permit->student->image)
                                             : asset('storage/students/student.jpg');
@@ -351,7 +355,7 @@
                                                 <div class="info-icon"><i class="fas fa-id-card"></i></div>
                                                 <div>
                                                     <div class="info-label">Student ID</div>
-                                                    <div class="info-value">{{  strtoupper($permit->student->admission_number) }}</div>
+                                                    <div class="info-value">{{ strtoupper($permit->student->admission_number) }}</div>
                                                 </div>
                                             </div>
                                             <div class="info-item">
@@ -365,7 +369,7 @@
                                                 <div class="info-icon"><i class="fas fa-code-branch"></i></div>
                                                 <div>
                                                     <div class="info-label">Mkondo / Stream</div>
-                                                    <div class="info-value">{{ strtoupper($permit->student->group ??  'N/A') }}</div>
+                                                    <div class="info-value">{{ strtoupper($permit->student->group ?? 'N/A') }}</div>
                                                 </div>
                                             </div>
                                             <div class="info-item">
@@ -404,7 +408,15 @@
                                         <div class="info-icon"><i class="fas fa-handshake"></i></div>
                                         <div>
                                             <div class="info-label">Undugu</div>
-                                            <div class="info-value">{{ ucfirst($permit->guardian_type) }}</div>
+                                            @php
+                                                $guardianType = $permit->guardian_type;
+                                                if(strtolower($guardianType) == 'parent') {
+                                                    $guardianType = 'mzazi';
+                                                } else {
+                                                    $guardianType = 'mlezi';
+                                                }
+                                            @endphp
+                                            <div class="info-value">{{ ucfirst($guardianType) }}</div>
                                         </div>
                                     </div>
                                     <div class="info-item">
@@ -466,6 +478,104 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- ============ RETURN INFORMATION SECTION ============ -->
+                            @if($permit->status == 'completed' && $permit->verified_at)
+                            <div class="info-card return-section">
+                                <div class="card-title">
+                                    <i class="fas fa-undo-alt"></i> Taarifa za Kurejea Shuleni
+                                </div>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <div class="info-icon"><i class="fas fa-calendar-check"></i></div>
+                                        <div>
+                                            <div class="info-label">Tarehe ya Kurejea</div>
+                                            <div class="info-value">{{ \Carbon\Carbon::parse($permit->verified_at)->format('d/m/Y H:i') }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="info-icon"><i class="fas fa-user-check"></i></div>
+                                        <div>
+                                            <div class="info-label">Aliyethibitisha</div>
+                                            <div class="info-value">{{ ucwords(strtolower($permit->verifier?->user?->first_name . ' ' . $permit->verifier?->user?->last_name)) }}</div>
+                                        </div>
+                                    </div>
+                                    @if($permit->is_late_return)
+                                        <div class="info-item">
+                                            <div class="info-icon"><i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i></div>
+                                            <div>
+                                                <div class="info-label">Hali ya Kurejea</div>
+                                                <div class="info-value"><span class="badge bg-warning text-dark">Imechelewa</span></div>
+                                            </div>
+                                        </div>
+                                        @if($permit->late_return_reason)
+                                            <div class="info-item">
+                                                <div class="info-icon"><i class="fas fa-comment"></i></div>
+                                                <div>
+                                                    <div class="info-label">Sababu ya Kuchelewa</div>
+                                                    <div class="info-value">{{ ucfirst($permit->late_return_reason) }}</div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    @else
+                                        <div class="info-item">
+                                            <div class="info-icon"><i class="fas fa-check-circle" style="color: #22c55e;"></i></div>
+                                            <div>
+                                                <div class="info-label">Hali ya Kurejea</div>
+                                                <div class="info-value"><span class="badge bg-success">Kwa Wakati</span></div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <!-- Accompanied Person Information -->
+                                @if($permit->returned_alone == 0 || $permit->returned_alone === false)
+                                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #e2e8f0;">
+                                        <h6 class="mb-3" style="color: #475569;"><i class="fas fa-users me-2"></i>Taarifa za Aliyemrudisha</h6>
+                                        <div class="info-grid">
+                                            <div class="info-item">
+                                                <div class="info-icon"><i class="fas fa-user"></i></div>
+                                                <div>
+                                                    <div class="info-label">Jina Kamili</div>
+                                                    <div class="info-value">{{ ucwords(strtolower($permit->return_accompanied_by)) }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="info-item">
+                                                <div class="info-icon"><i class="fas fa-handshake"></i></div>
+                                                <div>
+                                                    <div class="info-label">Undugu</div>
+                                                    @php
+                                                        $returnGuardianType = match($permit->return_guardian_type) {
+                                                            'parent' => 'Mzazi',
+                                                            'guardian' => 'Mlezi',
+                                                            default => ucfirst($permit->return_guardian_type)
+                                                        };
+                                                    @endphp
+                                                    <div class="info-value">{{ $returnGuardianType }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="info-item">
+                                                <div class="info-icon"><i class="fas fa-heart"></i></div>
+                                                <div>
+                                                    <div class="info-label">Uhusiano</div>
+                                                    <div class="info-value">{{ ucfirst($permit->return_relationship) }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #e2e8f0;">
+                                        <div class="info-item">
+                                            <div class="info-icon"><i class="fas fa-user-check"></i></div>
+                                            <div>
+                                                <div class="info-label">Hali ya Kurejea</div>
+                                                <div class="info-value">Mwanafunzi amerudi peke yake</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                            @endif
                         </div>
 
                         <!-- Right Column - Timeline -->

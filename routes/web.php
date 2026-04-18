@@ -738,6 +738,7 @@ Route::middleware('auth', 'activeUser', 'throttle:30,1', 'checkSessionTimeout', 
         Route::get('/return', [TeacherEPermitController::class, 'returnForm'])->name('return-form');
         Route::get('/return/search', [TeacherEPermitController::class, 'searchReturn'])->name('return-search');
         Route::post('/return/{id}/confirm', [TeacherEPermitController::class, 'confirmReturn'])->name('return-confirm');
+        Route::get('/reports/data', [TeacherEPermitController::class, 'getReportsData'])->name('reports.data');
 
         // Reports
         Route::get('/reports', [TeacherEPermitController::class, 'reports'])->name('reports');

@@ -4,14 +4,19 @@
 namespace App\Services;
 
 use App\Models\EPermit;
+use App\Models\Parents;
+use App\Models\school;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\TodRoster;
+use App\Traits\formatPhoneTrait;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class EPermitService
 {
+    use formatPhoneTrait;
     /**
      * Generate unique permit number
      */
@@ -28,32 +33,87 @@ class EPermitService
     }
 
     /**
-     * Find class teacher for a student based on class_id and group
-     * This is the CORRECT way - matching student's class and stream with class_teachers table
+     * Get all class teachers assigned to a student's class and group
+     * Returns collection of teachers - ANY of them can approve
      */
-    public function findClassTeacher(Student $student): ?Teacher
+    public function getClassTeachers(Student $student): \Illuminate\Support\Collection
     {
         // Query class_teachers table using student's class_id and group
-        $classTeacherRecord = DB::table('class_teachers')
+        $classTeacherRecords = DB::table('class_teachers')
             ->where('class_id', $student->class_id)
-            ->where('group', $student->group)  // Match the stream/group
-            ->first();
+            ->where('group', $student->group)
+            ->get();
 
-        if ($classTeacherRecord && $classTeacherRecord->teacher_id) {
-            return Teacher::with('user')->find($classTeacherRecord->teacher_id);
+        if ($classTeacherRecords->isEmpty()) {
+            // Fallback: try without group (for backward compatibility)
+            $classTeacherRecords = DB::table('class_teachers')
+                ->where('class_id', $student->class_id)
+                ->whereNull('group')
+                ->get();
         }
 
-        // Fallback: try without group (for backward compatibility)
-        $classTeacherRecord = DB::table('class_teachers')
-            ->where('class_id', $student->class_id)
-            ->whereNull('group')
-            ->first();
+        $teacherIds = $classTeacherRecords->pluck('teacher_id')->unique();
 
-        if ($classTeacherRecord && $classTeacherRecord->teacher_id) {
-            return Teacher::with('user')->find($classTeacherRecord->teacher_id);
-        }
+        return Teacher::with('user')->whereIn('id', $teacherIds)->get();
+    }
 
-        return null;
+    /**
+     * Check if a teacher is assigned as class teacher for this student
+     */
+    public function isClassTeacher(Student $student, Teacher $teacher): bool
+    {
+        $classTeachers = $this->getClassTeachers($student);
+        return $classTeachers->contains('id', $teacher->id);
+    }
+
+    /**
+     * Get first class teacher for assignment (when creating permit)
+     * This is used only for initial assignment to store one teacher ID
+     */
+    public function getFirstClassTeacher(Student $student): ?Teacher
+    {
+        $classTeachers = $this->getClassTeachers($student);
+        return $classTeachers->isNotEmpty() ? $classTeachers->first() : null;
+    }
+
+    /**
+     * Get all academic teachers in the school (role_id = 3)
+     * ANY of them can approve academic stage permits
+     */
+    public function getAcademicTeachers($schoolId): \Illuminate\Support\Collection
+    {
+        return Teacher::with('user')
+            ->where('role_id', 3)
+            ->where('school_id', $schoolId)
+            ->get();
+    }
+
+    /**
+     * Check if a teacher is an academic teacher
+     */
+    public function isAcademicTeacher(Teacher $teacher): bool
+    {
+        return $teacher->role_id === 3;
+    }
+
+    /**
+     * Get all head teachers in the school (role_id = 2)
+     * ANY of them can approve head stage permits
+     */
+    public function getHeadTeachers($schoolId): \Illuminate\Support\Collection
+    {
+        return Teacher::with('user')
+            ->where('role_id', 2)
+            ->where('school_id', $schoolId)
+            ->get();
+    }
+
+    /**
+     * Check if a teacher is a head teacher
+     */
+    public function isHeadTeacher(Teacher $teacher): bool
+    {
+        return $teacher->role_id === 2;
     }
 
     /**
@@ -82,34 +142,26 @@ class EPermitService
     }
 
     /**
-     * Find first duty teacher for a date (for assignment)
+     * Get first duty teacher for a date (for assignment)
      */
-    public function findFirstDutyTeacherForDate($date = null): ?Teacher
+    public function getFirstDutyTeacherForDate($date = null): ?Teacher
     {
         $teachers = $this->findDutyTeachersForDate($date);
         return !empty($teachers) ? $teachers[0] : null;
     }
 
     /**
-     * Find academic teacher (role_id = 3)
+     * Check if a teacher is on duty for a specific date
      */
-    public function findAcademicTeacher($schoolId): ?Teacher
+    public function isDutyTeacherForDate(Teacher $teacher, $date = null): bool
     {
-        return Teacher::with('user')
-            ->where('role_id', 3)
-            ->where('school_id', $schoolId)
-            ->first();
-    }
-
-    /**
-     * Find head teacher (role_id = 2)
-     */
-    public function findHeadTeacher($schoolId): ?Teacher
-    {
-        return Teacher::with('user')
-            ->where('role_id', 2)
-            ->where('school_id', $schoolId)
-            ->first();
+        $dutyTeachers = $this->findDutyTeachersForDate($date);
+        foreach ($dutyTeachers as $dt) {
+            if ($dt->id === $teacher->id) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -188,6 +240,7 @@ class EPermitService
 
     /**
      * Approve request at different stages
+     * ANY assigned class teacher, ANY academic teacher, ANY head teacher can approve
      */
     public function approveRequest(EPermit $request, Teacher $teacher, $comment = null)
     {
@@ -195,6 +248,7 @@ class EPermitService
 
         try {
             $currentStatus = $request->status;
+            $parent_id = $request->parent_id;
             $nextStatus = $this->getNextStatus($request);
             $stage = null;
             $fieldToUpdate = null;
@@ -204,10 +258,9 @@ class EPermitService
 
             switch ($currentStatus) {
                 case 'pending_class_teacher':
-                    // Verify this is the correct class teacher for this student
-                    $expectedClassTeacher = $this->findClassTeacher($request->student);
-                    if (!$expectedClassTeacher || $expectedClassTeacher->id !== $teacher->id) {
-                        throw new \Exception('Only the assigned class teacher for this student can approve.');
+                    // ANY class teacher assigned to this student's class can approve
+                    if (!$this->isClassTeacher($request->student, $teacher)) {
+                        throw new \Exception('Only class teachers assigned to this student can approve.');
                     }
                     $fieldToUpdate = 'class_teacher_id';
                     $timeField = 'class_teacher_approved_at';
@@ -217,29 +270,23 @@ class EPermitService
                     break;
 
                 case 'pending_duty_teacher':
-                    // Verify this teacher is on duty for the request date
-                    $dutyTeachers = $this->findDutyTeachersForDate($request->departure_date);
-                    $isDutyTeacher = false;
-                    foreach ($dutyTeachers as $dt) {
-                        if ($dt->id === $teacher->id) {
-                            $isDutyTeacher = true;
-                            break;
-                        }
-                    }
-                    // Academic teacher can also approve on behalf
-                    if (!$isDutyTeacher && $teacher->role_id !== 3) {
+                    // Check if teacher is on duty OR is an academic teacher (can act as backup)
+                    $isDutyTeacher = $this->isDutyTeacherForDate($teacher, $request->departure_date);
+
+                    if (!$isDutyTeacher && !$this->isAcademicTeacher($teacher)) {
                         throw new \Exception('Only duty teachers or academic teacher can approve at this stage.');
                     }
                     $fieldToUpdate = 'duty_teacher_id';
                     $timeField = 'duty_teacher_approved_at';
                     $actionField = 'duty_teacher_action';
                     $commentField = 'duty_teacher_comment';
-                    $stage = $teacher->role_id === 3 ? 'duty_teacher_by_academic' : 'duty_teacher';
+                    $stage = $this->isAcademicTeacher($teacher) ? 'duty_teacher_by_academic' : 'duty_teacher';
                     break;
 
                 case 'pending_academic':
-                    if ($teacher->role_id !== 3) {
-                        throw new \Exception('Only academic teacher can approve at this stage.');
+                    // ANY academic teacher can approve
+                    if (!$this->isAcademicTeacher($teacher)) {
+                        throw new \Exception('Only academic teachers can approve at this stage.');
                     }
                     $fieldToUpdate = 'academic_teacher_id';
                     $timeField = 'academic_teacher_approved_at';
@@ -249,8 +296,9 @@ class EPermitService
                     break;
 
                 case 'pending_head':
-                    if ($teacher->role_id !== 2) {
-                        throw new \Exception('Only head teacher can approve at this stage.');
+                    // ANY head teacher can approve
+                    if (!$this->isHeadTeacher($teacher)) {
+                        throw new \Exception('Only head teachers can approve at this stage.');
                     }
                     $fieldToUpdate = 'head_teacher_id';
                     $timeField = 'head_teacher_approved_at';
@@ -275,7 +323,9 @@ class EPermitService
 
             // If final approval, generate PDF
             if ($nextStatus === 'approved') {
-                $this->generateEPermitPDF($request);
+                // $this->generateEPermitPDF($request);
+                $parent_info = Parents::with('User')->findOrFail($parent_id);
+                $this->NotifyParentofTheStudentBySms($request, $schoolId = $parent_info->school_id, $parent_info);
             }
 
             DB::commit();
@@ -307,41 +357,34 @@ class EPermitService
 
             switch ($currentStatus) {
                 case 'pending_class_teacher':
-                    $expectedClassTeacher = $this->findClassTeacher($request->student);
-                    if (!$expectedClassTeacher || $expectedClassTeacher->id !== $teacher->id) {
-                        throw new \Exception('Only the assigned class teacher can reject.');
+                    if (!$this->isClassTeacher($request->student, $teacher)) {
+                        throw new \Exception('Only class teachers assigned to this student can reject.');
                     }
                     $stage = 'class_teacher';
                     $commentField = 'class_teacher_comment';
                     break;
 
                 case 'pending_duty_teacher':
-                    $dutyTeachers = $this->findDutyTeachersForDate($request->departure_date);
-                    $isDutyTeacher = false;
-                    foreach ($dutyTeachers as $dt) {
-                        if ($dt->id === $teacher->id) {
-                            $isDutyTeacher = true;
-                            break;
-                        }
-                    }
-                    if (!$isDutyTeacher && $teacher->role_id !== 3) {
+                    $isDutyTeacher = $this->isDutyTeacherForDate($teacher, $request->departure_date);
+
+                    if (!$isDutyTeacher && !$this->isAcademicTeacher($teacher)) {
                         throw new \Exception('Only duty teacher or academic teacher can reject.');
                     }
-                    $stage = $teacher->role_id === 3 ? 'duty_teacher_by_academic' : 'duty_teacher';
+                    $stage = $this->isAcademicTeacher($teacher) ? 'duty_teacher_by_academic' : 'duty_teacher';
                     $commentField = 'duty_teacher_comment';
                     break;
 
                 case 'pending_academic':
-                    if ($teacher->role_id !== 3) {
-                        throw new \Exception('Only academic teacher can reject.');
+                    if (!$this->isAcademicTeacher($teacher)) {
+                        throw new \Exception('Only academic teachers can reject.');
                     }
                     $stage = 'academic';
                     $commentField = 'academic_teacher_comment';
                     break;
 
                 case 'pending_head':
-                    if ($teacher->role_id !== 2) {
-                        throw new \Exception('Only head teacher can reject.');
+                    if (!$this->isHeadTeacher($teacher)) {
+                        throw new \Exception('Only head teachers can reject.');
                     }
                     $stage = 'head';
                     $commentField = 'head_teacher_comment';
@@ -379,6 +422,38 @@ class EPermitService
         $pdfPath = storage_path("app/public/e-permits/e-permit_{$request->permit_number}.pdf");
         $request->update(['pdf_path' => $pdfPath]);
         return $pdfPath;
+    }
+
+    public function NotifyParentofTheStudentBySms(EPermit $request, $schoolId, $parent_info)
+    {
+        $student = Student::findOrFail($request->student_id);
+        $school = school::findOrFail($schoolId);
+        $headTeacher = Teacher::with('User')->findOrFail($request->head_teacher_id);
+        $nextSmsService = new NextSmsService();
+
+        $reasonText = match($request->reason) {
+            'medical' => 'Matibabu',
+            'family_matter' => 'Jambo la Kifamilia',
+            'other' => 'Sababu Nyingine',
+            default => ucfirst($request->reason)
+        };
+
+        $message = "Habari {$parent_info->user->first_name} ";
+        $message .= "Mtoto wako {$student->first_name} {$student->last_name} ";
+        $message .= "Amepewa kibali Na.{$request->permit_number} cha ruhusa kuanzia". Carbon::parse($request->head_teacher_approved_at)->format('d/m/Y')." hadi ". Carbon::parse($request->expected_return_date)->format('d/m/Y');
+        $message .= ". Ruhusa imeombwa na {$request->guardian_name}, Sababu ya ruhusa ni {$reasonText} ";
+        $message .= "Kibali kimetolewa na {$headTeacher->user->first_name} {$headTeacher->user->last_name[0]} ";
+        $message .= "Kama hutambui ombi hili tafadhali piga {$school->school_phone} /fika shuleni. Asante";
+
+        $payload = [
+            'from' => $school->sender_id ?? 'SHULE APP',
+            'to' => $this->formatPhoneNumberForSms($parent_info->user->phone),
+            'text' => $message,
+            'reference' => uniqid(),
+        ];
+
+        Log::info("Sending Sms to: ". $this->formatPhoneNumberForSms($parent_info->user->phone). ": Message ". $message);
+        // $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
     }
 
     /**

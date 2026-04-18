@@ -55,7 +55,7 @@ class CheckBankDetails
                         ]);
 
                         // Log for debugging
-                        Log::info('Bank modal should show for teacher: ' . $teacher->id);
+                        // Log::info('Bank modal should show for teacher: ' . $teacher->id);
                     } else {
                         if (!$bankDetailsMissing || $isOnBankPage) {
                             session()->forget(['show_bank_modal', 'teacher_id_for_modal']);
