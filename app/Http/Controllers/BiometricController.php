@@ -21,17 +21,19 @@ class BiometricController extends Controller
         $request->validate(['username' => 'required']);
 
         // Global IP rate limit
-        if (RateLimiter::tooManyAttempts('otp-ip:' . $request->ip(), 5)) {
+        if (RateLimiter::tooManyAttempts('otp-ip:' . $request->ip(), 3)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Too many requests. Please try again later.'
             ], 429);
         }
 
-        RateLimiter::hit('otp-ip:' . $request->ip(), 60);
+
+        RateLimiter::hit('otp-ip:' . $request->ip(), 15 * 60);
 
         $user = User::where('email', $request->username)
             ->orWhere('phone', $request->username)
+            ->where('status', 1)
             ->first();
 
         // Generic response to prevent enumeration
@@ -138,6 +140,7 @@ class BiometricController extends Controller
 
         $user = User::where('email', $request->username)
                 ->orWhere('phone', $request->username)
+                ->where('status', 1)
                 ->first();
 
         if (!$user) {

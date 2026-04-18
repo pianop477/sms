@@ -36,18 +36,18 @@ class EPermitController extends Controller
             'student_id' => 'required|string'
         ]);
 
-        // Find student by admission number or id
+        // Find student by admission number or id - ONLY status 1 (active)
         $student = Student::with(['class', 'parents', 'schools'])
             ->where(function ($query) use ($request) {
-                $query->where('admission_number', $request->student_id)
-                    ->orWhere('id', $request->student_id);
+                $query->where('admission_number', $request->student_id);
             })
+            ->where('status', 1)  // ← MAJIBU: Filter active students only
             ->first();
 
         if (!$student) {
             return response()->json([
                 'success' => false,
-                'message' => 'Student ID haijapatikana. Tafadhali hakikisha umeingiza sahihi.'
+                'message' => 'Mwanafunzi hayupo. Tafadhali hakikisha umeingiza ID sahihi.'
             ], 404);
         }
 

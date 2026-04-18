@@ -58,8 +58,8 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $this->validate($request, [
-            'username' => 'required|string',
-            'password' => 'required|string',
+            'username' => 'required|string|max:35',
+            'password' => 'required|string|max:10',
         ]);
 
         $ip   = $request->ip();
