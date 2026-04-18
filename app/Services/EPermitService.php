@@ -452,8 +452,8 @@ class EPermitService
             'reference' => uniqid(),
         ];
 
-        Log::info("Sending Sms to: ". $this->formatPhoneNumberForSms($parent_info->user->phone). ": Message ". $message);
-        // $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
+        // Log::info("Sending Sms to: ". $this->formatPhoneNumberForSms($parent_info->user->phone). ": Message ". $message);
+        $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
     }
 
     /**
