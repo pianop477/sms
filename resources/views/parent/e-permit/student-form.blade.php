@@ -476,7 +476,7 @@
                 <div class="gateway-icon">
                     <i class="fas fa-file-alt"></i>
                 </div>
-                <h3>e-PERMIT System Module</h3>
+                <h3>e-Permit System Module</h3>
                 <p>Omba ruhusa ya mwanafunzi hapa</p>
             </div>
 
