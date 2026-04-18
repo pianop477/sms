@@ -217,17 +217,19 @@
                             </li>
                             {{-- payment reports --}}
                             @if (Auth::user()->school->package == 'premium')
-                                <li>
-                                    <a href="javascript:void(0)"><i class="fas fa-exchange-alt"></i><span>
-                                            Financial
-                                            Transactions</span></a>
-                                    <ul class="submenu">
-                                        <li><a href="{{ route('expenditure.all.transactions') }}"><span
-                                                    style="font-size: 1.2rem;">💶</span> Transactions</a></li>
-                                        <li><a href="{{ route('payment.report') }}">
-                                                <span style="font-size: 1.2rem;">💳</span> Bills Payment</a></li>
-                                    </ul>
-                                </li>
+                                @if (Auth::user()->usertype == 2)
+                                    <li>
+                                        <a href="javascript:void(0)"><i class="fas fa-exchange-alt"></i><span>
+                                                Financial
+                                                Transactions</span></a>
+                                        <ul class="submenu">
+                                            <li><a href="{{ route('expenditure.all.transactions') }}"><span
+                                                        style="font-size: 1.2rem;">💶</span> Transactions</a></li>
+                                            <li><a href="{{ route('payment.report') }}">
+                                                    <span style="font-size: 1.2rem;">💳</span> Bills Payment</a></li>
+                                        </ul>
+                                    </li>
+                                @endif
                             @endif
                             {{-- Services --}}
                             <li>
