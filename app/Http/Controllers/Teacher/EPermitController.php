@@ -545,7 +545,7 @@ class EPermitController extends Controller
         // Statistics
         $stats = [
             'total' => $permits->count(),
-            'approved' => $permits->where('status', 'approved')->count(),
+            'approved' => $permits->where('head_teacher_action', 'approved')->count(),
             'rejected' => $permits->where('status', 'rejected')->count(),
             'completed' => $permits->where('status', 'completed')->count(),
             'pending' => $permits->whereIn('status', ['pending_class_teacher', 'pending_duty_teacher', 'pending_academic', 'pending_head'])->count()
@@ -687,27 +687,29 @@ class EPermitController extends Controller
 
         // Class Teacher
         if ($permit->class_teacher_approved_at) {
+            $isRejected = $permit->class_teacher_action === 'rejected';
             $timeline[] = [
                 'stage' => 'Mwalimu wa Darasa',
-                'status' => $permit->class_teacher_action,
+                'status' => $isRejected ? 'rejected' : $permit->class_teacher_action,
                 'person' => ucwords(strtolower($permit->classTeacher?->user?->first_name . ' ' . $permit->classTeacher?->user?->last_name)),
                 'time' => $permit->class_teacher_approved_at,
                 'comment' => ucfirst($permit->class_teacher_comment),
                 'icon' => 'fa-chalkboard-user',
-                'color' => $permit->class_teacher_action === 'approved' ? 'green' : 'red'
+                'color' => $isRejected ? 'red' : ($permit->class_teacher_action === 'approved' ? 'green' : 'orange')
             ];
         }
 
         // Duty Teacher - only if exists and approved
         if ($permit->duty_teacher_approved_at) {
+            $isRejected = $permit->duty_teacher_action === 'rejected';
             $timeline[] = [
                 'stage' => 'Mwalimu wa Zamu',
-                'status' => $permit->duty_teacher_action,
+                'status' => $isRejected ? 'rejected' : $permit->duty_teacher_action,
                 'person' => ucwords(strtolower($permit->dutyTeacher?->user?->first_name . ' ' . $permit->dutyTeacher?->user?->last_name)),
                 'time' => $permit->duty_teacher_approved_at,
                 'comment' => ucfirst($permit->duty_teacher_comment),
                 'icon' => 'fa-clock',
-                'color' => $permit->duty_teacher_action === 'approved' ? 'green' : 'red'
+                'color' => $isRejected ? 'red' : ($permit->duty_teacher_action === 'approved' ? 'green' : 'orange')
             ];
         } elseif ($permit->status === 'pending_academic' && !$permit->duty_teacher_approved_at && $permit->class_teacher_approved_at) {
             // If no duty teacher was assigned, show as skipped
@@ -724,29 +726,35 @@ class EPermitController extends Controller
 
         // Academic Teacher
         if ($permit->academic_teacher_approved_at) {
+            $isRejected = $permit->academic_teacher_action === 'rejected';
             $timeline[] = [
                 'stage' => 'Mwalimu wa Taaluma',
-                'status' => $permit->academic_teacher_action,
+                'status' => $isRejected ? 'rejected' : $permit->academic_teacher_action,
                 'person' => ucwords(strtolower($permit->academicTeacher?->user?->first_name . ' ' . $permit->academicTeacher?->user?->last_name)),
                 'time' => $permit->academic_teacher_approved_at,
                 'comment' => ucfirst($permit->academic_teacher_comment),
                 'icon' => 'fa-book',
-                'color' => $permit->academic_teacher_action === 'approved' ? 'green' : 'red'
+                'color' => $isRejected ? 'red' : ($permit->academic_teacher_action === 'approved' ? 'green' : 'orange')
             ];
         }
 
         // Head Teacher
         if ($permit->head_teacher_approved_at) {
+            $isRejected = $permit->head_teacher_action === 'rejected';
             $timeline[] = [
                 'stage' => 'Mwalimu Mkuu',
-                'status' => $permit->head_teacher_action,
+                'status' => $isRejected ? 'rejected' : $permit->head_teacher_action,
                 'person' => ucwords(strtolower($permit->headTeacher?->user?->first_name . ' ' . $permit->headTeacher?->user?->last_name)),
                 'time' => $permit->head_teacher_approved_at,
                 'comment' => ucfirst($permit->head_teacher_comment),
                 'icon' => 'fa-user-tie',
-                'color' => $permit->head_teacher_action === 'approved' ? 'green' : 'red'
+                'color' => $isRejected ? 'red' : ($permit->head_teacher_action === 'approved' ? 'green' : 'orange')
             ];
         }
+
+        // ============ REMOVED: Rejection summary from timeline ============
+        // Tuna rejection card tofauti, hivyo hatuitaji hii tena kwenye timeline
+        // Ili kuepuka kuonyesha mara mbili
 
         // Return/Complete
         if ($permit->verified_at) {

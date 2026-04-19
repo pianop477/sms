@@ -512,7 +512,7 @@
                                     <i class="fas fa-calendar-day"></i> Tarehe ya Kuomba Ruhusa <span class="required">*</span>
                                 </label>
                                 <input type="date" name="departure_date" class="form-control" required
-                                       value="{{ old('departure_date', date('Y-m-d')) }}" min="{{ date('Y-m-d') }}">
+                                       value="{{ old('departure_date', date('Y-m-d')) }}" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}">
                             </div>
                         </div>
                         <div class="col-md-6">

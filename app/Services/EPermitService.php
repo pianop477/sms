@@ -335,7 +335,6 @@ class EPermitService
                 'message' => 'Request approved successfully',
                 'next_status' => $nextStatus
             ];
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('E-Permit approval failed: ' . $e->getMessage());
@@ -346,6 +345,9 @@ class EPermitService
     /**
      * Reject request
      */
+    /**
+     * Reject request with full tracking
+     */
     public function rejectRequest(EPermit $request, Teacher $teacher, $reason)
     {
         DB::beginTransaction();
@@ -354,6 +356,9 @@ class EPermitService
             $currentStatus = $request->status;
             $stage = null;
             $commentField = null;
+            $actionField = null;
+            $timestampField = null;
+            $teacherIdField = null;
 
             switch ($currentStatus) {
                 case 'pending_class_teacher':
@@ -362,6 +367,9 @@ class EPermitService
                     }
                     $stage = 'class_teacher';
                     $commentField = 'class_teacher_comment';
+                    $actionField = 'class_teacher_action';
+                    $timestampField = 'class_teacher_approved_at';
+                    $teacherIdField = 'class_teacher_id';
                     break;
 
                 case 'pending_duty_teacher':
@@ -372,6 +380,9 @@ class EPermitService
                     }
                     $stage = $this->isAcademicTeacher($teacher) ? 'duty_teacher_by_academic' : 'duty_teacher';
                     $commentField = 'duty_teacher_comment';
+                    $actionField = 'duty_teacher_action';
+                    $timestampField = 'duty_teacher_approved_at';
+                    $teacherIdField = 'duty_teacher_id';
                     break;
 
                 case 'pending_academic':
@@ -380,6 +391,9 @@ class EPermitService
                     }
                     $stage = 'academic';
                     $commentField = 'academic_teacher_comment';
+                    $actionField = 'academic_teacher_action';
+                    $timestampField = 'academic_teacher_approved_at';
+                    $teacherIdField = 'academic_teacher_id';
                     break;
 
                 case 'pending_head':
@@ -388,24 +402,40 @@ class EPermitService
                     }
                     $stage = 'head';
                     $commentField = 'head_teacher_comment';
+                    $actionField = 'head_teacher_action';
+                    $timestampField = 'head_teacher_approved_at';
+                    $teacherIdField = 'head_teacher_id';
                     break;
 
                 default:
                     throw new \Exception('Cannot reject request in current status');
             }
 
-            $request->update([
+            // Update the permit with complete rejection details
+            $updateData = [
                 'status' => 'rejected',
                 'rejection_reason' => $reason,
-                $commentField => $reason
-            ]);
+                $commentField => $reason,
+                $actionField => 'rejected',
+                $timestampField => now(),
+                $teacherIdField => $teacher->id,
+            ];
 
+            $request->update($updateData);
+
+            // Log tracking
             $this->logTracking($request, $teacher->id, 'rejected', $stage, $reason);
 
             DB::commit();
 
-            return ['success' => true, 'message' => 'Request rejected successfully'];
-
+            return [
+                'success' => true,
+                'message' => 'Request rejected successfully',
+                'rejected_by' => $teacher->user->name ?? 'Unknown',
+                'rejected_at' => now()->format('d/m/Y H:i'),
+                'rejection_reason' => $reason,
+                'stage' => $stage
+            ];
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('E-Permit rejection failed: ' . $e->getMessage());
@@ -431,7 +461,7 @@ class EPermitService
         $headTeacher = Teacher::with('User')->findOrFail($request->head_teacher_id);
         $nextSmsService = new NextSmsService();
 
-        $reasonText = match($request->reason) {
+        $reasonText = match ($request->reason) {
             'medical' => 'Matibabu',
             'family_matter' => 'Jambo la Kifamilia',
             'other' => 'Sababu Nyingine',
@@ -440,7 +470,7 @@ class EPermitService
 
         $message = "Habari {$parent_info->user->first_name} ";
         $message .= "Mtoto wako {$student->first_name} {$student->last_name} ";
-        $message .= "Amepewa kibali Na.{$request->permit_number} cha ruhusa kuanzia". Carbon::parse($request->head_teacher_approved_at)->format('d/m/Y')." hadi ". Carbon::parse($request->expected_return_date)->format('d/m/Y');
+        $message .= "Amepewa kibali Na.{$request->permit_number} cha ruhusa kuanzia" . Carbon::parse($request->head_teacher_approved_at)->format('d/m/Y') . " hadi " . Carbon::parse($request->expected_return_date)->format('d/m/Y');
         $message .= ". Ruhusa imeombwa na {$request->guardian_name}, Sababu ya ruhusa ni {$reasonText} ";
         $message .= "Kibali kimetolewa na {$headTeacher->user->first_name} {$headTeacher->user->last_name[0]} ";
         $message .= "Kama hutambui ombi hili tafadhali piga {$school->school_phone} /fika shuleni. Asante";
@@ -452,7 +482,7 @@ class EPermitService
             'reference' => uniqid(),
         ];
 
-        // Log::info("Sending Sms to: ". $this->formatPhoneNumberForSms($parent_info->user->phone). ": Message ". $message);
+        // Log::info("Sending Sms to: " . $this->formatPhoneNumberForSms($parent_info->user->phone) . ": Message " . $message);
         $nextSmsService->sendSmsByNext($payload['from'], $payload['to'], $payload['text'], $payload['reference']);
     }
 
@@ -484,7 +514,6 @@ class EPermitService
             DB::commit();
 
             return ['success' => true, 'message' => 'Return confirmed successfully'];
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Return confirmation failed: ' . $e->getMessage());

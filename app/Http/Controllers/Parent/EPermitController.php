@@ -195,10 +195,6 @@ class EPermitController extends Controller
 
         $message = 'Ombi lako limewasilishwa kwa kikamilifu.';
 
-        if (!$firstDutyTeacher) {
-            $message .= ' Kumbuka: Hakuna mwalimu wa zamu kwa tarehe uliyochagua, hivyo ombi litaenda moja kwa moja kwa Mwalimu wa Taaluma baada ya Mwalimu wa Darasa.';
-        }
-
         return response()->json([
             'success' => true,
             'message' => $message,
