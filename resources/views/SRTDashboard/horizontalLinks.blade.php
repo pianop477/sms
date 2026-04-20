@@ -422,7 +422,7 @@
                                 <li>
                                     <a href="javascript:void(0)">
                                         <i class="fas fa-chart-line icon-success"></i>
-                                        <span>Financial Transactions</span>
+                                        <span>Financial Report</span>
                                     </a>
                                     <ul class="submenu">
                                         <li><a href="{{ route('expenditure.all.transactions') }}"><i class="fas fa-exchange-alt"></i> Transactions</a></li>
