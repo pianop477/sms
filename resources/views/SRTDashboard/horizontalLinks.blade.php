@@ -84,7 +84,7 @@
 
     /* Submenu icons */
     .submenu li a i {
-        margin-right: 10px;
+        margin-right: 7px;
         width: 18px;
         font-size: 14px;
     }
