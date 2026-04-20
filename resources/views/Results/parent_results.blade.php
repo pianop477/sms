@@ -2,519 +2,556 @@
 <html>
 
 <head>
+    <meta charset="UTF-8">
+    <title>Academic Report - {{ $studentId->first_name }} {{ $studentId->last_name }}</title>
     <style>
+        /* RESET & BASE */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Times New Roman', 'Arial', serif;
             font-size: 12px;
             line-height: 1.4;
+            background: white;
+            color: #000000;
+            padding: 0.5cm;
         }
 
-        .header {
+        /* Page Setup for Printing */
+        @page {
+            size: A4;
+            margin: 1cm 1cm 1.2cm 1cm;
+        }
+
+        /* Container */
+        .report-container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        /* ============ HEADER SECTION ============ */
+        .school-header {
             width: 100%;
-            margin-bottom: 10px;
-            border-bottom: 2px solid #333;
-            padding-bottom: 5px;
+            border-bottom: 2px solid #000000;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
         }
 
-        .header td {
-            vertical-align: top;
-        }
-
-        .school-info {
-            text-align: center;
-            text-transform: uppercase;
-            font-size: 16px;
-        }
-
-        .report-header {
-            width: 100%;
-            margin-bottom: 10px;
-            margin-top: 10px;
-            text-align: center;
-            font-size: 14px;
-            text-transform: uppercase;
-            border-bottom: #333 solid 1px;
-        }
-
-        .student-info {
-            width: 100%;
-            margin-bottom: 15px;
-            font-size: 12px;
-            text-transform: uppercase;
-        }
-
-        .student-info td {
-            vertical-align: top;
-            padding: 2px 5px;
-        }
-
-        .report-table {
+        .school-header table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 15px;
-            font-size: 12px;
         }
 
-        .report-table th,
-        .report-table td {
-            border: 1px solid #ddd;
-            padding: 6px;
-            text-align: center;
-        }
-
-        .report-table th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-        }
-
-        .subject-name {
-            text-align: left;
-            width: 20%;
-        }
-
-        .teacher-name {
-            text-align: left;
+        .logo-cell {
             width: 15%;
+            text-align: center;
+            vertical-align: middle;
         }
 
-        .exam-score {
-            width: 8%;
+        .logo-img {
+            max-width: 80px;
+            max-height: 80px;
         }
 
-        .summary-row td {
+        .school-info-cell {
+            width: 70%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .school-name {
+            font-size: 13px;
             font-weight: bold;
-            padding: 6px;
+            text-transform: uppercase;
+            margin: 2px 0;
         }
 
-        .excellent {
-            background-color: #75f430;
-            padding: 2px 4px;
-        }
-
-        .good {
-            background-color: #99faed;
-            padding: 2px 4px;
-        }
-
-        .pass {
-            background-color: #eddc71;
-            padding: 2px 4px;
-        }
-
-        .satisfactory {
-            background-color: #eddc71;
-            padding: 2px 4px;
-        }
-
-        .fair {
-            background-color: #b6b0b0;
-            padding: 2px 4px;
-        }
-
-        .poor {
-            background-color: #b6b0b0;
-            padding: 2px 4px;
-        }
-
-        .fail {
-            background-color: #eb4b4b;
-            padding: 2px 4px;
-        }
-
-        .absent {
-            background-color: #eb4b4b;
-            padding: 2px 4px;
-        }
-
-        .footer {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            text-align: center;
-            border-top: 1px solid #ddd;
+        .school-address {
             font-size: 10px;
-            color: #666;
+            margin: 2px 0;
         }
 
-        @page {
-            margin-top: 6mm;
-            margin-bottom: 8mm;
-            /* Ongeza nafasi ya chini kwa footer */
-            margin-left: 6mm;
-            margin-right: 6mm;
-        }
-
-        footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 3mm;
-            /*urefu wa footer*/
+        .school-contacts {
             font-size: 10px;
-            padding-top: 6px;
-            border-top: 1px solid #ddd;
+            margin: 2px 0;
+        }
+
+        .photo-cell {
+            width: 15%;
             text-align: center;
-            background-color: white;
-            z-index: 1000;
+            vertical-align: middle;
         }
 
         .student-photo {
-            text-align: center;
-            flex-shrink: 0;
-        }
-
-        .student-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
+            width: 80px;
+            height: 80px;
             object-fit: cover;
-            border: 4px solid var(--primary);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #cccccc;
+            padding: 2px;
         }
 
-        .profile-img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            transition: all 0.4s ease;
-        }
-
-        .division-i {
-            /* background-color: #75f430 !important; */
-            color: black !important;
-            padding: 2px 4px !important;
-        }
-
-        .division-ii {
-            /* background-color: #99faed !important; */
-            color: black !important;
-            padding: 2px 4px !important;
-        }
-
-        .division-iii {
-            /* background-color: #eddc71 !important; */
-            color: black !important;
-            padding: 2px 4px !important;
-        }
-
-        .division-iv {
-            /* background-color: #b6b0b0 !important; */
-            color: black !important;
-            padding: 2px 4px !important;
-        }
-
-        .division-zero {
-            /* background-color: #eb4b4b !important; */
-            color: black !important;
-            padding: 2px 4px !important;
-        }
-
-        .info-box {
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-        }
-
-        .info-box h4 {
-            margin: 0 0 10px 0;
-            color: #333;
+        /* ============ REPORT TITLE ============ */
+        .report-title {
             text-align: center;
+            margin: 12px 0;
         }
 
-        .division-table {
+        .report-title h3 {
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 5px 0;
+        }
+
+        .report-title p {
+            font-size: 11px;
+            margin-top: 3px;
+        }
+
+        /* ============ STUDENT INFO SECTION ============ */
+        .student-info {
+            width: 100%;
+            margin: 12px 0;
+            border: 1px solid #000000;
+            border-collapse: collapse;
+        }
+
+        .student-info td {
+            border: 1px solid #000000;
+            padding: 8px 10px;
+            vertical-align: top;
+        }
+
+        .info-label {
+            font-weight: bold;
+            width: 40%;
+            background-color: #f5f5f5;
+        }
+
+        .info-value {
+            width: 60%;
+        }
+
+        /* ============ RESULTS TABLE ============ */
+        .results-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 5px;
+            margin: 12px 0;
+            font-size: 11px;
         }
 
-        .division-table th,
-        .division-table td {
-            border: 1px solid #ddd;
-            padding: 4px;
+        .results-table th {
+            border: 1px solid #000000;
+            padding: 8px 5px;
+            background-color: #f0f0f0;
+            font-weight: bold;
             text-align: center;
             font-size: 11px;
         }
 
-        .division-table th {
-            background-color: #f2f2f2;
+        .results-table td {
+            border: 1px solid #000000;
+            padding: 6px 5px;
+            text-align: center;
         }
+
+        .subject-name-cell {
+            text-align: left;
+            font-weight: normal;
+        }
+
+        /* ============ SUMMARY SECTION ============ */
+        .summary-section {
+            width: 100%;
+            margin: 12px 0;
+            border: 1px solid #000000;
+            border-collapse: collapse;
+        }
+
+        .summary-section td {
+            border: 1px solid #000000;
+            padding: 8px 10px;
+        }
+
+        .summary-label {
+            font-weight: bold;
+            background-color: #f5f5f5;
+        }
+
+        /* ============ DIVISION SECTION ============ */
+        .division-section {
+            width: 100%;
+            margin: 12px 0;
+            border: 2px solid #000000;
+            border-collapse: collapse;
+            background-color: #f9f9f9;
+        }
+
+        .division-section td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .division-score {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* ============ HEAD TEACHER COMMENT ============ */
+        .comment-section {
+            width: 100%;
+            margin: 12px 0;
+            border: 1px solid #000000;
+            border-collapse: collapse;
+        }
+
+        .comment-section td {
+            padding: 10px 12px;
+            vertical-align: top;
+        }
+
+        .comment-label {
+            font-weight: bold;
+            width: 18%;
+            background-color: #f5f5f5;
+            text-align: center;
+        }
+
+        .comment-content {
+            width: 82%;
+            line-height: 1.5;
+        }
+
+        /* ============ QR CODE SECTION ============ */
+        .qr-section {
+            width: 100%;
+            margin: 20px 0;
+            text-align: center;
+            page-break-inside: avoid;
+        }
+
+        .qr-code {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+        }
+
+        .qr-text {
+            font-size: 9px;
+            margin-top: 2px;
+        }
+
+        /* ============ FOOTER ============ */
+        .footer {
+            width: 100%;
+            margin-top: 15px;
+            padding-top: 8px;
+            border-top: 1px solid #cccccc;
+            font-size: 9px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+        }
+
+        /* ============ GRADE COLORS ============ */
+        .grade-A { background-color: #e8f5e9; font-weight: bold; padding: 2px 6px; border-radius: 2px; }
+        .grade-B { background-color: #e3f2fd; padding: 2px 6px; border-radius: 2px; }
+        .grade-C { background-color: #fff3e0; padding: 2px 6px; border-radius: 2px; }
+        .grade-D { background-color: #ffebee; padding: 2px 6px; border-radius: 2px; }
+        .grade-E { background-color: #fce4ec; padding: 2px 6px; border-radius: 2px; }
+        .grade-F { background-color: #ffcdd2; padding: 2px 6px; border-radius: 2px; }
+
+        .excellent-text { font-weight: bold; color: #2e7d32; }
+        .good-text { font-weight: bold; color: #1565c0; }
+        .pass-text { font-weight: bold; color: #e65100; }
+        .poor-text { font-weight: bold; color: #c62828; }
+        .fail-text { font-weight: bold; color: #b71c1c; }
+
+        @media print {
+            body { padding: 0; margin: 0; }
+            .results-table th {
+                background-color: #e0e0e0 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+
+        .bold { font-weight: bold; }
     </style>
 </head>
 
 <body>
-
-    <table class="header">
-        <tr>
-            <td width="15%">
-                <img src="{{ storage_path('app/public/logo/' . $results->first()->logo) }}" alt="Logo" width="80">
-            </td>
-            <td width="70%" class="school-info">
-                <h3 style="margin:0; padding:0;">THE UNITED REPUBLIC OF TANZANIA</h3>
-                <h3 style="margin:0; padding:0;">PRESIDENT OFFICE - TAMISEMI</h3>
-                <h4 style="margin:0; padding:0;">{{ $results->first()->school_name }}</h4>
-                <h5 style="margin:0; padding:0;">{{ $results->first()->postal_address }} -
-                    {{ $results->first()->postal_name }}, {{ $results->first()->country }}
-                </h5>
-                <p style="font-size:14px; text-transform:capitalize; margin:0; padding:0;"><b>Email:</b> <span
-                        style="text-transform: lowercase; text-align:center">{{ strtolower($results->first()->school_email ?? 'N/A') }}</span>
-                    |
-                    <b>Phone:</b> {{ $results->first()->school_phone ?? 'N/A' }}
-                </p>
-            </td>
-            <td width="15%" align="right">
-                @php
-                    // Determine the image path
-                    $imageName = $studentId->image;
-                    $imagePath = storage_path('app/public/students/' . $imageName);
-
-                    // Check if the image exists and is not empty
-                    if (!empty($imageName) && file_exists($imagePath)) {
-                        $avatarImage = storage_path('app/public/students/' . $imageName);
-                    } else {
-                        // Use default avatar based on gender
-                        $avatarImage = storage_path(
-                            'app/public/students/' . ($studentId->gender == 'male' ? 'student.jpg' : 'student.jpg'),
-                        );
-                    }
-                @endphp
-                <img src="{{ $avatarImage }}" alt="" width="80" class="profile-img bounce-in">
-            </td>
-        </tr>
-    </table>
-    <table class="report-header">
-        <tr>
-            <td>
-                <h5 style="margin:5px 0; padding:0;">STUDENT'S ACADEMIC REPORT</h5>
-                <h5 style="margin:0; padding:0;"> {{ strtoupper($results->first()->exam_type) }} Assessment -
-                    {{ \Carbon\Carbon::parse($date)->format('d/m/Y') }}</h5>
-            </td>
-        </tr>
-    </table>
-    <p style="padding: 3px; background:rgb(187, 163, 56); text-align:center; font-size: 12px;"><strong>Student's
-            Information</strong></p>
-    <table class="student-info">
-        <tr>
-            <td width="50%">
-                <strong>Admission Number:</strong> <span
-                    class="">{{ strtoupper($results->first()->admission_number) }}</span><br>
-                <strong>Student Name:</strong> <span class="">{{ strtoupper($studentId->first_name) }}
-                    {{ strtoupper($studentId->middle_name) }} {{ strtoupper($studentId->last_name) }}</span><br>
-                <strong>Gender:</strong> <span class="">{{ ucfirst($studentId->gender) }}</span>
-            </td>
-            <td width="50%">
-                <strong>Class:</strong> <span class="">{{ strtoupper($results->first()->class_name) }}</span><br>
-                <strong>Stream:</strong> <span class="">{{ strtoupper($studentId->group) }}</span><br>
-                <strong>Term:</strong> <span class="">{{ strtoupper($results->first()->Exam_term) }}</span>
-            </td>
-        </tr>
-    </table>
-    <table class="report-table">
-        <thead>
+    <div class="report-container">
+        <table class="school-header" cellpadding="5" cellspacing="0">
             <tr>
-                <th class="subject-name">Subject Name</th>
-                <th class="teacher-name">Subject Code</th>
-                <th class="text-center">Teacher</th>
-                <th>Score</th>
-                <th>Grade</th>
-                <th>Rank</th>
-                <th>Remarks</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($results as $index => $result)
-                <tr>
-                    <td class="subject-name" style="text-transform: capitalize">
-                        {{ ucwords(strtolower($result->course_name)) }}</td>
-                    <td class="teacher-name">{{ ucwords(strtoupper($result->course_code)) }}</td>
-                    <td>{{ ucwords(strtolower($result->teacher_first_name . '. ' . $result->teacher_last_name[0])) }}
-                    </td>
-                    <td>{{ $result->score ?? 'X' }}</td>
-                    <td>{{ $result->score ? $result->grade : 'X' }}</td>
-                    <td>{{ $result->score ? $result->courseRank : 'X' }}</td>
-                    <td style="font-style: italic">{{ $result->score ? $result->remarks : 'X' }}</td>
-                </tr>
-            @endforeach
-            <tr>
-                <td colspan="7"></td>
-            </tr>
-            <tr class="summary-row">
-                <td colspan="7" style="background: rgb(187, 163, 56)">Overall Performance Summary</td>
-            </tr>
-            <tr class="summary-row">
-                <td colspan="1">
-                    Total Marks: <strong>{{ $totalScore }}</strong>
-                </td>
-                <td colspan="1">
-                    Average: <strong>{{ number_format($averageScore, 3) }}</strong>
-                </td>
-                @php
-                    $grade = '';
-                    $gradeClass = '';
-                    if ($marking_style == 1) {
-                        if ($averageScore >= 40.5) {
-                            $grade = 'A';
-                            $gradeClass = 'excellent';
-                        } elseif ($averageScore >= 30.5) {
-                            $grade = 'B';
-                            $gradeClass = 'good';
-                        } elseif ($averageScore >= 20.5) {
-                            $grade = 'C';
-                            $gradeClass = 'pass';
-                        } elseif ($averageScore >= 10.5) {
-                            $grade = 'D';
-                            $gradeClass = 'poor';
-                        } else {
-                            $grade = 'E';
-                            $gradeClass = 'fail';
-                        }
-                    } elseif ($marking_style == 2) {
-                        if ($averageScore >= 80.5) {
-                            $grade = 'A';
-                            $gradeClass = 'excellent';
-                        } elseif ($averageScore >= 60.5) {
-                            $grade = 'B';
-                            $gradeClass = 'good';
-                        } elseif ($averageScore >= 40.5) {
-                            $grade = 'C';
-                            $gradeClass = 'pass';
-                        } elseif ($averageScore >= 20.5) {
-                            $grade = 'D';
-                            $gradeClass = 'poor';
-                        } else {
-                            $grade = 'E';
-                            $gradeClass = 'fail';
-                        }
-                    } else {
-                        // For marking style 3, we don't show general grade
-    $grade = 'N/A';
-    $gradeClass = '';
-                    }
-                @endphp
-                @if ($marking_style != 3)
-                    <td colspan="1" class="text-center">
-                        Grade: <strong>{{ $grade }}</strong>
-                    </td>
-                @endif
-                <td colspan="{{ $marking_style == 3 ? '2' : '2' }}">
-                    Position: <strong style="text-decoration:underline">{{ $studentRank }} out of
-                        {{ $rankings->count() }}</strong>
-                </td>
-                <td colspan="{{ $marking_style == 3 ? '3' : '2' }}" class="text-center">
-                    General Remarks:
-                    @if ($marking_style == 1)
-                        @if ($averageScore >= 40.5)
-                            <span class="excellent">EXCELLENT</span>
-                        @elseif ($averageScore >= 30.5)
-                            <span class="good">GOOD</span>
-                        @elseif ($averageScore >= 20.5)
-                            <span class="pass">PASS</span>
-                        @elseif ($averageScore >= 10.5)
-                            <span class="poor">POOR</span>
-                        @else
-                            <span class="fail">FAIL</span>
-                        @endif
-                    @elseif($marking_style == 2)
-                        @if ($averageScore >= 80.5)
-                            <span class="excellent">EXCELLENT</span>
-                        @elseif ($averageScore >= 60.5)
-                            <span class="good">GOOD</span>
-                        @elseif ($averageScore >= 40.5)
-                            <span class="pass">PASS</span>
-                        @elseif ($averageScore >= 20.5)
-                            <span class="poor">POOR</span>
-                        @else
-                            <span class="fail">FAIL</span>
-                        @endif
+                <td class="logo-cell">
+                    @php
+                        $logoPath = storage_path('app/public/logo/' . ($results->first()->logo ?? 'default.png'));
+                        $logoExists = file_exists($logoPath) && !empty($results->first()->logo);
+                    @endphp
+                    @if($logoExists)
+                        <img src="{{ $logoPath }}" class="logo-img" alt="School Logo">
                     @else
-                        @if ($averageScore >= 74.5)
-                            <span class="excellent">EXCELLENT</span>
-                        @elseif ($averageScore >= 64.5)
-                            <span class="good">GOOD</span>
-                        @elseif ($averageScore >= 44.5)
-                            <span class="pass">PASS</span>
-                        @elseif ($averageScore >= 90.5)
-                            <span class="poor">UNSATISFACTORY</span>
-                        @else
-                            <span class="fail">FAIL</span>
-                        @endif
+                        <div style="width: 80px; height: 80px; border: 1px solid #ccc; margin: 0 auto;"></div>
+                    @endif
+                </td>
+                <td class="school-info-cell">
+                    <div class="school-name">THE UNITED REPUBLIC OF TANZANIA</div>
+                    <div class="school-name">PRESIDENT'S OFFICE - TAMISEMI</div>
+                    <div class="school-name" style="font-size: 13px; margin-top: 5px;">
+                        {{ strtoupper($results->first()->school_name ?? 'SCHOOL NAME') }}
+                    </div>
+                    <div class="school-address">
+                        P.O.BOX {{ $results->first()->postal_address ?? '______' }} -
+                        {{ $results->first()->postal_name ?? '______' }},
+                        {{ $results->first()->country ?? 'TANZANIA' }}
+                    </div>
+                    <div class="school-contacts">
+                        Email: {{ strtolower($results->first()->school_email ?? 'info@school.ac.tz') }} |
+                        Phone: {{ $results->first()->school_phone ?? '_________' }}
+                    </div>
+                </td>
+                <td class="photo-cell">
+                    @php
+                        $studentImage = storage_path('app/public/students/' . ($studentId->image ?? ''));
+                        $hasImage = file_exists($studentImage) && !empty($studentId->image);
+                    @endphp
+                    @if($hasImage)
+                        <img src="{{ $studentImage }}" class="student-photo" alt="Student Photo">
+                    @else
+                        <div style="width: 80px; height: 80px; border: 1px solid #ccc; text-align: center; line-height: 80px;">
+                            <img src="{{storage_path('app/public/students/student.jpg')}}" class="student-photo" alt="Student Photo">
+                        </div>
                     @endif
                 </td>
             </tr>
-        </tbody>
-    </table>
+        </table>
 
-    @if ($marking_style == 3)
-        <!-- DIVISION INFORMATION FOR MARKING STYLE 3 -->
-        <div class="info-box">
-            <h4 style="background: rgb(187, 163, 56); padding: 5px; color: black;">Division summary</h4>
-
-            <table class="report-table">
-                <tr class="summary-row">
-                    <td style="background: #f2f2f2; text-align: left;">
-                        <strong>Aggregate Points:</strong>
-                        <span style="font-size: 16px; font-weight: bold; margin-left: 10px;">
-                            {{ $aggregatePoints }} points
-                        </span>
-                    </td>
-                    <td style="background: #f2f2f2; text-align: left;">
-                        <strong>Division:</strong>
-                        <span class="division-{{ strtolower($division) }}"
-                            style="font-size: 16px; font-weight: bold; margin-left: 10px; padding: 5px 10px;">
-                            {{ $division === '0' ? '0' : $division }}
-                        </span>
-                    </td>
-                </tr>
-            </table>
-
-            <p style="text-align: center; font-size: 11px; margin-top: 10px;">
-                <strong>Division Interpretation:</strong>
-                Division I (Excellent), Division II (Good), Division III (Pass),
-                Division IV (Unsatisfactory), 0 (Fail)
-            </p>
-            <p style="text-align: center; font-size: 12px; margin-top: 10px;">
-                Note: "X" indicates that the student did not take the exam.
+        <div class="report-title">
+            <h3>ACADEMIC PROGRESS REPORT</h3>
+            <p>
+                {{ strtoupper($results->first()->exam_type ?? 'TERMINAL') }} ASSESSMENT -
+                TERM {{ strtoupper($results->first()->Exam_term ?? 'I') }},
+                {{ \Carbon\Carbon::parse($date ?? now())->format('Y') }}
             </p>
         </div>
-    @endif
-    <div style="
-    position: fixed;
-    bottom: 6mm;
-    left: 0;
-    right: 0;
-    text-align: center;
-">
-        <img src="data:image/png;base64,{{ $qrPng }}" width="180" alt="Report Verification QR"
-            style="
-            display: block;
-            margin-bottom: -4 auto;
-        ">
-        <p
-            style="
-        font-size: 10px;
-        margin-top: -15px;
-        margin-bottom: 0;
-        font-style: italic;
-        line-height: 1;
-    ">
-            Scan to verify Authenticity
-        </p>
+
+        <table class="student-info" cellpadding="8" cellspacing="0">
+            <tr>
+                <td class="info-label">ADMISSION NUMBER</td>
+                <td class="info-value">{{ strtoupper($results->first()->admission_number ?? 'N/A') }}</td>
+                <td class="info-label">CLASS</td>
+                <td class="info-value">{{ strtoupper($results->first()->class_name ?? 'N/A') }}</td>
+            </tr>
+            <tr>
+                <td class="info-label">STUDENT NAME</td>
+                <td class="info-value">
+                    {{ strtoupper($studentId->first_name ?? '') }}
+                    {{ strtoupper($studentId->middle_name ?? '') }}
+                    {{ strtoupper($studentId->last_name ?? '') }}
+                </td>
+                <td class="info-label">STREAM</td>
+                <td class="info-value">{{ strtoupper($studentId->group ?? 'N/A') }}</td>
+            </tr>
+            <tr>
+                <td class="info-label">GENDER</td>
+                <td class="info-value">{{ ucfirst($studentId->gender ?? 'N/A') }}</td>
+                <td class="info-label">TERM</td>
+                <td class="info-value">{{ strtoupper($results->first()->Exam_term ?? 'N/A') }}</td>
+            </tr>
+        </table>
+
+        <table class="results-table" cellpadding="6" cellspacing="0">
+            <thead>
+                <tr>
+                    <th width="25%">SUBJECT NAME</th>
+                    <th width="10%">CODE</th>
+                    <th width="15%">TEACHER</th>
+                    <th width="10%">SCORE</th>
+                    <th width="8%">GRADE</th>
+                    <th width="8%">RANK</th>
+                    <th width="24%">REMARKS</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php $subjectCount = 0; @endphp
+                @foreach ($results as $result)
+                @php $subjectCount++; @endphp
+                <tr>
+                    <td class="subject-name-cell">{{ ucwords(strtolower($result->course_name ?? 'N/A')) }}</td>
+                    <td>{{ strtoupper($result->course_code ?? 'N/A') }}</td>
+                    <td>
+                        {{ ucwords(strtolower($result->teacher_first_name ?? '')) }}
+                        {{ strtoupper(substr($result->teacher_last_name ?? '', 0, 1)) }}.
+                    </td>
+                    <td class="bold">{{ $result->score ?? 'X' }}</td>
+                    <td>
+                        @php
+                            $grade = $result->grade ?? 'X';
+                            $gradeClass = 'grade-' . $grade;
+                        @endphp
+                        <span class="{{ $gradeClass }}">{{ $grade }}</span>
+                    </td>
+                    <td>{{ $result->score ? ($result->courseRank ?? '-') : 'X' }}</td>
+                    <td>{{ $result->score ? ($result->remarks ?? '-') : 'ABSENT' }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <table class="summary-section" cellpadding="8" cellspacing="0">
+            <tr>
+                <td class="summary-label" width="25%">TOTAL MARKS</td>
+                <td width="25%"><strong>{{ $totalScore ?? 0 }}</strong></td>
+                <td class="summary-label" width="25%">CLASS POSITION</td>
+                <td width="25%"><strong>{{ $studentRank ?? 1 }} out of {{ $rankings->count() ?? 1 }}</strong></td>
+            </tr>
+            <tr>
+                <td class="summary-label">AVERAGE SCORE</td>
+                <td><strong>{{ number_format($averageScore ?? 0, 2) }}%</strong></td>
+                <td class="summary-label">SUBJECTS TAKEN</td>
+                <td><strong>{{ $subjectCount }}</strong></td>
+            </tr>
+        </table>
+
+        @if ($marking_style == 3)
+        <table class="division-section" cellpadding="10" cellspacing="0">
+            <tr>
+                <td width="50%">
+                    <strong>AGGREGATE POINTS</strong><br>
+                    <span class="division-score">{{ $aggregatePoints ?? 0 }}</span>
+                </td>
+                <td width="50%">
+                    <strong>DIVISION</strong><br>
+                    <span class="division-score" style="
+                        background-color:
+                            @if($division == 'I') #4caf50
+                            @elseif($division == 'II') #2196f3
+                            @elseif($division == 'III') #ff9800
+                            @elseif($division == 'IV') #9e9e9e
+                            @else #f44336
+                            @endif;
+                        color: white; padding: 5px 25px; border-radius: 5px; display: inline-block;
+                    ">
+                        {{ $division === '0' ? '0' : $division }}
+                    </span>
+                </td>
+            </tr>
+        </table>
+        @endif
+
+         @php
+            // Generate motivational Head Teacher's Comment based on performance
+            $headComment = '';
+            $motivationalMessage = '';
+            $nextGoal = '';
+
+            if ($marking_style == 3) {
+                if ($division == 'I') {
+                    $headComment = 'Outstanding Achievement! You have demonstrated exceptional mastery of all subjects.';
+                    $motivationalMessage = '"Excellence is not a skill, it is an attitude." Keep shining and inspire others!';
+                    $nextGoal = 'Target: Maintain Division I next term. You have proven you can do it!';
+                } elseif ($division == 'II') {
+                    $headComment = 'Very Good Performance! You have shown strong understanding across the curriculum.';
+                    $motivationalMessage = '"Success is the sum of small efforts, repeated day in and day out." Push harder!';
+                    $nextGoal = 'Target: Aim for Division I next term - just a little more effort will get you there!';
+                } elseif ($division == 'III') {
+                    $headComment = 'Satisfactory Performance. You have met the basic requirements.';
+                    $motivationalMessage = '"The only limit to your impact is your imagination and commitment." You can do better!';
+                    $nextGoal = 'Target: Focus on weaker subjects to reach Division II. We believe in your potential!';
+                } elseif ($division == 'IV') {
+                    $headComment = 'You have potential to do better. This term was a learning experience.';
+                    $motivationalMessage = '"Every expert was once a beginner." Let\'s work together to improve next term.';
+                    $nextGoal = 'Target: Regular study schedule and homework completion will boost your performance.';
+                } else {
+                    $headComment = 'This is a wake-up call. You are capable of achieving more than this.';
+                    $motivationalMessage = '"Your attitude, not your aptitude, will determine your altitude." Time to rise up!';
+                    $nextGoal = 'Target: Attend extra classes and seek help from teachers. We are here to support you.';
+                }
+            } else {
+                $avg = $averageScore ?? 0;
+                if ($marking_style == 1) {
+                    if ($avg >= 40.5) {
+                        $headComment = 'Magnificent Performance! You have excelled brilliantly this term.';
+                        $motivationalMessage = '"Success is no accident. It is hard work, perseverance, learning, and most of all, love for what you are doing."';
+                        $nextGoal = 'Keep setting higher targets. Aim for 100% attendance and perfect scores!';
+                    } elseif ($avg >= 30.5) {
+                        $headComment = 'Well Done! You have shown consistent improvement and good understanding.';
+                        $motivationalMessage = '"The future depends on what you do today." A few more steps and you reach excellence!';
+                        $nextGoal = 'Target: Improve your average by 5% next term. You can achieve Grade A!';
+                    } elseif ($avg >= 20.5) {
+                        $headComment = 'Good Effort! You are on the right track. Keep building on this foundation.';
+                        $motivationalMessage = '"Education is the most powerful weapon which you can use to change the world."';
+                        $nextGoal = 'Target: Focus on daily revision and complete all assignments on time.';
+                    } elseif ($avg >= 10.5) {
+                        $headComment = 'Room for Improvement. This is not your full potential - you can rise higher!';
+                        $motivationalMessage = '"It always seems impossible until it\'s done." Start believing in yourself!';
+                        $nextGoal = 'Target: Create a study timetable and stick to it. Small daily progress adds up!';
+                    } else {
+                        $headComment = 'A Fresh Start Ahead. Every setback is a setup for a comeback.';
+                        $motivationalMessage = '"The only person you are destined to become is the person you decide to be."';
+                        $nextGoal = 'Target: Meet with subject teachers weekly. We will support your journey to success.';
+                    }
+                } else {
+                    if ($avg >= 80.5) {
+                        $headComment = 'Exceptional Achievement! You have set a standard of excellence.';
+                        $motivationalMessage = '"Excellence is not an act, but a habit." Continue being a role model!';
+                        $nextGoal = 'Target: Maintain top position and help classmates who are struggling.';
+                    } elseif ($avg >= 60.5) {
+                        $headComment = 'Commendable Performance! Your hard work is paying off.';
+                        $motivationalMessage = '"Shoot for the moon. Even if you miss, you\'ll land among the stars."';
+                        $nextGoal = 'Target: Push your average above 70% - you have the ability!';
+                    } elseif ($avg >= 40.5) {
+                        $headComment = 'You are making progress. Keep the momentum going!';
+                        $motivationalMessage = '"Believe you can and you\'re halfway there." You have what it takes!';
+                        $nextGoal = 'Target: Improve by 10% next term through consistent effort.';
+                    } elseif ($avg >= 20.5) {
+                        $headComment = 'Time to Unlock Your Potential. You have hidden talents waiting to shine.';
+                        $motivationalMessage = '"The secret of getting ahead is getting started." Start today!';
+                        $nextGoal = 'Target: Attend all remedial classes and ask questions without fear.';
+                    } else {
+                        $headComment = 'Your Comeback Story Starts Now. Every master was once a beginner.';
+                        $motivationalMessage = '"Failure is not the opposite of success, it\'s part of success."';
+                        $nextGoal = 'Target: One-on-one mentoring sessions arranged. Let\'s turn things around together!';
+                    }
+                }
+            }
+        @endphp
+
+        <table class="comment-section" cellpadding="10" cellspacing="0">
+            <tr>
+                <td class="comment-label">HEAD TEACHER'S<br>REMARKS</td>
+                <td class="comment-content">
+                    <i>{{ $headComment }}</i>
+                </td>
+            </tr>
+        </table>
+
+        <div class="qr-section">
+            <div style="display: inline-block; text-align: center;">
+                <img src="data:image/png;base64,{{ $qrPng ?? '' }}" class="qr-code" alt="Verification QR Code">
+                <div class="qr-text">
+                    <strong>Scan to Verify Authenticity</strong><br>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span>&copy; {{ date('Y') }} - {{ strtoupper($results->first()->school_name ?? 'SCHOOL') }}</span>
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            <span>Printed: {{ now()->format('d-M-Y H:i:s') }}</span>
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            <span>Document ID: {{ strtoupper(substr(md5(uniqid()), 0, 8)) }}</span>
+        </div>
     </div>
-
-    <footer>
-        <span class="copyright">
-            &copy; {{ ucwords(strtolower(Auth::user()->school->school_name)) }} – {{ date('Y') }}
-        </span>
-        <span class="printed">
-            Printed at: {{ now()->format('d-M-Y H:i') }}
-        </span>
-    </footer>
-
 </body>
 
 </html>

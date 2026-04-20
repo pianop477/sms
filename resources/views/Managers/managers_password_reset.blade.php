@@ -67,8 +67,13 @@
         }
 
         @keyframes shimmer {
-            0% { transform: translateX(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) rotate(45deg); }
+            0% {
+                transform: translateX(-100%) rotate(45deg);
+            }
+
+            100% {
+                transform: translateX(100%) rotate(45deg);
+            }
         }
 
         .modern-table {
@@ -220,6 +225,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -231,6 +237,7 @@
                 opacity: 0;
                 transform: translateX(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateX(0);
@@ -307,7 +314,8 @@
                         <span class="input-group-text bg-transparent border-end-0">
                             <i class="fas fa-search text-primary"></i>
                         </span>
-                        <input type="text" class="form-control border-start-0" placeholder="Search managers..." id="searchInput">
+                        <input type="text" class="form-control border-start-0" placeholder="Search managers..."
+                            id="searchInput">
                     </div>
                 </div>
                 <div class="col-md-6 text-end">
@@ -383,12 +391,12 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <form action="{{ route('admin.update.password', $user->id) }}" method="POST" class="d-inline">
+                                        <form class="reset-password-form"
+                                            action="{{ route('admin.update.password', $user->id) }}" method="POST"
+                                            data-user-id="{{ $user->id }}">
                                             @csrf
                                             @method('PUT')
-                                            <button class="btn-reset"
-                                                    onclick=""
-                                                    title="Reset Password">
+                                            <button type="submit" class="btn-reset" title="Reset Password">
                                                 <i class="fas fa-key me-2"></i> Reset
                                             </button>
                                         </form>
@@ -399,7 +407,7 @@
                     </table>
                 </div>
 
-                @if($users->isEmpty())
+                @if ($users->isEmpty())
                     <div class="text-center p-5">
                         <div class="empty-icon mb-4">
                             <i class="fas fa-user-slash fa-4x text-primary opacity-50"></i>
@@ -427,24 +435,15 @@
                 });
             });
 
-            // Add confirmation for reset action
-            const resetButtons = document.querySelectorAll('.btn-reset');
-            resetButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    if (!confirm('⚠️ This will reset the password to default. Are you sure?')) {
-                        e.preventDefault();
-                    } else {
-                        // Show loading state
-                        const originalText = this.innerHTML;
-                        this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Resetting...';
-                        this.disabled = true;
+            const searchInput = document.getElementById('searchInput');
+            const tableRows = document.querySelectorAll('.modern-table tbody tr');
 
-                        // Revert after 2 seconds if form doesn't submit
-                        setTimeout(() => {
-                            this.innerHTML = originalText;
-                            this.disabled = false;
-                        }, 2000);
-                    }
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+
+                tableRows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(searchTerm) ? '' : 'none';
                 });
             });
 

@@ -167,13 +167,37 @@ class ManagerController extends Controller
      */
     public function resetPassword(Request $request, $user)
     {
-        //
-        $users = User::findOrFail($user);
-        $users->password = Hash::make($request->input('password', 'shule2025'));
-        $users->save();
-        event(new PasswordResetEvent($user));
-        Alert()->toast('Account Password reset successfully', 'success');
-        return back();
+        try {
+            dd('Request inaweza kufika hapa');
+            $users = User::findOrFail($user);
+            $defaultPassword = 'shule2025';
+            $users->password = Hash::make($defaultPassword);
+            $users->save();
+
+            // Check if request expects JSON (AJAX)
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => "Password reset successfully to: {$defaultPassword}",
+                    'user' => $users->email
+                ]);
+            }
+
+            // Normal form submission
+            Alert()->toast('Account Password reset successfully', 'success');
+
+            return back();
+        } catch (\Exception $e) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to reset password: ' . $e->getMessage()
+                ], 500);
+            }
+
+            Alert()->toast('Failed to reset password', 'error');
+            return back();
+        }
     }
 
     /**
