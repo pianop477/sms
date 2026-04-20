@@ -2164,7 +2164,7 @@
                                                     <td class="text-center">
                                                         <a href="{{ route('attendance.get.form', ['class' => Hashids::encode($class->id)]) }}"
                                                             class="btn btn-info btn-sm" data-bs-toggle="tooltip"
-                                                            title="Take Attendance">
+                                                            title="Report">
                                                             <i class="ti-settings me-1"></i> Report
                                                         </a>
                                                     </td>
