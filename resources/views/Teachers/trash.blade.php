@@ -15,7 +15,6 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            /* padding: 20px; */
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             overflow-x: hidden;
@@ -26,10 +25,10 @@
             backdrop-filter: blur(10px);
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            overflow-y: visible; /* Changed from hidden to visible */
+            overflow-y: visible;
             margin-top: 30px;
             border: 1px solid rgba(255, 255, 255, 0.5);
-            position: relative; /* Added for proper dropdown positioning */
+            position: relative;
         }
 
         .card-header-custom {
@@ -37,8 +36,8 @@
             color: white;
             padding: 12px 15px;
             position: relative;
-            overflow: visible; /* Changed from hidden to visible */
-            z-index: 100; /* Lower than dropdown */
+            overflow: visible;
+            z-index: 100;
         }
 
         .card-header-custom::before {
@@ -50,7 +49,7 @@
             height: 200%;
             background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
             transform: rotate(30deg);
-            z-index: -1; /* Keep background behind content */
+            z-index: -1;
         }
 
         .header-title {
@@ -64,46 +63,64 @@
         .card-body {
             padding: 10px;
             position: relative;
-            z-index: 1; /* Ensure content stays above background */
+            z-index: 1;
         }
 
-        .dropdown-custom {
-            background: linear-gradient(135deg, var(--success) 0%, #20c997 100%);
+        /* Tabs Styling */
+        .nav-tabs-custom {
+            border-bottom: none;
+            margin-bottom: 0;
+            background: transparent;
+        }
+
+        .nav-tabs-custom .nav-link {
             border: none;
-            border-radius: 50px;
-            padding: 5px 10px;
+            color: rgba(255, 255, 255, 0.8);
             font-weight: 600;
-            color: white;
+            padding: 8px 20px;
             transition: all 0.3s;
             position: relative;
-            z-index: 101; /* Higher than card header */
+            background: transparent;
+            border-radius: 0;
+            font-size: 14px;
         }
 
-        .dropdown-custom:hover {
-            background: linear-gradient(135deg, #1e7e34 0%, #1c9e75 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
-        }
-
-        .dropdown-menu-custom {
-            border-radius: 15px;
-            border: none;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-            z-index: 1000; /* Highest z-index to ensure visibility */
-            position: absolute;
-            margin-top: 5px;
-        }
-
-        .dropdown-item-custom {
-            padding: 12px 20px;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .dropdown-item-custom:hover {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        .nav-tabs-custom .nav-link:hover {
             color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-tabs-custom .nav-link.active {
+            color: white;
+            background: transparent;
+        }
+
+        .nav-tabs-custom .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: white;
+            border-radius: 3px;
+        }
+
+        .nav-tabs-custom .nav-link i {
+            margin-right: 8px;
+        }
+
+        .badge-tab {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 50px;
+            padding: 2px 8px;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+
+        .nav-tabs-custom .nav-link.active .badge-tab {
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .table-container {
@@ -248,12 +265,6 @@
             z-index: 0;
         }
 
-        /* Fix for dropdown positioning */
-        .dropdown-container {
-            position: relative;
-            display: inline-block;
-        }
-
         @media (max-width: 768px) {
             .card-body {
                 padding: 10px;
@@ -282,54 +293,62 @@
                 margin-bottom: 8px;
             }
 
-            .dropdown-container {
-                margin-top: 15px;
-                width: 100%;
+            .nav-tabs-custom .nav-link {
+                padding: 6px 12px;
+                font-size: 12px;
             }
 
-            .dropdown-custom {
-                width: 100%;
-                text-align: center;
+            .nav-tabs-custom .nav-link i {
+                margin-right: 4px;
             }
 
-            .dropdown-menu-custom {
-                width: 100%;
-                left: 0 !important;
-                right: 0 !important;
+            .badge-tab {
+                font-size: 9px;
+                padding: 1px 6px;
+                margin-left: 4px;
             }
         }
     </style>
 
     <div class="">
         <div class="glass-card">
-            <!-- Card Header with Dropdown -->
+            <!-- Card Header -->
             <div class="card-header-custom">
                 <div class="row align-items-center">
-                    <div class="col-md-8">
+                    <div class="col-md-6">
                         <h4 class="header-title text-white">
-                            <i class="fas fa-trash-alt me-2"></i> Deleted Teachers Accounts
+                            <i class="fas fa-trash-alt me-2"></i> Deleted Accounts
                         </h4>
-                        <p class="mb-0 text-white">Manage deleted teacher accounts and restore access</p>
+                        <p class="mb-0 text-white">Manage deleted accounts and restore access</p>
                     </div>
-                    <div class="col-md-4 text-end">
-                        <div class="dropdown-container">
-                            <div class="btn-group" role="group">
-                                <button id="btnGroupDrop1" type="button" class="dropdown-custom" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-archive me-2"></i> Deleted Accounts
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-custom" aria-labelledby="btnGroupDrop1">
-                                    <a href="{{route('Teachers.trashed')}}" class="dropdown-item dropdown-item-custom">
-                                        <i class="fas fa-chalkboard-teacher me-2"></i> Teachers
-                                    </a>
-                                    <a class="dropdown-item dropdown-item-custom" href="{{route('students.trash')}}">
-                                        <i class="fas fa-user-graduate me-2"></i> Students
-                                    </a>
-                                    <a class="dropdown-item dropdown-item-custom" href="{{route('staffs.trash')}}">
-                                        <i class="fas fa-user-tie me-2"></i> Other Staffs
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="col-md-6">
+                        <!-- Tabs Navigation -->
+                        <ul class="nav nav-tabs-custom justify-content-end" id="deletedAccountsTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link {{ request()->routeIs('Teachers.trashed') ? 'active' : '' }}"
+                                   href="{{ route('Teachers.trashed') }}"
+                                   role="tab">
+                                    <i class="fas fa-chalkboard-teacher"></i> Teachers
+                                    <span class="badge-tab">{{ $teachers->count() ?? 0 }}</span>
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link {{ request()->routeIs('students.trash') ? 'active' : '' }}"
+                                   href="{{ route('students.trash') }}"
+                                   role="tab">
+                                    <i class="fas fa-user-graduate"></i> Students
+                                    <span class="badge-tab">{{ $studentsCount ?? 0 }}</span>
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link {{ request()->routeIs('staffs.trash') ? 'active' : '' }}"
+                                   href="{{ route('staffs.trash') }}"
+                                   role="tab">
+                                    <i class="fas fa-user-tie"></i> Other Staffs
+                                    <span class="badge-tab">{{ $staffsCount ?? 0 }}</span>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
                 <i class="fas fa-user-slash floating-icons"></i>
@@ -353,17 +372,17 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($teachers as $teacher)
+                                @forelse ($teachers as $teacher)
                                     <tr>
-                                        <td>{{$loop->iteration}}</td>
+                                        <td>{{ $loop->iteration }}</td>
                                         <td>
                                             <div class="user-info">
                                                 <div class="user-avatar text-capitalize">
                                                     {{ ucwords(strtolower(substr($teacher->first_name, 0, 1))) }}{{ ucwords(strtolower(substr($teacher->last_name, 0, 1))) }}
                                                 </div>
                                                 <div>
-                                                    <div class="text-capitalize fw-bold">{{ucwords(strtolower($teacher->first_name. ' '. $teacher->last_name))}}</div>
-                                                    <small class="text-muted">ID: {{strtoupper($teacher->member_id)}}</small>
+                                                    <div class="text-capitalize fw-bold">{{ ucwords(strtolower($teacher->first_name . ' ' . $teacher->last_name)) }}</div>
+                                                    <small class="text-muted">ID: {{ strtoupper($teacher->member_id) }}</small>
                                                 </div>
                                             </div>
                                         </td>
@@ -373,12 +392,12 @@
                                             @elseif(strtolower($teacher->gender[0]) === 'f')
                                                 <span class="gender-badge female" title="Female">F</span>
                                             @else
-                                                <span class="gender-badge" title="Other">{{$teacher->gender[0]}}</span>
+                                                <span class="gender-badge" title="Other">{{ $teacher->gender[0] }}</span>
                                             @endif
                                         </td>
-                                        <td>{{$teacher->phone ?? 'N/A'}}</td>
-                                        <td>{{$teacher->email ?? 'N/A'}}</td>
-                                        <td>{{$teacher->joined ?? 'N/A'}}</td>
+                                        <td>{{ $teacher->phone ?? 'N/A' }}</td>
+                                        <td>{{ $teacher->email ?? 'N/A' }}</td>
+                                        <td>{{ $teacher->joined ?? 'N/A' }}</td>
                                         <td>
                                             @if ($teacher->status == 2)
                                                 <span class="badge-danger-custom">
@@ -388,42 +407,30 @@
                                         </td>
                                         <td class="text-center">
                                             <ul class="action-list">
-                                                @if ($teacher->status == 1)
-                                                    <li>
-                                                        <a href="{{route('Teachers.show.profile', ['teacher' => Hashids::encode($teacher->id)])}}"
-                                                           class="action-btn"
-                                                           title="View Profile">
-                                                            <i class="fas fa-eye"></i>
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <form action="{{route('update.teacher.status', ['teacher' => Hashids::encode($teacher->id)])}}"
-                                                              method="POST"
-                                                              class="d-inline">
-                                                            @csrf
-                                                            @method('PUT')
-                                                            <button type="submit" class="action-btn action-btn-danger" onclick="return confirm('Block', '{{$teacher->first_name}}', '{{$teacher->last_name}}')" title="Block Teacher">
-                                                                <i class="fas fa-ban"></i>
-                                                            </button>
-                                                        </form>
-                                                    </li>
-                                                @else
-                                                    <li>
-                                                        <form action="{{route('teachers.restore', ['teacher' => Hashids::encode($teacher->id)])}}"
-                                                              method="POST"
-                                                              class="d-inline">
-                                                            @csrf
-                                                            @method('PUT')
-                                                            <button type="submit" class="action-btn action-btn-success" onclick="return confirm('Restore', '{{$teacher->first_name}}', '{{$teacher->last_name}}')" title="Restore Teacher">
-                                                                <i class="fas fa-undo"></i>
-                                                            </button>
-                                                        </form>
-                                                    </li>
-                                                @endif
+                                                <li>
+                                                    <form action="{{ route('teachers.restore', ['teacher' => Hashids::encode($teacher->id)]) }}"
+                                                          method="POST"
+                                                          class="d-inline"
+                                                          onsubmit="return confirmRestore('{{ $teacher->first_name }}', '{{ $teacher->last_name }}')">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <button type="submit" class="action-btn action-btn-success" title="Restore Teacher">
+                                                            <i class="fas fa-undo"></i>
+                                                        </button>
+                                                    </form>
+                                                </li>
                                             </ul>
                                         </td>
                                     </tr>
-                                @endforeach
+                                @empty
+                                    <tr>
+                                        <td colspan="8" class="text-center py-5">
+                                            <i class="fas fa-trash-alt fa-3x text-muted mb-3 d-block"></i>
+                                            <h5 class="text-muted">No Deleted Teachers Found</h5>
+                                            <p class="text-muted">There are no deleted teacher accounts at the moment.</p>
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -434,19 +441,11 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Function to handle confirmation dialogs
-            window.confirmAction = function(action, firstName, lastName) {
+            // Function to handle restore confirmation dialogs
+            window.confirmRestore = function(firstName, lastName) {
                 const userName = `${firstName.toUpperCase()} ${lastName.toUpperCase()}`;
-                return confirm(`Are you sure you want to ${action} ${userName}?`);
+                return confirm(`Are you sure you want to RESTORE ${userName}?`);
             };
-
-            // Initialize dropdown functionality
-            $('.dropdown-toggle').dropdown();
-
-            // Ensure dropdown menu stays visible when clicked
-            $(document).on('click', '.dropdown-custom', function(e) {
-                e.stopPropagation();
-            });
         });
     </script>
 @endsection
