@@ -1,46 +1,48 @@
-<script src="{{ asset('assets/js/vendor/jquery-2.2.4.min.js') }}"></script>
+<!-- ============ JQUERY - Lazima iwe kwanza (MOJA TU) ============ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<!-- ============ BOOTSTRAP 5 (Badala ya mchanganyiko wa Bootstrap 4 & 5) ============ -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- jQuery lazima iwe ya kwanza -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<!-- Pakia Select2 CSS -->
+<!-- ============ SELECT2 ============ -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-<!-- Pakia Select2 JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-<!-- bootstrap 4 js -->
+
+<!-- ============ OTHER LIBRARIES ============ -->
 <script src="{{ asset('assets/js/popper.min.js') }}"></script>
-<script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
 <script src="{{ asset('assets/js/owl.carousel.min.js') }}"></script>
 <script src="{{ asset('assets/js/metisMenu.min.js') }}"></script>
 <script src="{{ asset('assets/js/jquery.slicknav.min.js') }}"></script>
-{{-- <script src="assets/js/jquery.slicknav.min.js"></script> --}}
 <script src="{{ asset('assets/js/jquery.slimscroll.min.js') }}"></script>
 
-<!-- start chart js -->
+<!-- ============ CHART LIBRARIES ============ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
-<!-- start highcharts js -->
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/modules/export-data.js"></script>
-<!-- start amcharts -->
+
+<!-- ============ AMCHARTS ============ -->
 <script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
 <script src="https://www.amcharts.com/lib/3/ammap.js"></script>
 <script src="https://www.amcharts.com/lib/3/maps/js/worldLow.js"></script>
 <script src="https://www.amcharts.com/lib/3/serial.js"></script>
 <script src="https://www.amcharts.com/lib/3/plugins/export/export.min.js"></script>
 <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
-<!-- all line chart activation -->
+
+<!-- ============ CHART ACTIVATIONS ============ -->
 <script src="{{ asset('assets/js/line-chart.js') }}"></script>
-<!-- all pie chart -->
 <script src="{{ asset('assets/js/pie-chart.js') }}"></script>
-<!-- all bar chart -->
 <script src="{{ asset('assets/js/bar-chart.js') }}"></script>
-<!-- all map chart -->
 <script src="{{ asset('assets/js/maps.js') }}"></script>
-<!-- others plugins -->
+
+<!-- ============ DATATABLES ============ -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+<!-- ============ OTHER PLUGINS ============ -->
 <script src="{{ asset('assets/js/plugins.js') }}"></script>
 <script src="{{ asset('assets/js/scripts.js') }}?v={{ time() }}"></script>
 
+<!-- ============ CUSTOM SCRIPTS ============ -->
 <script>
     function scrollToTopAndPrint() {
         window.scrollTo(0, 0);
@@ -49,15 +51,16 @@
         }, 1000);
     }
 </script>
+
 <script>
     $(document).ready(function() {
+        // Initialize DataTable
         var table = $('#myTable').DataTable({
             stateSave: true,
             columnDefs: [{
                 orderable: false,
                 targets: 0
             }],
-            // Safisha data zilizohifadhiwa kwenye state kabla ya kuinitialize
             stateLoadParams: function(settings, data) {
                 if (data.checkedRows) {
                     delete data.checkedRows;
@@ -65,7 +68,7 @@
             }
         });
 
-        // Object ya kuhifadhi rows zilizochaguliwa
+        // Object for selected rows
         var selectedRows = new Set();
 
         // Handle select all checkbox
@@ -73,28 +76,19 @@
             var isChecked = this.checked;
 
             if (isChecked) {
-                // Get ALL rows (including those not on current page)
-                table.rows({
-                    search: 'applied'
-                }).every(function() {
+                table.rows({ search: 'applied' }).every(function() {
                     var rowId = $(this.node()).find('input[name="student[]"]').val();
-                    selectedRows.add(rowId);
+                    if (rowId) selectedRows.add(rowId);
                 });
             } else {
-                // Clear all selections
                 selectedRows.clear();
             }
 
-            // Update checkboxes on current page
-            table.rows({
-                page: 'current'
-            }).every(function() {
+            table.rows({ page: 'current' }).every(function() {
                 var checkbox = $(this.node()).find('input[name="student[]"]');
                 var rowId = checkbox.val();
                 checkbox.prop('checked', isChecked);
-
-                // Update selectedRows set
-                if (isChecked) {
+                if (isChecked && rowId) {
                     selectedRows.add(rowId);
                 } else if (selectedRows.has(rowId)) {
                     selectedRows.delete(rowId);
@@ -120,146 +114,92 @@
             updateFormInputs();
         });
 
-        // Function to update selected count
         function updateSelectedCount() {
             $('#selectedCount').text(selectedRows.size + ' students selected');
         }
 
-        // Function to update hidden inputs in the form
         function updateFormInputs() {
-            // Clear existing hidden inputs
             $('#batchForm input[name="student[]"][type="hidden"]').remove();
-
-            // Add new hidden inputs for all selected rows
             selectedRows.forEach(function(studentId) {
                 $('#batchForm').append(
-                    $('<input>')
-                    .attr('type', 'hidden')
-                    .attr('name', 'student[]')
-                    .val(studentId)
+                    $('<input>').attr('type', 'hidden').attr('name', 'student[]').val(studentId)
                 );
             });
         }
 
-        // Update checkboxes when page changes
         table.on('draw', function() {
-            // Update checkboxes on current page based on selectedRows
-            table.rows({
-                page: 'current'
-            }).every(function() {
+            table.rows({ page: 'current' }).every(function() {
                 var checkbox = $(this.node()).find('input[name="student[]"]');
                 var rowId = checkbox.val();
                 checkbox.prop('checked', selectedRows.has(rowId));
             });
 
-            // Update selectAll checkbox state
-            var currentPageRows = table.rows({
-                page: 'current',
-                search: 'applied'
-            }).count();
-            var currentPageSelected = table.rows({
-                    page: 'current',
-                    search: 'applied'
-                })
+            var currentPageRows = table.rows({ page: 'current', search: 'applied' }).count();
+            var currentPageSelected = table.rows({ page: 'current', search: 'applied' })
                 .nodes().to$().find('input[name="student[]"]:checked').length;
 
-            $('#selectAll').prop('checked',
-                currentPageSelected === currentPageRows && currentPageRows > 0
-            );
-
+            $('#selectAll').prop('checked', currentPageSelected === currentPageRows && currentPageRows > 0);
             updateSelectedCount();
         });
 
-        // Handle form submission
         $('#batchForm').on('submit', function(e) {
             if (selectedRows.size === 0) {
                 e.preventDefault();
                 alert('Please select at least one student');
                 return false;
             }
-
-            // Confirm before submitting
             if (!confirm(`Are you sure you want to update ${selectedRows.size} student(s)?`)) {
                 e.preventDefault();
                 return false;
             }
-
-            // Update hidden inputs before submit
             updateFormInputs();
             return true;
         });
-        // Function to refresh CSRF token periodically
+
+        // CSRF Token refresh
         function refreshCsrfToken() {
             fetch('/csrf-token', {
-                    cache: 'no-store',
-                    headers: {
-                        'Cache-Control': 'no-cache, no-store, must-revalidate'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.token) {
-                        // Update meta tag
-                        let metaToken = document.querySelector('meta[name="csrf-token"]');
-                        if (metaToken) {
-                            metaToken.setAttribute('content', data.token);
-                        }
+                cache: 'no-store',
+                headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.token) {
+                    let metaToken = document.querySelector('meta[name="csrf-token"]');
+                    if (metaToken) metaToken.setAttribute('content', data.token);
 
-                        // Update all forms with _token input
-                        document.querySelectorAll('input[name="_token"]').forEach(input => {
-                            input.value = data.token;
-                        });
-
-                        // Update all forms with _token in hidden fields
-                        document.querySelectorAll('form').forEach(form => {
-                            let tokenInput = form.querySelector('input[name="_token"]');
-                            if (!tokenInput) {
-                                tokenInput = document.createElement('input');
-                                tokenInput.type = 'hidden';
-                                tokenInput.name = '_token';
-                                form.appendChild(tokenInput);
-                            }
-                            tokenInput.value = data.token;
-                        });
-                    }
-                })
-                .catch(error => console.log('CSRF refresh failed:', error));
+                    document.querySelectorAll('input[name="_token"]').forEach(input => {
+                        input.value = data.token;
+                    });
+                }
+            })
+            .catch(error => console.log('CSRF refresh failed:', error));
         }
 
-        // Refresh CSRF token every 4 minutes (before it expires)
         setInterval(refreshCsrfToken, 4 * 60 * 1000);
-
-        // Refresh on page load
         document.addEventListener('DOMContentLoaded', refreshCsrfToken);
 
-        // Clear caches on logout button click
+        // Clear caches on logout
         document.addEventListener('click', function(e) {
             if (e.target.closest('form[action*="logout"]') ||
                 e.target.closest('a[href*="logout"]') ||
-                (e.target.type === 'submit' && e.target.form && e.target.form.action.includes('logout'))
-            ) {
+                (e.target.type === 'submit' && e.target.form && e.target.form.action.includes('logout'))) {
 
                 e.preventDefault();
 
-                // Clear all caches
                 if ('caches' in window) {
                     caches.keys().then(function(names) {
-                        for (let name of names) {
-                            if (name.includes('shuleapp-cache') || name.includes(
-                                    'gatepass-tokens')) {
+                        names.forEach(name => {
+                            if (name.includes('shuleapp-cache') || name.includes('gatepass-tokens')) {
                                 caches.delete(name);
                             }
-                        }
+                        });
                     });
                 }
 
-                // Clear localStorage
                 localStorage.clear();
-
-                // Clear sessionStorage
                 sessionStorage.clear();
 
-                // Submit the form after a small delay
                 setTimeout(() => {
                     if (e.target.closest('form')) {
                         e.target.closest('form').submit();
@@ -269,7 +209,5 @@
                 }, 100);
             }
         });
-
     });
 </script>
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>

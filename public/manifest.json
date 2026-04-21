@@ -1,14 +1,22 @@
 {
-    "name": "ShuleApp",
+    "name": "ShuleApp - School Management System",
     "short_name": "ShuleApp",
-    "start_url": "/?source=pwa",
+    "description": "Digital platform for School Management System",
+    "start_url": "/?utm_source=pwa",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#2C3E50",
     "orientation": "portrait",
     "scope": "/",
     "lang": "sw",
+    "categories": ["education", "productivity"],
     "icons": [
+        {
+            "src": "/icons/new_icon1.png",
+            "sizes": "72x72",
+            "type": "image/png",
+            "purpose": "any"
+        },
         {
             "src": "/icons/new_icon2.png",
             "sizes": "192x192",
@@ -20,6 +28,17 @@
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
+        }
+    ],
+    "screenshots": [],
+    "prefer_related_applications": false,
+    "shortcuts": [
+        {
+            "name": "Dashboard",
+            "short_name": "Home",
+            "description": "Go to Dashboard",
+            "url": "/",
+            "icons": [{ "src": "/icons/new_icon2.png", "sizes": "192x192" }]
         }
     ]
 }

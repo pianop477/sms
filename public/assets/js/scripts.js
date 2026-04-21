@@ -1,4 +1,4 @@
-(function() {
+(function () {
     "use strict";
 
     /*================================
@@ -265,82 +265,384 @@
     });
 
     /*================================
-    PWA Service Worker + Update System
-    =================================*/
-    (function() {
-        if (!('serviceWorker' in navigator)) return;
+     PWA - Dual Banner System
+     Banner 1: Install App (Always visible if not installed)
+     Banner 2: Update Available (Only when update exists, can be ignored)
+ =================================*/
+    (function () {
+        // Check if running on Android
+        const isAndroid = /android/i.test(navigator.userAgent);
 
+        // Only run on Android devices
+        if (!isAndroid) {
+            console.log('PWA features only enabled on Android devices');
+            return;
+        }
+
+        if (!('serviceWorker' in navigator)) {
+            console.log('Service Worker not supported');
+            return;
+        }
+
+        let deferredPrompt;
         let refreshing = false;
+        let updateToast = null;
+        let installBanner = null;
 
+        /* =============================
+           BANNER 1: INSTALL APP (Always visible if not installed)
+        ============================= */
+        function showInstallBanner() {
+            // Don't show if already installed
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                console.log('App already installed, hiding install banner');
+                return;
+            }
+
+            // Don't show if banner already exists
+            if (document.getElementById('pwa-install-banner')) {
+                return;
+            }
+
+            // Check if user dismissed banner before (store in localStorage)
+            const bannerDismissed = localStorage.getItem('pwa_install_banner_dismissed');
+            if (bannerDismissed === 'true') {
+                console.log('User previously dismissed install banner');
+                return;
+            }
+
+            installBanner = document.createElement('div');
+            installBanner.id = 'pwa-install-banner';
+            installBanner.innerHTML = `
+            <div style="
+                background: linear-gradient(135deg, #4361ee, #3a0ca3);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 15px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                min-width: 280px;
+            ">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 28px;">📱</span>
+                    <div>
+                        <div style="font-weight: bold; font-size: 14px;">Install ShuleApp</div>
+                        <div style="font-size: 11px; opacity: 0.9;">Install for better experience</div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button id="pwa-install-btn" style="
+                        background: white;
+                        color: #4361ee;
+                        border: none;
+                        padding: 6px 16px;
+                        border-radius: 25px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        font-size: 12px;
+                    ">Install</button>
+                    <button id="pwa-dismiss-btn" style="
+                        background: transparent;
+                        color: white;
+                        border: 1px solid white;
+                        padding: 6px 12px;
+                        border-radius: 25px;
+                        cursor: pointer;
+                        font-size: 12px;
+                    ">Later</button>
+                </div>
+            </div>
+        `;
+
+            installBanner.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            animation: slideUp 0.3s ease-out;
+        `;
+
+            // Add animation styles
+            if (!document.getElementById('pwa-banner-styles')) {
+                const style = document.createElement('style');
+                style.id = 'pwa-banner-styles';
+                style.textContent = `
+                @keyframes slideUp {
+                    from {
+                        transform: translateX(-50%) translateY(100px);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(-50%) translateY(0);
+                        opacity: 1;
+                    }
+                }
+                @keyframes slideDown {
+                    from {
+                        transform: translateX(-50%) translateY(0);
+                        opacity: 1;
+                    }
+                    to {
+                        transform: translateX(-50%) translateY(100px);
+                        opacity: 0;
+                    }
+                }
+                @keyframes slideInRight {
+                    from {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+            `;
+                document.head.appendChild(style);
+            }
+
+            document.body.appendChild(installBanner);
+
+            // Install button handler
+            document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+                if (!deferredPrompt) {
+                    console.log('No install prompt available');
+                    return;
+                }
+
+                try {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`Install prompt outcome: ${outcome}`);
+
+                    if (outcome === 'accepted') {
+                        console.log('User accepted installation');
+                        hideInstallBanner();
+                    }
+                    deferredPrompt = null;
+                } catch (error) {
+                    console.error('Install prompt error:', error);
+                }
+            });
+
+            // Dismiss button handler
+            document.getElementById('pwa-dismiss-btn').addEventListener('click', () => {
+                hideInstallBanner();
+                // Store dismissal for 7 days
+                localStorage.setItem('pwa_install_banner_dismissed', 'true');
+                setTimeout(() => {
+                    localStorage.removeItem('pwa_install_banner_dismissed');
+                }, 7 * 24 * 60 * 60 * 1000); // 7 days
+            });
+        }
+
+        function hideInstallBanner() {
+            if (installBanner) {
+                installBanner.style.animation = 'slideDown 0.3s ease-out';
+                setTimeout(() => {
+                    if (installBanner && installBanner.remove) {
+                        installBanner.remove();
+                    }
+                }, 300);
+            }
+        }
+
+        /* =============================
+           BANNER 2: UPDATE AVAILABLE (Can be ignored)
+        ============================= */
+        function showUpdateBanner(worker) {
+            // Don't show if already showing
+            if (document.getElementById('pwa-update-banner')) {
+                return;
+            }
+
+            const updateBanner = document.createElement('div');
+            updateBanner.id = 'pwa-update-banner';
+            updateBanner.innerHTML = `
+            <div style="
+                background: #333;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 15px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                min-width: 280px;
+                border-left: 4px solid #4CAF50;
+            ">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 24px;">🔄</span>
+                    <div>
+                        <div style="font-weight: bold; font-size: 13px;">Update Available</div>
+                        <div style="font-size: 10px; opacity: 0.8;">New version ready to install</div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button id="pwa-update-btn" style="
+                        background: #4CAF50;
+                        color: white;
+                        border: none;
+                        padding: 6px 16px;
+                        border-radius: 25px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        font-size: 12px;
+                    ">Update</button>
+                    <button id="pwa-update-dismiss-btn" style="
+                        background: transparent;
+                        color: white;
+                        border: 1px solid #666;
+                        padding: 6px 12px;
+                        border-radius: 25px;
+                        cursor: pointer;
+                        font-size: 12px;
+                    ">Later</button>
+                </div>
+            </div>
+        `;
+
+            updateBanner.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10001;
+            animation: slideInRight 0.3s ease-out;
+        `;
+
+            document.body.appendChild(updateBanner);
+
+            // Update button handler
+            document.getElementById('pwa-update-btn').addEventListener('click', () => {
+                updateBanner.remove();
+                worker.postMessage({ type: 'SKIP_WAITING' });
+            });
+
+            // Dismiss button handler
+            document.getElementById('pwa-update-dismiss-btn').addEventListener('click', () => {
+                updateBanner.remove();
+                // Store that user dismissed this update version
+                localStorage.setItem('pwa_update_dismissed_' + APP_VERSION, 'true');
+            });
+
+            // Auto-hide after 30 seconds if not interacted
+            setTimeout(() => {
+                if (document.getElementById('pwa-update-banner')) {
+                    updateBanner.remove();
+                }
+            }, 30000);
+        }
+
+        /* =============================
+           REGISTER SERVICE WORKER
+        ============================= */
         window.addEventListener('load', async () => {
             try {
-                const reg = await navigator.serviceWorker.register('/service-worker.js?v=2026.04.10');
+                const reg = await navigator.serviceWorker.register('/service-worker.js?v=2026.04.21');
+                console.log('Service Worker registered:', reg.scope);
 
-                if (reg.waiting) showUpdateUI(reg.waiting);
+                // Check for waiting worker (update available)
+                if (reg.waiting) {
+                    const updateDismissed = localStorage.getItem('pwa_update_dismissed_' + APP_VERSION);
+                    if (!updateDismissed) {
+                        showUpdateBanner(reg.waiting);
+                    }
+                }
 
+                // Listen for new workers
                 reg.addEventListener('updatefound', () => {
                     const newWorker = reg.installing;
-                    if (newWorker) {
-                        newWorker.addEventListener('statechange', () => {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                showUpdateUI(newWorker);
+                    console.log('New Service Worker found');
+
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            console.log('Update available');
+                            const updateDismissed = localStorage.getItem('pwa_update_dismissed_' + APP_VERSION);
+                            if (!updateDismissed) {
+                                showUpdateBanner(newWorker);
                             }
-                        });
-                    }
+                        }
+                    });
                 });
 
-                /* 🔥 REGISTER BACKGROUND SYNC */
+                /* REGISTER BACKGROUND SYNC */
                 if ('sync' in reg) {
                     try {
                         await reg.sync.register('sync-tokens');
+                        console.log('Background sync registered');
                     } catch (e) {
                         console.log('Sync registration failed:', e);
                     }
                 }
 
-                /* 🔥 FORCE UPDATE CHECK */
-                setInterval(() => reg.update(), 60000);
+                /* CHECK FOR UPDATES every 30 minutes */
+                setInterval(() => reg.update(), 30 * 60 * 1000);
+
             } catch (error) {
                 console.error('Service worker registration failed:', error);
             }
         });
 
+        /* =============================
+           HANDLE CONTROLLER CHANGE
+        ============================= */
         navigator.serviceWorker.addEventListener('controllerchange', () => {
             if (refreshing) return;
             refreshing = true;
+            console.log('Controller changed, reloading...');
             window.location.reload();
         });
 
-        function showUpdateUI(worker) {
-            if (document.getElementById('update-toast')) return;
+        /* =============================
+           PWA INSTALL PROMPT
+        ============================= */
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('beforeinstallprompt event fired');
+            e.preventDefault();
+            deferredPrompt = e;
 
-            const toast = document.createElement('div');
-            toast.id = 'update-toast';
-            toast.innerHTML = `
-                <span>New update available</span>
-                <button id="update-app-btn">Update</button>
-            `;
-            toast.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                background: #333;
-                color: white;
-                padding: 12px 20px;
-                border-radius: 8px;
-                z-index: 9999;
-                display: flex;
-                gap: 15px;
-                align-items: center;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            `;
+            // Show install banner after a short delay
+            setTimeout(() => {
+                showInstallBanner();
+            }, 1000);
+        });
 
-            document.body.appendChild(toast);
+        /* =============================
+           CHECK IF ALREADY INSTALLED
+        ============================= */
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA was installed successfully');
+            hideInstallBanner();
+            deferredPrompt = null;
 
-            document.getElementById('update-app-btn').onclick = () => {
-                worker.postMessage({ type: 'SKIP_WAITING' });
-            };
+            // Show success message
+            if (typeof toastr !== 'undefined') {
+                toastr.success('ShuleApp installed successfully!');
+            }
+        });
+
+        /* =============================
+           HIDE INSTALL BANNER IF ALREADY INSTALLED
+        ============================= */
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            console.log('App is already installed (standalone mode)');
+            // Banner will not show
         }
+
+        /* =============================
+           RESET BANNER PREFERENCES (For testing)
+        ============================= */
+        window.resetPWA = function () {
+            localStorage.removeItem('pwa_install_banner_dismissed');
+            localStorage.removeItem('pwa_update_dismissed_' + APP_VERSION);
+            console.log('PWA preferences reset');
+            location.reload();
+        };
     })();
 
 })(); // Remove jQuery dependency

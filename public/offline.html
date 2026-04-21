@@ -2,47 +2,59 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShuleApp | Offline</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ShuleApp | Offline Mode</title>
+
     <!-- Single Font Awesome import -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <!-- Google Fonts for better typography -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --primary: #4361ee;
             --danger: #e63946;
+            --success: #4cc9f0;
             --light: #f8f9fa;
             --dark: #212529;
             --gray: #6c757d;
             --border-radius: 12px;
-            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             margin: 0;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--dark);
             text-align: center;
             line-height: 1.6;
+            padding: 20px;
         }
 
         .offline-container {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.98);
             padding: 40px;
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
             max-width: 90%;
-            width: 450px;
+            width: 500px;
             transform: translateY(0);
-            animation: fadeInUp 0.5s ease;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            animation: fadeInUp 0.6s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
         }
 
         .offline-icon {
@@ -67,45 +79,51 @@
 
         .connection-status {
             display: inline-block;
-            padding: 8px 15px;
-            background-color: rgba(230, 57, 70, 0.1);
+            padding: 8px 18px;
+            background: linear-gradient(135deg, rgba(230, 57, 70, 0.1), rgba(230, 57, 70, 0.05));
             color: var(--danger);
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
             margin-bottom: 20px;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(230, 57, 70, 0.2);
         }
 
         .retry-btn {
-            background-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), #3a0ca3);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: var(--border-radius);
+            padding: 14px 32px;
+            border-radius: 50px;
             font-size: 1rem;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 6px rgba(67, 97, 238, 0.2);
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
         }
 
-        .retry-btn:hover {
-            background-color: #3a56d4;
+        .retry-btn:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(67, 97, 238, 0.25);
+            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
         }
 
-        .retry-btn i {
-            margin-right: 8px;
+        .retry-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
 
         .progress-container {
             width: 100%;
             height: 4px;
-            background: rgba(0, 0, 0, 0.05);
+            background: rgba(0, 0, 0, 0.08);
             border-radius: 2px;
             margin-top: 25px;
             overflow: hidden;
@@ -115,22 +133,25 @@
         .progress-bar {
             height: 100%;
             width: 0;
-            background: linear-gradient(90deg, var(--primary), #5a67d8);
+            background: linear-gradient(90deg, var(--primary), var(--success));
             transition: width 0.3s ease;
         }
 
         .tips {
             margin-top: 30px;
             text-align: left;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
             padding-top: 20px;
         }
 
         .tips h3 {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: var(--dark);
-            margin-bottom: 10px;
-            font-weight: 500;
+            margin-bottom: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .tips ul {
@@ -139,15 +160,51 @@
         }
 
         .tips li {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--gray);
             margin-bottom: 8px;
+        }
+
+        .tips li i {
+            color: var(--primary);
+            margin-right: 8px;
+            font-size: 0.75rem;
+        }
+
+        .saved-pages {
+            margin-top: 20px;
+            background: rgba(67, 97, 238, 0.05);
+            border-radius: 8px;
+            padding: 12px;
+            display: none;
+        }
+
+        .saved-pages.show {
+            display: block;
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        .saved-pages h4 {
+            font-size: 0.85rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .saved-pages ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .saved-pages li {
+            font-size: 0.8rem;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
@@ -156,20 +213,28 @@
         }
 
         @keyframes pulse {
-            0% {
+            0%, 100% {
                 transform: scale(1);
             }
             50% {
                 transform: scale(1.1);
             }
-            100% {
-                transform: scale(1);
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
             }
+        }
+
+        .fa-spinner {
+            animation: spin 1s linear infinite;
         }
 
         @media (max-width: 480px) {
             .offline-container {
                 padding: 30px 20px;
+                width: 95%;
             }
 
             h1 {
@@ -177,20 +242,44 @@
             }
 
             .offline-icon {
-                font-size: 4rem;
+                font-size: 3.5rem;
+            }
+
+            .retry-btn {
+                padding: 12px 24px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .offline-container {
+                background: rgba(33, 37, 41, 0.98);
+            }
+
+            h1, .tips h3 {
+                color: #f8f9fa;
+            }
+
+            p, .tips li {
+                color: #adb5bd;
+            }
+
+            .tips {
+                border-top-color: rgba(255, 255, 255, 0.1);
             }
         }
     </style>
 </head>
 <body>
     <div class="offline-container">
-        <div class="connection-status">
-            <i class="fas fa-circle" style="font-size: 0.5rem; vertical-align: middle; margin-right: 6px;"></i>
-            OFFLINE
+        <div class="connection-status" id="connectionStatus">
+            <i class="fas fa-circle" style="font-size: 0.5rem; vertical-align: middle; margin-right: 6px; color: #e63946;"></i>
+            OFFLINE MODE
         </div>
         <i class="fas fa-wifi-slash offline-icon"></i>
         <h1>No Internet Connection</h1>
-        <p>We can't connect to the internet right now. Please check your connection and try again.</p>
+        <p id="mainMessage">We can't connect to the internet right now. Please check your connection and try again.</p>
 
         <button class="retry-btn" id="retryBtn">
             <i class="fas fa-sync-alt"></i> Try Again
@@ -200,69 +289,237 @@
             <div class="progress-bar" id="progressBar"></div>
         </div>
 
+        <div class="saved-pages" id="savedPages">
+            <h4><i class="fas fa-save"></i> Saved Pages Available Offline:</h4>
+            <ul id="savedPagesList"></ul>
+        </div>
+
         <div class="tips">
-            <h3>Quick Fixes:</h3>
+            <h3><i class="fas fa-lightbulb"></i> Quick Fixes:</h3>
             <ul>
-                <li>Check your Wi-Fi or mobile data connection</li>
-                <li>Restart your router or modem</li>
-                <li>Disable any VPN or proxy services</li>
+                <li><i class="fas fa-wifi"></i> Check your Wi-Fi or mobile data connection</li>
+                <li><i class="fas fa-sync-alt"></i> Toggle Airplane mode on/off</li>
+                <li><i class="fas fa-router"></i> Restart your router or modem</li>
+                <li><i class="fas fa-shield-alt"></i> Disable any VPN or proxy services</li>
             </ul>
         </div>
     </div>
 
     <script>
-        // Store last visited URL
-        if (!navigator.onLine) {
-            sessionStorage.setItem('lastURL', document.referrer || window.location.href);
+        // Prevent any errors from affecting the page
+        window.addEventListener('error', function(e) {
+            console.warn('Caught error:', e.message);
+            e.preventDefault();
+            return true;
+        });
+
+        // Safe console log wrapper
+        const safeLog = function(msg) {
+            if (typeof console !== 'undefined' && console.log) {
+                console.log('[Offline Page]', msg);
+            }
+        };
+
+        safeLog('Offline page loaded');
+
+        // Store last visited URL safely
+        try {
+            if (!navigator.onLine) {
+                const lastUrl = document.referrer || window.location.origin;
+                sessionStorage.setItem('offline_lastURL', lastUrl);
+                safeLog('Stored last URL: ' + lastUrl);
+            }
+        } catch (e) {
+            safeLog('Could not store last URL: ' + e.message);
         }
 
-        // Check connection status
+        // Function to check and display saved pages
+        async function checkSavedPages() {
+            const savedPagesDiv = document.getElementById('savedPages');
+            const savedPagesList = document.getElementById('savedPagesList');
+
+            if (!savedPagesDiv || !savedPagesList) return;
+
+            try {
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    let savedUrls = [];
+
+                    for (const cacheName of cacheNames) {
+                        const cache = await caches.open(cacheName);
+                        const requests = await cache.keys();
+
+                        for (const request of requests) {
+                            const url = request.url;
+                            // Filter only important pages
+                            if (url.includes('/dashboard') ||
+                                url.includes('/students') ||
+                                url.includes('/home') ||
+                                url === window.location.origin + '/') {
+                                if (!savedUrls.includes(url)) {
+                                    savedUrls.push(url);
+                                }
+                            }
+                        }
+                    }
+
+                    if (savedUrls.length > 0) {
+                        savedPagesList.innerHTML = savedUrls.map(url =>
+                            `<li><i class="fas fa-file-alt"></i> ${url.replace(window.location.origin, '') || 'Home'}</li>`
+                        ).join('');
+                        savedPagesDiv.classList.add('show');
+                        safeLog('Found ' + savedUrls.length + ' saved pages');
+                    }
+                }
+            } catch (e) {
+                safeLog('Error checking saved pages: ' + e.message);
+            }
+        }
+
+        // Call after a short delay
+        setTimeout(checkSavedPages, 500);
+
+        // Check connection status with progress bar
+        let retryCount = 0;
+        const maxRetries = 3;
+
         function checkConnection() {
             const progressContainer = document.getElementById('progressContainer');
             const progressBar = document.getElementById('progressBar');
             const retryBtn = document.getElementById('retryBtn');
+            const connectionStatus = document.getElementById('connectionStatus');
+            const mainMessage = document.getElementById('mainMessage');
 
+            if (!progressContainer || !retryBtn) return;
+
+            retryCount++;
             retryBtn.disabled = true;
             progressContainer.style.display = 'block';
+
+            // Update status message
+            if (connectionStatus) {
+                connectionStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> CHECKING CONNECTION...';
+            }
+            if (mainMessage) {
+                mainMessage.innerHTML = 'Attempting to reconnect... Please wait.';
+            }
 
             // Animate progress bar
             let progress = 0;
             const interval = setInterval(() => {
-                progress += 5;
-                progressBar.style.width = `${progress}%`;
+                progress += 10;
+                if (progressBar) {
+                    progressBar.style.width = `${progress}%`;
+                }
 
                 if (progress >= 100) {
                     clearInterval(interval);
-                    if (navigator.onLine) {
-                        const lastURL = sessionStorage.getItem('lastURL');
-                        window.location.href = lastURL || window.location.origin;
-                    } else {
-                        progressContainer.style.display = 'none';
-                        retryBtn.disabled = false;
-                        progressBar.style.width = '0';
-                    }
+
+                    // Final connection check
+                    setTimeout(() => {
+                        if (navigator.onLine) {
+                            safeLog('Connection restored! Redirecting...');
+                            const lastURL = sessionStorage.getItem('offline_lastURL');
+                            const redirectUrl = lastURL || window.location.origin;
+                            window.location.href = redirectUrl;
+                        } else {
+                            // Still offline
+                            progressContainer.style.display = 'none';
+                            retryBtn.disabled = false;
+                            if (progressBar) progressBar.style.width = '0';
+                            if (connectionStatus) {
+                                connectionStatus.innerHTML = '<i class="fas fa-circle" style="color: #e63946;"></i> OFFLINE MODE';
+                            }
+                            if (mainMessage) {
+                                if (retryCount >= maxRetries) {
+                                    mainMessage.innerHTML = 'Still having trouble connecting. Please check your network settings and try again.';
+                                } else {
+                                    mainMessage.innerHTML = 'Unable to connect. Please check your internet connection and try again.';
+                                }
+                            }
+                            safeLog('Still offline after attempt ' + retryCount);
+                        }
+                    }, 500);
                 }
-            }, 100);
+            }, 150);
         }
 
-        // Manual retry button
-        document.getElementById('retryBtn').addEventListener('click', checkConnection);
+        // Manual retry button handler
+        const retryBtn = document.getElementById('retryBtn');
+        if (retryBtn) {
+            retryBtn.addEventListener('click', function() {
+                if (retryCount >= maxRetries) {
+                    // Reset retry count after showing message
+                    if (confirm('Still having trouble connecting?\n\nWould you like to try again or go to home page?')) {
+                        retryCount = 0;
+                        checkConnection();
+                    } else {
+                        window.location.href = window.location.origin;
+                    }
+                } else {
+                    checkConnection();
+                }
+            });
+        }
 
-        // Auto-check every 10 seconds
+        // Auto-check every 15 seconds (but only if not already checking)
+        let isChecking = false;
         setInterval(() => {
-            if (navigator.onLine) {
-                const lastURL = sessionStorage.getItem('lastURL');
+            if (navigator.onLine && !isChecking) {
+                safeLog('Connection detected, redirecting...');
+                const lastURL = sessionStorage.getItem('offline_lastURL');
                 window.location.href = lastURL || window.location.origin;
             }
-        }, 10000);
+        }, 15000);
 
         // Listen for online event
         window.addEventListener('online', () => {
-            const lastURL = sessionStorage.getItem('lastURL');
+            safeLog('Online event fired');
+            const lastURL = sessionStorage.getItem('offline_lastURL');
             setTimeout(() => {
                 window.location.href = lastURL || window.location.origin;
-            }, 1500);
+            }, 1000);
         });
+
+        // Listen for offline event
+        window.addEventListener('offline', () => {
+            safeLog('Offline event fired');
+            const connectionStatus = document.getElementById('connectionStatus');
+            if (connectionStatus) {
+                connectionStatus.innerHTML = '<i class="fas fa-circle" style="color: #e63946;"></i> OFFLINE MODE';
+            }
+        });
+
+        // Add keyboard shortcut (press 'r' to retry)
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'r' || e.key === 'R') {
+                if (!retryBtn.disabled) {
+                    e.preventDefault();
+                    retryBtn.click();
+                }
+            }
+        });
+
+        // Initial check after page load
+        setTimeout(() => {
+            if (navigator.onLine) {
+                safeLog('Already online, redirecting...');
+                const lastURL = sessionStorage.getItem('offline_lastURL');
+                window.location.href = lastURL || window.location.origin;
+            }
+        }, 1000);
+
+        // Fix for the error you mentioned - prevent any undefined access
+        // This catches the error from the main page trying to access undefined objects
+        if (typeof Object.defineProperty === 'function') {
+            try {
+                // Create a safe global object to prevent errors
+                window.recentTransactions = window.recentTransactions || [];
+                window.dashboardData = window.dashboardData || {};
+            } catch (e) {
+                safeLog('Error setting globals: ' + e.message);
+            }
+        }
     </script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-const APP_VERSION = '2026.04.10';
+const APP_VERSION = '2026.04.21';
 const CACHE_NAME = `shuleapp-cache-${APP_VERSION}`;
 const TOKEN_CACHE_NAME = 'gatepass-tokens-v1';
 
@@ -9,21 +9,24 @@ const STATIC_ASSETS = [
     '/',
     '/offline.html',
     '/manifest.json',
-    '/tokens/verify',
+    '/assets/css/bootstrap.min.css',
     '/assets/css/styles.css',
     '/assets/js/scripts.js',
     '/icons/new_icon1.png',
     '/icons/new_icon2.png',
     '/icons/new_icon3.png'
-].map(url => `${url}?v=${APP_VERSION}`);
+];
 
 /* =============================
    INSTALL
 ============================= */
 self.addEventListener('install', event => {
+    console.log('[SW] Installing new version:', APP_VERSION);
     self.skipWaiting();
     event.waitUntil(
-        caches.open(CACHE_NAME).then(cache => cache.addAll(STATIC_ASSETS))
+        caches.open(CACHE_NAME).then(cache => {
+            return cache.addAll(STATIC_ASSETS);
+        })
     );
 });
 
@@ -31,16 +34,21 @@ self.addEventListener('install', event => {
    ACTIVATE
 ============================= */
 self.addEventListener('activate', event => {
+    console.log('[SW] Activating new version:', APP_VERSION);
     event.waitUntil(
-        caches.keys().then(keys =>
-            Promise.all(
+        caches.keys().then(keys => {
+            return Promise.all(
                 keys.map(key => {
                     if (key !== CACHE_NAME && key !== TOKEN_CACHE_NAME) {
+                        console.log('[SW] Deleting old cache:', key);
                         return caches.delete(key);
                     }
                 })
-            )
-        ).then(() => self.clients.claim())
+            );
+        }).then(() => {
+            console.log('[SW] Claiming clients');
+            return self.clients.claim();
+        })
     );
 });
 
@@ -49,6 +57,7 @@ self.addEventListener('activate', event => {
 ============================= */
 self.addEventListener('message', event => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
+        console.log('[SW] Skipping waiting');
         self.skipWaiting();
     }
 });
@@ -59,7 +68,7 @@ self.addEventListener('message', event => {
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
 
-    /* 🔥 1. NEVER CACHE AUTH / OTP */
+    /* API REQUESTS - NEVER CACHE */
     if (
         url.pathname.startsWith('/api/') ||
         url.pathname.includes('login') ||
@@ -71,61 +80,70 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    /* 🔥 2. TOKEN VERIFY */
-    if (url.pathname === '/tokens/verify') {
-
-        // POST → verify token
-        if (event.request.method === 'POST') {
-            event.respondWith(handleTokenVerification(event.request));
-            return;
-        }
-
-        // GET → page offline support
-        if (event.request.method === 'GET') {
-            event.respondWith(
-                fetch(event.request)
-                    .then(res => {
-                        const clone = res.clone();
-                        caches.open(CACHE_NAME).then(cache => {
-                            cache.put('/tokens/verify?v=' + APP_VERSION, clone);
-                        });
-                        return res;
-                    })
-                    .catch(() =>
-                        caches.match('/tokens/verify?v=' + APP_VERSION)
-                    )
-            );
-            return;
-        }
+    /* MANIFEST.JSON */
+    if (url.pathname === '/manifest.json') {
+        event.respondWith(
+            fetch(event.request)
+                .then(res => {
+                    const clone = res.clone();
+                    caches.open(CACHE_NAME).then(cache => {
+                        cache.put(event.request, clone);
+                    });
+                    return res;
+                })
+                .catch(() => caches.match(event.request))
+        );
+        return;
     }
 
-    /* 🔥 3. STATIC FILES */
+    /* STATIC ASSETS */
     if (
         url.pathname.startsWith('/assets/') ||
-        url.pathname.startsWith('/icons/')
+        url.pathname.startsWith('/icons/') ||
+        url.pathname.match(/\.(css|js|png|jpg|jpeg|svg|ico)$/i)
     ) {
         event.respondWith(
             caches.match(event.request).then(cached => {
                 const fetchPromise = fetch(event.request)
                     .then(res => {
-                        const clone = res.clone();
-                        caches.open(CACHE_NAME).then(cache => {
-                            cache.put(event.request, clone);
-                        });
+                        if (res && res.status === 200) {
+                            const clone = res.clone();
+                            caches.open(CACHE_NAME).then(cache => {
+                                cache.put(event.request, clone);
+                            });
+                        }
                         return res;
                     })
                     .catch(() => cached);
-
                 return cached || fetchPromise;
             })
         );
         return;
     }
 
-    /* 🔥 4. HTML */
+    /* TOKEN VERIFICATION */
+    if (url.pathname === '/tokens/verify') {
+        if (event.request.method === 'POST') {
+            event.respondWith(handleTokenVerification(event.request));
+            return;
+        }
+    }
+
+    /* HTML PAGES - Network first with offline fallback */
     event.respondWith(
         fetch(event.request)
-            .catch(() => caches.match('/offline.html?v=' + APP_VERSION))
+            .then(res => {
+                if (res && res.status === 200) {
+                    const clone = res.clone();
+                    caches.open(CACHE_NAME).then(cache => {
+                        cache.put(event.request, clone);
+                    });
+                }
+                return res;
+            })
+            .catch(() => {
+                return caches.match('/offline.html');
+            })
     );
 });
 
@@ -135,29 +153,23 @@ self.addEventListener('fetch', event => {
 async function handleTokenVerification(request) {
     try {
         const response = await fetch(request.clone());
-
         if (response.ok) {
             const data = await response.clone().json();
-
             if (data.success) {
                 await storeTokenInCache(data.data);
             }
-
             return response;
         }
-
         throw new Error('Network failed');
     } catch (error) {
-
         const requestData = await request.clone().json();
         const tokenCode = requestData.token;
-
         const cachedToken = await getTokenFromCache(tokenCode);
 
         if (cachedToken) {
             return new Response(JSON.stringify({
                 success: true,
-                message: 'Token sahihi (Offline)',
+                message: 'Token valid (Offline Mode)',
                 data: cachedToken,
                 offline: true
             }), {
@@ -167,7 +179,7 @@ async function handleTokenVerification(request) {
 
         return new Response(JSON.stringify({
             success: false,
-            message: 'Token si sahihi au imeexpire'
+            message: 'Token invalid or expired'
         }), {
             status: 400,
             headers: { 'Content-Type': 'application/json' }
@@ -175,59 +187,39 @@ async function handleTokenVerification(request) {
     }
 }
 
-/* =============================
-   STORE TOKEN
-============================= */
 async function storeTokenInCache(tokenData) {
     const cache = await caches.open(TOKEN_CACHE_NAME);
-
     const key = `token_${tokenData.token.token}`;
-
     const payload = {
         token: tokenData.token,
         student: tokenData.student,
         installment: tokenData.installment,
         cached_at: new Date().toISOString()
     };
-
     await cache.put(key, new Response(JSON.stringify(payload)));
-
     await cleanOldTokens();
 }
 
-/* =============================
-   GET TOKEN
-============================= */
 async function getTokenFromCache(code) {
     const cache = await caches.open(TOKEN_CACHE_NAME);
     const res = await cache.match(`token_${code}`);
-
     if (!res) return null;
-
     const data = await res.json();
     const expires = new Date(data.token.expires_at);
-
     if (expires > new Date()) {
         return data;
     }
-
     await cache.delete(`token_${code}`);
     return null;
 }
 
-/* =============================
-   CLEAN TOKENS
-============================= */
 async function cleanOldTokens() {
     const cache = await caches.open(TOKEN_CACHE_NAME);
     const keys = await cache.keys();
-
     const now = new Date();
-
     for (const req of keys) {
         const res = await cache.match(req);
         const data = await res.json();
-
         if (new Date(data.token.expires_at) < now) {
             await cache.delete(req);
         }
@@ -235,10 +227,11 @@ async function cleanOldTokens() {
 }
 
 /* =============================
-   🔥 BACKGROUND SYNC
+   BACKGROUND SYNC
 ============================= */
 self.addEventListener('sync', event => {
     if (event.tag === 'sync-tokens') {
+        console.log('[SW] Background sync triggered');
         event.waitUntil(syncTokens());
     }
 });
@@ -252,24 +245,19 @@ async function syncTokens() {
             const res = await cache.match(req);
             const data = await res.json();
 
-            // 🔥 re-validate token with server
             const response = await fetch('/tokens/verify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    token: data.token.token
-                })
+                body: JSON.stringify({ token: data.token.token })
             });
 
             const result = await response.json();
-
             if (!result.success) {
                 await cache.delete(req);
             }
         }
-
         console.log('[SW] Tokens synced successfully');
     } catch (e) {
-        console.error('[SW] Sync failed', e);
+        console.error('[SW] Sync failed:', e);
     }
 }
