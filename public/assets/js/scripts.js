@@ -330,7 +330,6 @@
                     <span style="font-size: 28px;">📱</span>
                     <div>
                         <div style="font-weight: bold; font-size: 14px;">Install ShuleApp</div>
-                        <div style="font-size: 11px; opacity: 0.9;">Install for better experience</div>
                     </div>
                 </div>
                 <div style="display: flex; gap: 8px;">
